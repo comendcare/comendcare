@@ -6,15 +6,17 @@ import {Tab} from '@headlessui/react'
 import clsx from 'clsx'
 
 import {Container} from '@/components/Container'
-import screenshotContacts from '@/images/screenshots/contacts.png'
-import screenshotInventory from '@/images/screenshots/inventory.png'
-import screenshotProfitLoss from '@/images/screenshots/profit-loss.png'
+import screenshotProduct1 from '@/images/screenshots/rareheros.png'
+import screenshotProduct2 from '@/images/screenshots/product2.png'
+import screenshotProduct3 from '@/images/screenshots/librarey.png'
+import Link from "next/link"
 
 interface Feature {
     name: React.ReactNode
     summary: string
     description: string
     image: ImageProps['src']
+    link: string
     icon: React.ComponentType
 }
 
@@ -24,7 +26,8 @@ const features: Array<Feature> = [
         summary: 'A free tool to search and filter for rare disease resources.',
         description:
             'Find advocacy groups, financial support, accessible summer camps, and everything in between. Resources curated by and for the community.',
-        image: screenshotProfitLoss,
+        image: screenshotProduct3,
+        link: "https://librarey.com/",
         icon: function ReportingIcon() {
             let id = useId()
             return (
@@ -59,7 +62,8 @@ const features: Array<Feature> = [
             'A platform for patient groups to organize and mobilize research.',
         description:
             'Gather real-world evidence, manage research, and create content for your patient community. Take your first steps on the path to new treatments.',
-        image: screenshotInventory,
+        image: screenshotProduct2,
+        link: "https://livery.vercel.app/",
         icon: function InventoryIcon() {
             return (
                 <>
@@ -87,7 +91,8 @@ const features: Array<Feature> = [
             'The most technologically advanced patient registry',
         description:
             'Every datapoint is protected by dynamic consent. Every user has their own database. Every registry is its own legal entity.',
-        image: screenshotContacts,
+        image: screenshotProduct1,
+        link: "https://rareheros.com/",
         icon: function ContactsIcon() {
             return (
                 <>
@@ -141,7 +146,15 @@ function Feature({
             <p className="mt-2 font-display text-xl text-slate-900">
                 {feature.summary}
             </p>
-            <p className="mt-4 text-sm text-slate-600">{feature.description}</p>
+            <p className="mt-4 text-sm text-slate-600">
+                {feature.description}
+            </p>
+            <Link
+                className="mt-4 text-sm font-bold underline text-blue-600"
+                href={feature.link}
+            >
+                Try now
+            </Link>
         </div>
     )
 }
@@ -228,11 +241,11 @@ function FeaturesDesktop() {
     )
 }
 
-export function SecondaryFeatures() {
+export function ProductSuite() {
     return (
         <section
-            id="secondary-features"
-            aria-label="Features for simplifying everyday business tasks"
+            id="products"
+            aria-label="Products for simplifying everyday business tasks"
             className="pb-14 pt-20 sm:pb-20 sm:pt-32 lg:pb-32"
         >
             <Container>
