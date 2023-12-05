@@ -6,7 +6,7 @@ import {type Metadata} from 'next'
 
 export const metadata: Metadata = {
     title: {
-        template: '%s - TaxPal',
+        template: '%s - Comend',
         default: 'Comend - Tools for research ready patient groups.',
     },
     description:
