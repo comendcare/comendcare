@@ -27,7 +27,7 @@ export function Footer() {
                     className="flex flex-col items-center border-t border-slate-400/10 py-10 sm:flex-row-reverse sm:justify-between">
                     <div className="flex gap-x-6">
                         <Link
-                            href="https://github.com"
+                            href="https://www.facebook.com/comendcare"
                             className="group"
                             aria-label="Comend on Facebook"
                         >
@@ -37,7 +37,7 @@ export function Footer() {
                             />
                         </Link>
                         <Link
-                            href="https://github.com"
+                            href="https://www.instagram.com/comendcare/"
                             className="group"
                             aria-label="Comend on Instagram"
                         >
@@ -47,7 +47,7 @@ export function Footer() {
                             />
                         </Link>
                         <Link
-                            href="https://github.com"
+                            href="https://www.linkedin.com/company/comend"
                             className="group"
                             aria-label="Comend on LinkedIn"
                         >
@@ -57,9 +57,9 @@ export function Footer() {
                             />
                         </Link>
                         <Link
-                            href="https://twitter.com"
+                            href="https://twitter.com/comendcare"
                             className="group"
-                            aria-label="TaxPal on Twitter"
+                            aria-label="Comend on Twitter"
                         >
                             <FaTwitter
                                 aria-hidden="true"
