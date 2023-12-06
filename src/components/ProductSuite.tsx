@@ -23,9 +23,9 @@ interface Feature {
 const features: Array<Feature> = [
     {
         name: 'Librarey',
-        summary: 'A free tool to search and filter for rare disease resources.',
+        summary: 'Helping families discover resources they need but didn’t know existed.',
         description:
-            'Find advocacy groups, financial support, accessible summer camps, and everything in between. Resources curated by and for the community.',
+            'A free platform to search, save, share, and contribute to resources ranging from financial support to accessibility products.',
         image: screenshotProduct3,
         link: "https://librarey.com/",
         icon: function ReportingIcon() {
@@ -59,9 +59,9 @@ const features: Array<Feature> = [
     {
         name: 'Product 2',
         summary:
-            'A platform for patient groups to organize and mobilize research.',
+            'Making academic science accessible to families, donors, and industry.',
         description:
-            'Gather real-world evidence, manage research, and create content for your patient community. Take your first steps on the path to new treatments.',
+            'An AI-powered scientific communicator that translates academic text into helpful content for families and other stakeholders.',
         image: screenshotProduct2,
         link: "https://livery.vercel.app/",
         icon: function InventoryIcon() {
@@ -86,11 +86,11 @@ const features: Array<Feature> = [
         },
     },
     {
-        name: 'Rareheros',
+        name: 'Coming soon...',
         summary:
-            'The most technologically advanced patient registry',
+            'Patient-led data management and collaboration.',
         description:
-            'Every datapoint is protected by dynamic consent. Every user has their own database. Every registry is its own legal entity.',
+            'A self-governing platform for aggregating and sharing patient data where you own the commercial value you create.',
         image: screenshotProduct1,
         link: "https://rareheros.com/",
         icon: function ContactsIcon() {
@@ -153,7 +153,7 @@ function Feature({
                 className="mt-4 text-sm font-bold underline text-blue-600"
                 href={feature.link}
             >
-                Try now
+                Learn more
             </Link>
         </div>
     )
@@ -254,7 +254,7 @@ export function ProductSuite() {
                         End-to-end products
                     </h2>
                     <p className="mt-4 text-lg tracking-tight text-slate-700">
-                        We can help you get started no matter the stage of your patient group.
+                        {`We're working with the community to build tools that support your patient group from kitchen table to clinical trials`}
                     </p>
                 </div>
                 <FeaturesMobile/>
