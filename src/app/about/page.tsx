@@ -9,14 +9,14 @@ const people = [
         role: 'Co-founder and CEO',
         imageUrl:
             Flawnson,
-        bio: 'Quia illum aut in beatae. Possimus dolores aliquid accusantium aut in ut non assumenda. Enim iusto molestias aut deleniti eos aliquid magnam molestiae. At et non possimus ab. Magni labore molestiae nulla qui.',
+        bio: 'I went to school for biomedical engineering, have worked with deep tech startups and in life sciences research, and spent a past life volunteering with kids. On the weekend, I try to catch up with the happenings in genomics.',
     },
     {
         name: 'Flawnson Tong',
         role: 'Co-founder and CTO',
         imageUrl:
             Flawnson,
-        bio: 'Quia illum aut in beatae. Possimus dolores aliquid accusantium aut in ut non assumenda. Enim iusto molestias aut deleniti eos aliquid magnam molestiae. At et non possimus ab. Magni labore molestiae nulla qui.',
+        bio: 'Hi there! I’m the guy behind the screen building what you see here. My background is in machine learning engineering and these days I do a lot of full stack development. I love playing piano, travelling, and working out.',
     },
     {
         name: 'Sierra Phillips',
@@ -61,7 +61,6 @@ const timeline = [
 export default function About() {
     return (
         <>
-            <Header/>
             <main>
                 <div className="mx-auto max-w-7xl px-6 py-32 sm:py-20 lg:px-8">
                     <div className="mx-auto max-w-2xl lg:mx-0 lg:grid lg:max-w-none lg:grid-cols-2 lg:gap-x-16 lg:gap-y-6 xl:grid-cols-1 xl:grid-rows-1 xl:gap-x-8">

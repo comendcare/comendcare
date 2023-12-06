@@ -87,7 +87,7 @@ function MobileNavigation() {
                     >
                         <MobileNavLink href="#products">Products</MobileNavLink>
                         <MobileNavLink href="/about">About</MobileNavLink>
-                        <MobileNavLink href="mailto:corporate@comendcare.com?cc=flawnson@comendcare.com, albert@comendcare.com&subject=Hello%20Comend">Contact</MobileNavLink>
+                        <MobileNavLink href="/contact">Contact</MobileNavLink>
                         {/*<hr className="m-2 border-slate-300/40"/>*/}
                         {/*<MobileNavLink href="/login">Sign in</MobileNavLink>*/}
                     </Popover.Panel>
@@ -109,7 +109,7 @@ export function Header() {
                         <div className="hidden md:flex md:gap-x-6">
                             <NavLink href="#products">Products</NavLink>
                             <NavLink href="/about">About</NavLink>
-                            <NavLink href="mailto:corporate@comendcare.com?cc=flawnson@comendcare.com, albert@comendcare.com&subject=Hello%20Comend">Contact</NavLink>
+                            <NavLink href="/contact">Contact</NavLink>
                         </div>
                     </div>
                     <div className="flex items-center gap-x-5 md:gap-x-8">
