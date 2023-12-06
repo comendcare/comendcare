@@ -27,25 +27,15 @@ export function Hero() {
                     <span className="relative"> research ready.</span>
                 </span>
             </h1>
+
             <p className="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-slate-700">
-                New treatments in rare diseases relies on the work of patient families. From growing your organization and educating stakeholders to advancing research, we’re building the tools to help.
+                {`Advances in rare disease treatments rely on the work of patient groups. From growing organizations and educating stakeholders to driving research, we’re building the tools to help.`}
             </p>
+
             <div className="mt-10 flex justify-center gap-x-6">
-                <Button href="/register">Get 6 months free</Button>
-                <Button
-                    href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                    variant="outline"
-                >
-                    <svg
-                        aria-hidden="true"
-                        className="h-3 w-3 flex-none fill-blue-600 group-active:fill-current"
-                    >
-                        <path
-                            d="m9.997 6.91-7.583 3.447A1 1 0 0 1 1 9.447V2.553a1 1 0 0 1 1.414-.91L9.997 5.09c.782.355.782 1.465 0 1.82Z"/>
-                    </svg>
-                    <span className="ml-3">Watch video</span>
-                </Button>
+                <Button href="/register">Get in touch</Button>
             </div>
+
             <div className="mt-36 lg:mt-44">
                 <p className="font-display text-base text-slate-900">
                     Trusted by these six companies so far
@@ -81,6 +71,7 @@ export function Hero() {
                     ))}
                 </ul>
             </div>
+
         </Container>
     )
 }

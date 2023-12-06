@@ -1,12 +1,5 @@
-import {CallToAction} from '@/components/CallToAction'
-import {Faqs} from '@/components/Faqs'
 import {Footer} from '@/components/Footer'
 import {Header} from '@/components/Header'
-import {Hero} from '@/components/Hero'
-import {Pricing} from '@/components/Pricing'
-import {PrimaryFeatures} from '@/components/PrimaryFeatures'
-import {ProductSuite} from '@/components/ProductSuite'
-import {Testimonials} from '@/components/Testimonials'
 import Flawnson from "@/images/profiles/Flawnson.jpg"
 import Sierra from "@/images/profiles/Sierra.jpeg"
 
@@ -36,36 +29,36 @@ const people = [
 
 const timeline = [
     {
-        name: 'Founded company',
+        name: 'Comend is founded',
         description:
-            'Nihil aut nam. Dignissimos a pariatur et quos omnis. Aspernatur asperiores et dolorem dolorem optio voluptate repudiandae.',
-        date: 'Aug 2021',
-        dateTime: '2021-08',
+            'We re-united to fix broken areas of healthcare after working in drug development and biomedical engineering.',
+        date: 'Jan 2023',
+        dateTime: '2023-01',
     },
     {
-        name: 'Secured $65m in funding',
+        name: 'First investment',
         description:
-            'Provident quia ut esse. Vero vel eos repudiandae aspernatur. Cumque minima impedit sapiente a architecto nihil.',
-        date: 'Dec 2021',
-        dateTime: '2021-12',
+            'We received investment from Character Labs to build solutions for rare families. We met Sierra in one of our early user tests.',
+        date: 'Apr 2023',
+        dateTime: '2023-04',
     },
     {
-        name: 'Released beta',
+        name: 'Launched Librarey',
         description:
-            'Sunt perspiciatis incidunt. Non necessitatibus aliquid. Consequatur ut officiis earum eum quia facilis. Hic deleniti dolorem quia et.',
-        date: 'Feb 2022',
-        dateTime: '2022-02',
+            `With Sierra's help, we launched a free search platform for rare resources and attended rare disease conferences to gather feedback.` ,
+        date: 'Sep 2023',
+        dateTime: '2023-09',
     },
     {
-        name: 'Global launch of product',
+        name: 'Launching 2 products',
         description:
-            'Ut ipsa sint distinctio quod itaque nam qui. Possimus aut unde id architecto voluptatem hic aut pariatur velit.',
-        date: 'Dec 2022',
-        dateTime: '2022-12',
+            `We're currently working with several patient groups to build a new scientific communicator and patient data platform.`,
+        date: 'Jan 2024',
+        dateTime: '2024-01',
     },
 ]
 
-export default function Home() {
+export default function About() {
     return (
         <>
             <Header/>
@@ -73,13 +66,12 @@ export default function Home() {
                 <div className="mx-auto max-w-7xl px-6 py-32 sm:py-20 lg:px-8">
                     <div className="mx-auto max-w-2xl lg:mx-0 lg:grid lg:max-w-none lg:grid-cols-2 lg:gap-x-16 lg:gap-y-6 xl:grid-cols-1 xl:grid-rows-1 xl:gap-x-8">
                         <h1 className="max-w-2xl text-4xl font-display font-medium tracking-tight text-gray-900 sm:text-6xl lg:col-span-2 xl:col-auto">
-                            We’re a passionate group of people working from around the world to build the future of ecommerce.
+                            We’re a passionate group working to empower a patient-led future for research and development.
                         </h1>
                         <div className="mt-6 max-w-xl lg:mt-0 xl:col-end-1 xl:row-start-1">
                             <p className="text-lg leading-8 text-gray-600">
-                                Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo. Elit sunt
-                                amet fugiat veniam occaecat fugiat aliqua. Anim aute id magna aliqua ad ad non deserunt sunt. Qui
-                                irure qui lorem cupidatat commodo.
+                                We’re a team of tech enthusiasts and advocates who see that institutions lack incentives to build infrastructure for rare diseases.
+                                We believe the way to foster new treatments is to amplify the grassroots work of patient groups who fight for what patients need.
                             </p>
                         </div>
                         <img
@@ -118,10 +110,9 @@ export default function Home() {
                 <div className="bg-white py-24 sm:py-32">
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="mx-auto max-w-2xl sm:text-center">
-                            <h2 className="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">Meet our leadership</h2>
+                            <h2 className="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">Meet the team</h2>
                             <p className="mt-6 text-lg leading-8 text-gray-600">
-                                We’re a dynamic group of individuals who are passionate about what we do and dedicated to delivering the
-                                best results for our clients.
+                                {`Want to chat or collaborate? We're all ears! Contact us.`}
                             </p>
                         </div>
                         <ul
