@@ -1,14 +1,17 @@
 import {Footer} from '@/components/Footer'
 import {Header} from '@/components/Header'
+import Albert from "@/images/profiles/Albert.jpeg"
 import Flawnson from "@/images/profiles/Flawnson.jpg"
 import Sierra from "@/images/profiles/Sierra.jpeg"
+import Team from "@/images/profiles/comend-team.jpeg"
+import Link from "next/link"
 
 const people = [
     {
         name: 'Albert Wang',
         role: 'Co-founder and CEO',
         imageUrl:
-            Flawnson,
+            Albert,
         bio: 'I went to school for biomedical engineering, have worked with deep tech startups and in life sciences research, and spent a past life volunteering with kids. On the weekend, I try to catch up with the happenings in genomics.',
     },
     {
@@ -23,7 +26,7 @@ const people = [
         role: 'Advisor',
         imageUrl:
             Sierra,
-        bio: 'Quia illum aut in beatae. Possimus dolores aliquid accusantium aut in ut non assumenda. Enim iusto molestias aut deleniti eos aliquid magnam molestiae. At et non possimus ab. Magni labore molestiae nulla qui.',
+        bio: 'Hello! I\'m a twin mom, rare mom, heart mom, genetics enthusiast, and relentless advocate on a mission to to curate the most comprehensive freely-available disability resource database.',
     },
 ]
 
@@ -74,8 +77,8 @@ export default function About() {
                             </p>
                         </div>
                         <img
-                            src="https://images.unsplash.com/photo-1567532900872-f4e906cbf06a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1280&q=80"
-                            alt=""
+                            src={Team.src}
+                            alt="The Comend team"
                             className="aspect-[6/5] w-full max-w-lg rounded-2xl object-cover lg:max-w-none xl:row-span-2 xl:row-end-2"
                         />
                     </div>
@@ -111,7 +114,13 @@ export default function About() {
                         <div className="mx-auto max-w-2xl sm:text-center">
                             <h2 className="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">Meet the team</h2>
                             <p className="mt-6 text-lg leading-8 text-gray-600">
-                                {`Want to chat or collaborate? We're all ears! Contact us.`}
+                                {`Want to chat or collaborate? We're all ears! `}
+                                <Link
+                                    href="/contact"
+                                    className="mt-4 underline font-semibold text-blue-600"
+                                >
+                                    Contact us.
+                                </Link>
                             </p>
                         </div>
                         <ul
