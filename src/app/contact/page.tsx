@@ -3,6 +3,7 @@
 import {useState} from 'react'
 import { InlineWidget } from "react-calendly"
 import {Switch} from '@headlessui/react'
+import Link from "next/link";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
@@ -18,7 +19,15 @@ export default function Contact() {
                     Get in touch
                 </h2>
                 <p className="mt-2 text-lg leading-8 text-gray-600">
-                    Say hello, learn about our tools, or explore ways to work together.
+                    {`Say hello, learn about our tools, or explore ways to work together.
+                    Book a meeting below or `}
+                    <Link
+                        className="mt-4 underline font-semibold text-blue-600"
+                        href="mailto:corporate@comendcare.com?cc=flawnson@comendcare.com, albert@comendcare.com&subject=Hello%20Comend"
+                    >
+                        {`email us`}
+                    </Link>
+                    .
                 </p>
             </div>
 
