@@ -6,10 +6,17 @@ import {Tab} from '@headlessui/react'
 import clsx from 'clsx'
 
 import {Container} from '@/components/Container'
+import {
+    FaBook,
+    FaMicroscope,
+    FaRocket,
+} from "react-icons/fa6";
 import screenshotProduct1 from '@/images/screenshots/rareheros.png'
-import screenshotProduct2 from '@/images/screenshots/product2.png'
+import screenshotProduct2 from '@/images/screenshots/scimantic.png'
 import screenshotProduct3 from '@/images/screenshots/librarey.png'
-import librarey from '@/images/logos/Librarey Logo - Small.png'
+import screenshotProduct1Small from '@/images/screenshots/rareheros-small.png'
+import screenshotProduct2Small from '@/images/screenshots/scimantic-small.png'
+import screenshotProduct3Small from '@/images/screenshots/librarey-small.png'
 import Link from "next/link"
 
 interface Feature {
@@ -17,6 +24,7 @@ interface Feature {
     summary: string
     description: string
     image: ImageProps['src']
+    smallImage: ImageProps['src']
     link: string
     icon: React.ComponentType
 }
@@ -28,14 +36,12 @@ const features: Array<Feature> = [
         description:
             'A free platform to search, save, share, and contribute to resources ranging from financial support to accessibility products.',
         image: screenshotProduct3,
+        smallImage: screenshotProduct3Small,
         link: "https://librarey.com/",
         icon: function LibrareyIcon() {
             let id = useId()
             return (
-                <img
-                    src={librarey.src}
-                    className="scale-90"
-                />
+                <FaBook className="h-5 w-5 text-white"/>
             )
         },
     },
@@ -46,13 +52,11 @@ const features: Array<Feature> = [
         description:
             'An AI-powered scientific communicator that translates academic text into helpful content for families and other stakeholders.',
         image: screenshotProduct2,
+        smallImage: screenshotProduct2Small,
         link: "https://livery.vercel.app/",
         icon: function InventoryIcon() {
             return (
-                <img
-                    src={librarey.src}
-                    className="scale-90"
-                />
+                <FaMicroscope className="h-5 w-5 text-white"/>
             )
         },
     },
@@ -63,13 +67,11 @@ const features: Array<Feature> = [
         description:
             'A self-governing platform for aggregating and sharing patient data where you own the commercial value you create.',
         image: screenshotProduct1,
+        smallImage: screenshotProduct1Small,
         link: "https://rareheros.com/",
         icon: function ContactsIcon() {
             return (
-                <img
-                    src={librarey.src}
-                    className="scale-90"
-                />
+                <FaRocket className="h-5 w-5 text-white"/>
             )
         },
     },
@@ -95,7 +97,9 @@ function Feature({
                     isActive ? 'bg-blue-600' : 'bg-slate-500',
                 )}
             >
-                <feature.icon/>
+                <div aria-hidden="true" className="h-9 w-9 flex items-center justify-center">
+                    <feature.icon/>
+                </div>
             </div>
             <h3
                 className={clsx(
@@ -123,19 +127,41 @@ function Feature({
 
 function FeaturesMobile() {
     return (
-        <div className="-mx-4 mt-20 flex flex-col gap-y-10 overflow-hidden px-4 sm:-mx-6 sm:px-6 lg:hidden">
+        <div className="-mx-4 mt-20 flex flex-col gap-y-10 overflow-hidden px-4 sm:-mx-6 sm:px-6 xs:hidden">
             {features.map((feature) => (
                 <div key={feature.summary}>
                     <Feature feature={feature} className="mx-auto max-w-2xl" isActive/>
                     <div className="relative mt-10 pb-10">
                         <div className="absolute -inset-x-4 bottom-0 top-8 bg-slate-200 sm:-inset-x-6"/>
                         <div
-                            className="relative mx-auto w-[52.75rem] overflow-hidden rounded-xl bg-white shadow-lg shadow-slate-900/5 ring-1 ring-slate-500/10">
+                            className="relative mx-auto overflow-hidden rounded-xl bg-white shadow-lg shadow-slate-900/5 ring-1 ring-slate-500/10">
+                            <Image
+                                className="w-full"
+                                src={feature.smallImage}
+                                alt=""
+                            />
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    )
+}
+
+function FeaturesTablet() {
+    return (
+        <div className="-mx-4 mt-20 hidden flex-col gap-y-10 overflow-hidden px-4 sm:-mx-6 sm:px-6 xs:flex md:hidden">
+            {features.map((feature) => (
+                <div key={feature.summary}>
+                    <Feature feature={feature} className="mx-auto max-w-2xl" isActive/>
+                    <div className="relative mt-10 pb-10">
+                        <div className="absolute -inset-x-4 bottom-0 top-8 bg-slate-200 sm:-inset-x-6"/>
+                        <div
+                            className="relative mx-auto overflow-hidden rounded-xl bg-white shadow-lg shadow-slate-900/5 ring-1 ring-slate-500/10">
                             <Image
                                 className="w-full"
                                 src={feature.image}
                                 alt=""
-                                sizes="52.75rem"
                             />
                         </div>
                     </div>
@@ -147,7 +173,7 @@ function FeaturesMobile() {
 
 function FeaturesDesktop() {
     return (
-        <Tab.Group as="div" className="hidden lg:mt-20 lg:block">
+        <Tab.Group as="div" className="hidden lg:mt-20 md:block">
             {({selectedIndex}) => (
                 <>
                     <Tab.List className="grid grid-cols-3 gap-x-8">
@@ -189,6 +215,7 @@ function FeaturesDesktop() {
                                             src={feature.image}
                                             alt=""
                                             sizes="52.75rem"
+                                            objectFit={"contain"}
                                         />
                                     </div>
                                 </Tab.Panel>
@@ -220,6 +247,7 @@ export function ProductSuite() {
                     </p>
                 </div>
                 <FeaturesMobile/>
+                <FeaturesTablet/>
                 <FeaturesDesktop/>
             </Container>
         </section>

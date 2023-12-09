@@ -21,6 +21,9 @@ export default {
             '9xl': ['8rem', {lineHeight: '1'}],
         },
         extend: {
+            screens: {
+                'xs': '426px',
+            },
             borderRadius: {
                 '4xl': '2rem',
             },
