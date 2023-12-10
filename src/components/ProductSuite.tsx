@@ -68,7 +68,7 @@ const features: Array<Feature> = [
             'A self-governing platform for aggregating and sharing patient data where you own the commercial value you create.',
         image: screenshotProduct1,
         smallImage: screenshotProduct1Small,
-        link: "https://rareheros.com/",
+        link: "/contact",
         icon: function ContactsIcon() {
             return (
                 <FaRocket className="h-5 w-5 text-white"/>
@@ -87,6 +87,7 @@ function Feature({
     isActive: boolean
 }) {
     return (
+    <div>
         <div
             className={clsx(className, !isActive && 'opacity-75 hover:opacity-100')}
             {...props}
@@ -115,13 +116,14 @@ function Feature({
             <p className="mt-4 text-sm text-slate-600">
                 {feature.description}
             </p>
-            <Link
-                className="mt-4 text-sm font-bold underline text-blue-600"
-                href={feature.link}
-            >
-                Learn more
-            </Link>
         </div>
+        <Link
+            className="mt-4 text-sm font-bold underline text-blue-600"
+            href={feature.link}
+        >
+            Learn more
+        </Link>
+    </div>
     )
 }
 
@@ -233,8 +235,8 @@ function FeaturesDesktop() {
 export function ProductSuite() {
     return (
         <section
-            id="products"
-            aria-label="Products for simplifying everyday business tasks"
+            id="solutions"
+            aria-label="Solutions to help grow patient groups"
             className="pb-14 pt-20 sm:pb-20 sm:pt-32 lg:pb-32"
         >
             <Container>

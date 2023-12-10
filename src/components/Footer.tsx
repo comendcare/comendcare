@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 
 import {Container} from '@/components/Container'
@@ -18,7 +20,7 @@ export function Footer() {
                     <Logo className="mx-auto h-10 w-auto"/>
                     <nav className="mt-10 text-sm" aria-label="quick links">
                         <div className="-my-1 flex justify-center gap-x-6">
-                            <NavLink href="#solutions">Solutions</NavLink>
+                            <NavLink href={`${window.location.origin}/#solutions`}>Solutions</NavLink>
                             <NavLink href="/about">About</NavLink>
                             <NavLink href="/contact">Contact</NavLink>
                         </div>
@@ -29,6 +31,7 @@ export function Footer() {
                     <div className="flex gap-x-6">
                         <Link
                             href="https://www.facebook.com/comendcare"
+                            target="_blank"
                             className="group"
                             aria-label="Comend on Facebook"
                         >
@@ -39,6 +42,7 @@ export function Footer() {
                         </Link>
                         <Link
                             href="https://www.instagram.com/comendcare/"
+                            target="_blank"
                             className="group"
                             aria-label="Comend on Instagram"
                         >
@@ -49,6 +53,7 @@ export function Footer() {
                         </Link>
                         <Link
                             href="https://www.linkedin.com/company/comend"
+                            target="_blank"
                             className="group"
                             aria-label="Comend on LinkedIn"
                         >
@@ -59,6 +64,7 @@ export function Footer() {
                         </Link>
                         <Link
                             href="https://twitter.com/comendcare"
+                            target="_blank"
                             className="group"
                             aria-label="Comend on Twitter"
                         >

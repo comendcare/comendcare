@@ -4,6 +4,7 @@ import {useState} from 'react'
 import { InlineWidget } from "react-calendly"
 import {Switch} from '@headlessui/react'
 import Link from "next/link";
+import {Footer} from "@/components/Footer";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
@@ -13,6 +14,7 @@ export default function Contact() {
     const [enabled, setEnabled] = useState(true)
 
     return (
+    <div>
         <div className="isolate bg-white px-6 py-8 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
                 <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -31,7 +33,7 @@ export default function Contact() {
                 </p>
             </div>
 
-            <form action="#" method="POST" className="mx-auto mt-16 max-w-xl sm:mt-20">
+            <form action="#" method="POST" className="mx-auto my-24 max-w-xl sm:mt-20">
 
                 <div className="grid grid-cols-1 gap-x-8 gap-y-6">
                     {/*<Switch.Group as="div" className="flex items-center">*/}
@@ -117,5 +119,7 @@ export default function Contact() {
 
             </form>
         </div>
+        <Footer/>
+    </div>
     )
 }

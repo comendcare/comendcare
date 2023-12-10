@@ -2,12 +2,6 @@ import Image from 'next/image'
 
 import {Button} from '@/components/Button'
 import {Container} from '@/components/Container'
-import logoLaravel from '@/images/logos/laravel.svg'
-import logoMirage from '@/images/logos/mirage.svg'
-import logoStatamic from '@/images/logos/statamic.svg'
-import logoStaticKit from '@/images/logos/statickit.svg'
-import logoTransistor from '@/images/logos/transistor.svg'
-import logoTuple from '@/images/logos/tuple.svg'
 import logoCharacter from '@/images/logos/affiliations/Character.png'
 import logoManeki from '@/images/logos/affiliations/Maneki.png'
 import logoOUAG from '@/images/logos/affiliations/OUAG.png'
@@ -38,7 +32,7 @@ export function Hero() {
             </p>
 
             <div className="mt-10 flex justify-center gap-x-6">
-                <Button href="/register">Get in touch</Button>
+                <Button href="/contact">Get in touch</Button>
             </div>
 
             <div className="mt-36 lg:mt-44">
