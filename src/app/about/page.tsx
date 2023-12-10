@@ -5,6 +5,7 @@ import Flawnson from "@/images/profiles/Flawnson.jpg"
 import Sierra from "@/images/profiles/Sierra.jpeg"
 import Team from "@/images/profiles/comend-team.jpeg"
 import Link from "next/link"
+import {FaInstagram, FaLinkedin} from "react-icons/fa";
 
 const people = [
     {
@@ -13,6 +14,8 @@ const people = [
         imageUrl:
             Albert,
         bio: 'I went to school for biomedical engineering, have worked with deep tech startups and in life sciences research, and spent a past life volunteering with kids. On the weekend, I try to catch up with the happenings in genomics.',
+        linkedInURL: 'https://www.linkedin.com/in/albert-yq-wang/',
+        instagramURL: 'https://www.instagram.com/albert.yqw/',
     },
     {
         name: 'Flawnson Tong',
@@ -20,6 +23,8 @@ const people = [
         imageUrl:
             Flawnson,
         bio: 'Hi there! I’m the guy behind the screen building what you see here. My background is in machine learning engineering and these days I do a lot of full stack development. I love playing piano, travelling, and working out.',
+        linkedInURL: 'https://www.linkedin.com/in/flawnson/',
+        instagramURL: 'https://www.instagram.com/flaws.non/',
     },
     {
         name: 'Sierra Phillips',
@@ -27,6 +32,8 @@ const people = [
         imageUrl:
             Sierra,
         bio: 'Hello! I\'m a twin mom, rare mom, heart mom, genetics enthusiast, and relentless advocate on a mission to to curate the most comprehensive freely-available disability resource database.',
+        linkedInURL: 'https://www.linkedin.com/in/sierra-phillips-208a0b106/',
+        instagramURL: 'https://www.instagram.com/mrs.phillijt/',
     },
 ]
 
@@ -133,6 +140,14 @@ export default function About() {
                                     <div className="flex-auto">
                                         <h3 className="text-lg font-semibold leading-8 tracking-tight text-gray-900">{person.name}</h3>
                                         <p className="text-base leading-7 text-gray-600">{person.role}</p>
+                                        <div className="flex flex-row space-x-1 mt-2">
+                                            <Link href={person.linkedInURL} target="_blank">
+                                                <FaLinkedin className="h-6 w-6 text-gray-600 hover:text-gray-800" />
+                                            </Link>
+                                            <Link href={person.instagramURL} target="_blank">
+                                                <FaInstagram className="h-6 w-6 text-gray-600 hover:text-gray-800" />
+                                            </Link>
+                                        </div>
                                         <p className="mt-6 text-base leading-7 text-gray-600">{person.bio}</p>
                                     </div>
                                 </li>
