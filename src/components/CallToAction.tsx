@@ -26,7 +26,7 @@ export function CallToAction() {
                     <p className="mt-4 text-lg tracking-tight text-white">
                         Try out our existing tools and tell us what we can build next to help your patient group flourish.
                     </p>
-                    <Button href="/register" color="white" className="mt-10">
+                    <Button href="/contact" color="white" className="mt-10">
                         Get in touch
                     </Button>
                 </div>
