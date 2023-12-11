@@ -45,13 +45,13 @@ export function Hero() {
                 >
                     {[
                         [
-                            {name: 'Transistor', logo: logoCharacter},
-                            {name: 'Tuple', logo: logoManeki},
-                            {name: 'StaticKit', logo: logoOUAG},
+                            {name: 'Character', logo: logoCharacter},
+                            {name: 'Maneki', logo: logoManeki},
+                            // {name: 'StaticKit', logo: logoOUAG},
                         ],
                         [
-                            {name: 'Mirage', logo: logoVAMP2},
-                            {name: 'Laravel', logo: logoWABS},
+                            {name: 'VAMP2', logo: logoVAMP2},
+                            {name: 'WABS', logo: logoWABS},
                             // {name: 'Statamic', logo: logoStatamic},
                         ],
                     ].map((group, groupIndex) => (
