@@ -60,7 +60,7 @@ export default function Contact() {
                     {/*    </Switch.Label>*/}
                     {/*</Switch.Group>*/}
 
-                    {enabled ? <InlineWidget url="https://calendly.com/albertatcomend/librarey" styles={{height: '500px'}}/>
+                    {enabled ? <InlineWidget url="https://calendly.com/albertatcomend/comend-convos" styles={{height: '500px'}}/>
                         : <>
                             <div>
                                 <label htmlFor="first-name" className="block text-sm font-semibold leading-6 text-gray-900">
