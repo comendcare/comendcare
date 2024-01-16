@@ -47,12 +47,10 @@ export function Hero() {
                         [
                             {name: 'Character', logo: logoCharacter},
                             {name: 'Maneki', logo: logoManeki},
-                            // {name: 'StaticKit', logo: logoOUAG},
                         ],
                         [
-                            {name: 'VAMP2', logo: logoVAMP2},
+                            {name: 'Once Upon A Gene', logo: logoOUAG},
                             {name: 'WABS', logo: logoWABS},
-                            // {name: 'Statamic', logo: logoStatamic},
                         ],
                     ].map((group, groupIndex) => (
                         <li key={groupIndex}>
