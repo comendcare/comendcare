@@ -6,6 +6,8 @@ import Sierra from "@/images/profiles/Sierra.jpeg"
 import Team from "@/images/profiles/comend-team.jpeg"
 import Link from "next/link"
 import {FaInstagram, FaLinkedin} from "react-icons/fa";
+import {CallToAction} from "@/components/CallToAction";
+import {CoreValues} from "@/components/CoreValues";
 
 const people = [
     {
@@ -116,10 +118,14 @@ export default function About() {
                     </div>
                 </div>
 
+                <CoreValues />
+
                 <div className="bg-white py-24 sm:py-32">
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <div className="mx-auto max-w-2xl sm:text-center">
-                            <h2 className="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">Meet the team</h2>
+                            <h2 className="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">
+                                Meet the team
+                            </h2>
                             <p className="mt-6 text-lg leading-8 text-gray-600">
                                 {`Want to chat or collaborate? We're all ears! `}
                                 <Link
@@ -155,6 +161,9 @@ export default function About() {
                         </ul>
                     </div>
                 </div>
+
+                <CallToAction/>
+
             </main>
             <Footer/>
         </>
