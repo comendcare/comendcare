@@ -36,7 +36,7 @@ export function CoreValues() {
                     Our values
                 </h2>
                 <p className="mt-6 text-lg leading-8 text-gray-600 text-center">
-                    Comend was born out of a need
+                    {`We follow a few guiding principles.`}
                 </p>
             </div>
             <dl className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 text-base leading-7 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-3">
