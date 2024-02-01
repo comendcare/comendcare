@@ -9,19 +9,19 @@ export function CoreValues() {
     const coreValues = [
         {
             heading: "Designed by and for the people",
-            description: "We strive to do everything in partnership with the community. We welcome feedback with open arms. Every decision we make should be towards the benefit of our users, and we believe we can only make those decisions if we build with our users."
+            description: "We strive to do everything in partnership with the community. We’re active and empathetic listeners who welcome feedback with open arms. Come build with us."
         },
         {
             heading: "Build things that last",
-            description: "We move with urgency to disrupt the status quo and with the self-awareness to avoid breaking things. We aim to achieve a state of sustainable disruption by building robust products that can be the foundation for future growth."
+            description: "We move with the urgency needed to disrupt the status quo and accelerate cures but with the self-awareness to avoid breaking things. We aim to create sustainable innovations by building robust products that can last beyond us."
         },
         {
             heading: "Lead with transparency",
-            description: "We endeavour to keep our incentives aligned with the community at all times, and achieve our goals transparently. At every step of the way, we build in public and communicate our progress."
+            description: "We operate with clear incentives that prioritize the needs of patient families. We make decisions and take actions with full transparency to demonstrate our integrity."
         },
         {
             heading: "Great science can come from you",
-            description: "We’re believers in the productive power of citizen science, and that the future of science is in the hands of those that reject rejection. We want to support mission-aligned members of the community and believe these special individuals can come from anywhere."
+            description: "We’re deep believers in the power of citizen science to solve the world's hardest problems. Our model empowers families from any background to create change for their loved ones."
         },
     ]
 
