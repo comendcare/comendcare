@@ -7,6 +7,7 @@ import {Pricing} from '@/components/Pricing'
 import {PrimaryFeatures} from '@/components/PrimaryFeatures'
 import {ProductSuite} from '@/components/ProductSuite'
 import {Testimonials} from '@/components/Testimonials'
+import Blog from "@/components/Blog";
 
 export default function Home() {
     return (
@@ -15,6 +16,7 @@ export default function Home() {
                 <Hero/>
                 {/*<PrimaryFeatures/>*/}
                 <ProductSuite/>
+                {/*<Blog />*/}
                 <CallToAction/>
                 {/*<Testimonials/>*/}
                 {/*<Pricing/>*/}
