@@ -16,7 +16,7 @@ export default function Home() {
                 <Hero/>
                 {/*<PrimaryFeatures/>*/}
                 <ProductSuite/>
-                {/*<Blog />*/}
+                <Blog />
                 <CallToAction/>
                 {/*<Testimonials/>*/}
                 {/*<Pricing/>*/}
