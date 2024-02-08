@@ -1,3 +1,5 @@
+import parse from "rss-to-json"
+
 const posts = [
     {
         id: 1,
@@ -21,7 +23,29 @@ const posts = [
     // More posts...
 ]
 
-export default function Blog() {
+export default async function Blog() {
+
+    const formatDate = (timestamp: number) => {
+        const date = new Date(timestamp);
+
+        return new Intl.DateTimeFormat('en-US', {
+            month: 'long', // "January", "February", ..., "December"
+            day: '2-digit', // "01", "02", ..., "31"
+            year: 'numeric', // "2020"
+        }).format(date);
+    }
+
+    async function getData() {
+        const rssLink = "https://medium.com/feed/@flawnsontong"
+        const rssFeedData = await parse(rssLink)
+
+        console.log(rssFeedData)
+
+        return rssFeedData
+    }
+
+    const blogData = await getData()
+
     return (
         <div className="bg-white py-24 sm:py-32">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -34,7 +58,7 @@ export default function Blog() {
                     </p>
                 </div>
                 <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-                    {posts.map((post) => (
+                    {blogData.items.slice(0, 3).map((post) => (
                         <article key={post.id} className="flex flex-col items-start justify-between">
                             <div className="relative w-full">
                                 <img
@@ -46,15 +70,14 @@ export default function Blog() {
                             </div>
                             <div className="max-w-xl">
                                 <div className="mt-8 flex items-center gap-x-4 text-xs">
-                                    <time dateTime={post.datetime} className="text-gray-500">
-                                        {post.date}
+                                    <time dateTime={post.published} className="text-gray-500">
+                                        {formatDate(post.published)}
                                     </time>
-                                    <a
-                                        href={post.category.href}
-                                        className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
+                                    <p
+                                        className="capitalize relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600"
                                     >
-                                        {post.category.title}
-                                    </a>
+                                        {post.category[0]}
+                                    </p>
                                 </div>
                                 <div className="group relative">
                                     <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
@@ -63,15 +86,17 @@ export default function Blog() {
                                             {post.title}
                                         </a>
                                     </h3>
-                                    <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">{post.description}</p>
+                                    {/*<p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">*/}
+                                    {/*    {post.description}*/}
+                                    {/*</p>*/}
                                 </div>
                                 <div className="relative mt-8 flex items-center gap-x-4">
-                                    <img src={post.author.imageUrl} alt="" className="h-10 w-10 rounded-full bg-gray-100" />
+                                    <img src={blogData.image} alt="" className="h-10 w-10 rounded-full bg-gray-100" />
                                     <div className="text-sm leading-6">
                                         <p className="font-semibold text-gray-900">
                                             <a href={post.author.href}>
                                                 <span className="absolute inset-0" />
-                                                {post.author.name}
+                                                {post.author}
                                             </a>
                                         </p>
                                         <p className="text-gray-600">{post.author.role}</p>
