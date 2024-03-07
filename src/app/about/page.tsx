@@ -6,6 +6,7 @@ import Sierra from "@/images/profiles/Sierra.jpeg"
 import Betty from "@/images/profiles/Betty.jpeg"
 import Foy from "@/images/profiles/Foy.jpg"
 import Bruce from "@/images/profiles/Bruce.jpg"
+import Andrew from "@/images/profiles/Andrew.jpeg"
 import Pepi from "@/images/profiles/Pepi.jpg"
 import Sanath from "@/images/profiles/Sanath.jpg"
 import Team from "@/images/profiles/comend-team.jpeg"
@@ -58,7 +59,7 @@ const people = [
     {
         name: 'Andrew Wells',
         role: 'Advisor',
-        imageUrl: Bruce,
+        imageUrl: Andrew,
         bio: 'Experienced C-suite executive and a thought leader in drug development, philanthropy, and patient advocacy with professional experience in all areas of executive management, including strategy, advocacy, medical affairs, legal, operations, finance, sales, marketing, and IT; success in small, mid-size, and large businesses, and entrepreneurial ventures.',
         linkedInURL: 'https://www.linkedin.com/in/andrewjoshuawells/',
         instagramURL: '',
