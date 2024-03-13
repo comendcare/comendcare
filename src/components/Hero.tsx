@@ -7,6 +7,7 @@ import logoManeki from '@/images/logos/affiliations/Maneki.png'
 import logoOUAG from '@/images/logos/affiliations/OUAG.png'
 import logoVAMP2 from '@/images/logos/affiliations/VAMP2-adjusted.png'
 import logoWABS from '@/images/logos/affiliations/WABS.png'
+import {LogoCloud} from "@/components/LogoCloud";
 
 export function Hero() {
     return (
@@ -33,40 +34,6 @@ export function Hero() {
 
             <div className="mt-10 flex justify-center gap-x-6">
                 <Button href="/contact">Get in touch</Button>
-            </div>
-
-            <div className="mt-36 lg:mt-44">
-                <p className="font-display text-base text-slate-900">
-                    Co-designed with these organizations so far
-                </p>
-                <ul
-                    role="list"
-                    className="mt-8 flex items-center justify-center gap-x-8 sm:flex-col sm:gap-x-0 sm:gap-y-10 xl:flex-row xl:gap-x-12 xl:gap-y-0"
-                >
-                    {[
-                        [
-                            {name: 'Character', logo: logoCharacter},
-                            {name: 'Maneki', logo: logoManeki},
-                        ],
-                        [
-                            {name: 'Once Upon A Gene', logo: logoOUAG},
-                            {name: 'WABS', logo: logoWABS},
-                        ],
-                    ].map((group, groupIndex) => (
-                        <li key={groupIndex}>
-                            <ul
-                                role="list"
-                                className="flex flex-col items-center gap-y-8 sm:flex-row sm:gap-x-12 sm:gap-y-0"
-                            >
-                                {group.map((company) => (
-                                    <li key={company.name} className="flex w-40">
-                                        <Image src={company.logo} alt={company.name} unoptimized/>
-                                    </li>
-                                ))}
-                            </ul>
-                        </li>
-                    ))}
-                </ul>
             </div>
 
         </Container>
