@@ -237,7 +237,7 @@ export function ProductSuite() {
         <section
             id="solutions"
             aria-label="Solutions to help grow patient groups"
-            className="pb-14 pt-20 sm:pb-20 sm:pt-32 lg:pb-32"
+            className="pb-14 pt-20 sm:pb-20 sm:pt-40 lg:pb-32"
         >
             <Container>
                 <div className="mx-auto max-w-2xl md:text-center">

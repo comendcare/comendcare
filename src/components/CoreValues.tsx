@@ -1,9 +1,3 @@
-import Image from 'next/image'
-
-import {Button} from '@/components/Button'
-import {Container} from '@/components/Container'
-import backgroundImage from '@/images/background-call-to-action.jpg'
-
 export function CoreValues() {
 
     const coreValues = [
@@ -26,10 +20,9 @@ export function CoreValues() {
     ]
 
     return (
-        <section
-            id="core-values"
+        <div
             aria-label="Solutions to help grow patient groups"
-            className="flex flex-col items-center mx-auto mt-32 max-w-7xl px-6 sm:mt-40 lg:px-8"
+            className="flex flex-col items-center mx-auto max-w-7xl px-6 my-48 lg:px-8"
         >
             <div className="flex flex-col items-center max-w-2xl lg:mx-0">
                 <h2 className="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">
@@ -47,6 +40,6 @@ export function CoreValues() {
                     </div>
                 ))}
             </dl>
-        </section>
+        </div>
     )
 }
