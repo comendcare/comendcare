@@ -5,6 +5,7 @@ import logoFoundersBoost from "@/images/logos/affiliations/FoundersBoost.png";
 import logoNextAI from "@/images/logos/affiliations/NextAI.png";
 import logoOpenTreatments from "@/images/logos/affiliations/Open Treatments.png";
 import logo11ElevenLabsGrants from "@/images/logos/affiliations/11ElevenLabsGrants.png";
+import logoCuresDev from "@/images/logos/affiliations/CuresDev.png"
 import logoOUAG from "@/images/logos/affiliations/OUAG.png";
 import logoWABS from "@/images/logos/affiliations/WABS.png";
 import Image from "next/image";
@@ -12,13 +13,13 @@ import Image from "next/image";
 
 export const LogoCloud = () => {
     return (
-        <div className="pb-16 pt-20 text-center lg:pt-32 mt-36 lg:mt-44">
+        <div className="text-center my-48">
             <p className="font-display text-base text-slate-900">
                 Co-designed with these organizations so far
             </p>
             <ul
                 role="list"
-                className="mt-8 flex items-center justify-center gap-x-8 flex-col gap-y-10 xl:flex-row xl:gap-x-12 xl:gap-y-0"
+                className="mt-8 flex items-center justify-center flex-col gap-y-8"
             >
                 {[
                     [
@@ -28,10 +29,9 @@ export const LogoCloud = () => {
                         {name: 'Drive Capital', logo: logoDrive},
                     ],
                     [
-                        // {name: 'Once Upon A Gene', logo: logoOUAG},
-                        // {name: 'WABS', logo: logoWABS},
                         {name: 'Maneki', logo: logoManeki},
                         {name: 'OpenTreatments', logo: logoOpenTreatments},
+                        {name: 'CuresDev', logo: logoCuresDev},
                         {name: '11ElevenLabs', logo: logo11ElevenLabsGrants},
                     ],
                 ].map((group, groupIndex) => (
