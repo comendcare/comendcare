@@ -4,6 +4,7 @@ import {Team} from '@/components/Team'
 import {CallToAction} from "@/components/CallToAction";
 import {CoreValues} from "@/components/CoreValues";
 import {LogoCloud} from "@/components/LogoCloud";
+import {JoinTeam} from "@/components/JoinTeam";
 
 
 const timeline = [
@@ -95,6 +96,8 @@ export default function About() {
                 <CoreValues />
 
                 <Team />
+
+                <JoinTeam />
 
                 <CallToAction />
 
