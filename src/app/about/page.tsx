@@ -4,7 +4,6 @@ import {Team} from '@/components/Team'
 import {CallToAction} from "@/components/CallToAction";
 import {CoreValues} from "@/components/CoreValues";
 import {LogoCloud} from "@/components/LogoCloud";
-import {TeamOld} from "@/components/TeamOld";
 
 
 const timeline = [
