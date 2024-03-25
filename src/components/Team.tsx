@@ -29,11 +29,27 @@ const team = [
     },
     {
         name: 'Sierra Phillips',
-        role: 'Advisor',
+        role: 'Chief Rare Mom',
         imageUrl: Sierra,
         bio: 'Hello! I\'m a twin mom, rare mom, heart mom, genetics enthusiast, and relentless advocate on a mission to to curate the most comprehensive freely-available disability resource database.',
         linkedInURL: 'https://www.linkedin.com/in/sierra-phillips-208a0b106/',
         instagramURL: 'https://www.instagram.com/mrs.phillijt/',
+    },
+    {
+        name: 'Pepi Martinez',
+        role: 'Head of Data Governance',
+        imageUrl: Pepi,
+        bio: 'Excited to help Comend revolutionize the future of patient-first drug discovery. I come from a software engineering background with a focus on decentralization, governance systems, and on-chain dynamics. I\'ve been a passionate builder for about 10 years, and have been theorizing heavily in the future of patient drug discovery for the last 3 years.',
+        linkedInURL: 'https://www.linkedin.com/in/pepimartinez/',
+        instagramURL: '',
+    },
+    {
+        name: 'Betty Trevino',
+        role: 'Head of Product Marketing',
+        imageUrl: Betty,
+        bio: 'I\'m a mom of two amazing boys, one of whom has been diagnosed with Aicardi Goutieres Syndrome, and a wife to my wonderful husband. My goal is to create a welcoming space in the rare disease community where everyone feels connected and better equipped. When I\'m not busy, you\'ll often find me snuggled up with my family while listening to T.S. 🫶🏻',
+        linkedInURL: 'https://www.linkedin.com/in/bettyctrevino/',
+        instagramURL: 'https://www.instagram.com/agsadvocacy/',
     },
     // {
     //     name: 'Dennis Akkaya',
@@ -74,22 +90,6 @@ const team = [
         bio: 'Thrilled to support Comend and its vision for the future of patient-led research! My background includes working at a medical device CRO, bootstrapping a healthcare analytics company, investing as a VC, and contributing to open source communities.',
         linkedInURL: 'https://www.linkedin.com/in/foysavas/',
         instagramURL: '',
-    },
-    {
-        name: 'Pepi Martinez',
-        role: 'Head of Data Governance',
-        imageUrl: Pepi,
-        bio: 'Excited to help Comend revolutionize the future of patient-first drug discovery. I come from a software engineering background with a focus on decentralization, governance systems, and on-chain dynamics. I\'ve been a passionate builder for about 10 years, and have been theorizing heavily in the future of patient drug discovery for the last 3 years.',
-        linkedInURL: 'https://www.linkedin.com/in/pepimartinez/',
-        instagramURL: '',
-    },
-    {
-        name: 'Betty Trevino',
-        role: 'Head of Product Marketing',
-        imageUrl: Betty,
-        bio: 'I\'m a mom of two amazing boys, one of whom has been diagnosed with Aicardi Goutieres Syndrome, and a wife to my wonderful husband. My goal is to create a welcoming space in the rare disease community where everyone feels connected and better equipped. When I\'m not busy, you\'ll often find me snuggled up with my family while listening to T.S. 🫶🏻',
-        linkedInURL: 'https://www.linkedin.com/in/bettyctrevino/',
-        instagramURL: 'https://www.instagram.com/agsadvocacy/',
     },
 ]
 
