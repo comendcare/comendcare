@@ -1,8 +1,7 @@
 import {Footer} from '@/components/Footer'
 import {CallToAction} from "@/components/CallToAction";
 import Link from "next/link";
-import {FaCakeCandles, FaMoneyBill, FaPlane} from "react-icons/fa6";
-import {FaBirthdayCake} from "react-icons/fa";
+import {FaChartLine, FaCakeCandles, FaSeedling, FaMoneyBill, FaPlane} from "react-icons/fa6";
 
 const benefits = [
     {
@@ -13,14 +12,31 @@ const benefits = [
     },
     {
         title: "Birthdays off",
-        description: "Besides the requisite holidays of your culture/nationality, your birthday is a day for yourself on us." +
+        description: "Besides the requisite holidays of your culture/nationality, your birthday is a day for yourself on us. " +
             "This comes in addition to paid time off of course.",
-        icon: FaBirthdayCake
+        icon: FaCakeCandles
     },
     {
         title: "Equity and options",
         description: "We believe strongly in aligning incentives, and this is especially true amongst our own team. " +
             "Every full-time employee receives equity in Comend.",
+        icon: FaChartLine
+    },
+    {
+        title: "Internal growth",
+        description: "All team members are subject to annual raises, improved benefits, and opportunities to be promoted from within. " +
+            "This is non-negotiable.",
+        icon: FaSeedling
+    },
+    {
+        title: "Signing bonus",
+        description: "Every filled opening comes with a little thank you and welcome to the team.",
+        icon: FaMoneyBill
+    },
+    {
+        title: "Flexible work environment",
+        description: "This means flexible hours, remote and hybrid work options, and generally relaxed policies around work. " +
+            "We trust our team members.",
         icon: FaMoneyBill
     },
 ]
@@ -29,9 +45,9 @@ const jobOpenings = [
     {
         id: 1,
         role: 'Full stack developer',
-        href: '#',
+        href: 'https://comend.notion.site/Full-Stack-Engineer-9ef3214c9f0246f5a89d0cdd07a534d2?pvs=4',
         description:
-            'We mean FULL stack.',
+            'Partner closely with the CTO to build product. Particular emphasis on DevOps and backend engineering.',
         salary: '$125,000 USD',
         location: 'Remote | Toronto, CA preferred',
     },
@@ -68,7 +84,7 @@ export default function Careers() {
                         <div className="bg-white py-24 sm:py-32">
                             <div className="flex flex-col justify-center items-center mx-auto max-w-7xl px-6 lg:px-8">
                                 <div className="text-center mx-auto max-w-2xl lg:mx-0">
-                                    <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                                    <h2 className="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">
                                         {`We're a growing startup`}
                                     </h2>
                                     <p className="mt-6 text-lg leading-8 text-gray-600">
@@ -100,11 +116,11 @@ export default function Careers() {
 
                         <div
                             className="flex flex-col items-center justify-center w-full text-center mx-auto max-w-2xl lg:mx-0">
-                            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                            <h2 className="font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">
                                 {`Our openings`}
                             </h2>
                         </div>
-                        <div className="w-full lg:flex-auto">
+                        <div className="w-full lg:flex-auto mb-24">
                             <ul className="-my-8 divide-y divide-gray-100">
                                 {jobOpenings.map((opening) => (
                                     <li key={opening.id} className="py-8">
