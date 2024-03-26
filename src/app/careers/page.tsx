@@ -1,22 +1,27 @@
 import {Footer} from '@/components/Footer'
 import {CallToAction} from "@/components/CallToAction";
 import Link from "next/link";
+import {FaCakeCandles, FaMoneyBill, FaPlane} from "react-icons/fa6";
+import {FaBirthdayCake} from "react-icons/fa";
 
 const benefits = [
     {
         title: "Annual retreat",
         description: "At least once a year we'll bring the whole team out to a location for a few days. " +
-            "You'll also be given the chance to take a few days to yourself and enjoy the city itself."
+            "You'll also be given the chance to take a few days to yourself and enjoy the city itself.",
+        icon: FaPlane
     },
     {
         title: "Birthdays off",
         description: "Besides the requisite holidays of your culture/nationality, your birthday is a day for yourself on us." +
-            "This comes in addition to paid time off of course."
+            "This comes in addition to paid time off of course.",
+        icon: FaBirthdayCake
     },
     {
         title: "Equity and options",
         description: "We believe strongly in aligning incentives, and this is especially true amongst our own team. " +
-            "Every full-time employee receives equity in Comend."
+            "Every full-time employee receives equity in Comend.",
+        icon: FaMoneyBill
     },
 ]
 
@@ -30,24 +35,6 @@ const jobOpenings = [
         salary: '$125,000 USD',
         location: 'Remote | Toronto, CA preferred',
     },
-    {
-        id: 2,
-        role: 'Laravel developer',
-        href: '#',
-        description:
-            'Et veniam et officia dolorum rerum. Et voluptas consequatur magni sapiente amet voluptates dolorum. Ut porro aut eveniet.',
-        salary: '$125,000 USD',
-        location: 'San Francisco, CA',
-    },
-    {
-        id: 3,
-        role: 'React Native developer',
-        href: '#',
-        description:
-            'Veniam ipsam nisi quas architecto eos non voluptatem in nemo. Est occaecati nihil omnis delectus illum est.',
-        salary: '$105,000 USD',
-        location: 'San Francisco, CA',
-    },
 ]
 
 export default function Careers() {
@@ -60,13 +47,16 @@ export default function Careers() {
                         className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-16 lg:mx-0 lg:max-w-none">
                         <div className="flex flex-col items-center w-full text-center lg:flex-auto">
                             <h1 className="max-w-4xl text-4xl font-display font-medium tracking-tight text-gray-900 sm:text-6xl lg:col-span-2 xl:col-auto">
-                                We’re always looking for awesome people to join us
+                                {`We’re always looking for awesome people to join us`}
                             </h1>
                             <p className="max-w-5xl mt-6 text-xl leading-8 text-gray-600">
-                                This means it doesn't matter what jobs we do or don't have listed bellow.
-                                If you want to get involved and you think you have what it takes then <Link
-                                href="/contact" className="hover:underline font-semibold text-blue-600">reach
-                                out</Link> and we'll carve out a role for you.
+                                {`This means it doesn't matter what jobs we do or don't have listed bellow.
+                                If you want to get involved and you think you have what it takes then `}
+                                <Link
+                                    href="/contact" className="hover:underline font-semibold text-blue-600">
+                                    reach out
+                                </Link>
+                                {` and we'll carve out a role for you.`}
                             </p>
                             <img
                                 src="https://images.unsplash.com/photo-1606857521015-7f9fcf423740?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1344&h=1104&q=80"
@@ -74,8 +64,47 @@ export default function Careers() {
                                 className="mt-16 aspect-[6/5] w-full rounded-2xl bg-gray-50 object-cover lg:aspect-auto lg:h-[34.5rem]"
                             />
                         </div>
+
+                        <div className="bg-white py-24 sm:py-32">
+                            <div className="flex flex-col justify-center items-center mx-auto max-w-7xl px-6 lg:px-8">
+                                <div className="text-center mx-auto max-w-2xl lg:mx-0">
+                                    <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                                        {`We're a growing startup`}
+                                    </h2>
+                                    <p className="mt-6 text-lg leading-8 text-gray-600">
+                                        {`We're lean and agile, and we care a lot about attracting the best talent.
+                                        That means doing our best to offer some perks.`}
+                                    </p>
+                                </div>
+                                <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+                                    <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+                                        {benefits.map((feature) => (
+                                            <div key={feature.title} className="flex flex-col">
+                                                <dt className="text-base font-semibold leading-7 text-gray-900">
+                                                    <div
+                                                        className="mb-6 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
+                                                        <feature.icon className="h-6 w-6 text-white"
+                                                                      aria-hidden="true"/>
+                                                    </div>
+                                                    {feature.title}
+                                                </dt>
+                                                <dd className="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                                                    <p className="flex-auto">{feature.description}</p>
+                                                </dd>
+                                            </div>
+                                        ))}
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            className="flex flex-col items-center justify-center w-full text-center mx-auto max-w-2xl lg:mx-0">
+                            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                                {`Our openings`}
+                            </h2>
+                        </div>
                         <div className="w-full lg:flex-auto">
-                            <h3 className="sr-only">Job openings</h3>
                             <ul className="-my-8 divide-y divide-gray-100">
                                 {jobOpenings.map((opening) => (
                                     <li key={opening.id} className="py-8">
@@ -104,7 +133,7 @@ export default function Careers() {
                                 ))}
                             </ul>
                             <div className="mt-8 flex border-t border-gray-100 pt-8">
-                                Don't see a role you fit?
+                                {`Don't see a role you fit?`}
                                 <Link href="/contact"
                                       className="hover:underline font-semibold leading-6 text-blue-600 hover:text-blue-500">
                                     &nbsp;Get in touch <span aria-hidden="true">&rarr;</span>
