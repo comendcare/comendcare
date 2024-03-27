@@ -1,12 +1,13 @@
 import {FaCheckCircle} from "react-icons/fa";
 import Link from "next/link"
+import FlawnsonAndAlbert from "@/images/profiles/Flawnson and Albert.jpg";
 
 const benefits = [
     'Competitive salaries',
     'Flexible work hours',
-    '30 days of paid vacation',
+    '21 days of paid vacation',
     'Annual team retreats',
-    'Benefits for you and your family',
+    'Equity and ownership',
     'A great work environment',
 ]
 
@@ -18,9 +19,9 @@ export function JoinTeam() {
                 <div
                     className="mx-auto flex max-w-2xl flex-col gap-16 bg-black/5 px-6 py-16 ring-1 ring-black/10 sm:rounded-3xl sm:p-8 lg:mx-0 lg:max-w-none lg:flex-row lg:items-center lg:py-20 xl:gap-x-20 xl:px-20">
                     <img
-                        className="h-96 w-full flex-none rounded-2xl object-cover shadow-xl lg:aspect-square lg:h-auto lg:max-w-sm"
-                        src="https://images.unsplash.com/photo-1519338381761-c7523edc1f46?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80"
-                        alt=""
+                        className="h-96 w-full object-left flex-none rounded-2xl object-cover shadow-xl lg:aspect-square lg:h-auto lg:max-w-sm"
+                        src={FlawnsonAndAlbert.src}
+                        alt="Flawnson and Albert"
                     />
                     <div className="w-full flex-auto">
                         <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl">Join our team</h2>
