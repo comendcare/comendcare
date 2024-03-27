@@ -23,6 +23,7 @@ export function Footer() {
                             <NavLink href={`${typeof window !== "undefined" ? window.location.origin : ""}/#solutions`}>Solutions</NavLink>
                             <NavLink href="/about">About</NavLink>
                             <NavLink href="/contact">Contact</NavLink>
+                            <NavLink href="/careers">Careers</NavLink>
                         </div>
                     </nav>
                 </div>
