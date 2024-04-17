@@ -26,9 +26,8 @@ export function JoinTeam() {
                     <div className="w-full flex-auto">
                         <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl">Join our team</h2>
                         <p className="mt-6 text-lg leading-8 text-gray-800">
-                            Lorem ipsum dolor sit amet consect adipisicing elit. Possimus magnam voluptatum cupiditate
-                            veritatis
-                            in accusamus quisquam.
+                            Comend wouldn't exist without our incredible team and we're always looking to grow.
+                            If you want to get involved have a look at our openings.
                         </p>
                         <ul
                             role="list"
