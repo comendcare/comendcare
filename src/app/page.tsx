@@ -8,6 +8,8 @@ import {PrimaryFeatures} from '@/components/PrimaryFeatures'
 import {ProductSuite} from '@/components/ProductSuite'
 import {Testimonials} from '@/components/Testimonials'
 import Blog from "@/components/Blog";
+import {Vision} from "@/components/Vision";
+import {Mission} from "@/components/Mission";
 
 export default function Home() {
     return (
@@ -15,6 +17,7 @@ export default function Home() {
             <main>
                 <Hero/>
                 {/*<PrimaryFeatures/>*/}
+                <Mission />
                 <ProductSuite/>
                 {/*<Blog />*/}
                 <CallToAction/>
