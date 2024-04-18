@@ -43,7 +43,7 @@ export const Vision = ({
     };
 
     return (
-        <div className={cn("font-bold", className)}>
+        <div className={cn("", className)}>
             <div className="mt-4">
                 <h2 className="text-center max-w-2xl font-display text-3xl tracking-tight text-slate-900 sm:text-4xl">
                     {renderWords()}
