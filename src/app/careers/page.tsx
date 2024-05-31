@@ -48,9 +48,18 @@ const jobOpenings = [
         href: 'https://comend.notion.site/Full-Stack-Engineer-9ef3214c9f0246f5a89d0cdd07a534d2?pvs=4',
         description:
             'Partner closely with the CTO to build product. Particular emphasis on DevOps and backend engineering.',
-        salary: '$100,000 - $150,000',
+        salary: '$80,000 - $150,000',
         location: 'Remote | Toronto, CA preferred',
     },
+    // {
+    //     id: 1,
+    //     role: 'Frontend Engineer',
+    //     href: 'https://comend.notion.site/Full-Stack-Engineer-9ef3214c9f0246f5a89d0cdd07a534d2?pvs=4',
+    //     description:
+    //         `Partner closely with the CTO to build product. We're looking for someone with some product design experience.`,
+    //     salary: '$80,000 - $150,000',
+    //     location: 'Remote | Toronto, CA preferred',
+    // },
     {
         id: 2,
         role: 'Social Media and Community Coordinator',
