@@ -7,6 +7,7 @@ import Andrew from "@/images/profiles/Andrew.jpeg";
 import Foy from "@/images/profiles/Foy.jpg";
 import Pepi from "@/images/profiles/Pepi.jpg";
 import Betty from "@/images/profiles/Betty.jpeg";
+import Megan from "@/images/profiles/Megan.png";
 import Link from "next/link";
 import {FaInstagram, FaLinkedin} from "react-icons/fa";
 
@@ -50,6 +51,13 @@ const team = [
         bio: 'I\'m a mom of two amazing boys, one of whom has been diagnosed with Aicardi Goutieres Syndrome, and a wife to my wonderful husband. My goal is to create a welcoming space in the rare disease community where everyone feels connected and better equipped. When I\'m not busy, you\'ll often find me snuggled up with my family while listening to T.S. 🫶🏻',
         linkedInURL: 'https://www.linkedin.com/in/bettyctrevino/',
         instagramURL: 'https://www.instagram.com/agsadvocacy/',
+    },
+    {
+        name: 'Megan McClure',
+        role: 'Full Stack Software Developer',
+        imageUrl: Megan,
+        bio: 'Hi! As part of Comend\'s engineering team, I spend my time helping to build our products. My background is in computer science, with a focus on full stack development and user experience design. In my free time I enjoy knitting, spinning yarn, and generally exploring the fiber arts.',
+        linkedInURL: 'https://www.linkedin.com/in/megan-mcclure-2216391a3/',
     },
     // {
     //     name: 'Dennis Akkaya',

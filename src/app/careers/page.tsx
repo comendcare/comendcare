@@ -41,16 +41,16 @@ const benefits = [
     },
 ]
 
-const jobOpenings = [
-    {
-        id: 1,
-        role: 'Full Stack Founding Engineer',
-        href: 'https://comend.notion.site/Full-Stack-Engineer-9ef3214c9f0246f5a89d0cdd07a534d2?pvs=4',
-        description:
-            'Partner closely with the CTO to build product. Particular emphasis on DevOps and backend engineering.',
-        salary: '$80,000 - $150,000',
-        location: 'Remote | Toronto, CA preferred',
-    },
+const jobOpenings: any[] = [
+    // {
+    //     id: 1,
+    //     role: 'Full Stack Founding Engineer',
+    //     href: 'https://comend.notion.site/Full-Stack-Engineer-9ef3214c9f0246f5a89d0cdd07a534d2?pvs=4',
+    //     description:
+    //         'Partner closely with the CTO to build product. Particular emphasis on DevOps and backend engineering.',
+    //     salary: '$80,000 - $150,000',
+    //     location: 'Remote | Toronto, CA preferred',
+    // },
     // {
     //     id: 1,
     //     role: 'Frontend Engineer',
@@ -60,15 +60,15 @@ const jobOpenings = [
     //     salary: '$80,000 - $150,000',
     //     location: 'Remote | Toronto, CA preferred',
     // },
-    {
-        id: 2,
-        role: 'Social Media and Community Coordinator',
-        href: 'https://comend.notion.site/Comend-Social-Media-and-Community-Coordinator-9f30311cb0134109a5c0abd3aaf32830?pvs=74',
-        description:
-            'Drive brand awareness, foster meaningful connections, and support our mission by partnering closely with our Product team.',
-        salary: 'Contractor',
-        location: 'Remote',
-    },
+    // {
+    //     id: 2,
+    //     role: 'Social Media and Community Coordinator',
+    //     href: 'https://comend.notion.site/Comend-Social-Media-and-Community-Coordinator-9f30311cb0134109a5c0abd3aaf32830?pvs=74',
+    //     description:
+    //         'Drive brand awareness, foster meaningful connections, and support our mission by partnering closely with our Product team.',
+    //     salary: 'Contractor',
+    //     location: 'Remote',
+    // },
 ]
 
 export default function Careers() {
@@ -140,7 +140,7 @@ export default function Careers() {
                         </div>
                         <div className="w-full lg:flex-auto mb-24">
                             <ul className="-my-8 divide-y divide-gray-100">
-                                {jobOpenings.map((opening) => (
+                                {jobOpenings.length > 0 ? jobOpenings.map((opening) => (
                                     <li key={opening.id} className="py-8">
                                         <dl className="relative flex flex-wrap gap-x-3">
                                             <dt className="sr-only">Role</dt>
@@ -164,7 +164,10 @@ export default function Careers() {
                                             </dd>
                                         </dl>
                                     </li>
-                                ))}
+                                )) : <div className="py-8">
+                                    {`We're not hiring right now, but we welcome you to check back soon for future opportunities!`}
+                                </div>
+                                }
                             </ul>
                             <div className="mt-8 flex border-t border-gray-100 pt-8">
                                 {`Don't see a role you fit?`}

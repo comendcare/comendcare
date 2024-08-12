@@ -63,9 +63,9 @@ const features: Array<Feature> = [
     {
         name: 'Coming soon...',
         summary:
-            'Patient-led data management and collaboration.',
+            'Accelerating patient-led research by connecting researchers to PAGs.',
         description:
-            'A self-governing platform for aggregating and sharing patient data where you own the commercial value you create.',
+            'A marketplace for projects between researchers and patient groups that enforces accountability and IP governance.',
         image: screenshotProduct1,
         smallImage: screenshotProduct1Small,
         link: "/contact",
