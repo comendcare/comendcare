@@ -14,9 +14,9 @@ export const metadata: Metadata = {
         'From growing your organization and educating stakeholders to advancing research, we’re building the tools to help.',
     keywords: `Comend, Librarey, Rare Disease, Disability Resource Guide, Support`,
     openGraph: {
-        title: `Librarey - Rare disease and disability resources for families`,
+        title: `Comend - Building tech for rare diseases`,
         // images: landingScreenshot.src, Handled by opengraph-image.tsx
-        description: `Librarey is a resource repository for rare disease patients and caregivers. Developed and maintained by Comend and supported by the Warsaw Breakage Syndrome Foundation.`,
+        description: `We build software to help those affected by rare disease find resources, learn about their disorder, and discover new treatments.`,
         locale: `en_US`
     }
 }

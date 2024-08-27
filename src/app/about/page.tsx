@@ -32,8 +32,8 @@ const timeline = [
     {
         name: 'Launching 2 products',
         description:
-            `We're currently working with several patient groups to build a new scientific communicator and patient data platform.`,
-        date: 'Mar 2024',
+            `We're currently working with several patient groups to build a new scientific communicator and research platform.`,
+        date: 'Coming soon...',
         dateTime: '2024-01',
     },
 ]
