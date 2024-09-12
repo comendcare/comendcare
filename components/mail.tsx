@@ -2,17 +2,10 @@
 
 import * as React from "react"
 import {
-    AlertCircle,
-    Archive,
-    ArchiveX,
-    File,
-    Inbox,
-    MessagesSquare,
+    User,
     Search,
-    Send,
-    ShoppingCart,
-    Trash2,
-    Users2,
+    Store,
+    Workflow,
 } from "lucide-react"
 
 import {cn} from "@/lib/utils"
@@ -83,76 +76,25 @@ export function Mail({
                         isCollapsed={isCollapsed}
                         links={[
                             {
-                                title: "Inbox",
+                                title: "Roadmap",
                                 label: "128",
-                                icon: Inbox,
-                                variant: "default",
+                                icon: Workflow,
+                                variant: "ghost",
+                                href: "roadmap"
                             },
                             {
-                                title: "Drafts",
+                                title: "Marketplace",
                                 label: "9",
-                                icon: File,
+                                icon: Store,
                                 variant: "ghost",
+                                href: "marketplace"
                             },
                             {
-                                title: "Sent",
+                                title: "Profile",
                                 label: "",
-                                icon: Send,
+                                icon: User,
                                 variant: "ghost",
-                            },
-                            {
-                                title: "Junk",
-                                label: "23",
-                                icon: ArchiveX,
-                                variant: "ghost",
-                            },
-                            {
-                                title: "Trash",
-                                label: "",
-                                icon: Trash2,
-                                variant: "ghost",
-                            },
-                            {
-                                title: "Archive",
-                                label: "",
-                                icon: Archive,
-                                variant: "ghost",
-                            },
-                        ]}
-                    />
-                    <Separator/>
-                    <AppNav
-                        isCollapsed={isCollapsed}
-                        links={[
-                            {
-                                title: "Social",
-                                label: "972",
-                                icon: Users2,
-                                variant: "ghost",
-                            },
-                            {
-                                title: "Updates",
-                                label: "342",
-                                icon: AlertCircle,
-                                variant: "ghost",
-                            },
-                            {
-                                title: "Forums",
-                                label: "128",
-                                icon: MessagesSquare,
-                                variant: "ghost",
-                            },
-                            {
-                                title: "Shopping",
-                                label: "8",
-                                icon: ShoppingCart,
-                                variant: "ghost",
-                            },
-                            {
-                                title: "Promotions",
-                                label: "21",
-                                icon: Archive,
-                                variant: "ghost",
+                                href: "profile"
                             },
                         ]}
                     />

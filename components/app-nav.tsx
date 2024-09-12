@@ -1,40 +1,50 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { LucideIcon } from "lucide-react"
+import Link from "next/link";
+import { LucideIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import {buttonVariants} from "@/components/ui/button"
-import {Tooltip, TooltipTrigger, TooltipContent} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { usePathname } from "next/navigation";
 
 interface NavProps {
-    isCollapsed: boolean
+    isCollapsed: boolean;
     links: {
-        title: string
-        label?: string
-        icon: LucideIcon
-        variant: "default" | "ghost"
-    }[]
+        title: string;
+        label?: string;
+        icon: LucideIcon;
+        variant: "default" | "ghost";
+        href: string;
+    }[];
 }
 
 export function AppNav({ links, isCollapsed }: NavProps) {
+    const pathname = usePathname();
+
     return (
         <div
             data-collapsed={isCollapsed}
             className="group flex flex-col gap-4 py-2 data-[collapsed=true]:py-2"
         >
-            <nav className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">
-                {links.map((link, index) =>
-                    isCollapsed ? (
+            <nav
+                className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2"
+            >
+                {links.map((link, index) => {
+                    const isActive =
+                        pathname?.endsWith(link.href) || (index === 0 && pathname === "/"); // Adjusting active state
+
+                    return isCollapsed ? (
                         <Tooltip key={index} delayDuration={0}>
                             <TooltipTrigger asChild>
                                 <Link
-                                    href="#"
+                                    href={link.href}
                                     className={cn(
                                         buttonVariants({ variant: link.variant, size: "icon" }),
                                         "h-9 w-9",
                                         link.variant === "default" &&
-                                        "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
+                                        "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white",
+                                        isActive && "bg-muted text-primary" // Active styles
                                     )}
                                 >
                                     <link.icon className="h-4 w-4" />
@@ -53,12 +63,13 @@ export function AppNav({ links, isCollapsed }: NavProps) {
                     ) : (
                         <Link
                             key={index}
-                            href="#"
+                            href={link.href}
                             className={cn(
                                 buttonVariants({ variant: link.variant, size: "sm" }),
                                 link.variant === "default" &&
                                 "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
-                                "justify-start"
+                                "justify-start",
+                                isActive && "bg-muted text-primary font-medium" // Active styles
                             )}
                         >
                             <link.icon className="mr-2 h-4 w-4" />
@@ -75,9 +86,9 @@ export function AppNav({ links, isCollapsed }: NavProps) {
                                 </span>
                             )}
                         </Link>
-                    )
-                )}
+                    );
+                })}
             </nav>
         </div>
-    )
+    );
 }
