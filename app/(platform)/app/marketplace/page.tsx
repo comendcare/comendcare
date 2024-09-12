@@ -12,7 +12,6 @@ export default function MailPage() {
 
     return (
         <main className="flex flex-col items-center w-full h-screen mx-auto">
-            {/*<main className="">*/}
             <Mail
                 defaultLayout={defaultLayout}
                 defaultCollapsed={defaultCollapsed}
