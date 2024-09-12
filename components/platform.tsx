@@ -5,7 +5,7 @@ import {
     User,
     Search,
     Store,
-    Workflow,
+    Workflow, Cog,
 } from "lucide-react"
 
 import {cn} from "@/lib/utils"
@@ -15,18 +15,19 @@ import {Separator} from "@/components/ui/separator";
 import {Tabs, TabsTrigger, TabsList, TabsContent} from "@/components/ui/tabs";
 import {TooltipProvider} from "@/components/ui/tooltip";
 import {AppNav} from "@/components/app-nav";
+import {PlateEditor} from "@/components/editor";
 
-interface MailProps {
+interface PlatformProps {
     defaultLayout: number[] | undefined
     defaultCollapsed?: boolean
     navCollapsedSize: number
 }
 
-export function Mail({
+export function Platform({
                          defaultLayout = [20, 32, 48],
                          defaultCollapsed = false,
                          navCollapsedSize,
-                     }: MailProps) {
+                     }: PlatformProps) {
     const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
 
     return (
@@ -34,7 +35,7 @@ export function Mail({
             <ResizablePanelGroup
                 direction="horizontal"
                 onLayout={(sizes: number[]) => {
-                    document.cookie = `react-resizable-panels:layout:mail=${JSON.stringify(
+                    document.cookie = `react-resizable-panels:layout:platform=${JSON.stringify(
                         sizes
                     )}`
                 }}
@@ -96,11 +97,18 @@ export function Mail({
                                 variant: "ghost",
                                 href: "profile"
                             },
+                            {
+                                title: "Settings",
+                                label: "",
+                                icon: Cog,
+                                variant: "ghost",
+                                href: "settings"
+                            }
                         ]}
                     />
                 </ResizablePanel>
                 <ResizableHandle withHandle/>
-                <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+                <ResizablePanel defaultSize={defaultLayout[2]} minSize={30}>
                     <Tabs defaultValue="all">
                         <div className="flex items-center px-4 py-2">
                             <h1 className="text-xl font-bold">Inbox</h1>
@@ -120,14 +128,6 @@ export function Mail({
                             </TabsList>
                         </div>
                         <Separator/>
-                        <div className="bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                            <form>
-                                <div className="relative">
-                                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground"/>
-                                    <Input placeholder="Search" className="pl-8"/>
-                                </div>
-                            </form>
-                        </div>
                         <TabsContent value="all" className="m-0">
                         </TabsContent>
                         <TabsContent value="unread" className="m-0">
@@ -135,7 +135,8 @@ export function Mail({
                     </Tabs>
                 </ResizablePanel>
                 <ResizableHandle withHandle/>
-                <ResizablePanel defaultSize={defaultLayout[2]} minSize={30}>
+                <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+                    <PlateEditor/>
                 </ResizablePanel>
             </ResizablePanelGroup>
         </TooltipProvider>
