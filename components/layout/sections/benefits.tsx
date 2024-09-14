@@ -1,6 +1,8 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Icon} from "@/components/ui/icon";
-import {icons} from "lucide-react";
+import {ChevronRight, icons} from "lucide-react";
+import AnimatedGradientText from "@/components/ui/animated-gradient-text";
+import {cn} from "@/lib/utils";
 
 interface BenefitsProps {
     icon: string;
@@ -17,12 +19,12 @@ const benefitList: BenefitsProps[] = [
     },
     {
         icon: "Wallet",
-        title: "Researcher & patient group database",
+        title: "Grant database",
         description:
             "Search, filter, and get recommendations for researcher and advocates relevant to your interests.",
     },
     {
-        icon: "LineChart",
+        icon: "ChartLine",
         title: "Project hub",
         description:
             "Search, filter, and get recommendations for completed, in-progress, or future research projects.",
@@ -70,18 +72,25 @@ export const BenefitsSection = () => {
                             key={title}
                             className="bg-muted/50 dark:bg-card hover:bg-background transition-all delay-75 group/number"
                         >
-                            <CardHeader>
-                                <div className="flex justify-between">
+                            <CardHeader className="flex flex-col space-y-4">
+
+                                <div className="flex justify-between items-center">
                                     <Icon
                                         name={icon as keyof typeof icons}
                                         size={32}
                                         color="hsl(var(--primary))"
-                                        className="mb-6 text-primary"
+                                        className="text-primary"
                                     />
-                                    <span
-                                        className="text-5xl text-muted-foreground/15 font-medium transition-all delay-75 group-hover/number:text-muted-foreground/30">
-                                        0{index + 1}
-                                    </span>
+                                    <AnimatedGradientText>
+                                        <span
+                                            className={cn(
+                                                `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
+                                            )}
+                                        >
+                                            Coming soon
+                                        </span>
+                                        <ChevronRight className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+                                    </AnimatedGradientText>
                                 </div>
 
                                 <CardTitle>{title}</CardTitle>

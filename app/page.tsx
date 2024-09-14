@@ -16,7 +16,7 @@ import TabsFeaturesSection from "@/components/layout/sections/tabs-features";
 import {ContractorsSection} from "@/components/layout/sections/contractors";
 import HowItWorks from "@/components/layout/sections/how-it-works";
 
-export default function Home() {
+export default function App() {
     return (
         <>
             <HeroSection/>
