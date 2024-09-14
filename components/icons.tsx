@@ -1,6 +1,7 @@
 import React from 'react';
 
-import type { IconProps } from '@radix-ui/react-icons/dist/types';
+// import type { IconProps } from '@radix-ui/react-icons/dist/types';
+import type {IconBaseProps} from "react-icons";
 
 import { cva } from 'class-variance-authority';
 import {
@@ -473,7 +474,7 @@ export const Icons = {
     threeColumn: ThreeColumnOutlined,
     todo: Square,
     trash: Trash,
-    twitter: (props: IconProps) => (
+    twitter: (props: IconBaseProps) => (
         <svg
             {...props}
             height="23"
