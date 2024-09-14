@@ -3,31 +3,29 @@
 import * as React from "react"
 import {
     User,
-    Search,
     Store,
     Workflow, Cog,
 } from "lucide-react"
 
 import {cn} from "@/lib/utils"
-import {Input} from "@/components/ui/input"
 import {ResizablePanel, ResizablePanelGroup, ResizableHandle} from "@/components/ui/resizable";
 import {Separator} from "@/components/ui/separator";
 import {Tabs, TabsTrigger, TabsList, TabsContent} from "@/components/ui/tabs";
 import {TooltipProvider} from "@/components/ui/tooltip";
 import {AppNav} from "@/components/app-nav";
-import {PlateEditor} from "@/components/editor";
+import Flow from "@/components/flow";
+import Kanban from "@/components/kanban";
 
-interface PlatformProps {
+interface MarketplaceProps {
     defaultLayout: number[] | undefined
     defaultCollapsed?: boolean
     navCollapsedSize: number
 }
 
-export function Platform({
-                         defaultLayout = [20, 32, 48],
-                         defaultCollapsed = false,
-                         navCollapsedSize,
-                     }: PlatformProps) {
+export function Marketplace({
+                                defaultCollapsed = false,
+                                navCollapsedSize,
+                            }: MarketplaceProps) {
     const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
 
     return (
@@ -42,7 +40,7 @@ export function Platform({
                 className="h-full items-stretch"
             >
                 <ResizablePanel
-                    defaultSize={defaultLayout[0]}
+                    defaultSize={20}
                     collapsedSize={navCollapsedSize}
                     collapsible={true}
                     minSize={15}
@@ -108,35 +106,8 @@ export function Platform({
                     />
                 </ResizablePanel>
                 <ResizableHandle withHandle/>
-                <ResizablePanel defaultSize={defaultLayout[2]} minSize={30}>
-                    <Tabs defaultValue="all">
-                        <div className="flex items-center px-4 py-2">
-                            <h1 className="text-xl font-bold">Inbox</h1>
-                            <TabsList className="ml-auto">
-                                <TabsTrigger
-                                    value="all"
-                                    className="text-zinc-600 dark:text-zinc-200"
-                                >
-                                    All mail
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="unread"
-                                    className="text-zinc-600 dark:text-zinc-200"
-                                >
-                                    Unread
-                                </TabsTrigger>
-                            </TabsList>
-                        </div>
-                        <Separator/>
-                        <TabsContent value="all" className="m-0">
-                        </TabsContent>
-                        <TabsContent value="unread" className="m-0">
-                        </TabsContent>
-                    </Tabs>
-                </ResizablePanel>
-                <ResizableHandle withHandle/>
-                <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
-                    <PlateEditor/>
+                <ResizablePanel defaultSize={80} minSize={30}>
+                    <Flow/>
                 </ResizablePanel>
             </ResizablePanelGroup>
         </TooltipProvider>

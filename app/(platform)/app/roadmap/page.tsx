@@ -1,9 +1,8 @@
 import {cookies} from "next/headers"
-import Image from "next/image"
 
-import {Platform} from "@/components/platform"
+import {Roadmap} from "@/components/roadmap"
 
-export default function MailPage() {
+export default function RoadmapPage() {
     const layout = cookies().get("react-resizable-panels:layout:platform")
     const collapsed = cookies().get("react-resizable-panels:collapsed")
 
@@ -11,8 +10,8 @@ export default function MailPage() {
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
     return (
-        <main className="flex flex-col items-center w-full h-screen mx-auto">
-            <Platform
+        <main className="flex flex-col items-center w-screen h-screen mx-auto">
+            <Roadmap
                 defaultLayout={defaultLayout}
                 defaultCollapsed={defaultCollapsed}
                 navCollapsedSize={4}
