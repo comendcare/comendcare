@@ -15,6 +15,7 @@ import {ResearchersSection} from "@/components/layout/sections/researchers";
 import TabsFeaturesSection from "@/components/layout/sections/tabs-features";
 import {ContractorsSection} from "@/components/layout/sections/contractors";
 import HowItWorks from "@/components/layout/sections/how-it-works";
+import LandingFooter from "@/components/layout/sections/landing-footer";
 
 export default function App() {
     return (
@@ -31,7 +32,8 @@ export default function App() {
             {/*<FeaturesSection/>*/}
             <BenefitsSection/>
             {/*<FAQSection/>*/}
-            <FooterSection/>
+            {/*<FooterSection/>*/}
+            <LandingFooter/>
         </>
     );
 }
