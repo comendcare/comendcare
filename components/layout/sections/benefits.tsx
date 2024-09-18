@@ -1,8 +1,8 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Icon} from "@/components/ui/icon";
 import {ChevronRight, icons} from "lucide-react";
-import AnimatedGradientText from "@/components/ui/animated-gradient-text";
 import {cn} from "@/lib/utils";
+import {HoverBorderGradient} from "@/components/ui/hover-border-gradient";
 
 interface BenefitsProps {
     icon: string;
@@ -81,16 +81,13 @@ export const BenefitsSection = () => {
                                         color="hsl(var(--primary))"
                                         className="text-primary"
                                     />
-                                    <AnimatedGradientText>
-                                        <span
-                                            className={cn(
-                                                `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`,
-                                            )}
-                                        >
-                                            Coming soon
-                                        </span>
-                                        <ChevronRight className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
-                                    </AnimatedGradientText>
+                                    <HoverBorderGradient
+                                        containerClassName="rounded-full"
+                                        as="button"
+                                        className="text-sm dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2"
+                                    >
+                                        <span>✨ Coming soon</span>
+                                    </HoverBorderGradient>
                                 </div>
 
                                 <CardTitle>{title}</CardTitle>

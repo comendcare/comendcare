@@ -150,10 +150,10 @@ export default function TabsFeaturesSection() {
                             </div>
 
                             <div className="flex flex-col items-start text-wrap text-start space-y-8 mt-4">
-                                <h3 className="text-2xl font-semibold leading-none tracking-tight">
+                                <h3 className="text-black text-2xl font-semibold leading-none tracking-tight">
                                     {tabContent[tab as keyof typeof tabContent].title}
                                 </h3>
-                                <p className="text-base">
+                                <p className="text-muted-foreground text-base">
                                     {tabContent[tab as keyof typeof tabContent].description}
                                 </p>
                             </div>
