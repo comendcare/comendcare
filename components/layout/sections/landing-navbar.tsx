@@ -8,6 +8,8 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import logo from "@/public/logos/comend-full-logo.png";
 import Image from "next/image";
 import { Menu, MenuItem, ProductItem } from "@/components/layout/sections/navbar-menu";
+import {encode} from "qss";
+import {imgHeight, imgWidth} from "@/components/layout/sections/tabs-features";
 
 interface NavbarItem {
     name: string;
@@ -15,7 +17,7 @@ interface NavbarItem {
     items?: {
         title: string;
         href: string;
-        src: string;
+        imgParams: string;
         description: string;
     }[];
 }
@@ -27,25 +29,45 @@ interface NavbarProps {
 
 export const LandingNavbar: React.FC = () => {
     const navItems: NavbarItem[] = [
-        { name: "Features", link: "/#features" },
-        { name: "FAQ", link: "/faq" },
         {
             name: "Products",
             items: [
                 {
                     title: "Librarey",
                     href: "https://www.librarey.com/",
-                    src: "https://assets.aceternity.com/demos/algochurn.webp",
+                    imgParams: encode({
+                        url: "https://www.librarey.com/",
+                        screenshot: true,
+                        meta: false,
+                        embed: "screenshot.url",
+                        colorScheme: "dark",
+                        "viewport.isMobile": true,
+                        "viewport.deviceScaleFactor": 1,
+                        "viewport.width": imgWidth * 3,
+                        "viewport.height": imgHeight * 3
+                    }),
                     description: "Where rare disease and disability communities discover and share resources."
                 },
                 {
                     title: "Scimantic",
                     href: "https://scimantic.com/",
-                    src: "https://assets.aceternity.com/demos/tailwindmasterkit.webp",
+                    imgParams: encode({
+                        url: "https://scimantic.com/",
+                        screenshot: true,
+                        meta: false,
+                        embed: "screenshot.url",
+                        colorScheme: "dark",
+                        "viewport.isMobile": true,
+                        "viewport.deviceScaleFactor": 1,
+                        "viewport.width": imgWidth * 3,
+                        "viewport.height": imgHeight * 3
+                    }),
                     description: "Helping patient families engage in science by making research more accessible."
                 },
             ]
         },
+        { name: "Features", link: "/#features" },
+        { name: "FAQ", link: "/faq" },
         { name: "Contact", link: "/contact" }
     ];
 
@@ -123,7 +145,7 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                                             key={idx}
                                             title={item.title}
                                             href={item.href}
-                                            src={item.src}
+                                            imgParams={item.imgParams}
                                             description={item.description}
                                         />
                                     ))}
