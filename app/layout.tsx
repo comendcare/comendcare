@@ -24,7 +24,6 @@ export default function RootLayout({
             enableSystem={false}
             disableTransitionOnChange
         >
-            <LandingNavbar/>
             {children}
         </ThemeProvider>
         </body>

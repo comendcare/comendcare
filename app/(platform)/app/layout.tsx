@@ -1,5 +1,4 @@
 import {Metadata} from "next"
-import {AppNav} from "@/components/app-nav";
 
 export const metadata: Metadata = {
     title: "RareSearch",
