@@ -30,7 +30,7 @@ export default function App() {
             {/*<WhoSection/>*/}
             {/*<FeaturesSection/>*/}
             <BenefitsSection/>
-            <FAQSection/>
+            {/*<FAQSection/>*/}
             <FooterSection/>
         </>
     );
