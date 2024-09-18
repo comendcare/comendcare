@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { motion } from "framer-motion";
+import {motion} from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -27,15 +27,15 @@ export const MenuItem = ({
     return (
         <div onMouseEnter={() => setActive(item)} className="relative">
             <motion.p
-                transition={{ duration: 0.3 }}
+                transition={{duration: 0.3}}
                 className="text-neutral-600 dark:text-neutral-300 relative cursor-pointer hover:opacity-[0.9]"
             >
                 {item}
             </motion.p>
             {active !== null && (
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.85, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    initial={{opacity: 0, scale: 0.85, y: 10}}
+                    animate={{opacity: 1, scale: 1, y: 0}}
                     transition={transition}
                 >
                     {active === item && (
@@ -81,20 +81,23 @@ export const ProductItem = ({
                                 title,
                                 description,
                                 href,
-                                src,
+                                imgParams,
                             }: {
     title: string;
     description: string;
     href: string;
-    src: string;
+    imgParams: string;
 }) => {
     return (
         <Link href={href} className="flex space-x-2">
-            <Image
-                src={src}
+            <Image // dynamically pull page preview if thumbnail is not available
+                src={`https://api.microlink.io/?${imgParams}`}
+                alt={title}
+                quality={100}
                 width={140}
                 height={70}
-                alt={title}
+                layout={"fixed"}
+                priority={true}
                 className="flex-shrink-0 rounded-md shadow-2xl"
             />
             <div>
@@ -109,7 +112,7 @@ export const ProductItem = ({
     );
 };
 
-export const HoveredLink = ({ children, ...rest }: any) => {
+export const HoveredLink = ({children, ...rest}: any) => {
     return (
         <Link
             {...rest}
