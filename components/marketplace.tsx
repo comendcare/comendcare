@@ -15,6 +15,7 @@ import {TooltipProvider} from "@/components/ui/tooltip";
 import {AppNav} from "@/components/app-nav";
 import Flow from "@/components/flow";
 import Kanban from "@/components/kanban";
+import Browse from "@/components/browse";
 
 interface MarketplaceProps {
     defaultLayout: number[] | undefined
@@ -107,7 +108,7 @@ export function Marketplace({
                 </ResizablePanel>
                 <ResizableHandle withHandle/>
                 <ResizablePanel defaultSize={80} minSize={30}>
-                    <Flow/>
+                    <Browse/>
                 </ResizablePanel>
             </ResizablePanelGroup>
         </TooltipProvider>

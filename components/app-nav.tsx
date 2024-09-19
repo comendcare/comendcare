@@ -1,8 +1,9 @@
+// src/components/app-nav.tsx (Client Component)
+
 "use client";
 
 import Link from "next/link";
 import { LucideIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -31,8 +32,7 @@ export function AppNav({ links, isCollapsed }: NavProps) {
                 className="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2"
             >
                 {links.map((link, index) => {
-                    const isActive =
-                        pathname?.endsWith(link.href) || (index === 0 && pathname === "/"); // Adjusting active state
+                    const isActive = pathname?.endsWith(link.href) || (index === 0 && pathname === "/");
 
                     return isCollapsed ? (
                         <Tooltip key={index} delayDuration={0}>
@@ -44,7 +44,7 @@ export function AppNav({ links, isCollapsed }: NavProps) {
                                         "h-9 w-9",
                                         link.variant === "default" &&
                                         "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white",
-                                        isActive && "bg-muted text-primary" // Active styles
+                                        isActive && "bg-muted text-primary"
                                     )}
                                 >
                                     <link.icon className="h-4 w-4" />
@@ -69,19 +69,13 @@ export function AppNav({ links, isCollapsed }: NavProps) {
                                 link.variant === "default" &&
                                 "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
                                 "justify-start",
-                                isActive && "bg-muted text-primary font-medium" // Active styles
+                                isActive && "bg-muted text-primary font-medium"
                             )}
                         >
                             <link.icon className="mr-2 h-4 w-4" />
                             {link.title}
                             {link.label && (
-                                <span
-                                    className={cn(
-                                        "ml-auto",
-                                        link.variant === "default" &&
-                                        "text-background dark:text-white"
-                                    )}
-                                >
+                                <span className={cn("ml-auto", link.variant === "default" && "text-background dark:text-white")}>
                                     {link.label}
                                 </span>
                             )}
