@@ -61,7 +61,7 @@ export const DateElement = withRef<typeof PlateElement>(
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
             <Calendar
-              initialFocus
+              // initialFocus
               mode="single"
               onSelect={(date) => {
                 if (!date) return;
