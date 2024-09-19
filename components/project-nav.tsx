@@ -5,16 +5,14 @@ import {usePathname} from "next/navigation"
 
 import {cn} from "@/lib/utils"
 
-const examples = [
+const links = [
     {
-        name: "Budget",
-        href: "/budget",
-        code: "https://github.com/shadcn/ui/tree/main/apps/www/app/(app)/examples/forms",
+        name: "Researchers",
+        href: "/researchers",
     },
     {
-        name: "Timeline",
-        href: "/timeline",
-        code: "https://github.com/shadcn/ui/tree/main/apps/www/app/(app)/examples/forms",
+        name: "Contractors",
+        href: "/contractors",
     },
 ]
 
@@ -27,19 +25,19 @@ export function ProjectNav({className, projectId, ...props}: ExamplesNavProps) {
 
     return (
         <div className={cn("mb-4 flex items-center", className)} {...props}>
-            {examples.map((example, index) => (
+            {links.map((link, index) => (
                 <Link
-                    href={"/pag/project/" + projectId + example.href}
-                    key={example.href}
+                    href={"/app/marketplace/" + link.href}
+                    key={link.href}
                     className={cn(
                         "flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                        pathname?.endsWith(example.href) ||
+                        pathname?.endsWith(link.href) ||
                         (index === 0 && pathname === "/")
                             ? "bg-muted font-medium text-primary"
                             : "text-muted-foreground"
                     )}
                 >
-                    {example.name}
+                    {link.name}
                 </Link>
             ))}
         </div>

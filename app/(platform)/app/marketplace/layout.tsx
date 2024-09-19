@@ -8,13 +8,15 @@ export const metadata: Metadata = {
 
 interface ProjectLayoutProps {
     children: React.ReactNode
-    params: { projectId: string }
 }
 
-export default function ProjectLayout({children, params}: ProjectLayoutProps) {
+export default function ProjectLayout({children}: ProjectLayoutProps) {
 
     return (
         <div className="container relative">
+            <div className="sticky left-0 top-10 w-full min-h-40 z-10">
+                <ProjectNav projectId={""}/>
+            </div>
             {children}
         </div>
     )

@@ -20,7 +20,7 @@ const whoList: WhoProps[] = [
             "Participate in research and support your research goals.",
         keyFeatures: [
             "Track research progression",
-            "Project budget breakdowns",
+            "Project researchers breakdowns",
             "Data intake and distribution",
         ]
     },
