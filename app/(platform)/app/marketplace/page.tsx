@@ -1,7 +1,4 @@
 import {cookies} from "next/headers"
-import Image from "next/image"
-
-import {Roadmap} from "@/components/roadmap"
 import {Marketplace} from "@/components/marketplace";
 
 export default function MarketplacePage() {

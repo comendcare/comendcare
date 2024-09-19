@@ -1,8 +1,6 @@
 import {cookies} from "next/headers"
 import Image from "next/image"
 
-import {Roadmap} from "@/components/roadmap"
-
 export default function ProfilePage() {
     const layout = cookies().get("react-resizable-panels:layout:platform")
     const collapsed = cookies().get("react-resizable-panels:collapsed")
@@ -12,11 +10,6 @@ export default function ProfilePage() {
 
     return (
         <main className="flex flex-col items-center w-full h-screen mx-auto">
-            <Roadmap
-                defaultLayout={defaultLayout}
-                defaultCollapsed={defaultCollapsed}
-                navCollapsedSize={4}
-            />
         </main>
     )
 }

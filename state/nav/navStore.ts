@@ -1,21 +1,20 @@
-// /src/state/auth/authStore.ts
-import create from 'zustand';
+import { create } from 'zustand';
 
 type NavState = {
     isCollapsed: boolean;
     navCollapsedSize: number;
+    defaultLayout: number[];
     setIsCollapsed: (isCollapsed: boolean) => void;
-    defaultLayout: number[],
-    setNavState: (layout: any, collapsed: boolean) => void;
+    setLayout: (layout: number[]) => void;
+    setNavState: (layout: number[], isCollapsed: boolean) => void;
 };
 
 export const useNavStore = create<NavState>((set) => ({
-    isCollapsed: false,
-    navCollapsedSize: 4,
-    defaultLayout: [20, 32, 48],
-    setIsCollapsed: (isCollapsed) => set(() => ({ isCollapsed: isCollapsed })),
-    setNavState: (layout, collapsed) => set(() => ({
-        defaultLayout: layout,
-        defaultCollapsed: collapsed,
-    }))
+    isCollapsed: false, // Collapsed by default
+    navCollapsedSize: 4, // Set the size when nav is collapsed
+    defaultLayout: [20, 32, 48], // Default layout sizes
+    setIsCollapsed: (isCollapsed) => set(() => ({ isCollapsed })),
+    setLayout: (layout) => set(() => ({ defaultLayout: layout })),
+    setNavState: (layout, isCollapsed) =>
+        set(() => ({ defaultLayout: layout, isCollapsed })),
 }));
