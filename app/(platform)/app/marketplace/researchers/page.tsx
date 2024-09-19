@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/chart";
 import {Label, Pie, PieChart} from "recharts";
 import {TrendingUp} from "lucide-react";
+import InputDropdown from "@/components/ui/input-dropdown";
 
 const chartData = [
     {category: "personnel", amount: 50000, fill: "var(--color-personnel)"},
@@ -54,6 +55,7 @@ export default function BudgetPage({params}: { params: { projectId: string } }) 
             <div className="max-w-7xl flex flex-col w-full p-4 mt-72">
                 <div className="grid grid-cols-2 gap-8">
                     <div className="space-y-2">
+                        <InputDropdown/>
                         <h2 className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                             Budget
                         </h2>
