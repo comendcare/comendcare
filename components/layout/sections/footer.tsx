@@ -12,7 +12,7 @@ export const FooterSection = () => {
                         <Image
                             priority
                             src={logo}
-                            alt="RareSearch logo"
+                            alt="Comend logo"
                         />
                     </div>
                 </div>
@@ -23,10 +23,10 @@ export const FooterSection = () => {
                         &copy; 2024 Designed and developed by
                         <Link
                             target="_blank"
-                            href="https://www.raresearch.com/"
+                            href="https://www.comendcare.com/"
                             className="text-primary transition-all border-primary hover:border-b-2 ml-1"
                         >
-                            RareSearch
+                            Comend
                         </Link>
                     </h3>
                 </section>

@@ -157,7 +157,7 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
             </motion.div>
 
             <div className="flex items-center gap-4">
-                <Link href="#" className={cn(buttonVariants({ variant: "secondary" }), "hidden md:block")}>
+                <Link href="/signin" className={cn(buttonVariants({ variant: "secondary" }), "hidden md:block")}>
                     Login
                 </Link>
             </div>
@@ -218,7 +218,7 @@ const MobileNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                                 </Link>
                             ))}
                             <Link
-                                href="#"
+                                href="signin"
                                 onClick={() => setOpen(false)}
                                 className={cn(buttonVariants({ variant: "default" }), "block md:hidden w-full")}
                             >

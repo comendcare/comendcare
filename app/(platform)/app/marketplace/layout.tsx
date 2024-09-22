@@ -2,7 +2,7 @@ import {Metadata} from "next"
 import {ProjectNav} from "@/components/project-nav";
 
 export const metadata: Metadata = {
-    title: "RareSearch",
+    title: "Comend",
     description: "Check out some examples app built using the components.",
 }
 

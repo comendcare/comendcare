@@ -89,12 +89,12 @@ export const ProductItem = ({
     imgParams: string;
 }) => {
     return (
-        <Link href={href} className="flex space-x-2">
+        <Link href={href} className="flex space-x-4">
             <Image // dynamically pull page preview if thumbnail is not available
                 src={`https://api.microlink.io/?${imgParams}`}
                 alt={title}
                 quality={100}
-                width={140}
+                width={200}
                 height={70}
                 layout={"fixed"}
                 priority={true}

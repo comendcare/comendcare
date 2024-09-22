@@ -11,8 +11,8 @@ import HeroIllustration from "@/components/layout/sections/hero-illustration";
 export const HeroSection = () => {
     return (
         <section className="container w-full mx-auto">
-            <div className="grid grid-cols-3 h-1/2 items-center max-w-7xl gap-8 mx-auto py-24 md:py-32 mt-16">
-                <div className="col-span-1 text-left space-y-8">
+            <div className="grid grid-cols-5 h-1/2 items-center max-w-7xl gap-8 mx-auto py-24 md:py-32 mt-16">
+                <div className="col-span-2 text-left space-y-8">
                     {/*<Badge variant="outline" className="text-sm py-2">*/}
                     {/*    <span className="mr-2 text-primary">*/}
                     {/*      <Badge>New</Badge>*/}
@@ -35,7 +35,7 @@ export const HeroSection = () => {
                     </div>
 
                     <p className="max-w-screen-sm text-xl text-muted-foreground">
-                        {`Design and manage your research roadmap. Connect with academics, CROs, and other patient groups who can help.`}
+                        {`Design your research roadmap. Connect with academics, CROs, and other patient groups who can help.`}
                     </p>
 
                     <div className="flex flex-row space-x-2">

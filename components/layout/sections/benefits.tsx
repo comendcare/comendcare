@@ -13,9 +13,9 @@ interface BenefitsProps {
 const benefitList: BenefitsProps[] = [
     {
         icon: "Blocks",
-        title: "Researcher & patient group profiles",
+        title: "Forums and discussions",
         description:
-            "Showcase your interests by detailing your accomplishments, roadmaps, and goals.",
+            "Talk with other advocates and researchers about their progress and find answers to your questions.",
     },
     {
         icon: "Wallet",
@@ -33,7 +33,7 @@ const benefitList: BenefitsProps[] = [
         icon: "Sparkle",
         title: "Research agreements",
         description:
-            "Streamline projects with legal templates that protect patient priorities.",
+            "Streamline projects with legal templates and IP management tools that protect patient priorities.",
     },
 ];
 

@@ -7,7 +7,7 @@ const ResearchersHowItWorks = () => {
                 <div className="flex flex-col gap-16">
                     <div className="flex flex-col gap-2 text-start">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                            How Raresearch works
+                            How Comend works
                         </h2>
                         <p className="text-xl text-muted-foreground mb-8">
                             Find funding, discover new collaborators, and validate your work with the patient community.
