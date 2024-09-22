@@ -83,7 +83,7 @@ const HeroIllustration = () => {
             elementsSelectable={false}
             nodesFocusable={false}
             edgesFocusable={false}
-            className="col-span-2 pointer-events-none"
+            className="col-span-3 pointer-events-none"
         >
         </ReactFlow>
     );

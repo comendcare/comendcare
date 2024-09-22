@@ -10,7 +10,7 @@ export default function Loading() {
                 <Image
                     priority
                     src={logo}
-                    alt="RareSearch logo"
+                    alt="Comend logo"
                 />
             </div>
         </div>

@@ -107,7 +107,7 @@ export default function TabsFeaturesSection() {
                         The all-in-one platform for collaboration
                     </h2>
                     <p className="text-xl text-muted-foreground mb-8">
-                        RareSearch streamlines your efforts in the rare disease community. Manage projects, apply for
+                        Comend streamlines your efforts in the rare disease community. Manage projects, apply for
                         grants, collaborate with researchers, connect with advocacy groups, and hire contractors—all
                         from one intuitive platform.
                     </p>

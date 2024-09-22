@@ -37,7 +37,7 @@ export default function ResearchersHeroSection() {
                     <Image
                         priority
                         src={researchersHero}
-                        alt="RareSearch hero"
+                        alt="Comend hero"
                         className="w-full"
                     />
                 </div>

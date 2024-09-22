@@ -54,7 +54,7 @@ export const WhoSection = () => {
             <div className="flex flex-col items-start mx-auto lg:max-w-screen-xl lg:gap-8">
                 <div>
                     <h2 className="text-3xl md:text-4xl font-bold">
-                        {`Who's on RareSearch?`}
+                        {`Who's on Comend?`}
                     </h2>
                 </div>
 
