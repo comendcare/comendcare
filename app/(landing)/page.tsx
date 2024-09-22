@@ -12,6 +12,7 @@ import TabsFeaturesSection from "@/components/layout/sections/tabs-features";
 import HowItWorks from "@/components/layout/sections/how-it-works";
 import LandingFooter from "@/components/layout/sections/landing-footer";
 import CTASection from "@/components/layout/sections/cta";
+import {LibrareySection} from "@/components/layout/sections/librarey-section";
 
 export default function App() {
     return (
@@ -24,6 +25,7 @@ export default function App() {
             <BenefitsSection/>
             {/*<FAQSection/>*/}
             {/*<FooterSection/>*/}
+            <LibrareySection/>
             <CTASection/>
             <LandingFooter/>
         </>

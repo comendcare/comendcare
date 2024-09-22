@@ -40,7 +40,7 @@ const benefitList: BenefitsProps[] = [
 export const BenefitsSection = () => {
     return (
         <section id="benefits" className="container w-full mx-auto py-24 sm:py-32 max-w-7xl">
-            <div className="grid lg:grid-cols-2 place-items-center lg:gap-24">
+            <div className="grid lg:grid-cols-2 items-center lg:gap-24">
                 <div>
                     <h2 className="text-lg text-primary mb-2 tracking-wider">Benefits</h2>
 
@@ -52,16 +52,16 @@ export const BenefitsSection = () => {
                     </p>
                     <div className="flex justify-start space-x-16">
                         <div>
-                            <div className="text-2xl font-bold">400+</div>
+                            <div className="text-2xl font-bold">37,000,000+</div>
                             <div className="text-muted-foreground">Patient groups</div>
                         </div>
                         <div>
-                            <div className="text-2xl font-bold">5000+</div>
-                            <div className="text-muted-foreground">Contractors</div>
+                            <div className="text-2xl font-bold">5,000,000+</div>
+                            <div className="text-muted-foreground">Researchers</div>
                         </div>
                         <div>
-                            <div className="text-2xl font-bold">1000+</div>
-                            <div className="text-muted-foreground">Researchers</div>
+                            <div className="text-2xl font-bold">60,000+</div>
+                            <div className="text-muted-foreground">Contractors</div>
                         </div>
                     </div>
                 </div>
