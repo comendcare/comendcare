@@ -1,5 +1,5 @@
 import React from "react";
-import HowItWorksCard from "@/components/ui/how-it-works-card";
+import HowItWorksCard from "@/components/how-it-works-card";
 import {FaCircleArrowRight, FaHandHoldingHeart, FaHandshakeSimple, FaUsers} from "react-icons/fa6";
 
 const steps = [
