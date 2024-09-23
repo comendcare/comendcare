@@ -4,11 +4,11 @@ import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import {
-  BaseParagraphPlugin,
   collapseSelection,
   getNodeEntries,
   isBlock,
 } from '@udecode/plate-common';
+import {ParagraphPlugin} from "@udecode/plate-common/react";
 import {
   focusEditor,
   useEditorRef,
@@ -34,7 +34,7 @@ const items = [
     description: 'Paragraph',
     icon: Icons.paragraph,
     label: 'Paragraph',
-    value: BaseParagraphPlugin.key,
+    value: ParagraphPlugin.key,
   },
   {
     description: 'Heading 1',
@@ -74,11 +74,11 @@ const items = [
   // },
 ];
 
-const defaultItem = items.find((item) => item.value === BaseParagraphPlugin.key)!;
+const defaultItem = items.find((item) => item.value === ParagraphPlugin.key)!;
 
 export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   const value: string = useEditorSelector((editor) => {
-    let initialNodeType: string = BaseParagraphPlugin.key;
+    let initialNodeType: string = ParagraphPlugin.key;
     let allNodesMatchInitialNodeType = false;
     const codeBlockEntries = getNodeEntries(editor, {
       match: (n) => isBlock(editor, n),
@@ -89,13 +89,13 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
     if (nodes.length > 0) {
       initialNodeType = nodes[0][0].type as string;
       allNodesMatchInitialNodeType = nodes.every(([node]) => {
-        const type: string = (node?.type as string) || BaseParagraphPlugin.key;
+        const type: string = (node?.type as string) || ParagraphPlugin.key;
 
         return type === initialNodeType;
       });
     }
 
-    return allNodesMatchInitialNodeType ? initialNodeType : BaseParagraphPlugin.key;
+    return allNodesMatchInitialNodeType ? initialNodeType : ParagraphPlugin.key;
   }, []);
 
   const editor = useEditorRef();
