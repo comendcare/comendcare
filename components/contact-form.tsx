@@ -163,7 +163,7 @@ export function ContactForm() {
     );
 }
 
-const BottomGradient = () => {
+export const BottomGradient = () => {
     return (
         <>
             <span className="group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
@@ -172,7 +172,7 @@ const BottomGradient = () => {
     );
 };
 
-const LabelInputContainer = ({
+export const LabelInputContainer = ({
                                  children,
                                  className,
                              }: {
@@ -180,7 +180,7 @@ const LabelInputContainer = ({
     className?: string;
 }) => {
     return (
-        <div className={cn("flex flex-col space-y-2 w-full", className)}>
+    <div className={cn("flex flex-col space-y-2 w-full", className)}>
             {children}
         </div>
     );
