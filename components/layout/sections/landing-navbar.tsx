@@ -67,8 +67,9 @@ export const LandingNavbar: React.FC = () => {
             ]
         },
         { name: "Features", link: "/#features" },
+        { name: "About", link: "/about" },
         { name: "FAQ", link: "/faq" },
-        { name: "Contact", link: "/contact" }
+        { name: "Contact", link: "/contact" },
     ];
 
     const ref = useRef<HTMLDivElement>(null);
