@@ -14,6 +14,7 @@ import LandingFooter from "@/components/layout/sections/landing-footer";
 import CTASection from "@/components/layout/sections/cta";
 import {LibrareySection} from "@/components/layout/sections/librarey-section";
 import {StatsSection} from "@/components/layout/sections/stats-section";
+import {ScimanticSection} from "@/components/layout/sections/scimantic-section";
 
 export default function App() {
     return (
@@ -28,6 +29,7 @@ export default function App() {
             {/*<FAQSection/>*/}
             {/*<FooterSection/>*/}
             <LibrareySection/>
+            <ScimanticSection/>
             <CTASection/>
             <LandingFooter/>
         </>

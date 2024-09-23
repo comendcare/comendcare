@@ -41,28 +41,14 @@ export const ComingSoonSection = () => {
         <section id="benefits" className="container w-full mx-auto py-24 sm:py-32 max-w-7xl">
             <div className="grid lg:grid-cols-2 items-center lg:gap-24">
                 <div>
-                    <h2 className="text-lg text-primary mb-2 tracking-wider">Benefits</h2>
+                    <h2 className="text-lg text-primary mb-2 tracking-wider">What's next</h2>
 
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                        For patient-led research
+                        {`Looking forward to building with you`}
                     </h2>
                     <p className="text-xl text-muted-foreground mb-8">
-                        End-to-end tools from ideation to collaboration and beyond.
+                        {`Our roadmap is chock full of features we think you'll like.`}
                     </p>
-                    <div className="flex justify-start space-x-16">
-                        <div>
-                            <div className="text-2xl font-bold">37,000,000+</div>
-                            <div className="text-muted-foreground">Patient groups</div>
-                        </div>
-                        <div>
-                            <div className="text-2xl font-bold">5,000,000+</div>
-                            <div className="text-muted-foreground">Researchers</div>
-                        </div>
-                        <div>
-                            <div className="text-2xl font-bold">60,000+</div>
-                            <div className="text-muted-foreground">Contractors</div>
-                        </div>
-                    </div>
                 </div>
 
                 <div className="grid lg:grid-cols-2 gap-4 w-full">

@@ -4,50 +4,56 @@ import React, {useEffect, useState} from "react";
 import Link from "next/link";
 import {LinkPreview} from "@/components/link-preview";
 import {Badge} from "@/components/ui/badge";
+import librareyLogo from "@/public/logos/librarey-Logo.svg"
+import Image from "next/image"
 
 // ResourceCard component remains the same
 const ResourceCard = ({
                           img,
                           name,
+                          href,
                           categories,
                           description,
                       }: {
     img: string
     name: string
+    href: string
     categories: { category: { name: string } }[]
     description: string
 }) => {
     return (
-        <figure
-            className={cn(
-                "relative w-64 cursor-pointer overflow-hidden rounded-xl border p-4 space-y-2",
-                // light styles
-                "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
-                // dark styles
-                "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
-            )}
-        >
-            <div className="flex flex-row items-center gap-2">
-                <img className="rounded-full" width="32" height="32" alt="" src={img}/>
-                <div className="flex flex-col">
-                    <figcaption className="text-sm font-medium dark:text-white">
-                        {name}
-                    </figcaption>
+        <Link rel="noopener noreferrer" target="_blank" href={href}>
+            <figure
+                className={cn(
+                    "relative w-64 cursor-pointer overflow-hidden rounded-xl border p-4 space-y-2",
+                    // light styles
+                    "border-gray-950/[.1] bg-gray-950/[.01] hover:bg-gray-950/[.05]",
+                    // dark styles
+                    "dark:border-gray-50/[.1] dark:bg-gray-50/[.10] dark:hover:bg-gray-50/[.15]",
+                )}
+            >
+                <div className="flex flex-row items-center gap-2">
+                    <img className="rounded-full" width="32" height="32" alt="" src={img}/>
+                    <div className="flex flex-col">
+                        <figcaption className="text-sm font-medium dark:text-white">
+                            {name}
+                        </figcaption>
+                    </div>
                 </div>
-            </div>
 
-            <div className="flex flex-wrap gap-1">
-                {categories?.map((category, index) => (
-                    <Badge key={index}>
-                        {category.category.name}
-                    </Badge>
-                ))}
-            </div>
+                <div className="flex flex-wrap gap-1">
+                    {categories?.map((category, index) => (
+                        <Badge key={index}>
+                            {category.category.name}
+                        </Badge>
+                    ))}
+                </div>
 
-            <blockquote className="text-sm line-clamp-4">
-                {description}
-            </blockquote>
-        </figure>
+                <blockquote className="text-sm line-clamp-4">
+                    {description}
+                </blockquote>
+            </figure>
+        </Link>
     );
 };
 
@@ -113,7 +119,12 @@ export function LibrareySection() {
 
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
                         {`Latest from `}
-                        <LinkPreview url={"https://www.librarey.com/"} className="hover:underline" target="_blank">
+                        <LinkPreview
+                            url={"https://www.librarey.com/"}
+                            className="hover:underline inline-flex items-baseline"
+                            target="_blank"
+                        >
+                            <Image src={librareyLogo} alt="" className="self-center w-8 h-8 mx-2"/>
                             Librarey
                         </LinkPreview>
                     </h2>
@@ -129,6 +140,7 @@ export function LibrareySection() {
                             key={resource.id}
                             img={resource.favicon || "https://avatar.vercel.sh/placeholder"}
                             name={resource.name}
+                            href={`https://www.librarey.com/resource/${resource.id}`}
                             categories={resource.categories.slice(0, 1)}
                             description={resource.description}
                         />
@@ -140,6 +152,7 @@ export function LibrareySection() {
                             key={resource.id}
                             img={resource.favicon || "https://avatar.vercel.sh/placeholder"}
                             name={resource.name}
+                            href={`https://www.librarey.com/resource/${resource.id}`}
                             categories={resource.categories.slice(0, 1)}
                             description={resource.description}
                         />
