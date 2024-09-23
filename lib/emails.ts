@@ -1,0 +1,57 @@
+"use server"
+import { render } from "@react-email/render"
+import sgMail from "@sendgrid/mail"
+import { ContactEmail } from "@/lib/email-templates/contact/contact-email"
+import rateLimit from "@/lib/rate-limit";
+import axios from "axios";
+
+const limiter = rateLimit({
+    interval: 600 * 1000, // 10 minutes (600 seconds * 1000 ms)
+    uniqueTokenPerInterval: 500, // Max 500 IPs
+});
+
+// from: https://medium.com/how-to-react/how-to-get-user-ip-address-in-react-js-73eb295720d0
+const getIp = async () => {
+    const res = await axios.get("https://api.ipify.org/?format=json")
+    return res.data.ip
+};
+
+const sendEmail = async (message: { to: string | string[]; from: string; subject: string; text?: string; html: string }) => {
+    // this may throw an error - errors handled outside send email
+    const clientIp = await getIp()
+    const blocked = await limiter.check(5, clientIp) // Limit to 5 requests per 10 minutes
+
+    if (blocked) throw Error("Rate limit exceeded.", { cause: "RATE-LIMIT" })
+        
+    sgMail
+        .send(message)
+        .then(() => {
+            console.log("Email sent")
+        })
+        .catch((error: Error) => {
+            console.error(error)
+            throw error
+        })
+}
+
+export async function sendContactEmail(params: {
+    user: { name: string | null | undefined; email: string | null | undefined }
+    message: string | null | undefined
+}) {
+    const emailTemplate = await render(
+        ContactEmail({ name: params.user.name, email: params.user.email, message: params.message })
+    )
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
+    if (params.user.email) {
+        const msg = {
+            // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
+            to: "hello@comendcare.com",
+            from: "corporate@comendcare.com",
+            html: emailTemplate,
+            text: "A user has sent a message via the contact page.",
+            subject: "Contact form message"
+        }
+        await sendEmail(msg)
+    }
+}
