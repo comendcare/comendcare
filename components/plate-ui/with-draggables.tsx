@@ -12,20 +12,18 @@ import {
 } from '@udecode/plate-dnd';
 import { ExcalidrawPlugin } from '@udecode/plate-excalidraw';
 import { HEADING_KEYS } from '@udecode/plate-heading';
-import { ColumnPlugin } from '@udecode/plate-layout';
+import {BaseColumnPlugin } from '@udecode/plate-layout';
 import {
   BulletedListPlugin,
   NumberedListPlugin,
 } from '@udecode/plate-list/react';
-import {
-  ImagePlugin,
-  MediaEmbedPlugin,
-  PlaceholderPlugin,
-} from '@udecode/plate-media';
-import { TablePlugin } from '@udecode/plate-table';
-import { TogglePlugin } from '@udecode/plate-toggle';
+import {ImagePlugin} from "@udecode/plate-media/react";
+import {TablePlugin} from "@udecode/plate-table/react";
 
 import { Draggable, type DraggableProps } from './draggable';
+import {ColumnPlugin} from "@udecode/plate-layout/react";
+import {MediaEmbedPlugin, PlaceholderPlugin} from "@udecode/plate-media/react";
+import {TogglePlugin} from "@udecode/plate-toggle/react";
 
 export const withDraggable = (
   Component: FC,

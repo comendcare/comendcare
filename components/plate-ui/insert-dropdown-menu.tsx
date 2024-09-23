@@ -3,7 +3,8 @@ import React from 'react';
 import type { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
-import { ParagraphPlugin, insertEmptyElement } from '@udecode/plate-common';
+import { insertEmptyElement } from '@udecode/plate-common';
+import {ParagraphPlugin} from "@udecode/plate-common/react";
 import { focusEditor, useEditorRef } from '@udecode/plate-common/react';
 import { HEADING_KEYS } from '@udecode/plate-heading';
 
