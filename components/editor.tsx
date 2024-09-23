@@ -15,13 +15,13 @@ import { TablePlugin, TableRowPlugin, TableCellPlugin, TableCellHeaderPlugin } f
 import { TodoListPlugin } from '@udecode/plate-list/react';
 import { DatePlugin } from '@udecode/plate-date/react';
 import { BoldPlugin, ItalicPlugin, UnderlinePlugin, StrikethroughPlugin, CodePlugin, SubscriptPlugin, SuperscriptPlugin } from '@udecode/plate-basic-marks/react';
-import { FontColorPlugin, FontBackgroundColorPlugin, FontSizePlugin } from '@udecode/plate-font';
+import {BaseFontColorPlugin, BaseFontBackgroundColorPlugin, BaseFontSizePlugin } from '@udecode/plate-font';
 import { HighlightPlugin } from '@udecode/plate-highlight/react';
 import { KbdPlugin } from '@udecode/plate-kbd/react';
-import { AlignPlugin } from '@udecode/plate-alignment';
+// import { AlignPlugin } from '@udecode/plate-alignment';
 import { IndentPlugin } from '@udecode/plate-indent/react';
 import { IndentListPlugin } from '@udecode/plate-indent-list/react';
-import { LineHeightPlugin } from '@udecode/plate-line-height';
+import { BaseLineHeightPlugin } from '@udecode/plate-line-height';
 import { AutoformatPlugin } from '@udecode/plate-autoformat/react';
 import { BlockSelectionPlugin } from '@udecode/plate-selection/react';
 import { DndPlugin } from '@udecode/plate-dnd';
@@ -108,21 +108,21 @@ const editor = createPlateEditor({
         CodePlugin,
         SubscriptPlugin,
         SuperscriptPlugin,
-        FontColorPlugin,
-        FontBackgroundColorPlugin,
-        FontSizePlugin,
+        BaseFontColorPlugin,
+        BaseFontBackgroundColorPlugin,
+        BaseFontSizePlugin,
         HighlightPlugin,
         KbdPlugin,
-        AlignPlugin.configure({
-            inject: { targetPlugins: ['p', 'h1', 'h2', 'h3'] },
-        }),
+        // AlignPlugin.configure({
+        //     inject: { targetPlugins: ['p', 'h1', 'h2', 'h3'] },
+        // }),
         IndentPlugin.configure({
             inject: { targetPlugins: ['p', 'h1', 'h2', 'h3'] },
         }),
         IndentListPlugin.configure({
             inject: { targetPlugins: ['p', 'h1', 'h2', 'h3'] },
         }),
-        LineHeightPlugin.configure({
+        BaseLineHeightPlugin.configure({
             inject: {
                 nodeProps: {
                     defaultNodeValue: 1.5,
