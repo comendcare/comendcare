@@ -25,7 +25,7 @@ const steps = [
 
 const HowItWorks = () => {
     return (
-        <div className="w-full container mx-auto my-32 max-w-7xl flex flex-col items-start gap-16">
+        <div className="w-full container mx-auto my-24 max-w-7xl flex flex-col items-start gap-16">
             <div className="flex flex-col gap-16">
                 <div className="flex flex-col gap-2 text-start">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">

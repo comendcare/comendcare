@@ -23,7 +23,7 @@ export function StatsSection() {
         }
     ];
     return (
-        <section className="group/container relative mx-auto w-full max-w-7xl overflow-hidden rounded-3xl py-20">
+        <section className="group/container relative mx-auto w-full max-w-7xl overflow-hidden rounded-3xl py-24">
             <div className="relative z-20 space-y-8">
                 <div className="grid grid-cols-2">
                     <div>

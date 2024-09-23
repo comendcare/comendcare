@@ -15,6 +15,7 @@ import CTASection from "@/components/layout/sections/cta";
 import {LibrareySection} from "@/components/layout/sections/librarey-section";
 import {StatsSection} from "@/components/layout/sections/stats-section";
 import {ScimanticSection} from "@/components/layout/sections/scimantic-section";
+import WhatElseSection from "@/components/layout/sections/what-else-section";
 
 export default function App() {
     return (
@@ -28,6 +29,7 @@ export default function App() {
             <ComingSoonSection/>
             {/*<FAQSection/>*/}
             {/*<FooterSection/>*/}
+            <WhatElseSection/>
             <LibrareySection/>
             <ScimanticSection/>
             <CTASection/>

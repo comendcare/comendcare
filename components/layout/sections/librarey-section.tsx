@@ -102,7 +102,7 @@ export function LibrareySection() {
     }, []);
 
     if (loading) {
-        return <div className="mx-auto w-full max-w-7xl py-20">
+        return <div className="mx-auto w-full max-w-7xl py-32">
             Loading...
         </div>
     }
@@ -112,7 +112,7 @@ export function LibrareySection() {
     const secondRow = resources.slice(Math.ceil(resources.length / 2));
 
     return (
-        <div className="mx-auto w-full max-w-7xl py-20">
+        <div className="mx-auto w-full max-w-7xl py-24">
             <div className="grid grid-cols-2">
                 <div>
                     <h2 className="text-lg text-primary mb-2 tracking-wider">Products</h2>
