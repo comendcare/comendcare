@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import Link from "next/link";
 import {LinkPreview} from "@/components/link-preview";
 import {Badge} from "@/components/ui/badge";
-import librareyLogo from "@/public/logos/librarey-Logo.svg"
+import librareyLogo from "@/public/logos/librarey-logo.svg"
 import Image from "next/image"
 
 // ResourceCard component remains the same

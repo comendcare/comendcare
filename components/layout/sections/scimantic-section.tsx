@@ -3,7 +3,7 @@
 import {PlaceholdersAndVanishInput} from "@/components/placeholders-and-vanish-input";
 import {LinkPreview} from "@/components/link-preview";
 import React from "react";
-import scimanticLogo from "@/public/logos/scimantic-Logo.png"
+import scimanticLogo from "@/public/logos/scimantic-logo.png"
 import Image from "next/image"
 
 export function ScimanticSection() {
