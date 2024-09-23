@@ -21,7 +21,7 @@ export default function App() {
     return (
         <>
             <HeroSection/>
-            <HowItWorks/>
+            {/*<HowItWorks/>*/}
             <TabsFeaturesSection/>
             {/*<WhoSection/>*/}
             {/*<FeaturesSection/>*/}
@@ -29,9 +29,9 @@ export default function App() {
             <ComingSoonSection/>
             {/*<FAQSection/>*/}
             {/*<FooterSection/>*/}
-            <WhatElseSection/>
-            <LibrareySection/>
-            <ScimanticSection/>
+            {/*<WhatElseSection/>*/}
+            {/*<LibrareySection/>*/}
+            {/*<ScimanticSection/>*/}
             <CTASection/>
             <LandingFooter/>
         </>

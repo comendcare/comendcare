@@ -4,7 +4,7 @@ import { FaBars, FaX } from "react-icons/fa6";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import Link from "next/link";
 import React, { useRef, useState } from "react";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import logo from "@/public/logos/comend-full-logo.png";
 import Image from "next/image";
 import { Menu, MenuItem, ProductItem } from "@/components/layout/sections/navbar-menu";
@@ -29,44 +29,44 @@ interface NavbarProps {
 
 export const LandingNavbar: React.FC = () => {
     const navItems: NavbarItem[] = [
-        {
-            name: "Products",
-            items: [
-                {
-                    title: "Librarey",
-                    href: "https://www.librarey.com/",
-                    imgParams: encode({
-                        url: "https://www.librarey.com/",
-                        screenshot: true,
-                        meta: false,
-                        embed: "screenshot.url",
-                        colorScheme: "dark",
-                        "viewport.isMobile": true,
-                        "viewport.deviceScaleFactor": 1,
-                        "viewport.width": imgWidth * 3,
-                        "viewport.height": imgHeight * 3
-                    }),
-                    description: "Where rare disease and disability communities discover and share resources."
-                },
-                {
-                    title: "Scimantic",
-                    href: "https://scimantic.com/",
-                    imgParams: encode({
-                        url: "https://scimantic.com/",
-                        screenshot: true,
-                        meta: false,
-                        embed: "screenshot.url",
-                        colorScheme: "dark",
-                        "viewport.isMobile": true,
-                        "viewport.deviceScaleFactor": 1,
-                        "viewport.width": imgWidth * 3,
-                        "viewport.height": imgHeight * 3
-                    }),
-                    description: "Helping patient families engage in science by making research more accessible."
-                },
-            ]
-        },
-        { name: "Features", link: "/#features" },
+        // {
+        //     name: "Products",
+        //     items: [
+        //         {
+        //             title: "Librarey",
+        //             href: "https://www.librarey.com/",
+        //             imgParams: encode({
+        //                 url: "https://www.librarey.com/",
+        //                 screenshot: true,
+        //                 meta: false,
+        //                 embed: "screenshot.url",
+        //                 colorScheme: "dark",
+        //                 "viewport.isMobile": true,
+        //                 "viewport.deviceScaleFactor": 1,
+        //                 "viewport.width": imgWidth * 3,
+        //                 "viewport.height": imgHeight * 3
+        //             }),
+        //             description: "Where rare disease and disability communities discover and share resources."
+        //         },
+        //         {
+        //             title: "Scimantic",
+        //             href: "https://scimantic.com/",
+        //             imgParams: encode({
+        //                 url: "https://scimantic.com/",
+        //                 screenshot: true,
+        //                 meta: false,
+        //                 embed: "screenshot.url",
+        //                 colorScheme: "dark",
+        //                 "viewport.isMobile": true,
+        //                 "viewport.deviceScaleFactor": 1,
+        //                 "viewport.width": imgWidth * 3,
+        //                 "viewport.height": imgHeight * 3
+        //             }),
+        //             description: "Helping patient families engage in science by making research more accessible."
+        //         },
+        //     ]
+        // },
+        // { name: "Features", link: "/#features" },
         { name: "About", link: "/about" },
         { name: "FAQ", link: "/faq" },
         { name: "Contact", link: "/contact" },
@@ -119,7 +119,9 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                 visible && "bg-white/80 dark:bg-neutral-950/80"
             )}
         >
-            <Image className="w-24 inline" src={logo} alt="Comend Logo" />
+            <Link href="/">
+                <Image className="w-36 inline" src={logo} alt="Comend Logo" />
+            </Link>
             <motion.div className="lg:flex flex-row flex-1 absolute inset-0 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
                 {navItems.map((navItem, idx) =>
                     navItem.link ? (
@@ -192,7 +194,9 @@ const MobileNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                 )}
             >
                 <div className="flex flex-row justify-between items-center w-full">
-                    <Image className="w-24 inline" src={logo} alt="Comend Logo" />
+                    <Link href="/">
+                        <Image className="w-24 inline" src={logo} alt="Comend Logo" />
+                    </Link>
                     {open ? (
                         <FaX className="text-black dark:text-white" onClick={() => setOpen(!open)} />
                     ) : (

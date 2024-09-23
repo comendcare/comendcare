@@ -2,6 +2,10 @@ import Link from "next/link";
 import {FaArrowRight} from "react-icons/fa6";
 import {buttonVariants} from "@/components/ui/button";
 import {cn} from "@/lib/utils";
+import {LabelInputContainer} from "@/components/contact-form";
+import {FancyInput} from "@/components/ui/fancy-input";
+import React from "react";
+import {RainbowSubscribeButton} from "@/components/ui/rainbow-subscribe-button";
 
 
 export default function CTASection () {
@@ -9,24 +13,40 @@ export default function CTASection () {
         <section className="py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div
-                    // className="lg:py-14 lg:px-20 p-10 rounded-2xl bg-gradient-to-r from-[#E65D27] to-[#EEAE43] flex items-center justify-between flex-col lg:flex-row"
                     className="lg:py-14 lg:px-20 p-10 rounded-2xl bg-gradient-to-r from-[#87EBA4] to-[#87CEEB] flex items-center justify-between flex-col lg:flex-row"
                 >
                     <div className="block text-center mb-5 lg:text-left lg:mb-0">
                         <h2 className="text-black text-3xl md:text-4xl font-bold mb-4">
-                            Connect with us
+                            🎉&nbsp;&nbsp;Become a beta tester
                         </h2>
                         <p className="text-xl text-gray-900">
-                            Contact us with any query or any idea.
+                            Be the first to access features that can help you push new treatments forward.
                         </p>
                     </div>
-                    <Link
-                        href="/contact"
-                        className={cn(buttonVariants({variant: "default"}), "gap-x-2")}
-                    >
-                        Get In Touch
-                        <FaArrowRight />
-                    </Link>
+
+                    {/*<Link*/}
+                    {/*    href="/contact"*/}
+                    {/*    className={cn(buttonVariants({variant: "default"}), "gap-x-2")}*/}
+                    {/*>*/}
+                    {/*    Get In Touch*/}
+                    {/*    <FaArrowRight />*/}
+                    {/*</Link>*/}
+
+                    <div className="w-fit flex flex-col space-y-2 mb-4">
+                        <LabelInputContainer>
+                            <FancyInput id="name" placeholder="Name" type="text"/>
+                        </LabelInputContainer>
+                        <LabelInputContainer>
+                            <FancyInput id="email" placeholder="Email" type="email"/>
+                        </LabelInputContainer>
+                        <RainbowSubscribeButton
+                            subscribeStatus={false}
+                            initialText="Join"
+                            changeText="Joined"
+                            buttonTextColor="white"
+                        />
+                    </div>
+
                 </div>
             </div>
         </section>

@@ -7,19 +7,16 @@ import {useEffect} from "react";
 export function StatsSection() {
     const items = [
         {
-            description:
-                "Contractors",
-            value: 60000,
-            subtext: "million",
+            description: "Expected grants",
+            value: 500,
+        },
+        {
+            description: "Contractors",
+            value: 1000,
         },
         {
             description: "Researchers",
-            value: 5000000,
-            subtext: "million",
-        },
-        {
-            description: "Research papers",
-            value: 37000000,
+            value: 10000,
         }
     ];
     return (
@@ -33,7 +30,8 @@ export function StatsSection() {
                             Everything you need in one place
                         </h2>
                         <p className="text-xl text-muted-foreground mb-8">
-                            A rich marketplace of people and organizations uniquely positioned to help you find and develop a treatment.
+                            A rich marketplace of people and organizations uniquely positioned to help you find and
+                            develop a treatment.
                         </p>
                     </div>
                 </div>
