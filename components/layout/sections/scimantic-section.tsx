@@ -23,7 +23,7 @@ export function ScimanticSection() {
         console.log("submitted");
     };
     return (
-        <div className="mx-auto max-w-7xl flex flex-col justify-center items-center px-4 py-20">
+        <div className="mx-auto max-w-7xl flex flex-col justify-center items-center px-4 py-24">
             <div className="w-1/2 text-center">
                 <div>
                     <h2 className="text-lg text-primary mb-2 tracking-wider">Products</h2>

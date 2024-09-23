@@ -14,7 +14,7 @@ import {motion} from "framer-motion";
 export const HeroSection = () => {
     return (
         <section className="container w-full mx-auto">
-            <div className="grid grid-cols-5 h-1/2 items-center max-w-7xl gap-8 mx-auto py-24 md:py-32 mt-16">
+            <div className="grid grid-cols-5 h-1/2 items-center max-w-7xl gap-8 mx-auto py-24 md:py-24 mt-16">
                 <div className="col-span-2 text-left space-y-8">
                     {/*<Badge variant="outline" className="text-sm py-2">*/}
                     {/*    <span className="mr-2 text-primary">*/}
