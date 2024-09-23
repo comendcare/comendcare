@@ -1,6 +1,6 @@
 
 
-export default function FAQPage () {
+export default function AboutPage () {
     return (
         <></>
     )
