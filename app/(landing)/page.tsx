@@ -1,5 +1,5 @@
 "use client"
-import {BenefitsSection} from "@/components/layout/sections/benefits";
+import {ComingSoonSection} from "@/components/layout/sections/coming-soon-section";
 import {FAQSection} from "@/components/layout/sections/faq";
 import {FeaturesSection} from "@/components/layout/sections/features";
 import {FooterSection} from "@/components/layout/sections/footer";
@@ -13,6 +13,7 @@ import HowItWorks from "@/components/layout/sections/how-it-works";
 import LandingFooter from "@/components/layout/sections/landing-footer";
 import CTASection from "@/components/layout/sections/cta";
 import {LibrareySection} from "@/components/layout/sections/librarey-section";
+import {StatsSection} from "@/components/layout/sections/stats-section";
 
 export default function App() {
     return (
@@ -22,7 +23,8 @@ export default function App() {
             <TabsFeaturesSection/>
             {/*<WhoSection/>*/}
             {/*<FeaturesSection/>*/}
-            <BenefitsSection/>
+            <StatsSection/>
+            <ComingSoonSection/>
             {/*<FAQSection/>*/}
             {/*<FooterSection/>*/}
             <LibrareySection/>

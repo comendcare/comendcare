@@ -1,7 +1,6 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Icon} from "@/components/ui/icon";
-import {ChevronRight, icons} from "lucide-react";
-import {cn} from "@/lib/utils";
+import {icons} from "lucide-react";
 import {HoverBorderGradient} from "@/components/ui/hover-border-gradient";
 
 interface BenefitsProps {
@@ -37,7 +36,7 @@ const benefitList: BenefitsProps[] = [
     },
 ];
 
-export const BenefitsSection = () => {
+export const ComingSoonSection = () => {
     return (
         <section id="benefits" className="container w-full mx-auto py-24 sm:py-32 max-w-7xl">
             <div className="grid lg:grid-cols-2 items-center lg:gap-24">
