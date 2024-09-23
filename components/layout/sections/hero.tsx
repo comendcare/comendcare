@@ -7,6 +7,9 @@ import {cn} from "@/lib/utils";
 import {buttonVariants} from "@/components/ui/button";
 import {ArrowRight} from "lucide-react";
 import HeroIllustration from "@/components/layout/sections/hero-illustration";
+import {HeroHighlight, Highlight} from "@/components/layout/sections/hero-highlight";
+import {motion} from "framer-motion";
+
 
 export const HeroSection = () => {
     return (
@@ -20,25 +23,75 @@ export const HeroSection = () => {
                     {/*    <span> Demo is out now! </span>*/}
                     {/*</Badge>*/}
 
-                    <div className="max-w-screen-md mx-auto text-4xl md:text-6xl font-bold">
-                        <h1>
-                            {`Where patient groups `}
-                            <span
-                                className="inline-flex text-transparent pr-2 bg-gradient-to-r from-[#E65D27] to-[#EEAE43] bg-clip-text">
-                                drive
-                            </span>
-                            <span
-                                className="inline-flex text-transparent px-2 bg-gradient-to-r from-[#5AC1CF] to-[#1E3A8A] bg-clip-text">
-                                research
-                            </span>
-                        </h1>
-                    </div>
+                    {/*<div className="mx-auto text-4xl md:text-6xl font-bold">*/}
+                    {/*<h1>*/}
+                    {/*    {`Where patient groups `}*/}
+                    {/*    <span*/}
+                    {/*        className="inline-flex text-transparent pr-2 bg-gradient-to-r from-[#E65D27] to-[#EEAE43] bg-clip-text">*/}
+                    {/*        drive*/}
+                    {/*    </span>*/}
+                    {/*    <span*/}
+                    {/*        className="inline-flex text-transparent px-2 bg-gradient-to-r from-[#5AC1CF] to-[#1E3A8A] bg-clip-text">*/}
+                    {/*        research*/}
+                    {/*    </span>*/}
+                    {/*</h1>*/}
+                    <HeroHighlight>
+                        <motion.h1
+                            initial={{
+                                opacity: 0,
+                                y: 20,
+                            }}
+                            animate={{
+                                opacity: 1,
+                                y: [20, -5, 0],
+                            }}
+                            transition={{
+                                duration: 0.5,
+                                ease: [0.4, 0.0, 0.2, 1],
+                            }}
+                            className="max-w-screen-md text-2xl md:text-4xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
+                        >
+                            Where patient groups
+                            <Highlight className="text-black dark:text-white">
+                                drive research
+                            </Highlight>
+                        </motion.h1>
+                    </HeroHighlight>
+                    {/*</div>*/}
 
-                    <p className="max-w-screen-sm text-xl text-muted-foreground">
+                    <motion.p
+                        initial={{
+                            opacity: 0,
+                            y: 20,
+                        }}
+                        animate={{
+                            opacity: 1,
+                            y: [20, -5, 0],
+                        }}
+                        transition={{
+                            duration: 0.5,
+                            ease: [0.4, 0.0, 0.2, 1],
+                        }}
+                        className="max-w-screen-sm text-xl text-muted-foreground"
+                    >
                         {`Design your research roadmap. Connect with academics, CROs, and other patient groups who can help.`}
-                    </p>
+                    </motion.p>
 
-                    <div className="flex flex-row space-x-2">
+                    <motion.div
+                        initial={{
+                            opacity: 0,
+                            y: 20,
+                        }}
+                        animate={{
+                            opacity: 1,
+                            y: [20, -5, 0],
+                        }}
+                        transition={{
+                            duration: 0.5,
+                            ease: [0.4, 0.0, 0.2, 1],
+                        }}
+                        className="flex flex-row space-x-2"
+                    >
                         <Link
                             href="#benefits"
                             className={cn(buttonVariants({variant: "default"}), "w-5/6 md:w-1/2 font-bold group/arrow")}
@@ -51,7 +104,7 @@ export const HeroSection = () => {
                         >
                             For researchers
                         </Link>
-                    </div>
+                    </motion.div>
 
                 </div>
                 {/*<div className="relative">*/}

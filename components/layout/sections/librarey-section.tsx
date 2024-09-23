@@ -66,20 +66,20 @@ export function LibrareySection() {
                 },
                 body: JSON.stringify({
                     query: `
-            query GetAdminData($orderBy: [ResourceOrderByWithRelationInput!], $take: Int) {
-              resources(orderBy: $orderBy, take: $take) {
-                id
-                name
-                description
-                favicon
-                categories {
-                    category {
-                        name
-                    }
-                }
-              }
-            }
-          `,
+                        query GetAdminData($orderBy: [ResourceOrderByWithRelationInput!], $take: Int) {
+                            resources(orderBy: $orderBy, take: $take) {
+                                id
+                                name
+                                description
+                                favicon
+                                categories {
+                                    category {
+                                        name
+                                    }
+                                }
+                            }
+                        }
+                    `,
                     variables: {
                         orderBy: [{createdAt: "desc"}],
                         take: 12,
@@ -96,7 +96,9 @@ export function LibrareySection() {
     }, []);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className="mx-auto w-full max-w-7xl py-20">
+            Loading...
+        </div>
     }
 
     // Divide the resources into two rows for the marquee
@@ -104,7 +106,7 @@ export function LibrareySection() {
     const secondRow = resources.slice(Math.ceil(resources.length / 2));
 
     return (
-        <div className="mx-auto w-full max-w-7xl">
+        <div className="mx-auto w-full max-w-7xl py-20">
             <div className="grid grid-cols-2">
                 <div>
                     <h2 className="text-lg text-primary mb-2 tracking-wider">Products</h2>
