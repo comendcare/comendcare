@@ -35,7 +35,7 @@ const bubbles = [
     { title: "Biomarkers", href: "#" },
     { title: "Biobanks", href: "#" },
     { title: "AAVs", href: "#" },
-    { title: "Nanoparticles", href: "#" },
+    // { title: "Nanoparticles", href: "#" },
     { title: "Gene editing", href: "#" },
     { title: "CRISPR", href: "#" },
     { title: "ASOs", href: "#" },
@@ -263,7 +263,7 @@ export const CloudHeroSection = () => {
                 initial={{opacity: 0, y: 50}}
                 animate={{opacity: 1, y: [50, -10, 0]}}
                 transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-                className="hidden sm:block absolute inset-0 z-0 pointer-events-none opacity-80" ref={containerRef}
+                className="hidden sm:block absolute inset-0 z-0 pointer-events-none opacity-60" ref={containerRef}
             >
                 {bubbles.map((bubble, index) => {
                     const {x, y} = calculateMovement(cloudPositions[index].x, cloudPositions[index].y);
