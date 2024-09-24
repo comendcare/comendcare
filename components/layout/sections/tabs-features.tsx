@@ -112,9 +112,9 @@ export default function TabsFeaturesSection() {
             initial={{opacity: 0, y: 50}}
             animate={{opacity: 1, y: [50, -10, 0]}}
             transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-            id="features" className="w-full container mx-auto max-w-7xl py-24 sm:py-24 space-y-8">
+            id="features" className="w-full container mx-auto max-w-7xl px-8 py-24 sm:py-24 space-y-8">
             {/*<div className="grid grid-cols-2">*/}
-            <div className="flex flex-col justify-center items-center w-1/2 mx-auto text-center">
+            <div className="flex flex-col justify-center items-center md:w-1/2 mx-auto text-center">
                 <div>
                     <h2 className="text-lg text-primary mb-2 tracking-wider">Platform</h2>
 

@@ -20,23 +20,26 @@ export function StatsSection() {
         }
     ];
     return (
-        <section className="group/container relative mx-auto w-full max-w-7xl overflow-hidden rounded-3xl py-24">
+        <section className="group/container relative mx-auto w-full max-w-7xl px-8 overflow-hidden rounded-3xl py-24">
             <div className="flex flex-col justify-center items-center relative z-20 space-y-8">
                 {/*<div className="grid grid-cols-2">*/}
-                <div className="flex flex-col justify-center items-center w-1/2 mx-auto text-center">
+                <div className="flex flex-col justify-center items-center md:w-1/2 mx-auto text-center">
                     <div>
-                        <h2 className="text-lg text-primary mb-2 tracking-wider">Marketplace</h2>
+                        <h2 className="text-lg text-primary mb-2 tracking-wider">
+                            {`Marketplace`}
+                        </h2>
 
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                            Everything you need in one place
+                            {`Everything you need in one place`}
                         </h2>
                         <p className="text-xl text-muted-foreground mb-8">
-                            We connect opportunities, people, and organizations to help you find the best partners and advance treatments.
+                            {`We connect opportunities, people, and organizations to help you find the best partners and advance treatments.`}
                         </p>
                     </div>
                 </div>
                 {/*<div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3">*/}
-                <div className="flex flex-col sm:flex-row mx-auto max-w-7xl space-x-16">
+                <div
+                    className="flex flex-col sm:flex-row justify-center mx-auto max-w-7xl space-y-6 sm:space-y-0 sm:space-x-4 lg:space-x-8">
                     {items.map((item, index) => (
                         <motion.div
                             initial={{
@@ -54,19 +57,20 @@ export function StatsSection() {
                                 delay: index * 0.1,
                             }}
                             key={"card" + index}
-                            className={cn("flex flex-col justify-center items-center group/card space-y-2 relative overflow-hidden rounded-lg")}
+                            className={cn("flex flex-col justify-center items-center group/card p-4 sm:p-6 lg:p-8 space-y-2 relative overflow-hidden rounded-lg")}
                         >
-                            <div className="flex items-center gap-2">
-                                <p className="text-3xl sm:text-6xl font-bold text-neutral-700 dark:text-neutral-200">
+                            <div className="flex flex-col justify-center items-center gap-2 text-center">
+                                <p className="text-3xl md:text-4xl font-bold text-neutral-700 dark:text-neutral-200 font-mono">
                                     <AnimatedNumber value={item.value}/> +
                                 </p>
                             </div>
-                            <p className="text-balance text-base text-neutral-600 dark:text-neutral-300">
+                            <p className="text-balance text-base sm:text-lg lg:text-xl text-neutral-600 dark:text-neutral-300">
                                 {item.description}
                             </p>
                         </motion.div>
                     ))}
                 </div>
+
             </div>
         </section>
     );

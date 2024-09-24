@@ -54,11 +54,11 @@ export const ComingSoonSection = () => {
     ];
 
     return (
-        <section id="benefits" className="container w-full mx-auto py-24 sm:py-24 max-w-7xl">
+        <section id="benefits" className="container w-full mx-auto px-8 py-24 sm:py-24 max-w-7xl">
             <div className="grid lg:grid-cols-2 items-center lg:gap-24">
                 <div>
                     <h2 className="text-lg text-primary mb-2 tracking-wider">
-                        What's next
+                        {`What's next`}
                     </h2>
 
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -97,7 +97,7 @@ export const ComingSoonSection = () => {
                                 <CardTitle>{title}</CardTitle>
                             </CardHeader>
 
-                            <CardContent className="text-muted-foreground flex flex-col justify-center items-center">
+                            <CardContent className={`text-muted-foreground ${typeof description === 'string' ? "" : "flex flex-col justify-center items-center"}`}>
                                 {/* Render description, whether it's a string or a component */}
                                 {typeof description === 'string' ? <p>{description}</p> : description}
                             </CardContent>
