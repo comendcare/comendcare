@@ -8,11 +8,11 @@ import { Label } from "@/components/ui/label";
 import { FancyInput } from "@/components/ui/fancy-input";
 import React, {useEffect, useRef, useState} from "react";
 import { LabelInputContainer } from "@/components/contact-form";
-import { RainbowSubscribeButton } from "@/components/ui/rainbow-subscribe-button";
 import {LinkPreview} from "@/components/link-preview";
 import Image from "next/image";
 import librareyLogo from "@/public/logos/librarey-logo.svg";
 import scimanticLogo from "@/public/logos/scimantic-logo.png";
+import { BetaSignup } from "@/components/beta-signup";
 
 const bubbles = [
     { title: "Full Stack Developers", href: "#" },
@@ -238,22 +238,8 @@ export const CloudHeroSection = () => {
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                     className="flex flex-row space-x-2"
                 >
-                    <div className="text-center w-full flex flex-col justify-center items-center space-y-2">
-                        <Label className="text-base">🎉&nbsp;&nbsp;Become a beta tester</Label>
-                        <div className="w-full flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
-                            <LabelInputContainer>
-                                <FancyInput id="name" placeholder="Name" type="text"/>
-                            </LabelInputContainer>
-                            <LabelInputContainer>
-                                <FancyInput id="email" placeholder="Email" type="email"/>
-                            </LabelInputContainer>
-                        </div>
-                        <RainbowSubscribeButton
-                            subscribeStatus={false}
-                            initialText="Join"
-                            changeText="Joined"
-                            buttonTextColor="white"
-                        />
+                    <div className="w-full flex flex-col space-y-2">
+                        <BetaSignup />
                     </div>
                 </motion.div>
 

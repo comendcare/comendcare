@@ -5,7 +5,7 @@ import {cn} from "@/lib/utils";
 import {LabelInputContainer} from "@/components/contact-form";
 import {FancyInput} from "@/components/ui/fancy-input";
 import React from "react";
-import {RainbowSubscribeButton} from "@/components/ui/rainbow-subscribe-button";
+import { BetaSignup } from "@/components/beta-signup";
 
 
 export default function CTASection () {
@@ -33,18 +33,7 @@ export default function CTASection () {
                     {/*</Link>*/}
 
                     <div className="w-fit flex flex-col space-y-2 mb-4">
-                        <LabelInputContainer>
-                            <FancyInput id="name" placeholder="Name" type="text"/>
-                        </LabelInputContainer>
-                        <LabelInputContainer>
-                            <FancyInput id="email" placeholder="Email" type="email"/>
-                        </LabelInputContainer>
-                        <RainbowSubscribeButton
-                            subscribeStatus={false}
-                            initialText="Join"
-                            changeText="Joined"
-                            buttonTextColor="white"
-                        />
+                        <BetaSignup inline={true} />
                     </div>
 
                 </div>
