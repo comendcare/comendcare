@@ -49,9 +49,7 @@ export function ContactForm() {
     const email = form.watch("email")
     const message = form.watch("message")
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-
+    const handleContactSubmit = async () => {
         try {
             await sendContactEmail({
                 user: {
@@ -78,7 +76,7 @@ export function ContactForm() {
             </p>
 
             <Form {...form}>
-                <form className="my-8" onSubmit={handleSubmit}>
+                <form className="my-8" onSubmit={form.handleSubmit(handleContactSubmit)}>
                     <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
                         <FormField
                             control={form.control}
@@ -88,7 +86,7 @@ export function ContactForm() {
                                     <FormControl>
                                         <LabelInputContainer>
                                             <Label htmlFor="firstname">First name</Label>
-                                            <FancyInput id="firstname" placeholder="Spongebob" type="text" {...form.register("firstName")} />
+                                            <FancyInput id="firstname" placeholder="Spongebob" type="text" {...field} />
                                         </LabelInputContainer>
                                     </FormControl>
                                     <FormMessage />
@@ -104,7 +102,7 @@ export function ContactForm() {
                                     <FormControl>
                                         <LabelInputContainer>
                                             <Label htmlFor="lastname">Last name</Label>
-                                            <FancyInput id="lastname" placeholder="Squarepants" type="text" {...form.register("lastName")} />
+                                            <FancyInput id="lastname" placeholder="Squarepants" type="text" {...field} />
                                         </LabelInputContainer>
                                     </FormControl>
                                     <FormMessage />
@@ -117,11 +115,11 @@ export function ContactForm() {
                         control={form.control}
                         name="email"
                         render={({ field }) => (
-                            <FormItem className="flex flex-col grow">
+                            <FormItem className="flex flex-col mb-4">
                                 <FormControl>
-                                    <LabelInputContainer className="mb-4">
+                                    <LabelInputContainer>
                                         <Label htmlFor="email">Email Address</Label>
-                                        <FancyInput id="email" placeholder="spongebob.squarepants@gmail.com" type="email" {...form.register("email")} />
+                                        <FancyInput id="email" placeholder="spongebob.squarepants@gmail.com" type="email" {...field} />
                                     </LabelInputContainer>
                                 </FormControl>
                                 <FormMessage />
@@ -133,11 +131,11 @@ export function ContactForm() {
                         control={form.control}
                         name="message"
                         render={({ field }) => (
-                            <FormItem className="flex flex-col grow">
+                            <FormItem className="flex flex-col mb-4">
                                 <FormControl>
-                                    <LabelInputContainer className="mb-4">
+                                    <LabelInputContainer>
                                         <Label htmlFor="message">Message</Label>
-                                        <FancyTextarea id="message" placeholder="••••••••" {...form.register("message")} />
+                                        <FancyTextarea id="message" placeholder="••••••••" {...field} />
                                     </LabelInputContainer>
                                 </FormControl>
                                 <FormMessage />
