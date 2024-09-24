@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { useForm } from "react-hook-form";
 import { sendBetaSignupEmail } from "@/lib/emails";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const betaSignupFormSchema = z.object({
     name: z
@@ -24,8 +24,7 @@ const betaSignupFormSchema = z.object({
         .email({ message: "Invalid email format" }),
 })
 
-export function BetaSignup({ inline = false }: { inline?: boolean }) {
-    const [isSubscribed, setIsSubscribed] = useState<boolean>(false)
+export function BetaSignup({ isSubscribed, isSubscribedCallback, inline = false }: { isSubscribed: boolean, isSubscribedCallback: () => Promise<void>, inline?: boolean }) {
     const form = useForm<z.infer<typeof betaSignupFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(betaSignupFormSchema)
@@ -45,8 +44,8 @@ export function BetaSignup({ inline = false }: { inline?: boolean }) {
                 }
             })
 
-            console.log("Form submitted")
-            setIsSubscribed(true)
+            console.log("Form submitted, email sent")
+            isSubscribedCallback()
         } catch (e) {
             console.error(`Erroor submitting beta signup form: `, e)
         }

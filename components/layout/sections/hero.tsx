@@ -149,7 +149,7 @@ export const HeroSection = () => {
                         {/*    For researchers*/}
                         {/*</Link>*/}
                         <div className="w-full flex flex-col space-y-2">
-                            <BetaSignup />  
+                            {/* <BetaSignup />   */}
                         </div>
                     </motion.div>
 

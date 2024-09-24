@@ -50,7 +50,7 @@ const bubbles = [
     // { title: "Web designers", href: "#" },
 ]
 
-export const CloudHeroSection = () => {
+export const CloudHeroSection = ({ isSubscribedCallback, isSubscribed }: { isSubscribedCallback: () => Promise<void>, isSubscribed: boolean }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const heroRef = useRef<HTMLDivElement>(null); // Ref for hero section
     const [isHeroInView, setIsHeroInView] = useState(false); // State to track if hero is in view
@@ -252,7 +252,7 @@ export const CloudHeroSection = () => {
                     className="flex flex-row space-x-2"
                 >
                     <div className="w-full flex flex-col space-y-2">
-                        <BetaSignup />
+                        <BetaSignup isSubscribedCallback={isSubscribedCallback} isSubscribed={isSubscribed}/>
                     </div>
                 </motion.div>
 
