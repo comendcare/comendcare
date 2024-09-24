@@ -4,6 +4,7 @@ import sgMail from "@sendgrid/mail"
 import { ContactEmail } from "@/lib/email-templates/contact/contact-email"
 import rateLimit from "@/lib/rate-limit";
 import axios from "axios";
+import { WaitlistEmail } from "./email-templates/contact/waitlist-email";
 
 const limiter = rateLimit({
     interval: 600 * 1000, // 10 minutes (600 seconds * 1000 ms)
@@ -51,6 +52,27 @@ export async function sendContactEmail(params: {
             html: emailTemplate,
             text: "A user has sent a message via the contact page.",
             subject: "Contact form message"
+        }
+        await sendEmail(msg)
+    }
+}
+
+export async function sendBetaSignupEmail(params: {
+    user: { name: string | null | undefined; email: string | null | undefined }
+}) {
+    const emailTemplate = await render(
+        WaitlistEmail({ name: params.user.name, email: params.user.email })
+    )
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
+    if (params.user.email) {
+        const msg = {
+            // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
+            to: "hello@comendcare.com",
+            from: "corporate@comendcare.com",
+            html: emailTemplate,
+            text: "Add this user to the waitlist",
+            subject: "[WAITLIST] Beta tester waitlist request"
         }
         await sendEmail(msg)
     }
