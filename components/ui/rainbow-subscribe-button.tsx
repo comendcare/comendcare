@@ -58,6 +58,7 @@ export const RainbowSubscribeButton: React.FC<RainbowSubscribeButtonProps> = ({
                 </motion.button>
             ) : (
                 <motion.button
+                    type="submit"
                     className={cn(
                         buttonVariants,
                         "relative w-[200px] overflow-hidden rounded-md bg-black text-white cursor-pointer border border-black", // Add border for visibility
@@ -66,7 +67,7 @@ export const RainbowSubscribeButton: React.FC<RainbowSubscribeButtonProps> = ({
                         "before:absolute before:bottom-[-20%] before:left-1/2 before:z-0 before:h-2/5 before:w-4/5 before:-translate-x-1/2 before:animate-rainbow before:bg-[linear-gradient(90deg,hsl(var(--color-1)),hsl(var(--color-5)),hsl(var(--color-3)),hsl(var(--color-4)),hsl(var(--color-2)))] before:bg-[length:200%] before:[filter:blur(calc(0.8*1rem))]"
                     )}
                     style={{ color: buttonTextColor || "white" }}
-                    onClick={() => setIsSubscribed(true)} // Set to true on click
+                    // onClick={() => setIsSubscribed(true)} // Set to true on click
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
