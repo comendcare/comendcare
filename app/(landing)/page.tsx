@@ -1,4 +1,5 @@
 "use client"
+import { useEffect, useState } from "react";
 import {ComingSoonSection} from "@/components/layout/sections/coming-soon-section";
 import {FeaturesSection} from "@/components/layout/sections/features";
 import {FooterSection} from "@/components/layout/sections/footer";
@@ -18,10 +19,24 @@ import WhatElseSection from "@/components/layout/sections/what-else-section";
 import {CloudHeroSection} from "@/components/layout/sections/cloud-hero";
 
 export default function App() {
+    const [isSubscribed, setIsSubscribed] = useState<boolean>(false)
+
+    useEffect(() => {
+        const data = localStorage.getItem("isSubscribedBeta");
+        if (data) {
+            setIsSubscribed(data === "true")
+        }
+    }, [])
+
+    const betaSubscribeCallback = async () => {
+        localStorage.setItem("isSubscribedBeta", "true")
+        setIsSubscribed(true)
+    }
+
     return (
         <>
             {/*<HeroSection/>*/}
-            <CloudHeroSection/>
+            <CloudHeroSection isSubscribedCallback={betaSubscribeCallback} isSubscribed={isSubscribed}/>
             {/*<HowItWorks/>*/}
             <TabsFeaturesSection/>
             {/*<WhoSection/>*/}
@@ -33,7 +48,7 @@ export default function App() {
             {/*<WhatElseSection/>*/}
             {/*<LibrareySection/>*/}
             {/*<ScimanticSection/>*/}
-            <CTASection/>
+            <CTASection isSubscribedCallback={betaSubscribeCallback} isSubscribed={isSubscribed}/>
             <LandingFooter/>
         </>
     );

@@ -8,7 +8,7 @@ import React from "react";
 import { BetaSignup } from "@/components/beta-signup";
 
 
-export default function CTASection () {
+export default function CTASection ({ isSubscribedCallback, isSubscribed }: { isSubscribedCallback: () => Promise<void>, isSubscribed: boolean }) {
     return (
         <section className="py-16">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -33,7 +33,7 @@ export default function CTASection () {
                     {/*</Link>*/}
 
                     <div className="w-fit flex flex-col space-y-2">
-                        <BetaSignup inline={true} />
+                        <BetaSignup inline={true} isSubscribed={isSubscribed} isSubscribedCallback={isSubscribedCallback}/>
                     </div>
 
                 </div>
