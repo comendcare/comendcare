@@ -3,6 +3,10 @@ import {cn} from "@/lib/utils";
 import Image from "next/image";
 import React, {useRef, useState} from "react";
 import {AnimatePresence, motion, useMotionValue} from "framer-motion";
+import NORDTeam from "@/public/team/nord-team.jpeg";
+import NYTeam from "@/public/team/ny-team.jpeg"
+import SDTeam from "@/public/team/sd-team.jpg"
+import TorontoTeam from "@/public/team/toronto-team.jpg"
 
 export function TimelineSection() {
     const timeline = [
@@ -13,11 +17,11 @@ export function TimelineSection() {
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
                         Comend is founded
                     </h2>
-                    <p className="mb-8 mt-4 text-neutral-600 dark:text-neutral-300">
+                    <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
                         We re-united to fix broken areas of healthcare after working in drug development and biomedical engineering.
                     </p>
                     <Image
-                        src="https://assets.aceternity.com/templates/startup-1.webp"
+                        src={SDTeam}
                         height="2000"
                         width="2000"
                         className="w-full rounded-xl object-cover object-left-top md:rounded-3xl"
@@ -34,12 +38,12 @@ export function TimelineSection() {
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
                         First investment
                     </h2>
-                    <p className="mb-8 mt-4 text-neutral-600 dark:text-neutral-300">
+                    <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
                         We received investment from Character Labs to build solutions for rare families.
                         We met Sierra in one of our early user tests.
                     </p>
                     <Image
-                        src="https://assets.aceternity.com/templates/startup-2.webp"
+                        src={NYTeam}
                         height="2000"
                         width="2000"
                         className="w-full rounded-xl object-cover object-left-top md:rounded-3xl"
@@ -56,11 +60,11 @@ export function TimelineSection() {
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
                         Launched Librarey
                     </h2>
-                    <p className="mb-8 mt-4 text-neutral-600 dark:text-neutral-300">
+                    <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
                         With Sierra's help, we launched a free search platform for rare resources and attended rare disease conferences to gather feedback.
                     </p>
                     <Image
-                        src="https://assets.aceternity.com/templates/startup-3.webp"
+                        src={NORDTeam}
                         height="2000"
                         width="2000"
                         className="w-full rounded-xl object-cover object-left-top md:rounded-3xl"
@@ -77,11 +81,11 @@ export function TimelineSection() {
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
                         Team growth
                     </h2>
-                    <p className="mb-8 mt-4 text-neutral-600 dark:text-neutral-300">
+                    <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
                         We're currently working with several patient groups to build a new scientific communicator and research platform.
                     </p>
                     <Image
-                        src="https://assets.aceternity.com/templates/startup-4.webp"
+                        src={TorontoTeam}
                         height="2000"
                         width="2000"
                         className="w-full rounded-xl object-cover object-left-top md:rounded-3xl"
@@ -153,7 +157,7 @@ export const StatsForChangelogDesktop = ({stats}: { stats: Stats[] }) => {
 
     return (
         <section className="relative container w-full mx-auto">
-            <div className="max-w-7xl gap-8 mx-auto py-24 md:py-24 mt-16">
+            <div className="max-w-7xl gap-8 mx-auto py-16 md:py-24 mt-16">
                 <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
                     We’re working to empower a patient-led future for research and development.
                 </h2>

@@ -57,14 +57,10 @@ export function SpotlightLogoCloud() {
     ];
 
     return (
-        <div className="relative py-40 w-full overflow-hidden">
+        <div className="relative py-24 w-full overflow-hidden space-y-8">
             <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
                 Co-designed with these organizations so far
             </h2>
-            <p className="text-center text-base text-neutral-7000 font-sans dark:text-neutral-300 mt-4 mb-10">
-                Brands who funded us deserve more than a spotlight. Check out what they
-                are saying.
-            </p>
             <div className="grid grid-cols-4 gap-10 w-full max-w-3xl mx-auto  relative">
                 {logos.map((logo) => (
                     <div key={logo.name} className="flex items-center justify-center">
