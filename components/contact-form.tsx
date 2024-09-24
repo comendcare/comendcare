@@ -10,6 +10,7 @@ import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { sendContactEmail } from "@/lib/emails";
+import { useRouter } from "next/navigation";
 
 const contactFormSchema = z.object({
     firstName: z
@@ -37,6 +38,7 @@ const contactFormSchema = z.object({
 })
 
 export function ContactForm() {
+    const router = useRouter()
     const form = useForm<z.infer<typeof contactFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(contactFormSchema)
@@ -58,19 +60,12 @@ export function ContactForm() {
                 },
                 message: message
             })
-    
-            // toast(`Success!`, {
-            //     description: `We've recieved your message. We'll be in touch!`
-            // })
+
+            console.log("Form submitted")
+            router.push("/contact/thank-you")
         } catch (e) {
-            console.error(`Error submitting contact form: ${JSON.stringify(e)}`)
-
-            // toast(`Error!`, {
-            //     description: `Something went while trying to send your message. Please try again in a few minutes.<br><br>If the issue persists please email us at contact@comendcare.com.`
-            // })
+            console.error(`Error submitting contact form:`, e)
         }
-
-        console.log("Form submitted")
     }
 
     return (
