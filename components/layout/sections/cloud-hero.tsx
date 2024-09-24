@@ -193,32 +193,33 @@ export const CloudHeroSection = () => {
         <section className="relative container w-full mx-auto">
             {/* Hero section with a ref to observe visibility */}
             <div ref={heroRef}
-                 className="bg-gradient-to-r from-transparent via-white to-transparent relative z-10 flex flex-col h-1/2 justify-center items-center text-center max-w-7xl gap-8 mx-auto py-24 md:py-24 mt-16"
+                 className="bg-gradient-to-r from-transparent via-white to-transparent relative z-10 flex flex-col h-1/2 justify-center items-center text-center max-w-7xl gap-8 mx-auto px-4 py-16 md:py-24 mt-16"
             >
                 <motion.div
                     initial={{opacity: 0, y: 50}} // More pronounced drop effect
                     animate={{opacity: 1, y: [50, -10, 0]}}
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-                    className="hidden sm:mt-8 sm:flex lg:mt-8"
+                    className="mt-8 flex justify-center sm:justify-start"
                 >
                     <div
-                        className="bg-white inline-flex items-center rounded-full px-3 py-1 text-base leading-6 text-gray-500 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
+                        className="bg-white inline-flex flex-wrap items-center text-center rounded-full px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base leading-5 sm:leading-6 text-gray-500 ring-1 ring-gray-900/10 hover:ring-gray-900/20"
+                    >
                         From the creators of
                         <LinkPreview
                             url={"https://www.librarey.com/"}
-                            className="hover:underline inline-flex items-center mx-2 gap-x-1"
+                            className="hover:underline inline-flex items-center mx-1 sm:mx-2 gap-x-1"
                             target="_blank"
                         >
-                            <Image src={librareyLogo} alt="" className="self-center w-8 h-8"/>
+                            <Image src={librareyLogo} alt="" className="self-center w-6 sm:w-8 h-6 sm:h-8"/>
                             Librarey
                         </LinkPreview>
                         and
                         <LinkPreview
                             url={"https://scimantic.com/"}
-                            className="hover:underline inline-flex items-center mx-2 gap-x-1"
+                            className="hover:underline inline-flex items-center mx-1 sm:mx-2 gap-x-1"
                             target="_blank"
                         >
-                            <Image src={scimanticLogo} alt="" className="self-center w-6 h-6"/>
+                            <Image src={scimanticLogo} alt="" className="self-center w-5 sm:w-6 h-5 sm:h-6"/>
                             Scimantic
                         </LinkPreview>
                     </div>
