@@ -54,7 +54,7 @@ export function BetaSignup({ inline = false }: { inline?: boolean }) {
     return (
         <>
             {!inline && <Label className="text-base">
-                🎉&nbsp;&nbsp;Become a beta tester
+                🎉&nbsp;&nbsp;Join our beta testing community
             </Label>}
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleBetaSignupSubmit)}>
