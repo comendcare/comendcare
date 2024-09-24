@@ -16,7 +16,7 @@ const tabContent = {
         title: "Research Profiles",
         image: <Image // dynamically pull page preview if thumbnail is not available
             src={`https://api.microlink.io/?${encode({
-                url: "https://comend-refresh-sprint-3.vercel.app/pag/project/Gene%20Therapy%20for%20Rett%20Syndrome/overview",
+                url: "https://comend-refresh-sprint-3.vercel.app/pag/profile/Myhre%20Syndrome%20Foundation",
                 screenshot: true,
                 meta: false,
                 embed: "screenshot.url",
@@ -38,7 +38,17 @@ const tabContent = {
     marketplace: {
         title: "Rare Marketplace",
         image: <Image // dynamically pull page preview if thumbnail is not available
-            src={roadmap}
+            src={`https://api.microlink.io/?${encode({
+                url: "https://comend-refresh-sprint.vercel.app/researcher",
+                screenshot: true,
+                meta: false,
+                embed: "screenshot.url",
+                colorScheme: "dark",
+                "viewport.isMobile": true,
+                "viewport.deviceScaleFactor": 1,
+                "viewport.width": imgWidth * 3,
+                "viewport.height": imgHeight * 3
+            })}`}
             quality={100}
             layout={"fixed"}
             priority={true}
@@ -77,7 +87,7 @@ const tabContent = {
 };
 
 export default function TabsFeaturesSection() {
-    const [activeTab, setActiveTab] = useState('project');
+    const [activeTab, setActiveTab] = useState('profiles');
     const tabs = ["profiles", "marketplace", "forums"];
     const tabDuration = 8;
 
@@ -98,7 +108,11 @@ export default function TabsFeaturesSection() {
     };
 
     return (
-        <section id="features" className="w-full container mx-auto max-w-7xl py-24 sm:py-24 space-y-8">
+        <motion.section
+            initial={{opacity: 0, y: 50}}
+            animate={{opacity: 1, y: [50, -10, 0]}}
+            transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
+            id="features" className="w-full container mx-auto max-w-7xl py-24 sm:py-24 space-y-8">
             {/*<div className="grid grid-cols-2">*/}
             <div className="flex flex-col justify-center items-center w-1/2 mx-auto text-center">
                 <div>
@@ -118,7 +132,7 @@ export default function TabsFeaturesSection() {
                 {tabs.map((tab) => (
                     activeTab === tab && (
                         <TabsContent key={tab} value={tab}
-                                     className="flex justify-center items-center w-full max-w-7xl mx-auto bg-gradient-to-b p-8 from-80% from-[#1E3A8A] to-[#5AC1CF] to-100% rounded-lg">
+                                     className="flex justify-center items-center w-full max-w-7xl mx-auto bg-gradient-to-b p-8 from-80% from-[#87EBA4]/70 to-[#87CEEB]/70 to-100% rounded-lg">
                             <div className="relative w-[800px] h-[500px] max-w-7xl rounded-lg">
                                 {tabContent[tab as keyof typeof tabContent].image}
                             </div>
@@ -161,6 +175,6 @@ export default function TabsFeaturesSection() {
                     ))}
                 </TabsList>
             </Tabs>
-        </section>
+        </motion.section>
     )
 }
