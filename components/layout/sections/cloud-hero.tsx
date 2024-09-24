@@ -50,7 +50,7 @@ const bubbles = [
     // { title: "Web designers", href: "#" },
 ]
 
-export const CloudHeroSection = ({ isSubscribedCallback, isSubscribed }: { isSubscribedCallback: () => Promise<void>, isSubscribed: boolean }) => {
+export const CloudHeroSection = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const heroRef = useRef<HTMLDivElement>(null); // Ref for hero section
     const [isHeroInView, setIsHeroInView] = useState(false); // State to track if hero is in view
@@ -245,16 +245,16 @@ export const CloudHeroSection = ({ isSubscribedCallback, isSubscribed }: { isSub
                     {`Create your research roadmap, connect with collaborators, and stay updated on the latest scientific breakthroughs.`}
                 </motion.p>
 
-                <motion.div
-                    initial={{opacity: 0, y: 50}}
-                    animate={{opacity: 1, y: [50, -10, 0]}}
-                    transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-                    className="flex flex-row space-x-2"
-                >
-                    <div className="w-full flex flex-col space-y-2">
-                        <BetaSignup isSubscribedCallback={isSubscribedCallback} isSubscribed={isSubscribed}/>
-                    </div>
-                </motion.div>
+                {/*<motion.div*/}
+                {/*    initial={{opacity: 0, y: 50}}*/}
+                {/*    animate={{opacity: 1, y: [50, -10, 0]}}*/}
+                {/*    transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}*/}
+                {/*    className="flex flex-row space-x-2"*/}
+                {/*>*/}
+                {/*    <div className="w-full flex flex-col space-y-2">*/}
+                {/*        <BetaSignup isSubscribedCallback={isSubscribedCallback} isSubscribed={isSubscribed}/>*/}
+                {/*    </div>*/}
+                {/*</motion.div>*/}
 
             </div>
 
@@ -263,7 +263,7 @@ export const CloudHeroSection = ({ isSubscribedCallback, isSubscribed }: { isSub
                 initial={{opacity: 0, y: 50}}
                 animate={{opacity: 1, y: [50, -10, 0]}}
                 transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-                className="hidden sm:block absolute inset-0 z-0 pointer-events-none opacity-40" ref={containerRef}
+                className="hidden sm:block absolute inset-0 z-0 pointer-events-none opacity-50" ref={containerRef}
             >
                 {bubbles.map((bubble, index) => {
                     const {x, y} = calculateMovement(cloudPositions[index].x, cloudPositions[index].y);
