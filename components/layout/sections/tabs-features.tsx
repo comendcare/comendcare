@@ -12,8 +12,8 @@ export const imgWidth = 400;
 export const imgHeight = 250;
 
 const tabContent = {
-    project: {
-        title: "Project Profiles",
+    profiles: {
+        title: "Research Profiles",
         image: <Image // dynamically pull page preview if thumbnail is not available
             src={`https://api.microlink.io/?${encode({
                 url: "https://comend-refresh-sprint-3.vercel.app/pag/project/Gene%20Therapy%20for%20Rett%20Syndrome/overview",
@@ -33,10 +33,10 @@ const tabContent = {
             alt="preview image"
             fill
         />,
-        description: "Control the narrative and show patients, donors, researchers, and other stakeholders what you're working on.",
+        description: "Fill in your research roadmap to create a profile. Then match with others and share your progress with researchers, donors, and others.",
     },
-    roadmap: {
-        title: "Roadmap Planning",
+    marketplace: {
+        title: "Rare Marketplace",
         image: <Image // dynamically pull page preview if thumbnail is not available
             src={roadmap}
             quality={100}
@@ -46,10 +46,10 @@ const tabContent = {
             alt="preview image"
             fill
         />,
-        description: "AI powered roadmapping tools to make it easy for you to find the best path to the most effective treatments.",
+        description: "Find and learn about those who can help you advance based on shared biologies, projects, or goals.",
     },
-    timelines: {
-        title: "Timeline Organization",
+    forums: {
+        title: "Focused Forums",
         image: <Image // dynamically pull page preview if thumbnail is not available
             src={timeline}
             quality={100}
@@ -59,26 +59,26 @@ const tabContent = {
             alt="preview image"
             fill
         />,
-        description: "Align your team on objective timelines and stay productive towards milestones.",
+        description: "Talk about your challenges, wins, and the latest news in rare disease science and drug development news.",
     },
-    kanban: {
-        title: "Project Management",
-        image: <Image // dynamically pull page preview if thumbnail is not available
-            src={kanban}
-            quality={100}
-            layout={"fixed"}
-            priority={true}
-            className="rounded-lg"
-            alt="preview image"
-            fill
-        />,
-        description: "Connect with patient advocacy groups for better outcomes.",
-    },
+    // kanban: {
+    //     title: "Project Management",
+    //     image: <Image // dynamically pull page preview if thumbnail is not available
+    //         src={kanban}
+    //         quality={100}
+    //         layout={"fixed"}
+    //         priority={true}
+    //         className="rounded-lg"
+    //         alt="preview image"
+    //         fill
+    //     />,
+    //     description: "Connect with patient advocacy groups for better outcomes.",
+    // },
 };
 
 export default function TabsFeaturesSection() {
     const [activeTab, setActiveTab] = useState('project');
-    const tabs = ['project', 'roadmap', 'timelines', 'kanban'];
+    const tabs = ["profiles", "marketplace", "forums"];
     const tabDuration = 8;
 
     useEffect(() => {
@@ -105,12 +105,11 @@ export default function TabsFeaturesSection() {
                     <h2 className="text-lg text-primary mb-2 tracking-wider">Platform</h2>
 
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                        The all-in-one platform for collaboration
+                        The hub for patient-led research
                     </h2>
                     <p className="text-xl text-muted-foreground mb-8">
-                        Comend streamlines your efforts in the rare disease community. Manage projects, apply for
-                        grants, collaborate with researchers, connect with advocacy groups, and hire contractors—all
-                        from one intuitive platform.
+                        Comend streamlines your efforts to maximize impact.
+                        Here, you can apply for grants, meet researchers, hire contractors, and talk to other patient groups like yours — all from one intuitive platform.
                     </p>
                 </div>
             </div>
@@ -127,7 +126,7 @@ export default function TabsFeaturesSection() {
                     )
                 ))}
                 <TabsList
-                    className="grid grid-cols-4 items-start justify-start bg-transparent border-none shadow-none h-min">
+                    className="grid grid-cols-3 items-start justify-start bg-transparent border-none shadow-none h-min">
                     {tabs.map((tab) => (
                         <TabsTrigger
                             key={tab}

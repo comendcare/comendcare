@@ -7,15 +7,14 @@ import {AnimatePresence, motion, useMotionValue} from "framer-motion";
 export function TimelineSection() {
     const timeline = [
         {
-            title: "Sept 2024",
+            title: "Jan 2023",
             content: (
                 <div className="flex flex-col">
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
-                        Released Startup Template
+                        Comend is founded
                     </h2>
                     <p className="mb-8 mt-4 text-neutral-600 dark:text-neutral-300">
-                        Minor bug fixes in the template, included new features with beams
-                        collision and dark mode.
+                        We re-united to fix broken areas of healthcare after working in drug development and biomedical engineering.
                     </p>
                     <Image
                         src="https://assets.aceternity.com/templates/startup-1.webp"
@@ -29,14 +28,15 @@ export function TimelineSection() {
             ),
         },
         {
-            title: "Aug 2024",
+            title: "Apr 2023",
             content: (
                 <div className="flex flex-col">
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
-                        Released Agency Template
+                        First investment
                     </h2>
                     <p className="mb-8 mt-4 text-neutral-600 dark:text-neutral-300">
-                        Beautiful template with modern design and minimal animations.
+                        We received investment from Character Labs to build solutions for rare families.
+                        We met Sierra in one of our early user tests.
                     </p>
                     <Image
                         src="https://assets.aceternity.com/templates/startup-2.webp"
@@ -54,10 +54,10 @@ export function TimelineSection() {
             content: (
                 <div className="flex flex-col">
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
-                        Released Startup Template
+                        Launched Librarey
                     </h2>
                     <p className="mb-8 mt-4 text-neutral-600 dark:text-neutral-300">
-                        Minor bug fixes in the template
+                        With Sierra's help, we launched a free search platform for rare resources and attended rare disease conferences to gather feedback.
                     </p>
                     <Image
                         src="https://assets.aceternity.com/templates/startup-3.webp"
@@ -75,10 +75,10 @@ export function TimelineSection() {
             content: (
                 <div className="flex flex-col">
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
-                        Released Startup Template
+                        Team growth
                     </h2>
                     <p className="mb-8 mt-4 text-neutral-600 dark:text-neutral-300">
-                        Minor bug fixes in the template
+                        We're currently working with several patient groups to build a new scientific communicator and research platform.
                     </p>
                     <Image
                         src="https://assets.aceternity.com/templates/startup-4.webp"
@@ -154,6 +154,13 @@ export const StatsForChangelogDesktop = ({stats}: { stats: Stats[] }) => {
     return (
         <section className="relative container w-full mx-auto">
             <div className="max-w-7xl gap-8 mx-auto py-24 md:py-24 mt-16">
+                <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
+                    We’re working to empower a patient-led future for research and development.
+                </h2>
+                <p className="text-center text-base text-neutral-7000 font-sans dark:text-neutral-300 mt-4 mb-10">
+                    We’re a team of tech enthusiasts and advocates who see that institutions lack incentives to build infrastructure for rare diseases.
+                    We believe the way to foster new treatments is to amplify the grassroots work of patient groups who fight for what patients need.
+                </p>
                 <div className="grid w-full grid-cols-4 gap-10">
                     {stats.map((stat, index) => (
                         <button

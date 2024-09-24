@@ -15,27 +15,40 @@ import librareyLogo from "@/public/logos/librarey-logo.svg";
 import scimanticLogo from "@/public/logos/scimantic-logo.png";
 
 const bubbles = [
-    { title: "Full Stack Developers", href: "#" },
-    { title: "Node JS Developers", href: "#" },
-    { title: "React Developers", href: "#" },
-    { title: "Blockchain Developers", href: "#" },
-    { title: "Cyber Security", href: "#" },
-    { title: "Typescript Development", href: "#" },
-    { title: "AI in Production", href: "#" },
-    { title: "Python Developers", href: "#" },
-    { title: "DevOps Engineers", href: "#" },
-    { title: "Machine Learning Engineers", href: "#" },
-    { title: "Data Scientists", href: "#" },
-    { title: "Front-end Developers", href: "#" },
-    { title: "Backend Developers", href: "#" },
-    { title: "Mobile App Developers", href: "#" },
-    { title: "UI/UX Designers", href: "#" },
-    { title: "Cloud Architects", href: "#" },
-    { title: "Database Administrators", href: "#" },
-    { title: "Site Reliability Engineers", href: "#" },
-    { title: "Game Developers", href: "#" },
-    { title: "Product Managers", href: "#" },
-];
+    { title: "Patient groups", href: "#" },
+    { title: "CROs", href: "#" },
+    { title: "CDMOs", href: "#" },
+    { title: "Biotechs", href: "#" },
+    { title: "Pharma", href: "#" },
+    { title: "Labs", href: "#" },
+    { title: "PIs", href: "#" },
+    { title: "Post-docs", href: "#" },
+    { title: "Consultants", href: "#" },
+    { title: "Grants", href: "#" },
+    { title: "Research agreements", href: "#" },
+    { title: "IP licenses", href: "#" },
+    { title: "Animal models", href: "#" },
+    { title: "Cell lines", href: "#" },
+    { title: "Organoids", href: "#" },
+    { title: "Registries", href: "#" },
+    { title: "Natural history", href: "#" },
+    { title: "Biomarkers", href: "#" },
+    { title: "Biobanks", href: "#" },
+    { title: "AAVs", href: "#" },
+    { title: "Nanoparticles", href: "#" },
+    { title: "Gene editing", href: "#" },
+    { title: "CRISPR", href: "#" },
+    { title: "ASOs", href: "#" },
+    { title: "RNA therapy", href: "#" },
+    { title: "Prime editing", href: "#" },
+    { title: "Epilepsy", href: "#" },
+    { title: "Autism", href: "#" },
+    { title: "Mitochondrial diseases", href: "#" },
+    { title: "Neurodegeneration", href: "#" },
+    { title: "Lawyers", href: "#" },
+    { title: "Accountants", href: "#" },
+    { title: "Web designers", href: "#" },
+]
 
 export const CloudHeroSection = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -229,7 +242,7 @@ export const CloudHeroSection = () => {
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                     className="max-w-screen-sm text-xl text-muted-foreground"
                 >
-                    {`Design your research roadmap. Connect with academics, CROs, and other patient groups who can help.`}
+                    {`Create your research roadmap, connect with collaborators, and stay updated on the latest scientific breakthroughs.`}
                 </motion.p>
 
                 <motion.div
@@ -239,7 +252,7 @@ export const CloudHeroSection = () => {
                     className="flex flex-row space-x-2"
                 >
                     <div className="text-center w-full flex flex-col justify-center items-center space-y-2">
-                        <Label className="text-base">🎉&nbsp;&nbsp;Become a beta tester</Label>
+                        <Label className="text-base">🎉&nbsp;&nbsp;Join our beta testing community</Label>
                         <div className="w-full flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
                             <LabelInputContainer>
                                 <FancyInput id="name" placeholder="Name" type="text"/>

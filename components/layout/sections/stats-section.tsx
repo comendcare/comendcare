@@ -31,8 +31,7 @@ export function StatsSection() {
                             Everything you need in one place
                         </h2>
                         <p className="text-xl text-muted-foreground mb-8">
-                            A rich marketplace of people and organizations uniquely positioned to help you find and
-                            develop a treatment.
+                            We connect opportunities, people, and organizations to help you find the best partners and advance treatments.
                         </p>
                     </div>
                 </div>
