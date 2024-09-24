@@ -7,8 +7,8 @@ import {useEffect} from "react";
 export function StatsSection() {
     const items = [
         {
-            description: "Expected grants",
-            value: 500,
+            description: "Grants",
+            value: 250,
         },
         {
             description: "Contractors",

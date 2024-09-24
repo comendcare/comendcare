@@ -52,7 +52,7 @@ export function BetaSignup({ isSubscribed, isSubscribedCallback, inline = false 
     }
 
     return (
-        <>
+        <div className="flex flex-col justify-center items-center space-y-2">
             {!inline && !isSubscribed && <Label className="text-base">
                 🎉&nbsp;&nbsp;Join our beta testing community
             </Label>}
@@ -60,47 +60,48 @@ export function BetaSignup({ isSubscribed, isSubscribedCallback, inline = false 
                 Thank you for joining!
             </Label>}
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleBetaSignupSubmit)}>
-                {!isSubscribed && <div className={`w-full flex ${inline ? "flex-col" : "flex-col md:flex-row md:space-y-0 md:space-x-2"} space-y-2 mb-4`}>
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({ field }) => (
-                            <FormItem className="flex flex-col grow">
-                                <FormControl>
-                                    <LabelInputContainer>
-                                        <FancyInput id="name" placeholder="Name" type="text" {...field} />
-                                    </LabelInputContainer>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                <form onSubmit={form.handleSubmit(handleBetaSignupSubmit)} className="flex flex-col justify-center items-center space-y-2">
+                    {!isSubscribed && <div
+                        className={`w-full flex ${inline ? "flex-col" : "flex-col md:flex-row md:space-y-0 md:space-x-2"} space-y-2`}>
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({field}) => (
+                                <FormItem className="flex flex-col grow">
+                                    <FormControl>
+                                        <LabelInputContainer>
+                                            <FancyInput id="name" placeholder="Name" type="text" {...field} />
+                                        </LabelInputContainer>
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
 
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem className="flex flex-col grow">
-                                <FormControl>
-                                    <LabelInputContainer>
-                                        <FancyInput id="email" placeholder="Email" type="email" {...field} />
-                                    </LabelInputContainer>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>}
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({field}) => (
+                                <FormItem className="flex flex-col grow">
+                                    <FormControl>
+                                        <LabelInputContainer>
+                                            <FancyInput id="email" placeholder="Email" type="email" {...field} />
+                                        </LabelInputContainer>
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                    </div>}
 
-                <RainbowSubscribeButton
-                    subscribeStatus={isSubscribed}
-                    initialText="Join"
-                    changeText="Joined"
-                    buttonTextColor="white"
-                />
+                    <RainbowSubscribeButton
+                        subscribeStatus={isSubscribed}
+                        initialText="Join"
+                        changeText="Joined"
+                        buttonTextColor="white"
+                    />
                 </form>
             </Form>
-        </>
+        </div>
     )
 }

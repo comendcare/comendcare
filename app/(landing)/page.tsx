@@ -17,6 +17,7 @@ import {StatsSection} from "@/components/layout/sections/stats-section";
 import {ScimanticSection} from "@/components/layout/sections/scimantic-section";
 import WhatElseSection from "@/components/layout/sections/what-else-section";
 import {CloudHeroSection} from "@/components/layout/sections/cloud-hero";
+import {BetaSignup} from "@/components/beta-signup";
 
 export default function App() {
     const [isSubscribed, setIsSubscribed] = useState<boolean>(false)
@@ -36,7 +37,10 @@ export default function App() {
     return (
         <>
             {/*<HeroSection/>*/}
-            <CloudHeroSection isSubscribedCallback={betaSubscribeCallback} isSubscribed={isSubscribed}/>
+            <CloudHeroSection/>
+            <div className="max-w-7xl mx-auto py-8 mt-8 flex flex-col justify-center items-center">
+                <BetaSignup isSubscribedCallback={betaSubscribeCallback} isSubscribed={isSubscribed}/>
+            </div>
             {/*<HowItWorks/>*/}
             <TabsFeaturesSection/>
             {/*<WhoSection/>*/}

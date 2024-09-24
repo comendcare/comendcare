@@ -1,9 +1,3 @@
-import Link from "next/link";
-import {FaArrowRight} from "react-icons/fa6";
-import {buttonVariants} from "@/components/ui/button";
-import {cn} from "@/lib/utils";
-import {LabelInputContainer} from "@/components/contact-form";
-import {FancyInput} from "@/components/ui/fancy-input";
 import React from "react";
 import { BetaSignup } from "@/components/beta-signup";
 
