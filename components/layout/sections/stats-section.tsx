@@ -21,8 +21,9 @@ export function StatsSection() {
     ];
     return (
         <section className="group/container relative mx-auto w-full max-w-7xl overflow-hidden rounded-3xl py-24">
-            <div className="relative z-20 space-y-8">
-                <div className="grid grid-cols-2">
+            <div className="flex flex-col justify-center items-center relative z-20 space-y-8">
+                {/*<div className="grid grid-cols-2">*/}
+                <div className="flex flex-col justify-center items-center w-1/2 mx-auto text-center">
                     <div>
                         <h2 className="text-lg text-primary mb-2 tracking-wider">Marketplace</h2>
 
@@ -35,7 +36,8 @@ export function StatsSection() {
                         </p>
                     </div>
                 </div>
-                <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3">
+                {/*<div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3">*/}
+                <div className="flex flex-col sm:flex-row mx-auto max-w-7xl space-x-16">
                     {items.map((item, index) => (
                         <motion.div
                             initial={{
@@ -53,10 +55,10 @@ export function StatsSection() {
                                 delay: index * 0.1,
                             }}
                             key={"card" + index}
-                            className={cn("group/card space-y-2 relative overflow-hidden rounded-lg")}
+                            className={cn("flex flex-col justify-center items-center group/card space-y-2 relative overflow-hidden rounded-lg")}
                         >
                             <div className="flex items-center gap-2">
-                                <p className="text-3xl font-bold text-neutral-700 dark:text-neutral-200">
+                                <p className="text-3xl sm:text-6xl font-bold text-neutral-700 dark:text-neutral-200">
                                     <AnimatedNumber value={item.value}/> +
                                 </p>
                             </div>

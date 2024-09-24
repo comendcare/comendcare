@@ -16,11 +16,13 @@ import {LibrareySection} from "@/components/layout/sections/librarey-section";
 import {StatsSection} from "@/components/layout/sections/stats-section";
 import {ScimanticSection} from "@/components/layout/sections/scimantic-section";
 import WhatElseSection from "@/components/layout/sections/what-else-section";
+import {CloudHeroSection} from "@/components/layout/sections/cloud-hero";
 
 export default function App() {
     return (
         <>
-            <HeroSection/>
+            {/*<HeroSection/>*/}
+            <CloudHeroSection/>
             {/*<HowItWorks/>*/}
             <TabsFeaturesSection/>
             {/*<WhoSection/>*/}
