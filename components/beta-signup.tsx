@@ -1,3 +1,4 @@
+"use client"
 import {Label} from "@/components/ui/label";
 import {FancyInput} from "@/components/ui/fancy-input";
 import {LabelInputContainer} from "@/components/contact-form";
@@ -24,7 +25,7 @@ const betaSignupFormSchema = z.object({
 })
 
 export function BetaSignup({ inline = false }: { inline?: boolean }) {
-    const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+    const [isSubscribed, setIsSubscribed] = useState<boolean>(false)
     const form = useForm<z.infer<typeof betaSignupFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(betaSignupFormSchema)
@@ -53,12 +54,15 @@ export function BetaSignup({ inline = false }: { inline?: boolean }) {
 
     return (
         <>
-            {!inline && <Label className="text-base">
+            {!inline && !isSubscribed && <Label className="text-base">
                 🎉&nbsp;&nbsp;Join our beta testing community
+            </Label>}
+            {!inline && isSubscribed && <Label className="text-base">
+                Thank you for joining!
             </Label>}
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleBetaSignupSubmit)}>
-                <div className={`w-full flex ${inline ? "flex-col" : "flex-col md:flex-row md:space-y-0 md:space-x-2"} space-y-2 mb-4`}>
+                {!isSubscribed && <div className={`w-full flex ${inline ? "flex-col" : "flex-col md:flex-row md:space-y-0 md:space-x-2"} space-y-2 mb-4`}>
                     <FormField
                         control={form.control}
                         name="name"
@@ -88,7 +92,7 @@ export function BetaSignup({ inline = false }: { inline?: boolean }) {
                             </FormItem>
                         )}
                     />
-                </div>
+                </div>}
 
                 <RainbowSubscribeButton
                     subscribeStatus={isSubscribed}
