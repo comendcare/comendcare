@@ -119,7 +119,8 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                 visible && "bg-white/80 dark:bg-neutral-950/80"
             )}
         >
-            <Link href="/">
+            {/* NOTE: hackey fix here (setting the z-index) to fix the comend logo link. Note to fix this properly in Notion https://www.notion.so/comend/2f37a4f54517416fa140578a9b714f84?v=8e6e002c8ecc429081f6981f68d6e23a&p=3f7ae8399edb45e4a14de4b63324ce44&pm=s */}
+            <Link href="/" className="z-[61]">
                 <Image className="w-36 inline" src={logo} alt="Comend Logo" />
             </Link>
             <motion.div className="lg:flex flex-row flex-1 absolute inset-0 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
