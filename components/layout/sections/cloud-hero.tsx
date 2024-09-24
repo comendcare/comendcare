@@ -20,13 +20,13 @@ const bubbles = [
     { title: "CDMOs", href: "#" },
     { title: "Biotechs", href: "#" },
     { title: "Pharma", href: "#" },
-    { title: "Labs", href: "#" },
-    { title: "PIs", href: "#" },
-    { title: "Post-docs", href: "#" },
-    { title: "Consultants", href: "#" },
+    // { title: "Labs", href: "#" },
+    // { title: "PIs", href: "#" },
+    // { title: "Post-docs", href: "#" },
+    // { title: "Consultants", href: "#" },
     { title: "Grants", href: "#" },
-    { title: "Research agreements", href: "#" },
-    { title: "IP licenses", href: "#" },
+    // { title: "Research agreements", href: "#" },
+    // { title: "IP licenses", href: "#" },
     { title: "Animal models", href: "#" },
     { title: "Cell lines", href: "#" },
     { title: "Organoids", href: "#" },
@@ -45,9 +45,9 @@ const bubbles = [
     { title: "Autism", href: "#" },
     { title: "Mitochondrial diseases", href: "#" },
     { title: "Neurodegeneration", href: "#" },
-    { title: "Lawyers", href: "#" },
-    { title: "Accountants", href: "#" },
-    { title: "Web designers", href: "#" },
+    // { title: "Lawyers", href: "#" },
+    // { title: "Accountants", href: "#" },
+    // { title: "Web designers", href: "#" },
 ]
 
 export const CloudHeroSection = () => {
@@ -263,7 +263,7 @@ export const CloudHeroSection = () => {
                 initial={{opacity: 0, y: 50}}
                 animate={{opacity: 1, y: [50, -10, 0]}}
                 transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-                className="hidden sm:block absolute inset-0 z-0 pointer-events-none opacity-60" ref={containerRef}
+                className="hidden sm:block absolute inset-0 z-0 pointer-events-none opacity-40" ref={containerRef}
             >
                 {bubbles.map((bubble, index) => {
                     const {x, y} = calculateMovement(cloudPositions[index].x, cloudPositions[index].y);
