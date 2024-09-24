@@ -12,7 +12,7 @@ import logoWABS from "@/public/logos/affiliations/WABS.png";
 import Image from "next/image";
 import React from "react";
 
-export function SpotlightLogoCloud() {
+export function LogoCloud() {
     const logos = [
         {
             name: "Character",
