@@ -42,6 +42,12 @@ export function TeamSection() {
     return (
         <section className="relative container w-full mx-auto">
             <div className="max-w-7xl gap-8 mx-auto py-24 md:py-24 mt-16">
+                <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
+                    Meet the team
+                </h2>
+                <p className="text-center text-base text-neutral-7000 font-sans dark:text-neutral-300 mt-4 mb-10">
+                    Want to chat or collaborate? We're all ears!
+                </p>
                 <AnimatePresence>
                     {active && (
                         <motion.div
@@ -76,24 +82,24 @@ export function TeamSection() {
                                 <CloseIcon />
                             </motion.button>
                             <motion.div
-                                layoutId={`card-${active.title}-${id}`}
+                                layoutId={`card-${active.name}-${id}`}
                                 ref={ref}
-                                className="w-full max-w-[500px]  h-full md:h-fit md:max-h-[90%]  flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden"
+                                className="w-full max-w-[500px] h-full md:h-fit md:max-h-[90%] flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden"
                             >
-                                <motion.div layoutId={`image-${active.title}-${id}`}>
+                                <motion.div layoutId={`image-${active.name}-${id}`}>
                                     <Image
                                         priority
                                         width={200}
                                         height={200}
                                         src={active.src}
-                                        alt={active.title}
+                                        alt={active.name}
                                         className="w-full h-80 lg:h-80 sm:rounded-tr-lg sm:rounded-tl-lg object-cover object-top"
                                     />
                                 </motion.div>
 
                                 <div>
                                     <div className="flex justify-between items-start p-4">
-                                        <div className="">
+                                        <div>
                                             <motion.h3
                                                 layoutId={`name-${active.name}-${id}`}
                                                 className="font-medium text-neutral-700 dark:text-neutral-200 text-base"
@@ -101,7 +107,7 @@ export function TeamSection() {
                                                 {active.name}
                                             </motion.h3>
                                             <motion.p
-                                                layoutId={`title-${active.title}-${id}`}
+                                                layoutId={`title-${active.name}-${id}`}
                                                 className="text-neutral-600 dark:text-neutral-400 text-base"
                                             >
                                                 {active.title}
@@ -142,18 +148,18 @@ export function TeamSection() {
                 <ul className="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-4 items-start gap-4">
                     {cards.map((card) => (
                         <motion.div
-                            layoutId={`card-${card.title}-${id}`}
+                            layoutId={`card-${card.name}-${id}`}
                             key={card.name}
                             onClick={() => setActive(card)}
-                            className="p-4 flex flex-col  hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
+                            className="p-4 flex flex-col hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
                         >
                             <div className="flex gap-4 flex-col w-full">
-                                <motion.div layoutId={`image-${card.title}-${id}`}>
+                                <motion.div layoutId={`image-${card.name}-${id}`}>
                                     <Image
                                         width={100}
                                         height={100}
                                         src={card.src}
-                                        alt={card.title}
+                                        alt={card.name}
                                         className="h-60 w-full rounded-lg object-cover object-top"
                                     />
                                 </motion.div>
@@ -165,7 +171,7 @@ export function TeamSection() {
                                         {card.name}
                                     </motion.h3>
                                     <motion.p
-                                        layoutId={`title-${card.title}-${id}`}
+                                        layoutId={`title-${card.name}-${id}`}
                                         className="text-neutral-600 dark:text-neutral-400 text-center md:text-left text-base"
                                     >
                                         {card.title}

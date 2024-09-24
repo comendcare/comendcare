@@ -1,8 +1,8 @@
 "use client";
-import { cn } from "@/lib/utils";
+import {cn} from "@/lib/utils";
 import Image from "next/image";
-import React, { useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValue } from "framer-motion";
+import React, {useRef, useState} from "react";
+import {AnimatePresence, motion, useMotionValue} from "framer-motion";
 
 export function TimelineSection() {
     const timeline = [
@@ -95,8 +95,8 @@ export function TimelineSection() {
 
     return (
         <div className="w-full">
-            <StatsForChangelogDesktop stats={timeline} />
-            <StatsForChangelogMobile stats={timeline} />
+            <StatsForChangelogDesktop stats={timeline}/>
+            <StatsForChangelogMobile stats={timeline}/>
         </div>
     );
 }
@@ -106,7 +106,7 @@ type Stats = {
     content: React.ReactNode;
 };
 
-export const StatsForChangelogMobile = ({ stats }: { stats: Stats[] }) => {
+export const StatsForChangelogMobile = ({stats}: { stats: Stats[] }) => {
     return (
         <div className="mx-auto block w-full max-w-7xl px-4 md:px-8 lg:hidden">
             {stats.map((stat, index) => (
@@ -123,9 +123,11 @@ export const StatsForChangelogMobile = ({ stats }: { stats: Stats[] }) => {
                             {stat.title}
                         </span>
                         <div className="flex w-full items-center gap-2">
-                            <div className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
+                            <div
+                                className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
                             <div className="h-px w-full bg-neutral-300 dark:bg-neutral-700"></div>
-                            <div className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
+                            <div
+                                className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
                         </div>
                     </div>
                     {stat.content}
@@ -135,7 +137,7 @@ export const StatsForChangelogMobile = ({ stats }: { stats: Stats[] }) => {
     );
 };
 
-export const StatsForChangelogDesktop = ({ stats }: { stats: Stats[] }) => {
+export const StatsForChangelogDesktop = ({stats}: { stats: Stats[] }) => {
     const [active, setActive] = useState(stats[0]);
     const direction = useMotionValue(0);
 
@@ -150,54 +152,59 @@ export const StatsForChangelogDesktop = ({ stats }: { stats: Stats[] }) => {
     };
 
     return (
-        <div className="mx-auto hidden w-full max-w-7xl px-4 md:px-8 lg:block">
-            <div className="grid w-full grid-cols-4 gap-10">
-                {stats.map((stat, index) => (
-                    <button
-                        key={`stat-tab-${index}`}
-                        onClick={() => handleSetActive(stat)}
-                        className={cn(
-                            "flex items-center rounded-2xl p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800",
+        <section className="relative container w-full mx-auto">
+            <div className="max-w-7xl gap-8 mx-auto py-24 md:py-24 mt-16">
+                <div className="grid w-full grid-cols-4 gap-10">
+                    {stats.map((stat, index) => (
+                        <button
+                            key={`stat-tab-${index}`}
+                            onClick={() => handleSetActive(stat)}
+                            className={cn(
+                                "flex items-center rounded-2xl p-4 hover:bg-neutral-100 dark:hover:bg-neutral-800",
 
-                            isActive(stat) ? "bg-neutral-100 dark:bg-neutral-800" : "",
-                        )}
-                    >
-                        <span className="mr-4 flex-shrink-0 font-medium text-neutral-700 dark:text-neutral-100">
-                            {stat.title}
-                        </span>
-                        <div className="flex w-full items-center gap-2">
-                            <div className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
-                            <div className="h-px w-full bg-neutral-300 dark:bg-neutral-700"></div>
-                            <div className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
-                        </div>
-                    </button>
-                ))}
+                                isActive(stat) ? "bg-neutral-100 dark:bg-neutral-800" : "",
+                            )}
+                        >
+                            <span className="mr-4 flex-shrink-0 font-medium text-neutral-700 dark:text-neutral-100">
+                                {stat.title}
+                            </span>
+                            <div className="flex w-full items-center gap-2">
+                                <div
+                                    className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
+                                <div className="h-px w-full bg-neutral-300 dark:bg-neutral-700"></div>
+                                <div
+                                    className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
+                            </div>
+                        </button>
+                    ))}
+                </div>
+                <div
+                    className="relative mt-4 w-full overflow-hidden px-10 [mask-image:linear-gradient(to_right,transparent,white_2%,white_98%,transparent)]">
+                    <AnimatePresence mode="popLayout" initial={false}>
+                        <motion.div
+                            key={String(active.title)}
+                            initial={{
+                                x: 1000,
+                                opacity: 0,
+                            }}
+                            exit={{
+                                x: -1000,
+                                opacity: 0,
+                            }}
+                            animate={{
+                                x: 0,
+                                opacity: 1,
+                            }}
+                            transition={{
+                                ease: "easeOut",
+                            }}
+                            className="w-full"
+                        >
+                            {active.content}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
             </div>
-            <div className="relative mt-4 w-full overflow-hidden px-10 [mask-image:linear-gradient(to_right,transparent,white_2%,white_98%,transparent)]">
-                <AnimatePresence mode="popLayout" initial={false}>
-                    <motion.div
-                        key={String(active.title)}
-                        initial={{
-                            x: 1000,
-                            opacity: 0,
-                        }}
-                        exit={{
-                            x: -1000,
-                            opacity: 0,
-                        }}
-                        animate={{
-                            x: 0,
-                            opacity: 1,
-                        }}
-                        transition={{
-                            ease: "easeOut",
-                        }}
-                        className="w-full"
-                    >
-                        {active.content}
-                    </motion.div>
-                </AnimatePresence>
-            </div>
-        </div>
+        </section>
     );
 };
