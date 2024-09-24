@@ -160,11 +160,11 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                 )}
             </motion.div>
 
-            <div className="flex items-center gap-4">
-                <Link href="/signin" className={cn(buttonVariants({ variant: "secondary" }), "hidden md:block")}>
-                    Login
-                </Link>
-            </div>
+            {/*<div className="flex items-center gap-4">*/}
+            {/*    <Link href="/signin" className={cn(buttonVariants({ variant: "secondary" }), "hidden md:block")}>*/}
+            {/*        Login*/}
+            {/*    </Link>*/}
+            {/*</div>*/}
         </motion.div>
     );
 };
@@ -223,13 +223,14 @@ const MobileNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                                     <motion.span className="block">{navItem.name}</motion.span>
                                 </Link>
                             ))}
-                            <Link
-                                href="signin"
-                                onClick={() => setOpen(false)}
-                                className={cn(buttonVariants({ variant: "default" }), "block md:hidden w-full")}
-                            >
-                                Login
-                            </Link>
+
+                            {/*<Link*/}
+                            {/*    href="signin"*/}
+                            {/*    onClick={() => setOpen(false)}*/}
+                            {/*    className={cn(buttonVariants({ variant: "default" }), "block md:hidden w-full")}*/}
+                            {/*>*/}
+                            {/*    Login*/}
+                            {/*</Link>*/}
                         </motion.div>
                     )}
                 </AnimatePresence>
