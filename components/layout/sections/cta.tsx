@@ -32,7 +32,7 @@ export default function CTASection () {
                     {/*    <FaArrowRight />*/}
                     {/*</Link>*/}
 
-                    <div className="w-fit flex flex-col space-y-2 mb-4">
+                    <div className="w-fit flex flex-col space-y-2">
                         <BetaSignup inline={true} />
                     </div>
 
