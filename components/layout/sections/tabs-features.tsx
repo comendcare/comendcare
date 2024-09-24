@@ -99,7 +99,8 @@ export default function TabsFeaturesSection() {
 
     return (
         <section id="features" className="w-full container mx-auto max-w-7xl py-24 sm:py-24 space-y-8">
-            <div className="grid grid-cols-2">
+            {/*<div className="grid grid-cols-2">*/}
+            <div className="flex flex-col justify-center items-center w-1/2 mx-auto text-center">
                 <div>
                     <h2 className="text-lg text-primary mb-2 tracking-wider">Platform</h2>
 
