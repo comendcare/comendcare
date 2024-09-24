@@ -14,6 +14,7 @@ import Pepi from "@/public/profiles/Pepi.jpg";
 import Betty from "@/public/profiles/Betty.jpeg";
 import Megan from "@/public/profiles/Megan.png";
 import Link from "next/link";
+import {FaInstagram, FaLinkedin} from "react-icons/fa6";
 
 export function TeamSection() {
     const [active, setActive] = useState<(typeof cards)[number] | null>(null);
@@ -89,8 +90,10 @@ export function TeamSection() {
                                 <motion.div layoutId={`image-${active.name}-${id}`}>
                                     <Image
                                         priority
-                                        width={200}
-                                        height={200}
+                                        unoptimized={true}
+                                        quality={100}
+                                        width={500}
+                                        height={500}
                                         src={active.src}
                                         alt={active.name}
                                         className="object-center w-full h-80 lg:h-80 sm:rounded-tr-lg sm:rounded-tl-lg object-cover"
@@ -114,25 +117,42 @@ export function TeamSection() {
                                             </motion.p>
                                         </div>
 
-                                        <motion.a
-                                            layout
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            href={active.ctaLink}
-                                            target="_blank"
-                                            className="px-4 py-3 text-sm rounded-full font-bold bg-green-500 text-white"
-                                        >
-                                            {active.ctaText}
-                                        </motion.a>
+                                        <div className="flex space-x-4">
+                                            {active.linkedInURL && (
+                                                <motion.a
+                                                    layout
+                                                    initial={{opacity: 0}}
+                                                    animate={{opacity: 1}}
+                                                    exit={{opacity: 0}}
+                                                    href={active.linkedInURL}
+                                                    target="_blank"
+                                                    className="text-gray-600 hover:text-gray-800"
+                                                >
+                                                    <FaLinkedin className="h-6 w-6"/>
+                                                </motion.a>
+                                            )}
+                                            {active.instagramURL && (
+                                                <motion.a
+                                                    layout
+                                                    initial={{opacity: 0}}
+                                                    animate={{opacity: 1}}
+                                                    exit={{opacity: 0}}
+                                                    href={active.instagramURL}
+                                                    target="_blank"
+                                                    className="text-gray-600 hover:text-gray-800"
+                                                >
+                                                    <FaInstagram className="h-6 w-6"/>
+                                                </motion.a>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="pt-4 relative px-4">
                                         <motion.div
                                             layout
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className="text-neutral-600 text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto dark:text-neutral-400 [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
+                                            initial={{opacity: 0}}
+                                            animate={{opacity: 1}}
+                                            exit={{opacity: 0}}
+                                            className="text-neutral-600 text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto dark:text-neutral-400 [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
                                         >
                                             {typeof active.content === "function"
                                                 ? active.content()
@@ -156,6 +176,8 @@ export function TeamSection() {
                             <div className="flex gap-4 flex-col w-full">
                                 <motion.div layoutId={`image-${card.name}-${id}`}>
                                     <Image
+                                        unoptimized={true}
+                                        quality={100}
                                         width={100}
                                         height={100}
                                         src={card.src}
@@ -224,13 +246,13 @@ const cards = [
         name: "Albert Wang",
         title: "Co-founder and CEO",
         src: Albert,
-        ctaText: "Learn More",
-        ctaLink: "#",
+        linkedInURL: "https://www.linkedin.com/in/albert-yq-wang/",
+        instagramURL: "https://www.instagram.com/albert.yqw/",
         content: () => {
             return (
                 <p>
-                    I went to school for biomedical engineering, have worked with deep
-                    tech startups and in life sciences research, and spent a past life
+                    I went to school for biomedical engineering, have worked with deep tech
+                    startups and in life sciences research, and spent a past life
                     volunteering with kids. On the weekend, I try to catch up with the
                     happenings in genomics.
                 </p>
@@ -241,8 +263,8 @@ const cards = [
         name: "Flawnson Tong",
         title: "Co-founder and CTO",
         src: Flawnson,
-        ctaText: "Learn More",
-        ctaLink: "#",
+        linkedInURL: "https://www.linkedin.com/in/flawnson/",
+        instagramURL: "https://www.instagram.com/flaws.non/",
         content: () => {
             return (
                 <p>
@@ -258,8 +280,8 @@ const cards = [
         name: "Sierra Phillips",
         title: "Chief Rare Mom",
         src: Sierra,
-        ctaText: "Learn More",
-        ctaLink: "#",
+        linkedInURL: "https://www.linkedin.com/in/sierra-phillips-208a0b106/",
+        instagramURL: "https://www.instagram.com/mrs.phillijt/",
         content: () => {
             return (
                 <p>
@@ -274,8 +296,8 @@ const cards = [
         name: "Pepi Martinez",
         title: "Head of Data Governance",
         src: Pepi,
-        ctaText: "Learn More",
-        ctaLink: "#",
+        linkedInURL: "https://www.linkedin.com/in/pepimartinez/",
+        instagramURL: "",
         content: () => {
             return (
                 <p>
@@ -292,8 +314,8 @@ const cards = [
         name: "Betty Trevino",
         title: "Head of Product Marketing",
         src: Betty,
-        ctaText: "Learn More",
-        ctaLink: "#",
+        linkedInURL: "https://www.linkedin.com/in/bettyctrevino/",
+        instagramURL: "https://www.instagram.com/agsadvocacy/",
         content: () => {
             return (
                 <p>
@@ -310,8 +332,8 @@ const cards = [
         name: "Megan McClure",
         title: "Full Stack Software Developer",
         src: Megan,
-        ctaText: "Learn More",
-        ctaLink: "#",
+        linkedInURL: "https://www.linkedin.com/in/megan-mcclure-2216391a3/",
+        instagramURL: "",
         content: () => {
             return (
                 <p>
@@ -327,8 +349,8 @@ const cards = [
         name: "Bruce Bloom",
         title: "Advisor",
         src: Bruce,
-        ctaText: "Learn More",
-        ctaLink: "#",
+        linkedInURL: "https://www.linkedin.com/in/drbrucebloom/",
+        instagramURL: "",
         content: () => {
             return (
                 <p>
@@ -345,8 +367,8 @@ const cards = [
         name: "Sanath Ramesh",
         title: "Advisor",
         src: Sanath,
-        ctaText: "Learn More",
-        ctaLink: "#",
+        linkedInURL: "https://www.linkedin.com/in/sanathkr/",
+        instagramURL: "",
         content: () => {
             return (
                 <p>
@@ -363,8 +385,8 @@ const cards = [
         name: "Andrew Wells",
         title: "Advisor",
         src: Andrew,
-        ctaText: "Learn More",
-        ctaLink: "#",
+        linkedInURL: "https://www.linkedin.com/in/andrewjoshuawells/",
+        instagramURL: "",
         content: () => {
             return (
                 <p>
@@ -381,8 +403,8 @@ const cards = [
         name: "Foy Savas",
         title: "Advisor",
         src: Foy,
-        ctaText: "Learn More",
-        ctaLink: "#",
+        linkedInURL: "https://www.linkedin.com/in/foysavas/",
+        instagramURL: "",
         content: () => {
             return (
                 <p>
