@@ -45,7 +45,7 @@ export function TeamSection() {
                 <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
                     Meet the team
                 </h2>
-                <p className="text-center text-base text-neutral-7000 font-sans dark:text-neutral-300 mt-4 mb-10">
+                <p className="text-center text-xl text-muted-foreground dark:text-neutral-300 mt-4 mb-10">
                     Want to chat or collaborate? We're all ears!
                 </p>
                 <AnimatePresence>
@@ -93,7 +93,7 @@ export function TeamSection() {
                                         height={200}
                                         src={active.src}
                                         alt={active.name}
-                                        className="w-full h-80 lg:h-80 sm:rounded-tr-lg sm:rounded-tl-lg object-cover object-top"
+                                        className="object-center w-full h-80 lg:h-80 sm:rounded-tr-lg sm:rounded-tl-lg object-cover"
                                     />
                                 </motion.div>
 
@@ -160,7 +160,7 @@ export function TeamSection() {
                                         height={100}
                                         src={card.src}
                                         alt={card.name}
-                                        className="h-60 w-full rounded-lg object-cover object-top"
+                                        className="object-center h-60 w-full rounded-lg object-cover"
                                     />
                                 </motion.div>
                                 <div className="flex justify-center items-center flex-col">
