@@ -1,6 +1,12 @@
 "use client";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import React from "react";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+  } from "@/components/ui/accordion"
 
 export function FAQsWithGrid({faqs}: { faqs: { question: string, answer: string, contactLink: boolean }[] }) {
     const columns = 3;
@@ -12,7 +18,7 @@ export function FAQsWithGrid({faqs}: { faqs: { question: string, answer: string,
         faqsGrid[index % columns].push(faq);
     });
     return (
-        <div className="mx-auto grid max-w-7xl place-items-center gap-4 px-4 py-8 md:py-16 mt-16">
+        <div className="mx-auto grid max-w-7xl place-items-center gap-4 px-4 py-4 md:py-8">
             <h2 className="text-center text-3xl md:text-4xl font-bold mb-4">
                 Frequently asked questions
             </h2>
@@ -26,7 +32,7 @@ export function FAQsWithGrid({faqs}: { faqs: { question: string, answer: string,
                     contact page
                 </a>.
             </p>
-            <div className="mt-10 grid w-full grid-cols-1 items-start gap-4 md:grid-cols-3">
+            <div className="hidden md:grid mt-10 w-full grid-cols-1 items-start gap-4 md:grid-cols-3">
                 {faqsGrid.map((faqs, rowIndex) => (
                     <div key={rowIndex} className="grid grid-cols-1 items-start gap-4">
                         {faqs.map((faq, index) => (
@@ -40,6 +46,29 @@ export function FAQsWithGrid({faqs}: { faqs: { question: string, answer: string,
                     </div>
                 ))}
             </div>
+
+            <Accordion type="single" collapsible className="w-full max-w-lg md:hidden mt-10 mx-10">
+                {faqs.map((faq) => (
+                    <AccordionItem value={faq.question}>
+                        <AccordionTrigger className="text-center font-bold">{faq.question}</AccordionTrigger>
+                        <AccordionContent className="text-muted-foreground text-base">
+                            {faq.answer}
+
+                            {faq.contactLink && (
+                                <p className="text-muted-foreground text-base pt-4">
+                                    {`Have thoughts? `}
+                                    <a
+                                        href="/contact"
+                                        className="text-blue-500 underline"
+                                    >
+                                        Let us know.
+                                    </a>
+                                </p>
+                            )}
+                        </AccordionContent>
+                    </AccordionItem>
+                ))}
+            </Accordion>
         </div>
     );
 }
@@ -54,28 +83,6 @@ const FAQItem = ({
     contactLink: boolean
 }) => {
     return (
-        // <div className="rounded-2xl bg-white p-8 shadow-[0_1px_1px_rgba(0,0,0,0.05),0_4px_6px_rgba(34,42,53,0.04),0_24px_68px_rgba(47,48,55,0.05),0_2px_3px_rgba(0,0,0,0.04)] dark:bg-neutral-900 dark:shadow-[2px_4px_16px_0px_rgba(248,248,248,0.06)_inset]">
-        //   <h3 className="text-black text-2xl font-semibold leading-none tracking-tight">
-        //     {question}
-        //   </h3>
-
-        //   <p className="text-muted-foreground text-base">
-        //     {answer}
-        //   </p>
-
-        //   {contactLink && (
-        //     <p className="text-muted-foreground text-base">
-        //         {`Have thoughts? `}
-        //         <a
-        //             href="/contact"
-        //             className="text-blue-500 underline"
-        //         >
-        //             Let us know.
-        //         </a>
-        //     </p>
-        //   )}
-        // </div>
-
         <Card
             key={question}
             className="bg-muted/50 dark:bg-card transition-all delay-75 group/number"
@@ -94,8 +101,8 @@ const FAQItem = ({
                             href="/contact"
                             className="text-blue-500 underline"
                         >
-                            Let us know.
-                        </a>
+                            Let us know
+                        </a>.
                     </p>
                 )}
             </CardContent>
