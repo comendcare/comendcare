@@ -52,7 +52,6 @@ export default function App() {
             {/*<LibrareySection/>*/}
             {/*<ScimanticSection/>*/}
             <CTASection isSubscribedCallback={betaSubscribeCallback} isSubscribed={isSubscribed}/>
-            <LandingFooter/>
         </>
     );
 }
