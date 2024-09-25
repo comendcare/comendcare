@@ -190,7 +190,7 @@ const MobileNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                     damping: 50
                 }}
                 className={cn(
-                    "flex relative flex-col lg:hidden w-full justify-between items-center bg-transparent max-w-[calc(100vw-2rem)] mx-auto px-0 py-2 z-50",
+                    "flex relative flex-col lg:hidden w-full justify-between items-center bg-transparent max-w-[calc(100vw-2rem)] mx-auto px-4 py-2 z-50",
                     visible && "bg-white/80 dark:bg-neutral-950/80"
                 )}
             >
