@@ -16,7 +16,7 @@ const tabContent = {
         title: "Research Profiles",
         image: <Image
             src={`https://api.microlink.io/?${encode({
-                url: "https://comend-refresh-sprint-3.vercel.app/pag/profile/Myhre%20Syndrome%20Foundation",
+                url: "https://comend-refresh-sprint-3.vercel.app/pag/profile/ACME%20Syndrome%20Foundation",
                 screenshot: true,
                 meta: false,
                 embed: "screenshot.url",
@@ -63,7 +63,17 @@ const tabContent = {
     forums: {
         title: "Focused Forums",
         image: <Image
-            src={timeline}
+            src={`https://api.microlink.io/?${encode({
+                url: "https://comend-refresh-sprint-3.vercel.app/pag/project/Potassium%20Ion%20Channels/discussion",
+                screenshot: true,
+                meta: false,
+                embed: "screenshot.url",
+                colorScheme: "dark",
+                "viewport.isMobile": true,
+                "viewport.deviceScaleFactor": 1,
+                "viewport.width": imgWidth * 3,
+                "viewport.height": imgHeight * 3,
+            })}`}
             quality={100}
             layout="responsive"
             priority={true}
