@@ -16,7 +16,7 @@ export default function LandingFooter() {
                     <ul className="mt-8 flex justify-start gap-6 sm:mt-0 sm:justify-end">
                         <li>
                             <a
-                                href="#"
+                                href="https://www.facebook.com/comendcare/"
                                 rel="noreferrer"
                                 target="_blank"
                                 className="text-gray-700 transition hover:opacity-75"
@@ -29,7 +29,7 @@ export default function LandingFooter() {
 
                         <li>
                             <a
-                                href="#"
+                                href="https://www.instagram.com/comendcare/"
                                 rel="noreferrer"
                                 target="_blank"
                                 className="text-gray-700 transition hover:opacity-75"
@@ -43,7 +43,7 @@ export default function LandingFooter() {
 
                         <li>
                             <a
-                                href="#"
+                                href="https://www.linkedin.com/company/comend"
                                 rel="noreferrer"
                                 target="_blank"
                                 className="text-gray-700 transition hover:opacity-75"
@@ -56,7 +56,7 @@ export default function LandingFooter() {
 
                         <li>
                             <a
-                                href="#"
+                                href="https://twitter.com/comendcare"
                                 rel="noreferrer"
                                 target="_blank"
                                 className="text-gray-700 transition hover:opacity-75"
