@@ -69,7 +69,7 @@ const tabContent = {
             alt="preview image"
             fill
         />,
-        description: "Talk about your challenges, wins, and the latest news in rare disease science and drug development news.",
+        description: "Talk about your challenges, wins, and the latest in rare disease science and drug development news.",
     },
     // kanban: {
     //     title: "Project Management",
