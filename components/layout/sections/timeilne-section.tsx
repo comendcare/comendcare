@@ -159,11 +159,10 @@ export const StatsForChangelogDesktop = ({stats}: { stats: Stats[] }) => {
         <section className="relative container w-full mx-auto">
             <div className="max-w-7xl gap-8 mx-auto py-16 md:py-24 mt-16">
                 <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
-                    We’re working to empower a patient-led future for research and development.
+                    {`We’re working to empower a patient-led future for research and development.`}
                 </h2>
                 <p className="text-center text-base text-neutral-7000 font-sans dark:text-neutral-300 mt-4 mb-10">
-                    We’re a team of tech enthusiasts and advocates who see that institutions lack incentives to build infrastructure for rare diseases.
-                    We believe the way to foster new treatments is to amplify the grassroots work of patient groups who fight for what patients need.
+                    {`We believe that advancing new treatments begins by empowering patient groups, whose grassroots efforts are essential in advocating for the needs of patients.`}
                 </p>
                 <div className="grid w-full grid-cols-4 gap-10">
                     {stats.map((stat, index) => (

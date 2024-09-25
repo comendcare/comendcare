@@ -4,7 +4,7 @@ const FAQs = [
     {
         question: "Where does our data come from?",
         answer:
-            "We have seeded our marketplace using existing online databases like PubMed. Soon, researchers and contractors will be able to claim and edit their pages.",
+            "We have seeded our marketplace using existing online databases like PubMed. Soon, researchers and contractors will be able to claim and manage their pages.",
         contactLink: false,
     },
     {

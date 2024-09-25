@@ -1,12 +1,12 @@
-"use client"
-import {encode} from "qss"
+"use client";
+import {encode} from "qss";
 import React, {useEffect, useState} from "react";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {motion} from "framer-motion"; // Import motion from framer-motion
+import {motion} from "framer-motion";
 import Image from "next/image";
-import roadmap from "@/public/illustrations/roadmap.png"
-import timeline from "@/public/illustrations/timeline.png"
-import kanban from "@/public/illustrations/kanban.png"
+import roadmap from "@/public/illustrations/roadmap.png";
+import timeline from "@/public/illustrations/timeline.png";
+import kanban from "@/public/illustrations/kanban.png";
 
 export const imgWidth = 400;
 export const imgHeight = 250;
@@ -14,7 +14,7 @@ export const imgHeight = 250;
 const tabContent = {
     profiles: {
         title: "Research Profiles",
-        image: <Image // dynamically pull page preview if thumbnail is not available
+        image: <Image
             src={`https://api.microlink.io/?${encode({
                 url: "https://comend-refresh-sprint-3.vercel.app/pag/profile/Myhre%20Syndrome%20Foundation",
                 screenshot: true,
@@ -24,20 +24,21 @@ const tabContent = {
                 "viewport.isMobile": true,
                 "viewport.deviceScaleFactor": 1,
                 "viewport.width": imgWidth * 3,
-                "viewport.height": imgHeight * 3
+                "viewport.height": imgHeight * 3,
             })}`}
             quality={100}
-            layout={"fixed"}
+            layout="responsive"
             priority={true}
-            className="rounded-lg"
+            className="rounded-lg object-cover"
             alt="preview image"
-            fill
+            width={imgWidth}
+            height={imgHeight}
         />,
         description: "Fill in your research roadmap to create a profile. Then match with others and share your progress with researchers, donors, and others.",
     },
     marketplace: {
         title: "Rare Marketplace",
-        image: <Image // dynamically pull page preview if thumbnail is not available
+        image: <Image
             src={`https://api.microlink.io/?${encode({
                 url: "https://comend-refresh-sprint.vercel.app/researcher",
                 screenshot: true,
@@ -47,43 +48,32 @@ const tabContent = {
                 "viewport.isMobile": true,
                 "viewport.deviceScaleFactor": 1,
                 "viewport.width": imgWidth * 3,
-                "viewport.height": imgHeight * 3
+                "viewport.height": imgHeight * 3,
             })}`}
             quality={100}
-            layout={"fixed"}
+            layout="responsive"
             priority={true}
-            className="rounded-lg"
+            className="rounded-lg object-cover"
             alt="preview image"
-            fill
+            width={imgWidth}
+            height={imgHeight}
         />,
         description: "Find and learn about those who can help you advance based on shared biologies, projects, or goals.",
     },
     forums: {
         title: "Focused Forums",
-        image: <Image // dynamically pull page preview if thumbnail is not available
+        image: <Image
             src={timeline}
             quality={100}
-            layout={"fixed"}
+            layout="responsive"
             priority={true}
-            className="rounded-lg"
+            className="rounded-lg object-cover"
             alt="preview image"
-            fill
+            width={imgWidth}
+            height={imgHeight}
         />,
         description: "Talk about your challenges, wins, and the latest in rare disease science and drug development news.",
     },
-    // kanban: {
-    //     title: "Project Management",
-    //     image: <Image // dynamically pull page preview if thumbnail is not available
-    //         src={kanban}
-    //         quality={100}
-    //         layout={"fixed"}
-    //         priority={true}
-    //         className="rounded-lg"
-    //         alt="preview image"
-    //         fill
-    //     />,
-    //     description: "Connect with patient advocacy groups for better outcomes.",
-    // },
 };
 
 export default function TabsFeaturesSection() {
@@ -112,69 +102,81 @@ export default function TabsFeaturesSection() {
             initial={{opacity: 0, y: 50}}
             animate={{opacity: 1, y: [50, -10, 0]}}
             transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-            id="features" className="w-full container mx-auto max-w-7xl px-8 py-24 sm:py-24 space-y-8">
-            {/*<div className="grid grid-cols-2">*/}
-            <div className="flex flex-col justify-center items-center md:w-1/2 mx-auto text-center">
+            id="features"
+            className="w-full container mx-auto max-w-7xl px-8 py-24 sm:py-24 space-y-8"
+        >
+            <div className="flex flex-col justify-center items-center text-center">
                 <div>
                     <h2 className="text-lg text-primary mb-2 tracking-wider">Platform</h2>
-
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                        The hub for patient-led research
-                    </h2>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4">The hub for patient-led research</h2>
                     <p className="text-xl text-muted-foreground mb-8">
                         Comend streamlines your efforts to maximize impact.
                         Here, you can apply for grants, meet researchers, hire contractors, and talk to other patient groups like yours — all from one intuitive platform.
                     </p>
                 </div>
             </div>
-            <Tabs value={activeTab} onValueChange={handleTabChange as any} className="flex flex-col space-y-8">
-                {/* Only render the active tab content */}
-                {tabs.map((tab) => (
-                    activeTab === tab && (
-                        <TabsContent key={tab} value={tab}
-                                     className="flex justify-center items-center w-full max-w-7xl mx-auto bg-gradient-to-b p-8 from-80% from-[#87EBA4]/70 to-[#87CEEB]/70 to-100% rounded-lg">
-                            <div className="relative w-[800px] h-[500px] max-w-7xl rounded-lg">
-                                {tabContent[tab as keyof typeof tabContent].image}
-                            </div>
-                        </TabsContent>
-                    )
-                ))}
-                <TabsList
-                    className="grid grid-cols-3 items-start justify-start bg-transparent border-none shadow-none h-min">
-                    {tabs.map((tab) => (
-                        <TabsTrigger
-                            key={tab}
-                            value={tab}
-                            className="flex flex-col items-start space-y-8 relative bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                        >
-                            {/* Gray bar for each tab */}
-                            <div className="relative w-full h-0.5 bg-gray-300">
-                                {/* Blue animated bar for the active tab */}
-                                {activeTab === tab && (
-                                    <motion.div
-                                        className="absolute top-0 left-0 h-full bg-sky-500"
-                                        initial={{width: 0}}
-                                        animate={{width: "100%"}}
-                                        transition={{
-                                            duration: tabDuration,
-                                            ease: "linear"
-                                        }}
-                                    />
-                                )}
-                            </div>
 
-                            <div className="flex flex-col items-start text-wrap text-start space-y-8 mt-4">
-                                <h3 className="text-black text-2xl font-semibold leading-none tracking-tight">
-                                    {tabContent[tab as keyof typeof tabContent].title}
-                                </h3>
-                                <p className="text-muted-foreground text-base">
-                                    {tabContent[tab as keyof typeof tabContent].description}
-                                </p>
-                            </div>
-                        </TabsTrigger>
+            {/* Display tabs only on large screens */}
+            <div className="hidden md:block">
+                <Tabs value={activeTab} onValueChange={handleTabChange as any} className="flex flex-col space-y-8">
+                    {tabs.map((tab) => (
+                        activeTab === tab && (
+                            <TabsContent key={tab} value={tab}
+                                         className="flex justify-center items-center w-full max-w-7xl mx-auto bg-gradient-to-b p-8 from-80% from-[#87EBA4]/70 to-[#87CEEB]/70 to-100% rounded-lg">
+                                <div className="relative w-[800px] h-[500px] max-w-7xl rounded-lg">
+                                    {tabContent[tab as keyof typeof tabContent].image}
+                                </div>
+                            </TabsContent>
+                        )
                     ))}
-                </TabsList>
-            </Tabs>
+
+                    <TabsList className="grid grid-cols-3 items-start justify-start bg-transparent border-none shadow-none h-min">
+                        {tabs.map((tab) => (
+                            <TabsTrigger key={tab} value={tab}
+                                         className="flex flex-col items-start space-y-8 relative bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:shadow-none">
+                                <div className="relative w-full h-0.5 bg-gray-300">
+                                    {activeTab === tab && (
+                                        <motion.div
+                                            className="absolute top-0 left-0 h-full bg-sky-500"
+                                            initial={{width: 0}}
+                                            animate={{width: "100%"}}
+                                            transition={{
+                                                duration: tabDuration,
+                                                ease: "linear",
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                                <div className="flex flex-col items-start text-wrap text-start space-y-8 mt-4">
+                                    <h3 className="text-black text-2xl font-semibold leading-none tracking-tight">
+                                        {tabContent[tab as keyof typeof tabContent].title}
+                                    </h3>
+                                    <p className="text-muted-foreground text-base">
+                                        {tabContent[tab as keyof typeof tabContent].description}
+                                    </p>
+                                </div>
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                </Tabs>
+            </div>
+
+            {/* Mobile-friendly version */}
+            <div className="block md:hidden space-y-8">
+                {tabs.map((tab) => (
+                    <div key={tab} className="flex flex-col space-y-4">
+                        <div className="relative w-full h-auto">
+                            {tabContent[tab as keyof typeof tabContent].image}
+                        </div>
+                        <div className="flex flex-col items-center text-center space-y-4">
+                            <h3 className="text-xl font-semibold">{tabContent[tab as keyof typeof tabContent].title}</h3>
+                            <p className="text-base text-muted-foreground">
+                                {tabContent[tab as keyof typeof tabContent].description}
+                            </p>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </motion.section>
-    )
+    );
 }
