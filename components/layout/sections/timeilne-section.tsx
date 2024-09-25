@@ -112,32 +112,41 @@ type Stats = {
 
 export const StatsForChangelogMobile = ({stats}: { stats: Stats[] }) => {
     return (
-        <div className="mx-auto block w-full max-w-7xl px-4 md:px-8 lg:hidden">
-            {stats.map((stat, index) => (
-                <div
-                    className="mb-10 flex flex-col gap-4"
-                    key={`stat-tab-mobile-${index}`}
-                >
+        <section className="relative container w-full mx-auto">
+            {/* <div className="mx-auto block w-full max-w-7xl px-4 md:px-8 lg:hidden"> */}
+            <div className="block lg:hidden max-w-7xl gap-8 px-4 md:px-8 py-16 md:py-24 mt-16">
+                <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
+                    {`We’re working to empower a patient-led future for research and development.`}
+                </h2>
+                <p className="text-center text-base text-neutral-7000 font-sans dark:text-neutral-300 mt-4 mb-10">
+                    {`We believe that advancing new treatments begins by empowering patient groups, whose grassroots efforts are essential in advocating for the needs of patients.`}
+                </p>
+                {stats.map((stat, index) => (
                     <div
-                        className={cn(
-                            "flex items-center rounded-2xl hover:bg-neutral-100 dark:hover:bg-neutral-800",
-                        )}
+                        className="mb-10 flex flex-col gap-4"
+                        key={`stat-tab-mobile-${index}`}
                     >
-                        <span className="mr-4 flex-shrink-0 font-medium text-neutral-700 dark:text-neutral-100">
-                            {stat.title}
-                        </span>
-                        <div className="flex w-full items-center gap-2">
-                            <div
-                                className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
-                            <div className="h-px w-full bg-neutral-300 dark:bg-neutral-700"></div>
-                            <div
-                                className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
+                        <div
+                            className={cn(
+                                "flex items-center rounded-2xl hover:bg-neutral-100 dark:hover:bg-neutral-800",
+                            )}
+                        >
+                            <span className="mr-4 flex-shrink-0 font-medium text-neutral-700 dark:text-neutral-100">
+                                {stat.title}
+                            </span>
+                            <div className="flex w-full items-center gap-2">
+                                <div
+                                    className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
+                                <div className="h-px w-full bg-neutral-300 dark:bg-neutral-700"></div>
+                                <div
+                                    className="h-1 w-1 flex-shrink-0 rounded-full bg-neutral-300 dark:bg-neutral-700"></div>
+                            </div>
                         </div>
+                        {stat.content}
                     </div>
-                    {stat.content}
-                </div>
-            ))}
-        </div>
+                ))}
+            </div>
+        </section>
     );
 };
 
@@ -157,7 +166,7 @@ export const StatsForChangelogDesktop = ({stats}: { stats: Stats[] }) => {
 
     return (
         <section className="relative container w-full mx-auto">
-            <div className="max-w-7xl gap-8 mx-auto py-16 md:py-24 mt-16">
+            <div className="hidden lg:grid max-w-7xl gap-8 mx-auto py-16 md:py-24 mt-16">
                 <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
                     {`We’re working to empower a patient-led future for research and development.`}
                 </h2>
