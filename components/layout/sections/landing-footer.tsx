@@ -137,10 +137,10 @@ export default function LandingFooter() {
                 <nav className="mt-10 text-sm" aria-label="quick links">
                     <div className="-my-1 flex justify-center gap-x-6">
                         <Link
-                            href={`${typeof window !== "undefined" ? window.location.origin : ""}/#solutions`}>
+                            href="https://www.librarey.com/terms-of-service">
                             Terms of Services
                         </Link>
-                        <Link href="/about">
+                        <Link href="https://comend.notion.site/Librarey-s-Policies-98d960fe48e34b97a5bb5b152266ecc2">
                             Privacy Policy
                         </Link>
                     </div>
