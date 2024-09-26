@@ -69,7 +69,7 @@ export async function sendBetaSignupEmail(params: {
         const msg = {
             // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
             to: "hello@comendcare.com",
-            from: "corporate@comendcare.com",
+            from: "megan@comendcare.com",
             html: emailTemplate,
             text: "Add this user to the waitlist",
             subject: "[WAITLIST] Beta tester waitlist request"
