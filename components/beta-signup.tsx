@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { useForm } from "react-hook-form";
 import { sendBetaSignupEmail } from "@/lib/emails";
 import { useEffect, useState } from "react";
+import mixpanel from "mixpanel-browser";
 
 const betaSignupFormSchema = z.object({
     name: z
@@ -42,6 +43,11 @@ export function BetaSignup({ isSubscribed, isSubscribedCallback, inline = false 
                     name,
                     email
                 }
+            })
+            
+            mixpanel.track(`Beta signup`,{
+                name: name,
+                email: email
             })
 
             console.log("Form submitted, email sent")
