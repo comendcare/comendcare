@@ -13,6 +13,7 @@ import Foy from "@/public/profiles/Foy.jpg";
 import Pepi from "@/public/profiles/Pepi.jpg";
 import Betty from "@/public/profiles/Betty.jpeg";
 import Megan from "@/public/profiles/Megan.png";
+import Tuongvi from "@/public/profiles/Tuongvi.jpeg";
 import Link from "next/link";
 import {FaInstagram, FaLinkedin} from "react-icons/fa6";
 
@@ -52,9 +53,9 @@ export function TeamSection() {
                 <AnimatePresence>
                     {active && (
                         <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            exit={{opacity: 0}}
                             className="fixed inset-0 bg-black/20 h-full w-full z-10"
                         />
                     )}
@@ -80,7 +81,7 @@ export function TeamSection() {
                                 className="flex absolute top-2 right-2 lg:hidden items-center justify-center bg-white rounded-full h-6 w-6"
                                 onClick={() => setActive(null)}
                             >
-                                <CloseIcon />
+                                <CloseIcon/>
                             </motion.button>
                             <motion.div
                                 layoutId={`card-${active.name}-${id}`}
@@ -341,6 +342,23 @@ const cards = [
                     build our products. My background is in computer science, with a focus
                     on full stack development and user experience design. In my free time I
                     enjoy knitting, spinning yarn, and generally exploring the fiber arts.
+                </p>
+            );
+        },
+    },
+    {
+        name: "Tuongvi Diep",
+        title: "Social Media and Community Coordinator",
+        src: Tuongvi,
+        linkedInURL: "https://www.linkedin.com/in/tuongvi-diep-17080b12b/",
+        instagramURL: "",
+        content: () => {
+            return (
+                <p>
+                    Hello! As part of Comend’s social media team I’m excited to support patient-led biotechs by crafting
+                    narratives that not only inform but inspire, and empowering families with rare diseases.
+                    With a background in journalism,I’m a storyteller at heart with a passion for helping others and
+                    building authentic relationships in the digital space.
                 </p>
             );
         },
