@@ -24,7 +24,7 @@ export function ScimanticSection() {
     };
     return (
         <div className="mx-auto max-w-7xl flex flex-col justify-center items-center px-4 py-24">
-            <div className="w-1/2 text-center">
+            <div className="md:w-1/2 mx-auto text-center">
                 <div>
                     <h2 className="text-lg text-primary mb-2 tracking-wider">Products</h2>
 

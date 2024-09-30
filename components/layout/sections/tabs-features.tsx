@@ -58,7 +58,7 @@ const tabContent = {
             width={imgWidth}
             height={imgHeight}
         />,
-        description: "Find and learn about those who can help you advance based on shared biologies, projects, or goals.",
+        description: "Find and learn about those who can help you advance your research objectives based on shared biologies, projects, or goals.",
     },
     forums: {
         title: "Focused Forums",
@@ -82,7 +82,7 @@ const tabContent = {
             width={imgWidth}
             height={imgHeight}
         />,
-        description: "Talk about your challenges, wins, and the latest in rare disease science and drug development news.",
+        description: "Talk and keep up to date about your challenges, wins, and the latest in rare disease science and drug development news.",
     },
 };
 
@@ -143,7 +143,7 @@ export default function TabsFeaturesSection() {
                     <TabsList className="grid grid-cols-3 items-start justify-start bg-transparent border-none shadow-none h-min">
                         {tabs.map((tab) => (
                             <TabsTrigger key={tab} value={tab}
-                                         className="flex flex-col items-start space-y-8 relative bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:shadow-none">
+                                         className="flex flex-col items-start space-y-8 relative bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:shadow-none hover:bg-gray-100 transition-colors duration-300 rounded-lg p-4 md:p-6">
                                 <div className="relative w-full h-0.5 bg-gray-300">
                                     {activeTab === tab && (
                                         <motion.div

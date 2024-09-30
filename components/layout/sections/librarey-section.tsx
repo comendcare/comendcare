@@ -113,7 +113,7 @@ export function LibrareySection() {
 
     return (
         <div className="mx-auto w-full max-w-7xl py-24">
-            <div className="grid grid-cols-2">
+            <div className="mx-auto md:w-1/2 px-4 text-center">
                 <div>
                     <h2 className="text-lg text-primary mb-2 tracking-wider">Products</h2>
 

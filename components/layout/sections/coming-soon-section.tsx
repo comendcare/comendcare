@@ -55,13 +55,13 @@ export const ComingSoonSection = () => {
 
     return (
         <section id="benefits" className="container w-full mx-auto px-8 py-24 sm:py-24 max-w-7xl">
-            <div className="grid lg:grid-cols-2 items-center lg:gap-24">
+            <div className="flex flex-col text-center lg:text-left lg:grid lg:grid-cols-2 items-center lg:gap-24">
                 <div>
                     <h2 className="text-lg text-primary mb-2 tracking-wider">
                         {`What's next`}
                     </h2>
 
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                    <h2 className="text-3xl lg:text-4xl font-bold mb-4">
                         {`Empowering patient groups with technology`}
                     </h2>
                     <p className="text-xl text-muted-foreground mb-8">
@@ -73,7 +73,7 @@ export const ComingSoonSection = () => {
                     {benefitList.map(({ icon, title, description, eta }, index) => (
                         <Card
                             key={title}
-                            className="bg-muted/50 dark:bg-card hover:bg-background transition-all delay-75 group/number"
+                            className="bg-muted/50 group/number"
                         >
                             <CardHeader className="flex flex-col space-y-4">
                                 <div className="flex justify-between items-center">
@@ -86,7 +86,7 @@ export const ComingSoonSection = () => {
                                     {eta &&
                                         <HoverBorderGradient
                                             containerClassName="rounded-full"
-                                            as="button"
+                                            as="div"
                                             className="text-xs dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2"
                                         >
                                             <span>✨ Coming {eta}</span>

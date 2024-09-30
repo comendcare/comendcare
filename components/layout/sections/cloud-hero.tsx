@@ -183,8 +183,8 @@ export const CloudHeroSection = () => {
             mass: 0.3,
         });
 
-        const x = useTransform(distX, (val) => val / 30 + bubbleX);
-        const y = useTransform(distY, (val) => val / 30 + bubbleY);
+        const x = useTransform(distX, (val) => val / 20 + bubbleX);
+        const y = useTransform(distY, (val) => val / 20 + bubbleY);
 
         return { x, y };
     };

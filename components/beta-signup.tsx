@@ -8,7 +8,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { useForm } from "react-hook-form";
 import { sendBetaSignupEmail } from "@/lib/emails";
-import { useEffect, useState } from "react";
 import mixpanel from "mixpanel-browser";
 
 const betaSignupFormSchema = z.object({

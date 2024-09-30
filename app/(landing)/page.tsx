@@ -45,9 +45,9 @@ export default function App() {
             <StatsSection/>
             <ComingSoonSection/>
             {/*<FAQSection/>*/}
-            {/*<WhatElseSection/>*/}
-            {/*<LibrareySection/>*/}
-            {/*<ScimanticSection/>*/}
+            <WhatElseSection/>
+            <LibrareySection/>
+            <ScimanticSection/>
             <CTASection isSubscribedCallback={betaSubscribeCallback} isSubscribed={isSubscribed}/>
             <AnalyticsScripts/>
         </>
