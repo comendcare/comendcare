@@ -190,11 +190,18 @@ export const CloudHeroSection = () => {
     };
 
     return (
-        <section className="relative container w-full mx-auto">
+        <section
+            className="relative container w-full mx-auto"
+            aria-labelledby="hero-section"
+            role="region"
+        >
             {/* Hero section with a ref to observe visibility */}
-            <div ref={heroRef}
-                 className="bg-gradient-to-r from-transparent via-white to-transparent relative z-10 flex flex-col h-1/2 justify-center items-center text-center max-w-7xl gap-8 mx-auto px-4 py-16 md:py-24 mt-16"
+            <div
+                ref={heroRef}
+                className="bg-gradient-to-r from-transparent via-white to-transparent relative z-10 flex flex-col h-1/2 justify-center items-center text-center max-w-7xl gap-8 mx-auto px-4 py-16 md:py-24 mt-16"
+                aria-describedby="hero-description"
             >
+                {/* Decorative banner with attribution */}
                 <motion.div
                     initial={{opacity: 0, y: 50}} // More pronounced drop effect
                     animate={{opacity: 1, y: [50, -10, 0]}}
@@ -203,30 +210,42 @@ export const CloudHeroSection = () => {
                 >
                     <div
                         className="bg-white inline-flex flex-wrap items-center text-center rounded-full px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base leading-5 sm:leading-6 text-gray-500 ring-1 ring-gray-900/10 hover:ring-gray-900/20"
+                        aria-label="From the creators of Librarey and Scimantic"
                     >
-                        From the creators of
+                        <span>From the creators of</span>
                         <LinkPreview
                             url={"https://www.librarey.com/"}
                             className="hover:underline inline-flex items-center mx-1 sm:mx-2 gap-x-1"
                             target="_blank"
+                            aria-label="Visit Librarey website"
                         >
-                            <Image src={librareyLogo} alt="" className="self-center w-6 sm:w-8 h-6 sm:h-8"/>
-                            Librarey
+                            <Image
+                                src={librareyLogo}
+                                alt="Librarey logo"
+                                className="self-center w-6 sm:w-8 h-6 sm:h-8"
+                            />
+                            <span>Librarey</span>
                         </LinkPreview>
-                        and
+                        <span>and</span>
                         <LinkPreview
                             url={"https://scimantic.com/"}
                             className="hover:underline inline-flex items-center mx-1 sm:mx-2 gap-x-1"
                             target="_blank"
+                            aria-label="Visit Scimantic website"
                         >
-                            <Image src={scimanticLogo} alt="" className="self-center w-5 sm:w-6 h-5 sm:h-6"/>
-                            Scimantic
+                            <Image
+                                src={scimanticLogo}
+                                alt="Scimantic logo"
+                                className="self-center w-5 sm:w-6 h-5 sm:h-6"
+                            />
+                            <span>Scimantic</span>
                         </LinkPreview>
                     </div>
                 </motion.div>
 
                 <HeroHighlight>
                     <motion.h1
+                        id="hero-section"
                         initial={{opacity: 0, y: 50}}
                         animate={{opacity: 1, y: [50, -10, 0]}}
                         transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
@@ -238,6 +257,7 @@ export const CloudHeroSection = () => {
                 </HeroHighlight>
 
                 <motion.p
+                    id="hero-description"
                     initial={{opacity: 0, y: 50}}
                     animate={{opacity: 1, y: [50, -10, 0]}}
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
@@ -245,18 +265,6 @@ export const CloudHeroSection = () => {
                 >
                     {`Create your research roadmap, connect with collaborators, and stay updated on the latest scientific breakthroughs.`}
                 </motion.p>
-
-                {/*<motion.div*/}
-                {/*    initial={{opacity: 0, y: 50}}*/}
-                {/*    animate={{opacity: 1, y: [50, -10, 0]}}*/}
-                {/*    transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}*/}
-                {/*    className="flex flex-row space-x-2"*/}
-                {/*>*/}
-                {/*    <div className="w-full flex flex-col space-y-2">*/}
-                {/*        <BetaSignup isSubscribedCallback={isSubscribedCallback} isSubscribed={isSubscribed}/>*/}
-                {/*    </div>*/}
-                {/*</motion.div>*/}
-
             </div>
 
             {/* Render bubbles whether or not the hero is in view, but hide them until hero is in view */}
@@ -264,7 +272,9 @@ export const CloudHeroSection = () => {
                 initial={{opacity: 0, y: 50}}
                 animate={{opacity: 1, y: [50, -10, 0]}}
                 transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-                className="hidden sm:block absolute inset-0 z-0 pointer-events-none opacity-50" ref={containerRef}
+                className="hidden sm:block absolute inset-0 z-0 pointer-events-none opacity-50"
+                ref={containerRef}
+                aria-hidden="true"
             >
                 {bubbles.map((bubble, index) => {
                     const {x, y} = calculateMovement(cloudPositions[index].x, cloudPositions[index].y);
@@ -278,6 +288,7 @@ export const CloudHeroSection = () => {
                             whileHover={{scale: 1.4}} // Increased scale on hover
                             whileTap={{scale: 0.8}} // More exaggerated tap feedback
                             transition={{type: "spring", stiffness: 100, damping: 15}} // Stronger spring effect
+                            aria-label={`Link to ${bubble.title}`}
                         >
                             {bubble.title}
                         </motion.a>
