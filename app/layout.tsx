@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/app/theme-provider";
-import { LandingNavbar } from "@/components/layout/sections/landing-navbar";
+import type { Metadata, ResolvingMetadata } from 'next'
 
 // Import Montserrat Display and Source Sans Pro
 import {Poppins, Source_Sans_3} from "next/font/google";
 
 // Set up Playfair Display and Source Sans 3 fonts
-const playfairDisplay = Poppins({
+const poppins = Poppins({
     subsets: ["latin"],
     weight: ["400", "700"], // Regular and bold weights
     variable: "--font-poppins", // Create a CSS variable for the font
@@ -21,10 +20,37 @@ const sourceSans3 = Source_Sans_3({
     display: "swap",
 });
 
-export const metadata: Metadata = {
-    title: "Comend",
-    description: "Software for rare disease patient groups",
-};
+export async function generateMetadata(
+    // { params, searchParams }: Props,
+    // parent: ResolvingMetadata
+): Promise<Metadata> {
+
+    // optionally access and extend (rather than replace) parent metadata
+    // const previousImages = (await parent).openGraph?.images || []
+
+    return {
+        title: "Comend",
+        description: "Software for rare disease patient groups",
+        generator: 'Next.js',
+        applicationName: 'Comend',
+        referrer: 'origin-when-cross-origin',
+        keywords: ['Comend', 'Rare Disease', 'Genetic Disorders', 'Orphan Diseases', 'Drug Development', 'Patient Advocacy Groups', 'Researchers'],
+        authors: [{ name: 'Flawnson', url: "http://flawnson.com/" }, { name: 'Albert', url: "https://www.linkedin.com/in/albert-yq-wang/" }],
+        creator: 'Flawnson Tong',
+        publisher: 'Flawnson Tong',
+        openGraph: {
+            title: 'Comend - Tech for Rare Disease Patient Groups',
+            description: 'Collaborate with researchers and patient advocacy groups.',
+            url: `https://www.joincomend.com/`,
+            siteName: 'Comend',
+            locale: 'en_US',
+        },
+        robots: {
+            index: true,
+            follow: true,
+        }
+    }
+}
 
 export default function RootLayout({
                                        children,
@@ -35,7 +61,7 @@ export default function RootLayout({
         <html
             lang="en"
             suppressHydrationWarning
-            className={`${playfairDisplay.variable} ${sourceSans3.variable}`}
+            className={`${poppins.variable} ${sourceSans3.variable}`}
         >
         <body>
         <ThemeProvider

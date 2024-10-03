@@ -1,11 +1,5 @@
-import {Metadata} from "next"
 import {LandingNavbar} from "@/components/layout/sections/landing-navbar";
 import LandingFooter from "@/components/layout/sections/landing-footer";
-
-export const metadata: Metadata = {
-    title: "Comend",
-    description: "The platform for patient-led rare disease research",
-}
 
 interface AppLayoutProps {
     children: React.ReactNode

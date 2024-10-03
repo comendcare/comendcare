@@ -31,6 +31,12 @@ const FAQs = [
             "We know how detrimental it can be when companies in the rare disease space wind down. We are committed to establishing and sharing plans to safeguard and return your data and efforts in the unfortunate case that we cannot sustain our operations. We will be proactive about informing the community on challenges that arise for our future.",
         contactLink: false,
     },
+    {
+        question: `What does "Comend" mean?`,
+        answer:
+            "It means working together to fix things.",
+        contactLink: false,
+    },
   ];
 
 export default function FAQPage () {
