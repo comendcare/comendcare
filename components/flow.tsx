@@ -96,7 +96,7 @@ const initEdges = [
 
 const proOptions = { hideAttribution: true }
 
-const RoadmapFlowchart = ({ width, selectedNodeId, nodeClickCallback }: { width: number, selectedNodeId: string | null, nodeClickCallback: (event: any, node: any) => void}) => {
+const RoadmapFlowchart = ({ width, selectedNodeId, nodeClickCallback }: { width: number, selectedNodeId: string | null, nodeClickCallback: (nodeId: string) => void}) => {
     const { fitView } = useReactFlow() 
     const [nodes, setNodes, onNodesChange] = useNodesState(initNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges)
@@ -111,8 +111,17 @@ const RoadmapFlowchart = ({ width, selectedNodeId, nodeClickCallback }: { width:
     )
 
     const onNodeClick = (event: any, node: any) => {
-        nodeClickCallback(event, node)
+        // nodeClickCallback(event, node)
     }
+
+    const handleEditClick = (nodeId: string) => {
+        nodeClickCallback(nodeId)
+    };
+
+    const updatedNodes = nodes.map(node => ({
+        ...node,
+        data: { ...node.data, handleEditClick }
+    }))
 
     useEffect(() => {
         if (selectedNodeId) {
@@ -145,12 +154,12 @@ const RoadmapFlowchart = ({ width, selectedNodeId, nodeClickCallback }: { width:
     return (
         <ReactFlow
             width={width}
-            nodes={nodes}
+            nodes={updatedNodes}
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            onNodeClick={onNodeClick}
+            // onNodeClick={onNodeClick}
             nodeTypes={nodeTypes}
             fitView
             proOptions={proOptions}

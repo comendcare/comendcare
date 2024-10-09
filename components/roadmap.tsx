@@ -17,8 +17,8 @@ export function Roadmap() {
     const { defaultLayout, setLayout } = useNavStore()
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
 
-    const onNodeClick = (event: any, node: any) => {
-        setSelectedNodeId(node.id); // Update state with selected node ID
+    const onNodeClick = (nodeId: string) => {
+        setSelectedNodeId(nodeId); // Update state with selected node ID
     }
 
     const handlePanelChange = (open: boolean) => {

@@ -10,7 +10,8 @@ export type MilestoneNode = Node<
     description?: string,
     tasks: TaskType[]
     notes?: string,
-    status: StatusType
+    status: StatusType,
+    handleEditClick: (nodeId: string) => void
   },
   'milestone'
 >
@@ -23,6 +24,13 @@ interface TaskType {
 type StatusType = 'todo' | 'inprogress' | 'done'
 
 function MilestoneNode(props: NodeProps<MilestoneNode>) {
+
+    const handleEditClick = () => {
+        if (props.data?.handleEditClick) {
+            props.data.handleEditClick(props.id);
+        }
+    }
+
     return (
         <Card className="w-[350px]">
         <CardHeader>
@@ -42,6 +50,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
         </CardContent>
         <CardFooter className="flex justify-between">
             <MilestoneStatusButton milestoneStatus={props.data?.status} />
+            <Button onClick={handleEditClick}>{`Edit Details`}</Button>
         </CardFooter>
 
         <Handle
