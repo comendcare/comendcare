@@ -92,7 +92,7 @@ const initEdges = [
 
 const proOptions = { hideAttribution: true }
 
-const RoadmapFlowchart = ({ width, nodeClickCallback }: { width: number, nodeClickCallback: (event: any, node: any) => void}) => {
+const RoadmapFlowchart = ({ width, selectedNodeId, nodeClickCallback }: { width: number, selectedNodeId: string | null, nodeClickCallback: (event: any, node: any) => void}) => {
     const { fitView } = useReactFlow() 
     const [nodes, setNodes, onNodesChange] = useNodesState(initNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges)
@@ -111,7 +111,11 @@ const RoadmapFlowchart = ({ width, nodeClickCallback }: { width: number, nodeCli
     }
 
     useEffect(() => {
-        fitView()
+        if (selectedNodeId) {
+            fitView({ nodes: [{ id: selectedNodeId }] })
+        } else {
+            fitView()
+        }
     }, [width])
 
     return (

@@ -44,7 +44,11 @@ export function Roadmap() {
                         </TabsList>
                         <TabsContent value="roadmap" className="m-0 h-[calc(100vh-3.5rem)]">
                             <ReactFlowProvider>
-                                <Flow width={defaultLayout[0]} nodeClickCallback={onNodeClick}/>
+                                <Flow 
+                                    selectedNodeId={selectedNodeId}
+                                    width={defaultLayout[0]} 
+                                    nodeClickCallback={onNodeClick}
+                                />
                             </ReactFlowProvider>
                         </TabsContent>
                         <TabsContent value="kanban">
