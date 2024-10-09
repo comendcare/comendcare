@@ -1,6 +1,5 @@
 "use client"
-
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react'
 import {
     ReactFlow,
     useNodesState,
@@ -8,16 +7,12 @@ import {
     addEdge,
     MiniMap,
     Controls,
-    useOnSelectionChange,
-    Panel,
-} from '@xyflow/react';
+    useReactFlow,
+} from '@xyflow/react'
 
-import '@xyflow/react/dist/base.css';
+import '@xyflow/react/dist/base.css'
 
-import MilestoneNode from '@/components/milestone-node';
-import EditNodePanel from './edit-node';
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from './ui/sheet';
-import { Button } from './ui/button';
+import MilestoneNode from '@/components/milestone-node'
 
 const initNodes = [
     {
@@ -75,7 +70,7 @@ const initNodes = [
         selected: false,
         selectable: true
     }
-];
+]
 
 const initEdges = [
     {
@@ -88,16 +83,16 @@ const initEdges = [
         source: '2',
         target: '3',
     },
-];
+]
 
-const proOptions = { hideAttribution: true };
+const proOptions = { hideAttribution: true }
 
-const RoadmapFlowchart = ({ nodeClickCallback }: { nodeClickCallback: (event: any, node: any) => void}) => {
+const RoadmapFlowchart = ({ width, nodeClickCallback }: { width: number, nodeClickCallback: (event: any, node: any) => void}) => {
+    const { fitView } = useReactFlow() 
     const [nodes, setNodes, onNodesChange] = useNodesState(initNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges)
     
     const nodeTypes = {
-        // custom: { ...MilestoneNode, callback: selectNodeCallback }
         milestone: MilestoneNode
     }
 
@@ -106,42 +101,32 @@ const RoadmapFlowchart = ({ nodeClickCallback }: { nodeClickCallback: (event: an
         [],
     )
 
+    const onNodeClick = (event: any, node: any) => {
+        nodeClickCallback(event, node)
+    }
+
+    useEffect(() => {
+        fitView()
+    }, [width])
+
     return (
         <ReactFlow
+            width={width}
             nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            onNodeClick={nodeClickCallback}
+            onNodeClick={onNodeClick}
             nodeTypes={nodeTypes}
             fitView
             proOptions={proOptions}
         >
             <MiniMap />
             <Controls />
-            {/* <Panel position="top-right">
-                <Sheet open={selectedNodeId !== null} onOpenChange={handlePanelChange}>
-                    <SheetContent>
-                        <SheetHeader>
-                            <SheetTitle>Edit Milestone</SheetTitle>
-                            <SheetDescription>
-                                here we can edit our milestones - TODO
-                            </SheetDescription>
-                        </SheetHeader>
-
-                        <p>{`Currently Selected Node: ${selectedNodeId}`}</p>
-
-                        <SheetFooter>
-                            <SheetClose asChild>
-                                <Button type="submit">Save changes</Button>
-                            </SheetClose>
-                        </SheetFooter>
-                    </SheetContent>
-                </Sheet>
-            </Panel> */}
         </ReactFlow>
-    );
-};
+    )
+}
 
-export default RoadmapFlowchart;
+export default RoadmapFlowchart
+

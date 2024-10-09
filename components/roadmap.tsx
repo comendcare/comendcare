@@ -11,6 +11,7 @@ import { PlateEditor } from "@/components/editor";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { FaX } from "react-icons/fa6";
+import { ReactFlowProvider } from "@xyflow/react";
 
 export function Roadmap() {
     // Zustand state management
@@ -32,6 +33,7 @@ export function Roadmap() {
             <ResizablePanelGroup
                 direction="horizontal"
                 onLayout={(sizes: number[]) => {
+                    console.log(`layout changed: ${JSON.stringify(sizes)}`)
                     setLayout(sizes); // Use Zustand's setLayout to save panel sizes
                 }}
                 className="h-full items-stretch"
@@ -44,7 +46,9 @@ export function Roadmap() {
                             <TabsTrigger value="kanban">Kanban</TabsTrigger>
                         </TabsList>
                         <TabsContent value="roadmap" className="m-0 h-[calc(100vh-3.5rem)]">
-                            <Flow nodeClickCallback={onNodeClick}/>
+                            <ReactFlowProvider>
+                                <Flow width={defaultLayout[0]} nodeClickCallback={onNodeClick}/>
+                            </ReactFlowProvider>
                         </TabsContent>
                         <TabsContent value="kanban">
                             <Kanban />

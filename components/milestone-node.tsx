@@ -31,8 +31,8 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
         </CardHeader>
         <CardContent>
                 <ul className="flex flex-col gap-2"> 
-                    {props.data?.tasks.map(task => (
-                        <li className="flex flex-row gap-2 items-center">
+                    {props.data?.tasks.map((task, index) => (
+                        <li key={index} className="flex flex-row gap-2 items-center">
                             <TaskStatusButton task={task} />
                             <p>{task.name}</p>
                         </li>
