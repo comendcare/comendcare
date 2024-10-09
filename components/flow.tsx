@@ -92,14 +92,9 @@ const initEdges = [
 
 const proOptions = { hideAttribution: true };
 
-const RoadmapFlowchart = () => {
+const RoadmapFlowchart = ({ nodeClickCallback }: { nodeClickCallback: (event: any, node: any) => void}) => {
     const [nodes, setNodes, onNodesChange] = useNodesState(initNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges)
-    const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
-
-    const selectNodeCallback = (id: string | null) => {
-        setSelectedNodeId(id)
-    }
     
     const nodeTypes = {
         // custom: { ...MilestoneNode, callback: selectNodeCallback }
@@ -111,22 +106,6 @@ const RoadmapFlowchart = () => {
         [],
     )
 
-    const onNodeClick = (event: any, node: any) => {
-        console.log(`Node Clicked`)
-        setSelectedNodeId(node.id); // Update state with selected node ID
-    }
-
-    useEffect(() => { console.log(`Selected node changed: ${selectedNodeId}`) }, [selectedNodeId])
-
-    const selectNode = (nodeId: string) => {
-        setSelectedNodeId(nodeId)
-    }
-
-    const handlePanelChange = (open: boolean) => {
-        console.log(`Open Changed: ${open}`)
-        if (!open) setSelectedNodeId(null)
-    }
-
     return (
         <ReactFlow
             nodes={nodes}
@@ -134,14 +113,14 @@ const RoadmapFlowchart = () => {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            onNodeClick={onNodeClick}
+            onNodeClick={nodeClickCallback}
             nodeTypes={nodeTypes}
             fitView
             proOptions={proOptions}
         >
             <MiniMap />
             <Controls />
-            <Panel position="top-right">
+            {/* <Panel position="top-right">
                 <Sheet open={selectedNodeId !== null} onOpenChange={handlePanelChange}>
                     <SheetContent>
                         <SheetHeader>
@@ -160,7 +139,7 @@ const RoadmapFlowchart = () => {
                         </SheetFooter>
                     </SheetContent>
                 </Sheet>
-            </Panel>
+            </Panel> */}
         </ReactFlow>
     );
 };

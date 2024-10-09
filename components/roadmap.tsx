@@ -8,10 +8,24 @@ import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs";
 import Flow from "@/components/flow";
 import Kanban from "@/components/kanban";
 import { PlateEditor } from "@/components/editor";
+import { useState } from "react";
+import { Button } from "./ui/button";
+import { FaX } from "react-icons/fa6";
 
 export function Roadmap() {
     // Zustand state management
-    const { defaultLayout, setLayout } = useNavStore();
+    const { defaultLayout, setLayout } = useNavStore()
+    const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+
+    const onNodeClick = (event: any, node: any) => {
+        console.log(`Node Clicked`)
+        setSelectedNodeId(node.id); // Update state with selected node ID
+    }
+
+    const handlePanelChange = (open: boolean) => {
+        console.log(`Open Changed: ${open}`)
+        if (!open) setSelectedNodeId(null)
+    }
 
     return (
         <TooltipProvider delayDuration={0}>
@@ -30,7 +44,7 @@ export function Roadmap() {
                             <TabsTrigger value="kanban">Kanban</TabsTrigger>
                         </TabsList>
                         <TabsContent value="roadmap" className="m-0 h-[calc(100vh-3.5rem)]">
-                            <Flow />
+                            <Flow nodeClickCallback={onNodeClick}/>
                         </TabsContent>
                         <TabsContent value="kanban">
                             <Kanban />
@@ -38,13 +52,16 @@ export function Roadmap() {
                     </Tabs>
                 </ResizablePanel>
 
-                {/* Resizable Handle between panels */}
-                <ResizableHandle withHandle />
+                {selectedNodeId != null && (
+                    <>
+                        <ResizableHandle withHandle />
 
-                {/* Third Panel for the editor */}
-                <ResizablePanel defaultSize={defaultLayout[2]} minSize={30}>
-                    <PlateEditor />
-                </ResizablePanel>
+                        <ResizablePanel defaultSize={defaultLayout[2]} minSize={30}>
+                            <p>{`Selected Node: ${selectedNodeId}`}</p>
+                            <Button onClick={() => handlePanelChange(false)}><FaX /></Button>
+                        </ResizablePanel>
+                    </>
+                )}
             </ResizablePanelGroup>
         </TooltipProvider>
     );
