@@ -8,6 +8,7 @@ import {
     MiniMap,
     Controls,
     useReactFlow,
+    Position,
 } from '@xyflow/react'
 
 import '@xyflow/react/dist/base.css'
@@ -27,7 +28,7 @@ const initNodes = [
             notes: '',
             status: 'done'
         },
-        position: { x: 0, y: 50 },
+        position: { x: 0, y: 0 },
         selected: false,
         selectable: true
     },
@@ -48,7 +49,7 @@ const initNodes = [
             notes: '',
             status: 'inprogress'
         },
-        position: { x: 0, y: 350 },
+        position: { x: 600, y: 0 },
         selected: false,
         selectable: true
     },
@@ -66,7 +67,7 @@ const initNodes = [
             notes: 'Here are some extra notes as an example...',
             status: 'todo'
         },
-        position: { x: 0, y: 850 },
+        position: { x: 1200, y: 0 },
         selected: false,
         selectable: true
     }
@@ -77,11 +78,15 @@ const initEdges = [
         id: 'e1-2',
         source: '1',
         target: '2',
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
     },
     {
         id: 'e2-3',
         source: '2',
         target: '3',
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
     },
 ]
 

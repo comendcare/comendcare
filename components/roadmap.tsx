@@ -19,12 +19,10 @@ export function Roadmap() {
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
 
     const onNodeClick = (event: any, node: any) => {
-        console.log(`Node Clicked`)
         setSelectedNodeId(node.id); // Update state with selected node ID
     }
 
     const handlePanelChange = (open: boolean) => {
-        console.log(`Open Changed: ${open}`)
         if (!open) setSelectedNodeId(null)
     }
 
@@ -33,7 +31,6 @@ export function Roadmap() {
             <ResizablePanelGroup
                 direction="horizontal"
                 onLayout={(sizes: number[]) => {
-                    console.log(`layout changed: ${JSON.stringify(sizes)}`)
                     setLayout(sizes); // Use Zustand's setLayout to save panel sizes
                 }}
                 className="h-full items-stretch"

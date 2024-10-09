@@ -46,13 +46,13 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
 
         <Handle
                 type="target" 
-                position={Position.Top}
-                className="w-16"
+                position={Position.Left}
+                className="h-16"
             /> 
         <Handle
                 type="source"
-                position={Position.Bottom}
-                className="w-16"
+                position={Position.Right}
+                className="h-16"
             />
       </Card>
     );
