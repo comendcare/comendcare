@@ -9,11 +9,13 @@ import {
     Controls,
     useReactFlow,
     Position,
+    MarkerType,
 } from '@xyflow/react'
 
 import '@xyflow/react/dist/base.css'
 
 import MilestoneNode from '@/components/milestone-node'
+import { Button } from './ui/button'
 
 const initNodes = [
     {
@@ -80,6 +82,7 @@ const initEdges = [
         target: '2',
         sourcePosition: Position.Right,
         targetPosition: Position.Left,
+        markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 }
     },
     {
         id: 'e2-3',
@@ -87,6 +90,7 @@ const initEdges = [
         target: '3',
         sourcePosition: Position.Right,
         targetPosition: Position.Left,
+        markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 }
     },
 ]
 
@@ -112,11 +116,31 @@ const RoadmapFlowchart = ({ width, selectedNodeId, nodeClickCallback }: { width:
 
     useEffect(() => {
         if (selectedNodeId) {
-            fitView({ nodes: [{ id: selectedNodeId }] })
+            fitView({ nodes: [{ id: selectedNodeId }], padding: 1 })
         } else {
             fitView()
         }
-    }, [width])
+    }, [width, selectedNodeId])
+
+    const newNode = () => {
+        const id = (nodes.length + 1).toString()
+        const newNode = {
+            id,
+            type: 'milestone',
+            position: { x: 0, y: 400 },
+            data: {
+                name: `Node ${id}`,
+                description: '',
+                tasks: [],
+                notes: '',
+                status: 'todo'
+            },
+            selected: false,
+            selectable: true
+          };
+
+          setNodes((nodes) => nodes.concat(newNode))
+    }
 
     return (
         <ReactFlow
@@ -132,7 +156,9 @@ const RoadmapFlowchart = ({ width, selectedNodeId, nodeClickCallback }: { width:
             proOptions={proOptions}
         >
             <MiniMap />
-            <Controls />
+            <Controls>
+            <Button onClick={newNode}>Add Node</Button>
+            </Controls>
         </ReactFlow>
     )
 }
