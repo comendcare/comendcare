@@ -1,8 +1,8 @@
 import React, { memo, useState } from 'react';
 import { Handle, Position, Node, NodeProps } from '@xyflow/react';
-import { FaCheck } from 'react-icons/fa6';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
+import TaskStatusButton from './task-status-button';
 
 export type MilestoneNode = Node<
   {
@@ -101,21 +101,6 @@ function MilestoneStatusButton({ milestoneStatus }: { milestoneStatus: StatusTyp
             onClick={handleStateChange}
         >
             {StatusData[status].text}
-        </Button>
-    )
-}
-
-function TaskStatusButton({ task }: { task: TaskType }) {
-    const [complete, setComplete] = useState(task.complete)
-
-    return (
-        <Button 
-            variant="outline"  
-            size="icon" 
-            onClick={() => { setComplete(!complete) }}
-            className={`rounded-full h-6 w-6 ${complete ? 'text-green-600': 'text-red-600'}`}
-        >
-            <FaCheck />
         </Button>
     )
 }
