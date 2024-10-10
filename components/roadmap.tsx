@@ -7,7 +7,7 @@ import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/componen
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs";
 import Flow from "@/components/flow";
 import Kanban from "@/components/kanban";
-import { PlateEditor } from "@/components/editor";
+import { PlateEditor } from "@/components/plate-editor";
 
 export function Roadmap() {
     // Zustand state management
