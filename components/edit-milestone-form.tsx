@@ -15,6 +15,7 @@ import { Calendar } from './ui/calendar'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 import MultiSelect from './multi-select'
 import { ScrollArea } from './ui/scroll-area'
+import MilestoneStatusButton from './milestone-status-button'
 
 const editMilestoneForm = z.object({
     title: z
@@ -47,10 +48,11 @@ export default function EditMilestoneForm({ nodeData }: { nodeData: any }) {
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
-            title: nodeData.name || "",
+            title: nodeData.title || "",
             description: nodeData.description || "",
-            subtasks: nodeData.tasks || [],
-            notes: nodeData.notes || ""
+            subtasks: nodeData.subtasks || [],
+            notes: nodeData.notes || "",
+            status: nodeData.status || "todo"
         }
     })
 
@@ -63,6 +65,7 @@ export default function EditMilestoneForm({ nodeData }: { nodeData: any }) {
     const dependencies = form.watch("dependencies")
     const budget = form.watch("budget")
     const notes = form.watch("notes")
+    const status = form.watch("status")
 
     const handleMilestoneFormSubmit = () => {
         console.log(`Handle Milstone Form Submit...`)
@@ -73,6 +76,20 @@ export default function EditMilestoneForm({ nodeData }: { nodeData: any }) {
         <Form {...form}>
             <ScrollArea>
             <form onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}  className='flex flex-col gap-8 pr-4'>
+                <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col grow">
+                            <FormLabel className="text-xl">{`Milestone Status:`}</FormLabel>
+                            <FormControl>
+                                <MilestoneStatusButton milestoneStatus={nodeData.status} {...field}/>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
                 <FormField
                     control={form.control}
                     name="title"
@@ -272,7 +289,7 @@ export default function EditMilestoneForm({ nodeData }: { nodeData: any }) {
                     )}
                 />
 
-                <span>
+                <span className="flex justify-between">
                     <Button type="submit">Save Changes</Button>
                 </span>
             </form>

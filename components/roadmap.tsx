@@ -20,9 +20,9 @@ const initNodes: Node[] = [
         id: '1',
         type: 'milestone',
         data: { 
-            name: 'Basic Science - Disease',
+            title: 'Basic Science - Disease',
             description: 'Complete the basic science for investigating our disease.',
-            tasks: [
+            subtasks: [
                 { name: 'Literature search to undersand disease', complete: true }
             ],
             notes: '',
@@ -36,9 +36,9 @@ const initNodes: Node[] = [
         id: '2',
         type: 'milestone',
         data: { 
-            name: 'Disease Models',
+            title: 'Disease Models',
             description: 'Discover, construct, and phenotype disease models.',
-            tasks: [
+            subtasks: [
                 { name: 'Identify the best models currently available', complete: true },
                 { name: 'Construct Knock-in Mice', complete: true },
                 { name: 'Phenotyping of Knock-in Mice', complete: false },
@@ -57,9 +57,9 @@ const initNodes: Node[] = [
         id: '3',
         type: 'milestone',
         data: { 
-            name: 'Pre-Clinical Design',
+            title: 'Pre-Clinical Design',
             description: 'Pre-clinical design and production.',
-            tasks: [
+            subtasks: [
                 { name: 'Construct design', complete: false },
                 { name: 'Plasmid production', complete: false },
                 { name: 'AAV Production', complete: false},
@@ -148,7 +148,6 @@ export function Roadmap() {
 
                         <ResizablePanel defaultSize={defaultLayout[1]} minSize={30} className="p-10 flex flex-col gap-4">
                             <span className="flex flex-row justify-between items-center">
-                                {/* <MilestoneStatusButton milestoneStatus={nodes.find(node => node.id === selectedNodeId)?.data?.status as StatusType} /> */}
                                 <h1 className="text-2xl font-bold">Edit Milestone Details</h1>
                                 <Button onClick={() => handlePanelChange(false)}><FaX /></Button>
                             </span>

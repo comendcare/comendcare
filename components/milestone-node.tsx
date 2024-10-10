@@ -6,9 +6,9 @@ import TaskStatusButton from './task-status-button';
 
 export type MilestoneNode = Node<
   {
-    name: string,
+    title: string,
     description?: string,
-    tasks: TaskType[]
+    subtasks: TaskType[]
     notes?: string,
     status: StatusType,
     handleEditClick: (nodeId: string) => void
@@ -34,12 +34,12 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
     return (
         <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>{props.data?.name}</CardTitle>
+          <CardTitle>{props.data?.title}</CardTitle>
           <CardDescription>{props.data?.description}</CardDescription>
         </CardHeader>
         <CardContent>
                 <ul className="flex flex-col gap-2"> 
-                    {props.data?.tasks.map((task, index) => (
+                    {props.data?.subtasks.map((task, index) => (
                         <li key={index} className="flex flex-row gap-2 items-center">
                             <TaskStatusButton task={task} />
                             <p>{task.name}</p>
