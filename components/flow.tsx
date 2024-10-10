@@ -7,7 +7,8 @@ import {
     Controls,
     useReactFlow,
     OnNodesChange,
-    OnEdgesChange
+    OnEdgesChange,
+    MarkerType
 } from '@xyflow/react'
 import type { Edge, Node } from '@xyflow/react'
 
@@ -66,18 +67,23 @@ const RoadmapFlowchart = ({
                         y: clientY,
                     }), 
                     data: {  
-                        name: `Node ${id}`,
+                        title: `Node ${id}`,
                         description: '',
                         tasks: [],
                         notes: '',
                         status: 'todo'
-                    },
+                    }, 
                     origin: [0.5, 0.0],
                 }
 
                 setNodes((nds: Node[]) => nds.concat(newNode))
                 setEdges((eds: Edge[]) =>
-                    eds.concat({ id, source: connectionState.fromNode.id, target: id }),
+                    eds.concat({ 
+                        id, 
+                        source: connectionState.fromNode.id, 
+                        target: id, 
+                        markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 } 
+                    }),
                 )
             }
         },

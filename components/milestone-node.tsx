@@ -66,7 +66,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
             }
 
             <ul className="flex flex-col gap-2"> 
-                {props.data?.subtasks.map((task, index) => (
+                {props.data?.subtasks?.map((task, index) => (
                     <li key={index} className="flex flex-row gap-2 items-center">
                         <TaskStatusButton task={task} />
                         <p>{task.name}</p>
