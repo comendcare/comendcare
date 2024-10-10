@@ -6,8 +6,11 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {createOrGetSite} from "@/lib/actions";
+import {createOrganization, createOrGetSite} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
+import {toast} from "sonner";
+import va from "@vercel/analytics";
+import {useRouter} from "next/navigation";
 
 const invitationFormSchema = z.object({
     name: z.string().min(2, {
@@ -26,6 +29,7 @@ const invitationFormSchema = z.object({
 
 export default function OnboardingForm() {
     const session = useSession();
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
@@ -33,16 +37,34 @@ export default function OnboardingForm() {
     })
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
-        console.log(values)
-        const createOrg = await createOrGetSite({
-                siteName: form.getValues("orgName"),
-                siteSlug: form.getValues("slug")
-            },
-            session.data?.user.id,
-            form.getValues("description")
-        )
+        // console.log(values)
+        // const createOrg = await createOrGetSite({
+        //         siteName: form.getValues("orgName"),
+        //         siteSlug: form.getValues("slug")
+        //     },
+        //     session.data?.user.id,
+        //     form.getValues("description")
+        // )
+        //
+        // console.log(createOrg)
 
-        console.log(createOrg)
+        const formData = new FormData();
+        formData.append("name", values.orgName);
+        formData.append("subdomain", values.slug);
+        formData.append("description", values.description);
+
+        createOrganization(formData).then((res: any) => {
+            if (res.error) {
+                toast.error(res.error);
+            } else {
+                va.track("Created Site");
+                const {id} = res;
+                router.refresh();
+                router.push(`/organization/${id}`);
+                toast.success(`Successfully created site!`);
+            }
+        })
+
     }
 
     return (
@@ -108,7 +130,7 @@ export default function OnboardingForm() {
                 <FormField
                     control={form.control}
                     name="description"
-                    render={({ field }) => (
+                    render={({field}) => (
                         <FormItem>
                             <FormLabel>Bio</FormLabel>
                             <FormControl>
@@ -121,7 +143,7 @@ export default function OnboardingForm() {
                             <FormDescription>
                                 You can <span>@mention</span> other users and organizations.
                             </FormDescription>
-                            <FormMessage />
+                            <FormMessage/>
                         </FormItem>
                     )}
                 />

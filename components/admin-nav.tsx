@@ -41,7 +41,7 @@ const externalLinks: any[] = [
     //     icon: <FileCode width={18}/>,
     // },
     // {
-    //     name: "View demo site",
+    //     name: "View demo organization",
     //     href: "https://demo.vercel.pub",
     //     icon: <Layout width={18}/>,
     // },

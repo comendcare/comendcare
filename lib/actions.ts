@@ -487,7 +487,7 @@ export async function inviteUser(
     }
 }
 
-// Create or get site (replaces organization logic with site logic)
+// Create or get organization (replaces organization logic with organization logic)
 export async function createOrGetSite(
     input: {
         siteName: string
@@ -505,7 +505,7 @@ export async function createOrGetSite(
     }
 
     try {
-        // Try to find a site by slug first
+        // Try to find a organization by slug first
         if (input.siteSlug) {
             const site = await prisma.organization.findUnique({
                 where: {
@@ -513,13 +513,13 @@ export async function createOrGetSite(
                 },
             });
 
-            // If the site is found, return it
+            // If the organization is found, return it
             if (site) {
                 return site;
             }
         }
 
-        // If no site was found by slug or no slug was provided, create a new one if name is provided
+        // If no organization was found by slug or no slug was provided, create a new one if name is provided
         if (input.siteName) {
             return await prisma.organization.create({
                 data: {
@@ -537,12 +537,12 @@ export async function createOrGetSite(
         // If neither name nor slug was provided or used, throw an error
         throw new Error("Site name or slug must be provided");
     } catch (error) {
-        console.error("Error creating or retrieving site:", error);
-        throw new Error("Failed to create or retrieve site.");
+        console.error("Error creating or retrieving organization:", error);
+        throw new Error("Failed to create or retrieve organization.");
     }
 }
 
-// Add a member to the site
+// Add a member to the organization
 export async function addMemberToSite(
     organizationId: string,
     session: Session | null
@@ -558,7 +558,7 @@ export async function addMemberToSite(
             throw new Error("Email is required but is missing");
         }
 
-        // If session and organizationId are valid, create a new member for the site
+        // If session and organizationId are valid, create a new member for the organization
         return await prisma.member.create({
             data: {
                 email: email, // email is guaranteed to be a string here
@@ -568,7 +568,7 @@ export async function addMemberToSite(
             },
         });
     } catch (error) {
-        console.error("Error adding member to site:", error);
-        throw new Error("Failed to add member to site.");
+        console.error("Error adding member to organization:", error);
+        throw new Error("Failed to add member to organization.");
     }
 }
