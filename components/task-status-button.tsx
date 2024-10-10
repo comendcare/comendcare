@@ -10,11 +10,15 @@ interface TaskType {
 export default function TaskStatusButton({ task }: { task: TaskType }) {
     const [complete, setComplete] = useState(task.complete)
 
+    const handleStateChange = () => {
+        setComplete(!complete)
+    }
+
     return (
         <Button 
             variant="outline"  
             size="icon" 
-            // onClick={() => { setComplete(!complete) }}
+            onClick={handleStateChange}
             className={`rounded-full h-6 w-6 ${complete ? 'text-green-600': 'text-red-600'}`}
         >
             <FaCheck />

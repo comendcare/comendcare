@@ -99,10 +99,6 @@ export function Roadmap() {
     const [nodes, setNodes, onNodesChange] = useNodesState(initNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges)
 
-    const onNodeClick = (nodeId: string) => {
-        setSelectedNodeId(nodeId); // Update state with selected node ID
-    }
-
     const handlePanelChange = (open: boolean) => {
         if (!open) setSelectedNodeId(null)
     }
@@ -112,25 +108,25 @@ export function Roadmap() {
         [],
     )
 
-    const newNode = () => {
-        const id = (nodes.length + 1).toString()
-        const newNode = {
-            id,
-            type: 'milestone',
-            position: { x: 0, y: 400 },
-            data: {
-                name: `Node ${id}`,
-                description: '',
-                tasks: [],
-                notes: '',
-                status: 'todo'
-            },
-            selected: false,
-            selectable: true
-          };
+    // const newNode = () => {
+    //     const id = (nodes.length + 1).toString()
+    //     const newNode = {
+    //         id,
+    //         type: 'milestone',
+    //         position: { x: 0, y: 400 },
+    //         data: {
+    //             name: `Node ${id}`,
+    //             description: '',
+    //             tasks: [],
+    //             notes: '',
+    //             status: 'todo'
+    //         },
+    //         selected: false,
+    //         selectable: true
+    //       };
 
-          setNodes((nodes) => nodes.concat(newNode))
-    }
+    //       setNodes((nodes) => nodes.concat(newNode))
+    // }
 
     return (
         <TooltipProvider delayDuration={0}>
@@ -155,11 +151,13 @@ export function Roadmap() {
                                     nodes={nodes}
                                     edges={edges}
                                     onConnect={onConnect}
-                                    newNode={newNode}
+                                    // newNode={newNode}
+                                    setNodes={setNodes}
+                                    setEdges={setEdges}
                                     onNodesChange={onNodesChange}
                                     onEdgesChange={onEdgesChange}
                                     width={defaultLayout[0]} 
-                                    nodeClickCallback={onNodeClick}
+                                    setSelectedNodeId={setSelectedNodeId}
                                 />
                             </ReactFlowProvider>
                         </TabsContent>

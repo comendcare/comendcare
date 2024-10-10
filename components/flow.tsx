@@ -24,35 +24,71 @@ const RoadmapFlowchart = ({
     nodes,
     edges,
     onConnect,
-    newNode,
+    // newNode,
+    setNodes,
+    setEdges,
     onNodesChange,
     onEdgesChange,
     selectedNodeId, 
-    nodeClickCallback 
+    setSelectedNodeId
 }: { 
     width: number, 
     nodes: any,
     edges: any,
     onConnect: any,
-    newNode: any,
+    // newNode: any,
+    setNodes: any,
+    setEdges: any,
     onNodesChange: any,
     onEdgesChange: any,
     selectedNodeId: string | null, 
-    nodeClickCallback: (nodeId: string) => void
+    setSelectedNodeId: any
 }) => {
-    const { fitView } = useReactFlow() 
+    const { fitView, screenToFlowPosition } = useReactFlow() 
     
     const nodeTypes = {
         milestone: MilestoneNode
     }
 
-    const onNodeClick = (event: any, node: any) => {
-        // nodeClickCallback(event, node)
-    }
+    let id = nodes.length + 1
+    const getId = () => `${id++}`
+
+    const onConnectEnd = useCallback(
+        (event: any, connectionState: any) => {
+            // when a connection is dropped on the pane it's not valid
+            if (!connectionState.isValid) {
+                // we need to remove the wrapper bounds, in order to get the correct position
+                const id = getId()
+                const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event
+                const newNode = {
+                    id,
+                    type: 'milestone',
+                    position: screenToFlowPosition({
+                        x: clientX,
+                        y: clientY,
+                    }), 
+                    data: {  
+                        name: `Node ${id}`,
+                        description: '',
+                        tasks: [],
+                        notes: '',
+                        status: 'todo'
+                    },
+                    origin: [0.5, 0.0],
+                }
+
+                setNodes((nds: any[]) => nds.concat(newNode))
+                setEdges((eds: any[]) =>
+                    eds.concat({ id, source: connectionState.fromNode.id, target: id }),
+                )
+            }
+        },
+        [screenToFlowPosition]
+    );
 
     const handleEditClick = (nodeId: string) => {
-        nodeClickCallback(nodeId)
-    };
+        setSelectedNodeId(nodeId)
+    }
 
     const updatedNodes = nodes.map((node: any) => ({
         ...node,
@@ -75,14 +111,14 @@ const RoadmapFlowchart = ({
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            // onNodeClick={onNodeClick}
+            onConnectEnd={onConnectEnd}
             nodeTypes={nodeTypes}
             fitView
             proOptions={proOptions}
         >
             <MiniMap />
             <Controls>
-            <Button onClick={newNode}>Add Node</Button>
+            {/* <Button onClick={newNode}>Add Node</Button> */}
             </Controls>
         </ReactFlow>
     )
