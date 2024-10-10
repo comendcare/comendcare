@@ -1,9 +1,10 @@
 import "./globals.css";
-import { ThemeProvider } from "@/app/theme-provider";
-import type { Metadata, ResolvingMetadata } from 'next'
+import {ThemeProvider} from "@/app/theme-provider";
+import type {Metadata, ResolvingMetadata} from 'next'
 
 // Import Montserrat Display and Source Sans Pro
 import {Poppins, Source_Sans_3} from "next/font/google";
+import {Providers} from "@/app/providers";
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -35,7 +36,10 @@ export async function generateMetadata(
         applicationName: 'Comend',
         referrer: 'origin-when-cross-origin',
         keywords: ['Comend', 'Rare Disease', 'Genetic Disorders', 'Orphan Diseases', 'Drug Development', 'Patient Advocacy Groups', 'Researchers'],
-        authors: [{ name: 'Flawnson', url: "http://flawnson.com/" }, { name: 'Albert', url: "https://www.linkedin.com/in/albert-yq-wang/" }],
+        authors: [{name: 'Flawnson', url: "http://flawnson.com/"}, {
+            name: 'Albert',
+            url: "https://www.linkedin.com/in/albert-yq-wang/"
+        }],
         creator: 'Flawnson Tong',
         publisher: 'Flawnson Tong',
         openGraph: {
@@ -64,14 +68,16 @@ export default function RootLayout({
             className={`${poppins.variable} ${sourceSans3.variable}`}
         >
         <body>
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem={false}
-            disableTransitionOnChange
-        >
-            {children}
-        </ThemeProvider>
+        <Providers>
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="light"
+                enableSystem={false}
+                disableTransitionOnChange
+            >
+                {children}
+            </ThemeProvider>
+        </Providers>
         </body>
         </html>
     );

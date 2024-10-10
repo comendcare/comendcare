@@ -8,15 +8,15 @@ export function StatsSection() {
     const items = [
         {
             description: "Grants",
-            value: 250,
+            value: 100,
         },
         {
             description: "Contractors",
-            value: 1000,
+            value: 500,
         },
         {
             description: "Researchers",
-            value: 10000,
+            value: 5000,
         },
     ];
 
