@@ -13,8 +13,9 @@ import { FaX } from "react-icons/fa6";
 import { addEdge, MarkerType, Position, ReactFlowProvider, useEdgesState, useNodesState } from "@xyflow/react";
 import EditMilestoneForm from "./edit-milestone-form";
 import MilestoneStatusButton, { StatusType } from "./milestone-status-button";
+import type { Edge, Node } from "@xyflow/react";
 
-const initNodes = [
+const initNodes: Node[] = [
     {
         id: '1',
         type: 'milestone',
@@ -72,21 +73,17 @@ const initNodes = [
     }
 ]
 
-const initEdges = [
+const initEdges: Edge[] = [
     {
         id: 'e1-2',
         source: '1',
         target: '2',
-        sourcePosition: Position.Right,
-        targetPosition: Position.Left,
         markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 }
     },
     {
         id: 'e2-3',
         source: '2',
         target: '3',
-        sourcePosition: Position.Right,
-        targetPosition: Position.Left,
         markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 }
     },
 ]
@@ -102,31 +99,6 @@ export function Roadmap() {
     const handlePanelChange = (open: boolean) => {
         if (!open) setSelectedNodeId(null)
     }
-
-    const onConnect = useCallback(
-        (params: any) => setEdges((eds) => addEdge(params, eds)),
-        [],
-    )
-
-    // const newNode = () => {
-    //     const id = (nodes.length + 1).toString()
-    //     const newNode = {
-    //         id,
-    //         type: 'milestone',
-    //         position: { x: 0, y: 400 },
-    //         data: {
-    //             name: `Node ${id}`,
-    //             description: '',
-    //             tasks: [],
-    //             notes: '',
-    //             status: 'todo'
-    //         },
-    //         selected: false,
-    //         selectable: true
-    //       };
-
-    //       setNodes((nodes) => nodes.concat(newNode))
-    // }
 
     return (
         <TooltipProvider delayDuration={0}>
@@ -150,7 +122,6 @@ export function Roadmap() {
                                     selectedNodeId={selectedNodeId}
                                     nodes={nodes}
                                     edges={edges}
-                                    onConnect={onConnect}
                                     // newNode={newNode}
                                     setNodes={setNodes}
                                     setEdges={setEdges}

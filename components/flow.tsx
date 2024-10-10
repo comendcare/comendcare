@@ -2,20 +2,18 @@
 import React, { useCallback, useEffect } from 'react'
 import {
     ReactFlow,
-    useNodesState,
-    useEdgesState,
     addEdge,
     MiniMap,
     Controls,
     useReactFlow,
-    Position,
-    MarkerType,
+    OnNodesChange,
+    OnEdgesChange
 } from '@xyflow/react'
+import type { Edge, Node } from '@xyflow/react'
 
 import '@xyflow/react/dist/base.css'
 
 import MilestoneNode from '@/components/milestone-node'
-import { Button } from './ui/button'
 
 const proOptions = { hideAttribution: true }
 
@@ -23,8 +21,6 @@ const RoadmapFlowchart = ({
     width, 
     nodes,
     edges,
-    onConnect,
-    // newNode,
     setNodes,
     setEdges,
     onNodesChange,
@@ -33,26 +29,28 @@ const RoadmapFlowchart = ({
     setSelectedNodeId
 }: { 
     width: number, 
-    nodes: any,
-    edges: any,
-    onConnect: any,
-    // newNode: any,
-    setNodes: any,
-    setEdges: any,
-    onNodesChange: any,
-    onEdgesChange: any,
+    nodes: Node[],
+    edges: Edge[],
+    setNodes: React.Dispatch<React.SetStateAction<Node[]>>,
+    setEdges: React.Dispatch<React.SetStateAction<Edge[]>>,
+    onNodesChange: OnNodesChange<Node>,
+    onEdgesChange: OnEdgesChange<Edge>,
     selectedNodeId: string | null, 
-    setSelectedNodeId: any
+    setSelectedNodeId: React.Dispatch<React.SetStateAction<string | null>>
 }) => {
     const { fitView, screenToFlowPosition } = useReactFlow() 
-    
-    const nodeTypes = {
-        milestone: MilestoneNode
-    }
+    const nodeTypes = { milestone: MilestoneNode }
 
     let id = nodes.length + 1
     const getId = () => `${id++}`
 
+    // Add an edge to the state when two nodes are connected
+    const onConnect = useCallback(
+        (params: any) => setEdges((eds: Edge[]) => addEdge(params, eds)),
+        [],
+    )
+
+    // Add a node to the state when an edge connection is dropped: https://reactflow.dev/examples/nodes/add-node-on-edge-drop
     const onConnectEnd = useCallback(
         (event: any, connectionState: any) => {
             // when a connection is dropped on the pane it's not valid
@@ -60,7 +58,7 @@ const RoadmapFlowchart = ({
                 // we need to remove the wrapper bounds, in order to get the correct position
                 const id = getId()
                 const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event
-                const newNode = {
+                const newNode: Node = {
                     id,
                     type: 'milestone',
                     position: screenToFlowPosition({
@@ -77,8 +75,8 @@ const RoadmapFlowchart = ({
                     origin: [0.5, 0.0],
                 }
 
-                setNodes((nds: any[]) => nds.concat(newNode))
-                setEdges((eds: any[]) =>
+                setNodes((nds: Node[]) => nds.concat(newNode))
+                setEdges((eds: Edge[]) =>
                     eds.concat({ id, source: connectionState.fromNode.id, target: id }),
                 )
             }
@@ -86,15 +84,14 @@ const RoadmapFlowchart = ({
         [screenToFlowPosition]
     );
 
-    const handleEditClick = (nodeId: string) => {
-        setSelectedNodeId(nodeId)
-    }
-
+    // add handleEditClick() callback to nodes in the flow
+    // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
     const updatedNodes = nodes.map((node: any) => ({
         ...node,
-        data: { ...node.data, handleEditClick }
+        data: { ...node.data, handleEditClick: (nodeId: string) => setSelectedNodeId(nodeId) }
     }))
 
+    // when the handle is adjusted (width changes) or a node is selected (details panel opens), fit the view
     useEffect(() => {
         if (selectedNodeId) {
             fitView({ nodes: [{ id: selectedNodeId }], padding: 1 })
@@ -117,9 +114,7 @@ const RoadmapFlowchart = ({
             proOptions={proOptions}
         >
             <MiniMap />
-            <Controls>
-            {/* <Button onClick={newNode}>Add Node</Button> */}
-            </Controls>
+            <Controls />
         </ReactFlow>
     )
 }
