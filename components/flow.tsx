@@ -82,7 +82,7 @@ const RoadmapFlowchart = ({
             }
         },
         [screenToFlowPosition]
-    );
+    )
 
     // add handleEditClick() callback to nodes in the flow
     // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
@@ -93,11 +93,15 @@ const RoadmapFlowchart = ({
 
     // when the handle is adjusted (width changes) or a node is selected (details panel opens), fit the view
     useEffect(() => {
-        if (selectedNodeId) {
-            fitView({ nodes: [{ id: selectedNodeId }], padding: 1 })
-        } else {
-            fitView()
-        }
+        const timer = setTimeout(() => {
+            if (selectedNodeId) {
+                fitView({ nodes: [{ id: selectedNodeId }], padding: 1 })
+            } else {
+                fitView()
+            }
+        }, 1); // Delay by a short time to allow layout adjustment
+        
+        return () => clearTimeout(timer)
     }, [width, selectedNodeId])
 
     return (

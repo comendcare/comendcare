@@ -105,33 +105,37 @@ export function Roadmap() {
             <ResizablePanelGroup
                 direction="horizontal"
                 onLayout={(sizes: number[]) => {
+                    console.log(`set layout size: ${sizes}`)
                     setLayout(sizes); // Use Zustand's setLayout to save panel sizes
                 }}
                 className="h-full items-stretch"
             >
 
-                <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+                <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
                     <Tabs defaultValue="roadmap">
                         <TabsList>
                             <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
                             <TabsTrigger value="kanban">Kanban</TabsTrigger>
                         </TabsList>
+
+                        {/* Roadmap View */}
                         <TabsContent value="roadmap" className="m-0 h-[calc(100vh-3.5rem)]">
                             <ReactFlowProvider>
                                 <Flow 
+                                    width={defaultLayout[0]}
                                     selectedNodeId={selectedNodeId}
                                     nodes={nodes}
                                     edges={edges}
-                                    // newNode={newNode}
                                     setNodes={setNodes}
                                     setEdges={setEdges}
                                     onNodesChange={onNodesChange}
-                                    onEdgesChange={onEdgesChange}
-                                    width={defaultLayout[0]} 
+                                    onEdgesChange={onEdgesChange} 
                                     setSelectedNodeId={setSelectedNodeId}
                                 />
                             </ReactFlowProvider>
                         </TabsContent>
+
+                        {/* Kanban View */}
                         <TabsContent value="kanban">
                             <Kanban />
                         </TabsContent>
@@ -142,9 +146,10 @@ export function Roadmap() {
                     <>
                         <ResizableHandle withHandle />
 
-                        <ResizablePanel defaultSize={defaultLayout[2]} minSize={30} className="p-10 flex flex-col gap-4">
-                            <span className="flex flex-row justify-between">
-                                <MilestoneStatusButton milestoneStatus={nodes.find(node => node.id === selectedNodeId)?.data?.status as StatusType} />
+                        <ResizablePanel defaultSize={defaultLayout[1]} minSize={30} className="p-10 flex flex-col gap-4">
+                            <span className="flex flex-row justify-between items-center">
+                                {/* <MilestoneStatusButton milestoneStatus={nodes.find(node => node.id === selectedNodeId)?.data?.status as StatusType} /> */}
+                                <h1 className="text-2xl font-bold">Edit Milestone Details</h1>
                                 <Button onClick={() => handlePanelChange(false)}><FaX /></Button>
                             </span>
                             <EditMilestoneForm nodeData={nodes.find(node => node.id === selectedNodeId)?.data}/>
