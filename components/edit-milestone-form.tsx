@@ -38,7 +38,7 @@ const editMilestoneForm = z.object({
         })
     ),
     dependencies: z.array(z.string()),
-    budget: z.string().optional(),
+    budget: z.number().optional(),
     notes: z.string().optional(),
     status: z.string()
 })
@@ -260,8 +260,8 @@ export default function EditMilestoneForm({ nodeData }: { nodeData: any }) {
                             <FormControl>
                                 <Input
                                     id="budget"
-                                    placeholder={field.value}
-                                    defaultValue={field.value}
+                                    placeholder={field.value?.toString()}
+                                    defaultValue={field.value?.toString()}
                                     {...field}
                                 />
                             </FormControl>

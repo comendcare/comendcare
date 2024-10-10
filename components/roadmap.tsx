@@ -38,6 +38,9 @@ const initNodes: Node[] = [
         data: { 
             title: 'Disease Models',
             description: 'Discover, construct, and phenotype disease models.',
+            deadline: new Date(),
+            stakeholders: ['Person 1', 'Person 2'],
+            labels: ['Label 1', 'Label 2'],
             subtasks: [
                 { name: 'Identify the best models currently available', complete: true },
                 { name: 'Construct Knock-in Mice', complete: true },
@@ -46,7 +49,9 @@ const initNodes: Node[] = [
                 { name: 'Construct iPSCs', complete: true },
                 { name: 'Phenotype iPSCs', complete: false }
             ],
-            notes: '',
+            dependencies: ['Basic Science - Disease'],
+            budget: 100000,
+            notes: 'Here are some notes as an example...',
             status: 'inprogress'
         },
         position: { x: 600, y: 0 },
