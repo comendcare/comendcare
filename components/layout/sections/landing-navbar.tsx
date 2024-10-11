@@ -115,15 +115,14 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                 minWidth: "800px"
             }}
             className={cn(
-                "hidden lg:flex flex-row self-start bg-transparent dark:bg-transparent items-center justify-between py-4 max-w-7xl mx-auto px-4 rounded-full relative z-[60] w-full",
+                "hidden lg:grid grid-cols-3 self-start bg-transparent dark:bg-transparent items-center justify-between py-4 max-w-7xl mx-auto px-4 rounded-full relative z-[60] w-full",
                 visible && "bg-white/80 dark:bg-neutral-950/80"
             )}
         >
-            {/* NOTE: hackey fix here (setting the z-index) to fix the comend logo link. Note to fix this properly in Notion https://www.notion.so/comend/2f37a4f54517416fa140578a9b714f84?v=8e6e002c8ecc429081f6981f68d6e23a&p=3f7ae8399edb45e4a14de4b63324ce44&pm=s */}
-            <Link href="/" className="z-[61]">
+            <Link href="/">
                 <Image className="w-36 inline" src={logo} alt="Comend Logo" />
             </Link>
-            <motion.div className="lg:flex flex-row flex-1 absolute inset-0 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
+            <motion.div className="lg:flex flex-row flex-1 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
                 {navItems.map((navItem, idx) =>
                     navItem.link ? (
                         <Link
