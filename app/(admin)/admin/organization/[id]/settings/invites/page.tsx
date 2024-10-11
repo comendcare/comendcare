@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma";
-import {updateSite} from "@/lib/actions";
 import InvitationForm from "@/components/invitation-form";
 
 export default async function SiteSettingsAppearance({
@@ -7,7 +6,7 @@ export default async function SiteSettingsAppearance({
                                                      }: {
     params: { id: string };
 }) {
-    const data = await prisma.site.findUnique({
+    const data = await prisma.organization.findUnique({
         where: {
             id: decodeURIComponent(params.id),
         },
