@@ -41,11 +41,6 @@ Multi-tenancy features are based off the way [Openpanel](https://github.com/Open
 
 ## Environment Setup
 
-### Prerequisites
-
-1. Ensure you have the [gearbox](https://github.com/comendcare/gearbox) repo set up. Follow the setup instructions in
-   the gearbox README.
-
 ### Setup
 
 1. Clone the Comend repo
@@ -67,13 +62,13 @@ Multi-tenancy features are based off the way [Openpanel](https://github.com/Open
     3. Run `createdb -U postgres comend-psql` to create the database if you're using Bash mode.
        Run `CREATE DATABASE comend-psql TEMPLATE template0` to create the database if you're using psql mode.
         - (optional) To check that the database has been created, enter psql mode (if you haven't already), and
-          run `\list`. The slipstream-postgres database should be listed.
-    4. Double-check your .env file in your slipstream repo contains the following environment
+          run `\list`. The comend-postgres database should be listed.
+    4. Double-check your .env file in your comendcare repo contains the following environment
        variable `DATABASE_URL="postgresql://postgres:comend@localhost:5432/comend-psql"`
 
 7. Prisma Migration - run `npx prisma migrate deploy` in the root directory to apply all migrations to the database
-8. Install dependances - run `npm install` in the slipstream root directory
-9. Run the app! - run `npm run dev` in the slipstream root directory
+8. Install dependances - run `npm install` in the comendcare root directory
+9. Run the app! - run `npm run dev` in the comendcare root directory
 
 ## Styling and Best Practices
 > We don't have these yet but will soon!
