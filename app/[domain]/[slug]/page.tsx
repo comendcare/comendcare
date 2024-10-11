@@ -18,31 +18,36 @@ export async function generateMetadata({
         getRoadmapData(domain, slug),
         getOrganizationData(domain),
     ]);
+
+    // Fallback to avoid passing null to title or description
+    const title = data?.title || "Default Title"; // Use a fallback title
+    const description = data?.description || "Default description"; // Use a fallback description
+
     if (!data || !organizationData) {
-        return null;
+        return {
+            title: "Page Not Found",
+            description: "The page you are looking for does not exist.",
+        };
     }
-    const {title, description} = data;
 
     return {
         title,
         description,
         openGraph: {
-            title,
-            description,
+            title: title || undefined, // Ensure it's not null
+            description: description || undefined, // Ensure it's not null
         },
         twitter: {
             card: "summary_large_image",
-            title,
-            description,
+            title: title || undefined, // Ensure it's not null
+            description: description || undefined, // Ensure it's not null
             creator: "@vercel",
         },
-        // Optional: Set canonical URL to custom domain if it exists
-        // ...(params.domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) &&
-        //   organizationData.customDomain && {
-        //     alternates: {
-        //       canonical: `https://${organizationData.customDomain}/${params.slug}`,
-        //     },
-        //   }),
+        ...(organizationData.customDomain && {
+            alternates: {
+                canonical: `https://${organizationData.customDomain}/${params.slug}`,
+            },
+        }),
     };
 }
 
