@@ -1,12 +1,11 @@
 import prisma from "@/lib/prisma";
-import {inviteUser} from "@/app/actions";
 
 export default async function SiteSettingsDomains({
                                                       params,
                                                   }: {
     params: { id: string };
 }) {
-    const data = await prisma.site.findUnique({
+    const data = await prisma.organization.findUnique({
         where: {
             id: decodeURIComponent(params.id),
         },
