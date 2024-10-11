@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import logo from "@/public/RareSearch Logo.svg"
+import logo from "@/public/logos/comend-full-logo.png"
 import Spinner from "@/components/ui/spinner";
 
 export default function Loading() {

@@ -7,6 +7,7 @@ import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/componen
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs";
 import Flow from "@/components/flow";
 import Kanban from "@/components/kanban";
+import { PlateEditor } from "@/components/plate-editor";
 import { useCallback, useState } from "react";
 import { Button } from "./ui/button";
 import { FaX } from "react-icons/fa6";
