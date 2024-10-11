@@ -1,10 +1,8 @@
-// write-certificates.ts
-
 const { tmpdir } = require("os");
 const fs = require("fs");
 
 // Function to write the decoded content to a file
-function writeDecodedFile(filename: string, base64Content: string) {
+function writeDecodedFile(filename, base64Content) {
     const filePath = `${tmpdir()}/${filename}`;
     const contentBuffer = Buffer.from(base64Content, "base64");
 
