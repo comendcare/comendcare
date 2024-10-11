@@ -1,7 +1,6 @@
 const { tmpdir } = require("os");
 const fs = require("fs");
 
-// Function to write the decoded content to a file
 function writeDecodedFile(filename, base64Content) {
     const filePath = `${tmpdir()}/${filename}`;
     const contentBuffer = Buffer.from(base64Content, "base64");
@@ -9,6 +8,7 @@ function writeDecodedFile(filename, base64Content) {
     try {
         fs.writeFileSync(filePath, contentBuffer);
         console.log(`${filename} successfully written to ${filePath}`);
+        console.log(`File exists: ${fs.existsSync(filePath)}`);
     } catch (err) {
         console.error(`Error writing ${filename}:`, err);
         throw err;
