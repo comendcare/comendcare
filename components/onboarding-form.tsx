@@ -60,7 +60,7 @@ export default function OnboardingForm() {
                 va.track("Created Site");
                 const {id} = res;
                 router.refresh();
-                router.push(`/organization/${id}`);
+                router.push(`/admin/organization/${id}`);
                 toast.success(`Successfully created site!`);
             }
         })
