@@ -29,7 +29,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                 className="h-full w-full items-stretch"
             >
                 {/* Navigation Panel */}
-                <ResizablePanel
+                {/* <ResizablePanel
                     defaultSize={defaultLayout[0]}
                     collapsedSize={4}
                     collapsible={true}
@@ -57,10 +57,10 @@ export default function AppLayout({children}: AppLayoutProps) {
                             {title: "Settings", icon: Cog, variant: "ghost", href: "/app/settings"},
                         ]}
                     />
-                </ResizablePanel>
+                </ResizablePanel> */}
 
                 {/* Resizable Handle between panels */}
-                <ResizableHandle withHandle/>
+                {/* <ResizableHandle withHandle/> */}
 
                 {/* Main Content Panel */}
                 <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
