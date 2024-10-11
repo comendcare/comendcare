@@ -8,13 +8,15 @@ import {
     useReactFlow,
     OnNodesChange,
     OnEdgesChange,
-    MarkerType
+    MarkerType,
+    useStoreApi
 } from '@xyflow/react'
 import type { Edge, Node } from '@xyflow/react'
 
 import '@xyflow/react/dist/base.css'
 
 import MilestoneNode from '@/components/milestone-node'
+import { Button } from './ui/button'
 
 const proOptions = { hideAttribution: true }
 
@@ -40,10 +42,50 @@ const RoadmapFlowchart = ({
     setSelectedNodeId: React.Dispatch<React.SetStateAction<string | null>>
 }) => {
     const { fitView, screenToFlowPosition } = useReactFlow() 
+    const store = useStoreApi()
     const nodeTypes = { milestone: MilestoneNode }
 
     let id = nodes.length + 1
     const getId = () => `${id++}`
+
+    // Add a empty milestone node
+    // if a position is provided, place at the given coordinates
+    // if a position is not provided, place in the center
+    const onAddMilestone = useCallback(
+        (position?: { x: number, y: number }) => {
+            // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
+            const {
+                height,
+                width,
+                transform: [transformX, transformY, zoomLevel]
+            } = store.getState()
+            
+            const zoomMultiplier = 1 / zoomLevel
+            const centerX = -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+            const centerY = -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        
+            const id = getId()
+            const newNode: Node = {
+                id,
+                type: 'milestone',
+                position: {
+                    x: position ? position.x : centerX,
+                    y: position ? position.y : centerY
+                },
+                data: {  
+                    title: `Milestone ${id}`,
+                    description: '',
+                    tasks: [],
+                    notes: '',
+                    status: 'todo'
+                }, 
+            }
+
+            setNodes((nds: Node[]) => nds.concat(newNode))
+            return newNode
+        },
+        []
+    )
 
     // Add an edge to the state when two nodes are connected
     const onConnect = useCallback(
@@ -59,24 +101,8 @@ const RoadmapFlowchart = ({
                 // we need to remove the wrapper bounds, in order to get the correct position
                 const id = getId()
                 const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event
-                const newNode: Node = {
-                    id,
-                    type: 'milestone',
-                    position: screenToFlowPosition({
-                        x: clientX,
-                        y: clientY,
-                    }), 
-                    data: {  
-                        title: `Node ${id}`,
-                        description: '',
-                        tasks: [],
-                        notes: '',
-                        status: 'todo'
-                    }, 
-                    origin: [0.5, 0.0],
-                }
 
-                setNodes((nds: Node[]) => nds.concat(newNode))
+                onAddMilestone({ x: clientX, y: clientY })
                 setEdges((eds: Edge[]) =>
                     eds.concat({ 
                         id, 
@@ -124,7 +150,9 @@ const RoadmapFlowchart = ({
             proOptions={proOptions}
         >
             <MiniMap />
-            <Controls />
+            <Controls>
+                <Button onClick={() => onAddMilestone()}>Add Milestone</Button>
+            </Controls>
         </ReactFlow>
     )
 }
