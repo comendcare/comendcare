@@ -63,11 +63,11 @@ export async function generateStaticParams() {
             },
         },
         // feel free to remove this filter if you want to generate paths for all roadmaps
-        where: {
-            organization: {
-                subdomain: "demo",
-            },
-        },
+        // where: {
+        //     organization: {
+        //         subdomain: "demo",
+        //     },
+        // },
     });
 
     const allPaths = allRoadmaps

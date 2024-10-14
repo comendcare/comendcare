@@ -11,6 +11,9 @@ I've bootstrapped this project using an older version of the platforms template 
 specifically [this](https://github.com/realmikesolo/platforms) version that was forked from the [main repo](https://github.com/vercel/platforms))
 I didn't use the main repo because they recently migrated to Drizzle ORM, but I wanted to use Prisma.
 
+I've used a modified directory structure, which changes the configuration a bit.
+For the most part the steps described [here](https://vercel.com/guides/nextjs-multi-tenant-application#3.-publish-your-prisma-schema) still apply (if this guide changes, consult the Wayback machine).
+
 Multi-tenancy features are based off the way [Openpanel](https://github.com/Openpanel-dev/openpanel) has implemented organizations, memberships, and invites.
 
 ### Dependencies
