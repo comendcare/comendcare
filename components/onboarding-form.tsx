@@ -61,7 +61,7 @@ export default function OnboardingForm() {
                 const {id} = res;
                 router.refresh();
                 router.push(`/admin/organization/${id}`);
-                toast.success(`Successfully created site!`);
+                toast.success(`Successfully created organization!`);
             }
         })
 

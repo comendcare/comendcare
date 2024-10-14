@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic';  // To prevent error in production; see the following docs:
+// https://nextjs.org/docs/messages/app-static-to-dynamic-error
+
 import {getSession} from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import {notFound, redirect} from "next/navigation";
