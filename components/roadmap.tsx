@@ -11,16 +11,15 @@ import Flow from "@/components/flow";
 import Kanban from "@/components/kanban";
 import { Button } from "./ui/button";
 import { FaX } from "react-icons/fa6";
-import { ReactFlowProvider } from "@xyflow/react";
-import EditMilestoneForm from "./edit-milestone-form";
+import { EditMilestoneForm } from "./edit-milestone-form";
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     nodes: state.nodes
-});
+})
 
-export function Roadmap() {
+export function Roadmap({ initNodes, initEdges }: { initNodes: any[], initEdges: any[] }) {
     // Zustand state management
     const { defaultLayout, setLayout } = useNavStore()
     const { selectedNodeId, setSelectedNodeId, nodes } = useRoadmapStore( useShallow(selector) )
@@ -48,9 +47,7 @@ export function Roadmap() {
 
                         {/* Roadmap View */}
                         <TabsContent value="roadmap" className="m-0 h-[calc(100vh-3.5rem)]">
-                            <ReactFlowProvider>
-                                <Flow width={defaultLayout[0]} />
-                            </ReactFlowProvider>
+                            <Flow width={defaultLayout[0]} initNodes={initNodes} initEdges={initEdges}/>
                         </TabsContent>
 
                         {/* Kanban View */}
@@ -69,7 +66,10 @@ export function Roadmap() {
                                 <h1 className="text-2xl font-bold">Edit Milestone Details</h1>
                                 <Button onClick={() => handlePanelChange(false)}><FaX /></Button>
                             </span>
-                            <EditMilestoneForm nodeData={nodes.find(node => node.id === selectedNodeId)?.data}/>
+                            <EditMilestoneForm 
+                                nodeData={nodes.find(node => node.id === selectedNodeId)?.data} 
+                                nodeId={nodes.find(node => node.id === selectedNodeId)?.id}
+                            />
                         </ResizablePanel>
                     </>
                 )}

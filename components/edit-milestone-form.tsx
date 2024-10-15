@@ -1,3 +1,5 @@
+"use client"
+
 import { zodResolver } from '@hookform/resolvers/zod'
 import React from 'react'
 import { useForm } from 'react-hook-form'
@@ -43,12 +45,12 @@ const editMilestoneForm = z.object({
     status: z.string()
 })
 
-export default function EditMilestoneForm({ nodeData }: { nodeData: any }) {
+export function EditMilestoneForm({ nodeData, nodeId }: { nodeData: any, nodeId: string | undefined }) {
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
-            title: nodeData.title || "",
+            title: nodeData.title || "NO TITLE",
             description: nodeData.description || "",
             subtasks: nodeData.subtasks || [],
             notes: nodeData.notes || "",

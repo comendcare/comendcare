@@ -11,14 +11,14 @@ export async function POST(request: Request) {
         await prisma.node.upsert({
           where: { id: node.id },
           update: {
-            positionX: node.position.x,
-            positionY: node.position.y,
+            positionX: node.position?.x,
+            positionY: node.position?.y,
           },
           create: {
             id: node.id,
             type: node.type,
-            positionX: node.position.x,
-            positionY: node.position.y,
+            positionX: node.position?.x,
+            positionY: node.position?.y,
             data: {
               create: {
                 title: node.data.title,
