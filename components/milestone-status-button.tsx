@@ -1,3 +1,5 @@
+"use client"
+
 import React, { memo, useState } from 'react';
 import { Button } from './ui/button';
 

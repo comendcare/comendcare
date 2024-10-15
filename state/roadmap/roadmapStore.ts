@@ -96,9 +96,12 @@ export type RoadmapState = {
 
 export const useRoadmapStore = create<RoadmapState>((set, get) => ({
   selectedNodeId: null,
-  setSelectedNodeId: (id: string | null) => set({ selectedNodeId: id }),
-  nodes: initNodes,
-  edges: initEdges,
+  setSelectedNodeId: (id: string | null) => {
+    console.log(`SET SELECTED NODE ID: ${id}`)
+    set({ selectedNodeId: id })
+  },
+  nodes: [],
+  edges: [],
   onNodesChange: (changes: NodeChange[]) => {
     const nodes = applyNodeChanges(changes, get().nodes)
     set({ nodes })
@@ -133,7 +136,7 @@ export const debouncedSaveToDatabase = debounce((nodes: Node[], edges: Edge[]) =
 
 export const saveToDatabase = async (nodes: Node[], edges: Edge[]) => {
   try {
-    const response = await fetch('/api/flow', {
+    const response = await fetch('/api/flow/update', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

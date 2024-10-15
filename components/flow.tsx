@@ -1,11 +1,13 @@
 "use client"
+
 import React, { useCallback, useEffect } from 'react'
 import {
     ReactFlow,
     MiniMap,
     Controls,
     useReactFlow,
-    useStoreApi
+    useStoreApi,
+    ReactFlowProvider
 } from '@xyflow/react'
 import type { Edge, Node } from '@xyflow/react'
 import { useShallow } from 'zustand/react/shallow'
@@ -33,9 +35,13 @@ const selector = (state: RoadmapState) => ({
 });
 
 const RoadmapFlowchart = ({ 
-    width
+    width,
+    initNodes,
+    initEdges
 }: { 
-    width: number
+    width: number,
+    initNodes: Node[],
+    initEdges: Edge[]
 }) => {
     const { 
         selectedNodeId,
@@ -44,12 +50,22 @@ const RoadmapFlowchart = ({
         edges, 
         onNodesChange, 
         onEdgesChange,
+        setNodes,
+        setEdges,
         addNode, 
         onConnect 
     } = useRoadmapStore( useShallow(selector) )
     const { fitView } = useReactFlow() 
     const store = useStoreApi()
     const nodeTypes = { MILESTONE: MilestoneNode }
+
+    useEffect(() => {
+        // const { initialNodes, initialEdges } = await getServerSideProps()
+
+        console.log(`set nodes...`, initNodes)
+        setNodes(initNodes)
+        setEdges(initEdges)
+      }, [initNodes, initEdges])
 
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
@@ -72,8 +88,8 @@ const RoadmapFlowchart = ({
                 id: id,
                 type: 'MILESTONE',
                 position: {
-                    x: position ? position.x : centerX,
-                    y: position ? position.y : centerY
+                    x: position ? position?.x : centerX,
+                    y: position ? position?.y : centerY
                 },
                 data: {  
                     title: `New Milestone`,
@@ -130,5 +146,15 @@ const RoadmapFlowchart = ({
     )
 }
 
-export default RoadmapFlowchart
+function FlowWithProvider(props: any) {
+    // const serverData = await getServerSideProps()
+
+    return (
+      <ReactFlowProvider>
+        <RoadmapFlowchart {...props} />
+      </ReactFlowProvider>
+    );
+  }
+
+export default FlowWithProvider
 
