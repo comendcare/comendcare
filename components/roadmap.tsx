@@ -16,68 +16,68 @@ import EditMilestoneForm from "./edit-milestone-form";
 import MilestoneStatusButton, { StatusType } from "./milestone-status-button";
 import type { Edge, Node } from "@xyflow/react";
 
-const initNodes: Node[] = [
-    {
-        id: '1',
-        type: 'milestone',
-        data: { 
-            title: 'Basic Science - Disease',
-            description: 'Complete the basic science for investigating our disease.',
-            subtasks: [
-                { name: 'Literature search to undersand disease', complete: true }
-            ],
-            notes: '',
-            status: 'done'
-        },
-        position: { x: 0, y: 0 },
-        selected: false,
-        selectable: true
-    },
-    {
-        id: '2',
-        type: 'milestone',
-        data: { 
-            title: 'Disease Models',
-            description: 'Discover, construct, and phenotype disease models.',
-            deadline: new Date(),
-            stakeholders: ['Person 1', 'Person 2'],
-            labels: ['Label 1', 'Label 2'],
-            subtasks: [
-                { name: 'Identify the best models currently available', complete: true },
-                { name: 'Construct Knock-in Mice', complete: true },
-                { name: 'Phenotyping of Knock-in Mice', complete: false },
-                { name: 'Construct Fibroblasts', complete: true },
-                { name: 'Construct iPSCs', complete: true },
-                { name: 'Phenotype iPSCs', complete: false }
-            ],
-            dependencies: ['Basic Science - Disease'],
-            budget: 100000,
-            notes: 'Here are some notes as an example...',
-            status: 'inprogress'
-        },
-        position: { x: 600, y: 0 },
-        selected: false,
-        selectable: true
-    },
-    {
-        id: '3',
-        type: 'milestone',
-        data: { 
-            title: 'Pre-Clinical Design',
-            description: 'Pre-clinical design and production.',
-            subtasks: [
-                { name: 'Construct design', complete: false },
-                { name: 'Plasmid production', complete: false },
-                { name: 'AAV Production', complete: false},
-            ],
-            notes: 'Here are some extra notes as an example...',
-            status: 'todo'
-        },
-        position: { x: 1200, y: 0 },
-        selected: false,
-        selectable: true
-    }
-]
+// const initNodes: Node[] = [
+//     {
+//         id: '1',
+//         type: 'milestone',
+//         data: { 
+//             title: 'Basic Science - Disease',
+//             description: 'Complete the basic science for investigating our disease.',
+//             tasks: [
+//                 { name: 'Literature search to undersand disease', complete: true }
+//             ],
+//             notes: '',
+//             status: 'done'
+//         },
+//         position: { x: 0, y: 0 },
+//         selected: false,
+//         selectable: true
+//     },
+//     {
+//         id: '2',
+//         type: 'milestone',
+//         data: { 
+//             title: 'Disease Models',
+//             description: 'Discover, construct, and phenotype disease models.',
+//             deadline: new Date(),
+//             stakeholders: ['Person 1', 'Person 2'],
+//             labels: ['Label 1', 'Label 2'],
+//             tasks: [
+//                 { name: 'Identify the best models currently available', complete: true },
+//                 { name: 'Construct Knock-in Mice', complete: true },
+//                 { name: 'Phenotyping of Knock-in Mice', complete: false },
+//                 { name: 'Construct Fibroblasts', complete: true },
+//                 { name: 'Construct iPSCs', complete: true },
+//                 { name: 'Phenotype iPSCs', complete: false }
+//             ],
+//             dependencies: ['Basic Science - Disease'],
+//             budget: 100000,
+//             notes: 'Here are some notes as an example...',
+//             status: 'inprogress'
+//         },
+//         position: { x: 600, y: 0 },
+//         selected: false,
+//         selectable: true
+//     },
+//     {
+//         id: '3',
+//         type: 'milestone',
+//         data: { 
+//             title: 'Pre-Clinical Design',
+//             description: 'Pre-clinical design and production.',
+//             tasks: [
+//                 { name: 'Construct design', complete: false },
+//                 { name: 'Plasmid production', complete: false },
+//                 { name: 'AAV Production', complete: false},
+//             ],
+//             notes: 'Here are some extra notes as an example...',
+//             status: 'todo'
+//         },
+//         position: { x: 1200, y: 0 },
+//         selected: false,
+//         selectable: true
+//     }
+// ]
 
 const initEdges: Edge[] = [
     {
@@ -94,12 +94,11 @@ const initEdges: Edge[] = [
     },
 ]
 
-
-export function Roadmap() {
+export function Roadmap({ initNodes }: { initNodes: Node[] }) {
     // Zustand state management
     const { defaultLayout, setLayout } = useNavStore()
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
-    const [nodes, setNodes, onNodesChange] = useNodesState(initNodes)
+    const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initNodes)
     const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges)
 
     const handlePanelChange = (open: boolean) => {

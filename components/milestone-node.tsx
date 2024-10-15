@@ -12,14 +12,14 @@ export type MilestoneNode = Node<
     deadline?: Date,
     stakeholders?: string[],
     labels?: string[],
-    subtasks: TaskType[],
+    tasks: TaskType[],
     dependencies?: string[],
     budget?: number,
     notes?: string,
     status: StatusType,
     handleEditClick: (nodeId: string) => void
   },
-  'milestone'
+  'MILESTONE'
 >
 
 interface TaskType {
@@ -27,7 +27,7 @@ interface TaskType {
     complete: boolean
 }
 
-type StatusType = 'todo' | 'inprogress' | 'done'
+type StatusType = 'TODO' | 'INPROGRESS' | 'DONE'
 
 function MilestoneNode(props: NodeProps<MilestoneNode>) {
 
@@ -66,7 +66,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
             }
 
             <ul className="flex flex-col gap-2"> 
-                {props.data?.subtasks?.map((task, index) => (
+                {props.data?.tasks?.map((task, index) => (
                     <li key={index} className="flex flex-row gap-2 items-center">
                         <TaskStatusButton task={task} />
                         <p>{task.name}</p>
@@ -118,27 +118,27 @@ function MilestoneStatusButton({ milestoneStatus }: { milestoneStatus: StatusTyp
     const [status, setStatus] = useState(milestoneStatus)
 
     const StatusData = {
-        'todo': {
+        'TODO': {
             text: 'TODO',
             styling: 'bg-red-100 border-red-600 text-red-600 hover-red-400',
         },
-        'inprogress': {
+        'INPROGRESS': {
             text: 'IN PROGRESS',
             styling: 'bg-yellow-100 border-yellow-600 text-yellow-600',
         },
-        'done': {
+        'DONE': {
             text: 'DONE',
             styling: 'bg-green-100 border-green-600 text-green-600',
         }
     }
 
     const handleStateChange = () => {
-        if (status === 'todo') {
-            setStatus('inprogress')
-        } else if (status === 'inprogress') {
-            setStatus('done')
+        if (status === 'TODO') {
+            setStatus('INPROGRESS')
+        } else if (status === 'INPROGRESS') {
+            setStatus('DONE')
         } else {
-            setStatus('todo')
+            setStatus('TODO')
         }
     }
 

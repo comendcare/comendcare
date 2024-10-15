@@ -43,7 +43,7 @@ const RoadmapFlowchart = ({
 }) => {
     const { fitView, screenToFlowPosition } = useReactFlow() 
     const store = useStoreApi()
-    const nodeTypes = { milestone: MilestoneNode }
+    const nodeTypes = { MILESTONE: MilestoneNode }
 
     let id = nodes.length + 1
     const getId = () => `${id++}`
@@ -67,7 +67,7 @@ const RoadmapFlowchart = ({
             const id = getId()
             const newNode: Node = {
                 id,
-                type: 'milestone',
+                type: 'MILESTONE',
                 position: {
                     x: position ? position.x : centerX,
                     y: position ? position.y : centerY
@@ -77,7 +77,7 @@ const RoadmapFlowchart = ({
                     description: '',
                     tasks: [],
                     notes: '',
-                    status: 'todo'
+                    status: 'TODO'
                 }, 
             }
 
