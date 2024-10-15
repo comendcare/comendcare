@@ -2,51 +2,54 @@
 import React, { useCallback, useEffect } from 'react'
 import {
     ReactFlow,
-    addEdge,
     MiniMap,
     Controls,
     useReactFlow,
-    OnNodesChange,
-    OnEdgesChange,
-    MarkerType,
     useStoreApi
 } from '@xyflow/react'
 import type { Edge, Node } from '@xyflow/react'
+import { useShallow } from 'zustand/react/shallow'
 
 import '@xyflow/react/dist/base.css'
 
 import MilestoneNode from '@/components/milestone-node'
 import { Button } from './ui/button'
+import { RoadmapState, useRoadmapStore } from '@/state/roadmap/roadmapStore'
+import { nanoid } from 'nanoid'
 
 const proOptions = { hideAttribution: true }
 
+const selector = (state: RoadmapState) => ({
+    selectedNodeId: state.selectedNodeId,
+    setSelectedNodeId: state.setSelectedNodeId,
+    nodes: state.nodes,
+    edges: state.edges,
+    setNodes: state.setNodes,
+    setEdges: state.setEdges,
+    onNodesChange: state.onNodesChange,
+    onEdgesChange: state.onEdgesChange,
+    onConnect: state.onConnect,
+    addNode: state.addNode,
+});
+
 const RoadmapFlowchart = ({ 
-    width, 
-    nodes,
-    edges,
-    setNodes,
-    setEdges,
-    onNodesChange,
-    onEdgesChange,
-    selectedNodeId, 
-    setSelectedNodeId
+    width
 }: { 
-    width: number, 
-    nodes: Node[],
-    edges: Edge[],
-    setNodes: React.Dispatch<React.SetStateAction<Node[]>>,
-    setEdges: React.Dispatch<React.SetStateAction<Edge[]>>,
-    onNodesChange: OnNodesChange<Node>,
-    onEdgesChange: OnEdgesChange<Edge>,
-    selectedNodeId: string | null, 
-    setSelectedNodeId: React.Dispatch<React.SetStateAction<string | null>>
+    width: number
 }) => {
-    const { fitView, screenToFlowPosition } = useReactFlow() 
+    const { 
+        selectedNodeId,
+        setSelectedNodeId,
+        nodes, 
+        edges, 
+        onNodesChange, 
+        onEdgesChange,
+        addNode, 
+        onConnect 
+    } = useRoadmapStore( useShallow(selector) )
+    const { fitView } = useReactFlow() 
     const store = useStoreApi()
     const nodeTypes = { MILESTONE: MilestoneNode }
-
-    let id = nodes.length + 1
-    const getId = () => `${id++}`
 
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
@@ -64,16 +67,17 @@ const RoadmapFlowchart = ({
             const centerX = -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
             const centerY = -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
         
-            const id = getId()
+            // const id = getId()
+            const id = nanoid()
             const newNode: Node = {
-                id,
+                id: id,
                 type: 'MILESTONE',
                 position: {
                     x: position ? position.x : centerX,
                     y: position ? position.y : centerY
                 },
                 data: {  
-                    title: `Milestone ${id}`,
+                    title: `New Milestone`,
                     description: '',
                     tasks: [],
                     notes: '',
@@ -81,44 +85,15 @@ const RoadmapFlowchart = ({
                 }, 
             }
 
-            setNodes((nds: Node[]) => nds.concat(newNode))
+            addNode(newNode)
             return newNode
         },
         []
     )
 
-    // Add an edge to the state when two nodes are connected
-    const onConnect = useCallback(
-        (params: any) => setEdges((eds: Edge[]) => addEdge(params, eds)),
-        [],
-    )
-
-    // Add a node to the state when an edge connection is dropped: https://reactflow.dev/examples/nodes/add-node-on-edge-drop
-    const onConnectEnd = useCallback(
-        (event: any, connectionState: any) => {
-            // when a connection is dropped on the pane it's not valid
-            if (!connectionState.isValid) {
-                // we need to remove the wrapper bounds, in order to get the correct position
-                const id = getId()
-                const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event
-
-                onAddMilestone({ x: clientX, y: clientY })
-                setEdges((eds: Edge[]) =>
-                    eds.concat({ 
-                        id, 
-                        source: connectionState.fromNode.id, 
-                        target: id, 
-                        markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 } 
-                    }),
-                )
-            }
-        },
-        [screenToFlowPosition]
-    )
-
     // add handleEditClick() callback to nodes in the flow
     // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
-    const updatedNodes = nodes.map((node: any) => ({
+    const updatedNodes = nodes.map((node: Node) => ({
         ...node,
         data: { ...node.data, handleEditClick: (nodeId: string) => setSelectedNodeId(nodeId) }
     }))
@@ -144,7 +119,6 @@ const RoadmapFlowchart = ({
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            onConnectEnd={onConnectEnd}
             nodeTypes={nodeTypes}
             fitView
             proOptions={proOptions}

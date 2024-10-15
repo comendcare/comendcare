@@ -36,7 +36,7 @@ export default async function RoadmapPage() {
 
     return (
         <main className="flex flex-col items-center w-screen h-screen mx-auto">
-            <Roadmap initNodes={dbNodes}/>
+            <Roadmap />
         </main>
     )
 }

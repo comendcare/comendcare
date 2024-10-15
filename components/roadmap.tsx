@@ -1,105 +1,29 @@
 "use client"
 
 import * as React from "react";
-import { useNavStore } from "@/state/nav/navStore"; // Zustand store
+import { useNavStore } from "@/state/nav/navStore";
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
+import { useShallow } from "zustand/react/shallow";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/components/ui/resizable";
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs";
 import Flow from "@/components/flow";
 import Kanban from "@/components/kanban";
-import { PlateEditor } from "@/components/plate-editor";
-import { useCallback, useState } from "react";
 import { Button } from "./ui/button";
 import { FaX } from "react-icons/fa6";
-import { addEdge, MarkerType, Position, ReactFlowProvider, useEdgesState, useNodesState } from "@xyflow/react";
+import { ReactFlowProvider } from "@xyflow/react";
 import EditMilestoneForm from "./edit-milestone-form";
-import MilestoneStatusButton, { StatusType } from "./milestone-status-button";
-import type { Edge, Node } from "@xyflow/react";
 
-// const initNodes: Node[] = [
-//     {
-//         id: '1',
-//         type: 'milestone',
-//         data: { 
-//             title: 'Basic Science - Disease',
-//             description: 'Complete the basic science for investigating our disease.',
-//             tasks: [
-//                 { name: 'Literature search to undersand disease', complete: true }
-//             ],
-//             notes: '',
-//             status: 'done'
-//         },
-//         position: { x: 0, y: 0 },
-//         selected: false,
-//         selectable: true
-//     },
-//     {
-//         id: '2',
-//         type: 'milestone',
-//         data: { 
-//             title: 'Disease Models',
-//             description: 'Discover, construct, and phenotype disease models.',
-//             deadline: new Date(),
-//             stakeholders: ['Person 1', 'Person 2'],
-//             labels: ['Label 1', 'Label 2'],
-//             tasks: [
-//                 { name: 'Identify the best models currently available', complete: true },
-//                 { name: 'Construct Knock-in Mice', complete: true },
-//                 { name: 'Phenotyping of Knock-in Mice', complete: false },
-//                 { name: 'Construct Fibroblasts', complete: true },
-//                 { name: 'Construct iPSCs', complete: true },
-//                 { name: 'Phenotype iPSCs', complete: false }
-//             ],
-//             dependencies: ['Basic Science - Disease'],
-//             budget: 100000,
-//             notes: 'Here are some notes as an example...',
-//             status: 'inprogress'
-//         },
-//         position: { x: 600, y: 0 },
-//         selected: false,
-//         selectable: true
-//     },
-//     {
-//         id: '3',
-//         type: 'milestone',
-//         data: { 
-//             title: 'Pre-Clinical Design',
-//             description: 'Pre-clinical design and production.',
-//             tasks: [
-//                 { name: 'Construct design', complete: false },
-//                 { name: 'Plasmid production', complete: false },
-//                 { name: 'AAV Production', complete: false},
-//             ],
-//             notes: 'Here are some extra notes as an example...',
-//             status: 'todo'
-//         },
-//         position: { x: 1200, y: 0 },
-//         selected: false,
-//         selectable: true
-//     }
-// ]
+const selector = (state: RoadmapState) => ({
+    selectedNodeId: state.selectedNodeId,
+    setSelectedNodeId: state.setSelectedNodeId,
+    nodes: state.nodes
+});
 
-const initEdges: Edge[] = [
-    {
-        id: 'e1-2',
-        source: '1',
-        target: '2',
-        markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 }
-    },
-    {
-        id: 'e2-3',
-        source: '2',
-        target: '3',
-        markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 }
-    },
-]
-
-export function Roadmap({ initNodes }: { initNodes: Node[] }) {
+export function Roadmap() {
     // Zustand state management
     const { defaultLayout, setLayout } = useNavStore()
-    const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
-    const [nodes, setNodes, onNodesChange] = useNodesState<Node>(initNodes)
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges)
+    const { selectedNodeId, setSelectedNodeId, nodes } = useRoadmapStore( useShallow(selector) )
 
     const handlePanelChange = (open: boolean) => {
         if (!open) setSelectedNodeId(null)
@@ -126,17 +50,7 @@ export function Roadmap({ initNodes }: { initNodes: Node[] }) {
                         {/* Roadmap View */}
                         <TabsContent value="roadmap" className="m-0 h-[calc(100vh-3.5rem)]">
                             <ReactFlowProvider>
-                                <Flow 
-                                    width={defaultLayout[0]}
-                                    selectedNodeId={selectedNodeId}
-                                    nodes={nodes}
-                                    edges={edges}
-                                    setNodes={setNodes}
-                                    setEdges={setEdges}
-                                    onNodesChange={onNodesChange}
-                                    onEdgesChange={onEdgesChange} 
-                                    setSelectedNodeId={setSelectedNodeId}
-                                />
+                                <Flow width={defaultLayout[0]} />
                             </ReactFlowProvider>
                         </TabsContent>
 
