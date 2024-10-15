@@ -67,7 +67,6 @@ const RoadmapFlowchart = ({
             const centerX = -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
             const centerY = -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
         
-            // const id = getId()
             const id = nanoid()
             const newNode: Node = {
                 id: id,

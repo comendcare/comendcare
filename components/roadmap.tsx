@@ -34,7 +34,6 @@ export function Roadmap() {
             <ResizablePanelGroup
                 direction="horizontal"
                 onLayout={(sizes: number[]) => {
-                    console.log(`set layout size: ${sizes}`)
                     setLayout(sizes); // Use Zustand's setLayout to save panel sizes
                 }}
                 className="h-full items-stretch"

@@ -128,56 +128,26 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => ({
 
 // Wrap saveToDatabase in a debounce function - to avoid spamming the database
 export const debouncedSaveToDatabase = debounce((nodes: Node[], edges: Edge[]) => {
-  // saveToDatabase(nodes, edges)
-  console.log(`Save to database: `)
-  console.log(`Nodes: ${JSON.stringify(nodes)}`)
-  console.log(`Edges: ${JSON.stringify(edges)}`)
-}, 500); // 500ms debounce
+  saveToDatabase(nodes, edges)
+}, 500)
 
-// const saveToDatabase = async (nodes: Node[], edges: Edge[]) => {
-//   try {
-//       // Save or update nodes
-//       await Promise.all(
-//           nodes.map(async (node: any) => {
-//               await prisma.node.upsert({
-//               where: { id: node.id },
-//               update: {
-//                   type: node.type,
-//                   positionX: node.position.x,
-//                   positionY: node.position.y,
-//                   // data: node.data,
-//               },
-//               create: {
-//                   id: node.id,
-//                   type: node.type,
-//                   positionX: node.position.x,
-//                   positionY: node.position.y,
-//                   // data: node.data,
-//               },
-//               });
-//           })
-//       );
+export const saveToDatabase = async (nodes: Node[], edges: Edge[]) => {
+  try {
+    const response = await fetch('/api/flow', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ nodes, edges }), // Send the nodes and edges as JSON
+    });
 
-//       // Save or update edges
-//       // await Promise.all(
-//       //     edges.map(async (edge: any) => {
-//       //         await prisma.edge.upsert({
-//       //         where: { id: edge.id },
-//       //         update: {
-//       //             sourceId: edge.source,
-//       //             targetId: edge.target,
-//       //             label: edge.label,
-//       //         },
-//       //         create: {
-//       //             id: edge.id,
-//       //             sourceId: edge.source,
-//       //             targetId: edge.target,
-//       //             label: edge.label,
-//       //         },
-//       //         });
-//       //     })
-//       // );
-//   } catch (error) {
-//       console.error(`Error saving roadmap state to database`, error)
-//   }
-// }
+    if (!response.ok) {
+      throw new Error('Failed to save flow');
+    }
+
+    const data = await response.json();
+    console.log(data.message); // "Flow saved successfully"
+  } catch (error) {
+    console.error('Error saving flow:', error);
+  }
+}
