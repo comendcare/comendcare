@@ -106,8 +106,12 @@ CloudSQL.
 The Vercel deployment assumes you provide the correct environment variables as defined in the `.env`.
 Be sure to include all the API keys, Authentication tokens, and database URLs.
 
-### Database
+### Subdomains
+Special care and configuration is needed when setting up subdomains in production.
+The `middleware.ts` file in the root directory contains a script that rewrites routes which can cause issues with auth.
+The `.env` contains a variable `NEXT_PUBLIC_ROOT_DOMAIN` that must be configured in each environment (both locally, and in each deployment environment like development, preview, and production).
 
+### Database
 There is a specific setup required because our backend and database are hosted on two different platforms.
 It's easy to access CloudSQL when deploying a backend on Cloud Run, but due to security concerns, accessing the deployed
 database via a backend hosted off-platform requires additional configuration.
@@ -116,11 +120,21 @@ The detailed process of implementing SSL certificates in deployment is
 defined [here](https://github.com/prisma/prisma/issues/1673).
 You may need to refer to additional support [here](https://github.com/prisma/prisma/issues/4324)
 and [here](https://stackoverflow.com/questions/77083613/how-to-use-ssl-with-prisma-on-a-vercel-deployment)
-Use `gcloud projects list` to list all existing projects associated with your account and
-use `gcloud config set project PROJECT_ID` to switch to an existing project.
-You will need gcloud to use CLI tools. When you run `gcloud run deploy` after deploying the database, it will
-automatically attempt to build and (re)deploy this project.
 
+To set up the connection:
+1. Navigate to the "Connections" tab of your cloud SQL instance.
+2. Navigate to the "Authorized networks" section of the "Networking" subtab.
+3. Create a new authorized network set to `0.0.0.0/0`, which allows any network to access the db (we'll set up the SSL certificates necessary to keep this secure next)
+    - The reason this is necessary is that Vercel is serverless, and so many different addresses will be used to access the hosted database.
+4. Navigate to the "Security" subtab.
+5. Scroll down to the "Manage client certificates" section and click "Create Client Certificate"
+6. Copy or download the `.pem` files and its content
+    - Be sure to copy everything (you will only see this once) and exactly as displayed (or your setup will fail)
+7. Convert the `.pem` files to base64 (you can do this in command line or using an online converter)
+8. Create new environment variables in your `.env` with the base64 SSL certificate content
+9. Check that you have `write-certificates.js` and/or `db.ts` setup to write the certificates back to the correct file in production.
+
+### Connecting to the database
 To access the deployed database locally, we use cloud sql proxy.
 First you'll need to authenticate yourself with: `gcloud auth application-default login`.
 This is session based, so occasionally you'll have to log in again, otherwise you won't be able to use cloud-sql-proxy.
@@ -138,8 +152,6 @@ You'll most likely have to run the `npx prisma migrate deploy` to apply migratio
 requests may fail due to database mismatches.
 Worst case scenario you may have to reset the database to apply migrations that have conflicts using the
 command `npx prisma migrate reset`.
-This resets the entire database and deletes all stored data entries. You probably won't do this once Scimantic has
-launched.
 Running `npx prisma migrate dev --name "your message here"` will create a new migration (which you will likely want to
 do locally).
 The `prisma migrate deploy` command will apply existing migrations without creating a new one (which you will likely
