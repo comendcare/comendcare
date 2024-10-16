@@ -162,6 +162,7 @@ model Milestone {
   nodeId      String     @unique
   title       String
   description String?
+  deadline    DateTime?
   notes       String?
   status      StatusType
   tasks       Task[]

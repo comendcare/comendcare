@@ -16,13 +16,14 @@ import { EditMilestoneForm } from "./edit-milestone-form";
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
-    nodes: state.nodes
+    nodes: state.nodes,
+    milestones: state.milestones
 })
 
-export function Roadmap({ initNodes, initEdges }: { initNodes: any[], initEdges: any[] }) {
+export function Roadmap({ initNodes, initEdges, initMilestones }: { initNodes: any[], initEdges: any[], initMilestones: any[] }) {
     // Zustand state management
     const { defaultLayout, setLayout } = useNavStore()
-    const { selectedNodeId, setSelectedNodeId, nodes } = useRoadmapStore( useShallow(selector) )
+    const { selectedNodeId, setSelectedNodeId, nodes, milestones } = useRoadmapStore( useShallow(selector) )
 
     const handlePanelChange = (open: boolean) => {
         if (!open) setSelectedNodeId(null)
@@ -47,7 +48,7 @@ export function Roadmap({ initNodes, initEdges }: { initNodes: any[], initEdges:
 
                         {/* Roadmap View */}
                         <TabsContent value="roadmap" className="m-0 h-[calc(100vh-3.5rem)]">
-                            <Flow width={defaultLayout[0]} initNodes={initNodes} initEdges={initEdges}/>
+                            <Flow width={defaultLayout[0]} initNodes={initNodes} initEdges={initEdges} initMilestones={initMilestones}/>
                         </TabsContent>
 
                         {/* Kanban View */}
@@ -67,8 +68,7 @@ export function Roadmap({ initNodes, initEdges }: { initNodes: any[], initEdges:
                                 <Button onClick={() => handlePanelChange(false)}><FaX /></Button>
                             </span>
                             <EditMilestoneForm 
-                                nodeData={nodes.find(node => node.id === selectedNodeId)?.data} 
-                                nodeId={nodes.find(node => node.id === selectedNodeId)?.id}
+                                milestoneData={milestones.find(milestone => milestone.nodeId === selectedNodeId)}
                             />
                         </ResizablePanel>
                     </>

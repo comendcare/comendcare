@@ -3,7 +3,9 @@ import prisma from '@/lib/prisma'; // Adjust the path to your Prisma client
 
 export async function POST(request: Request) {
   try {
-    const { nodes, edges } = await request.json();
+    const { nodes, edges, milestones } = await request.json()
+
+    console.log(`Milestones: `, milestones)
 
     // Save or update nodes
     await Promise.all(
@@ -21,14 +23,31 @@ export async function POST(request: Request) {
             positionY: node.position?.y,
             data: {
               create: {
-                title: node.data.title,
-                status: node.data.status
+                title: "New Milestone",
+                status: "TODO"
               }
             }
           },
-        });
+        })
       })
-    );
+    )
+
+    await Promise.all(
+      milestones.map(async (milestone: any) => {
+        console.log(`Saving Milestone Data: `, milestone)
+        await prisma.milestone.update({
+          where: { nodeId: milestone.nodeId },
+          data: {
+            // ...milestone,
+            title: milestone.title,
+            description: milestone.description,
+            deadline: milestone.deadline,
+            notes: milestone.notes,
+            tasks: undefined
+          }
+        })
+      })
+    )
 
     // Save or update edges
     await Promise.all(
@@ -44,12 +63,13 @@ export async function POST(request: Request) {
             source: edge.source,
             target: edge.target,
           },
-        });
+        })
       })
-    );
+    )
 
-    return NextResponse.json({ message: 'Flow saved successfully' }, { status: 200 });
+    return NextResponse.json({ message: 'Flow saved successfully' }, { status: 200 })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to save flow' }, { status: 500 });
+    console.error(`Error: `, error)
+    return NextResponse.json({ error: 'Failed to save flow' }, { status: 500 })
   }
 }

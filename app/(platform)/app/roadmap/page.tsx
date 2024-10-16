@@ -7,26 +7,11 @@ export default async function RoadmapPage() {
         (await prisma.node.findMany({
             include: { data: true }
         })).map(async (node) => {
-            const { id, type, data, positionX, positionY } = node
-    
-            const milestone = await prisma.milestone.findUnique({
-                where: { id: data?.id },
-                include: { tasks: true }
-            })
+            const { id, type, positionX, positionY } = node
     
             return {
                 id,
                 type,
-                data: {
-                    title: milestone?.title,
-                    description: milestone?.description,
-                    notes: milestone?.notes,
-                    status: milestone?.status,
-                    tasks: milestone?.tasks.map(task => ({
-                        name: task.name,
-                        complete: task.complete
-                    }))
-                },
                 position: {
                     x: positionX,
                     y: positionY
@@ -47,11 +32,13 @@ export default async function RoadmapPage() {
         })
     )
 
-    const milestones = await prisma.milestone.findMany()
+    const dbMilestones = await prisma.milestone.findMany({
+        include: { tasks: true }
+    })
 
     return (
         <main className="flex flex-col items-center w-screen h-screen mx-auto">
-            <Roadmap initNodes={dbNodes || []} initEdges={dbEdges || []}/>
+            <Roadmap initNodes={dbNodes || []} initEdges={dbEdges || []} initMilestones={dbMilestones || []} />
         </main>
     )
 }

@@ -18,6 +18,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 import MultiSelect from './multi-select'
 import { ScrollArea } from './ui/scroll-area'
 import MilestoneStatusButton from './milestone-status-button'
+import { RoadmapState, useRoadmapStore } from '@/state/roadmap/roadmapStore'
+import { useShallow } from 'zustand/react/shallow'
 
 const editMilestoneForm = z.object({
     title: z
@@ -31,30 +33,40 @@ const editMilestoneForm = z.object({
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
     deadline: z.date().optional(),
-    stakeholders: z.array(z.string()),
-    labels: z.array(z.string()),
-    subtasks: z.array(
+    stakeholders: z.array(z.string()).optional(),
+    labels: z.array(z.string()).optional(),
+    tasks: z.array(
         z.object({
             name: z.string(),
             complete: z.boolean()
         })
-    ),
-    dependencies: z.array(z.string()),
-    budget: z.number().optional(),
-    notes: z.string().optional(),
+    ).optional(),
+    dependencies: z.array(z.string()).optional(),
+    budget: z.number().optional().optional(),
+    notes: z.string().optional().optional(),
     status: z.string()
 })
 
-export function EditMilestoneForm({ nodeData, nodeId }: { nodeData: any, nodeId: string | undefined }) {
+const selector = (state: RoadmapState) => ({
+    milestones: state.milestones,
+    setMilestone: state.setMilestone
+})
+
+export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
+    const { 
+        milestones,
+        setMilestone
+    } = useRoadmapStore( useShallow(selector) )
+    
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
-            title: nodeData.title || "NO TITLE",
-            description: nodeData.description || "",
-            subtasks: nodeData.subtasks || [],
-            notes: nodeData.notes || "",
-            status: nodeData.status || "todo"
+            title: milestoneData?.title || "",
+            description: milestoneData?.description || "",
+            tasks:milestoneData?.tasks || [],
+            notes: milestoneData?.notes || "",
+            status: milestoneData?.status || "TODO"
         }
     })
 
@@ -63,15 +75,32 @@ export function EditMilestoneForm({ nodeData, nodeId }: { nodeData: any, nodeId:
     const deadline = form.watch("deadline")
     const stakeholders = form.watch("stakeholders")
     const labels = form.watch("labels")
-    const subtasks = form.watch("subtasks")
+    const tasks = form.watch("tasks")
     const dependencies = form.watch("dependencies")
     const budget = form.watch("budget")
     const notes = form.watch("notes")
     const status = form.watch("status")
 
     const handleMilestoneFormSubmit = () => {
-        console.log(`Handle Milstone Form Submit...`)
-        // TODO: submit logic
+        console.log(`Handle Milstone Form Submit... `)
+        console.log({
+            id: milestoneData.id,
+            title,
+            description,
+            deadline,
+            notes,
+            status
+        })
+        setMilestone(
+            milestoneData.id,
+            {
+                title,
+                ...(description ? { description } : undefined),
+                ...(deadline ? { deadline } : undefined),
+                ...(notes ? { notes } : undefined),
+                status
+            }
+        )
     }
     
     return (
@@ -85,7 +114,11 @@ export function EditMilestoneForm({ nodeData, nodeId }: { nodeData: any, nodeId:
                         <FormItem className="flex flex-col grow">
                             <FormLabel className="text-xl">{`Milestone Status:`}</FormLabel>
                             <FormControl>
-                                <MilestoneStatusButton milestoneStatus={nodeData.status} {...field}/>
+                                <MilestoneStatusButton
+                                    milestoneStatus={milestoneData?.status} 
+                                    onStatusChange={(status) => form.setValue('status', status)}
+                                    {...field}
+                                />
                             </FormControl>
                             <FormMessage/>
                         </FormItem>
@@ -165,7 +198,7 @@ export function EditMilestoneForm({ nodeData, nodeId }: { nodeData: any, nodeId:
                     )}
                 />
 
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name="stakeholders"
                     render={({ field }) => (
@@ -184,9 +217,9 @@ export function EditMilestoneForm({ nodeData, nodeId }: { nodeData: any, nodeId:
                             <FormMessage/>
                         </FormItem>
                     )}
-                />
+                /> */}
 
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name="labels"
                     render={({ field }) => (
@@ -205,19 +238,18 @@ export function EditMilestoneForm({ nodeData, nodeId }: { nodeData: any, nodeId:
                             <FormMessage/>
                         </FormItem>
                     )}
-                />
-
+                /> */}
             
-                <FormField
+                {/* <FormField
                     control={form.control}
-                    name="subtasks"
+                    name="tasks"
                     render={({ field }) => (
                         <FormItem className="flex flex-col grow">
-                            <FormLabel className="text-xl">{`Subtasks:`}</FormLabel>
+                            <FormLabel className="text-xl">{`tasks:`}</FormLabel>
                             <FormControl>
                                 <>
                                 <ul className="flex flex-col gap-2"> 
-                                    {field.value.map((task, index) => (
+                                    {field?.value?.map((task, index) => (
                                         <li key={index} className="flex flex-row gap-2 items-center">
                                             <TaskStatusButton task={task} />
                                             <p>{task.name}</p>
@@ -230,9 +262,9 @@ export function EditMilestoneForm({ nodeData, nodeId }: { nodeData: any, nodeId:
                             <FormMessage/>
                         </FormItem>
                     )}
-                />
+                /> */}
                 
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name="dependencies"
                     render={({ field }) => (
@@ -251,9 +283,9 @@ export function EditMilestoneForm({ nodeData, nodeId }: { nodeData: any, nodeId:
                             <FormMessage/>
                         </FormItem>
                     )}
-                />
+                /> */}
 
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name="budget"
                     render={({ field }) => (
@@ -270,7 +302,7 @@ export function EditMilestoneForm({ nodeData, nodeId }: { nodeData: any, nodeId:
                             <FormMessage/>
                         </FormItem>
                     )}
-                />
+                /> */}
 
                 <FormField
                     control={form.control}

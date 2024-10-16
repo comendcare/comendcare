@@ -24,6 +24,8 @@ const proOptions = { hideAttribution: true }
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
+    milestones: state.milestones,
+    setMilestones: state.setMilestones,
     nodes: state.nodes,
     edges: state.edges,
     setNodes: state.setNodes,
@@ -32,20 +34,24 @@ const selector = (state: RoadmapState) => ({
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
     addNode: state.addNode,
-});
+})
 
 const RoadmapFlowchart = ({ 
     width,
     initNodes,
-    initEdges
+    initEdges,
+    initMilestones
 }: { 
     width: number,
     initNodes: Node[],
-    initEdges: Edge[]
+    initEdges: Edge[],
+    initMilestones: any[]
 }) => {
     const { 
         selectedNodeId,
         setSelectedNodeId,
+        milestones,
+        setMilestones,
         nodes, 
         edges, 
         onNodesChange, 
@@ -60,11 +66,9 @@ const RoadmapFlowchart = ({
     const nodeTypes = { MILESTONE: MilestoneNode }
 
     useEffect(() => {
-        // const { initialNodes, initialEdges } = await getServerSideProps()
-
-        console.log(`set nodes...`, initNodes)
         setNodes(initNodes)
         setEdges(initEdges)
+        setMilestones(initMilestones)
       }, [initNodes, initEdges])
 
     // Add a empty milestone node
@@ -91,13 +95,14 @@ const RoadmapFlowchart = ({
                     x: position ? position?.x : centerX,
                     y: position ? position?.y : centerY
                 },
-                data: {  
-                    title: `New Milestone`,
-                    description: '',
-                    tasks: [],
-                    notes: '',
-                    status: 'TODO'
-                }, 
+                data: {}
+                // data: {  
+                //     title: `New Milestone`,
+                //     description: '',
+                //     tasks: [],
+                //     notes: '',
+                //     status: 'TODO'
+                // }, 
             }
 
             addNode(newNode)
@@ -110,7 +115,10 @@ const RoadmapFlowchart = ({
     // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
     const updatedNodes = nodes.map((node: Node) => ({
         ...node,
-        data: { ...node.data, handleEditClick: (nodeId: string) => setSelectedNodeId(nodeId) }
+        data: { 
+            ...milestones.find(milestone => milestone.nodeId === node.id),
+            handleEditClick: (nodeId: string) => setSelectedNodeId(nodeId) 
+        }
     }))
 
     // when the handle is adjusted (width changes) or a node is selected (details panel opens), fit the view
@@ -147,8 +155,6 @@ const RoadmapFlowchart = ({
 }
 
 function FlowWithProvider(props: any) {
-    // const serverData = await getServerSideProps()
-
     return (
       <ReactFlowProvider>
         <RoadmapFlowchart {...props} />
