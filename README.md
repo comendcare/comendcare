@@ -110,6 +110,8 @@ Be sure to include all the API keys, Authentication tokens, and database URLs.
 Special care and configuration is needed when setting up subdomains in production.
 The `middleware.ts` file in the root directory contains a script that rewrites routes which can cause issues with auth.
 The `.env` contains a variable `NEXT_PUBLIC_ROOT_DOMAIN` that must be configured in each environment (both locally, and in each deployment environment like development, preview, and production).
+Specifically, each branch's deployment on Vercel will need to define its own `NEXT_PUBLIC_ROOT_DOMAIN` (because each branch deployment has a unique domain name).
+If you don't specify a `NEXT_PUBLIC_ROOT_DOMAIN`, the branch deployment might still succeed, but attempting to open the branch deployment will lead to a 404 (due to middleware.ts relying on `NEXT_PUBLIC_ROOT_DOMAIN` to work).
 
 ### Database
 There is a specific setup required because our backend and database are hosted on two different platforms.
