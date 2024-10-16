@@ -24,6 +24,12 @@ export function hasDraggableData<T extends Active | Over>(
     return false;
 }
 
+export const getIp = async (): Promise<string> => {
+    const res = await fetch('https://api.ipify.org?format=json');
+    const data = await res.json();
+    return data.ip;
+}
+
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
 }
