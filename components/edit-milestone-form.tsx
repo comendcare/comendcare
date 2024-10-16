@@ -20,6 +20,9 @@ import { ScrollArea } from './ui/scroll-area'
 import MilestoneStatusButton from './milestone-status-button'
 import { RoadmapState, useRoadmapStore } from '@/state/roadmap/roadmapStore'
 import { useShallow } from 'zustand/react/shallow'
+import type { TaskType } from './milestone-node'
+import type { StatusType } from './milestone-status-button'
+import { FaTrash } from 'react-icons/fa6'
 
 const editMilestoneForm = z.object({
     title: z
@@ -64,7 +67,8 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
         defaultValues: {
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            tasks:milestoneData?.tasks || [],
+            deadline: milestoneData?.deadline || undefined,
+            tasks: milestoneData?.tasks || [],
             notes: milestoneData?.notes || "",
             status: milestoneData?.status || "TODO"
         }
@@ -88,6 +92,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
             title,
             description,
             deadline,
+            tasks,
             notes,
             status
         })
@@ -98,6 +103,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                 ...(description ? { description } : undefined),
                 ...(deadline ? { deadline } : undefined),
                 ...(notes ? { notes } : undefined),
+                tasks,
                 status
             }
         )
@@ -115,7 +121,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                             <FormLabel className="text-xl">{`Milestone Status:`}</FormLabel>
                             <FormControl>
                                 <MilestoneStatusButton
-                                    milestoneStatus={milestoneData?.status} 
+                                    milestoneStatus={field?.value as StatusType} 
                                     onStatusChange={(status) => form.setValue('status', status)}
                                     {...field}
                                 />
@@ -240,7 +246,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                     )}
                 /> */}
             
-                {/* <FormField
+                <FormField
                     control={form.control}
                     name="tasks"
                     render={({ field }) => (
@@ -249,20 +255,35 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                             <FormControl>
                                 <>
                                 <ul className="flex flex-col gap-2"> 
-                                    {field?.value?.map((task, index) => (
-                                        <li key={index} className="flex flex-row gap-2 items-center">
-                                            <TaskStatusButton task={task} />
-                                            <p>{task.name}</p>
-                                        </li>
+                                    {field?.value?.map((task, index) => ( 
+                                        <TaskField 
+                                            index={index} 
+                                            task={task} 
+                                            onDelete={() => (
+                                                form.setValue('tasks', field?.value?.filter((t, i) => i !== index))
+                                            )}
+                                            onNameChange={(newName) => {
+                                                form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, name: newName} : t))
+                                            }}
+                                            onCompleteChange={(complete) => {
+                                                form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, complete} : t))
+                                            }}
+                                        />
                                     ))}
                                 </ul>
-                                <Button onClick={() => {}}>Add a task</Button>
+                                <Button onClick={(e: any) => {
+                                    e.preventDefault()
+                                    form.setValue(
+                                        'tasks',
+                                        [...field?.value || [], { name: 'New Task', complete: false }]
+                                    )
+                                }}>Add a task</Button>
                                 </>
                             </FormControl>
                             <FormMessage/>
                         </FormItem>
                     )}
-                /> */}
+                />
                 
                 {/* <FormField
                     control={form.control}
@@ -329,5 +350,36 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
             </form>
             </ScrollArea>
         </Form>
+    )
+}
+
+const TaskField = ({ 
+    index, 
+    task, 
+    onDelete, 
+    onNameChange, 
+    onCompleteChange 
+}: { 
+    index: number, 
+    task: TaskType, 
+    onDelete: () => void, 
+    onNameChange: (newName: string) => void, 
+    onCompleteChange: (complete: boolean) => void 
+}) => {
+    const deleteTask = (e: React.MouseEvent<HTMLElement>) => {
+        e.preventDefault()
+        onDelete()
+    }
+
+    const nameChanged = (e: React.FormEvent<HTMLInputElement>) => {
+        onNameChange(e.currentTarget.value)
+    }
+
+    return (
+        <li key={index} className="flex flex-row gap-2 items-center">
+            <TaskStatusButton complete={task.complete} onClick={(complete) => onCompleteChange(complete)} />
+            <Input placeholder={task.name} value={task.name} onChange={nameChanged}/>
+            <Button size="icon" onClick={deleteTask}><FaTrash /></Button>
+        </li>
     )
 }

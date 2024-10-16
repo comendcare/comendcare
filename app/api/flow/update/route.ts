@@ -5,8 +5,6 @@ export async function POST(request: Request) {
   try {
     const { nodes, edges, milestones } = await request.json()
 
-    console.log(`Milestones: `, milestones)
-
     // Save or update nodes
     await Promise.all(
       nodes.map(async (node: any) => {
@@ -34,16 +32,24 @@ export async function POST(request: Request) {
 
     await Promise.all(
       milestones.map(async (milestone: any) => {
-        console.log(`Saving Milestone Data: `, milestone)
         await prisma.milestone.update({
           where: { nodeId: milestone.nodeId },
+          include: { tasks: true },
           data: {
             // ...milestone,
             title: milestone.title,
             description: milestone.description,
             deadline: milestone.deadline,
             notes: milestone.notes,
-            tasks: undefined
+            tasks: {
+              deleteMany: {},
+              createMany: {
+                data: milestone.tasks.map((task: any) => ({
+                    name: task.name,
+                    complete: task.complete,
+                }))
+              }
+            }
           }
         })
       })

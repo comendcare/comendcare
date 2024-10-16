@@ -4,16 +4,11 @@ import React, { memo, useState } from 'react';
 import { FaCheck } from 'react-icons/fa6';
 import { Button } from './ui/button';
 
-interface TaskType {
-    name: string,
-    complete: boolean
-}
-
-export default function TaskStatusButton({ task }: { task: TaskType }) {
-    const [complete, setComplete] = useState(task.complete)
-
-    const handleStateChange = () => {
-        setComplete(!complete)
+export default function TaskStatusButton({ complete, onClick }: { complete: boolean, onClick: (complete: boolean) => void }) {
+    const handleStateChange = (e: any) => {
+        e.preventDefault()
+        
+        onClick(!complete)
     }
 
     return (
