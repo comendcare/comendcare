@@ -95,14 +95,11 @@ const RoadmapFlowchart = ({
                     x: position ? position?.x : centerX,
                     y: position ? position?.y : centerY
                 },
-                data: {}
-                // data: {  
-                //     title: `New Milestone`,
-                //     description: '',
-                //     tasks: [],
-                //     notes: '',
-                //     status: 'TODO'
-                // }, 
+                data: {  
+                    title: `New Milestone`,
+                    tasks: [],
+                    status: 'TODO'
+                }, 
             }
 
             addNode(newNode)

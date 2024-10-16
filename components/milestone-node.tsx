@@ -41,7 +41,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
     return (
         <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>{props.data?.title || ""}</CardTitle>
+          <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
           <CardDescription>{props.data?.description || ""}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-8">
