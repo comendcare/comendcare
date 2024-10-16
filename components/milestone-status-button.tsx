@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 
 export type StatusType = 'TODO' | 'INPROGRESS' | 'DONE'
 
-export default function MilestoneStatusButton({ milestoneStatus, onStatusChange }: { milestoneStatus: StatusType, onStatusChange: (status: StatusType) => void }) {
+export default function MilestoneStatusButton({ milestoneStatus = 'TODO', onStatusChange }: { milestoneStatus?: StatusType, onStatusChange: (status: StatusType) => void }) {
     const StatusData = {
         'TODO': {
             text: 'TODO',

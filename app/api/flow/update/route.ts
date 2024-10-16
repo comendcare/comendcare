@@ -10,22 +10,22 @@ export async function POST(request: Request) {
       nodes.map(async (node: any) => {
         await prisma.node.upsert({
           where: { id: node.id },
-          update: {
-            positionX: node.position?.x,
-            positionY: node.position?.y,
-          },
-          create: {
-            id: node.id,
-            type: node.type,
-            positionX: node.position?.x,
-            positionY: node.position?.y,
-            data: {
-              create: {
-                title: "New Milestone",
-                status: "TODO"
+            update: {
+              positionX: node.position?.x,
+              positionY: node.position?.y,
+            },
+            create: {
+              id: node.id,
+              type: node.type,
+              positionX: node.position?.x,
+              positionY: node.position?.y,
+              data: {
+                create: {
+                  title: "New Milestone",
+                  status: "TODO"
+                }
               }
-            }
-          },
+            },
         })
       })
     )

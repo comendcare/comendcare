@@ -251,7 +251,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                     name="tasks"
                     render={({ field }) => (
                         <FormItem className="flex flex-col grow">
-                            <FormLabel className="text-xl">{`tasks:`}</FormLabel>
+                            <FormLabel className="text-xl">{`Tasks:`}</FormLabel>
                             <FormControl>
                                 <>
                                 <ul className="flex flex-col gap-2"> 
