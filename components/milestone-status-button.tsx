@@ -21,7 +21,9 @@ export default function MilestoneStatusButton({ milestoneStatus, onStatusChange 
         }
     }
 
-    const handleStateChange = () => {
+    const handleStateChange = (e: any) => {
+        e.preventDefault()
+
         if (milestoneStatus === 'TODO') {
             onStatusChange('INPROGRESS')
         } else if (milestoneStatus === 'INPROGRESS') {

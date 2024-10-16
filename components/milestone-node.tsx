@@ -23,7 +23,7 @@ export type MilestoneNode = Node<
   'MILESTONE'
 >
 
-interface TaskType {
+export interface TaskType {
     name: string,
     complete: boolean
 }
@@ -69,7 +69,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
             <ul className="flex flex-col gap-2"> 
                 {props.data?.tasks?.map((task, index) => (
                     <li key={index} className="flex flex-row gap-2 items-center">
-                        <TaskStatusButton task={task} />
+                        <TaskStatusButton complete={task.complete} onClick={() => {}} />
                         <p>{task.name}</p>
                     </li>
                 ))}

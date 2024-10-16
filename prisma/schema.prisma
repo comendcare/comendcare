@@ -173,7 +173,7 @@ model Task {
   name        String
   complete    Boolean
   milestone   Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  milestoneId String    @unique
+  milestoneId String
 }
 
 model Edge {
