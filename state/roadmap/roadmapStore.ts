@@ -84,6 +84,9 @@ const initEdges: Edge[] = [
 export type RoadmapState = {
   selectedNodeId: string | null
   setSelectedNodeId: (id: string | null) => void, 
+  milestones: any[],
+  setMilestones: (milestones: any[]) => void,
+  setMilestone: (id: string, newProperties: any) => void,
   nodes: Node[],
   edges: Edge[],
   onNodesChange: (changes: NodeChange[]) => void,
@@ -97,20 +100,28 @@ export type RoadmapState = {
 export const useRoadmapStore = create<RoadmapState>((set, get) => ({
   selectedNodeId: null,
   setSelectedNodeId: (id: string | null) => {
-    console.log(`SET SELECTED NODE ID: ${id}`)
     set({ selectedNodeId: id })
+  },
+  milestones: [],
+  setMilestones: (milestones: any[]) => { set({ milestones }) },
+  setMilestone: (id: string, newProperties: any) => {
+    const milestones = get().milestones.map((milestone) =>
+      milestone.id === id ? { ...milestone, ...newProperties } : milestone
+    )
+    set({ milestones })
+    debouncedSaveToDatabase(get().nodes, get().edges, milestones)
   },
   nodes: [],
   edges: [],
   onNodesChange: (changes: NodeChange[]) => {
     const nodes = applyNodeChanges(changes, get().nodes)
     set({ nodes })
-    debouncedSaveToDatabase(nodes, get().edges)
+    debouncedSaveToDatabase(nodes, get().edges, get().milestones)
   },
   onEdgesChange: (changes: EdgeChange[]) => {
     const edges = applyEdgeChanges(changes, get().edges) 
     set({ edges })
-    debouncedSaveToDatabase(get().nodes, edges)
+    debouncedSaveToDatabase(get().nodes, edges, get().milestones)
   },
   onConnect: (connection: any) => {
     const edges = addEdge(
@@ -118,30 +129,30 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => ({
       get().edges
     )
     set({ edges })
-    debouncedSaveToDatabase(get().nodes, edges)
+    debouncedSaveToDatabase(get().nodes, edges, get().milestones)
   },
   setNodes: (nodes: Node[]) => { set({ nodes }) },
   setEdges: (edges: Edge[]) => { set({ edges }) },
   addNode: (node: Node) => { 
     const nodes = [...get().nodes, node]
     set({ nodes }) 
-    debouncedSaveToDatabase(nodes, get().edges)
+    debouncedSaveToDatabase(nodes, get().edges, get().milestones)
   }
 }))
 
 // Wrap saveToDatabase in a debounce function - to avoid spamming the database
-export const debouncedSaveToDatabase = debounce((nodes: Node[], edges: Edge[]) => {
-  saveToDatabase(nodes, edges)
+export const debouncedSaveToDatabase = debounce((nodes: Node[], edges: Edge[], milestones: any[]) => {
+  saveToDatabase(nodes, edges, milestones)
 }, 500)
 
-export const saveToDatabase = async (nodes: Node[], edges: Edge[]) => {
+export const saveToDatabase = async (nodes: Node[], edges: Edge[], milestones: any[]) => {
   try {
     const response = await fetch('/api/flow/update', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ nodes, edges }), // Send the nodes and edges as JSON
+      body: JSON.stringify({ nodes, edges, milestones }), // Send the nodes and edges as JSON
     });
 
     if (!response.ok) {

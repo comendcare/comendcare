@@ -5,9 +5,7 @@ import { Button } from './ui/button';
 
 export type StatusType = 'TODO' | 'INPROGRESS' | 'DONE'
 
-export default function MilestoneStatusButton({ milestoneStatus = 'TODO' }: { milestoneStatus: StatusType | undefined }) {
-    const [status, setStatus] = useState(milestoneStatus)
-
+export default function MilestoneStatusButton({ milestoneStatus, onStatusChange }: { milestoneStatus: StatusType, onStatusChange: (status: StatusType) => void }) {
     const StatusData = {
         'TODO': {
             text: 'TODO',
@@ -24,21 +22,21 @@ export default function MilestoneStatusButton({ milestoneStatus = 'TODO' }: { mi
     }
 
     const handleStateChange = () => {
-        if (status === 'TODO') {
-            setStatus('INPROGRESS')
-        } else if (status === 'INPROGRESS') {
-            setStatus('DONE')
+        if (milestoneStatus === 'TODO') {
+            onStatusChange('INPROGRESS')
+        } else if (milestoneStatus === 'INPROGRESS') {
+            onStatusChange('DONE')
         } else {
-            setStatus('DONE')
+            onStatusChange('TODO')
         }
     }
 
     return (
         <Button 
-            className={`${StatusData[status].styling}`}
+            className={`${StatusData[milestoneStatus].styling}`}
             onClick={handleStateChange}
         >
-            {StatusData[status].text}
+            {StatusData[milestoneStatus].text}
         </Button>
     )
 }

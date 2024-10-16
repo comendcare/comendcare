@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import TaskStatusButton from './task-status-button';
 import { FaCalendar, FaCircleMinus, FaDollarSign, FaNoteSticky, FaPeopleGroup, FaTag, FaUser } from 'react-icons/fa6';
+import MilestoneStatusButton from './milestone-status-button';
 
 export type MilestoneNode = Node<
   {
@@ -33,15 +34,15 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
 
     const handleEditClick = () => {
         if (props.data?.handleEditClick) {
-            props.data.handleEditClick(props.id);
+            props.data.handleEditClick(props?.id);
         }
     }
 
     return (
         <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>{props.data?.title}</CardTitle>
-          <CardDescription>{props.data?.description}</CardDescription>
+          <CardTitle>{props.data?.title || ""}</CardTitle>
+          <CardDescription>{props.data?.description || ""}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-8">
             {props.data?.deadline && 
@@ -96,7 +97,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
             }
         </CardContent>
         <CardFooter className="flex justify-between">
-            <MilestoneStatusButton milestoneStatus={props.data?.status} />
+            <MilestoneStatusButton milestoneStatus={props.data.status} onStatusChange={() => {}} />
             <Button onClick={handleEditClick}>{`Edit Details`}</Button>
         </CardFooter>
 
@@ -111,44 +112,6 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
                 className="h-16"
             />
       </Card>
-    )
-}
-
-function MilestoneStatusButton({ milestoneStatus }: { milestoneStatus: StatusType }) {
-    const [status, setStatus] = useState(milestoneStatus)
-
-    const StatusData = {
-        'TODO': {
-            text: 'TODO',
-            styling: 'bg-red-100 border-red-600 text-red-600 hover-red-400',
-        },
-        'INPROGRESS': {
-            text: 'IN PROGRESS',
-            styling: 'bg-yellow-100 border-yellow-600 text-yellow-600',
-        },
-        'DONE': {
-            text: 'DONE',
-            styling: 'bg-green-100 border-green-600 text-green-600',
-        }
-    }
-
-    const handleStateChange = () => {
-        if (status === 'TODO') {
-            setStatus('INPROGRESS')
-        } else if (status === 'INPROGRESS') {
-            setStatus('DONE')
-        } else {
-            setStatus('TODO')
-        }
-    }
-
-    return (
-        <Button 
-            className={`${StatusData[status].styling}`}
-            onClick={handleStateChange}
-        >
-            {StatusData[status].text}
-        </Button>
     )
 }
 
