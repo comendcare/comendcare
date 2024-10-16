@@ -1,10 +1,10 @@
 "use server"
 import { render } from "@react-email/render"
 import sgMail from "@sendgrid/mail"
-import { ContactEmail } from "@/lib/email-templates/contact/contact-email"
+import ContactEmail from "@/packages/transactional/emails/contact/contact-email"
 import rateLimit from "@/lib/rate-limit";
 import axios from "axios";
-import { WaitlistEmail } from "./email-templates/contact/waitlist-email";
+import WaitlistEmail from "@/packages/transactional/emails/contact/waitlist-email";
 
 const limiter = rateLimit({
     interval: 600 * 1000, // 10 minutes (600 seconds * 1000 ms)
