@@ -135,8 +135,10 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => ({
   setEdges: (edges: Edge[]) => { set({ edges }) },
   addNode: (node: Node) => { 
     const nodes = [...get().nodes, node]
+    const milestones = [...get().milestones, node.data]
     set({ nodes }) 
-    debouncedSaveToDatabase(nodes, get().edges, get().milestones)
+    set({ milestones })
+    debouncedSaveToDatabase(nodes, get().edges, milestones)
   }
 }))
 

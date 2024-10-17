@@ -88,7 +88,8 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
     const handleMilestoneFormSubmit = () => {
         console.log(`Handle Milstone Form Submit... `)
         console.log({
-            id: milestoneData.id,
+            id: milestoneData?.id || 'no id set',
+            nodeId: milestoneData?.nodeId || 'no associated node', 
             title,
             description,
             deadline,
@@ -97,7 +98,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
             status
         })
         setMilestone(
-            milestoneData.id,
+            milestoneData?.id,
             {
                 title,
                 ...(description ? { description } : undefined),
