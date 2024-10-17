@@ -22,7 +22,7 @@ import { RoadmapState, useRoadmapStore } from '@/state/roadmap/roadmapStore'
 import { useShallow } from 'zustand/react/shallow'
 import type { TaskType } from './milestone-node'
 import type { StatusType } from './milestone-status-button'
-import { FaTrash } from 'react-icons/fa6'
+import { FaDollarSign, FaTrash } from 'react-icons/fa6'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
 const editMilestoneForm = z.object({
@@ -38,6 +38,7 @@ const editMilestoneForm = z.object({
         .optional(),
     timelineMonth: z.string().optional(),
     timelineYear: z.string().optional(),
+    budget: z.number().optional(),
     stakeholders: z.array(z.string()).optional(),
     labels: z.array(z.string()).optional(),
     tasks: z.array(
@@ -47,8 +48,7 @@ const editMilestoneForm = z.object({
         })
     ).optional(),
     dependencies: z.array(z.string()).optional(),
-    budget: z.number().optional().optional(),
-    notes: z.string().optional().optional(),
+    notes: z.string().optional(),
     status: z.string()
 })
 
@@ -97,8 +97,9 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
         defaultValues: {
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            timelineMonth: milestoneData?.timelineMonth || monthsList[today.getMonth()],
-            timelineYear: milestoneData?.timelineYear || today.getFullYear().toString(),
+            timelineMonth: milestoneData?.timelineMonth || undefined,
+            timelineYear: milestoneData?.timelineYear || undefined,
+            budget: milestoneData?.budget || undefined,
             tasks: milestoneData?.tasks || [],
             notes: milestoneData?.notes || "",
             status: milestoneData?.status || "TODO"
@@ -109,11 +110,11 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
     const description = form.watch("description")
     const timelineMonth = form.watch("timelineMonth")
     const timelineYear = form.watch("timelineYear")
+    const budget = form.watch("budget")
     const stakeholders = form.watch("stakeholders")
     const labels = form.watch("labels")
     const tasks = form.watch("tasks")
     const dependencies = form.watch("dependencies")
-    const budget = form.watch("budget")
     const notes = form.watch("notes")
     const status = form.watch("status")
 
@@ -126,6 +127,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
             description,
             timelineMonth,
             timelineYear,
+            budget,
             tasks,
             // notes,
             status
@@ -137,6 +139,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                 ...(description !== undefined && description !== null ? { description } : undefined),
                 ...(timelineMonth ? { timelineMonth } : undefined),
                 ...(timelineYear ? { timelineYear } : undefined),
+                ...(budget ? { budget } : undefined),
                 // ...(notes ? { notes } : undefined),
                 tasks,
                 status
@@ -175,7 +178,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                             <FormControl>
                                 <Input
                                     id="title"
-                                    placeholder={field.value}
+                                    placeholder={`Enter a title`}
                                     defaultValue={field.value}
                                     {...field}
                                 />
@@ -194,7 +197,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                             <FormControl>
                                 <Textarea
                                     id="description"
-                                    placeholder={field.value}
+                                    placeholder={`Enter a description`}
                                     defaultValue={field.value}
                                     {...field}
                                 />
@@ -204,6 +207,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                     )}
                 />
 
+                <span className="flex flex-col gap-2">
                 <FormLabel className="text-xl">{`Timeline - Date of Completion:`}</FormLabel>
                 <span className="flex flex-col md:flex-row gap-4">
                 <FormField
@@ -251,6 +255,31 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                     )}
                 />
                 </span>
+                </span>
+
+                <FormField
+                    control={form.control}
+                    name="budget"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col grow">
+                            <FormLabel className="text-xl">{`Budget:`}</FormLabel>
+                            <FormControl>
+                                <span className="flex flex-row gap-2 items-center">
+                                <FaDollarSign size={24}/>
+                                <Input
+                                    id="budget"
+                                    type="number"
+                                    placeholder={`Enter a number`}
+                                    defaultValue={field.value}
+                                    // value={field.value}
+                                    onChange={(e)=> field.onChange(Number(e.target.value))}
+                                />
+                                </span>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
 
                 {/* <FormField
                     control={form.control}
@@ -346,25 +375,6 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                                         { id: 2, name: 'Milestone 2' }
                                     ]}
                                     maxSelectable={5}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                /> */}
-
-                {/* <FormField
-                    control={form.control}
-                    name="budget"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-col grow">
-                            <FormLabel className="text-xl">{`Budget:`}</FormLabel>
-                            <FormControl>
-                                <Input
-                                    id="budget"
-                                    placeholder={field.value?.toString()}
-                                    defaultValue={field.value?.toString()}
                                     {...field}
                                 />
                             </FormControl>

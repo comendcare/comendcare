@@ -40,6 +40,7 @@ export async function POST(request: Request) {
             description: milestone.description,
             timelineMonth: milestone.timelineMonth,
             timelineYear: milestone.timelineYear,
+            budget: milestone.budget,
             // notes: milestone.notes,
             tasks: {
               deleteMany: {},

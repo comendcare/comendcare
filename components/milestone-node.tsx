@@ -14,11 +14,11 @@ export type MilestoneNode = Node<
     description?: string,
     timelineMonth?: string,
     timelineYear?: string,
+    budget?: number,
     stakeholders?: string[],
     labels?: string[],
     tasks: TaskType[],
     dependencies?: string[],
-    budget?: number,
     notes?: string,
     status: StatusType,
     handleEditClick: (nodeId: string) => void
