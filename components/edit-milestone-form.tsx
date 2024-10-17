@@ -24,6 +24,9 @@ import type { TaskType } from './milestone-node'
 import type { StatusType } from './milestone-status-button'
 import { FaDollarSign, FaTrash } from 'react-icons/fa6'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
+import { DialogClose } from '@radix-ui/react-dialog'
+import { useReactFlow } from '@xyflow/react'
 
 const editMilestoneForm = z.object({
     title: z
@@ -54,8 +57,9 @@ const editMilestoneForm = z.object({
 })
 
 const selector = (state: RoadmapState) => ({
-    milestones: state.milestones,
-    setMilestone: state.setMilestone
+    setSelectedNodeId: state.setSelectedNodeId,
+    onNodesChange: state.onNodesChange,
+    setMilestone: state.setMilestone,
 })
 
 const monthsList = [
@@ -88,8 +92,9 @@ const getYearsList = () => {
 
 export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
     const { 
-        milestones,
-        setMilestone
+        setSelectedNodeId,
+        onNodesChange,
+        setMilestone,
     } = useRoadmapStore( useShallow(selector) )
     
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -149,6 +154,12 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                 status
             }
         )
+    }
+
+    const handleDeleteMilestone = (e: React.MouseEvent<HTMLElement>) => {
+        console.log(`handle Milestone delete...`)
+        onNodesChange([{ id: milestoneData?.nodeId, type: 'remove' }])
+        setSelectedNodeId(null)
     }
     
     return (
@@ -444,7 +455,28 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                     )}
                 /> */}
 
-                <span className="flex justify-between">
+                <span className="flex justify-end gap-4 flex-wrap">
+                    <Dialog>
+                        <DialogTrigger>
+                            <Button type="button" variant={'destructive'}>Delete Milestone</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogDescription>
+                                This action cannot be undone. This will permanently delete your milestone and it's data.
+                            </DialogDescription>
+                            <DialogFooter>
+                                <DialogClose>
+                                    <Button type="button">Cancel</Button>
+                                </DialogClose>
+                                <DialogClose>
+                                    <Button type="button" variant={'destructive'} onClick={handleDeleteMilestone}>Delete Milestone</Button>
+                                </DialogClose>
+                            </DialogFooter>
+                            </DialogHeader>
+                        </DialogContent>
+                    </Dialog>
                     <Button type="submit">Save Changes</Button>
                 </span>
             </form>
