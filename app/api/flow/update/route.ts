@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     const { nodes, edges, milestones } = await request.json()
 
     // console.log(`nodes:`, nodes)
-    console.log(`milestones:`, milestones)
+    // console.log(`milestones:`, milestones)
 
     // Delete any nodes that are not in the request
     const nodeIds = nodes.map((node: any) => node.id)

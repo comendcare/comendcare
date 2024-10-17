@@ -114,8 +114,11 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => ({
   edges: [],
   onNodesChange: (changes: NodeChange[]) => {
     const nodes = applyNodeChanges(changes, get().nodes)
+    const nodeIds = nodes.map(node => node.id)
+    const milestones = get().milestones.filter(milestone => nodeIds.includes(milestone.nodeId))
     set({ nodes })
-    debouncedSaveToDatabase(nodes, get().edges, get().milestones)
+    set({ milestones })
+    debouncedSaveToDatabase(nodes, get().edges, milestones)
   },
   onEdgesChange: (changes: EdgeChange[]) => {
     const edges = applyEdgeChanges(changes, get().edges) 
