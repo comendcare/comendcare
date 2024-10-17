@@ -15,6 +15,7 @@ export type MilestoneNode = Node<
     timelineMonth?: string,
     timelineYear?: string,
     budget?: number,
+    papers?: string[],
     stakeholders?: string[],
     labels?: string[],
     tasks: TaskType[],

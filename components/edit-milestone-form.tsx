@@ -28,10 +28,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 const editMilestoneForm = z.object({
     title: z
         .string({
-            required_error: "Please provide a name."
+            required_error: "Please provide a title."
         })
-        .min(1, "Name is required")
-        .max(100, "Name must be less than 100 characters"),
+        .min(1, "Title is required")
+        .max(100, "Title must be less than 100 characters"),
     description: z
         .string()
         .max(1000, "Description must be less than 1000 characters")
@@ -39,6 +39,7 @@ const editMilestoneForm = z.object({
     timelineMonth: z.string().optional(),
     timelineYear: z.string().optional(),
     budget: z.number().optional(),
+    papers: z.array(z.string()).optional(),
     stakeholders: z.array(z.string()).optional(),
     labels: z.array(z.string()).optional(),
     tasks: z.array(
@@ -100,6 +101,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
             timelineMonth: milestoneData?.timelineMonth || undefined,
             timelineYear: milestoneData?.timelineYear || undefined,
             budget: milestoneData?.budget || undefined,
+            papers: milestoneData?.papers || undefined,
             tasks: milestoneData?.tasks || [],
             notes: milestoneData?.notes || "",
             status: milestoneData?.status || "TODO"
@@ -111,6 +113,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
     const timelineMonth = form.watch("timelineMonth")
     const timelineYear = form.watch("timelineYear")
     const budget = form.watch("budget")
+    const papers = form.watch("papers")
     const stakeholders = form.watch("stakeholders")
     const labels = form.watch("labels")
     const tasks = form.watch("tasks")
@@ -140,6 +143,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                 ...(timelineMonth ? { timelineMonth } : undefined),
                 ...(timelineYear ? { timelineYear } : undefined),
                 ...(budget ? { budget } : undefined),
+                papers,
                 // ...(notes ? { notes } : undefined),
                 tasks,
                 status
@@ -208,7 +212,8 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                 />
 
                 <span className="flex flex-col gap-2">
-                <FormLabel className="text-xl">{`Timeline - Date of Completion:`}</FormLabel>
+                <FormLabel className="text-xl">{`Timeline:`}</FormLabel>
+                <FormDescription>{`Enter this milestone's completion timeline (past or future)`}</FormDescription>
                 <span className="flex flex-col md:flex-row gap-4">
                 <FormField
                     control={form.control}
@@ -275,6 +280,43 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                                     onChange={(e)=> field.onChange(Number(e.target.value))}
                                 />
                                 </span>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="papers"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col grow">
+                            <FormLabel className="text-xl">{`Associated Papers:`}</FormLabel>
+                            <FormDescription>{`Include links to any papers associated with this milestone`}</FormDescription>
+                            <FormControl>
+                                <>
+                                <ul className="flex flex-col gap-2"> 
+                                    {field?.value?.map((link, index) => ( 
+                                        <PaperField 
+                                            index={index} 
+                                            value={link} 
+                                            onDelete={() => (
+                                                form.setValue('papers', field?.value?.filter((t, i) => i !== index))
+                                            )}
+                                            onValueChange={(newValue) => {
+                                                form.setValue('papers', field?.value?.map((currentValue, i) => i === index ? newValue : currentValue))
+                                            }}
+                                        />
+                                    ))}
+                                </ul>
+                                <Button onClick={(e: any) => {
+                                    e.preventDefault()
+                                    form.setValue(
+                                        'papers',
+                                        [...field?.value || [], ""]
+                                    )
+                                }}>{`Add an Associated Paper`}</Button>
+                                </>
                             </FormControl>
                             <FormMessage/>
                         </FormItem>
@@ -408,6 +450,34 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
             </form>
             </ScrollArea>
         </Form>
+    )
+}
+
+const PaperField = ({
+    index,
+    value,
+    onDelete,
+    onValueChange
+}: {
+    index: number,
+    value: string,
+    onDelete: () => void, 
+    onValueChange: (newValue: string) => void
+}) => {
+    const deleteElement = (e: React.MouseEvent<HTMLElement>) => {
+        e.preventDefault()
+        onDelete()
+    }
+
+    const valueChanged = (e: React.FormEvent<HTMLInputElement>) => {
+        onValueChange(e.currentTarget.value)
+    }
+
+    return (
+        <li key={index} className="flex flex-row gap-2 items-center">
+            <Input placeholder={`Enter a link to the associated paper`} value={value} onChange={valueChanged}/>
+            <Button size="icon" onClick={deleteElement}><FaTrash /></Button>
+        </li>
     )
 }
 
