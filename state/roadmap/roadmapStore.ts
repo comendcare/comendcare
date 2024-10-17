@@ -102,9 +102,9 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => ({
     set({ selectedNodeId: id })
   },
   milestones: [],
-  setMilestone: (id: string, newProperties: any) => {
+  setMilestone: (nodeId: string, newProperties: any) => {
     const milestones = get().milestones.map((milestone) =>
-      milestone.id === id ? { ...milestone, ...newProperties } : milestone
+      milestone.nodeId === nodeId ? { ...milestone, ...newProperties } : milestone
     )
     set({ milestones })
     debouncedSaveToDatabase(get().nodes, get().edges, milestones)
