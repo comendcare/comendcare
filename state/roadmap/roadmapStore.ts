@@ -9,9 +9,9 @@ const initNodes: Node[] = [
         data: { 
             title: 'Basic Science - Disease',
             description: 'Complete the basic science for investigating our disease.',
-            tasks: [
-                { name: 'Literature search to undersand disease', complete: true }
-            ],
+            // tasks: [
+            //     { name: 'Literature search to undersand disease', complete: true }
+            // ],
             notes: '',
             status: 'DONE'
         },
@@ -27,14 +27,14 @@ const initNodes: Node[] = [
             description: 'Discover, construct, and phenotype disease models.',
             stakeholders: ['Person 1', 'Person 2'],
             labels: ['Label 1', 'Label 2'],
-            tasks: [
-                { name: 'Identify the best models currently available', complete: true },
-                { name: 'Construct Knock-in Mice', complete: true },
-                { name: 'Phenotyping of Knock-in Mice', complete: false },
-                { name: 'Construct Fibroblasts', complete: true },
-                { name: 'Construct iPSCs', complete: true },
-                { name: 'Phenotype iPSCs', complete: false }
-            ],
+            // tasks: [
+            //     { name: 'Identify the best models currently available', complete: true },
+            //     { name: 'Construct Knock-in Mice', complete: true },
+            //     { name: 'Phenotyping of Knock-in Mice', complete: false },
+            //     { name: 'Construct Fibroblasts', complete: true },
+            //     { name: 'Construct iPSCs', complete: true },
+            //     { name: 'Phenotype iPSCs', complete: false }
+            // ],
             dependencies: ['Basic Science - Disease'],
             budget: 100000,
             notes: 'Here are some notes as an example...',
@@ -50,11 +50,11 @@ const initNodes: Node[] = [
         data: { 
             title: 'Pre-Clinical Design',
             description: 'Pre-clinical design and production.',
-            tasks: [
-                { name: 'Construct design', complete: false },
-                { name: 'Plasmid production', complete: false },
-                { name: 'AAV Production', complete: false},
-            ],
+            // tasks: [
+            //     { name: 'Construct design', complete: false },
+            //     { name: 'Plasmid production', complete: false },
+            //     { name: 'AAV Production', complete: false},
+            // ],
             notes: 'Here are some extra notes as an example...',
             status: 'TODO'
         },

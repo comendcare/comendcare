@@ -18,7 +18,7 @@ export type MilestoneNode = Node<
     papers?: string[],
     stakeholders?: string[],
     labels?: string[],
-    tasks: TaskType[],
+    // tasks: TaskType[],
     dependencies?: string[],
     notes?: string,
     status: StatusType,
