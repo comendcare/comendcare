@@ -100,7 +100,7 @@ const RoadmapFlowchart = ({
                     nodeId: id,
                     title: `New Milestone`,
                     papers: [],
-                    tasks: [],
+                    // tasks: [],
                     status: 'TODO'
                 }, 
             }

@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       milestones.map(async (milestone: any) => {
         await prisma.milestone.update({
           where: { nodeId: milestone.nodeId },
-          include: { tasks: true },
+          // include: { tasks: true },
           data: {
             title: milestone.title,
             description: milestone.description,
@@ -58,15 +58,15 @@ export async function POST(request: Request) {
             budget: milestone.budget,
             papers: milestone.papers,
             // notes: milestone.notes,
-            tasks: {
-              deleteMany: {},
-              createMany: {
-                data: milestone.tasks?.map((task: any) => ({
-                    name: task?.name,
-                    complete: task?.complete,
-                }))
-              }
-            },
+            // tasks: {
+            //   deleteMany: {},
+            //   createMany: {
+            //     data: milestone.tasks?.map((task: any) => ({
+            //         name: task?.name,
+            //         complete: task?.complete,
+            //     }))
+            //   }
+            // },
             status: milestone.status || 'TODO'
           }
         })

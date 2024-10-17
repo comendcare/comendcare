@@ -45,12 +45,12 @@ const editMilestoneForm = z.object({
     papers: z.array(z.string()).optional(),
     stakeholders: z.array(z.string()).optional(),
     labels: z.array(z.string()).optional(),
-    tasks: z.array(
-        z.object({
-            name: z.string(),
-            complete: z.boolean()
-        })
-    ).optional(),
+    // tasks: z.array(
+    //     z.object({
+    //         name: z.string(),
+    //         complete: z.boolean()
+    //     })
+    // ).optional(),
     dependencies: z.array(z.string()).optional(),
     notes: z.string().optional(),
     status: z.string()
@@ -107,7 +107,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
             timelineYear: milestoneData?.timelineYear || undefined,
             budget: milestoneData?.budget || undefined,
             papers: milestoneData?.papers || undefined,
-            tasks: milestoneData?.tasks || [],
+            // tasks: milestoneData?.tasks || [],
             notes: milestoneData?.notes || "",
             status: milestoneData?.status || "TODO"
         }

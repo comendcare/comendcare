@@ -7,7 +7,7 @@ export async function POST(request: Request) {
 
     const milestone = await prisma.milestone.findUnique({
         where: { nodeId: nodeId },
-        include: { tasks: true }
+        // include: { tasks: true }
     })
 
     return NextResponse.json({
