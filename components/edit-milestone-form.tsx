@@ -141,7 +141,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
             status
         })
         setMilestone(
-            milestoneData?.id,
+            milestoneData?.nodeId,
             {
                 title,
                 ...(description !== undefined && description !== null ? { description } : undefined),
