@@ -23,6 +23,7 @@ import { useShallow } from 'zustand/react/shallow'
 import type { TaskType } from './milestone-node'
 import type { StatusType } from './milestone-status-button'
 import { FaTrash } from 'react-icons/fa6'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 
 const editMilestoneForm = z.object({
     title: z
@@ -35,7 +36,8 @@ const editMilestoneForm = z.object({
         .string()
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
-    deadline: z.date().optional(),
+    timelineMonth: z.string().optional(),
+    timelineYear: z.string().optional(),
     stakeholders: z.array(z.string()).optional(),
     labels: z.array(z.string()).optional(),
     tasks: z.array(
@@ -55,6 +57,34 @@ const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone
 })
 
+const monthsList = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+]
+
+const today = new Date()
+
+const getYearsList = () => {
+    const currentYear = today.getFullYear()
+    let years = []
+
+    for (let i = currentYear-100; i <= currentYear+100; i++) {
+        years.push(i.toString())
+    }
+
+    return years
+}
+
 export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
     const { 
         milestones,
@@ -67,7 +97,8 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
         defaultValues: {
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            deadline: milestoneData?.deadline || undefined,
+            timelineMonth: milestoneData?.timelineMonth || monthsList[today.getMonth()],
+            timelineYear: milestoneData?.timelineYear || today.getFullYear().toString(),
             tasks: milestoneData?.tasks || [],
             notes: milestoneData?.notes || "",
             status: milestoneData?.status || "TODO"
@@ -76,7 +107,8 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
 
     const title = form.watch("title")
     const description = form.watch("description")
-    const deadline = form.watch("deadline")
+    const timelineMonth = form.watch("timelineMonth")
+    const timelineYear = form.watch("timelineYear")
     const stakeholders = form.watch("stakeholders")
     const labels = form.watch("labels")
     const tasks = form.watch("tasks")
@@ -92,18 +124,20 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
             nodeId: milestoneData?.nodeId || 'no associated node', 
             title,
             description,
-            deadline,
+            timelineMonth,
+            timelineYear,
             tasks,
-            notes,
+            // notes,
             status
         })
         setMilestone(
             milestoneData?.id,
             {
                 title,
-                ...(description ? { description } : undefined),
-                ...(deadline ? { deadline } : undefined),
-                ...(notes ? { notes } : undefined),
+                ...(description !== undefined && description !== null ? { description } : undefined),
+                ...(timelineMonth ? { timelineMonth } : undefined),
+                ...(timelineYear ? { timelineYear } : undefined),
+                // ...(notes ? { notes } : undefined),
                 tasks,
                 status
             }
@@ -170,40 +204,53 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                     )}
                 />
 
+                <FormLabel className="text-xl">{`Timeline - Date of Completion:`}</FormLabel>
+                <span className="flex flex-col md:flex-row gap-4">
                 <FormField
                     control={form.control}
-                    name="deadline"
+                    name="timelineMonth"
                     render={({ field }) => (
-                        <FormItem className="flex flex-col grow">
-                            <FormLabel className="text-xl">{`Deadline:`}</FormLabel>
-                            <FormControl>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-[280px] justify-start text-left font-normal",
-                                            !field.value && "text-muted-foreground"
-                                        )}
-                                        >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0">
-                                        <Calendar
-                                            mode="single"
-                                            selected={field.value}
-                                            onSelect={field.onChange}
-                                            initialFocus
-                                        />
-                                    </PopoverContent>
-                                </Popover>
-                            </FormControl>
-                            <FormMessage/>
+                        <FormItem className='grow'>
+                            <FormLabel>{`Month:`}</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a month" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {monthsList.map((month: string) => (
+                                        <SelectItem value={month}>{month}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
+                <FormField
+                    control={form.control}
+                    name="timelineYear"
+                    render={({ field }) => (
+                        <FormItem className='grow'>
+                            <FormLabel>{`Year:`}</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                                <FormControl>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a year" />
+                                </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {getYearsList().map((year: string) => (
+                                        <SelectItem value={year}>{year}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                </span>
 
                 {/* <FormField
                     control={form.control}
@@ -247,7 +294,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                     )}
                 /> */}
             
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name="tasks"
                     render={({ field }) => (
@@ -284,7 +331,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                             <FormMessage/>
                         </FormItem>
                     )}
-                />
+                /> */}
                 
                 {/* <FormField
                     control={form.control}
@@ -326,7 +373,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                     )}
                 /> */}
 
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name="notes"
                     render={({ field }) => (
@@ -343,7 +390,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                             <FormMessage/>
                         </FormItem>
                     )}
-                />
+                /> */}
 
                 <span className="flex justify-between">
                     <Button type="submit">Save Changes</Button>

@@ -21,8 +21,8 @@ export async function POST(request: Request) {
               positionY: node.position?.y,
               data: {
                 create: {
-                  title: node.data.title,
-                  status: node.data.status
+                  title: node.data?.title || "New Milestone",
+                  status: node.data?.status || "TODO"
                 }
               }
             },
@@ -36,11 +36,11 @@ export async function POST(request: Request) {
           where: { nodeId: milestone.nodeId },
           include: { tasks: true },
           data: {
-            // ...milestone,
             title: milestone.title,
             description: milestone.description,
-            deadline: milestone.deadline,
-            notes: milestone.notes,
+            timelineMonth: milestone.timelineMonth,
+            timelineYear: milestone.timelineYear,
+            // notes: milestone.notes,
             tasks: {
               deleteMany: {},
               createMany: {
