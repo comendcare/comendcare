@@ -1,13 +1,15 @@
-import React, { memo, useState } from 'react';
+import React, { memo } from 'react';
 import { Handle, Position, Node, NodeProps } from '@xyflow/react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import TaskStatusButton from './task-status-button';
-import { FaCalendar, FaCircleMinus, FaDollarSign, FaNoteSticky, FaPeopleGroup, FaTag, FaUser } from 'react-icons/fa6';
+import { FaCalendar, FaDollarSign } from 'react-icons/fa6';
 import MilestoneStatusButton from './milestone-status-button';
+import { truncate } from '@/lib/utils'
 
 export type MilestoneNode = Node<
   {
+    nodeId: string,
     title: string,
     description?: string,
     deadline?: Date,
@@ -42,7 +44,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
         <Card className="w-[350px]">
         <CardHeader>
           <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
-          <CardDescription>{props.data?.description || ""}</CardDescription>
+          <CardDescription>{truncate(props.data?.description || "", 200)}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-8">
             {props.data?.deadline && 
@@ -52,47 +54,40 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
                 </span>
             }
 
-            {props.data?.stakeholders && props.data?.stakeholders.length > 0 && 
+            {/* {props.data?.stakeholders && props.data?.stakeholders.length > 0 && 
                 <span className='flex gap-2 items-center'>
                     <FaUser size={24}/>
                     <p>{props.data.stakeholders.join(', ')}</p>
                 </span>
-            }
+            } */}
 
-            {props.data?.labels && props.data?.labels.length > 0 && 
+            {/* {props.data?.labels && props.data?.labels.length > 0 && 
                 <span className='flex gap-2 items-center'>
                     <FaTag size={24}/>
                     <p>{props.data.labels.join(', ')}</p>
                 </span>
-            }
+            } */}
 
-            <ul className="flex flex-col gap-2"> 
+            {/* <ul className="flex flex-col gap-2"> 
                 {props.data?.tasks?.map((task, index) => (
                     <li key={index} className="flex flex-row gap-2 items-center">
                         <TaskStatusButton complete={task.complete} onClick={() => {}} />
                         <p>{task.name}</p>
                     </li>
                 ))}
-            </ul>
+            </ul> */}
 
-            {props.data?.dependencies && props.data?.dependencies.length > 0 && 
+            {/* {props.data?.dependencies && props.data?.dependencies.length > 0 && 
                 <span className='flex gap-2 items-center'>
                     <FaCircleMinus size={24}/>
                     <p>{props.data.dependencies.join(', ')}</p>
                 </span>
-            }
+            } */}
 
             {props.data?.budget && 
                 <span className='flex gap-2 items-center'>
                     <FaDollarSign size={24}/>
                     <p>{props.data.budget.toLocaleString()}</p>
-                </span>
-            }
-
-            {props.data?.notes && 
-                <span className='flex gap-2 items-center'>
-                    <FaNoteSticky size={24}/>
-                    <p>{props.data.notes}</p>
                 </span>
             }
         </CardContent>

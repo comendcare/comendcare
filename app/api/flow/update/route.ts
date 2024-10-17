@@ -21,8 +21,8 @@ export async function POST(request: Request) {
               positionY: node.position?.y,
               data: {
                 create: {
-                  title: "New Milestone",
-                  status: "TODO"
+                  title: node.data.title,
+                  status: node.data.status
                 }
               }
             },
@@ -49,7 +49,8 @@ export async function POST(request: Request) {
                     complete: task.complete,
                 }))
               }
-            }
+            },
+            status: milestone.status || 'TODO'
           }
         })
       })
