@@ -165,6 +165,7 @@ model Milestone {
   timelineMonth String?
   timelineYear  String?
   budget        Int?
+  papers        String[]
   notes         String?
   status        StatusType
   tasks         Task[]
