@@ -99,6 +99,7 @@ const RoadmapFlowchart = ({
                 data: {  
                     nodeId: id,
                     title: `New Milestone`,
+                    papers: [],
                     tasks: [],
                     status: 'TODO'
                 }, 

@@ -5,6 +5,21 @@ export async function POST(request: Request) {
   try {
     const { nodes, edges, milestones } = await request.json()
 
+    // console.log(`nodes:`, nodes)
+    console.log(`milestones:`, milestones)
+
+    // Delete any nodes that are not in the request
+    const nodeIds = nodes.map((node: any) => node.id)
+    const nodesInDB = await prisma.node.findMany({ select: { id: true } })
+    const nodeIdsInDB = nodesInDB.map((node: any) => node.id)
+    const nodesToDelete = nodeIdsInDB.filter((id: string) => !nodeIds.includes(id))
+
+    await prisma.node.deleteMany({
+      where: {
+        id: { in: nodesToDelete },
+      },
+    });
+
     // Save or update nodes
     await Promise.all(
       nodes.map(async (node: any) => {
@@ -46,9 +61,9 @@ export async function POST(request: Request) {
             tasks: {
               deleteMany: {},
               createMany: {
-                data: milestone.tasks.map((task: any) => ({
-                    name: task.name,
-                    complete: task.complete,
+                data: milestone.tasks?.map((task: any) => ({
+                    name: task?.name,
+                    complete: task?.complete,
                 }))
               }
             },

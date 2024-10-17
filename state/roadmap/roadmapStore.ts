@@ -84,8 +84,8 @@ export type RoadmapState = {
   selectedNodeId: string | null
   setSelectedNodeId: (id: string | null) => void, 
   milestones: any[],
-  setMilestones: (milestones: any[]) => void,
   setMilestone: (id: string, newProperties: any) => void,
+  setMilestones: (milestones: any[]) => void,
   nodes: Node[],
   edges: Edge[],
   onNodesChange: (changes: NodeChange[]) => void,
@@ -102,7 +102,6 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => ({
     set({ selectedNodeId: id })
   },
   milestones: [],
-  setMilestones: (milestones: any[]) => { set({ milestones }) },
   setMilestone: (id: string, newProperties: any) => {
     const milestones = get().milestones.map((milestone) =>
       milestone.id === id ? { ...milestone, ...newProperties } : milestone
@@ -110,6 +109,7 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => ({
     set({ milestones })
     debouncedSaveToDatabase(get().nodes, get().edges, milestones)
   },
+  setMilestones: (milestones: any[]) => { set({ milestones }) },
   nodes: [],
   edges: [],
   onNodesChange: (changes: NodeChange[]) => {
@@ -130,8 +130,14 @@ export const useRoadmapStore = create<RoadmapState>((set, get) => ({
     set({ edges })
     debouncedSaveToDatabase(get().nodes, edges, get().milestones)
   },
-  setNodes: (nodes: Node[]) => { set({ nodes }) },
-  setEdges: (edges: Edge[]) => { set({ edges }) },
+  setNodes: (nodes: Node[]) => {
+    set({ nodes })
+    debouncedSaveToDatabase(nodes, get().edges, get().milestones)
+  },
+  setEdges: (edges: Edge[]) => {
+    set({ edges })
+    debouncedSaveToDatabase(get().nodes, edges, get().milestones)
+  },
   addNode: (node: Node) => { 
     const nodes = [...get().nodes, node]
     const milestones = [...get().milestones, node.data]
