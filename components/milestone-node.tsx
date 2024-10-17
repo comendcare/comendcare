@@ -44,6 +44,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
         <Card className="w-[350px]">
         <CardHeader>
           <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
+          {/* Description length in node is truncated to 200 characters. */}
           <CardDescription>{truncate(props.data?.description || "", 200)}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-8">
@@ -54,13 +55,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
                 </span>
             }
 
-            {/* {props.data?.stakeholders && props.data?.stakeholders.length > 0 && 
-                <span className='flex gap-2 items-center'>
-                    <FaUser size={24}/>
-                    <p>{props.data.stakeholders.join(', ')}</p>
-                </span>
-            } */}
-
+            {/* Related Ticket: https://www.notion.so/comend/Milestone-Tasks-122801a6fddc80c69584f329f57f82fd?pvs=4 */}
             {/* {props.data?.labels && props.data?.labels.length > 0 && 
                 <span className='flex gap-2 items-center'>
                     <FaTag size={24}/>
@@ -68,6 +63,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
                 </span>
             } */}
 
+            {/* Related Ticket: https://www.notion.so/comend/Milestone-Labels-122801a6fddc80e69136e4e7ca9445b9?pvs=4 */}
             {/* <ul className="flex flex-col gap-2"> 
                 {props.data?.tasks?.map((task, index) => (
                     <li key={index} className="flex flex-row gap-2 items-center">
@@ -76,20 +72,6 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
                     </li>
                 ))}
             </ul> */}
-
-            {/* {props.data?.dependencies && props.data?.dependencies.length > 0 && 
-                <span className='flex gap-2 items-center'>
-                    <FaCircleMinus size={24}/>
-                    <p>{props.data.dependencies.join(', ')}</p>
-                </span>
-            } */}
-
-            {props.data?.budget && 
-                <span className='flex gap-2 items-center'>
-                    <FaDollarSign size={24}/>
-                    <p>{props.data.budget.toLocaleString()}</p>
-                </span>
-            }
         </CardContent>
         <CardFooter className="flex justify-between">
             <MilestoneStatusButton milestoneStatus={props.data.status} onStatusChange={() => {}} />
