@@ -25,7 +25,6 @@ const initNodes: Node[] = [
         data: { 
             title: 'Disease Models',
             description: 'Discover, construct, and phenotype disease models.',
-            deadline: new Date(),
             stakeholders: ['Person 1', 'Person 2'],
             labels: ['Label 1', 'Label 2'],
             tasks: [

@@ -157,15 +157,16 @@ model Node {
 }
 
 model Milestone {
-  id          String     @id @unique @default(uuid())
-  node        Node       @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  nodeId      String     @unique
-  title       String
-  description String?
-  deadline    DateTime?
-  notes       String?
-  status      StatusType
-  tasks       Task[]
+  id            String     @id @unique @default(uuid())
+  node          Node       @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  nodeId        String     @unique
+  title         String
+  description   String?
+  timelineMonth String?
+  timelineYear  String?
+  notes         String?
+  status        StatusType
+  tasks         Task[]
 }
 
 model Task {

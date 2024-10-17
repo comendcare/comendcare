@@ -12,7 +12,8 @@ export type MilestoneNode = Node<
     nodeId: string,
     title: string,
     description?: string,
-    deadline?: Date,
+    timelineMonth?: string,
+    timelineYear?: string,
     stakeholders?: string[],
     labels?: string[],
     tasks: TaskType[],
@@ -48,10 +49,11 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
           <CardDescription>{truncate(props.data?.description || "", 200)}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-8">
-            {props.data?.deadline && 
-                <span className='flex gap-2 items-center'>
+            {(props.data?.timelineMonth || props.data?.timelineYear) && 
+                <span className='flex gap-2 items-center text-bottom'>
                     <FaCalendar size={24}/>
-                    <p>{props.data.deadline.toDateString()}</p>
+                    <p>{props.data?.timelineMonth}</p>
+                    <p>{props.data?.timelineYear}</p>
                 </span>
             }
 
