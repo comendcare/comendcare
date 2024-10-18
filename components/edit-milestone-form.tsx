@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { Form, FormControl, FormField, FormLabel, FormItem, FormMessage, FormDescription } from './ui/form'
@@ -90,7 +90,7 @@ const getYearsList = () => {
     return years
 }
 
-export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
+export function EditMilestoneForm({ milestoneData, onClose }: { milestoneData: any, onClose: () => void }) {
     const { 
         setSelectedNodeId,
         onNodesChange,
@@ -121,7 +121,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
     const papers = form.watch("papers")
     const stakeholders = form.watch("stakeholders")
     const labels = form.watch("labels")
-    const tasks = form.watch("tasks")
+    // const tasks = form.watch("tasks")
     const dependencies = form.watch("dependencies")
     const notes = form.watch("notes")
     const status = form.watch("status")
@@ -136,7 +136,7 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
             timelineMonth,
             timelineYear,
             budget,
-            tasks,
+            // tasks,
             // notes,
             status
         })
@@ -150,10 +150,11 @@ export function EditMilestoneForm({ milestoneData }: { milestoneData: any }) {
                 ...(budget ? { budget } : undefined),
                 papers,
                 // ...(notes ? { notes } : undefined),
-                tasks,
+                // tasks,
                 status
             }
         )
+        onClose()
     }
 
     const handleDeleteMilestone = (e: React.MouseEvent<HTMLElement>) => {

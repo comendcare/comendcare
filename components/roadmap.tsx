@@ -12,6 +12,8 @@ import Kanban from "@/components/kanban";
 import { Button } from "./ui/button";
 import { FaX } from "react-icons/fa6";
 import { EditMilestoneForm } from "./edit-milestone-form";
+import { useState } from "react";
+import { MilestoneDetails } from "./milestone-details";
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -63,12 +65,16 @@ export function Roadmap({ initNodes, initEdges, initMilestones }: { initNodes: a
                         <ResizableHandle withHandle />
 
                         <ResizablePanel defaultSize={defaultLayout[1]} minSize={30} className="p-10 flex flex-col gap-4">
-                            <span className="flex flex-row justify-between items-center">
-                                <h1 className="text-2xl font-bold">Edit Milestone Details</h1>
+                            {/* <span className="flex flex-row justify-between items-center">
+                                <h1 className="text-2xl font-bold">Milestone Details</h1>
                                 <Button onClick={() => handlePanelChange(false)}><FaX /></Button>
                             </span>
                             <EditMilestoneForm 
                                 milestoneData={milestones.find(milestone => milestone.nodeId === selectedNodeId)}
+                            /> */}
+                            <MilestoneDetailsPanel 
+                                milestone={milestones.find(milestone => milestone.nodeId === selectedNodeId)}
+                                handlePanelChange={handlePanelChange}
                             />
                         </ResizablePanel>
                     </>
@@ -76,4 +82,38 @@ export function Roadmap({ initNodes, initEdges, initMilestones }: { initNodes: a
             </ResizablePanelGroup>
         </TooltipProvider>
     );
+}
+
+const MilestoneDetailsPanel = ({ 
+    milestone, 
+    handlePanelChange 
+}: { 
+    milestone: any, 
+    handlePanelChange: (open: boolean) => void 
+}) => {
+    const [isEditing, setIsEditing] = useState(false)
+
+    const handleClose = () => {
+        setIsEditing(false)
+        handlePanelChange(false)
+    }
+
+    return (
+        <>
+        <span className="flex flex-row justify-between items-center gap-4">
+            <h1 className="text-2xl font-bold grow">
+                {isEditing ? `Edit Milestone Details` : `Milestone Details`}
+            </h1>
+            {isEditing ?
+                <Button onClick={() => setIsEditing(false)}>Cancel Editing</Button> :
+                <Button onClick={() => setIsEditing(true)}>Edit Milestone</Button>
+            }
+            <Button onClick={handleClose}><FaX /></Button>
+        </span>
+        {isEditing ? 
+            <EditMilestoneForm milestoneData={milestone} onClose={() => setIsEditing(false)}/> : 
+            <MilestoneDetails milestoneData={milestone} />
+        }
+        </>
+    )
 }
