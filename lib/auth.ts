@@ -23,8 +23,9 @@ export const authOptions: NextAuthOptions = {
     ],
     pages: {
         signIn: `/login`,
-        verifyRequest: `/login`,
+        verifyRequest: `/login/verify-request`,
         error: "/login", // Error code passed in query string as ?error=
+        newUser: "/onboarding"
     },
     adapter: PrismaAdapter(prisma),
     session: {strategy: "jwt"},
@@ -44,6 +45,15 @@ export const authOptions: NextAuthOptions = {
         },
     },
     callbacks: {
+        // async signIn({ user, account, profile }) {
+        //     // Implement custom logic here to determine user type (admin vs normal)
+        //     const isAdmin = user.email?.endsWith("@comendcare.com"); // Example logic
+        //
+        //     if (isAdmin && process.env.ADMIN_WHITELIST?.includes(user.email!)) {
+        //         return "/admin"; // Redirect admins
+        //     }
+        //     return "/app/roadmap"; // Redirect regular users
+        // },
         jwt: async ({token, user}) => {
             if (user) {
                 token.user = user;
