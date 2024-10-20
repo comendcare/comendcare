@@ -1,22 +1,15 @@
 import {cookies} from "next/headers"
-import Image from "next/image"
 import {
-    FaBriefcase,
-    FaCalendar,
-    FaClipboardList,
-    FaEnvelope,
-    FaFolder,
-    FaHouse, FaPhone,
-    FaThumbsUp,
-    FaUser
+    FaCalendar, FaCircleDollarToSlot,
+    FaPencil, FaPeopleGroup, FaPhone, FaPlus,
 } from "react-icons/fa6";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {FaMapMarker} from "react-icons/fa";
 import {Button} from "@/components/ui/button";
 import {LineChartCard} from "@/components/line-chart-card";
 import {DonutChartCard} from "@/components/donut-chart-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
+import {PAGProfileDetailsCard} from "@/components/pag-profile-details-card";
+import {createDicebearAvatar} from "@/lib/utils";
 
 const profile = {
     name: 'Ricardo Cooper',
@@ -37,6 +30,30 @@ const profile = {
     ],
 }
 
+const pag = {
+    "groupName": "Myhre Syndrome Foundation",
+    "description": "The Myhre Syndrome Foundation is dedicated to improving the lives of individuals affected by Myhre Syndrome, a rare genetic disorder characterized by distinctive facial features, skeletal anomalies, and developmental delays. The foundation provides support to families, promotes awareness, and funds critical research to uncover potential treatments.",
+    "numberOfPatients": 150,
+    "amountRaised": 350000,
+    "dateJoined": "2023-01-15",
+    "dateFounded": "2015-03-12",
+    "topics": ["monogenic", "basic science", "gene replacement"],
+    "teamMembers": [
+        {
+            "name": "Dr. Sarah Johnson",
+            "title": "Chief Medical Officer",
+            "description": "Dr. Sarah Johnson has been a medical research wizard for over 20 years and has brought her magic to the Rare Disease Foundation for the past 8 years. She’s the heartbeat of our medical team, leading us with passion and a focus on innovation and patient care.",
+            "dateJoined": "2015-04-10"
+        },
+        {
+            "name": "Michael Brown",
+            "title": "Executive Director",
+            "description": "Michael Brown has been steering the ship at the Rare Disease Foundation for 5 years, after 15 years of leading non-profits to success. He’s our strategic mastermind, ensuring everything runs smoothly and we stay on course.",
+            "dateJoined": "2018-06-15"
+        }
+    ]
+}
+
 
 export default function ProfilePage() {
     const layout = cookies().get("react-resizable-panels:layout:platform")
@@ -46,8 +63,8 @@ export default function ProfilePage() {
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
     return (
-        <main className="flex flex-col items-center w-full max-w-7xl h-screen mx-auto">
-            <div className="flex flex-col space-y-8">
+        <main className="flex flex-col items-center w-full max-w-7xl mx-auto">
+            <div className="flex flex-col space-y-8 my-8">
                 <div>
                     <div>
                         <img className="h-32 w-full object-cover lg:h-48" src={profile.backgroundImage} alt=""/>
@@ -58,7 +75,7 @@ export default function ProfilePage() {
 
                             <div className="flex">
                                 <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                     src={profile.avatar}
+                                     src={createDicebearAvatar(pag?.dateJoined ?? "", 50, 40, "identicon")}
                                      alt=""/>
                             </div>
 
@@ -66,22 +83,25 @@ export default function ProfilePage() {
                                 className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
                             >
                                 <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
-                                    <h1 className="mt-6 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">{profile.name}</h1>
+                                    <h1 className="mt-6 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
+                                        {pag.groupName}
+                                    </h1>
                                     <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                                         <div className="mt-2 flex items-center text-sm text-gray-500">
-                                            <FaBriefcase className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                         aria-hidden="true"/>
-                                            SNARE mutation
+                                            <FaPeopleGroup className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                           aria-hidden="true"/>
+                                            {pag.numberOfPatients}+ patients
                                         </div>
                                         <div className="mt-2 flex items-center text-sm text-gray-500">
-                                            <FaMapMarker className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                         aria-hidden="true"/>
-                                            Toronto, Canada
+                                            <FaCircleDollarToSlot className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                                  aria-hidden="true"
+                                            />
+                                            ${pag.amountRaised.toLocaleString()} raised
                                         </div>
                                         <div className="mt-2 flex items-center text-sm text-gray-500">
                                             <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"/>
-                                            Joined on January 9, 2020
+                                            Founded on {new Date(pag?.dateJoined ?? "").toDateString()}
                                         </div>
                                     </div>
                                 </div>
@@ -89,13 +109,21 @@ export default function ProfilePage() {
 
                             <div
                                 className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
-                                <Button
-                                    type="button"
-                                    variant="default"
-                                >
-                                    <FaEnvelope className="-ml-0.5 mr-1.5 h-5 w-5 text-white" aria-hidden="true"/>
-                                    <span>Message</span>
-                                </Button>
+                                <div className="grid grid-cols-2 space-x-2">
+                                    <Button
+                                        variant="secondary"
+                                        className="gap-x-2"
+                                    >
+                                        <FaPencil/>
+                                        Edit profile
+                                    </Button>
+                                    <Button
+                                        className="gap-x-2"
+                                    >
+                                        <FaPlus/>
+                                        Add post
+                                    </Button>
+                                </div>
                             </div>
 
                         </div>
@@ -107,9 +135,9 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-6 gap-4">
                     <div className="col-span-2 space-y-4">
+                        <PAGProfileDetailsCard/>
                         <LineChartCard/>
                         <DonutChartCard/>
-                        {/*<UserFileUploadsTableCard/>*/}
                     </div>
 
                     <div className="col-span-4 flex flex-col space-y-4">

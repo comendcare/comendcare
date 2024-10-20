@@ -1,6 +1,7 @@
 'use client'
 import { Bar, BarChart, Line, LineChart, ResponsiveContainer } from "recharts"
 import {Card, CardHeader, CardTitle, CardContent} from "@/components/ui/card";
+import {cn} from "@/lib/utils";
 
 const data = [
     {
@@ -42,8 +43,8 @@ export const LineChartCard = () => {
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-base font-normal">
-                    Data Requests
+                <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                    Profile views
                 </CardTitle>
             </CardHeader>
             <CardContent>

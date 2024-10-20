@@ -10,6 +10,7 @@ import {Button} from "@/components/ui/button";
 import {FaPaperPlane} from "react-icons/fa6";
 import * as z from "zod";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {createDicebearAvatar} from "@/lib/utils";
 
 const newPostSchema = z.object({
     text: z
@@ -47,7 +48,7 @@ export const UserNewPostCard = () => {
             <CardHeader>
                 <CardTitle className="flex flex-row space-x-2 justify-between items-center">
                     <Avatar>
-                        <AvatarImage src="https://github.com/shadcn.png"/>
+                        <AvatarImage src={createDicebearAvatar("", 50, 40, "identicon")}/>
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <Form {...form}>

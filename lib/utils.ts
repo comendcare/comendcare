@@ -3,6 +3,8 @@ import {twMerge} from "tailwind-merge"
 import {Active, DataRef, Over} from "@dnd-kit/core";
 import {ColumnDragData} from "@/components/board-column";
 import {TaskDragData} from "@/components/task-card";
+import {personas, identicon} from "@dicebear/collection";
+import {createAvatar} from "@dicebear/core";
 
 type DraggableData = ColumnDragData | TaskDragData;
 
@@ -87,3 +89,30 @@ export const toDateString = (date: Date) => {
 export const random = (min: number, max: number) => {
     return Math.floor(Math.random() * (max - min + 1) + min);
 };
+
+export function createDicebearAvatar(seed: string, radius: number, size: number, style?: string) {
+    let selectedStyle;
+    let options: any = {
+        seed: seed,
+        radius: radius,
+        size: size,
+        backgroundColor: [
+            'b6e3f4', 'c0aede', 'd1d4f9', 'a3c9f1', 'b5d0ff',
+            'd4c3ef', 'c4cfff', 'b7d2f4', 'e0dafc', 'a8c6e9',
+            'b2d2f9', 'd7e4fa'
+        ]
+    };
+
+    switch (style) {
+        case 'identicon':
+            selectedStyle = identicon;
+            break;
+        case 'personas':
+        default:
+            selectedStyle = personas;
+            options.mouth = ['bigSmile', 'smirk', 'lips'];
+            break;
+    }
+
+    return createAvatar(selectedStyle, options).toDataUri();
+}
