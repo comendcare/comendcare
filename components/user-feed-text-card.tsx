@@ -11,6 +11,7 @@ import {
 import {Separator} from "@/components/ui/separator"
 import {Input} from "@/components/ui/input";
 import {UserFeedCardSocialSection} from "@/components/user-feed-card-social-section";
+import {createDicebearAvatar} from "@/lib/utils";
 
 interface UserFeedTextCardProps {
     content: string
@@ -27,7 +28,7 @@ export function UserFeedTextCard({content, blockquote}: UserFeedTextCardProps) {
                             <div className="flex items-center">
                                 <div>
                                     <Avatar className="h-10 w-10">
-                                        <AvatarImage src="https://github.com/shadcn.png" />
+                                        <AvatarImage src={createDicebearAvatar("", 50, 40, "identicon")}/>
                                         <AvatarFallback>CN</AvatarFallback>
                                     </Avatar>
                                 </div>
