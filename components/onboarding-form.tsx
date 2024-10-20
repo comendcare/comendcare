@@ -386,7 +386,7 @@ export default function OnboardingForm() {
                                     max={1000000}
                                     step={50000}
                                     defaultValue={[value]}
-                                    onValueChange={(vals) => {
+                                    onValueChange={(vals: number[]) => {
                                         onChange(vals[0]);
                                     }}
                                 />
