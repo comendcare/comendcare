@@ -116,7 +116,7 @@ export default function TabsFeaturesSection() {
             className="w-full container mx-auto max-w-7xl px-8 py-24 sm:py-24 space-y-8"
             aria-labelledby="features-heading"
         >
-            <div className="flex flex-col justify-center items-center text-center">
+            <div className="flex flex-col justify-center items-center md:w-1/2 mx-auto text-center">
                 <div>
                     <h2 id="features-heading" className="text-lg text-primary mb-2 tracking-wider">Platform</h2>
                     <h3 className="text-3xl md:text-4xl font-bold mb-4">
