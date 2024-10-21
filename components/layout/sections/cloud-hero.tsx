@@ -261,7 +261,7 @@ export const CloudHeroSection = () => {
                     initial={{opacity: 0, y: 50}}
                     animate={{opacity: 1, y: [50, -10, 0]}}
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-                    className="max-w-screen-sm text-xl text-muted-foreground"
+                    className="max-w-screen-sm text-xl text-"
                 >
                     {`Create your research roadmap, connect with collaborators, and stay updated on the latest scientific breakthroughs.`}
                 </motion.p>

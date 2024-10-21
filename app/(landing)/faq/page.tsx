@@ -4,25 +4,25 @@ const FAQs = [
     {
         question: "Where does our data come from?",
         answer:
-            "We have seeded our marketplace using existing online databases like PubMed. Soon, researchers and contractors will be able to claim and manage their pages.",
+            "We have seeded our network using existing databases like PubMed. Soon, researchers and contractors will be able to claim and edit their pages.",
         contactLink: false,
     },
     {
         question: "How do we make money?",
         answer:
-            "We are extremely intentional about aligning our incentives with patient groups. To do so, our current plan is to introduce low transaction fees, curate research for biopharma, and ultimately share revenue with patient groups through IP facilitated through our platform.",
+            "We are extremely intentional about aligning our incentives with patient groups. To do so, our current plan is to charge subscriptions for industry profiles, support biopharma with market research, and ultimately share revenue with patient groups through IP facilitated through our platform. Have thoughts? Let us know.",
         contactLink: true,
     },
     {
         question: "What do we do with your data?",
         answer:
-            "Although we do not currently capture patient data, our platform is totally secure. With your consent, we will use your data to create market research that is intended to attract biopharma to rare diseases and patient groups.",
+            "Although we do not currently capture individual-level patient data, our platform is totally secure. With your consent, we will use information you share with us to do market research that is intended to attract biopharma to launch new efforts in rare diseases and partner with patient groups.",
         contactLink: false,
     },
     {
         question: "Why are we doing this?",
         answer:
-            "We are a team of technology enthusiasts, rare disease parents, and citizen scientists who wish to improve the social processes of science, and recognize that patient advocates are the best suited to leading innovation.",
+            "We are a team of technology enthusiasts, rare disease parents, and citizen scientists who wish to improve the social processes of science and recognize that patient advocates are the best suited to leading innovation.",
         contactLink: false,
     },
     {
@@ -34,7 +34,7 @@ const FAQs = [
     {
         question: `What does "Comend" mean?`,
         answer:
-            "It means working together to fix things.",
+            "Pronounced KH-oh-mend. It means to work together to fix things. Particularly, in relation to patient-centricity, translational research, and drug development.",
         contactLink: false,
     },
   ];

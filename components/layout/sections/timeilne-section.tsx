@@ -11,14 +11,14 @@ import TorontoTeam from "@/public/team/toronto-team.jpg"
 export function TimelineSection() {
     const timeline = [
         {
-            title: "Jan 2023",
+            title: "March 2023",
             content: (
                 <div className="flex flex-col">
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
                         Comend is founded
                     </h2>
                     <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
-                        We re-united to fix broken areas of healthcare after working in drug development and biomedical engineering.
+                        Flawnson and Albert re-united to address broken processes in translational research after working in drug discovery and biomedical engineering.
                     </p>
                     <Image
                         src={SDTeam}
@@ -32,15 +32,35 @@ export function TimelineSection() {
             ),
         },
         {
-            title: "Apr 2023",
+            title: "July 2023",
             content: (
                 <div className="flex flex-col">
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
-                        First investment
+                        Librarey is born
                     </h2>
                     <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
-                        We received investment from Character Labs to build solutions for rare families.
-                        We met Sierra in one of our early user tests.
+                        With the support of Character Labs, we focused on co-designing solutions with and for rare families. That’s when we met Sierra and partnered to build Librarey which launched in the fall.
+                    </p>
+                    <Image
+                        src={NORDTeam}
+                        height="2000"
+                        width="2000"
+                        className="w-full rounded-xl object-cover object-left-top md:rounded-3xl"
+                        alt="Startup template image"
+                        fetchPriority="high"
+                    />
+                </div>
+            ),
+        },
+        {
+            title: "February 2024",
+            content: (
+                <div className="flex flex-col">
+                    <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
+                        The team grows
+                    </h2>
+                    <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
+                        After partnering with NEXT AI and Drive Capital, our team grew with kindred spirits including Pepi, Betty, Megan, and more.
                     </p>
                     <Image
                         src={NYTeam}
@@ -58,31 +78,10 @@ export function TimelineSection() {
             content: (
                 <div className="flex flex-col">
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
-                        Launched Librarey
+                        We commit
                     </h2>
                     <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
-                        With Sierra's help, we launched a free search platform for rare resources and attended rare disease conferences to gather feedback.
-                    </p>
-                    <Image
-                        src={NORDTeam}
-                        height="2000"
-                        width="2000"
-                        className="w-full rounded-xl object-cover object-left-top md:rounded-3xl"
-                        alt="Startup template image"
-                        fetchPriority="high"
-                    />
-                </div>
-            ),
-        },
-        {
-            title: "June 2024",
-            content: (
-                <div className="flex flex-col">
-                    <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
-                        Team growth
-                    </h2>
-                    <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
-                        We're currently working with several patient groups to build a new scientific communicator and research platform.
+                        We're curreAfter 16 months of boots-on-the-ground research and testing, we pick one of countless ideas to commit our resources to.ntly working with several patient groups to build a new scientific communicator and research platform.
                     </p>
                     <Image
                         src={TorontoTeam}
