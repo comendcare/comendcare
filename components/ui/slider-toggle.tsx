@@ -1,22 +1,22 @@
-import { motion } from "framer-motion";
-import { Dispatch, SetStateAction } from "react";
-import {FaCamera, FaEnvelope, FaVideo} from "react-icons/fa6";
+import { motion } from "framer-motion"
+import { Dispatch, SetStateAction } from "react"
+import { FaCamera, FaEnvelope, FaVideo } from "react-icons/fa6"
 
 const TOGGLE_CLASSES =
-    "text-sm font-medium flex items-center gap-2 px-4 py-3 md:py-1.5 transition-colors relative z-10";
+    "text-sm font-medium flex items-center gap-2 px-4 py-3 md:py-1.5 transition-colors relative z-10"
 
-type ToggleOptionsType = string;
+type ToggleOptionsType = string
 
 const SliderToggle = ({
-                          selected,
-                          setSelected,
-                          leftText,
-                          rightText,
-                      }: {
-    selected: ToggleOptionsType;
-    setSelected: Dispatch<SetStateAction<ToggleOptionsType>>;
-    leftText: string;
-    rightText: string;
+    selected,
+    setSelected,
+    leftText,
+    rightText
+}: {
+    selected: ToggleOptionsType
+    setSelected: Dispatch<SetStateAction<ToggleOptionsType>>
+    leftText: string
+    rightText: string
 }) => {
     return (
         <div className="relative flex w-fit items-center rounded-full">
@@ -25,10 +25,10 @@ const SliderToggle = ({
                     selected === leftText ? "text-black" : "text-slate-500"
                 }`}
                 onClick={() => {
-                    setSelected(leftText);
+                    setSelected(leftText)
                 }}
             >
-                <FaEnvelope className="relative z-10 text-lg md:text-sm"/>
+                <FaEnvelope className="relative z-10 text-lg md:text-sm" />
                 <span className="relative z-10 capitalize">{leftText}</span>
             </button>
             <button
@@ -36,10 +36,10 @@ const SliderToggle = ({
                     selected === rightText ? "text-black" : "text-slate-500"
                 }`}
                 onClick={() => {
-                    setSelected(rightText);
+                    setSelected(rightText)
                 }}
             >
-                <FaVideo className="relative z-10 text-lg md:text-sm"/>
+                <FaVideo className="relative z-10 text-lg md:text-sm" />
                 <span className="relative z-10 capitalize">{rightText}</span>
             </button>
             <div
@@ -54,7 +54,7 @@ const SliderToggle = ({
                 />
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default SliderToggle;
+export default SliderToggle

@@ -1,9 +1,9 @@
-import {getServerSession, type NextAuthOptions} from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
-import {PrismaAdapter} from "@next-auth/prisma-adapter";
-import prisma from "@/lib/prisma";
+import { getServerSession, type NextAuthOptions } from "next-auth"
+import GitHubProvider from "next-auth/providers/github"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import prisma from "@/lib/prisma"
 
-const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
+const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -16,18 +16,18 @@ export const authOptions: NextAuthOptions = {
                     name: profile.name || profile.login,
                     gh_username: profile.login,
                     email: profile.email,
-                    image: profile.avatar_url,
-                };
-            },
-        }),
+                    image: profile.avatar_url
+                }
+            }
+        })
     ],
     pages: {
         signIn: `/login`,
         verifyRequest: `/login`,
-        error: "/login", // Error code passed in query string as ?error=
+        error: "/login" // Error code passed in query string as ?error=
     },
     adapter: PrismaAdapter(prisma),
-    session: {strategy: "jwt"},
+    session: { strategy: "jwt" },
     cookies: {
         sessionToken: {
             name: `${VERCEL_DEPLOYMENT ? "__Secure-" : ""}next-auth.session-token`,
@@ -39,95 +39,95 @@ export const authOptions: NextAuthOptions = {
                 domain: VERCEL_DEPLOYMENT
                     ? `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
                     : undefined,
-                secure: VERCEL_DEPLOYMENT,
-            },
-        },
+                secure: VERCEL_DEPLOYMENT
+            }
+        }
     },
     callbacks: {
-        jwt: async ({token, user}) => {
+        jwt: async ({ token, user }) => {
             if (user) {
-                token.user = user;
+                token.user = user
             }
-            return token;
+            return token
         },
-        session: async ({session, token}) => {
+        session: async ({ session, token }) => {
             session.user = {
                 ...session.user,
                 // @ts-expect-error
                 id: token.sub,
                 // @ts-expect-error
-                username: token?.user?.username || token?.user?.gh_username,
-            };
-            return session;
-        },
-    },
-};
+                username: token?.user?.username || token?.user?.gh_username
+            }
+            return session
+        }
+    }
+}
 
 export function getSession() {
     return getServerSession(authOptions) as Promise<{
         user: {
-            id: string;
-            name: string;
-            username: string;
-            email: string;
-            image: string;
-        };
-    } | null>;
+            id: string
+            name: string
+            username: string
+            email: string
+            image: string
+        }
+    } | null>
 }
 
 export function withOrganizationAuth(action: any) {
     return async (
         formData: FormData | null,
         organizationId: string,
-        key: string | null,
+        key: string | null
     ) => {
-        const session = await getSession();
+        const session = await getSession()
         if (!session) {
             return {
-                error: "Not authenticated",
-            };
+                error: "Not authenticated"
+            }
         }
         const organization = await prisma.organization.findUnique({
             where: {
-                id: organizationId,
-            },
-        });
+                id: organizationId
+            }
+        })
         if (!organization || organization.userId !== session.user.id) {
             return {
-                error: "Not authorized",
-            };
+                error: "Not authorized"
+            }
         }
 
-        return action(formData, organization, key);
-    };
+        return action(formData, organization, key)
+    }
 }
 
 export function withRoadmapAuth(action: any) {
     return async (
         formData: FormData | null,
         roadmapId: string,
-        key: string | null,
+        key: string | null
     ) => {
-        const session = await getSession();
+        const session = await getSession()
         if (!session?.user.id) {
             return {
-                error: "Not authenticated",
-            };
+                error: "Not authenticated"
+            }
         }
         const roadmap = await prisma.roadmap.findUnique({
             where: {
-                id: roadmapId,
+                id: roadmapId
             },
             include: {
-                organization: true,
-            },
-        });
+                organization: true
+            }
+        })
         if (!roadmap || roadmap.userId !== session.user.id) {
             return {
-                error: "Roadmap not found",
-            };
+                error: "Roadmap not found"
+            }
         }
 
-        return action(formData, roadmap, key);
-    };
+        return action(formData, roadmap, key)
+    }
 }

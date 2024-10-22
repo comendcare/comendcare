@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import Link from "next/link";
+import Link from "next/link"
 import {
     ArrowLeft,
     BarChart3,
@@ -13,16 +13,16 @@ import {
     Newspaper,
     Settings,
     FileCode,
-    Github,
-} from "lucide-react";
+    Github
+} from "lucide-react"
 import {
     useParams,
     usePathname,
-    useSelectedLayoutSegments,
-} from "next/navigation";
-import {ReactNode, useEffect, useMemo, useState} from "react";
-import {getOrganizationFromRoadmapId} from "@/lib/actions";
-import Image from "next/image";
+    useSelectedLayoutSegments
+} from "next/navigation"
+import { ReactNode, useEffect, useMemo, useState } from "react"
+import { getOrganizationFromRoadmapId } from "@/lib/actions"
+import Image from "next/image"
 
 const externalLinks: any[] = [
     // {
@@ -60,21 +60,21 @@ const externalLinks: any[] = [
     //         </svg>
     //     ),
     // },
-];
+]
 
-export default function AdminNav({children}: { children: ReactNode }) {
-    const segments = useSelectedLayoutSegments();
-    const {id} = useParams() as { id?: string };
+export default function AdminNav({ children }: { children: ReactNode }) {
+    const segments = useSelectedLayoutSegments()
+    const { id } = useParams() as { id?: string }
 
-    const [organizationId, setOrganizationId] = useState<string | null>();
+    const [organizationId, setOrganizationId] = useState<string | null>()
 
     useEffect(() => {
         if (segments[0] === "roadmap" && id) {
-            getOrganizationFromRoadmapId(id).then((id) => {
-                setOrganizationId(id);
-            });
+            getOrganizationFromRoadmapId(id).then(id => {
+                setOrganizationId(id)
+            })
         }
-    }, [segments, id]);
+    }, [segments, id])
 
     const tabs = useMemo(() => {
         if (segments[0] === "organization" && id) {
@@ -82,91 +82,95 @@ export default function AdminNav({children}: { children: ReactNode }) {
                 {
                     name: "Back to All Organizations",
                     href: "/admin/organizations",
-                    icon: <ArrowLeft width={18}/>,
+                    icon: <ArrowLeft width={18} />
                 },
                 {
                     name: "Roadmaps",
                     href: `/admin/organization/${id}`,
                     isActive: segments.length === 2,
-                    icon: <Newspaper width={18}/>,
+                    icon: <Newspaper width={18} />
                 },
                 {
                     name: "Analytics",
                     href: `/admin/organization/${id}/analytics`,
                     isActive: segments.includes("analytics"),
-                    icon: <BarChart3 width={18}/>,
+                    icon: <BarChart3 width={18} />
                 },
                 {
                     name: "Settings",
                     href: `/admin/organization/${id}/settings`,
                     isActive: segments.includes("settings"),
-                    icon: <Settings width={18}/>,
-                },
-            ];
+                    icon: <Settings width={18} />
+                }
+            ]
         } else if (segments[0] === "roadmap" && id) {
             return [
                 {
                     name: "Back to All Roadmaps",
-                    href: organizationId ? `/admin/organization/${organizationId}` : "/organizations",
-                    icon: <ArrowLeft width={18}/>,
+                    href: organizationId
+                        ? `/admin/organization/${organizationId}`
+                        : "/organizations",
+                    icon: <ArrowLeft width={18} />
                 },
                 {
                     name: "Editor",
                     href: `/admin/roadmap/${id}`,
                     isActive: segments.length === 2,
-                    icon: <Edit3 width={18}/>,
+                    icon: <Edit3 width={18} />
                 },
                 {
                     name: "Settings",
                     href: `/admin/roadmap/${id}/settings`,
                     isActive: segments.includes("settings"),
-                    icon: <Settings width={18}/>,
-                },
-            ];
+                    icon: <Settings width={18} />
+                }
+            ]
         }
         return [
             {
                 name: "Overview",
                 href: "/admin",
                 isActive: segments.length === 0,
-                icon: <LayoutDashboard width={18}/>,
+                icon: <LayoutDashboard width={18} />
             },
             {
                 name: "Organizations",
                 href: "/admin/organizations",
                 isActive: segments[0] === "organizations",
-                icon: <Globe width={18}/>,
+                icon: <Globe width={18} />
             },
             {
                 name: "Settings",
                 href: "/admin/settings",
                 isActive: segments[0] === "settings",
-                icon: <Settings width={18}/>,
-            },
-        ];
-    }, [segments, id, organizationId]);
+                icon: <Settings width={18} />
+            }
+        ]
+    }, [segments, id, organizationId])
 
-    const [showSidebar, setShowSidebar] = useState(false);
+    const [showSidebar, setShowSidebar] = useState(false)
 
-    const pathname = usePathname();
+    const pathname = usePathname()
 
     useEffect(() => {
         // hide sidebar on path change
-        setShowSidebar(false);
-    }, [pathname]);
+        setShowSidebar(false)
+    }, [pathname])
 
     return (
         <>
             <button
                 className={`fixed z-20 ${
                     // left align for Editor, right align for other pages
-                    segments[0] === "roadmap" && segments.length === 2 && !showSidebar
+                    segments[0] === "roadmap" &&
+                    segments.length === 2 &&
+                    !showSidebar
                         ? "left-5 top-5"
                         : "right-5 top-7"
                 } sm:hidden`}
                 onClick={() => setShowSidebar(!showSidebar)}
             >
-                <Menu width={20}/>
+                <Menu width={20} />
             </button>
             <div
                 className={`transform ${
@@ -194,7 +198,7 @@ export default function AdminNav({children}: { children: ReactNode }) {
                                 />
                             </svg>
                         </a>
-                        <div className="h-6 rotate-[30deg] border-l border-stone-400 dark:border-stone-500"/>
+                        <div className="h-6 rotate-[30deg] border-l border-stone-400 dark:border-stone-500" />
                         <Link
                             href="/"
                             className="rounded-lg p-2 hover:bg-stone-200 dark:hover:bg-stone-700"
@@ -209,23 +213,27 @@ export default function AdminNav({children}: { children: ReactNode }) {
                         </Link>
                     </div>
                     <div className="grid gap-1">
-                        {tabs.map(({name, href, isActive, icon}) => (
+                        {tabs.map(({ name, href, isActive, icon }) => (
                             <Link
                                 key={name}
                                 href={href}
                                 className={`flex items-center space-x-3 ${
-                                    isActive ? "bg-stone-200 text-black dark:bg-stone-700" : ""
+                                    isActive
+                                        ? "bg-stone-200 text-black dark:bg-stone-700"
+                                        : ""
                                 } rounded-lg px-2 py-1.5 transition-all duration-150 ease-in-out hover:bg-stone-200 active:bg-stone-300 dark:text-white dark:hover:bg-stone-700 dark:active:bg-stone-800`}
                             >
                                 {icon}
-                                <span className="text-sm font-medium">{name}</span>
+                                <span className="text-sm font-medium">
+                                    {name}
+                                </span>
                             </Link>
                         ))}
                     </div>
                 </div>
                 <div>
                     <div className="grid gap-1">
-                        {externalLinks.map(({name, href, icon}) => (
+                        {externalLinks.map(({ name, href, icon }) => (
                             <a
                                 key={name}
                                 href={href}
@@ -235,16 +243,18 @@ export default function AdminNav({children}: { children: ReactNode }) {
                             >
                                 <div className="flex items-center space-x-3">
                                     {icon}
-                                    <span className="text-sm font-medium">{name}</span>
+                                    <span className="text-sm font-medium">
+                                        {name}
+                                    </span>
                                 </div>
                                 <p>↗</p>
                             </a>
                         ))}
                     </div>
-                    <div className="my-2 border-t border-stone-200 dark:border-stone-700"/>
+                    <div className="my-2 border-t border-stone-200 dark:border-stone-700" />
                     {children}
                 </div>
             </div>
         </>
-    );
+    )
 }

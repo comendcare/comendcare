@@ -1,111 +1,120 @@
-"use client";
-import {encode} from "qss";
-import React, {useEffect, useState} from "react";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {motion} from "framer-motion";
-import Image from "next/image";
-import roadmap from "@/public/illustrations/roadmap.png";
-import timeline from "@/public/illustrations/timeline.png";
-import kanban from "@/public/illustrations/kanban.png";
+"use client"
+import { encode } from "qss"
+import React, { useEffect, useState } from "react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { motion } from "framer-motion"
+import Image from "next/image"
+import roadmap from "@/public/illustrations/roadmap.png"
+import timeline from "@/public/illustrations/timeline.png"
+import kanban from "@/public/illustrations/kanban.png"
 
-export const imgWidth = 400;
-export const imgHeight = 250;
+export const imgWidth = 400
+export const imgHeight = 250
 
 const tabContent = {
     profiles: {
         title: "Research Profiles",
-        image: <Image
-            src={`https://api.microlink.io/?${encode({
-                url: "https://comend-refresh-sprint-3.vercel.app/pag/profile/ACME%20Syndrome%20Foundation",
-                screenshot: true,
-                meta: false,
-                embed: "screenshot.url",
-                colorScheme: "dark",
-                "viewport.isMobile": true,
-                "viewport.deviceScaleFactor": 1,
-                "viewport.width": imgWidth * 3,
-                "viewport.height": imgHeight * 3,
-            })}`}
-            quality={100}
-            layout="responsive"
-            priority={true}
-            className="rounded-lg object-cover"
-            alt="preview image"
-            width={imgWidth}
-            height={imgHeight}
-        />,
-        description: "Fill in your research roadmap to create a profile. Then match with others and share your progress with researchers, donors, and others.",
+        image: (
+            <Image
+                src={`https://api.microlink.io/?${encode({
+                    url: "https://comend-refresh-sprint-3.vercel.app/pag/profile/ACME%20Syndrome%20Foundation",
+                    screenshot: true,
+                    meta: false,
+                    embed: "screenshot.url",
+                    colorScheme: "dark",
+                    "viewport.isMobile": true,
+                    "viewport.deviceScaleFactor": 1,
+                    "viewport.width": imgWidth * 3,
+                    "viewport.height": imgHeight * 3
+                })}`}
+                quality={100}
+                layout="responsive"
+                priority={true}
+                className="rounded-lg object-cover"
+                alt="preview image"
+                width={imgWidth}
+                height={imgHeight}
+            />
+        ),
+        description:
+            "Fill in your research roadmap to create a profile. Then match with others and share your progress with researchers, donors, and others."
     },
     marketplace: {
         title: "Rare Marketplace",
-        image: <Image
-            src={`https://api.microlink.io/?${encode({
-                url: "https://comend-refresh-sprint.vercel.app/researcher",
-                screenshot: true,
-                meta: false,
-                embed: "screenshot.url",
-                colorScheme: "dark",
-                "viewport.isMobile": true,
-                "viewport.deviceScaleFactor": 1,
-                "viewport.width": imgWidth * 3,
-                "viewport.height": imgHeight * 3,
-            })}`}
-            quality={100}
-            layout="responsive"
-            priority={true}
-            className="rounded-lg object-cover"
-            alt="preview image"
-            width={imgWidth}
-            height={imgHeight}
-        />,
-        description: "Find and learn about those who can help you advance your research objectives based on shared biologies, projects, or goals.",
+        image: (
+            <Image
+                src={`https://api.microlink.io/?${encode({
+                    url: "https://comend-refresh-sprint.vercel.app/researcher",
+                    screenshot: true,
+                    meta: false,
+                    embed: "screenshot.url",
+                    colorScheme: "dark",
+                    "viewport.isMobile": true,
+                    "viewport.deviceScaleFactor": 1,
+                    "viewport.width": imgWidth * 3,
+                    "viewport.height": imgHeight * 3
+                })}`}
+                quality={100}
+                layout="responsive"
+                priority={true}
+                className="rounded-lg object-cover"
+                alt="preview image"
+                width={imgWidth}
+                height={imgHeight}
+            />
+        ),
+        description:
+            "Find and learn about those who can help you advance your research objectives based on shared biologies, projects, or goals."
     },
     forums: {
         title: "Focused Forums",
-        image: <Image
-            src={`https://api.microlink.io/?${encode({
-                url: "https://comend-refresh-sprint-3.vercel.app/pag/project/Potassium%20Ion%20Channels/discussion",
-                screenshot: true,
-                meta: false,
-                embed: "screenshot.url",
-                colorScheme: "dark",
-                "viewport.isMobile": true,
-                "viewport.deviceScaleFactor": 1,
-                "viewport.width": imgWidth * 3,
-                "viewport.height": imgHeight * 3,
-            })}`}
-            quality={100}
-            layout="responsive"
-            priority={true}
-            className="rounded-lg object-cover"
-            alt="preview image"
-            width={imgWidth}
-            height={imgHeight}
-        />,
-        description: "Talk and keep up to date about your challenges, wins, and the latest in rare disease science and drug development news.",
-    },
-};
+        image: (
+            <Image
+                src={`https://api.microlink.io/?${encode({
+                    url: "https://comend-refresh-sprint-3.vercel.app/pag/project/Potassium%20Ion%20Channels/discussion",
+                    screenshot: true,
+                    meta: false,
+                    embed: "screenshot.url",
+                    colorScheme: "dark",
+                    "viewport.isMobile": true,
+                    "viewport.deviceScaleFactor": 1,
+                    "viewport.width": imgWidth * 3,
+                    "viewport.height": imgHeight * 3
+                })}`}
+                quality={100}
+                layout="responsive"
+                priority={true}
+                className="rounded-lg object-cover"
+                alt="preview image"
+                width={imgWidth}
+                height={imgHeight}
+            />
+        ),
+        description:
+            "Talk and keep up to date about your challenges, wins, and the latest in rare disease science and drug development news."
+    }
+}
 
 export default function TabsFeaturesSection() {
-    const [activeTab, setActiveTab] = useState('profiles');
-    const tabs = ["profiles", "marketplace", "forums"];
-    const tabDuration = 8;
+    const [activeTab, setActiveTab] = useState("profiles")
+    const tabs = ["profiles", "marketplace", "forums"]
+    const tabDuration = 8
 
     useEffect(() => {
         const interval = setInterval(() => {
             setActiveTab(prev => {
-                const currentIndex = tabs.indexOf(prev);
-                const nextIndex = (currentIndex + 1) % tabs.length;
-                return tabs[nextIndex] as string;
-            });
-        }, tabDuration * 1000);
+                const currentIndex = tabs.indexOf(prev)
+                const nextIndex = (currentIndex + 1) % tabs.length
+                return tabs[nextIndex] as string
+            })
+        }, tabDuration * 1000)
 
-        return () => clearInterval(interval);
-    }, [activeTab]);
+        return () => clearInterval(interval)
+    }, [activeTab])
 
     const handleTabChange = (newValue: string) => {
-        setActiveTab(newValue);
-    };
+        setActiveTab(newValue)
+    }
 
     return (
         <motion.section
@@ -118,13 +127,20 @@ export default function TabsFeaturesSection() {
         >
             <div className="flex flex-col justify-center items-center text-center">
                 <div>
-                    <h2 id="features-heading" className="text-lg text-primary mb-2 tracking-wider">Platform</h2>
+                    <h2
+                        id="features-heading"
+                        className="text-lg text-primary mb-2 tracking-wider"
+                    >
+                        Platform
+                    </h2>
                     <h3 className="text-3xl md:text-4xl font-bold mb-4">
                         The hub for patient-led research
                     </h3>
                     <p className="text-xl text-muted-foreground mb-8">
                         Comend streamlines your efforts to maximize impact.
-                        Here, you can apply for grants, meet researchers, hire contractors, and talk to other patient groups like yours — all from one intuitive platform.
+                        Here, you can apply for grants, meet researchers, hire
+                        contractors, and talk to other patient groups like yours
+                        — all from one intuitive platform.
                     </p>
                 </div>
             </div>
@@ -134,26 +150,10 @@ export default function TabsFeaturesSection() {
                 <Tabs
                     value={activeTab}
                     onValueChange={handleTabChange as any}
-                    className="flex flex-col space-y-8"
+                    className="flex flex-row space-x-8"
                     aria-live="polite"
                 >
-                    {tabs.map((tab) => (
-                        activeTab === tab && (
-                            <TabsContent
-                                key={tab}
-                                value={tab}
-                                aria-labelledby={`${tab}-tab-title`}
-                                aria-describedby={`${tab}-tab-description`}
-                                className="flex justify-center items-center w-full max-w-7xl mx-auto bg-gradient-to-b p-8 from-80% from-[#87EBA4]/70 to-[#87CEEB]/70 to-100% rounded-lg"
-                            >
-                                <div className="relative w-[800px] h-[500px] max-w-7xl rounded-lg">
-                                    {tabContent[tab as keyof typeof tabContent].image}
-                                </div>
-                            </TabsContent>
-                        )
-                    ))}
-
-                    <TabsList className="grid grid-cols-3 items-start justify-start bg-transparent border-none shadow-none h-min">
+                    <TabsList className="grid grid-row-3 items-start justify-start bg-transparent border-none shadow-none h-min">
                         {tabs.map((tab) => (
                             <TabsTrigger
                                 key={tab}
@@ -163,7 +163,7 @@ export default function TabsFeaturesSection() {
                                 id={`${tab}-tab`}
                                 role="tab"
                             >
-                                <div className="relative w-full h-0.5 bg-gray-300">
+                                <div className="relative w-full h-1 bg-gray-300">
                                     {activeTab === tab && (
                                         <motion.div
                                             className="absolute top-0 left-0 h-full bg-sky-500"
@@ -171,44 +171,80 @@ export default function TabsFeaturesSection() {
                                             animate={{ width: "100%" }}
                                             transition={{
                                                 duration: tabDuration,
-                                                ease: "linear",
+                                                ease: "linear"
                                             }}
                                             aria-hidden="true"
                                         />
                                     )}
                                 </div>
                                 <div className="flex flex-col items-start text-wrap text-start space-y-8 mt-4">
-                                    <h3 id={`${tab}-tab-title`} className="text-black text-2xl font-semibold leading-none tracking-tight">
-                                        {tabContent[tab as keyof typeof tabContent].title}
+                                    <h3
+                                        id={`${tab}-tab-title`}
+                                        className="text-black text-2xl font-semibold leading-none tracking-tight"
+                                    >
+                                        {
+                                            tabContent[
+                                                tab as keyof typeof tabContent
+                                            ].title
+                                        }
                                     </h3>
-                                    <p id={`${tab}-tab-description`} className="text-muted-foreground text-base">
-                                        {tabContent[tab as keyof typeof tabContent].description}
+                                    <p
+                                        id={`${tab}-tab-description`}
+                                        className="text-muted-foreground text-base"
+                                    >
+                                        {
+                                            tabContent[
+                                                tab as keyof typeof tabContent
+                                            ].description
+                                        }
                                     </p>
                                 </div>
                             </TabsTrigger>
                         ))}
                     </TabsList>
+
+                    {tabs.map((tab) => (
+                        activeTab === tab && (
+                            <TabsContent
+                                key={tab}
+                                value={tab}
+                                aria-labelledby={`${tab}-tab-title`}
+                                aria-describedby={`${tab}-tab-description`}
+                                className="flex justify-center items-center w-full max-w-7xl mx-auto bg-gradient-to-b p-8 from-80% from-[#87EBA4]/70 to-[#87CEEB]/70 to-100% rounded-lg"
+                            >
+                                <div className="relative w-[750px] h-[470px] max-w-7xl rounded-lg">
+                                    {tabContent[tab as keyof typeof tabContent].image}
+                                </div>
+                            </TabsContent>
+                        )
+                    ))}
                 </Tabs>
             </div>
 
             {/* Mobile-friendly version */}
             <div className="block md:hidden space-y-8">
-                {tabs.map((tab) => (
+                {tabs.map(tab => (
                     <div key={tab} className="flex flex-col space-y-4">
                         <div className="relative w-full h-auto">
                             {tabContent[tab as keyof typeof tabContent].image}
                         </div>
                         <div className="flex flex-col items-center text-center space-y-4">
                             <h3 className="text-xl font-semibold">
-                                {tabContent[tab as keyof typeof tabContent].title}
+                                {
+                                    tabContent[tab as keyof typeof tabContent]
+                                        .title
+                                }
                             </h3>
                             <p className="text-base text-muted-foreground">
-                                {tabContent[tab as keyof typeof tabContent].description}
+                                {
+                                    tabContent[tab as keyof typeof tabContent]
+                                        .description
+                                }
                             </p>
                         </div>
                     </div>
                 ))}
             </div>
         </motion.section>
-    );
+    )
 }

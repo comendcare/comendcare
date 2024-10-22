@@ -1,4 +1,4 @@
-import {cookies} from "next/headers"
+import { cookies } from "next/headers"
 import Image from "next/image"
 
 export default function ProfilePage() {
@@ -9,7 +9,6 @@ export default function ProfilePage() {
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
     return (
-        <main className="flex flex-col items-center w-full h-screen mx-auto">
-        </main>
+        <main className="flex flex-col items-center w-full h-screen mx-auto"></main>
     )
 }

@@ -1,51 +1,51 @@
-"use client";
-import logoCharacter from "@/public/logos/affiliations/Character.png";
-import logoManeki from "@/public/logos/affiliations/Maneki.png";
-import logoDrive from "@/public/logos/affiliations/Drive.jpg";
-import logoFoundersBoost from "@/public/logos/affiliations/FoundersBoost.png";
-import logoNextAI from "@/public/logos/affiliations/NextAI.png";
-import logoOpenTreatments from "@/public/logos/affiliations/Open Treatments.png";
-import logo11ElevenLabsGrants from "@/public/logos/affiliations/11ElevenLabsGrants.png";
-import logoCuresDev from "@/public/logos/affiliations/CuresDev.png";
-import logoOUAG from "@/public/logos/affiliations/OUAG.png";
-import logoWABS from "@/public/logos/affiliations/WABS.png";
-import Image from "next/image";
-import React from "react";
+"use client"
+import logoCharacter from "@/public/logos/affiliations/Character.png"
+import logoManeki from "@/public/logos/affiliations/Maneki.png"
+import logoDrive from "@/public/logos/affiliations/Drive.jpg"
+import logoFoundersBoost from "@/public/logos/affiliations/FoundersBoost.png"
+import logoNextAI from "@/public/logos/affiliations/NextAI.png"
+import logoOpenTreatments from "@/public/logos/affiliations/Open Treatments.png"
+import logo11ElevenLabsGrants from "@/public/logos/affiliations/11ElevenLabsGrants.png"
+import logoCuresDev from "@/public/logos/affiliations/CuresDev.png"
+import logoOUAG from "@/public/logos/affiliations/OUAG.png"
+import logoWABS from "@/public/logos/affiliations/WABS.png"
+import Image from "next/image"
+import React from "react"
 
 export function LogoCloud() {
     const logos = [
         {
             name: "Character",
-            src: logoCharacter,
+            src: logoCharacter
         },
         {
             name: "Maneki",
-            src: logoManeki,
+            src: logoManeki
         },
         {
             name: "Drive",
-            src: logoDrive,
+            src: logoDrive
         },
         {
             name: "Founders Boost",
-            src: logoFoundersBoost,
+            src: logoFoundersBoost
         },
         {
             name: "Next AI",
-            src: logoNextAI,
+            src: logoNextAI
         },
         {
             name: "Open Treatments",
-            src: logoOpenTreatments,
+            src: logoOpenTreatments
         },
         {
             name: "11ElevenLabsGrants",
-            src: logo11ElevenLabsGrants,
+            src: logo11ElevenLabsGrants
         },
         {
             name: "Cures Dev",
-            src: logoCuresDev,
-        },
+            src: logoCuresDev
+        }
         // {
         //     name: "OUAG",
         //     src: logoOUAG,
@@ -54,7 +54,7 @@ export function LogoCloud() {
         //     name: "WABS",
         //     src: logoWABS,
         // },
-    ];
+    ]
 
     return (
         <div className="relative px-4 md:px-8 py-24 w-full overflow-hidden space-y-8">
@@ -62,8 +62,11 @@ export function LogoCloud() {
                 Co-designed with these organizations so far
             </h2>
             <div className="grid grid-cols-4 gap-10 w-full max-w-3xl mx-auto  relative">
-                {logos.map((logo) => (
-                    <div key={logo.name} className="flex items-center justify-center">
+                {logos.map(logo => (
+                    <div
+                        key={logo.name}
+                        className="flex items-center justify-center"
+                    >
                         <Image
                             src={logo.src}
                             alt={logo.name}
@@ -76,5 +79,5 @@ export function LogoCloud() {
                 ))}
             </div>
         </div>
-    );
+    )
 }

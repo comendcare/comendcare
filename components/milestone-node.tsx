@@ -35,7 +35,6 @@ export interface TaskType {
 type StatusType = 'TODO' | 'INPROGRESS' | 'DONE'
 
 function MilestoneNode(props: NodeProps<MilestoneNode>) {
-
     const handleEditClick = () => {
         if (props.data?.handleEditClick) {
             props.data.handleEditClick(props?.id);

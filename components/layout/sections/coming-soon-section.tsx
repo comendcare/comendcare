@@ -1,20 +1,20 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Icon } from "@/components/ui/icon";
-import { icons } from "lucide-react";
-import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
-import { Button } from "@/components/ui/button";
-import { ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Icon } from "@/components/ui/icon"
+import { icons } from "lucide-react"
+import { HoverBorderGradient } from "@/components/ui/hover-border-gradient"
+import { Button } from "@/components/ui/button"
+import { ReactNode } from "react"
+import { useRouter } from "next/navigation"
 
 interface BenefitsProps {
-    icon: string;
-    title: string;
-    description: string | ReactNode;  // Allow description to be string or ReactNode
-    eta?: string;
+    icon: string
+    title: string
+    description: string | ReactNode // Allow description to be string or ReactNode
+    eta?: string
 }
 
 export const ComingSoonSection = () => {
-    const router = useRouter();
+    const router = useRouter()
 
     const benefitList: BenefitsProps[] = [
         {
@@ -22,21 +22,21 @@ export const ComingSoonSection = () => {
             title: "Grant funding database",
             description:
                 "Find funding opportunities for your organization and advertise your own grants for others.",
-            eta: "early 2025",
+            eta: "early 2025"
         },
         {
             icon: "ChartLine",
             title: "Therapeutic overviews",
             description:
                 "Stay on top of the latest efforts, evidence, and eligibility in rapidly advancing technologies.",
-            eta: "spring 2025",
+            eta: "spring 2025"
         },
         {
             icon: "Sparkle",
             title: "Research agreements",
             description:
                 "Streamline new projects with legal templates and IP tools to protect patient priorities.",
-            eta: "summer 2025",
+            eta: "summer 2025"
         },
         {
             icon: "Blocks",
@@ -48,9 +48,9 @@ export const ComingSoonSection = () => {
                         Get in touch
                     </Button>
                 </div>
-            ),
-        },
-    ];
+            )
+        }
+    ]
 
     return (
         <section
@@ -80,59 +80,61 @@ export const ComingSoonSection = () => {
                     role="list"
                     aria-label="Upcoming features"
                 >
-                    {benefitList.map(({ icon, title, description, eta }, index) => (
-                        <Card
-                            key={title}
-                            className="bg-muted/50 group/number"
-                            role="listitem"
-                            aria-labelledby={`feature-${index}-title`}
-                            aria-describedby={`feature-${index}-description`}
-                        >
-                            <CardHeader className="flex flex-col space-y-4">
-                                <div className="flex justify-between items-center">
-                                    <Icon
-                                        name={icon as keyof typeof icons}
-                                        size={32}
-                                        color="hsl(var(--primary))"
-                                        className="text-primary"
-                                        aria-hidden="true" // Icon is decorative, not announced by screen readers
-                                    />
-                                    {eta && (
-                                        <HoverBorderGradient
-                                            containerClassName="rounded-full"
-                                            as="div"
-                                            className="text-xs dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2"
-                                            aria-label={`Coming in ${eta}`}
-                                        >
-                                            <span>✨ Coming {eta}</span>
-                                        </HoverBorderGradient>
-                                    )}
-                                </div>
-
-                                <CardTitle id={`feature-${index}-title`}>
-                                    {title}
-                                </CardTitle>
-                            </CardHeader>
-
-                            <CardContent
-                                id={`feature-${index}-description`}
-                                className={`text-muted-foreground ${
-                                    typeof description === "string"
-                                        ? ""
-                                        : "flex flex-col justify-center items-center"
-                                }`}
+                    {benefitList.map(
+                        ({ icon, title, description, eta }, index) => (
+                            <Card
+                                key={title}
+                                className="bg-muted/50 group/number"
+                                role="listitem"
+                                aria-labelledby={`feature-${index}-title`}
+                                aria-describedby={`feature-${index}-description`}
                             >
-                                {/* Render description, whether it's a string or a component */}
-                                {typeof description === "string" ? (
-                                    <p>{description}</p>
-                                ) : (
-                                    description
-                                )}
-                            </CardContent>
-                        </Card>
-                    ))}
+                                <CardHeader className="flex flex-col space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <Icon
+                                            name={icon as keyof typeof icons}
+                                            size={32}
+                                            color="hsl(var(--primary))"
+                                            className="text-primary"
+                                            aria-hidden="true" // Icon is decorative, not announced by screen readers
+                                        />
+                                        {eta && (
+                                            <HoverBorderGradient
+                                                containerClassName="rounded-full"
+                                                as="div"
+                                                className="text-xs dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2"
+                                                aria-label={`Coming in ${eta}`}
+                                            >
+                                                <span>✨ Coming {eta}</span>
+                                            </HoverBorderGradient>
+                                        )}
+                                    </div>
+
+                                    <CardTitle id={`feature-${index}-title`}>
+                                        {title}
+                                    </CardTitle>
+                                </CardHeader>
+
+                                <CardContent
+                                    id={`feature-${index}-description`}
+                                    className={`text-muted-foreground ${
+                                        typeof description === "string"
+                                            ? ""
+                                            : "flex flex-col justify-center items-center"
+                                    }`}
+                                >
+                                    {/* Render description, whether it's a string or a component */}
+                                    {typeof description === "string" ? (
+                                        <p>{description}</p>
+                                    ) : (
+                                        description
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )
+                    )}
                 </div>
             </div>
         </section>
-    );
-};
+    )
+}

@@ -1,13 +1,13 @@
-import {ReactNode} from "react";
-import Form from "@/components/form";
-import {getSession} from "@/lib/auth";
-import {redirect} from "next/navigation";
-import {editUser} from "@/lib/actions";
+import { ReactNode } from "react"
+import Form from "@/components/form"
+import { getSession } from "@/lib/auth"
+import { redirect } from "next/navigation"
+import { editUser } from "@/lib/actions"
 
 export default async function SettingsPage() {
-    const session = await getSession();
+    const session = await getSession()
     if (!session) {
-        redirect("/login");
+        redirect("/login")
     }
     return (
         <div className="flex max-w-screen-xl flex-col space-y-12 p-8">
@@ -24,7 +24,7 @@ export default async function SettingsPage() {
                         type: "text",
                         defaultValue: session.user.name!,
                         placeholder: "Brendon Urie",
-                        maxLength: 32,
+                        maxLength: 32
                     }}
                     handleSubmit={editUser}
                 />
@@ -36,11 +36,11 @@ export default async function SettingsPage() {
                         name: "email",
                         type: "email",
                         defaultValue: session.user.email!,
-                        placeholder: "panic@thedis.co",
+                        placeholder: "panic@thedis.co"
                     }}
                     handleSubmit={editUser}
                 />
             </div>
         </div>
-    );
+    )
 }
