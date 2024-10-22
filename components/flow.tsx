@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import {
     ReactFlow,
     MiniMap,
@@ -18,6 +18,8 @@ import MilestoneNode from "@/components/milestone-node"
 import { Button } from "./ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
+import { Dialog } from "./ui/dialog"
+import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 
 const proOptions = { hideAttribution: true }
 
@@ -64,6 +66,8 @@ const RoadmapFlowchart = ({
     const { fitView } = useReactFlow()
     const store = useStoreApi()
     const nodeTypes = { MILESTONE: MilestoneNode }
+    const [milestoneData, setMilestoneData] = useState({})
+    const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
     useEffect(() => {
         setNodes(initNodes)
@@ -113,6 +117,13 @@ const RoadmapFlowchart = ({
         []
     )
 
+    const handleNodeDelete = async ({nodes, edges}: {nodes: Node[], edges: Edge[]}) => {
+        // override default delete behaviour with our custom dialog
+        setMilestoneData(nodes[0].data)
+        setDeleteIsOpen(true)
+        return false
+    }
+
     // add handleEditClick() callback to nodes in the flow
     // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
     const updatedNodes = nodes.map((node: Node) => ({
@@ -137,6 +148,7 @@ const RoadmapFlowchart = ({
     }, [width, selectedNodeId])
 
     return (
+        <>
         <ReactFlow
             width={width}
             nodes={updatedNodes}
@@ -144,6 +156,7 @@ const RoadmapFlowchart = ({
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onBeforeDelete={handleNodeDelete}
             nodeTypes={nodeTypes}
             fitView
             proOptions={proOptions}
@@ -153,6 +166,10 @@ const RoadmapFlowchart = ({
                 <Button onClick={() => onAddMilestone()}>Add Milestone</Button>
             </Controls>
         </ReactFlow>
+        <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
+            <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
+        </Dialog>
+        </>
     )
 }
 

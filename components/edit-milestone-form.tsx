@@ -54,6 +54,7 @@ import {
 } from "./ui/dialog"
 import { DialogClose } from "@radix-ui/react-dialog"
 import { useReactFlow } from "@xyflow/react"
+import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 
 const editMilestoneForm = z.object({
     title: z
@@ -554,32 +555,7 @@ export function EditMilestoneForm({
                                     Delete Milestone
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>
-                                        Are you absolutely sure?
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        {`This action cannot be undone. This will permanently delete your milestone and it's data.`}
-                                    </DialogDescription>
-                                    <DialogFooter>
-                                        <DialogClose>
-                                            <Button type="button">
-                                                Cancel
-                                            </Button>
-                                        </DialogClose>
-                                        <DialogClose>
-                                            <Button
-                                                type="button"
-                                                variant={"destructive"}
-                                                onClick={handleDeleteMilestone}
-                                            >
-                                                Delete Milestone
-                                            </Button>
-                                        </DialogClose>
-                                    </DialogFooter>
-                                </DialogHeader>
-                            </DialogContent>
+                            <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
                         </Dialog>
                         <Button type="submit">Save Changes</Button>
                     </span>
