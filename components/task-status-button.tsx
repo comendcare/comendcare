@@ -12,11 +12,11 @@ export default function TaskStatusButton({ complete, onClick }: { complete: bool
     }
 
     return (
-        <Button 
-            variant="outline"  
-            size="icon" 
+        <Button
+            variant="outline"
+            size="icon"
             onClick={handleStateChange}
-            className={`rounded-full h-6 w-6 ${complete ? 'text-green-600': 'text-red-600'}`}
+            className={`rounded-full h-6 w-6 ${complete ? "text-green-600" : "text-red-600"}`}
         >
             <FaCheck />
         </Button>

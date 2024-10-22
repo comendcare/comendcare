@@ -40,7 +40,6 @@ export function Roadmap({ initNodes, initEdges, initMilestones }: { initNodes: a
                 }}
                 className="h-full items-stretch"
             >
-
                 <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
                     <Tabs defaultValue="roadmap">
                         <TabsList>
@@ -81,7 +80,7 @@ export function Roadmap({ initNodes, initEdges, initMilestones }: { initNodes: a
                 )}
             </ResizablePanelGroup>
         </TooltipProvider>
-    );
+    )
 }
 
 const MilestoneDetailsPanel = ({ 

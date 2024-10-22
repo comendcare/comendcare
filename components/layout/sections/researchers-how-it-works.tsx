@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 
 const ResearchersHowItWorks = () => {
     return (
@@ -7,30 +7,26 @@ const ResearchersHowItWorks = () => {
                 <div className="flex flex-col gap-16">
                     <div className="flex flex-col gap-2 text-start">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                            How Comend works
+                            {`How Comend works`}
                         </h2>
                         <p className="text-xl text-muted-foreground mb-8">
-                            Find funding, discover new collaborators, and validate your work with the patient community.
+                            {`Find funding, discover new collaborators, and validate your work with the patient community.`}
                         </p>
                     </div>
                 </div>
-                <div
-                    className="grid grid-cols-3 gap-y-10 lg:gap-x-8 lg:gap-y-0 xl:gap-x-10"
-                >
+                <div className="grid grid-cols-3 gap-y-10 lg:gap-x-8 lg:gap-y-0 xl:gap-x-10">
                     <div className="flex items-start gap-4">
-                        <div
-                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-500 transition hover:bg-blue-600 focus:bg-blue-700"
-                        >
-                            <span className="text-base font-bold leading-7 text-white">1</span>
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-500 transition hover:bg-blue-600 focus:bg-blue-700">
+                            <span className="text-base font-bold leading-7 text-white">
+                                1
+                            </span>
                         </div>
                         <div className="flex flex-col">
-                            <h3
-                                className="mb-2 text-base font-bold leading-tight text-dark-grey-900"
-                            >
-                                Create your researcher profile
+                            <h3 className="mb-2 text-base font-bold leading-tight text-dark-grey-900">
+                                {`Create your researcher profile`}
                             </h3>
                             <p className="text-base font-medium leading-7 text-dark-grey-600">
-                                Outline your past publications, your current research interests, and your past collaborations.
+                                {`Outline your past publications, your current research interests, and your past collaborations.`}
                             </p>
                         </div>
                         <div className="rotate-90 lg:rotate-0">
@@ -61,19 +57,17 @@ const ResearchersHowItWorks = () => {
                         </div>
                     </div>
                     <div className="flex items-start gap-4">
-                        <div
-                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-solid border-blue-500 bg-transparent text-blue-500"
-                        >
-                            <span className="text-base font-bold leading-7">2</span>
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-solid border-blue-500 bg-transparent text-blue-500">
+                            <span className="text-base font-bold leading-7">
+                                2
+                            </span>
                         </div>
                         <div className="flex flex-col">
-                            <h3
-                                className="mb-2 text-base font-bold leading-tight text-dark-grey-900"
-                            >
-                                Match with opportunities
+                            <h3 className="mb-2 text-base font-bold leading-tight text-dark-grey-900">
+                                {`Match with opportunities`}
                             </h3>
                             <p className="text-base font-medium leading-7 text-dark-grey-600">
-                                We'll find the most relevant patient groups, open RFPs, and grants for you; or browse thousands of patient groups, RFPs, and grants on our platform.
+                                {`We'll find the most relevant patient groups, open RFPs, and grants for you; or browse thousands of patient groups, RFPs, and grants on our platform.`}
                             </p>
                         </div>
                         <div className="rotate-90 lg:rotate-0">
@@ -104,27 +98,24 @@ const ResearchersHowItWorks = () => {
                         </div>
                     </div>
                     <div className="flex items-start gap-4">
-                        <div
-                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-solid border-blue-500 bg-transparent text-blue-500"
-                        >
-                            <span className="text-base font-bold leading-7">3</span>
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-solid border-blue-500 bg-transparent text-blue-500">
+                            <span className="text-base font-bold leading-7">
+                                3
+                            </span>
                         </div>
                         <div className="flex flex-col">
-                            <h3
-                                className="mb-2 text-base font-bold leading-tight text-dark-grey-900"
-                            >
+                            <h3 className="mb-2 text-base font-bold leading-tight text-dark-grey-900">
                                 Start collaborations
                             </h3>
                             <p className="text-base font-medium leading-7 text-dark-grey-600">
-                                Find a group you'd like to get to know better? Reach out to build a relationship or apply to one of their open RFPs.
+                                {`Find a group you'd like to get to know better? Reach out to build a relationship or apply to one of their open RFPs.`}
                             </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    )
+}
 
-    );
-};
-
-export default ResearchersHowItWorks;
+export default ResearchersHowItWorks

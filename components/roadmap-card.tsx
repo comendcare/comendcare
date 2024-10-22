@@ -1,19 +1,18 @@
-import BlurImage from "@/components/blur-image";
-import {placeholderBlurhash, random} from "@/lib/utils";
-import {Roadmap, Organization} from "@prisma/client";
-import {BarChart, ExternalLink} from "lucide-react";
-import Link from "next/link";
+import BlurImage from "@/components/blur-image"
+import { placeholderBlurhash, random } from "@/lib/utils"
+import { Roadmap, Organization } from "@prisma/client"
+import { BarChart, ExternalLink } from "lucide-react"
+import Link from "next/link"
 
 export default function RoadmapCard({
-                                        data,
-                                    }: {
-    data: Roadmap & { organization: Organization | null };
+    data
+}: {
+    data: Roadmap & { organization: Organization | null }
 }) {
-    const url = `${data.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/${data.slug}`;
+    const url = `${data.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/${data.slug}`
 
     return (
-        <div
-            className="relative rounded-lg border border-stone-200 pb-10 shadow-md transition-all hover:shadow-xl dark:border-stone-700 dark:hover:border-white">
+        <div className="relative rounded-lg border border-stone-200 pb-10 shadow-md transition-all hover:shadow-xl dark:border-stone-700 dark:hover:border-white">
             <Link
                 href={`/admin/roadmap/${data.id}`}
                 className="flex flex-col overflow-hidden rounded-lg"
@@ -29,8 +28,7 @@ export default function RoadmapCard({
                         blurDataURL={data.imageBlurhash ?? placeholderBlurhash}
                     />
                     {!data.published && (
-                        <span
-                            className="absolute bottom-2 right-2 rounded-md border border-stone-200 bg-white px-3 py-0.5 text-sm font-medium text-stone-600 shadow-md">
+                        <span className="absolute bottom-2 right-2 rounded-md border border-stone-200 bg-white px-3 py-0.5 text-sm font-medium text-stone-600 shadow-md">
                             Draft
                         </span>
                     )}
@@ -59,5 +57,5 @@ export default function RoadmapCard({
                 </a>
             </div>
         </div>
-    );
+    )
 }

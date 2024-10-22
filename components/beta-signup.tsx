@@ -1,14 +1,20 @@
 "use client"
-import {Label} from "@/components/ui/label";
-import {FancyInput} from "@/components/ui/fancy-input";
-import {LabelInputContainer} from "@/components/contact-form";
-import {RainbowSubscribeButton} from "@/components/ui/rainbow-subscribe-button";
+import { Label } from "@/components/ui/label"
+import { FancyInput } from "@/components/ui/fancy-input"
+import { LabelInputContainer } from "@/components/contact-form"
+import { RainbowSubscribeButton } from "@/components/ui/rainbow-subscribe-button"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
-import { useForm } from "react-hook-form";
-import { sendBetaSignupEmail } from "@/lib/emails";
-import mixpanel from "mixpanel-browser";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormMessage
+} from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { sendBetaSignupEmail } from "@/lib/emails"
+import mixpanel from "mixpanel-browser"
 
 const betaSignupFormSchema = z.object({
     name: z
@@ -21,10 +27,18 @@ const betaSignupFormSchema = z.object({
         .string({
             required_error: "Email is required"
         })
-        .email({ message: "Invalid email format" }),
+        .email({ message: "Invalid email format" })
 })
 
-export function BetaSignup({ isSubscribed, isSubscribedCallback, inline = false }: { isSubscribed: boolean, isSubscribedCallback: () => Promise<void>, inline?: boolean }) {
+export function BetaSignup({
+    isSubscribed,
+    isSubscribedCallback,
+    inline = false
+}: {
+    isSubscribed: boolean
+    isSubscribedCallback: () => Promise<void>
+    inline?: boolean
+}) {
     const form = useForm<z.infer<typeof betaSignupFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(betaSignupFormSchema)
@@ -43,8 +57,8 @@ export function BetaSignup({ isSubscribed, isSubscribedCallback, inline = false 
                     email
                 }
             })
-            
-            mixpanel.track(`Beta signup`,{
+
+            mixpanel.track(`Beta signup`, {
                 name: name,
                 email: email
             })
@@ -58,46 +72,64 @@ export function BetaSignup({ isSubscribed, isSubscribedCallback, inline = false 
 
     return (
         <div className="flex flex-col justify-center items-center space-y-2">
-            {!inline && !isSubscribed && <Label className="text-base">
-                🎉&nbsp;&nbsp;Join our beta testing community
-            </Label>}
-            {!inline && isSubscribed && <Label className="text-base">
-                Thank you for joining!
-            </Label>}
+            {!inline && !isSubscribed && (
+                <Label className="text-base">
+                    🎉&nbsp;&nbsp;Join our beta testing community
+                </Label>
+            )}
+            {!inline && isSubscribed && (
+                <Label className="text-base">Thank you for joining!</Label>
+            )}
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleBetaSignupSubmit)} className="flex flex-col justify-center items-center space-y-2">
-                    {!isSubscribed && <div
-                        className={`w-full flex ${inline ? "flex-col" : "flex-col md:flex-row md:space-y-0 md:space-x-2"} space-y-2`}>
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem className="flex flex-col grow">
-                                    <FormControl>
-                                        <LabelInputContainer>
-                                            <FancyInput id="name" placeholder="Name" type="text" {...field} />
-                                        </LabelInputContainer>
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                <form
+                    onSubmit={form.handleSubmit(handleBetaSignupSubmit)}
+                    className="flex flex-col justify-center items-center space-y-2"
+                >
+                    {!isSubscribed && (
+                        <div
+                            className={`w-full flex ${inline ? "flex-col" : "flex-col md:flex-row md:space-y-0 md:space-x-2"} space-y-2`}
+                        >
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col grow">
+                                        <FormControl>
+                                            <LabelInputContainer>
+                                                <FancyInput
+                                                    id="name"
+                                                    placeholder="Name"
+                                                    type="text"
+                                                    {...field}
+                                                />
+                                            </LabelInputContainer>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({field}) => (
-                                <FormItem className="flex flex-col grow">
-                                    <FormControl>
-                                        <LabelInputContainer>
-                                            <FancyInput id="email" placeholder="Email" type="email" {...field} />
-                                        </LabelInputContainer>
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-                    </div>}
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-col grow">
+                                        <FormControl>
+                                            <LabelInputContainer>
+                                                <FancyInput
+                                                    id="email"
+                                                    placeholder="Email"
+                                                    type="email"
+                                                    {...field}
+                                                />
+                                            </LabelInputContainer>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    )}
 
                     <RainbowSubscribeButton
                         subscribeStatus={isSubscribed}

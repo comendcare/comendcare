@@ -1,30 +1,39 @@
-"use client";
-import { cn } from "@/lib/utils";
-import { FaBars, FaX } from "react-icons/fa6";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
-import Link from "next/link";
-import React, { useRef, useState } from "react";
-import { buttonVariants } from "@/components/ui/button";
-import logo from "@/public/logos/comend-full-logo.png";
-import Image from "next/image";
-import { Menu, MenuItem, ProductItem } from "@/components/layout/sections/navbar-menu";
-import {encode} from "qss";
-import {imgHeight, imgWidth} from "@/components/layout/sections/tabs-features";
+"use client"
+import { cn } from "@/lib/utils"
+import { FaBars, FaX } from "react-icons/fa6"
+import {
+    motion,
+    AnimatePresence,
+    useScroll,
+    useMotionValueEvent
+} from "framer-motion"
+import Link from "next/link"
+import React, { useRef, useState } from "react"
+import { buttonVariants } from "@/components/ui/button"
+import logo from "@/public/logos/comend-full-logo.png"
+import Image from "next/image"
+import {
+    Menu,
+    MenuItem,
+    ProductItem
+} from "@/components/layout/sections/navbar-menu"
+import { encode } from "qss"
+import { imgHeight, imgWidth } from "@/components/layout/sections/tabs-features"
 
 interface NavbarItem {
-    name: string;
-    link?: string;
+    name: string
+    link?: string
     items?: {
-        title: string;
-        href: string;
-        imgParams: string;
-        description: string;
-    }[];
+        title: string
+        href: string
+        imgParams: string
+        description: string
+    }[]
 }
 
 interface NavbarProps {
-    navItems: NavbarItem[];
-    visible: boolean;
+    navItems: NavbarItem[]
+    visible: boolean
 }
 
 export const LandingNavbar: React.FC = () => {
@@ -69,31 +78,31 @@ export const LandingNavbar: React.FC = () => {
         // { name: "Features", link: "/#features" },
         { name: "About", link: "/about" },
         { name: "FAQ", link: "/faq" },
-        { name: "Contact", link: "/contact" },
-    ];
+        { name: "Contact", link: "/contact" }
+    ]
 
-    const ref = useRef<HTMLDivElement>(null);
+    const ref = useRef<HTMLDivElement>(null)
     const { scrollY } = useScroll({
         target: ref,
         offset: ["start start", "end start"]
-    });
-    const [visible, setVisible] = useState<boolean>(false);
+    })
+    const [visible, setVisible] = useState<boolean>(false)
 
-    useMotionValueEvent(scrollY, "change", (latest) => {
-        setVisible(latest > 100);
-    });
+    useMotionValueEvent(scrollY, "change", latest => {
+        setVisible(latest > 100)
+    })
 
     return (
         <motion.div ref={ref} className="w-full fixed top-0 inset-x-0 z-50">
             <DesktopNav visible={visible} navItems={navItems} />
             <MobileNav visible={visible} navItems={navItems} />
         </motion.div>
-    );
-};
+    )
+}
 
 const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
-    const [hovered, setHovered] = useState<number | null>(null);
-    const [active, setActive] = useState<string | null>(null);
+    const [hovered, setHovered] = useState<number | null>(null)
+    const [active, setActive] = useState<string | null>(null)
 
     return (
         <motion.div
@@ -115,15 +124,14 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                 minWidth: "800px"
             }}
             className={cn(
-                "hidden lg:flex flex-row self-start bg-transparent dark:bg-transparent items-center justify-between py-4 max-w-7xl mx-auto px-4 rounded-full relative z-[60] w-full",
+                "hidden lg:grid grid-cols-3 self-start bg-transparent dark:bg-transparent items-center justify-between py-4 max-w-7xl mx-auto px-4 rounded-full relative z-[60] w-full",
                 visible && "bg-white/80 dark:bg-neutral-950/80"
             )}
         >
-            {/* NOTE: hackey fix here (setting the z-index) to fix the comend logo link. Note to fix this properly in Notion https://www.notion.so/comend/2f37a4f54517416fa140578a9b714f84?v=8e6e002c8ecc429081f6981f68d6e23a&p=3f7ae8399edb45e4a14de4b63324ce44&pm=s */}
-            <Link href="/" className="z-[61]">
+            <Link href="/">
                 <Image className="w-36 inline" src={logo} alt="Comend Logo" />
             </Link>
-            <motion.div className="lg:flex flex-row flex-1 absolute inset-0 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
+            <motion.div className="lg:flex flex-row flex-1 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
                 {navItems.map((navItem, idx) =>
                     navItem.link ? (
                         <Link
@@ -138,11 +146,17 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                                     className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"
                                 />
                             )}
-                            <span className="relative z-20">{navItem.name}</span>
+                            <span className="relative z-20">
+                                {navItem.name}
+                            </span>
                         </Link>
                     ) : (
-                        <Menu setActive={setActive}>
-                            <MenuItem setActive={setActive} active={active} item="Products">
+                        <Menu setActive={setActive} key={`menu-${idx}`}>
+                            <MenuItem
+                                setActive={setActive}
+                                active={active}
+                                item="Products"
+                            >
                                 <div className="text-sm grid grid-cols-2 gap-10 p-4">
                                     {navItem.items?.map((item, idx) => (
                                         <ProductItem
@@ -166,18 +180,20 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
             {/*    </Link>*/}
             {/*</div>*/}
         </motion.div>
-    );
-};
+    )
+}
 
 const MobileNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
     return (
         <>
             <motion.div
                 animate={{
                     backdropFilter: visible ? "blur(10px)" : "none",
-                    boxShadow: visible ? "0 0 24px rgba(34, 42, 53, 0.06)" : "none",
+                    boxShadow: visible
+                        ? "0 0 24px rgba(34, 42, 53, 0.06)"
+                        : "none",
                     width: visible ? "90%" : "100%",
                     y: visible ? 20 : 0,
                     borderRadius: open ? "4px" : "2rem",
@@ -196,12 +212,22 @@ const MobileNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
             >
                 <div className="flex flex-row justify-between items-center w-full">
                     <Link href="/">
-                        <Image className="w-24 inline" src={logo} alt="Comend Logo" />
+                        <Image
+                            className="w-24 inline"
+                            src={logo}
+                            alt="Comend Logo"
+                        />
                     </Link>
                     {open ? (
-                        <FaX className="text-black dark:text-white" onClick={() => setOpen(!open)} />
+                        <FaX
+                            className="text-black dark:text-white"
+                            onClick={() => setOpen(!open)}
+                        />
                     ) : (
-                        <FaBars className="text-black dark:text-white" onClick={() => setOpen(!open)} />
+                        <FaBars
+                            className="text-black dark:text-white"
+                            onClick={() => setOpen(!open)}
+                        />
                     )}
                 </div>
 
@@ -220,7 +246,9 @@ const MobileNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                                     onClick={() => setOpen(false)}
                                     className="relative text-neutral-600 dark:text-neutral-300"
                                 >
-                                    <motion.span className="block">{navItem.name}</motion.span>
+                                    <motion.span className="block">
+                                        {navItem.name}
+                                    </motion.span>
                                 </Link>
                             ))}
 
@@ -236,5 +264,5 @@ const MobileNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                 </AnimatePresence>
             </motion.div>
         </>
-    );
-};
+    )
+}

@@ -162,7 +162,7 @@ export function EditMilestoneForm({ milestoneData, onClose }: { milestoneData: a
         onNodesChange([{ id: milestoneData?.nodeId, type: 'remove' }])
         setSelectedNodeId(null)
     }
-    
+
     return (
         <Form {...form}>
             <ScrollArea>

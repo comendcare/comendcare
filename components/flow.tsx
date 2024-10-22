@@ -12,7 +12,7 @@ import {
 import type { Edge, Node } from '@xyflow/react'
 import { useShallow } from 'zustand/react/shallow'
 
-import '@xyflow/react/dist/base.css'
+import "@xyflow/react/dist/base.css"
 
 import MilestoneNode from '@/components/milestone-node'
 import { Button } from './ui/button'
@@ -75,14 +75,14 @@ const RoadmapFlowchart = ({
     // if a position is provided, place at the given coordinates
     // if a position is not provided, place in the center
     const onAddMilestone = useCallback(
-        (position?: { x: number, y: number }) => {
+        (position?: { x: number; y: number }) => {
             // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
             const {
                 height,
                 width,
                 transform: [transformX, transformY, zoomLevel]
             } = store.getState()
-            
+
             const zoomMultiplier = 1 / zoomLevel
             const centerX = -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
             const centerY = -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
@@ -129,8 +129,8 @@ const RoadmapFlowchart = ({
             } else {
                 fitView()
             }
-        }, 1); // Delay by a short time to allow layout adjustment
-        
+        }, 1) // Delay by a short time to allow layout adjustment
+
         return () => clearTimeout(timer)
     }, [width, selectedNodeId])
 
