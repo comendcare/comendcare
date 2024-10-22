@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { useForm } from "react-hook-form";
 import { sendBetaSignupEmail } from "@/lib/emails";
 import mixpanel from "mixpanel-browser";
+import { customerIOTrack } from "@/lib/customer-io";
 
 const betaSignupFormSchema = z.object({
     name: z
@@ -47,6 +48,15 @@ export function BetaSignup({ isSubscribed, isSubscribedCallback, inline = false 
             mixpanel.track(`Beta signup`,{
                 name: name,
                 email: email
+            })
+
+            await customerIOTrack({
+                userId: email || undefined,
+                event: 'beta_signup',
+                properties: {
+                    name: name,
+                    email: email
+                }
             })
 
             console.log("Form submitted, email sent")
