@@ -35,7 +35,7 @@ const selector = (state: RoadmapState) => ({
     onNodesChange: state.onNodesChange,
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
-    addNode: state.addNode
+    addNode: state.addNode,
 })
 
 const RoadmapFlowchart = ({
@@ -61,10 +61,11 @@ const RoadmapFlowchart = ({
         setNodes,
         setEdges,
         addNode,
-        onConnect
+        onConnect,
     } = useRoadmapStore(useShallow(selector))
     const { fitView } = useReactFlow()
     const store = useStoreApi()
+    const { undo, redo, clear } = useRoadmapStore.temporal.getState()
     const nodeTypes = { MILESTONE: MilestoneNode }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
@@ -164,6 +165,7 @@ const RoadmapFlowchart = ({
             <MiniMap />
             <Controls>
                 <Button onClick={() => onAddMilestone()}>Add Milestone</Button>
+                <Button onClick={() => undo()}>Undo</Button>
             </Controls>
         </ReactFlow>
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>

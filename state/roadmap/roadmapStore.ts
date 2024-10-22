@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { temporal } from 'zundo'
 import {
     addEdge,
     applyEdgeChanges,
@@ -10,84 +11,6 @@ import {
     EdgeChange
 } from "@xyflow/react"
 import { debounce } from "lodash"
-
-const initNodes: Node[] = [
-    {
-        id: "1",
-        type: "MILESTONE",
-        data: {
-            title: "Basic Science - Disease",
-            description:
-                "Complete the basic science for investigating our disease.",
-            // tasks: [
-            //     { name: 'Literature search to undersand disease', complete: true }
-            // ],
-            notes: "",
-            status: "DONE"
-        },
-        position: { x: 0, y: 0 },
-        selected: false,
-        selectable: true
-    },
-    {
-        id: "2",
-        type: "MILESTONE",
-        data: {
-            title: "Disease Models",
-            description: "Discover, construct, and phenotype disease models.",
-            stakeholders: ["Person 1", "Person 2"],
-            labels: ["Label 1", "Label 2"],
-            // tasks: [
-            //     { name: 'Identify the best models currently available', complete: true },
-            //     { name: 'Construct Knock-in Mice', complete: true },
-            //     { name: 'Phenotyping of Knock-in Mice', complete: false },
-            //     { name: 'Construct Fibroblasts', complete: true },
-            //     { name: 'Construct iPSCs', complete: true },
-            //     { name: 'Phenotype iPSCs', complete: false }
-            // ],
-            dependencies: ["Basic Science - Disease"],
-            budget: 100000,
-            notes: "Here are some notes as an example...",
-            status: "INPROGRESS"
-        },
-        position: { x: 600, y: 0 },
-        selected: false,
-        selectable: true
-    },
-    {
-        id: "3",
-        type: "MILESTONE",
-        data: {
-            title: "Pre-Clinical Design",
-            description: "Pre-clinical design and production.",
-            // tasks: [
-            //     { name: 'Construct design', complete: false },
-            //     { name: 'Plasmid production', complete: false },
-            //     { name: 'AAV Production', complete: false},
-            // ],
-            notes: "Here are some extra notes as an example...",
-            status: "TODO"
-        },
-        position: { x: 1200, y: 0 },
-        selected: false,
-        selectable: true
-    }
-]
-
-const initEdges: Edge[] = [
-    {
-        id: "e1-2",
-        source: "1",
-        target: "2",
-        markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 }
-    },
-    {
-        id: "e2-3",
-        source: "2",
-        target: "3",
-        markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 }
-    }
-]
 
 export type RoadmapState = {
     selectedNodeId: string | null
@@ -104,73 +27,140 @@ export type RoadmapState = {
     setEdges: (edges: Edge[]) => void
     addNode: (node: Node) => void
 }
-
-export const useRoadmapStore = create<RoadmapState>((set, get) => ({
-    selectedNodeId: null,
-    setSelectedNodeId: (id: string | null) => {
-        set({ selectedNodeId: id })
-    },
-    milestones: [],
-    setMilestone: (nodeId: string, newProperties: any) => {
-        const milestones = get().milestones.map(milestone =>
-            milestone.nodeId === nodeId
-                ? { ...milestone, ...newProperties }
-                : milestone
-        )
-        set({ milestones })
-        debouncedSaveToDatabase(get().nodes, get().edges, milestones)
-    },
-    setMilestones: (milestones: any[]) => {
-        set({ milestones })
-    },
-    nodes: [],
-    edges: [],
-    onNodesChange: (changes: NodeChange[]) => {
-        const nodes = applyNodeChanges(changes, get().nodes)
-        const nodeIds = nodes.map(node => node.id)
-        const milestones = get().milestones.filter(milestone =>
-            nodeIds.includes(milestone.nodeId)
-        )
-        set({ nodes })
-        set({ milestones })
-        debouncedSaveToDatabase(nodes, get().edges, milestones)
-    },
-    onEdgesChange: (changes: EdgeChange[]) => {
-        const edges = applyEdgeChanges(changes, get().edges)
-        set({ edges })
-        debouncedSaveToDatabase(get().nodes, edges, get().milestones)
-    },
-    onConnect: (connection: any) => {
-        const edges = addEdge(
-            {
-                ...connection,
-                markerEnd: {
-                    type: MarkerType.ArrowClosed,
-                    width: 20,
-                    height: 20
-                }
-            },
-            get().edges
-        )
-        set({ edges })
-        debouncedSaveToDatabase(get().nodes, edges, get().milestones)
-    },
-    setNodes: (nodes: Node[]) => {
-        set({ nodes })
-        debouncedSaveToDatabase(nodes, get().edges, get().milestones)
-    },
-    setEdges: (edges: Edge[]) => {
-        set({ edges })
-        debouncedSaveToDatabase(get().nodes, edges, get().milestones)
-    },
-    addNode: (node: Node) => {
-        const nodes = [...get().nodes, node]
-        const milestones = [...get().milestones, node.data]
-        set({ nodes })
-        set({ milestones })
-        debouncedSaveToDatabase(nodes, get().edges, milestones)
-    }
-}))
+export const useRoadmapStore = create<RoadmapState>()(
+    temporal((set, get) => ({
+        selectedNodeId: null,
+        setSelectedNodeId: (id: string | null) => {
+            set({ selectedNodeId: id })
+        },
+        milestones: [],
+        setMilestone: (nodeId: string, newProperties: any) => {
+            const milestones = get().milestones.map(milestone =>
+                milestone.nodeId === nodeId
+                    ? { ...milestone, ...newProperties }
+                    : milestone
+            )
+            set({ milestones })
+            debouncedSaveToDatabase(get().nodes, get().edges, milestones)
+        },
+        setMilestones: (milestones: any[]) => {
+            set({ milestones })
+        },
+        nodes: [],
+        edges: [],
+        onNodesChange: (changes: NodeChange[]) => {
+            const nodes = applyNodeChanges(changes, get().nodes)
+            const nodeIds = nodes.map(node => node.id)
+            const milestones = get().milestones.filter(milestone =>
+                nodeIds.includes(milestone.nodeId)
+            )
+            set({ nodes })
+            set({ milestones })
+            debouncedSaveToDatabase(nodes, get().edges, milestones)
+        },
+        onEdgesChange: (changes: EdgeChange[]) => {
+            const edges = applyEdgeChanges(changes, get().edges)
+            set({ edges })
+            debouncedSaveToDatabase(get().nodes, edges, get().milestones)
+        },
+        onConnect: (connection: any) => {
+            const edges = addEdge(
+                {
+                    ...connection,
+                    markerEnd: {
+                        type: MarkerType.ArrowClosed,
+                        width: 20,
+                        height: 20
+                    }
+                },
+                get().edges
+            )
+            set({ edges })
+            debouncedSaveToDatabase(get().nodes, edges, get().milestones)
+        },
+        setNodes: (nodes: Node[]) => {
+            set({ nodes })
+            debouncedSaveToDatabase(nodes, get().edges, get().milestones)
+        },
+        setEdges: (edges: Edge[]) => {
+            set({ edges })
+            debouncedSaveToDatabase(get().nodes, edges, get().milestones)
+        },
+        addNode: (node: Node) => {
+            const nodes = [...get().nodes, node]
+            const milestones = [...get().milestones, node.data]
+            set({ nodes })
+            set({ milestones })
+            debouncedSaveToDatabase(nodes, get().edges, milestones)
+        }
+    }))
+)
+// export const useRoadmapStore = create<RoadmapState>((set, get) => ({
+//     selectedNodeId: null,
+//     setSelectedNodeId: (id: string | null) => {
+//         set({ selectedNodeId: id })
+//     },
+//     milestones: [],
+//     setMilestone: (nodeId: string, newProperties: any) => {
+//         const milestones = get().milestones.map(milestone =>
+//             milestone.nodeId === nodeId
+//                 ? { ...milestone, ...newProperties }
+//                 : milestone
+//         )
+//         set({ milestones })
+//         debouncedSaveToDatabase(get().nodes, get().edges, milestones)
+//     },
+//     setMilestones: (milestones: any[]) => {
+//         set({ milestones })
+//     },
+//     nodes: [],
+//     edges: [],
+//     onNodesChange: (changes: NodeChange[]) => {
+//         const nodes = applyNodeChanges(changes, get().nodes)
+//         const nodeIds = nodes.map(node => node.id)
+//         const milestones = get().milestones.filter(milestone =>
+//             nodeIds.includes(milestone.nodeId)
+//         )
+//         set({ nodes })
+//         set({ milestones })
+//         debouncedSaveToDatabase(nodes, get().edges, milestones)
+//     },
+//     onEdgesChange: (changes: EdgeChange[]) => {
+//         const edges = applyEdgeChanges(changes, get().edges)
+//         set({ edges })
+//         debouncedSaveToDatabase(get().nodes, edges, get().milestones)
+//     },
+//     onConnect: (connection: any) => {
+//         const edges = addEdge(
+//             {
+//                 ...connection,
+//                 markerEnd: {
+//                     type: MarkerType.ArrowClosed,
+//                     width: 20,
+//                     height: 20
+//                 }
+//             },
+//             get().edges
+//         )
+//         set({ edges })
+//         debouncedSaveToDatabase(get().nodes, edges, get().milestones)
+//     },
+//     setNodes: (nodes: Node[]) => {
+//         set({ nodes })
+//         debouncedSaveToDatabase(nodes, get().edges, get().milestones)
+//     },
+//     setEdges: (edges: Edge[]) => {
+//         set({ edges })
+//         debouncedSaveToDatabase(get().nodes, edges, get().milestones)
+//     },
+//     addNode: (node: Node) => {
+//         const nodes = [...get().nodes, node]
+//         const milestones = [...get().milestones, node.data]
+//         set({ nodes })
+//         set({ milestones })
+//         debouncedSaveToDatabase(nodes, get().edges, milestones)
+//     }
+// }))
 
 // Wrap saveToDatabase in a debounce function - to avoid spamming the database
 export const debouncedSaveToDatabase = debounce(
