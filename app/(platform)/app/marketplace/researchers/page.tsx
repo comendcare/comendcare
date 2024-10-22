@@ -1,7 +1,14 @@
 "use client"
-import {cn} from "@/lib/utils";
+import { cn } from "@/lib/utils"
 import React from "react"
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle
+} from "@/components/ui/card"
 import {
     ChartConfig,
     ChartContainer,
@@ -9,45 +16,53 @@ import {
     ChartLegendContent,
     ChartTooltip,
     ChartTooltipContent
-} from "@/components/ui/chart";
-import {Label, Pie, PieChart} from "recharts";
-import {TrendingUp} from "lucide-react";
-import InputDropdown from "@/components/ui/input-dropdown";
+} from "@/components/ui/chart"
+import { Label, Pie, PieChart } from "recharts"
+import { TrendingUp } from "lucide-react"
+import InputDropdown from "@/components/ui/input-dropdown"
 
 const chartData = [
-    {category: "personnel", amount: 50000, fill: "var(--color-personnel)"},
-    {category: "equipment", amount: 30000, fill: "var(--color-equipment)"},
-    {category: "materials", amount: 20000, fill: "var(--color-materials)"},
-    {category: "travel", amount: 10000, fill: "var(--color-travel)"},
-    {category: "miscellaneous", amount: 5000, fill: "var(--color-miscellaneous)"},
-];
+    { category: "personnel", amount: 50000, fill: "var(--color-personnel)" },
+    { category: "equipment", amount: 30000, fill: "var(--color-equipment)" },
+    { category: "materials", amount: 20000, fill: "var(--color-materials)" },
+    { category: "travel", amount: 10000, fill: "var(--color-travel)" },
+    {
+        category: "miscellaneous",
+        amount: 5000,
+        fill: "var(--color-miscellaneous)"
+    }
+]
 
 const chartConfig = {
     equipment: {
         label: "Equipment",
-        color: "hsl(var(--chart-1))",
+        color: "hsl(var(--chart-1))"
     },
     materials: {
         label: "Materials",
-        color: "hsl(var(--chart-2))",
+        color: "hsl(var(--chart-2))"
     },
     travel: {
         label: "travel",
-        color: "hsl(var(--chart-3))",
+        color: "hsl(var(--chart-3))"
     },
     personnel: {
         label: "Personnel",
-        color: "hsl(var(--chart-4))",
+        color: "hsl(var(--chart-4))"
     },
     miscellaneous: {
         label: "Miscellaneous",
-        color: "hsl(var(--chart-5))",
-    },
+        color: "hsl(var(--chart-5))"
+    }
 } satisfies ChartConfig
 
-export default function BudgetPage({params}: { params: { projectId: string } }) {
+export default function BudgetPage({
+    params
+}: {
+    params: { projectId: string }
+}) {
     const totalAmount = React.useMemo(() => {
-        return chartData.reduce((acc, curr) => acc + curr.amount, 0);
+        return chartData.reduce((acc, curr) => acc + curr.amount, 0)
     }, [])
 
     return (
@@ -55,8 +70,12 @@ export default function BudgetPage({params}: { params: { projectId: string } }) 
             <div className="max-w-7xl flex flex-col w-full p-4 mt-72">
                 <div className="grid grid-cols-2 gap-8">
                     <div className="space-y-2">
-                        <InputDropdown/>
-                        <h2 className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                        <InputDropdown />
+                        <h2
+                            className={cn(
+                                "scroll-m-20 text-3xl font-bold tracking-tight"
+                            )}
+                        >
                             Budget
                         </h2>
                         <p className="whitespace-pre-wrap">
@@ -76,7 +95,9 @@ In summary, our budget is carefully balanced to cover all critical areas of the 
                     <Card className="flex flex-col border-none shadow-none">
                         <CardHeader className="items-center pb-0">
                             <CardTitle>Budget Breakdown</CardTitle>
-                            <CardDescription>January - June 2024</CardDescription>
+                            <CardDescription>
+                                January - June 2024
+                            </CardDescription>
                         </CardHeader>
                         <CardContent className="flex-1 pb-0">
                             <ChartContainer
@@ -84,7 +105,14 @@ In summary, our budget is carefully balanced to cover all critical areas of the 
                                 className="mx-auto aspect-square max-h-[400px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
                             >
                                 <PieChart>
-                                    <ChartTooltip content={<ChartTooltipContent hideLabel className="w-40"/>} />
+                                    <ChartTooltip
+                                        content={
+                                            <ChartTooltipContent
+                                                hideLabel
+                                                className="w-40"
+                                            />
+                                        }
+                                    />
                                     <Pie
                                         data={chartData}
                                         dataKey="amount"
@@ -95,7 +123,11 @@ In summary, our budget is carefully balanced to cover all critical areas of the 
                                     >
                                         <Label
                                             content={({ viewBox }) => {
-                                                if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                                                if (
+                                                    viewBox &&
+                                                    "cx" in viewBox &&
+                                                    "cy" in viewBox
+                                                ) {
                                                     return (
                                                         <text
                                                             x={viewBox.cx}
@@ -112,19 +144,24 @@ In summary, our budget is carefully balanced to cover all critical areas of the 
                                                             </tspan>
                                                             <tspan
                                                                 x={viewBox.cx}
-                                                                y={(viewBox.cy || 0) + 24}
+                                                                y={
+                                                                    (viewBox.cy ||
+                                                                        0) + 24
+                                                                }
                                                                 className="fill-muted-foreground"
                                                             >
                                                                 USD
                                                             </tspan>
                                                         </text>
-                                                    );
+                                                    )
                                                 }
                                             }}
                                         />
                                     </Pie>
                                     <ChartLegend
-                                        content={<ChartLegendContent nameKey="category" />}
+                                        content={
+                                            <ChartLegendContent nameKey="category" />
+                                        }
                                         className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
                                     />
                                 </PieChart>

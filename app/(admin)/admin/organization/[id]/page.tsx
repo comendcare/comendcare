@@ -1,29 +1,29 @@
-import {getSession} from "@/lib/auth";
-import prisma from "@/lib/prisma";
-import {notFound, redirect} from "next/navigation";
-import Roadmaps from "@/components/roadmaps";
-import CreateRoadmapButton from "@/components/create-roadmap-button";
+import { getSession } from "@/lib/auth"
+import prisma from "@/lib/prisma"
+import { notFound, redirect } from "next/navigation"
+import Roadmaps from "@/components/roadmaps"
+import CreateRoadmapButton from "@/components/create-roadmap-button"
 
 export default async function OrganizationRoadmaps({
-                                                       params,
-                                                   }: {
-    params: { id: string };
+    params
+}: {
+    params: { id: string }
 }) {
-    const session = await getSession();
+    const session = await getSession()
     if (!session) {
-        redirect("/login");
+        redirect("/login")
     }
     const data = await prisma.organization.findUnique({
         where: {
-            id: decodeURIComponent(params.id),
-        },
-    });
+            id: decodeURIComponent(params.id)
+        }
+    })
 
     if (!data || data.userId !== session.user.id) {
-        notFound();
+        notFound()
     }
 
-    const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`;
+    const url = `${data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
 
     return (
         <>
@@ -45,9 +45,9 @@ export default async function OrganizationRoadmaps({
                         {url} ↗
                     </a>
                 </div>
-                <CreateRoadmapButton/>
+                <CreateRoadmapButton />
             </div>
-            <Roadmaps organizationId={decodeURIComponent(params.id)}/>
+            <Roadmaps organizationId={decodeURIComponent(params.id)} />
         </>
-    );
+    )
 }

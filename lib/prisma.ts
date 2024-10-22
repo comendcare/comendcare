@@ -1,7 +1,7 @@
 // prisma.ts
 
 // Always import `db` from `db.ts` and use that instance directly
-import { db } from "@/app/api/db";
+import { db } from "@/app/api/db"
 
 // Export the cached `db` directly
-export default db;
+export default db

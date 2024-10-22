@@ -2,7 +2,6 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
-
 export default function Page() {
     return (
         <main className="grid min-h-[calc(100vh-136px)] place-items-center bg-white px-6 py-24 sm:py-32 lg:px-8">
@@ -14,7 +13,13 @@ export default function Page() {
                     {`We'll be in touch!`}
                 </p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
-                    <Link href="/" className={cn(buttonVariants({ variant: "secondary" }), "hidden md:block")}>
+                    <Link
+                        href="/"
+                        className={cn(
+                            buttonVariants({ variant: "secondary" }),
+                            "hidden md:block"
+                        )}
+                    >
                         Back to homepage
                     </Link>
                 </div>

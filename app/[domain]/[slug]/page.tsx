@@ -1,41 +1,41 @@
-import {notFound} from "next/navigation";
-import prisma from "@/lib/prisma";
-import {getRoadmapData, getOrganizationData} from "@/lib/fetchers";
-import BlogCard from "@/components/blog-card";
-import BlurImage from "@/components/blur-image";
-import MDX from "@/components/mdx";
-import {placeholderBlurhash, toDateString} from "@/lib/utils";
+import { notFound } from "next/navigation"
+import prisma from "@/lib/prisma"
+import { getRoadmapData, getOrganizationData } from "@/lib/fetchers"
+import BlogCard from "@/components/blog-card"
+import BlurImage from "@/components/blur-image"
+import MDX from "@/components/mdx"
+import { placeholderBlurhash, toDateString } from "@/lib/utils"
 
 export async function generateMetadata({
-                                           params,
-                                       }: {
-    params: { domain: string; slug: string };
+    params
+}: {
+    params: { domain: string; slug: string }
 }) {
-    const domain = decodeURIComponent(params.domain);
-    const slug = decodeURIComponent(params.slug);
+    const domain = decodeURIComponent(params.domain)
+    const slug = decodeURIComponent(params.slug)
 
     const [data, organizationData] = await Promise.all([
         getRoadmapData(domain, slug),
-        getOrganizationData(domain),
-    ]);
+        getOrganizationData(domain)
+    ])
     if (!data || !organizationData) {
-        return null;
+        return null
     }
-    const {title, description} = data;
+    const { title, description } = data
 
     return {
         title,
         description,
         openGraph: {
             title,
-            description,
+            description
         },
         twitter: {
             card: "summary_large_image",
             title,
             description,
-            creator: "@vercel",
-        },
+            creator: "@vercel"
+        }
         // Optional: Set canonical URL to custom domain if it exists
         // ...(params.domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) &&
         //   organizationData.customDomain && {
@@ -43,7 +43,7 @@ export async function generateMetadata({
         //       canonical: `https://${organizationData.customDomain}/${params.slug}`,
         //     },
         //   }),
-    };
+    }
 }
 
 export async function generateStaticParams() {
@@ -53,45 +53,45 @@ export async function generateStaticParams() {
             organization: {
                 select: {
                     subdomain: true,
-                    customDomain: true,
-                },
-            },
+                    customDomain: true
+                }
+            }
         },
         // feel free to remove this filter if you want to generate paths for all roadmaps
         where: {
             organization: {
-                subdomain: "demo",
-            },
-        },
-    });
+                subdomain: "demo"
+            }
+        }
+    })
 
     const allPaths = allRoadmaps
-        .flatMap(({organization, slug}) => [
+        .flatMap(({ organization, slug }) => [
             organization?.subdomain && {
                 domain: `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
-                slug,
+                slug
             },
             organization?.customDomain && {
                 domain: organization.customDomain,
-                slug,
-            },
+                slug
+            }
         ])
-        .filter(Boolean);
+        .filter(Boolean)
 
-    return allPaths;
+    return allPaths
 }
 
 export default async function SitePostPage({
-                                               params,
-                                           }: {
-    params: { domain: string; slug: string };
+    params
+}: {
+    params: { domain: string; slug: string }
 }) {
-    const domain = decodeURIComponent(params.domain);
-    const slug = decodeURIComponent(params.slug);
-    const data = await getRoadmapData(domain, slug);
+    const domain = decodeURIComponent(params.domain)
+    const slug = decodeURIComponent(params.slug)
+    const data = await getRoadmapData(domain, slug)
 
     if (!data) {
-        notFound();
+        notFound()
     }
 
     return (
@@ -119,30 +119,33 @@ export default async function SitePostPage({
                     target="_blank"
                 >
                     <div className="my-8">
-                        <div
-                            className="relative inline-block h-8 w-8 overflow-hidden rounded-full align-middle md:h-12 md:w-12">
+                        <div className="relative inline-block h-8 w-8 overflow-hidden rounded-full align-middle md:h-12 md:w-12">
                             {data.organization?.user?.image ? (
                                 <BlurImage
-                                    alt={data.organization?.user?.name ?? "User Avatar"}
+                                    alt={
+                                        data.organization?.user?.name ??
+                                        "User Avatar"
+                                    }
                                     height={80}
                                     src={data.organization.user.image}
                                     width={80}
                                 />
                             ) : (
-                                <div
-                                    className="absolute flex h-full w-full select-none items-center justify-center bg-stone-100 text-4xl text-stone-500">
+                                <div className="absolute flex h-full w-full select-none items-center justify-center bg-stone-100 text-4xl text-stone-500">
                                     ?
                                 </div>
                             )}
                         </div>
                         <div className="text-md ml-3 inline-block align-middle dark:text-white md:text-lg">
-                            by <span className="font-semibold">{data.organization?.user?.name}</span>
+                            by{" "}
+                            <span className="font-semibold">
+                                {data.organization?.user?.name}
+                            </span>
                         </div>
                     </div>
                 </a>
             </div>
-            <div
-                className="relative m-auto mb-10 h-80 w-full max-w-screen-lg overflow-hidden md:mb-20 md:h-150 md:w-5/6 md:rounded-2xl lg:w-2/3">
+            <div className="relative m-auto mb-10 h-80 w-full max-w-screen-lg overflow-hidden md:mb-20 md:h-150 md:w-5/6 md:rounded-2xl lg:w-2/3">
                 <BlurImage
                     alt={data.title ?? "Post image"}
                     width={1200}
@@ -154,7 +157,7 @@ export default async function SitePostPage({
                 />
             </div>
 
-            <MDX source={data.mdxSource}/>
+            <MDX source={data.mdxSource} />
 
             {data.adjacentRoadmaps.length > 0 && (
                 <div className="relative mb-20 mt-10 sm:mt-20">
@@ -162,7 +165,7 @@ export default async function SitePostPage({
                         className="absolute inset-0 flex items-center"
                         aria-hidden="true"
                     >
-                        <div className="w-full border-t border-stone-300 dark:border-stone-700"/>
+                        <div className="w-full border-t border-stone-300 dark:border-stone-700" />
                     </div>
                     <div className="relative flex justify-center">
                         <span className="bg-white px-2 text-sm text-stone-500 dark:bg-black dark:text-stone-400">
@@ -172,13 +175,12 @@ export default async function SitePostPage({
                 </div>
             )}
             {data.adjacentRoadmaps && (
-                <div
-                    className="mx-5 mb-20 grid max-w-screen-xl grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:mx-auto xl:grid-cols-3">
+                <div className="mx-5 mb-20 grid max-w-screen-xl grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:mx-auto xl:grid-cols-3">
                     {data.adjacentRoadmaps.map((data: any, index: number) => (
-                        <BlogCard key={index} data={data}/>
+                        <BlogCard key={index} data={data} />
                     ))}
                 </div>
             )}
         </>
-    );
+    )
 }

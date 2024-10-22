@@ -1,30 +1,35 @@
 "use client"
 
-import * as React from "react";
-import {useNavStore} from "@/state/nav/navStore"; // Zustand store
-import {TooltipProvider} from "@/components/ui/tooltip";
-import {ResizablePanel, ResizablePanelGroup, ResizableHandle} from "@/components/ui/resizable";
-import {Separator} from "@/components/ui/separator";
-import {AppNav} from "@/components/app-nav";
-import {Cog, Store, User, Workflow} from "lucide-react";
-import {cn} from "@/lib/utils";
-import Image from "next/image";
-import logo from "@/public/logos/comend-logo.png";
+import * as React from "react"
+import { useNavStore } from "@/state/nav/navStore" // Zustand store
+import { TooltipProvider } from "@/components/ui/tooltip"
+import {
+    ResizablePanel,
+    ResizablePanelGroup,
+    ResizableHandle
+} from "@/components/ui/resizable"
+import { Separator } from "@/components/ui/separator"
+import { AppNav } from "@/components/app-nav"
+import { Cog, Store, User, Workflow } from "lucide-react"
+import { cn } from "@/lib/utils"
+import Image from "next/image"
+import logo from "@/public/logos/comend-logo.png"
 
 interface AppLayoutProps {
-    children: React.ReactNode;
+    children: React.ReactNode
 }
 
-export default function AppLayout({children}: AppLayoutProps) {
+export default function AppLayout({ children }: AppLayoutProps) {
     // Zustand state management
-    const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} = useNavStore();
+    const { defaultLayout, isCollapsed, setIsCollapsed, setLayout } =
+        useNavStore()
 
     return (
         <div className="flex h-full w-full">
             <ResizablePanelGroup
                 direction="horizontal"
                 onLayout={(sizes: number[]) => {
-                    setLayout(sizes); // Use Zustand's setLayout to save panel sizes
+                    setLayout(sizes) // Use Zustand's setLayout to save panel sizes
                 }}
                 className="h-full w-full items-stretch"
             >
@@ -68,5 +73,5 @@ export default function AppLayout({children}: AppLayoutProps) {
                 </ResizablePanel>
             </ResizablePanelGroup>
         </div>
-    );
+    )
 }

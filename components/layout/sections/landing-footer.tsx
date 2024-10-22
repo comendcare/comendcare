@@ -1,7 +1,7 @@
-import logo from "@/public/logos/comend-full-logo.png";
-import Image from "next/image";
-import Link from "next/link";
-import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa6";
+import logo from "@/public/logos/comend-full-logo.png"
+import Image from "next/image"
+import Link from "next/link"
+import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa6"
 
 export default function LandingFooter() {
     return (
@@ -65,7 +65,10 @@ export default function LandingFooter() {
                     </ul>
                 </div>
 
-                <nav className="text-center mt-10 text-sm" aria-label="quick links">
+                <nav
+                    className="text-center mt-10 text-sm"
+                    aria-label="quick links"
+                >
                     <div className="-my-1 flex justify-center gap-x-6">
                         <Link href="https://www.librarey.com/terms-of-service">
                             Terms of Services
@@ -78,9 +81,10 @@ export default function LandingFooter() {
 
                 {/* Center align copyright text */}
                 <p className="text-center text-xs text-gray-500">
-                    &copy; {new Date().getFullYear()}. Comend. All rights reserved.
+                    &copy; {new Date().getFullYear()}. Comend. All rights
+                    reserved.
                 </p>
             </div>
         </footer>
-    );
+    )
 }

@@ -1,20 +1,22 @@
-"use client";
-import {Badge} from "@/components/ui/badge";
+"use client"
+import { Badge } from "@/components/ui/badge"
 import hero from "@/public/illustrations/hero.png"
-import Image from "next/image";
-import Link from "next/link";
-import {cn} from "@/lib/utils";
-import {buttonVariants} from "@/components/ui/button";
-import {ArrowRight} from "lucide-react";
-import HeroIllustration from "@/components/layout/sections/hero-illustration";
-import {HeroHighlight, Highlight} from "@/components/layout/sections/hero-highlight";
-import {motion} from "framer-motion";
-import {LinkPreview} from "@/components/link-preview";
+import Image from "next/image"
+import Link from "next/link"
+import { cn } from "@/lib/utils"
+import { buttonVariants } from "@/components/ui/button"
+import { ArrowRight } from "lucide-react"
+import HeroIllustration from "@/components/layout/sections/hero-illustration"
+import {
+    HeroHighlight,
+    Highlight
+} from "@/components/layout/sections/hero-highlight"
+import { motion } from "framer-motion"
+import { LinkPreview } from "@/components/link-preview"
 import scimanticLogo from "@/public/logos/scimantic-logo.png"
 import librareyLogo from "@/public/logos/librarey-logo.svg"
-import React from "react";
-import { BetaSignup } from "@/components/beta-signup";
-
+import React from "react"
+import { BetaSignup } from "@/components/beta-signup"
 
 export const HeroSection = () => {
     return (
@@ -44,27 +46,30 @@ export const HeroSection = () => {
                     <motion.div
                         initial={{
                             opacity: 0,
-                            y: 20,
+                            y: 20
                         }}
                         animate={{
                             opacity: 1,
-                            y: [20, -5, 0],
+                            y: [20, -5, 0]
                         }}
                         transition={{
                             duration: 0.5,
-                            ease: [0.4, 0.0, 0.2, 1],
+                            ease: [0.4, 0.0, 0.2, 1]
                         }}
                         className="hidden sm:mt-8 sm:flex lg:mt-8"
                     >
-                        <div
-                            className="inline-flex items-center rounded-full px-3 py-1 text-base leading-6 text-gray-500 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
+                        <div className="inline-flex items-center rounded-full px-3 py-1 text-base leading-6 text-gray-500 ring-1 ring-gray-900/10 hover:ring-gray-900/20">
                             From the creators of
                             <LinkPreview
                                 url={"https://www.librarey.com/"}
                                 className="hover:underline inline-flex items-center mx-2 gap-x-1"
                                 target="_blank"
                             >
-                                <Image src={librareyLogo} alt="" className="self-center w-8 h-8"/>
+                                <Image
+                                    src={librareyLogo}
+                                    alt=""
+                                    className="self-center w-8 h-8"
+                                />
                                 Librarey
                             </LinkPreview>
                             and
@@ -73,7 +78,11 @@ export const HeroSection = () => {
                                 className="hover:underline inline-flex items-center mx-2 gap-x-1"
                                 target="_blank"
                             >
-                                <Image src={scimanticLogo} alt="" className="self-center w-6 h-6"/>
+                                <Image
+                                    src={scimanticLogo}
+                                    alt=""
+                                    className="self-center w-6 h-6"
+                                />
                                 Scimantic
                             </LinkPreview>
                         </div>
@@ -83,15 +92,15 @@ export const HeroSection = () => {
                         <motion.h1
                             initial={{
                                 opacity: 0,
-                                y: 20,
+                                y: 20
                             }}
                             animate={{
                                 opacity: 1,
-                                y: [20, -5, 0],
+                                y: [20, -5, 0]
                             }}
                             transition={{
                                 duration: 0.5,
-                                ease: [0.4, 0.0, 0.2, 1],
+                                ease: [0.4, 0.0, 0.2, 1]
                             }}
                             className="max-w-screen-md text-2xl md:text-4xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
                         >
@@ -106,15 +115,15 @@ export const HeroSection = () => {
                     <motion.p
                         initial={{
                             opacity: 0,
-                            y: 20,
+                            y: 20
                         }}
                         animate={{
                             opacity: 1,
-                            y: [20, -5, 0],
+                            y: [20, -5, 0]
                         }}
                         transition={{
                             duration: 0.5,
-                            ease: [0.4, 0.0, 0.2, 1],
+                            ease: [0.4, 0.0, 0.2, 1]
                         }}
                         className="max-w-screen-sm text-xl text-muted-foreground"
                     >
@@ -124,15 +133,15 @@ export const HeroSection = () => {
                     <motion.div
                         initial={{
                             opacity: 0,
-                            y: 20,
+                            y: 20
                         }}
                         animate={{
                             opacity: 1,
-                            y: [20, -5, 0],
+                            y: [20, -5, 0]
                         }}
                         transition={{
                             duration: 0.5,
-                            ease: [0.4, 0.0, 0.2, 1],
+                            ease: [0.4, 0.0, 0.2, 1]
                         }}
                         className="flex flex-row space-x-2"
                     >
@@ -152,7 +161,6 @@ export const HeroSection = () => {
                             {/* <BetaSignup />   */}
                         </div>
                     </motion.div>
-
                 </div>
                 {/*<div className="relative">*/}
                 {/*    <Image*/}
@@ -162,8 +170,8 @@ export const HeroSection = () => {
                 {/*        className="w-full"*/}
                 {/*    />*/}
                 {/*</div>*/}
-                <HeroIllustration/>
+                <HeroIllustration />
             </div>
         </section>
-    );
-};
+    )
+}

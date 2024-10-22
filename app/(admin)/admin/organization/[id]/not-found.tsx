@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/image"
 
 export default function NotFoundSite() {
     return (
@@ -19,8 +19,9 @@ export default function NotFoundSite() {
                 className="hidden dark:block"
             />
             <p className="text-lg text-stone-500 dark:text-stone-400">
-                Organization does not exist, or you do not have permission to view it
+                Organization does not exist, or you do not have permission to
+                view it
             </p>
         </div>
-    );
+    )
 }

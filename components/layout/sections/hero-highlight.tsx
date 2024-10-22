@@ -1,30 +1,30 @@
-"use client";
-import { cn } from "@/lib/utils";
-import { useMotionValue, motion, useMotionTemplate } from "framer-motion";
-import React from "react";
+"use client"
+import { cn } from "@/lib/utils"
+import { useMotionValue, motion, useMotionTemplate } from "framer-motion"
+import React from "react"
 
 export const HeroHighlight = ({
-                                  children,
-                                  className,
-                                  containerClassName,
-                              }: {
-    children: React.ReactNode;
-    className?: string;
-    containerClassName?: string;
+    children,
+    className,
+    containerClassName
+}: {
+    children: React.ReactNode
+    className?: string
+    containerClassName?: string
 }) => {
-    let mouseX = useMotionValue(0);
-    let mouseY = useMotionValue(0);
+    const mouseX = useMotionValue(0)
+    const mouseY = useMotionValue(0)
 
     function handleMouseMove({
-                                 currentTarget,
-                                 clientX,
-                                 clientY,
-                             }: React.MouseEvent<HTMLDivElement>) {
-        if (!currentTarget) return;
-        let { left, top } = currentTarget.getBoundingClientRect();
+        currentTarget,
+        clientX,
+        clientY
+    }: React.MouseEvent<HTMLDivElement>) {
+        if (!currentTarget) return
+        const { left, top } = currentTarget.getBoundingClientRect()
 
-        mouseX.set(clientX - left);
-        mouseY.set(clientY - top);
+        mouseX.set(clientX - left)
+        mouseY.set(clientY - top)
     }
     return (
         <div
@@ -51,39 +51,39 @@ export const HeroHighlight = ({
               black 0%,
               transparent 100%
             )
-          `,
+          `
                 }}
             />
 
             <div className={cn("relative z-20", className)}>{children}</div>
         </div>
-    );
-};
+    )
+}
 
 export const Highlight = ({
-                              children,
-                              className,
-                          }: {
-    children: React.ReactNode;
-    className?: string;
+    children,
+    className
+}: {
+    children: React.ReactNode
+    className?: string
 }) => {
     return (
         <motion.span
             initial={{
-                backgroundSize: "0% 100%",
+                backgroundSize: "0% 100%"
             }}
             animate={{
-                backgroundSize: "100% 100%",
+                backgroundSize: "100% 100%"
             }}
             transition={{
                 duration: 2,
                 ease: "linear",
-                delay: 0.5,
+                delay: 0.5
             }}
             style={{
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "left center",
-                display: "inline",
+                display: "inline"
             }}
             className={cn(
                 `relative inline-block pb-1 px-1 rounded-lg bg-gradient-to-r from-[#87EBA4]/70 to-[#87CEEB]/70 dark:from-indigo-500 dark:to-purple-500`,
@@ -92,5 +92,5 @@ export const Highlight = ({
         >
             {children}
         </motion.span>
-    );
-};
+    )
+}

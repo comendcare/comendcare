@@ -1,8 +1,8 @@
-"use client";
-import React from "react";
-import {motion} from "framer-motion";
-import Link from "next/link";
-import Image from "next/image";
+"use client"
+import React from "react"
+import { motion } from "framer-motion"
+import Link from "next/link"
+import Image from "next/image"
 
 const transition = {
     type: "spring",
@@ -10,32 +10,32 @@ const transition = {
     damping: 11.5,
     stiffness: 100,
     restDelta: 0.001,
-    restSpeed: 0.001,
-};
+    restSpeed: 0.001
+}
 
 export const MenuItem = ({
-                             setActive,
-                             active,
-                             item,
-                             children,
-                         }: {
-    setActive: (item: string) => void;
-    active: string | null;
-    item: string;
-    children?: React.ReactNode;
+    setActive,
+    active,
+    item,
+    children
+}: {
+    setActive: (item: string) => void
+    active: string | null
+    item: string
+    children?: React.ReactNode
 }) => {
     return (
         <div onMouseEnter={() => setActive(item)} className="relative">
             <motion.p
-                transition={{duration: 0.3}}
+                transition={{ duration: 0.3 }}
                 className="text-neutral-600 dark:text-neutral-300 relative cursor-pointer hover:opacity-[0.9]"
             >
                 {item}
             </motion.p>
             {active !== null && (
                 <motion.div
-                    initial={{opacity: 0, scale: 0.85, y: 10}}
-                    animate={{opacity: 1, scale: 1, y: 0}}
+                    initial={{ opacity: 0, scale: 0.85, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={transition}
                 >
                     {active === item && (
@@ -57,15 +57,15 @@ export const MenuItem = ({
                 </motion.div>
             )}
         </div>
-    );
-};
+    )
+}
 
 export const Menu = ({
-                         setActive,
-                         children,
-                     }: {
-    setActive: (item: string | null) => void;
-    children: React.ReactNode;
+    setActive,
+    children
+}: {
+    setActive: (item: string | null) => void
+    children: React.ReactNode
 }) => {
     return (
         <nav
@@ -74,19 +74,19 @@ export const Menu = ({
         >
             {children}
         </nav>
-    );
-};
+    )
+}
 
 export const ProductItem = ({
-                                title,
-                                description,
-                                href,
-                                imgParams,
-                            }: {
-    title: string;
-    description: string;
-    href: string;
-    imgParams: string;
+    title,
+    description,
+    href,
+    imgParams
+}: {
+    title: string
+    description: string
+    href: string
+    imgParams: string
 }) => {
     return (
         <Link href={href} className="flex space-x-4">
@@ -109,10 +109,10 @@ export const ProductItem = ({
                 </p>
             </div>
         </Link>
-    );
-};
+    )
+}
 
-export const HoveredLink = ({children, ...rest}: any) => {
+export const HoveredLink = ({ children, ...rest }: any) => {
     return (
         <Link
             {...rest}
@@ -120,5 +120,5 @@ export const HoveredLink = ({children, ...rest}: any) => {
         >
             {children}
         </Link>
-    );
-};
+    )
+}

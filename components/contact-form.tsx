@@ -1,16 +1,22 @@
-"use client";
-import React from "react";
-import {Label} from "@/components/ui/label"
-import { FancyInput } from "@/components/ui/fancy-input";
-import { cn } from "@/lib/utils";
-import {FancyTextarea} from "@/components/ui/fancy-textarea";
+"use client"
+import React from "react"
+import { Label } from "@/components/ui/label"
+import { FancyInput } from "@/components/ui/fancy-input"
+import { cn } from "@/lib/utils"
+import { FancyTextarea } from "@/components/ui/fancy-textarea"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
-import { sendContactEmail } from "@/lib/emails";
-import { useRouter } from "next/navigation";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormMessage
+} from "@/components/ui/form"
+import { sendContactEmail } from "@/lib/emails"
+import { useRouter } from "next/navigation"
 
 const contactFormSchema = z.object({
     firstName: z
@@ -76,7 +82,10 @@ export function ContactForm() {
             </p>
 
             <Form {...form}>
-                <form className="my-8" onSubmit={form.handleSubmit(handleContactSubmit)}>
+                <form
+                    className="my-8"
+                    onSubmit={form.handleSubmit(handleContactSubmit)}
+                >
                     <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mb-4">
                         <FormField
                             control={form.control}
@@ -85,8 +94,15 @@ export function ContactForm() {
                                 <FormItem className="flex flex-col grow">
                                     <FormControl>
                                         <LabelInputContainer>
-                                            <Label htmlFor="firstname">First name</Label>
-                                            <FancyInput id="firstname" placeholder="Spongebob" type="text" {...field} />
+                                            <Label htmlFor="firstname">
+                                                First name
+                                            </Label>
+                                            <FancyInput
+                                                id="firstname"
+                                                placeholder="Spongebob"
+                                                type="text"
+                                                {...field}
+                                            />
                                         </LabelInputContainer>
                                     </FormControl>
                                     <FormMessage />
@@ -101,8 +117,15 @@ export function ContactForm() {
                                 <FormItem className="flex flex-col grow">
                                     <FormControl>
                                         <LabelInputContainer>
-                                            <Label htmlFor="lastname">Last name</Label>
-                                            <FancyInput id="lastname" placeholder="Squarepants" type="text" {...field} />
+                                            <Label htmlFor="lastname">
+                                                Last name
+                                            </Label>
+                                            <FancyInput
+                                                id="lastname"
+                                                placeholder="Squarepants"
+                                                type="text"
+                                                {...field}
+                                            />
                                         </LabelInputContainer>
                                     </FormControl>
                                     <FormMessage />
@@ -118,8 +141,15 @@ export function ContactForm() {
                             <FormItem className="flex flex-col mb-4">
                                 <FormControl>
                                     <LabelInputContainer>
-                                        <Label htmlFor="email">Email Address</Label>
-                                        <FancyInput id="email" placeholder="spongebob.squarepants@gmail.com" type="email" {...field} />
+                                        <Label htmlFor="email">
+                                            Email Address
+                                        </Label>
+                                        <FancyInput
+                                            id="email"
+                                            placeholder="spongebob.squarepants@gmail.com"
+                                            type="email"
+                                            {...field}
+                                        />
                                     </LabelInputContainer>
                                 </FormControl>
                                 <FormMessage />
@@ -135,7 +165,11 @@ export function ContactForm() {
                                 <FormControl>
                                     <LabelInputContainer>
                                         <Label htmlFor="message">Message</Label>
-                                        <FancyTextarea id="message" placeholder="••••••••" {...field} />
+                                        <FancyTextarea
+                                            id="message"
+                                            placeholder="••••••••"
+                                            {...field}
+                                        />
                                     </LabelInputContainer>
                                 </FormControl>
                                 <FormMessage />
@@ -153,7 +187,7 @@ export function ContactForm() {
                 </form>
             </Form>
         </div>
-    );
+    )
 }
 
 export const BottomGradient = () => {
@@ -162,19 +196,19 @@ export const BottomGradient = () => {
             <span className="group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
             <span className="group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-1/2 mx-auto -bottom-px inset-x-10 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
         </>
-    );
-};
+    )
+}
 
 export const LabelInputContainer = ({
-                                 children,
-                                 className,
-                             }: {
-    children: React.ReactNode;
-    className?: string;
+    children,
+    className
+}: {
+    children: React.ReactNode
+    className?: string
 }) => {
     return (
-    <div className={cn("flex flex-col space-y-2 w-full", className)}>
+        <div className={cn("flex flex-col space-y-2 w-full", className)}>
             {children}
         </div>
-    );
-};
+    )
+}
