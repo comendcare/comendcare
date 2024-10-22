@@ -1,87 +1,97 @@
-"use client";
+"use client"
 
-import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { cn } from "@/lib/utils"
 
 export function PlaceholdersAndVanishTextarea({
-                                                  placeholders,
-                                                  onChange,
-                                                  onSubmit,
-                                              }: {
-    placeholders: string[];
-    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-    onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+    placeholders,
+    onChange,
+    onSubmit
+}: {
+    placeholders: string[]
+    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+    onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
 }) {
-    const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
+    const [currentPlaceholder, setCurrentPlaceholder] = useState(0)
 
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const intervalRef = useRef<NodeJS.Timeout | null>(null)
     const startAnimation = () => {
         intervalRef.current = setInterval(() => {
-            setCurrentPlaceholder((prev) => (prev + 1) % placeholders.length);
-        }, 10000);
-    };
+            setCurrentPlaceholder(prev => (prev + 1) % placeholders.length)
+        }, 10000)
+    }
     const handleVisibilityChange = () => {
         if (document.visibilityState !== "visible" && intervalRef.current) {
-            clearInterval(intervalRef.current); // Clear the interval when the tab is not visible
-            intervalRef.current = null;
+            clearInterval(intervalRef.current) // Clear the interval when the tab is not visible
+            intervalRef.current = null
         } else if (document.visibilityState === "visible") {
-            startAnimation(); // Restart the interval when the tab becomes visible
+            startAnimation() // Restart the interval when the tab becomes visible
         }
-    };
+    }
 
     useEffect(() => {
-        startAnimation();
-        document.addEventListener("visibilitychange", handleVisibilityChange);
+        startAnimation()
+        document.addEventListener("visibilitychange", handleVisibilityChange)
 
         return () => {
             if (intervalRef.current) {
-                clearInterval(intervalRef.current);
+                clearInterval(intervalRef.current)
             }
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
-        };
-    }, [placeholders]);
+            document.removeEventListener(
+                "visibilitychange",
+                handleVisibilityChange
+            )
+        }
+    }, [placeholders])
 
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const newDataRef = useRef<any[]>([]);
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const [value, setValue] = useState("");
-    const [animating, setAnimating] = useState(false);
+    const canvasRef = useRef<HTMLCanvasElement>(null)
+    const newDataRef = useRef<any[]>([])
+    const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const [value, setValue] = useState("")
+    const [animating, setAnimating] = useState(false)
 
     const draw = useCallback(
         (textToDraw: string) => {
-            if (!textareaRef.current) return;
-            const canvas = canvasRef.current;
-            if (!canvas) return;
-            const ctx = canvas.getContext("2d");
-            if (!ctx) return;
+            if (!textareaRef.current) return
+            const canvas = canvasRef.current
+            if (!canvas) return
+            const ctx = canvas.getContext("2d")
+            if (!ctx) return
 
-            const computedWidth = textareaRef.current.offsetWidth;
-            const computedHeight = textareaRef.current.offsetHeight;
+            const computedWidth = textareaRef.current.offsetWidth
+            const computedHeight = textareaRef.current.offsetHeight
 
-            canvas.width = computedWidth;
-            canvas.height = computedHeight;
-            ctx.clearRect(0, 0, computedWidth, computedHeight);
-            const computedStyles = getComputedStyle(textareaRef.current);
+            canvas.width = computedWidth
+            canvas.height = computedHeight
+            ctx.clearRect(0, 0, computedWidth, computedHeight)
+            const computedStyles = getComputedStyle(textareaRef.current)
 
-            const fontSize = parseFloat(computedStyles.getPropertyValue("font-size"));
-            ctx.font = `${fontSize}px ${computedStyles.fontFamily}`;
-            ctx.fillStyle = "#FFF";
+            const fontSize = parseFloat(
+                computedStyles.getPropertyValue("font-size")
+            )
+            ctx.font = `${fontSize}px ${computedStyles.fontFamily}`
+            ctx.fillStyle = "#FFF"
 
-            const lines = textToDraw.split("\n");
-            const lineHeight = fontSize * 1.2;
+            const lines = textToDraw.split("\n")
+            const lineHeight = fontSize * 1.2
             lines.forEach((line, index) => {
-                ctx.fillText(line, 10, fontSize + index * lineHeight);
-            });
+                ctx.fillText(line, 10, fontSize + index * lineHeight)
+            })
 
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const pixelData = imageData.data;
-            const newData: any[] = [];
+            const imageData = ctx.getImageData(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            )
+            const pixelData = imageData.data
+            const newData: any[] = []
 
             for (let t = 0; t < canvas.height; t++) {
-                let i = 4 * t * canvas.width;
+                let i = 4 * t * canvas.width
                 for (let n = 0; n < canvas.width; n++) {
-                    let e = i + 4 * n;
+                    let e = i + 4 * n
                     if (
                         pixelData[e] !== 0 &&
                         pixelData[e + 1] !== 0 &&
@@ -94,9 +104,9 @@ export function PlaceholdersAndVanishTextarea({
                                 pixelData[e],
                                 pixelData[e + 1],
                                 pixelData[e + 2],
-                                pixelData[e + 3],
-                            ],
-                        });
+                                pixelData[e + 3]
+                            ]
+                        })
                     }
                 }
             }
@@ -105,91 +115,93 @@ export function PlaceholdersAndVanishTextarea({
                 x,
                 y,
                 r: 1,
-                color: `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`,
-            }));
+                color: `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`
+            }))
         },
         [textareaRef]
-    );
+    )
 
     const animate = (start: number) => {
         const animateFrame = (pos: number = 0) => {
             requestAnimationFrame(() => {
-                const newArr = [];
+                const newArr = []
                 for (let i = 0; i < newDataRef.current.length; i++) {
-                    const current = newDataRef.current[i];
+                    const current = newDataRef.current[i]
                     if (current.x < pos) {
-                        newArr.push(current);
+                        newArr.push(current)
                     } else {
                         if (current.r <= 0) {
-                            current.r = 0;
-                            continue;
+                            current.r = 0
+                            continue
                         }
-                        current.x += Math.random() > 0.5 ? 1 : -1;
-                        current.y += Math.random() > 0.5 ? 1 : -1;
-                        current.r -= 0.05 * Math.random();
-                        newArr.push(current);
+                        current.x += Math.random() > 0.5 ? 1 : -1
+                        current.y += Math.random() > 0.5 ? 1 : -1
+                        current.r -= 0.05 * Math.random()
+                        newArr.push(current)
                     }
                 }
-                newDataRef.current = newArr;
-                const ctx = canvasRef.current?.getContext("2d");
+                newDataRef.current = newArr
+                const ctx = canvasRef.current?.getContext("2d")
                 if (ctx) {
-                    ctx.clearRect(pos, 0, 800, 800);
-                    newDataRef.current.forEach((t) => {
-                        const { x: n, y: i, r: s, color: color } = t;
+                    ctx.clearRect(pos, 0, 800, 800)
+                    newDataRef.current.forEach(t => {
+                        const { x: n, y: i, r: s, color: color } = t
                         if (n > pos) {
-                            ctx.beginPath();
-                            ctx.rect(n, i, s, s);
-                            ctx.fillStyle = color;
-                            ctx.strokeStyle = color;
-                            ctx.stroke();
+                            ctx.beginPath()
+                            ctx.rect(n, i, s, s)
+                            ctx.fillStyle = color
+                            ctx.strokeStyle = color
+                            ctx.stroke()
                         }
-                    });
+                    })
                 }
                 if (newDataRef.current.length > 0) {
-                    animateFrame(pos - 8);
+                    animateFrame(pos - 8)
                 } else {
-                    setValue("");
-                    setAnimating(false);
+                    setValue("")
+                    setAnimating(false)
                 }
-            });
-        };
-        animateFrame(start);
-    };
+            })
+        }
+        animateFrame(start)
+    }
 
     const vanishAndSubmit = () => {
-        setAnimating(true);
-        let inputValue = textareaRef.current?.value || placeholders[currentPlaceholder];
-        draw(inputValue);
+        setAnimating(true)
+        let inputValue =
+            textareaRef.current?.value || placeholders[currentPlaceholder]
+        draw(inputValue)
 
         if (inputValue && textareaRef.current) {
             const maxX = newDataRef.current.reduce(
                 (prev, current) => (current.x > prev ? current.x : prev),
                 0
-            );
-            animate(maxX);
+            )
+            animate(maxX)
         }
-        window.open(`https://www.scimantic.com/demo?input=${encodeURIComponent(inputValue)}`, "_blank");
-    };
+        window.open(
+            `https://www.scimantic.com/demo?input=${encodeURIComponent(inputValue)}`,
+            "_blank"
+        )
+    }
 
-    const handleKeyDown = (
-        e: React.KeyboardEvent<HTMLTextAreaElement>
-    ) => {
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === "Enter" && !animating) {
             if (!value) {
-                e.preventDefault();
-                vanishAndSubmit();
+                e.preventDefault()
+                vanishAndSubmit()
             } else if (e.ctrlKey) {
-                e.preventDefault();
-                vanishAndSubmit();
+                e.preventDefault()
+                vanishAndSubmit()
             }
         }
-    };
+    }
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        vanishAndSubmit();
-        onSubmit && onSubmit(e);
-    };
+        e.preventDefault()
+        vanishAndSubmit()
+        onSubmit && onSubmit(e)
+    }
 
     return (
         <form
@@ -208,10 +220,10 @@ export function PlaceholdersAndVanishTextarea({
             />
             <textarea
                 rows={5}
-                onChange={(e) => {
+                onChange={e => {
                     if (!animating) {
-                        setValue(e.target.value);
-                        onChange && onChange(e);
+                        setValue(e.target.value)
+                        onChange && onChange(e)
                     }
                 }}
                 onKeyDown={handleKeyDown}
@@ -245,14 +257,14 @@ export function PlaceholdersAndVanishTextarea({
                         d="M5 12l14 0"
                         initial={{
                             strokeDasharray: "50%",
-                            strokeDashoffset: "50%",
+                            strokeDashoffset: "50%"
                         }}
                         animate={{
-                            strokeDashoffset: value ? 0 : "50%",
+                            strokeDashoffset: value ? 0 : "50%"
                         }}
                         transition={{
                             duration: 0.8,
-                            ease: "linear",
+                            ease: "linear"
                         }}
                     />
                     <path d="M13 18l6 -6" />
@@ -266,20 +278,20 @@ export function PlaceholdersAndVanishTextarea({
                         <motion.p
                             initial={{
                                 y: 5,
-                                opacity: 0,
+                                opacity: 0
                             }}
                             key={`current-placeholder-${currentPlaceholder}`}
                             animate={{
                                 y: 0,
-                                opacity: 1,
+                                opacity: 1
                             }}
                             exit={{
                                 y: -15,
-                                opacity: 0,
+                                opacity: 0
                             }}
                             transition={{
                                 duration: 0.8,
-                                ease: "linear",
+                                ease: "linear"
                             }}
                             className="dark:text-zinc-500 text-sm sm:text-base font-normal text-neutral-500 w-full"
                         >
@@ -289,5 +301,5 @@ export function PlaceholdersAndVanishTextarea({
                 </AnimatePresence>
             </div>
         </form>
-    );
+    )
 }

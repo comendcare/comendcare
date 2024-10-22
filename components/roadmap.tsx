@@ -1,19 +1,23 @@
 "use client"
 
-import * as React from "react";
-import { useNavStore } from "@/state/nav/navStore";
-import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
-import { useShallow } from "zustand/react/shallow";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { ResizablePanel, ResizablePanelGroup, ResizableHandle } from "@/components/ui/resizable";
-import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs";
-import Flow from "@/components/flow";
-import Kanban from "@/components/kanban";
-import { Button } from "./ui/button";
-import { FaX } from "react-icons/fa6";
-import { EditMilestoneForm } from "./edit-milestone-form";
-import { useState } from "react";
-import { MilestoneDetails } from "./milestone-details";
+import * as React from "react"
+import { useNavStore } from "@/state/nav/navStore"
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { useShallow } from "zustand/react/shallow"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import {
+    ResizablePanel,
+    ResizablePanelGroup,
+    ResizableHandle
+} from "@/components/ui/resizable"
+import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
+import Flow from "@/components/flow"
+import Kanban from "@/components/kanban"
+import { Button } from "./ui/button"
+import { FaX } from "react-icons/fa6"
+import { EditMilestoneForm } from "./edit-milestone-form"
+import { useState } from "react"
+import { MilestoneDetails } from "./milestone-details"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -22,10 +26,19 @@ const selector = (state: RoadmapState) => ({
     milestones: state.milestones
 })
 
-export function Roadmap({ initNodes, initEdges, initMilestones }: { initNodes: any[], initEdges: any[], initMilestones: any[] }) {
+export function Roadmap({
+    initNodes,
+    initEdges,
+    initMilestones
+}: {
+    initNodes: any[]
+    initEdges: any[]
+    initMilestones: any[]
+}) {
     // Zustand state management
     const { defaultLayout, setLayout } = useNavStore()
-    const { selectedNodeId, setSelectedNodeId, nodes, milestones } = useRoadmapStore( useShallow(selector) )
+    const { selectedNodeId, setSelectedNodeId, nodes, milestones } =
+        useRoadmapStore(useShallow(selector))
 
     const handlePanelChange = (open: boolean) => {
         if (!open) setSelectedNodeId(null)
@@ -36,7 +49,7 @@ export function Roadmap({ initNodes, initEdges, initMilestones }: { initNodes: a
             <ResizablePanelGroup
                 direction="horizontal"
                 onLayout={(sizes: number[]) => {
-                    setLayout(sizes); // Use Zustand's setLayout to save panel sizes
+                    setLayout(sizes) // Use Zustand's setLayout to save panel sizes
                 }}
                 className="h-full items-stretch"
             >
@@ -48,8 +61,16 @@ export function Roadmap({ initNodes, initEdges, initMilestones }: { initNodes: a
                         </TabsList>
 
                         {/* Roadmap View */}
-                        <TabsContent value="roadmap" className="m-0 h-[calc(100vh-3.5rem)]">
-                            <Flow width={defaultLayout[0]} initNodes={initNodes} initEdges={initEdges} initMilestones={initMilestones}/>
+                        <TabsContent
+                            value="roadmap"
+                            className="m-0 h-[calc(100vh-3.5rem)]"
+                        >
+                            <Flow
+                                width={defaultLayout[0]}
+                                initNodes={initNodes}
+                                initEdges={initEdges}
+                                initMilestones={initMilestones}
+                            />
                         </TabsContent>
 
                         {/* Kanban View */}
@@ -63,7 +84,11 @@ export function Roadmap({ initNodes, initEdges, initMilestones }: { initNodes: a
                     <>
                         <ResizableHandle withHandle />
 
-                        <ResizablePanel defaultSize={defaultLayout[1]} minSize={30} className="p-10 flex flex-col gap-4">
+                        <ResizablePanel
+                            defaultSize={defaultLayout[1]}
+                            minSize={30}
+                            className="p-10 flex flex-col gap-4"
+                        >
                             {/* <span className="flex flex-row justify-between items-center">
                                 <h1 className="text-2xl font-bold">Milestone Details</h1>
                                 <Button onClick={() => handlePanelChange(false)}><FaX /></Button>
@@ -71,8 +96,11 @@ export function Roadmap({ initNodes, initEdges, initMilestones }: { initNodes: a
                             <EditMilestoneForm 
                                 milestoneData={milestones.find(milestone => milestone.nodeId === selectedNodeId)}
                             /> */}
-                            <MilestoneDetailsPanel 
-                                milestone={milestones.find(milestone => milestone.nodeId === selectedNodeId)}
+                            <MilestoneDetailsPanel
+                                milestone={milestones.find(
+                                    milestone =>
+                                        milestone.nodeId === selectedNodeId
+                                )}
                                 handlePanelChange={handlePanelChange}
                             />
                         </ResizablePanel>
@@ -83,12 +111,12 @@ export function Roadmap({ initNodes, initEdges, initMilestones }: { initNodes: a
     )
 }
 
-const MilestoneDetailsPanel = ({ 
-    milestone, 
-    handlePanelChange 
-}: { 
-    milestone: any, 
-    handlePanelChange: (open: boolean) => void 
+const MilestoneDetailsPanel = ({
+    milestone,
+    handlePanelChange
+}: {
+    milestone: any
+    handlePanelChange: (open: boolean) => void
 }) => {
     const [isEditing, setIsEditing] = useState(false)
 
@@ -99,20 +127,31 @@ const MilestoneDetailsPanel = ({
 
     return (
         <>
-        <span className="flex flex-row justify-between items-center gap-4">
-            <h1 className="text-2xl font-bold grow">
-                {isEditing ? `Edit Milestone Details` : `Milestone Details`}
-            </h1>
-            {isEditing ?
-                <Button onClick={() => setIsEditing(false)}>Cancel Editing</Button> :
-                <Button onClick={() => setIsEditing(true)}>Edit Milestone</Button>
-            }
-            <Button onClick={handleClose}><FaX /></Button>
-        </span>
-        {isEditing ? 
-            <EditMilestoneForm milestoneData={milestone} onClose={() => setIsEditing(false)}/> : 
-            <MilestoneDetails milestoneData={milestone} />
-        }
+            <span className="flex flex-row justify-between items-center gap-4">
+                <h1 className="text-2xl font-bold grow">
+                    {isEditing ? `Edit Milestone Details` : `Milestone Details`}
+                </h1>
+                {isEditing ? (
+                    <Button onClick={() => setIsEditing(false)}>
+                        Cancel Editing
+                    </Button>
+                ) : (
+                    <Button onClick={() => setIsEditing(true)}>
+                        Edit Milestone
+                    </Button>
+                )}
+                <Button onClick={handleClose}>
+                    <FaX />
+                </Button>
+            </span>
+            {isEditing ? (
+                <EditMilestoneForm
+                    milestoneData={milestone}
+                    onClose={() => setIsEditing(false)}
+                />
+            ) : (
+                <MilestoneDetails milestoneData={milestone} />
+            )}
         </>
     )
 }
