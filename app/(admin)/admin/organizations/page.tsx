@@ -30,7 +30,7 @@ export default function AllOrganizations({
                     }
                 >
                     <Organizations
-                        organizationId={decodeURIComponent(params.id)}
+                        // organizationId={decodeURIComponent(params.id)}
                     />
                 </Suspense>
             </div>
