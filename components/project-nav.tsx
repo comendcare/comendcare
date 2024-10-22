@@ -1,26 +1,30 @@
 "use client"
 
 import Link from "next/link"
-import {usePathname} from "next/navigation"
+import { usePathname } from "next/navigation"
 
-import {cn} from "@/lib/utils"
+import { cn } from "@/lib/utils"
 
 const links = [
     {
         name: "Researchers",
-        href: "/researchers",
+        href: "/researchers"
     },
     {
         name: "Contractors",
-        href: "/contractors",
-    },
+        href: "/contractors"
+    }
 ]
 
 interface ExamplesNavProps extends React.HTMLAttributes<HTMLDivElement> {
     projectId: string
 }
 
-export function ProjectNav({className, projectId, ...props}: ExamplesNavProps) {
+export function ProjectNav({
+    className,
+    projectId,
+    ...props
+}: ExamplesNavProps) {
     const pathname = usePathname()
 
     return (
@@ -32,7 +36,7 @@ export function ProjectNav({className, projectId, ...props}: ExamplesNavProps) {
                     className={cn(
                         "flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
                         pathname?.endsWith(link.href) ||
-                        (index === 0 && pathname === "/")
+                            (index === 0 && pathname === "/")
                             ? "bg-muted font-medium text-primary"
                             : "text-muted-foreground"
                     )}

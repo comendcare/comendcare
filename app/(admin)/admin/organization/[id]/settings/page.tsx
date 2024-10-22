@@ -1,18 +1,18 @@
-import prisma from "@/lib/prisma";
-import Form from "@/components/form";
-import {updateOrganization} from "@/lib/actions";
-import DeleteOrganizationForm from "@/components/form/delete-organization-form";
+import prisma from "@/lib/prisma"
+import Form from "@/components/form"
+import { updateOrganization } from "@/lib/actions"
+import DeleteOrganizationForm from "@/components/form/delete-organization-form"
 
 export default async function SiteSettingsIndex({
-                                                    params,
-                                                }: {
-    params: { id: string };
+    params
+}: {
+    params: { id: string }
 }) {
     const data = await prisma.organization.findUnique({
         where: {
-            id: decodeURIComponent(params.id),
-        },
-    });
+            id: decodeURIComponent(params.id)
+        }
+    })
 
     return (
         <div className="flex flex-col space-y-6">
@@ -25,7 +25,7 @@ export default async function SiteSettingsIndex({
                     type: "text",
                     defaultValue: data?.name!,
                     placeholder: "My Awesome Site",
-                    maxLength: 32,
+                    maxLength: 32
                 }}
                 handleSubmit={updateOrganization}
             />
@@ -38,12 +38,12 @@ export default async function SiteSettingsIndex({
                     name: "description",
                     type: "text",
                     defaultValue: data?.description!,
-                    placeholder: "A blog about really interesting things.",
+                    placeholder: "A blog about really interesting things."
                 }}
                 handleSubmit={updateOrganization}
             />
 
-            <DeleteOrganizationForm organizationName={data?.name!}/>
+            <DeleteOrganizationForm organizationName={data?.name!} />
         </div>
-    );
+    )
 }

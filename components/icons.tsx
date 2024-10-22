@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react"
 
 // import type { IconProps } from '@radix-ui/react-icons/dist/types';
-import type {IconBaseProps} from "react-icons";
+import type { IconBaseProps } from "react-icons"
 
-import { cva } from 'class-variance-authority';
+import { cva } from "class-variance-authority"
 import {
     AlignCenter,
     AlignJustify,
@@ -84,10 +84,10 @@ import {
     Ungroup,
     Unlink,
     WrapText,
-    X,
-} from 'lucide-react';
+    X
+} from "lucide-react"
 
-export type Icon = LucideIcon;
+export type Icon = LucideIcon
 
 const borderAll = (props: LucideProps) => (
     <svg
@@ -102,7 +102,7 @@ const borderAll = (props: LucideProps) => (
     >
         <path d="M3 6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6zm10 13h5a1 1 0 0 0 1-1v-5h-6v6zm-2-6H5v5a1 1 0 0 0 1 1h5v-6zm2-2h6V6a1 1 0 0 0-1-1h-5v6zm-2-6H6a1 1 0 0 0-1 1v5h6V5z" />
     </svg>
-);
+)
 
 const borderBottom = (props: LucideProps) => (
     <svg
@@ -117,7 +117,7 @@ const borderBottom = (props: LucideProps) => (
     >
         <path d="M13 5a1 1 0 1 0 0-2h-2a1 1 0 1 0 0 2h2zm-8 6a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2zm-2 7a1 1 0 1 1 2 0 1 1 0 0 0 1 1h12a1 1 0 0 0 1-1 1 1 0 1 1 2 0 3 3 0 0 1-3 3H6a3 3 0 0 1-3-3zm17-8a1 1 0 0 0-1 1v2a1 1 0 1 0 2 0v-2a1 1 0 0 0-1-1zM7 4a1 1 0 0 0-1-1 3 3 0 0 0-3 3 1 1 0 0 0 2 0 1 1 0 0 1 1-1 1 1 0 0 0 1-1zm11-1a1 1 0 1 0 0 2 1 1 0 0 1 1 1 1 1 0 1 0 2 0 3 3 0 0 0-3-3z" />
     </svg>
-);
+)
 
 const borderLeft = (props: LucideProps) => (
     <svg
@@ -132,7 +132,7 @@ const borderLeft = (props: LucideProps) => (
     >
         <path d="M6 21a1 1 0 1 0 0-2 1 1 0 0 1-1-1V6a1 1 0 0 1 1-1 1 1 0 0 0 0-2 3 3 0 0 0-3 3v12a3 3 0 0 0 3 3zm7-16a1 1 0 1 0 0-2h-2a1 1 0 1 0 0 2h2zm6 6a1 1 0 1 1 2 0v2a1 1 0 1 1-2 0v-2zm-5 9a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1zm4-17a1 1 0 1 0 0 2 1 1 0 0 1 1 1 1 1 0 1 0 2 0 3 3 0 0 0-3-3zm-1 17a1 1 0 0 0 1 1 3 3 0 0 0 3-3 1 1 0 1 0-2 0 1 1 0 0 1-1 1 1 1 0 0 0-1 1z" />
     </svg>
-);
+)
 
 const borderNone = (props: LucideProps) => (
     <svg
@@ -147,7 +147,7 @@ const borderNone = (props: LucideProps) => (
     >
         <path d="M14 4a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1zm-9 7a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2zm14 0a1 1 0 1 1 2 0v2a1 1 0 1 1-2 0v-2zm-6 10a1 1 0 1 0 0-2h-2a1 1 0 1 0 0 2h2zM7 4a1 1 0 0 0-1-1 3 3 0 0 0-3 3 1 1 0 0 0 2 0 1 1 0 0 1 1-1 1 1 0 0 0 1-1zm11-1a1 1 0 1 0 0 2 1 1 0 0 1 1 1 1 1 0 1 0 2 0 3 3 0 0 0-3-3zM7 20a1 1 0 0 1-1 1 3 3 0 0 1-3-3 1 1 0 1 1 2 0 1 1 0 0 0 1 1 1 1 0 0 1 1 1zm11 1a1 1 0 1 1 0-2 1 1 0 0 0 1-1 1 1 0 1 1 2 0 3 3 0 0 1-3 3z" />
     </svg>
-);
+)
 
 const borderRight = (props: LucideProps) => (
     <svg
@@ -162,7 +162,7 @@ const borderRight = (props: LucideProps) => (
     >
         <path d="M13 5a1 1 0 1 0 0-2h-2a1 1 0 1 0 0 2h2zm-8 6a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2zm9 9a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1zM6 3a1 1 0 0 1 0 2 1 1 0 0 0-1 1 1 1 0 0 1-2 0 3 3 0 0 1 3-3zm1 17a1 1 0 0 1-1 1 3 3 0 0 1-3-3 1 1 0 1 1 2 0 1 1 0 0 0 1 1 1 1 0 0 1 1 1zm11 1a1 1 0 1 1 0-2 1 1 0 0 0 1-1V6a1 1 0 0 0-1-1 1 1 0 1 1 0-2 3 3 0 0 1 3 3v12a3 3 0 0 1-3 3z" />
     </svg>
-);
+)
 
 const borderTop = (props: LucideProps) => (
     <svg
@@ -177,7 +177,7 @@ const borderTop = (props: LucideProps) => (
     >
         <path d="M3 6a1 1 0 0 0 2 0 1 1 0 0 1 1-1h12a1 1 0 0 1 1 1 1 1 0 1 0 2 0 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3zm2 5a1 1 0 1 0-2 0v2a1 1 0 1 0 2 0v-2zm14 0a1 1 0 1 1 2 0v2a1 1 0 1 1-2 0v-2zm-5 9a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1zm-8 1a1 1 0 1 0 0-2 1 1 0 0 1-1-1 1 1 0 1 0-2 0 3 3 0 0 0 3 3zm11-1a1 1 0 0 0 1 1 3 3 0 0 0 3-3 1 1 0 1 0-2 0 1 1 0 0 1-1 1 1 1 0 0 0-1 1z" />
     </svg>
-);
+)
 
 const discord = (props: LucideProps) => (
     <svg
@@ -200,7 +200,7 @@ const discord = (props: LucideProps) => (
             </clipPath>
         </defs>
     </svg>
-);
+)
 
 const gitHub = (props: LucideProps) => (
     <svg viewBox="0 0 438.549 438.549" {...props}>
@@ -209,7 +209,7 @@ const gitHub = (props: LucideProps) => (
             fill="currentColor"
         />
     </svg>
-);
+)
 
 const npm = (props: LucideProps) => (
     <svg viewBox="0 0 24 24" {...props}>
@@ -218,7 +218,7 @@ const npm = (props: LucideProps) => (
             fill="currentColor"
         />
     </svg>
-);
+)
 
 const radix = (props: LucideProps) => (
     <svg fill="none" viewBox="0 0 25 25" {...props}>
@@ -232,7 +232,7 @@ const radix = (props: LucideProps) => (
             fill="currentcolor"
         />
     </svg>
-);
+)
 const react = (props: LucideProps) => (
     <svg viewBox="0 0 24 24" {...props}>
         <path
@@ -240,7 +240,7 @@ const react = (props: LucideProps) => (
             fill="currentColor"
         />
     </svg>
-);
+)
 
 const tailwind = (props: LucideProps) => (
     <svg viewBox="0 0 24 24" {...props}>
@@ -249,7 +249,7 @@ const tailwind = (props: LucideProps) => (
             fill="currentColor"
         />
     </svg>
-);
+)
 const yarn = (props: LucideProps) => (
     <svg viewBox="0 0 24 24" {...props}>
         <path
@@ -257,7 +257,7 @@ const yarn = (props: LucideProps) => (
             fill="currentColor"
         />
     </svg>
-);
+)
 
 export const DoubleColumnOutlined = (props: LucideProps) => (
     <svg
@@ -275,7 +275,7 @@ export const DoubleColumnOutlined = (props: LucideProps) => (
             fillRule="evenodd"
         />
     </svg>
-);
+)
 
 export const ThreeColumnOutlined = (props: LucideProps) => (
     <svg
@@ -293,7 +293,7 @@ export const ThreeColumnOutlined = (props: LucideProps) => (
             fillRule="evenodd"
         />
     </svg>
-);
+)
 
 export const RightSideDoubleColumnOutlined = (props: LucideProps) => (
     <svg
@@ -311,7 +311,7 @@ export const RightSideDoubleColumnOutlined = (props: LucideProps) => (
             fillRule="evenodd"
         />
     </svg>
-);
+)
 
 export const LeftSideDoubleColumnOutlined = (props: LucideProps) => (
     <svg
@@ -329,7 +329,7 @@ export const LeftSideDoubleColumnOutlined = (props: LucideProps) => (
             fillRule="evenodd"
         />
     </svg>
-);
+)
 
 export const DoubleSideDoubleColumnOutlined = (props: LucideProps) => (
     <svg
@@ -347,7 +347,7 @@ export const DoubleSideDoubleColumnOutlined = (props: LucideProps) => (
             fillRule="evenodd"
         />
     </svg>
-);
+)
 
 const LayoutIcon = (props: LucideProps) => (
     <svg
@@ -373,7 +373,7 @@ const LayoutIcon = (props: LucideProps) => (
             fill="#595E6F"
         />
     </svg>
-);
+)
 
 export const Icons = {
     LayoutIcon,
@@ -490,19 +490,19 @@ export const Icons = {
     ungroup: Ungroup,
     unlink: Link2Off,
     viewing: Eye,
-    yarn,
-};
+    yarn
+}
 
-export const iconVariants = cva('', {
+export const iconVariants = cva("", {
     defaultVariants: {},
     variants: {
         size: {
-            md: 'mr-2 size-6',
-            sm: 'mr-2 size-4',
+            md: "mr-2 size-6",
+            sm: "mr-2 size-4"
         },
         variant: {
-            menuItem: 'mr-2 size-5',
-            toolbar: 'size-5',
-        },
-    },
-});
+            menuItem: "mr-2 size-5",
+            toolbar: "size-5"
+        }
+    }
+})
