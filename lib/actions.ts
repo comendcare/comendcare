@@ -1,37 +1,37 @@
-"use server";
+"use server"
 
-import prisma from "@/lib/prisma";
-import {Roadmap, Organization} from "@prisma/client";
-import {revalidateTag} from "next/cache";
-import {withRoadmapAuth, withOrganizationAuth} from "./auth";
-import {getSession} from "@/lib/auth";
+import prisma from "@/lib/prisma"
+import { Roadmap, Organization } from "@prisma/client"
+import { revalidateTag } from "next/cache"
+import { withRoadmapAuth, withOrganizationAuth } from "./auth"
+import { getSession } from "@/lib/auth"
 import {
     addDomainToVercel,
     // getApexDomain,
     removeDomainFromVercelProject,
     // removeDomainFromVercelTeam,
-    validDomainRegex,
-} from "@/lib/domains";
-import {put} from "@vercel/blob";
-import {customAlphabet} from "nanoid";
-import {getBlurDataURL} from "@/lib/utils";
-import { Session } from "next-auth";
+    validDomainRegex
+} from "@/lib/domains"
+import { put } from "@vercel/blob"
+import { customAlphabet } from "nanoid"
+import { getBlurDataURL } from "@/lib/utils"
+import { Session } from "next-auth"
 
 const nanoid = customAlphabet(
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
-    7,
-); // 7-character random string
+    7
+) // 7-character random string
 
 export const createOrganization = async (formData: FormData) => {
-    const session = await getSession();
+    const session = await getSession()
     if (!session?.user.id) {
         return {
-            error: "Not authenticated",
-        };
+            error: "Not authenticated"
+        }
     }
-    const name = formData.get("name") as string;
-    const description = formData.get("description") as string;
-    const subdomain = formData.get("subdomain") as string;
+    const name = formData.get("name") as string
+    const description = formData.get("description") as string
+    const subdomain = formData.get("subdomain") as string
 
     try {
         const response = await prisma.organization.create({
@@ -41,72 +41,77 @@ export const createOrganization = async (formData: FormData) => {
                 subdomain,
                 user: {
                     connect: {
-                        id: session.user.id,
-                    },
-                },
-            },
-        });
+                        id: session.user.id
+                    }
+                }
+            }
+        })
         await revalidateTag(
-            `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
-        );
-        return response;
+            `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+        )
+        return response
     } catch (error: any) {
         if (error.code === "P2002") {
             return {
-                error: `This subdomain is already taken`,
-            };
+                error: `This subdomain is already taken`
+            }
         } else {
             return {
-                error: error.message,
-            };
+                error: error.message
+            }
         }
     }
-};
+}
 
 export const updateOrganization = withOrganizationAuth(
     async (formData: FormData, organization: Organization, key: string) => {
-        const value = formData.get(key) as string;
+        const value = formData.get(key) as string
 
         try {
-            let response;
+            let response
 
             if (key === "customDomain") {
                 if (value.includes("vercel.pub")) {
                     return {
-                        error: "Cannot use vercel.pub subdomain as your custom domain",
-                    };
+                        error: "Cannot use vercel.pub subdomain as your custom domain"
+                    }
 
                     // if the custom domain is valid, we need to add it to Vercel
                 } else if (validDomainRegex.test(value)) {
                     response = await prisma.organization.update({
                         where: {
-                            id: organization.id,
+                            id: organization.id
                         },
                         data: {
-                            customDomain: value,
-                        },
-                    });
+                            customDomain: value
+                        }
+                    })
                     await Promise.all([
-                        addDomainToVercel(value),
+                        addDomainToVercel(value)
                         // Optional: add www subdomain as well and redirect to apex domain
                         // addDomainToVercel(`www.${value}`),
-                    ]);
+                    ])
 
                     // empty value means the user wants to remove the custom domain
                 } else if (value === "") {
                     response = await prisma.organization.update({
                         where: {
-                            id: organization.id,
+                            id: organization.id
                         },
                         data: {
-                            customDomain: null,
-                        },
-                    });
+                            customDomain: null
+                        }
+                    })
                 }
 
                 // if the organization had a different customDomain before, we need to remove it from Vercel
-                if (organization.customDomain && organization.customDomain !== value) {
-                    response = await removeDomainFromVercelProject(organization.customDomain);
+                if (
+                    organization.customDomain &&
+                    organization.customDomain !== value
+                ) {
+                    response = await removeDomainFromVercelProject(
+                        organization.customDomain
+                    )
 
                     /* Optional: remove domain from Vercel team
 
@@ -144,294 +149,309 @@ export const updateOrganization = withOrganizationAuth(
             } else if (key === "image" || key === "logo") {
                 if (!process.env.BLOB_READ_WRITE_TOKEN) {
                     return {
-                        error:
-                            "Missing BLOB_READ_WRITE_TOKEN token. Note: Vercel Blob is currently in beta – please fill out this form for access: https://tally.so/r/nPDMNd",
-                    };
+                        error: "Missing BLOB_READ_WRITE_TOKEN token. Note: Vercel Blob is currently in beta – please fill out this form for access: https://tally.so/r/nPDMNd"
+                    }
                 }
 
-                const file = formData.get(key) as File;
-                const filename = `${nanoid()}.${file.type.split("/")[1]}`;
+                const file = formData.get(key) as File
+                const filename = `${nanoid()}.${file.type.split("/")[1]}`
 
-                const {url} = await put(filename, file, {
-                    access: "public",
-                });
+                const { url } = await put(filename, file, {
+                    access: "public"
+                })
 
-                const blurhash = key === "image" ? await getBlurDataURL(url) : null;
+                const blurhash =
+                    key === "image" ? await getBlurDataURL(url) : null
 
                 response = await prisma.organization.update({
                     where: {
-                        id: organization.id,
+                        id: organization.id
                     },
                     data: {
                         [key]: url,
-                        ...(blurhash && {imageBlurhash: blurhash}),
-                    },
-                });
+                        ...(blurhash && { imageBlurhash: blurhash })
+                    }
+                })
             } else {
                 response = await prisma.organization.update({
                     where: {
-                        id: organization.id,
+                        id: organization.id
                     },
                     data: {
-                        [key]: value,
-                    },
-                });
+                        [key]: value
+                    }
+                })
             }
             console.log(
                 "Updated organization data! Revalidating tags: ",
                 `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
-                `${organization.customDomain}-metadata`,
-            );
+                `${organization.customDomain}-metadata`
+            )
             await revalidateTag(
-                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
-            );
+                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+            )
             organization.customDomain &&
-            (await revalidateTag(`${organization.customDomain}-metadata`));
+                (await revalidateTag(`${organization.customDomain}-metadata`))
 
-            return response;
+            return response
         } catch (error: any) {
             if (error.code === "P2002") {
                 return {
-                    error: `This ${key} is already taken`,
-                };
+                    error: `This ${key} is already taken`
+                }
             } else {
                 return {
-                    error: error.message,
-                };
+                    error: error.message
+                }
             }
         }
-    },
-);
-
-export const deleteOrganization = withOrganizationAuth(async (_: FormData, organization: Organization) => {
-    try {
-        const response = await prisma.organization.delete({
-            where: {
-                id: organization.id,
-            },
-        });
-        await revalidateTag(
-            `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
-        );
-        response.customDomain &&
-        (await revalidateTag(`${organization.customDomain}-metadata`));
-        return response;
-    } catch (error: any) {
-        return {
-            error: error.message,
-        };
     }
-});
+)
+
+export const deleteOrganization = withOrganizationAuth(
+    async (_: FormData, organization: Organization) => {
+        try {
+            const response = await prisma.organization.delete({
+                where: {
+                    id: organization.id
+                }
+            })
+            await revalidateTag(
+                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+            )
+            response.customDomain &&
+                (await revalidateTag(`${organization.customDomain}-metadata`))
+            return response
+        } catch (error: any) {
+            return {
+                error: error.message
+            }
+        }
+    }
+)
 
 export const getOrganizationFromRoadmapId = async (roadmapId: string) => {
     const roadmap = await prisma.roadmap.findUnique({
         where: {
-            id: roadmapId,
+            id: roadmapId
         },
         select: {
-            organizationId: true,
-        },
-    });
-    return roadmap?.organizationId;
-};
+            organizationId: true
+        }
+    })
+    return roadmap?.organizationId
+}
 
-export const createRoadmap = withOrganizationAuth(async (_: FormData, organization: Organization) => {
-    const session = await getSession();
-    if (!session?.user.id) {
-        return {
-            error: "Not authenticated",
-        };
+export const createRoadmap = withOrganizationAuth(
+    async (_: FormData, organization: Organization) => {
+        const session = await getSession()
+        if (!session?.user.id) {
+            return {
+                error: "Not authenticated"
+            }
+        }
+        const response = await prisma.roadmap.create({
+            data: {
+                organizationId: organization.id,
+                userId: session.user.id
+            }
+        })
+
+        await revalidateTag(
+            `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-roadmaps`
+        )
+        organization.customDomain &&
+            (await revalidateTag(`${organization.customDomain}-roadmaps`))
+
+        return response
     }
-    const response = await prisma.roadmap.create({
-        data: {
-            organizationId: organization.id,
-            userId: session.user.id,
-        },
-    });
-
-    await revalidateTag(
-        `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-roadmaps`,
-    );
-    organization.customDomain && (await revalidateTag(`${organization.customDomain}-roadmaps`));
-
-    return response;
-});
+)
 
 // creating a separate function for this because we're not using FormData
 export const updateRoadmap = async (data: Roadmap) => {
-    const session = await getSession();
+    const session = await getSession()
     if (!session?.user.id) {
         return {
-            error: "Not authenticated",
-        };
+            error: "Not authenticated"
+        }
     }
     const roadmap = await prisma.roadmap.findUnique({
         where: {
-            id: data.id,
+            id: data.id
         },
         include: {
-            organization: true,
-        },
-    });
+            organization: true
+        }
+    })
     if (!roadmap || roadmap.userId !== session.user.id) {
         return {
-            error: "Roadmap not found",
-        };
+            error: "Roadmap not found"
+        }
     }
     try {
         const response = await prisma.roadmap.update({
             where: {
-                id: data.id,
+                id: data.id
             },
             data: {
                 title: data.title,
                 description: data.description,
-                content: data.content,
-            },
-        });
+                content: data.content
+            }
+        })
 
         await revalidateTag(
-            `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-roadmap`,
-        );
+            `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-roadmap`
+        )
         await revalidateTag(
-            `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-${roadmap.slug}`,
-        );
+            `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-${roadmap.slug}`
+        )
 
         // if the organization has a custom domain, we need to revalidate those tags too
         roadmap.organization?.customDomain &&
-        (await revalidateTag(`${roadmap.organization?.customDomain}-roadmaps`),
-            await revalidateTag(`${roadmap.organization?.customDomain}-${roadmap.slug}`));
+            (await revalidateTag(
+                `${roadmap.organization?.customDomain}-roadmaps`
+            ),
+            await revalidateTag(
+                `${roadmap.organization?.customDomain}-${roadmap.slug}`
+            ))
 
-        return response;
+        return response
     } catch (error: any) {
         return {
-            error: error.message,
-        };
+            error: error.message
+        }
     }
-};
+}
 
 export const updateRoadmapMetadata = withRoadmapAuth(
     async (
         formData: FormData,
         roadmap: Roadmap & {
-            organization: Organization;
+            organization: Organization
         },
-        key: string,
+        key: string
     ) => {
-        const value = formData.get(key) as string;
+        const value = formData.get(key) as string
 
         try {
-            let response;
+            let response
             if (key === "image") {
-                const file = formData.get("image") as File;
-                const filename = `${nanoid()}.${file.type.split("/")[1]}`;
+                const file = formData.get("image") as File
+                const filename = `${nanoid()}.${file.type.split("/")[1]}`
 
-                const {url} = await put(filename, file, {
-                    access: "public",
-                });
+                const { url } = await put(filename, file, {
+                    access: "public"
+                })
 
-                const blurhash = await getBlurDataURL(url);
+                const blurhash = await getBlurDataURL(url)
 
                 response = await prisma.roadmap.update({
                     where: {
-                        id: roadmap.id,
+                        id: roadmap.id
                     },
                     data: {
                         image: url,
-                        imageBlurhash: blurhash,
-                    },
-                });
+                        imageBlurhash: blurhash
+                    }
+                })
             } else {
                 response = await prisma.roadmap.update({
                     where: {
-                        id: roadmap.id,
+                        id: roadmap.id
                     },
                     data: {
-                        [key]: key === "published" ? value === "true" : value,
-                    },
-                });
+                        [key]: key === "published" ? value === "true" : value
+                    }
+                })
             }
 
             await revalidateTag(
-                `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-roadmaps`,
-            );
+                `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-roadmaps`
+            )
             await revalidateTag(
-                `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-${roadmap.slug}`,
-            );
+                `${roadmap.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-${roadmap.slug}`
+            )
 
             // if the organization has a custom domain, we need to revalidate those tags too
             roadmap.organization?.customDomain &&
-            (await revalidateTag(`${roadmap.organization?.customDomain}-roadmaps`),
-                await revalidateTag(`${roadmap.organization?.customDomain}-${roadmap.slug}`));
+                (await revalidateTag(
+                    `${roadmap.organization?.customDomain}-roadmaps`
+                ),
+                await revalidateTag(
+                    `${roadmap.organization?.customDomain}-${roadmap.slug}`
+                ))
 
-            return response;
+            return response
         } catch (error: any) {
             if (error.code === "P2002") {
                 return {
-                    error: `This slug is already in use`,
-                };
+                    error: `This slug is already in use`
+                }
             } else {
                 return {
-                    error: error.message,
-                };
+                    error: error.message
+                }
             }
         }
-    },
-);
-
-export const deleteRoadmap = withRoadmapAuth(async (_: FormData, roadmap: Roadmap) => {
-    try {
-        const response = await prisma.roadmap.delete({
-            where: {
-                id: roadmap.id,
-            },
-            select: {
-                organizationId: true,
-            },
-        });
-        return response;
-    } catch (error: any) {
-        return {
-            error: error.message,
-        };
     }
-});
+)
+
+export const deleteRoadmap = withRoadmapAuth(
+    async (_: FormData, roadmap: Roadmap) => {
+        try {
+            const response = await prisma.roadmap.delete({
+                where: {
+                    id: roadmap.id
+                },
+                select: {
+                    organizationId: true
+                }
+            })
+            return response
+        } catch (error: any) {
+            return {
+                error: error.message
+            }
+        }
+    }
+)
 
 export const editUser = async (
     formData: FormData,
     _id: unknown,
-    key: string,
+    key: string
 ) => {
-    const session = await getSession();
+    const session = await getSession()
     if (!session?.user.id) {
         return {
-            error: "Not authenticated",
-        };
+            error: "Not authenticated"
+        }
     }
-    const value = formData.get(key) as string;
+    const value = formData.get(key) as string
 
     try {
         const response = await prisma.user.update({
             where: {
-                id: session.user.id,
+                id: session.user.id
             },
             data: {
-                [key]: value,
-            },
-        });
-        return response;
+                [key]: value
+            }
+        })
+        return response
     } catch (error: any) {
         if (error.code === "P2002") {
             return {
-                error: `This ${key} is already in use`,
-            };
+                error: `This ${key} is already in use`
+            }
         } else {
             return {
-                error: error.message,
-            };
+                error: error.message
+            }
         }
     }
-};
+}
 
 // Invite user function with updated Site model
 export async function inviteUser(
@@ -442,20 +462,20 @@ export async function inviteUser(
 ) {
     try {
         if (!session) {
-            throw new Error('You must be signed in to perform this action');
+            throw new Error("You must be signed in to perform this action")
         }
 
-        const lowerCaseEmail = email.toLowerCase();
+        const lowerCaseEmail = email.toLowerCase()
         const userExists = await prisma.user.findFirst({
             where: {
                 email: {
                     equals: lowerCaseEmail,
-                    mode: 'insensitive',
-                },
-            },
-        });
+                    mode: "insensitive"
+                }
+            }
+        })
 
-        let invitationId: string | undefined;
+        let invitationId: string | undefined
         if (!userExists) {
             const ticket = await prisma.invitation.create({
                 data: {
@@ -463,8 +483,8 @@ export async function inviteUser(
                     role: role,
                     organizationId: organizationId // Updated to siteId
                 }
-            });
-            invitationId = ticket.id;
+            })
+            invitationId = ticket.id
 
             return ticket
         }
@@ -482,8 +502,8 @@ export async function inviteUser(
         //     },
         // });
     } catch (error) {
-        console.error("Error inviting user:", error);
-        throw new Error("Failed to invite user.");
+        console.error("Error inviting user:", error)
+        throw new Error("Failed to invite user.")
     }
 }
 
@@ -496,12 +516,12 @@ export async function createOrGetSite(
     userId: string | undefined,
     description: string
 ) {
-    const session = await getSession();
+    const session = await getSession()
 
     if (!session?.user.id) {
         return {
-            error: "Not authenticated",
-        };
+            error: "Not authenticated"
+        }
     }
 
     try {
@@ -509,13 +529,13 @@ export async function createOrGetSite(
         if (input.siteSlug) {
             const site = await prisma.organization.findUnique({
                 where: {
-                    subdomain: input.siteSlug,
-                },
-            });
+                    subdomain: input.siteSlug
+                }
+            })
 
             // If the organization is found, return it
             if (site) {
-                return site;
+                return site
             }
         }
 
@@ -527,18 +547,18 @@ export async function createOrGetSite(
                     description: description,
                     user: {
                         connect: {
-                            id: session.user.id,
-                        },
-                    },
-                },
-            });
+                            id: session.user.id
+                        }
+                    }
+                }
+            })
         }
 
         // If neither name nor slug was provided or used, throw an error
-        throw new Error("Site name or slug must be provided");
+        throw new Error("Site name or slug must be provided")
     } catch (error) {
-        console.error("Error creating or retrieving organization:", error);
-        throw new Error("Failed to create or retrieve organization.");
+        console.error("Error creating or retrieving organization:", error)
+        throw new Error("Failed to create or retrieve organization.")
     }
 }
 
@@ -549,13 +569,13 @@ export async function addMemberToSite(
 ) {
     try {
         if (!session || !organizationId) {
-            throw new Error("Invalid session or organizationId");
+            throw new Error("Invalid session or organizationId")
         }
 
-        const email = session.user?.email;
+        const email = session.user?.email
 
         if (!email) {
-            throw new Error("Email is required but is missing");
+            throw new Error("Email is required but is missing")
         }
 
         // If session and organizationId are valid, create a new member for the organization
@@ -563,12 +583,12 @@ export async function addMemberToSite(
             data: {
                 email: email, // email is guaranteed to be a string here
                 organizationId: organizationId, // Updated to organizationId
-                role: 'admin',
-                userId: session.user?.id, // Ensure userId is also non-null
-            },
-        });
+                role: "admin",
+                userId: session.user?.id // Ensure userId is also non-null
+            }
+        })
     } catch (error) {
-        console.error("Error adding member to organization:", error);
-        throw new Error("Failed to add member to organization.");
+        console.error("Error adding member to organization:", error)
+        throw new Error("Failed to add member to organization.")
     }
 }

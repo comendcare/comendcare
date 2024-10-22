@@ -1,6 +1,6 @@
-import {Badge} from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge"
 import researchersHero from "@/public/illustrations/researchers-hero.svg"
-import Image from "next/image";
+import Image from "next/image"
 
 export default function ResearchersHeroSection() {
     return (
@@ -10,12 +10,10 @@ export default function ResearchersHeroSection() {
                     <div className="max-w-screen-md mx-auto text-4xl md:text-6xl font-bold">
                         <h1>
                             Do the research you want,&nbsp;
-                            <span
-                                className="text-transparent pr-2 bg-gradient-to-r from-[#EEAE43] to-[#E65D27] bg-clip-text">
+                            <span className="text-transparent pr-2 bg-gradient-to-r from-[#EEAE43] to-[#E65D27] bg-clip-text">
                                 with
                             </span>
-                            <span
-                                className="text-transparent px-2 bg-gradient-to-r from-[#5AC1CF] to-[#1E3A8A] bg-clip-text">
+                            <span className="text-transparent px-2 bg-gradient-to-r from-[#5AC1CF] to-[#1E3A8A] bg-clip-text">
                                 impact.
                             </span>
                         </h1>
@@ -43,5 +41,5 @@ export default function ResearchersHeroSection() {
                 </div>
             </div>
         </section>
-    );
+    )
 }

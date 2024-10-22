@@ -1,17 +1,17 @@
-import Link from "next/link";
-import prisma from "@/lib/prisma";
-import {notFound} from "next/navigation";
-import BlurImage from "@/components/blur-image";
-import {placeholderBlurhash, toDateString} from "@/lib/utils";
-import BlogCard from "@/components/blog-card";
-import {getRoadmapsForOrganization, getOrganizationData} from "@/lib/fetchers";
-import Image from "next/image";
+import Link from "next/link"
+import prisma from "@/lib/prisma"
+import { notFound } from "next/navigation"
+import BlurImage from "@/components/blur-image"
+import { placeholderBlurhash, toDateString } from "@/lib/utils"
+import BlogCard from "@/components/blog-card"
+import { getRoadmapsForOrganization, getOrganizationData } from "@/lib/fetchers"
+import Image from "next/image"
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
         select: {
             subdomain: true,
-            customDomain: true,
+            customDomain: true
         },
         // feel free to remove this filter if you want to generate paths for all organizations
         // where: {
@@ -20,32 +20,32 @@ export async function generateStaticParams() {
     });
 
     const allPaths = allOrganizations
-        .flatMap(({subdomain, customDomain}) => [
+        .flatMap(({ subdomain, customDomain }) => [
             subdomain && {
-                domain: `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
+                domain: `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
             },
             customDomain && {
-                domain: customDomain,
-            },
+                domain: customDomain
+            }
         ])
-        .filter(Boolean);
+        .filter(Boolean)
 
-    return allPaths;
+    return allPaths
 }
 
 export default async function OrganizationHomePage({
-                                               params,
-                                           }: {
-    params: { domain: string };
+    params
+}: {
+    params: { domain: string }
 }) {
-    const domain = decodeURIComponent(params.domain);
+    const domain = decodeURIComponent(params.domain)
     const [data, roadmaps] = await Promise.all([
         getOrganizationData(domain),
-        getRoadmapsForOrganization(domain),
-    ]);
+        getRoadmapsForOrganization(domain)
+    ])
 
     if (!data) {
-        notFound();
+        notFound()
     }
 
     return (
@@ -57,12 +57,17 @@ export default async function OrganizationHomePage({
                             <div className="group relative mx-auto h-80 w-full overflow-hidden sm:h-150 lg:rounded-xl">
                                 <BlurImage
                                     alt={roadmaps[0].title ?? ""}
-                                    blurDataURL={roadmaps[0].imageBlurhash ?? placeholderBlurhash}
+                                    blurDataURL={
+                                        roadmaps[0].imageBlurhash ??
+                                        placeholderBlurhash
+                                    }
                                     className="h-full w-full object-cover group-hover:scale-105 group-hover:duration-300"
                                     width={1300}
                                     height={630}
                                     placeholder="blur"
-                                    src={roadmaps[0].image ?? "/placeholder.png"}
+                                    src={
+                                        roadmaps[0].image ?? "/placeholder.png"
+                                    }
                                 />
                             </div>
                             <div className="mx-auto mt-10 w-5/6 lg:w-full">
@@ -76,15 +81,17 @@ export default async function OrganizationHomePage({
                                     <div className="relative h-8 w-8 flex-none overflow-hidden rounded-full">
                                         {data.user?.image ? (
                                             <BlurImage
-                                                alt={data.user?.name ?? "User Avatar"}
+                                                alt={
+                                                    data.user?.name ??
+                                                    "User Avatar"
+                                                }
                                                 width={100}
                                                 height={100}
                                                 className="h-full w-full object-cover"
                                                 src={data.user?.image}
                                             />
                                         ) : (
-                                            <div
-                                                className="absolute flex h-full w-full select-none items-center justify-center bg-stone-100 text-4xl text-stone-500">
+                                            <div className="absolute flex h-full w-full select-none items-center justify-center bg-stone-100 text-4xl text-stone-500">
                                                 ?
                                             </div>
                                         )}
@@ -92,7 +99,7 @@ export default async function OrganizationHomePage({
                                     <p className="ml-3 inline-block whitespace-nowrap align-middle text-sm font-semibold dark:text-white md:text-base">
                                         {data.user?.name}
                                     </p>
-                                    <div className="h-6 border-l border-stone-600 dark:border-stone-400"/>
+                                    <div className="h-6 border-l border-stone-600 dark:border-stone-400" />
                                     <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
                                         {toDateString(roadmaps[0].createdAt)}
                                     </p>
@@ -129,12 +136,14 @@ export default async function OrganizationHomePage({
                         More stories
                     </h2>
                     <div className="grid w-full grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
-                        {roadmaps.slice(1).map((metadata: any, index: number) => (
-                            <BlogCard key={index} data={metadata}/>
-                        ))}
+                        {roadmaps
+                            .slice(1)
+                            .map((metadata: any, index: number) => (
+                                <BlogCard key={index} data={metadata} />
+                            ))}
                     </div>
                 </div>
             )}
         </>
-    );
+    )
 }

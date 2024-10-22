@@ -1,24 +1,24 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
 interface MarqueeProps {
-    className?: string;
-    reverse?: boolean;
-    pauseOnHover?: boolean;
-    children?: React.ReactNode;
-    vertical?: boolean;
-    repeat?: number;
-    [key: string]: any;
+    className?: string
+    reverse?: boolean
+    pauseOnHover?: boolean
+    children?: React.ReactNode
+    vertical?: boolean
+    repeat?: number
+    [key: string]: any
 }
 
 export default function AnimatedMarquee({
-                                    className,
-                                    reverse,
-                                    pauseOnHover = false,
-                                    children,
-                                    vertical = false,
-                                    repeat = 4,
-                                    ...props
-                                }: MarqueeProps) {
+    className,
+    reverse,
+    pauseOnHover = false,
+    children,
+    vertical = false,
+    repeat = 4,
+    ...props
+}: MarqueeProps) {
     return (
         <div
             {...props}
@@ -26,9 +26,9 @@ export default function AnimatedMarquee({
                 "group flex overflow-hidden p-2 [--duration:40s] [--gap:1rem] [gap:var(--gap)]",
                 {
                     "flex-row": !vertical,
-                    "flex-col": vertical,
+                    "flex-col": vertical
                 },
-                className,
+                className
             )}
         >
             {Array(repeat)
@@ -36,16 +36,20 @@ export default function AnimatedMarquee({
                 .map((_, i) => (
                     <div
                         key={i}
-                        className={cn("flex shrink-0 justify-around [gap:var(--gap)]", {
-                            "animate-marquee flex-row": !vertical,
-                            "animate-marquee-vertical flex-col": vertical,
-                            "group-hover:[animation-play-state:paused]": pauseOnHover,
-                            "[animation-direction:reverse]": reverse,
-                        })}
+                        className={cn(
+                            "flex shrink-0 justify-around [gap:var(--gap)]",
+                            {
+                                "animate-marquee flex-row": !vertical,
+                                "animate-marquee-vertical flex-col": vertical,
+                                "group-hover:[animation-play-state:paused]":
+                                    pauseOnHover,
+                                "[animation-direction:reverse]": reverse
+                            }
+                        )}
                     >
                         {children}
                     </div>
                 ))}
         </div>
-    );
+    )
 }
