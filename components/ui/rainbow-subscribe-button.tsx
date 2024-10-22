@@ -1,33 +1,33 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import React, { useState, useEffect } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import { cn } from "@/lib/utils"
 
 const buttonVariants = cn(
     "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
     "h-10 px-4 py-2" // Default size for balanced padding and height
-);
+)
 
 interface RainbowSubscribeButtonProps {
-    buttonTextColor?: string;
-    subscribeStatus: boolean;
-    initialText: React.ReactElement | string;
-    changeText: React.ReactElement | string;
+    buttonTextColor?: string
+    subscribeStatus: boolean
+    initialText: React.ReactElement | string
+    changeText: React.ReactElement | string
 }
 
 export const RainbowSubscribeButton: React.FC<RainbowSubscribeButtonProps> = ({
-                                                                                  subscribeStatus,
-                                                                                  buttonTextColor,
-                                                                                  changeText,
-                                                                                  initialText,
-                                                                              }) => {
-    const [isSubscribed, setIsSubscribed] = useState<boolean>(subscribeStatus);
+    subscribeStatus,
+    buttonTextColor,
+    changeText,
+    initialText
+}) => {
+    const [isSubscribed, setIsSubscribed] = useState<boolean>(subscribeStatus)
 
     // Reset subscription state on page load or refresh
     useEffect(() => {
-        setIsSubscribed(subscribeStatus);
-    }, [subscribeStatus]);
+        setIsSubscribed(subscribeStatus)
+    }, [subscribeStatus])
 
     return (
         <AnimatePresence mode="wait">
@@ -83,5 +83,5 @@ export const RainbowSubscribeButton: React.FC<RainbowSubscribeButtonProps> = ({
                 </motion.button>
             )}
         </AnimatePresence>
-    );
-};
+    )
+}

@@ -1,22 +1,27 @@
-"use client";
-import React from "react";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+"use client"
+import React from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
-    AccordionTrigger,
-  } from "@/components/ui/accordion"
+    AccordionTrigger
+} from "@/components/ui/accordion"
 
-export function FAQsWithGrid({faqs}: { faqs: { question: string, answer: string, contactLink: boolean }[] }) {
-    const columns = 3;
-    const faqsGrid: { question: string; answer: string, contactLink: boolean }[][] = Array.from(
-        {length: columns},
-        () => [],
-    );
+export function FAQsWithGrid({
+    faqs
+}: {
+    faqs: { question: string; answer: string; contactLink: boolean }[]
+}) {
+    const columns = 3
+    const faqsGrid: {
+        question: string
+        answer: string
+        contactLink: boolean
+    }[][] = Array.from({ length: columns }, () => [])
     faqs.forEach((faq, index) => {
-        faqsGrid[index % columns].push(faq);
-    });
+        faqsGrid[index % columns].push(faq)
+    })
     return (
         <div className="mx-auto grid max-w-7xl place-items-center gap-4 px-4 py-4 md:py-8">
             <h2 className="text-center text-3xl md:text-4xl font-bold mb-4">
@@ -25,16 +30,17 @@ export function FAQsWithGrid({faqs}: { faqs: { question: string, answer: string,
             <p className="max-w-lg text-center text-xl text-muted-foreground mb-8">
                 We are here to help you with any questions you may have. If you
                 don&apos;t find what you need, please contact us through our{" "}
-                <a
-                    href="/contact"
-                    className="text-blue-500 underline"
-                >
+                <a href="/contact" className="text-blue-500 underline">
                     contact page
-                </a>.
+                </a>
+                .
             </p>
             <div className="hidden md:grid mt-10 w-full grid-cols-1 items-start gap-4 md:grid-cols-3">
                 {faqsGrid.map((faqs, rowIndex) => (
-                    <div key={rowIndex} className="grid grid-cols-1 items-start gap-4">
+                    <div
+                        key={rowIndex}
+                        className="grid grid-cols-1 items-start gap-4"
+                    >
                         {faqs.map((faq, index) => (
                             <FAQItem
                                 key={index}
@@ -47,10 +53,19 @@ export function FAQsWithGrid({faqs}: { faqs: { question: string, answer: string,
                 ))}
             </div>
 
-            <Accordion type="single" collapsible className="w-full max-w-lg md:hidden mt-10 mx-10">
-                {faqs.map((faq) => (
-                    <AccordionItem value={faq.question}>
-                        <AccordionTrigger className="text-center font-bold">{faq.question}</AccordionTrigger>
+            <Accordion
+                type="single"
+                collapsible
+                className="w-full max-w-lg md:hidden mt-10 mx-10"
+            >
+                {faqs.map((faq, index) => (
+                    <AccordionItem
+                        value={faq.question}
+                        key={`accordion-${index}`}
+                    >
+                        <AccordionTrigger className="text-center font-bold">
+                            {faq.question}
+                        </AccordionTrigger>
                         <AccordionContent className="text-muted-foreground text-base">
                             {faq.answer}
 
@@ -70,16 +85,16 @@ export function FAQsWithGrid({faqs}: { faqs: { question: string, answer: string,
                 ))}
             </Accordion>
         </div>
-    );
+    )
 }
 
 const FAQItem = ({
-                     question,
-                     answer,
-                     contactLink
-                 }: {
-    question: string;
-    answer: string;
+    question,
+    answer,
+    contactLink
+}: {
+    question: string
+    answer: string
     contactLink: boolean
 }) => {
     return (
@@ -97,19 +112,16 @@ const FAQItem = ({
                 {contactLink && (
                     <p className="text-muted-foreground text-base pt-4">
                         {`Have thoughts? `}
-                        <a
-                            href="/contact"
-                            className="text-blue-500 underline"
-                        >
+                        <a href="/contact" className="text-blue-500 underline">
                             Let us know
-                        </a>.
+                        </a>
+                        .
                     </p>
                 )}
             </CardContent>
         </Card>
-    );
-};
-
+    )
+}
 
 // THIS IS THE OLD FAQ STUFF -------------------------------------
 // import {
