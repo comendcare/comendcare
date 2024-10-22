@@ -16,34 +16,39 @@ export async function generateMetadata({
 
     const [data, organizationData] = await Promise.all([
         getRoadmapData(domain, slug),
-        getOrganizationData(domain)
-    ])
+        getOrganizationData(domain),
+    ]);
+
+    // Fallback to avoid passing null to title or description
+    const title = data?.title || "Default Title"; // Use a fallback title
+    const description = data?.description || "Default description"; // Use a fallback description
+
     if (!data || !organizationData) {
-        return null
+        return {
+            title: "Page Not Found",
+            description: "The page you are looking for does not exist.",
+        };
     }
-    const { title, description } = data
 
     return {
         title,
         description,
         openGraph: {
-            title,
-            description
+            title: title || undefined, // Ensure it's not null
+            description: description || undefined, // Ensure it's not null
         },
         twitter: {
             card: "summary_large_image",
-            title,
-            description,
-            creator: "@vercel"
-        }
-        // Optional: Set canonical URL to custom domain if it exists
-        // ...(params.domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) &&
-        //   organizationData.customDomain && {
-        //     alternates: {
-        //       canonical: `https://${organizationData.customDomain}/${params.slug}`,
-        //     },
-        //   }),
-    }
+            title: title || undefined, // Ensure it's not null
+            description: description || undefined, // Ensure it's not null
+            creator: "@vercel",
+        },
+        ...(organizationData.customDomain && {
+            alternates: {
+                canonical: `https://${organizationData.customDomain}/${params.slug}`,
+            },
+        }),
+    };
 }
 
 export async function generateStaticParams() {
@@ -58,12 +63,12 @@ export async function generateStaticParams() {
             }
         },
         // feel free to remove this filter if you want to generate paths for all roadmaps
-        where: {
-            organization: {
-                subdomain: "demo"
-            }
-        }
-    })
+        // where: {
+        //     organization: {
+        //         subdomain: "demo",
+        //     },
+        // },
+    });
 
     const allPaths = allRoadmaps
         .flatMap(({ organization, slug }) => [

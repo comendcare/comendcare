@@ -37,21 +37,19 @@ export default function CreateOrganizationModal() {
                     if (res.error) {
                         toast.error(res.error)
                     } else {
-                        va.track("Created Site")
-                        const { id } = res
-                        router.refresh()
-                        router.push(`/organization/${id}`)
-                        modal?.hide()
-                        toast.success(`Successfully created site!`)
+                        va.track("Created Site");
+                        const {id} = res;
+                        router.refresh();
+                        router.push(`/admin/organization/${id}`);
+                        modal?.hide();
+                        toast.success(`Successfully created organization!`);
                     }
                 })
             }
             className="w-full rounded-md bg-white dark:bg-black md:max-w-md md:border md:border-stone-200 md:shadow dark:md:border-stone-700"
         >
             <div className="relative flex flex-col space-y-4 p-5 md:p-10">
-                <h2 className="font-cal text-2xl dark:text-white">
-                    Create a new site
-                </h2>
+                <h2 className="font-cal text-2xl dark:text-white">Create a new organization</h2>
 
                 <div className="flex flex-col space-y-2">
                     <label
@@ -112,7 +110,7 @@ export default function CreateOrganizationModal() {
                     </label>
                     <textarea
                         name="description"
-                        placeholder="Description about why my site is so awesome"
+                        placeholder="Description about why my organization is so awesome"
                         value={data.description}
                         onChange={e =>
                             setData({ ...data, description: e.target.value })
@@ -123,15 +121,16 @@ export default function CreateOrganizationModal() {
                     />
                 </div>
             </div>
-            <div className="flex items-center justify-end rounded-b-lg border-t border-stone-200 bg-stone-50 p-3 dark:border-stone-700 dark:bg-stone-800 md:px-10">
-                <CreateSiteFormButton />
+            <div
+                className="flex items-center justify-end rounded-b-lg border-t border-stone-200 bg-stone-50 p-3 dark:border-stone-700 dark:bg-stone-800 md:px-10">
+                <CreateOrganizationFormButton/>
             </div>
         </form>
     )
 }
 
-function CreateSiteFormButton() {
-    const { pending } = useFormStatus()
+function CreateOrganizationFormButton() {
+    const {pending} = useFormStatus();
     return (
         <button
             className={cn(

@@ -150,32 +150,11 @@ export default function TabsFeaturesSection() {
                 <Tabs
                     value={activeTab}
                     onValueChange={handleTabChange as any}
-                    className="flex flex-col space-y-8"
+                    className="flex flex-row space-x-8"
                     aria-live="polite"
                 >
-                    {tabs.map(
-                        tab =>
-                            activeTab === tab && (
-                                <TabsContent
-                                    key={tab}
-                                    value={tab}
-                                    aria-labelledby={`${tab}-tab-title`}
-                                    aria-describedby={`${tab}-tab-description`}
-                                    className="flex justify-center items-center w-full max-w-7xl mx-auto bg-gradient-to-b p-8 from-80% from-[#87EBA4]/70 to-[#87CEEB]/70 to-100% rounded-lg"
-                                >
-                                    <div className="relative w-[800px] h-[500px] max-w-7xl rounded-lg">
-                                        {
-                                            tabContent[
-                                                tab as keyof typeof tabContent
-                                            ].image
-                                        }
-                                    </div>
-                                </TabsContent>
-                            )
-                    )}
-
-                    <TabsList className="grid grid-cols-3 items-start justify-start bg-transparent border-none shadow-none h-min">
-                        {tabs.map(tab => (
+                    <TabsList className="grid grid-row-3 items-start justify-start bg-transparent border-none shadow-none h-min">
+                        {tabs.map((tab) => (
                             <TabsTrigger
                                 key={tab}
                                 value={tab}
@@ -184,7 +163,7 @@ export default function TabsFeaturesSection() {
                                 id={`${tab}-tab`}
                                 role="tab"
                             >
-                                <div className="relative w-full h-0.5 bg-gray-300">
+                                <div className="relative w-full h-1 bg-gray-300">
                                     {activeTab === tab && (
                                         <motion.div
                                             className="absolute top-0 left-0 h-full bg-sky-500"
@@ -223,6 +202,22 @@ export default function TabsFeaturesSection() {
                             </TabsTrigger>
                         ))}
                     </TabsList>
+
+                    {tabs.map((tab) => (
+                        activeTab === tab && (
+                            <TabsContent
+                                key={tab}
+                                value={tab}
+                                aria-labelledby={`${tab}-tab-title`}
+                                aria-describedby={`${tab}-tab-description`}
+                                className="flex justify-center items-center w-full max-w-7xl mx-auto bg-gradient-to-b p-8 from-80% from-[#87EBA4]/70 to-[#87CEEB]/70 to-100% rounded-lg"
+                            >
+                                <div className="relative w-[750px] h-[470px] max-w-7xl rounded-lg">
+                                    {tabContent[tab as keyof typeof tabContent].image}
+                                </div>
+                            </TabsContent>
+                        )
+                    ))}
                 </Tabs>
             </div>
 
