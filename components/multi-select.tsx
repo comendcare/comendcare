@@ -1,7 +1,13 @@
 import * as React from "react"
 import { X } from "lucide-react"
 import { Badge } from "./ui/badge"
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "./ui/command"
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandItem,
+    CommandList
+} from "./ui/command"
 import { Command as CommandPrimitive } from "cmdk"
 import { useController, UseControllerProps } from "react-hook-form"
 
@@ -51,10 +57,15 @@ export default function MultiSelect({
         }
     }
 
-    const selectables = items?.filter(item => !selected?.some((s: any) => s?.id === item?.id))
+    const selectables = items?.filter(
+        item => !selected?.some((s: any) => s?.id === item?.id)
+    )
 
     return (
-        <Command onKeyDown={handleKeyDown} className="overflow-visible bg-transparent">
+        <Command
+            onKeyDown={handleKeyDown}
+            className="overflow-visible bg-transparent"
+        >
             <div className="group border border-input px-3 py-2 text-sm ring-offset-background rounded-md focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2">
                 <div className="flex gap-1 flex-wrap">
                     {selected?.map((item: any) => (
@@ -91,7 +102,9 @@ export default function MultiSelect({
                 </div>
             </div>
             <div className="relative mt-2">
-                {open && selectables.length > 0 && selected.length < maxSelectable ? (
+                {open &&
+                selectables.length > 0 &&
+                selected.length < maxSelectable ? (
                     <div className="absolute w-full z-10 top-0 rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
                         <CommandList>
                             <CommandEmpty>No results found.</CommandEmpty>

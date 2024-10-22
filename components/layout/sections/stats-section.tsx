@@ -1,24 +1,24 @@
-"use client";
-import {cn} from "@/lib/utils";
-import React, {useRef} from "react";
-import {motion, useInView, useSpring, useTransform} from "framer-motion";
-import {useEffect} from "react";
+"use client"
+import { cn } from "@/lib/utils"
+import React, { useRef } from "react"
+import { motion, useInView, useSpring, useTransform } from "framer-motion"
+import { useEffect } from "react"
 
 export function StatsSection() {
     const items = [
         {
             description: "Grants",
-            value: 100,
+            value: 100
         },
         {
             description: "Contractors",
-            value: 500,
+            value: 500
         },
         {
             description: "Researchers",
-            value: 5000,
-        },
-    ];
+            value: 5000
+        }
+    ]
 
     return (
         <section
@@ -29,7 +29,10 @@ export function StatsSection() {
                 {/* Title Section */}
                 <div className="flex flex-col justify-center items-center md:w-1/2 mx-auto text-center">
                     <div>
-                        <h2 id="stats-heading" className="text-lg text-primary mb-2 tracking-wider">
+                        <h2
+                            id="stats-heading"
+                            className="text-lg text-primary mb-2 tracking-wider"
+                        >
                             {`Marketplace`}
                         </h2>
 
@@ -53,16 +56,16 @@ export function StatsSection() {
                             initial={{
                                 y: 20,
                                 opacity: 0,
-                                filter: "blur(4px)",
+                                filter: "blur(4px)"
                             }}
                             animate={{
                                 y: 0,
                                 opacity: 1,
-                                filter: "blur(0px)",
+                                filter: "blur(0px)"
                             }}
                             transition={{
                                 duration: 0.5,
-                                delay: index * 0.1,
+                                delay: index * 0.1
                             }}
                             key={"card" + index}
                             className={cn(
@@ -91,31 +94,31 @@ export function StatsSection() {
                 </div>
             </div>
         </section>
-    );
+    )
 }
 
 function AnimatedNumber({
-                            value,
-                            initial = 0,
-                        }: {
-    value: number;
-    initial?: number;
+    value,
+    initial = 0
+}: {
+    value: number
+    initial?: number
 }) {
-    const ref = useRef(null);
-    const isInView = useInView(ref);
+    const ref = useRef(null)
+    const isInView = useInView(ref)
 
-    const spring = useSpring(initial, {mass: 0.8, stiffness: 75, damping: 15});
-    const display = useTransform(spring, (current) =>
-        Math.round(current).toLocaleString(),
-    );
+    const spring = useSpring(initial, { mass: 0.8, stiffness: 75, damping: 15 })
+    const display = useTransform(spring, current =>
+        Math.round(current).toLocaleString()
+    )
 
     useEffect(() => {
         if (isInView) {
-            spring.set(value);
+            spring.set(value)
         } else {
-            spring.set(initial);
+            spring.set(initial)
         }
-    }, [isInView, spring, value, initial]);
+    }, [isInView, spring, value, initial])
 
-    return <motion.span ref={ref}>{display}</motion.span>;
+    return <motion.span ref={ref}>{display}</motion.span>
 }

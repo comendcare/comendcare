@@ -1,27 +1,27 @@
 "use client"
-import { useEffect, useState } from "react";
-import {ComingSoonSection} from "@/components/layout/sections/coming-soon-section";
-import {FeaturesSection} from "@/components/layout/sections/features";
-import {HeroSection} from "@/components/layout/sections/hero";
-import {ServicesSection} from "@/components/layout/sections/services";
-import {WhoSection} from "@/components/layout/sections/who";
-import TabsFeaturesSection from "@/components/layout/sections/tabs-features";
-import HowItWorks from "@/components/layout/sections/how-it-works";
-import CTASection from "@/components/layout/sections/cta";
-import {LibrareySection} from "@/components/layout/sections/librarey-section";
-import {StatsSection} from "@/components/layout/sections/stats-section";
-import {ScimanticSection} from "@/components/layout/sections/scimantic-section";
-import WhatElseSection from "@/components/layout/sections/what-else-section";
-import {CloudHeroSection} from "@/components/layout/sections/cloud-hero";
-import {BetaSignup} from "@/components/beta-signup";
-import JoinWaitlistSection from "@/components/layout/sections/join-waitlist-section";
-import AnalyticsScripts from "@/lib/mixpanel";
+import { useEffect, useState } from "react"
+import { ComingSoonSection } from "@/components/layout/sections/coming-soon-section"
+import { FeaturesSection } from "@/components/layout/sections/features"
+import { HeroSection } from "@/components/layout/sections/hero"
+import { ServicesSection } from "@/components/layout/sections/services"
+import { WhoSection } from "@/components/layout/sections/who"
+import TabsFeaturesSection from "@/components/layout/sections/tabs-features"
+import HowItWorks from "@/components/layout/sections/how-it-works"
+import CTASection from "@/components/layout/sections/cta"
+import { LibrareySection } from "@/components/layout/sections/librarey-section"
+import { StatsSection } from "@/components/layout/sections/stats-section"
+import { ScimanticSection } from "@/components/layout/sections/scimantic-section"
+import WhatElseSection from "@/components/layout/sections/what-else-section"
+import { CloudHeroSection } from "@/components/layout/sections/cloud-hero"
+import { BetaSignup } from "@/components/beta-signup"
+import JoinWaitlistSection from "@/components/layout/sections/join-waitlist-section"
+import AnalyticsScripts from "@/lib/mixpanel"
 
 export default function App() {
     const [isSubscribed, setIsSubscribed] = useState<boolean>(false)
 
     useEffect(() => {
-        const data = localStorage.getItem("isSubscribedBeta");
+        const data = localStorage.getItem("isSubscribedBeta")
         if (data) {
             setIsSubscribed(data === "true")
         }
@@ -34,22 +34,27 @@ export default function App() {
 
     return (
         <>
-            
             {/*<HeroSection/>*/}
-            <CloudHeroSection/>
-            <JoinWaitlistSection isSubscribedCallback={betaSubscribeCallback} isSubscribed={isSubscribed}/>
+            <CloudHeroSection />
+            <JoinWaitlistSection
+                isSubscribedCallback={betaSubscribeCallback}
+                isSubscribed={isSubscribed}
+            />
             {/*<HowItWorks/>*/}
-            <TabsFeaturesSection/>
+            <TabsFeaturesSection />
             {/*<WhoSection/>*/}
             {/*<FeaturesSection/>*/}
-            <StatsSection/>
-            <ComingSoonSection/>
+            <StatsSection />
+            <ComingSoonSection />
             {/*<FAQSection/>*/}
-            <WhatElseSection/>
-            <LibrareySection/>
-            <ScimanticSection/>
-            <CTASection isSubscribedCallback={betaSubscribeCallback} isSubscribed={isSubscribed}/>
-            <AnalyticsScripts/>
+            <WhatElseSection />
+            <LibrareySection />
+            <ScimanticSection />
+            <CTASection
+                isSubscribedCallback={betaSubscribeCallback}
+                isSubscribed={isSubscribed}
+            />
+            <AnalyticsScripts />
         </>
-    );
+    )
 }

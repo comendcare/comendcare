@@ -1,4 +1,4 @@
-import {redirect} from "next/navigation";
+import { redirect } from "next/navigation"
 
 export default function MarketplacePage() {
     redirect("/app/marketplace/researchers")

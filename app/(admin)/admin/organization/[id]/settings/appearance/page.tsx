@@ -1,17 +1,17 @@
-import prisma from "@/lib/prisma";
-import Form from "@/components/form";
-import {updateOrganization} from "@/lib/actions";
+import prisma from "@/lib/prisma"
+import Form from "@/components/form"
+import { updateOrganization } from "@/lib/actions"
 
 export default async function SiteSettingsAppearance({
-                                                         params,
-                                                     }: {
-    params: { id: string };
+    params
+}: {
+    params: { id: string }
 }) {
     const data = await prisma.organization.findUnique({
         where: {
-            id: decodeURIComponent(params.id),
-        },
-    });
+            id: decodeURIComponent(params.id)
+        }
+    })
 
     return (
         <div className="flex flex-col space-y-6">
@@ -22,7 +22,7 @@ export default async function SiteSettingsAppearance({
                 inputAttrs={{
                     name: "image",
                     type: "file",
-                    defaultValue: data?.image!,
+                    defaultValue: data?.image!
                 }}
                 handleSubmit={updateOrganization}
             />
@@ -33,7 +33,7 @@ export default async function SiteSettingsAppearance({
                 inputAttrs={{
                     name: "logo",
                     type: "file",
-                    defaultValue: data?.logo!,
+                    defaultValue: data?.logo!
                 }}
                 handleSubmit={updateOrganization}
             />
@@ -44,7 +44,7 @@ export default async function SiteSettingsAppearance({
                 inputAttrs={{
                     name: "font",
                     type: "select",
-                    defaultValue: data?.font!,
+                    defaultValue: data?.font!
                 }}
                 handleSubmit={updateOrganization}
             />
@@ -56,11 +56,12 @@ export default async function SiteSettingsAppearance({
                     name: "message404",
                     type: "text",
                     defaultValue: data?.message404!,
-                    placeholder: "Blimey! You've found a page that doesn't exist.",
-                    maxLength: 240,
+                    placeholder:
+                        "Blimey! You've found a page that doesn't exist.",
+                    maxLength: 240
                 }}
                 handleSubmit={updateOrganization}
             />
         </div>
-    );
+    )
 }
