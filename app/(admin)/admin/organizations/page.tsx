@@ -29,7 +29,6 @@ export default function AllOrganizations({
                         </div>
                     }
                 >
-                    {/* @ts-expect-error Server Component */}
                     <Organizations
                         organizationId={decodeURIComponent(params.id)}
                     />
