@@ -1,13 +1,19 @@
 "use client"
 
-import React, { memo, useState } from 'react';
-import { FaCheck } from 'react-icons/fa6';
-import { Button } from './ui/button';
+import React, { memo, useState } from "react"
+import { FaCheck } from "react-icons/fa6"
+import { Button } from "./ui/button"
 
-export default function TaskStatusButton({ complete, onClick }: { complete: boolean, onClick: (complete: boolean) => void }) {
+export default function TaskStatusButton({
+    complete,
+    onClick
+}: {
+    complete: boolean
+    onClick: (complete: boolean) => void
+}) {
     const handleStateChange = (e: any) => {
         e.preventDefault()
-        
+
         onClick(!complete)
     }
 

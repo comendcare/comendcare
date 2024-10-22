@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect } from "react"
 import {
     ReactFlow,
     MiniMap,
@@ -8,16 +8,16 @@ import {
     useReactFlow,
     useStoreApi,
     ReactFlowProvider
-} from '@xyflow/react'
-import type { Edge, Node } from '@xyflow/react'
-import { useShallow } from 'zustand/react/shallow'
+} from "@xyflow/react"
+import type { Edge, Node } from "@xyflow/react"
+import { useShallow } from "zustand/react/shallow"
 
 import "@xyflow/react/dist/base.css"
 
-import MilestoneNode from '@/components/milestone-node'
-import { Button } from './ui/button'
-import { RoadmapState, useRoadmapStore } from '@/state/roadmap/roadmapStore'
-import { nanoid } from 'nanoid'
+import MilestoneNode from "@/components/milestone-node"
+import { Button } from "./ui/button"
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { nanoid } from "nanoid"
 
 const proOptions = { hideAttribution: true }
 
@@ -33,35 +33,35 @@ const selector = (state: RoadmapState) => ({
     onNodesChange: state.onNodesChange,
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
-    addNode: state.addNode,
+    addNode: state.addNode
 })
 
-const RoadmapFlowchart = ({ 
+const RoadmapFlowchart = ({
     width,
     initNodes,
     initEdges,
     initMilestones
-}: { 
-    width: number,
-    initNodes: Node[],
-    initEdges: Edge[],
+}: {
+    width: number
+    initNodes: Node[]
+    initEdges: Edge[]
     initMilestones: any[]
 }) => {
-    const { 
+    const {
         selectedNodeId,
         setSelectedNodeId,
         milestones,
         setMilestones,
-        nodes, 
-        edges, 
-        onNodesChange, 
+        nodes,
+        edges,
+        onNodesChange,
         onEdgesChange,
         setNodes,
         setEdges,
-        addNode, 
-        onConnect 
-    } = useRoadmapStore( useShallow(selector) )
-    const { fitView } = useReactFlow() 
+        addNode,
+        onConnect
+    } = useRoadmapStore(useShallow(selector))
+    const { fitView } = useReactFlow()
     const store = useStoreApi()
     const nodeTypes = { MILESTONE: MilestoneNode }
 
@@ -69,7 +69,7 @@ const RoadmapFlowchart = ({
         setNodes(initNodes)
         setEdges(initEdges)
         setMilestones(initMilestones)
-      }, [initNodes, initEdges])
+    }, [initNodes, initEdges])
 
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
@@ -84,25 +84,27 @@ const RoadmapFlowchart = ({
             } = store.getState()
 
             const zoomMultiplier = 1 / zoomLevel
-            const centerX = -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-            const centerY = -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
-        
+            const centerX =
+                -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+            const centerY =
+                -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+
             const id = nanoid()
             const newNode: Node = {
                 id: id,
-                type: 'MILESTONE',
+                type: "MILESTONE",
                 position: {
                     x: position ? position?.x : centerX,
                     y: position ? position?.y : centerY
                 },
                 // data: {}
-                data: {  
+                data: {
                     nodeId: id,
                     title: `New Milestone`,
                     papers: [],
                     // tasks: [],
-                    status: 'TODO'
-                }, 
+                    status: "TODO"
+                }
             }
 
             addNode(newNode)
@@ -115,9 +117,9 @@ const RoadmapFlowchart = ({
     // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
     const updatedNodes = nodes.map((node: Node) => ({
         ...node,
-        data: { 
+        data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
-            handleEditClick: (nodeId: string) => setSelectedNodeId(nodeId) 
+            handleEditClick: (nodeId: string) => setSelectedNodeId(nodeId)
         }
     }))
 
@@ -156,11 +158,10 @@ const RoadmapFlowchart = ({
 
 function FlowWithProvider(props: any) {
     return (
-      <ReactFlowProvider>
-        <RoadmapFlowchart {...props} />
-      </ReactFlowProvider>
-    );
-  }
+        <ReactFlowProvider>
+            <RoadmapFlowchart {...props} />
+        </ReactFlowProvider>
+    )
+}
 
 export default FlowWithProvider
-

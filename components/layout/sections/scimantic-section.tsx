@@ -1,9 +1,9 @@
 "use client"
 
-import {PlaceholdersAndVanishInput} from "@/components/placeholders-and-vanish-input";
-import {PlaceholdersAndVanishTextarea} from "@/components/placeholders-and-vanish-text-area";
-import {LinkPreview} from "@/components/link-preview";
-import React from "react";
+import { PlaceholdersAndVanishInput } from "@/components/placeholders-and-vanish-input"
+import { PlaceholdersAndVanishTextarea } from "@/components/placeholders-and-vanish-text-area"
+import { LinkPreview } from "@/components/link-preview"
+import React from "react"
 import scimanticLogo from "@/public/logos/scimantic-logo.png"
 import Image from "next/image"
 
@@ -21,8 +21,8 @@ export function ScimanticSection() {
     ]
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        console.log(e.target.value);
-    };
+        console.log(e.target.value)
+    }
     const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         console.log("submitted")

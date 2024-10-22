@@ -22,8 +22,8 @@ const sourceSans3 = Source_Sans_3({
 })
 
 export async function generateMetadata(): Promise<Metadata> {
-// { params, searchParams }: Props,
-// parent: ResolvingMetadata
+    // { params, searchParams }: Props,
+    // parent: ResolvingMetadata
     // optionally access and extend (rather than replace) parent metadata
     // const previousImages = (await parent).openGraph?.images || []
 

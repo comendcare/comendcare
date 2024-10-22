@@ -4,11 +4,13 @@ import type { Node, Edge } from "@xyflow/react"
 
 export default async function RoadmapPage() {
     const dbNodes = await Promise.all(
-        (await prisma.node.findMany({
-            include: { data: true }
-        })).map(async (node) => {
+        (
+            await prisma.node.findMany({
+                include: { data: true }
+            })
+        ).map(async node => {
             const { id, type, positionX, positionY } = node
-    
+
             return {
                 id,
                 type,
@@ -21,9 +23,9 @@ export default async function RoadmapPage() {
     )
 
     const dbEdges = await Promise.all(
-        (await prisma.edge.findMany()).map(async (edge) => {
+        (await prisma.edge.findMany()).map(async edge => {
             const { id, source, target } = edge
-    
+
             return {
                 id,
                 source,
@@ -38,7 +40,11 @@ export default async function RoadmapPage() {
 
     return (
         <main className="flex flex-col items-center w-screen h-screen mx-auto">
-            <Roadmap initNodes={dbNodes || []} initEdges={dbEdges || []} initMilestones={dbMilestones || []} />
+            <Roadmap
+                initNodes={dbNodes || []}
+                initEdges={dbEdges || []}
+                initMilestones={dbMilestones || []}
+            />
         </main>
     )
 }
