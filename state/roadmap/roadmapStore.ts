@@ -26,6 +26,8 @@ export type RoadmapState = {
     setNodes: (nodes: Node[]) => void
     setEdges: (edges: Edge[]) => void
     addNode: (node: Node) => void
+    deleteNode: (nodeId: string) => void
+    saveState: () => void
 }
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
@@ -41,7 +43,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                     : milestone
             )
             set({ milestones })
-            debouncedSaveToDatabase(get().nodes, get().edges, milestones)
         },
         setMilestones: (milestones: any[]) => {
             set({ milestones })
@@ -54,14 +55,11 @@ export const useRoadmapStore = create<RoadmapState>()(
             const milestones = get().milestones.filter(milestone =>
                 nodeIds.includes(milestone.nodeId)
             )
-            set({ nodes })
-            set({ milestones })
-            debouncedSaveToDatabase(nodes, get().edges, milestones)
+            set({ nodes, milestones })
         },
         onEdgesChange: (changes: EdgeChange[]) => {
             const edges = applyEdgeChanges(changes, get().edges)
             set({ edges })
-            debouncedSaveToDatabase(get().nodes, edges, get().milestones)
         },
         onConnect: (connection: any) => {
             const edges = addEdge(
@@ -76,91 +74,49 @@ export const useRoadmapStore = create<RoadmapState>()(
                 get().edges
             )
             set({ edges })
-            debouncedSaveToDatabase(get().nodes, edges, get().milestones)
         },
         setNodes: (nodes: Node[]) => {
             set({ nodes })
-            debouncedSaveToDatabase(nodes, get().edges, get().milestones)
         },
         setEdges: (edges: Edge[]) => {
             set({ edges })
-            debouncedSaveToDatabase(get().nodes, edges, get().milestones)
         },
         addNode: (node: Node) => {
             const nodes = [...get().nodes, node]
             const milestones = [...get().milestones, node.data]
-            set({ nodes })
-            set({ milestones })
-            debouncedSaveToDatabase(nodes, get().edges, milestones)
+            set({ nodes, milestones })
+        },
+        deleteNode: (nodeId: string | undefined) => {
+            const nodes = [...get().nodes].filter(({ id }) => id !== nodeId)
+            const nodeIds = nodes.map(node => node.id)
+            const milestones = get().milestones.filter(milestone =>
+                nodeIds.includes(milestone.nodeId)
+            )
+            set({ nodes, milestones, selectedNodeId: null })
+        },
+        saveState: () => {
+            const state = get()
+            set(state)
         }
-    }))
+    }),
+    {
+        limit: 100, // limit the stored history states to 100
+        // this handleSet should be where we're setting our debounce, but for some reason it grabs the previous state
+        // not the current state
+        // handleSet: (handleSet) => (
+        //     debounce((state) => {
+        //         console.log(`Saved State:`, state)
+        //         handleSet(state)
+        //         saveToDatabase(state.nodes, state.edges, state.milestones)
+        //     }, 500)
+        // ),
+        onSave: (pastState, currentState) => {
+            console.log(`Saved State: `, currentState)
+            debouncedSaveToDatabase(currentState.nodes, currentState.edges, currentState.milestones)
+            return
+        },
+    })
 )
-// export const useRoadmapStore = create<RoadmapState>((set, get) => ({
-//     selectedNodeId: null,
-//     setSelectedNodeId: (id: string | null) => {
-//         set({ selectedNodeId: id })
-//     },
-//     milestones: [],
-//     setMilestone: (nodeId: string, newProperties: any) => {
-//         const milestones = get().milestones.map(milestone =>
-//             milestone.nodeId === nodeId
-//                 ? { ...milestone, ...newProperties }
-//                 : milestone
-//         )
-//         set({ milestones })
-//         debouncedSaveToDatabase(get().nodes, get().edges, milestones)
-//     },
-//     setMilestones: (milestones: any[]) => {
-//         set({ milestones })
-//     },
-//     nodes: [],
-//     edges: [],
-//     onNodesChange: (changes: NodeChange[]) => {
-//         const nodes = applyNodeChanges(changes, get().nodes)
-//         const nodeIds = nodes.map(node => node.id)
-//         const milestones = get().milestones.filter(milestone =>
-//             nodeIds.includes(milestone.nodeId)
-//         )
-//         set({ nodes })
-//         set({ milestones })
-//         debouncedSaveToDatabase(nodes, get().edges, milestones)
-//     },
-//     onEdgesChange: (changes: EdgeChange[]) => {
-//         const edges = applyEdgeChanges(changes, get().edges)
-//         set({ edges })
-//         debouncedSaveToDatabase(get().nodes, edges, get().milestones)
-//     },
-//     onConnect: (connection: any) => {
-//         const edges = addEdge(
-//             {
-//                 ...connection,
-//                 markerEnd: {
-//                     type: MarkerType.ArrowClosed,
-//                     width: 20,
-//                     height: 20
-//                 }
-//             },
-//             get().edges
-//         )
-//         set({ edges })
-//         debouncedSaveToDatabase(get().nodes, edges, get().milestones)
-//     },
-//     setNodes: (nodes: Node[]) => {
-//         set({ nodes })
-//         debouncedSaveToDatabase(nodes, get().edges, get().milestones)
-//     },
-//     setEdges: (edges: Edge[]) => {
-//         set({ edges })
-//         debouncedSaveToDatabase(get().nodes, edges, get().milestones)
-//     },
-//     addNode: (node: Node) => {
-//         const nodes = [...get().nodes, node]
-//         const milestones = [...get().milestones, node.data]
-//         set({ nodes })
-//         set({ milestones })
-//         debouncedSaveToDatabase(nodes, get().edges, milestones)
-//     }
-// }))
 
 // Wrap saveToDatabase in a debounce function - to avoid spamming the database
 export const debouncedSaveToDatabase = debounce(
@@ -194,3 +150,4 @@ export const saveToDatabase = async (
         console.error("Error saving flow:", error)
     }
 }
+

@@ -16,9 +16,8 @@ import { DialogClose } from "@radix-ui/react-dialog"
 import { toast } from "sonner"
 
 const selector = (state: RoadmapState) => ({
-    setSelectedNodeId: state.setSelectedNodeId,
-    onNodesChange: state.onNodesChange,
-    setMilestone: state.setMilestone
+    deleteNode: state.deleteNode,
+    saveState: state.saveState
 })
 
 export function DeleteMilestoneDialogContent({
@@ -26,14 +25,17 @@ export function DeleteMilestoneDialogContent({
 }: {
     milestoneData: any
 }) {
-    const { setSelectedNodeId, onNodesChange } = useRoadmapStore(
-        useShallow(selector)
-    )
+    const { deleteNode, saveState } = useRoadmapStore(useShallow(selector))
+    const { undo } = useRoadmapStore.temporal.getState()
+
+    const handleUndo = () => {
+        undo()
+        saveState()
+    }
 
     const handleDeleteMilestone = (e: React.MouseEvent<HTMLElement>) => {
         console.log(`handle Milestone delete...`)
-        onNodesChange([{ id: milestoneData?.nodeId, type: "remove" }])
-        setSelectedNodeId(null)
+        deleteNode(milestoneData?.nodeId)
         toast(
             <div className="relative p-2 flex flex-col">
                 <p className="font-semibold text-gray-900">
@@ -42,7 +44,7 @@ export function DeleteMilestoneDialogContent({
                 <p className="mt-1 text-sm text-gray-500">
                     {`Your milestone had been deleted successfully.`}
                 </p>
-                <Button className="self-end mt-4">Undo Delete</Button>
+                <Button className="self-end mt-4" onClick={handleUndo}>Undo Delete</Button>
             </div>
         )
     }

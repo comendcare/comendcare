@@ -65,7 +65,7 @@ const RoadmapFlowchart = ({
     } = useRoadmapStore(useShallow(selector))
     const { fitView } = useReactFlow()
     const store = useStoreApi()
-    const { undo, redo, clear } = useRoadmapStore.temporal.getState()
+    // const { undo, redo, clear } = useRoadmapStore.temporal.getState()
     const nodeTypes = { MILESTONE: MilestoneNode }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
@@ -79,50 +79,50 @@ const RoadmapFlowchart = ({
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
     // if a position is not provided, place in the center
-    const onAddMilestone = useCallback(
-        (position?: { x: number; y: number }) => {
-            // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
-            const {
-                height,
-                width,
-                transform: [transformX, transformY, zoomLevel]
-            } = store.getState()
+    const addMilestone = (position?: { x: number; y: number }) => {
+        // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
+        const {
+            height,
+            width,
+            transform: [transformX, transformY, zoomLevel]
+        } = store.getState()
 
-            const zoomMultiplier = 1 / zoomLevel
-            const centerX =
-                -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-            const centerY =
-                -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        const zoomMultiplier = 1 / zoomLevel
+        const centerX =
+            -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+        const centerY =
+            -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
 
-            const id = nanoid()
-            const newNode: Node = {
-                id: id,
-                type: "MILESTONE",
-                position: {
-                    x: position ? position?.x : centerX,
-                    y: position ? position?.y : centerY
-                },
-                // data: {}
-                data: {
-                    nodeId: id,
-                    title: `New Milestone`,
-                    papers: [],
-                    // tasks: [],
-                    status: "TODO"
-                }
+        const id = nanoid()
+        const newNode: Node = {
+            id: id,
+            type: "MILESTONE",
+            position: {
+                x: position ? position?.x : centerX,
+                y: position ? position?.y : centerY
+            },
+            data: {
+                nodeId: id,
+                title: `New Milestone`,
+                papers: [],
+                // tasks: [],
+                status: "TODO"
             }
+        }
 
-            addNode(newNode)
-            return newNode
-        },
-        []
-    )
+        addNode(newNode)
+        return newNode
+    }
 
-    const handleNodeDelete = async ({nodes, edges}: {nodes: Node[], edges: Edge[]}) => {
+    const handleDelete = async ({nodes, edges}: {nodes: Node[], edges: Edge[]}) => {
         // override default delete behaviour with our custom dialog
-        setMilestoneData(nodes[0].data)
-        setDeleteIsOpen(true)
-        return false
+        if (nodes.length > 0) {
+            setMilestoneData(nodes[0].data)
+            setDeleteIsOpen(true)
+            return false
+        } else {
+            return { nodes, edges }
+        }
     }
 
     // add handleEditClick() callback to nodes in the flow
@@ -157,15 +157,16 @@ const RoadmapFlowchart = ({
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
-            onBeforeDelete={handleNodeDelete}
+            onBeforeDelete={handleDelete}
             nodeTypes={nodeTypes}
             fitView
             proOptions={proOptions}
         >
             <MiniMap />
             <Controls>
-                <Button onClick={() => onAddMilestone()}>Add Milestone</Button>
-                <Button onClick={() => undo()}>Undo</Button>
+                {/* <Button onClick={() => onAddMilestone()}>Add Milestone</Button> */}
+                <Button onClick={() => addMilestone()}>Add Milestone</Button>
+                {/* <Button onClick={() => undo()}>Undo</Button> */}
             </Controls>
         </ReactFlow>
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
