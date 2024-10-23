@@ -44,9 +44,11 @@ export const useRoadmapStore = create<RoadmapState>()(
                     : milestone
             )
             set({ milestones })
+            updateMilestones(milestones.filter(milestone => milestone.nodeId === nodeId))
         },
         setMilestones: (milestones: any[]) => {
             set({ milestones })
+            updateMilestones(milestones)
         },
         nodes: [],
         edges: [],
@@ -57,10 +59,12 @@ export const useRoadmapStore = create<RoadmapState>()(
                 nodeIds.includes(milestone.nodeId)
             )
             set({ nodes, milestones })
+            debounceUpdateFlow(nodes, get().edges)
         },
         onEdgesChange: (changes: EdgeChange[]) => {
             const edges = applyEdgeChanges(changes, get().edges)
             set({ edges })
+            debounceUpdateFlow(get().nodes, edges)
         },
         onConnect: (connection: any) => {
             const edges = addEdge(
@@ -75,17 +79,22 @@ export const useRoadmapStore = create<RoadmapState>()(
                 get().edges
             )
             set({ edges })
+            debounceUpdateFlow(get().nodes, edges)
         },
         setNodes: (nodes: Node[]) => {
             set({ nodes })
+            debounceUpdateFlow(nodes, get().edges)
         },
         setEdges: (edges: Edge[]) => {
             set({ edges })
+            debounceUpdateFlow(get().nodes, edges)
         },
         addNode: (node: Node) => {
             const nodes = [...get().nodes, node]
             const milestones = [...get().milestones, node.data]
             set({ nodes, milestones })
+            debounceUpdateFlow(nodes, get().edges)
+            updateMilestones([node.data])
         },
         deleteNode: (nodeId: string | undefined) => {
             const nodes = [...get().nodes].filter(({ id }) => id !== nodeId)
@@ -94,10 +103,13 @@ export const useRoadmapStore = create<RoadmapState>()(
                 nodeIds.includes(milestone.nodeId)
             )
             set({ nodes, milestones, selectedNodeId: null })
+            debounceUpdateFlow(nodes, get().edges)
         },
         saveState: () => {
             const state = get()
             set(state)
+            debounceUpdateFlow(state.nodes, state.edges)
+            updateMilestones(state.milestones)
         }
     }),
     {
@@ -111,26 +123,31 @@ export const useRoadmapStore = create<RoadmapState>()(
         //         saveToDatabase(state.nodes, state.edges, state.milestones)
         //     }, 500)
         // ),
-        onSave: (pastState, currentState) => {
-            console.log(`Saved State: `, currentState)
-            debouncedSaveToDatabase(currentState.nodes, currentState.edges, currentState.milestones)
-            return
-        },
+        // onSave: (pastState, currentState) => {
+        //     console.log(`Saved State: `, currentState)
+        //     debouncedSaveToDatabase(currentState.nodes, currentState.edges, currentState.milestones)
+        //     return
+        // },
     })
 )
 
 // Wrap saveToDatabase in a debounce function - to avoid spamming the database
-export const debouncedSaveToDatabase = debounce(
-    (nodes: Node[], edges: Edge[], milestones: any[]) => {
-        saveToDatabase(nodes, edges, milestones)
-    },
-    500
+// export const debouncedSaveToDatabase = debounce(
+//     (nodes: Node[], edges: Edge[], milestones: any[]) => {
+//         saveToDatabase(nodes, edges, milestones)
+//     },
+//     500
+// )
+
+export const debounceUpdateFlow = debounce(
+    (nodes: Node[], edges: Edge[]) => {
+        updateFlow(nodes, edges)
+    }, 500
 )
 
-export const saveToDatabase = async (
+export const updateFlow = async (
     nodes: Node[],
-    edges: Edge[],
-    milestones: any[]
+    edges: Edge[]
 ) => {
     try {
         const response = await fetch("/api/flow/update", {
@@ -138,7 +155,7 @@ export const saveToDatabase = async (
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ nodes, edges, milestones }) // Send the nodes and edges as JSON
+            body: JSON.stringify({ nodes, edges }) // Send the nodes and edges as JSON
         })
 
         if (!response.ok) {
@@ -151,4 +168,52 @@ export const saveToDatabase = async (
         console.error("Error saving flow:", error)
     }
 }
+
+export const updateMilestones = async (
+    milestones: any[] // milestones to update
+) => {
+    try {
+        const response = await fetch("/api/milestone/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ milestones })
+        })
+
+        if (!response.ok) {
+            throw new Error("Failed to save flow")
+        }
+
+        const data = await response.json()
+        console.log(data.message)
+    } catch (error) {
+        console.error("Error saving flow:", error)
+    }
+}
+
+// export const saveToDatabase = async (
+//     nodes: Node[],
+//     edges: Edge[],
+//     milestones: any[]
+// ) => {
+//     try {
+//         const response = await fetch("/api/flow/update", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             },
+//             body: JSON.stringify({ nodes, edges, milestones }) // Send the nodes and edges as JSON
+//         })
+
+//         if (!response.ok) {
+//             throw new Error("Failed to save flow")
+//         }
+
+//         const data = await response.json()
+//         console.log(data.message) // "Flow saved successfully"
+//     } catch (error) {
+//         console.error("Error saving flow:", error)
+//     }
+// }
 

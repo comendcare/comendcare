@@ -25,129 +25,27 @@ import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
 
 const defaultCols = [
     {
-        id: "todo" as const,
+        id: "TODO" as const,
         title: "Todo"
     },
     {
-        id: "in-progress" as const,
+        id: "INPROGRESS" as const,
         title: "In progress"
     },
     {
-        id: "done" as const,
+        id: "DONE" as const,
         title: "Done"
     }
 ] satisfies Column[]
 
 export type ColumnId = (typeof defaultCols)[number]["id"]
-const initialTasks: Task[] = [
-    {
-        id: "task1",
-        columnId: "done",
-        content: "Identify mutated gene responsible for the rare disease"
-    },
-    {
-        id: "task2",
-        columnId: "done",
-        content: "Conduct initial literature review on disease and mutations"
-    },
-    {
-        id: "task3",
-        columnId: "done",
-        content: "Determine disease progression and key biomarkers"
-    },
-    {
-        id: "task4",
-        columnId: "in-progress",
-        content: "Develop in vitro assays for testing gene functionality"
-    },
-    {
-        id: "task5",
-        columnId: "in-progress",
-        content: "Create and validate mouse model for preclinical studies"
-    },
-    {
-        id: "task6",
-        columnId: "todo",
-        content: "Perform high-throughput screening of compounds"
-    },
-    {
-        id: "task7",
-        columnId: "todo",
-        content: "Evaluate therapeutic efficacy in preclinical models"
-    },
-    {
-        id: "task8",
-        columnId: "todo",
-        content: "Select potential lead compounds for further testing"
-    },
-    {
-        id: "task9",
-        columnId: "todo",
-        content: "Develop gene therapy vector targeting identified gene"
-    },
-    {
-        id: "task10",
-        columnId: "todo",
-        content: "Conduct toxicology studies for lead compound"
-    },
-    {
-        id: "task11",
-        columnId: "todo",
-        content: "Prepare regulatory documentation for clinical trial approval"
-    },
-    {
-        id: "task12",
-        columnId: "todo",
-        content: "Initiate Phase I clinical trial with selected patients"
-    },
-    {
-        id: "task13",
-        columnId: "todo",
-        content: "Monitor adverse effects and safety data during trials"
-    },
-    {
-        id: "task14",
-        columnId: "todo",
-        content: "Identify suitable patient population for Phase II trial"
-    },
-    {
-        id: "task15",
-        columnId: "todo",
-        content: "Prepare submission for Orphan Drug Designation"
-    },
-    {
-        id: "task16",
-        columnId: "todo",
-        content: "Evaluate long-term efficacy and safety in Phase III trials"
-    },
-    {
-        id: "task17",
-        columnId: "todo",
-        content: "Develop patient engagement strategy for trial recruitment"
-    },
-    {
-        id: "task18",
-        columnId: "todo",
-        content: "Assess gene therapy delivery method for specific tissues"
-    },
-    {
-        id: "task19",
-        columnId: "todo",
-        content: "Submit data for regulatory review and approval"
-    },
-    {
-        id: "task20",
-        columnId: "todo",
-        content: "Prepare manufacturing plan for large-scale therapy production"
-    }
-]
 
-export default function Kanban() {
+export default function Kanban({ initTasks }: { initTasks: any[] }) {
     const [columns, setColumns] = useState<Column[]>(defaultCols)
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
     const columnsId = useMemo(() => columns.map(col => col.id), [columns])
 
-    const [tasks, setTasks] = useState<Task[]>(initialTasks)
+    const [tasks, setTasks] = useState<Task[]>(initTasks)
 
     const [activeColumn, setActiveColumn] = useState<Column | null>(null)
 
@@ -162,7 +60,7 @@ export default function Kanban() {
     )
 
     function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
-        const tasksInColumn = tasks.filter(task => task.columnId === columnId)
+        const tasksInColumn = tasks.filter(task => task.status === columnId)
         const taskPosition = tasksInColumn.findIndex(task => task.id === taskId)
         const column = columns.find(col => col.id === columnId)
         return {
@@ -184,11 +82,11 @@ export default function Kanban() {
                     startColumnIdx + 1
                 } of ${columnsId.length}`
             } else if (active.data.current?.type === "Task") {
-                pickedUpTaskColumn.current = active.data.current.task.columnId
+                pickedUpTaskColumn.current = active.data.current.task.status
                 const { tasksInColumn, taskPosition, column } =
                     getDraggingTaskData(active.id, pickedUpTaskColumn.current)
                 return `Picked up Task ${
-                    active.data.current.task.content
+                    active.data.current.task.name
                 } at position: ${taskPosition + 1} of ${
                     tasksInColumn.length
                 } in column ${column?.title}`
@@ -212,14 +110,14 @@ export default function Kanban() {
                 const { tasksInColumn, taskPosition, column } =
                     getDraggingTaskData(
                         over.id,
-                        over.data.current.task.columnId
+                        over.data.current.task.status
                     )
                 if (
-                    over.data.current.task.columnId !==
+                    over.data.current.task.status !==
                     pickedUpTaskColumn.current
                 ) {
                     return `Task ${
-                        active.data.current.task.content
+                        active.data.current.task.name
                     } was moved over column ${column?.title} in position ${
                         taskPosition + 1
                     } of ${tasksInColumn.length}`
@@ -254,10 +152,10 @@ export default function Kanban() {
                 const { tasksInColumn, taskPosition, column } =
                     getDraggingTaskData(
                         over.id,
-                        over.data.current.task.columnId
+                        over.data.current.task.status
                     )
                 if (
-                    over.data.current.task.columnId !==
+                    over.data.current.task.status !==
                     pickedUpTaskColumn.current
                 ) {
                     return `Task was dropped into column ${column?.title} in position ${
@@ -278,49 +176,6 @@ export default function Kanban() {
     }
 
     const isBrowser = typeof window !== "undefined"
-
-    return (
-        <DndContext
-            accessibility={{
-                announcements
-            }}
-            sensors={sensors}
-            onDragStart={onDragStart}
-            onDragEnd={onDragEnd}
-            onDragOver={onDragOver}
-        >
-            <BoardContainer>
-                <SortableContext items={columnsId}>
-                    {columns.map(col => (
-                        <BoardColumn
-                            key={col.id}
-                            column={col}
-                            tasks={tasks.filter(
-                                task => task.columnId === col.id
-                            )}
-                        />
-                    ))}
-                </SortableContext>
-            </BoardContainer>
-
-            {isBrowser &&
-                createPortal(
-                    <DragOverlay>
-                        {activeColumn && (
-                            <BoardColumn
-                                isOverlay
-                                column={activeColumn}
-                                tasks={tasks.filter(
-                                    task => task.columnId === activeColumn.id
-                                )}
-                            />
-                        )}
-                        {activeTask && <TaskCard task={activeTask} isOverlay />}
-                    </DragOverlay>,
-                    document.body
-                )}
-        </DndContext>
-    )
 
     function onDragStart(event: DragStartEvent) {
         if (!hasDraggableData(event.active)) return
@@ -395,9 +250,9 @@ export default function Kanban() {
                 if (
                     activeTask &&
                     overTask &&
-                    activeTask.columnId !== overTask.columnId
+                    activeTask.status !== overTask.status
                 ) {
-                    activeTask.columnId = overTask.columnId
+                    activeTask.status = overTask.status
                     return arrayMove(tasks, activeIndex, overIndex - 1)
                 }
 
@@ -413,11 +268,54 @@ export default function Kanban() {
                 const activeIndex = tasks.findIndex(t => t.id === activeId)
                 const activeTask = tasks[activeIndex]
                 if (activeTask) {
-                    activeTask.columnId = overId as ColumnId
+                    activeTask.status = overId as ColumnId
                     return arrayMove(tasks, activeIndex, activeIndex)
                 }
                 return tasks
             })
         }
     }
+
+    return (
+        <DndContext
+            accessibility={{
+                announcements
+            }}
+            sensors={sensors}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
+            onDragOver={onDragOver}
+        >
+            <BoardContainer>
+                <SortableContext items={columnsId}>
+                    {columns.map(col => (
+                        <BoardColumn
+                            key={col.id}
+                            column={col}
+                            tasks={tasks.filter(
+                                task => task.status === col.id
+                            )}
+                        />
+                    ))}
+                </SortableContext>
+            </BoardContainer>
+
+            {isBrowser &&
+                createPortal(
+                    <DragOverlay>
+                        {activeColumn && (
+                            <BoardColumn
+                                isOverlay
+                                column={activeColumn}
+                                tasks={tasks.filter(
+                                    task => task.status === activeColumn.id
+                                )}
+                            />
+                        )}
+                        {activeTask && <TaskCard task={activeTask} isOverlay />}
+                    </DragOverlay>,
+                    document.body
+                )}
+        </DndContext>
+    )
 }
