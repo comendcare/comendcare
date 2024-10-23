@@ -7,6 +7,7 @@ export async function POST(request: Request) {
 
         // console.log(`nodes:`, nodes)
         // console.log(`milestones:`, milestones)
+        // console.log(`edges:`, edges)
 
         // Delete any nodes that are not in the request
         const nodeIds = nodes.map((node: any) => node.id)
@@ -21,6 +22,8 @@ export async function POST(request: Request) {
                 id: { in: nodesToDelete }
             }
         })
+
+        await prisma.edge.deleteMany()
 
         // Save or update nodes
         await Promise.all(
