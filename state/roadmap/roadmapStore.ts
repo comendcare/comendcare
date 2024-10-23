@@ -29,6 +29,7 @@ export type RoadmapState = {
     deleteNode: (nodeId: string) => void
     saveState: () => void
 }
+
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
         selectedNodeId: null,

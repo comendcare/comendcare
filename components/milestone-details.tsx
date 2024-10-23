@@ -2,9 +2,10 @@
 
 import React from "react"
 import { ScrollArea } from "./ui/scroll-area"
-import MilestoneStatusButton from "./milestone-status-button"
+import StatusButton, { StatusType } from "./milestone-status-button"
 import { FaDollarSign } from "react-icons/fa6"
 import { Label } from "./ui/label"
+import { TaskType } from "./milestone-node"
 
 export function MilestoneDetails({ milestoneData }: { milestoneData: any }) {
     return (
@@ -12,8 +13,8 @@ export function MilestoneDetails({ milestoneData }: { milestoneData: any }) {
             <div className="flex flex-col gap-8 pr-4">
                 <div className="flex flex-col grow gap-2">
                     <Label className="text-xl">Milestone Status:</Label>
-                    <MilestoneStatusButton
-                        milestoneStatus={milestoneData.status}
+                    <StatusButton
+                        status={milestoneData.status}
                         onStatusChange={() => {}} // disabled
                     />
                 </div>
@@ -86,6 +87,26 @@ export function MilestoneDetails({ milestoneData }: { milestoneData: any }) {
                         </ol>
                     ) : (
                         <p>{"No associated papers"}</p>
+                    )}
+                </div>
+
+                <div className="flex flex-col grow gap-2">
+                    <Label htmlFor="papers" className="text-xl">
+                        Tasks:
+                    </Label>
+                    {milestoneData.tasks && milestoneData.tasks.length > 0 ? (
+                        <ol id="tasks" className="flex flex-col gap-2">
+                            {milestoneData.tasks.map(
+                                (task: TaskType, index: number) => (
+                                    <li key={index} className="flex justify-between items-center">
+                                        <StatusButton status={task.status} onStatusChange={() => {}} />
+                                        <p>{task.name}</p>
+                                    </li>
+                                )
+                            )}
+                        </ol>
+                    ) : (
+                        <p>{"This milestone has no tasks"}</p>
                     )}
                 </div>
             </div>

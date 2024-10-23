@@ -35,7 +35,13 @@ export default async function RoadmapPage() {
     )
 
     const dbMilestones = await prisma.milestone.findMany({
-        // include: { tasks: true }
+        include: { 
+            tasks: {
+                include: {
+                    checklist: true
+                }
+            } 
+        }
     })
 
     return (
