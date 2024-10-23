@@ -11,7 +11,7 @@ import {
 } from "./ui/card"
 import TaskStatusButton from "./task-status-button"
 import { FaCalendar, FaDollarSign } from "react-icons/fa6"
-import MilestoneStatusButton from "./milestone-status-button"
+import StatusButton from "./milestone-status-button"
 import { truncate } from "@/lib/utils"
 
 export type MilestoneNode = Node<
@@ -35,8 +35,9 @@ export type MilestoneNode = Node<
 >
 
 export interface TaskType {
+    id?: string
     name: string
-    complete: boolean
+    status: StatusType
 }
 
 type StatusType = "TODO" | "INPROGRESS" | "DONE"
@@ -85,8 +86,8 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
             </ul> */}
             </CardContent>
             <CardFooter className="flex justify-between">
-                <MilestoneStatusButton
-                    milestoneStatus={props.data.status}
+                <StatusButton
+                    status={props.data.status}
                     onStatusChange={() => {}}
                 />
                 <Button onClick={handleEditClick}>{`Details`}</Button>
