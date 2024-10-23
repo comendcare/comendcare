@@ -13,7 +13,7 @@ export const imgHeight = 250;
 
 const tabContent = {
     profiles: {
-        title: "Research Profiles",
+        title: "Research Roadmaps",
         image: <Image
             src={`https://api.microlink.io/?${encode({
                 url: "https://comend-refresh-sprint-3.vercel.app/pag/profile/ACME%20Syndrome%20Foundation",
@@ -34,7 +34,7 @@ const tabContent = {
             width={imgWidth}
             height={imgHeight}
         />,
-        description: "Fill in your research roadmap to create a profile. Then match with others and share your progress with researchers, donors, and others.",
+        description: "Develop your research strategy with the help of playbooks and other groups. Then organize your tasks and share your roadmap with others.",
     },
     marketplace: {
         title: "Rare Marketplace",
@@ -61,7 +61,7 @@ const tabContent = {
         description: "Find and learn about those who can help you advance your research objectives based on shared biologies, projects, or goals.",
     },
     forums: {
-        title: "Focused Forums",
+        title: "Research Forums",
         image: <Image
             src={`https://api.microlink.io/?${encode({
                 url: "https://comend-refresh-sprint-3.vercel.app/pag/project/Potassium%20Ion%20Channels/discussion",
@@ -82,7 +82,7 @@ const tabContent = {
             width={imgWidth}
             height={imgHeight}
         />,
-        description: "Talk and keep up to date about your challenges, wins, and the latest in rare disease science and drug development news.",
+        description: "Learn or share about challenges, wins, and the latest news in rare disease science and drug development.",
     },
 };
 
@@ -116,15 +116,15 @@ export default function TabsFeaturesSection() {
             className="w-full container mx-auto max-w-7xl px-8 py-24 sm:py-24 space-y-8"
             aria-labelledby="features-heading"
         >
-            <div className="flex flex-col justify-center items-center text-center">
+            <div className="flex flex-col justify-center items-center md:w-1/2 mx-auto text-center">
                 <div>
                     <h2 id="features-heading" className="text-lg text-primary mb-2 tracking-wider">Platform</h2>
                     <h3 className="text-3xl md:text-4xl font-bold mb-4">
-                        The hub for patient-led research
+                        The accelerator for patient-led research
                     </h3>
                     <p className="text-xl text-muted-foreground mb-8">
-                        Comend streamlines your efforts to maximize impact.
-                        Here, you can apply for grants, meet researchers, hire contractors, and talk to other patient groups like yours — all from one intuitive platform.
+                        Comend supports patient groups from formation to IND approval.
+                        Find grants, connect with researchers, contract CROs, and more - all from one intuitive platform.
                     </p>
                 </div>
             </div>
