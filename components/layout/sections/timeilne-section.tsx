@@ -4,7 +4,7 @@ import Image from "next/image";
 import React, {useRef, useState} from "react";
 import {AnimatePresence, motion, useMotionValue} from "framer-motion";
 import NORDTeam from "@/public/team/nord-team.jpeg";
-import OGTeam from "@/public/team/og-team.jpg";
+import OGTeam from "@/public/team/og-team.jpeg";
 import GGTeam from "@/public/team/gg-team.jpg";
 import NYTeam from "@/public/team/ny-team.jpeg"
 

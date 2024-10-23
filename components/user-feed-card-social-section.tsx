@@ -32,7 +32,9 @@ export const UserFeedCardSocialSection = ({text}: FeedCardSocialSectionProps) =>
                     <AvatarImage src={createDicebearAvatar("", 50, 40, "identicon")} />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
-                <Input placeholder={"What's on your mind?"}/>
+                <div className="flex-1">
+                    <Input placeholder={"What's on your mind?"} />
+                </div>
                 <Button
                     variant="ghost"
                     className="p-3 disabled:opacity-50"

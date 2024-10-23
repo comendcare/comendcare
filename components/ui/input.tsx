@@ -46,6 +46,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 <input
                     className={cn(
                         inputVariants({ variant, size, className }),
+                        "w-full",
                         variant === "currency" && "pl-6" // Apply left padding only for currency variant
                     )}
                     ref={ref}

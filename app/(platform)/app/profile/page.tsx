@@ -1,6 +1,6 @@
 import {cookies} from "next/headers"
 import {
-    FaCalendar, FaCircleDollarToSlot,
+    FaCalendar, FaCircleDollarToSlot, FaEllipsis, FaPen,
     FaPencil, FaPeopleGroup, FaPhone, FaPlus,
 } from "react-icons/fa6";
 import {Button} from "@/components/ui/button";
@@ -10,6 +10,8 @@ import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PAGProfileDetailsCard} from "@/components/pag-profile-details-card";
 import {createDicebearAvatar} from "@/lib/utils";
+import ProfileDropdown from "@/components/profile-dropdown";
+import EditProfileHeaderDialog from "@/components/edit-profile-header-dialog";
 
 const profile = {
     name: 'Ricardo Cooper',
@@ -109,20 +111,15 @@ export default function ProfilePage() {
 
                             <div
                                 className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
-                                <div className="grid grid-cols-2 space-x-2">
-                                    <Button
-                                        variant="secondary"
-                                        className="gap-x-2"
-                                    >
-                                        <FaPencil/>
-                                        Edit profile
-                                    </Button>
+                                <div className="flex flex-row space-x-2">
+                                    <EditProfileHeaderDialog/>
                                     <Button
                                         className="gap-x-2"
                                     >
                                         <FaPlus/>
                                         Add post
                                     </Button>
+                                    <ProfileDropdown/>
                                 </div>
                             </div>
 

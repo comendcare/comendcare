@@ -4,6 +4,7 @@ import {ResponsiveContainer, PieChart, Pie, Label} from "recharts";
 import {cn} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
 import {Badge} from "@/components/ui/badge";
+import EditProfileAboutDialog from "@/components/edit-profile-about-dialog";
 
 const milestones = [
     {text: "Identified biomarkers ", highlight: "2 years ago"},
@@ -48,6 +49,7 @@ export const PAGProfileDetailsCard = () => {
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     About
                 </CardTitle>
+                <EditProfileAboutDialog/>
             </CardHeader>
 
             <CardContent>
