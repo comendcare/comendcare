@@ -335,7 +335,6 @@ export function EditMilestoneForm({
                                     type="number"
                                     placeholder={`Enter a number`}
                                     defaultValue={field.value}
-                                    // value={field.value}
                                     onChange={e =>
                                         field.onChange(
                                             Number(e.target.value)

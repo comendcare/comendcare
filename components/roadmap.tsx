@@ -29,11 +29,13 @@ const selector = (state: RoadmapState) => ({
 export function Roadmap({
     initNodes,
     initEdges,
-    initMilestones
+    initMilestones,
+    initTasks
 }: {
     initNodes: any[]
     initEdges: any[]
     initMilestones: any[]
+    initTasks: any[]
 }) {
     // Zustand state management
     const { defaultLayout, setLayout } = useNavStore()
@@ -75,7 +77,7 @@ export function Roadmap({
 
                         {/* Kanban View */}
                         <TabsContent value="kanban">
-                            <Kanban />
+                            <Kanban initTasks={initTasks} />
                         </TabsContent>
                     </Tabs>
                 </ResizablePanel>

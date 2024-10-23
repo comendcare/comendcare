@@ -1,17 +1,24 @@
 import type { UniqueIdentifier } from "@dnd-kit/core"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { cva } from "class-variance-authority"
 import { GripVertical } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ColumnId } from "@/components/kanban-board"
+import { StatusType } from "./milestone-status-button"
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "./ui/dialog"
+import { EditTaskForm } from "./edit-task-form"
 
 export interface Task {
     id: UniqueIdentifier
-    columnId: ColumnId
-    content: string
+    status: StatusType
+    name: string
+    description?: string
+    checklist?: any[]
+    // columnId: ColumnId
+    // content: string
 }
 
 interface TaskCardProps {
@@ -67,8 +74,8 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
                 dragging: isOverlay
                     ? "overlay"
                     : isDragging
-                      ? "over"
-                      : undefined
+                    ? "over"
+                    : undefined
             })}
         >
             <CardHeader className="px-3 py-3 space-between flex flex-row border-b-2 border-secondary relative">
@@ -81,13 +88,22 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
                     <span className="sr-only">Move task</span>
                     <GripVertical />
                 </Button>
-                <Badge variant={"outline"} className="ml-auto font-semibold">
-                    Task
-                </Badge>
+                <p>{task.name}</p>
             </CardHeader>
             <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">
-                {task.content}
+                {task.description || ""}
             </CardContent>
+            <CardFooter>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button>Edit Task</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>Edit Task</DialogHeader>
+                        <EditTaskForm taskData={task} onClose={() => {}}/>
+                    </DialogContent>
+                </Dialog>
+            </CardFooter>
         </Card>
     )
 }
