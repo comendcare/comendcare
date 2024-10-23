@@ -29,7 +29,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                 className="h-full w-full items-stretch"
             >
                 {/* Navigation Panel */}
-                {/* <ResizablePanel
+                <ResizablePanel
                     defaultSize={defaultLayout[0]}
                     collapsedSize={4}
                     collapsible={true}
@@ -52,15 +52,15 @@ export default function AppLayout({children}: AppLayoutProps) {
                         isCollapsed={isCollapsed}
                         links={[
                             {title: "Roadmap", label: "128", icon: Workflow, variant: "ghost", href: "/app/roadmap"},
-                            {title: "Marketplace", label: "9", icon: Store, variant: "ghost", href: "/app/marketplace"},
                             {title: "Profile", icon: User, variant: "ghost", href: "/app/profile"},
+                            {title: "Marketplace", label: "9", icon: Store, variant: "ghost", href: "/app/marketplace"},
                             {title: "Settings", icon: Cog, variant: "ghost", href: "/app/settings"},
                         ]}
                     />
-                </ResizablePanel> */}
+                </ResizablePanel>
 
-                {/* Resizable Handle between panels */}
-                {/* <ResizableHandle withHandle/> */}
+                 {/*Resizable Handle between panels */}
+                 <ResizableHandle withHandle/>
 
                 {/* Main Content Panel */}
                 <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
