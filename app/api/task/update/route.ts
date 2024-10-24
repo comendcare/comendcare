@@ -14,7 +14,8 @@ export async function POST(request: Request) {
                     where: { id: task.id },
                     data: {
                         name: task.name,
-                        status: task.status
+                        status: task.status,
+                        description: task.description
                     }
                 })
             })

@@ -79,7 +79,6 @@ export function Roadmap({
         setNodes(initNodes)
         setEdges(initEdges)
         setMilestones(initMilestones)
-        // setTasks(initTasks)
     }, [initNodes, initEdges])
 
     return (
@@ -105,15 +104,12 @@ export function Roadmap({
                         >
                             <Flow
                                 width={defaultLayout[0]}
-                                initNodes={initNodes}
-                                initEdges={initEdges}
-                                initMilestones={initMilestones}
                             />
                         </TabsContent>
 
                         {/* Kanban View */}
                         <TabsContent value="kanban">
-                            <Kanban initTasks={milestones.map(milestone => milestone?.tasks || []).flat(1)} />
+                            <Kanban />
                         </TabsContent>
                     </Tabs>
                 </ResizablePanel>
