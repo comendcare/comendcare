@@ -24,6 +24,7 @@ import {
 import { DeleteTaskDialogContent } from "./delete-task-dialog-content"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
+import StatusButton from "./milestone-status-button"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 
@@ -87,7 +88,7 @@ export function EditTaskForm({
                 onSubmit={form.handleSubmit(handleFormSubmit)}
                 className="flex flex-col gap-8 pr-4"
             >
-                {/* <FormField
+                <FormField
                 control={form.control}
                 name="status"
                 render={({ field }) => (
@@ -107,7 +108,7 @@ export function EditTaskForm({
                         <FormMessage />
                     </FormItem>
                 )}
-                /> */}
+                />
 
                 <FormField
                 control={form.control}
