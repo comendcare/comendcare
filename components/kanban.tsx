@@ -47,7 +47,7 @@ const selector = (state: RoadmapState) => ({
     setTask: state.setTask
 })
 
-export default function KanbanView() {
+export function KanbanView() {
     const { milestones } = useRoadmapStore(useShallow(selector))
 
     return (

@@ -157,12 +157,10 @@ const RoadmapFlowchart = ({
     )
 }
 
-function FlowWithProvider(props: any) {
+export function FlowView(props: any) {
     return (
         <ReactFlowProvider>
             <RoadmapFlowchart {...props} />
         </ReactFlowProvider>
     )
 }
-
-export default FlowWithProvider

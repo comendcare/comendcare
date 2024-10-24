@@ -11,8 +11,8 @@ import {
     ResizableHandle
 } from "@/components/ui/resizable"
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
-import Flow from "@/components/flow"
-import Kanban from "@/components/kanban"
+import { FlowView } from "@/components/flow"
+import { KanbanView } from "@/components/kanban"
 import { Button } from "./ui/button"
 import { FaX } from "react-icons/fa6"
 import { EditMilestoneForm } from "./edit-milestone-form"
@@ -102,14 +102,14 @@ export function Roadmap({
                             value="roadmap"
                             className="m-0 h-[calc(100vh-3.5rem)]"
                         >
-                            <Flow
+                            <FlowView
                                 width={defaultLayout[0]}
                             />
                         </TabsContent>
 
                         {/* Kanban View */}
                         <TabsContent value="kanban">
-                            <Kanban />
+                            <KanbanView />
                         </TabsContent>
                     </Tabs>
                 </ResizablePanel>
@@ -144,11 +144,6 @@ export function Roadmap({
                             className="p-10 flex flex-col gap-4"
                         >
                             <TaskDetailsPanel 
-                                // milestoneId={milestones.find(milestone => milestone?.tasks?.includes(selectedTaskId))}
-                                // task={milestones.map(milestone => milestone?.tasks || []).flat(1).find(task => task.id === selectedTaskId)}
-                                // task={tasks.find(task => 
-                                //     task.id === selectedTaskId
-                                // )}
                                 milestones={milestones}
                                 selectedTaskId={selectedTaskId}
                                 handlePanelChange={handleTaskPanelChange}
