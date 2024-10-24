@@ -8,11 +8,14 @@ import { GripVertical } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { ColumnId } from "@/components/kanban-board"
 import { StatusType } from "./milestone-status-button"
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "./ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 import { EditTaskForm } from "./edit-task-form"
+import { useState } from "react"
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { useShallow } from "zustand/react/shallow"
 
 export interface Task {
-    id: UniqueIdentifier
+    id: string
     status: StatusType
     name: string
     description?: string
@@ -33,7 +36,12 @@ export interface TaskDragData {
     task: Task
 }
 
+const selector = (state: RoadmapState) => ({
+    setSelectedTaskId: state.setSelectedTaskId
+})
+
 export function TaskCard({ task, isOverlay }: TaskCardProps) {
+    const { setSelectedTaskId } = useRoadmapStore(useShallow(selector))
     const {
         setNodeRef,
         attributes,
@@ -94,15 +102,7 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
                 {task.description || ""}
             </CardContent>
             <CardFooter>
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button>Edit Task</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>Edit Task</DialogHeader>
-                        <EditTaskForm taskData={task} onClose={() => {}}/>
-                    </DialogContent>
-                </Dialog>
+                <Button onClick={() => setSelectedTaskId(task?.id)}>Edit Task</Button>
             </CardFooter>
         </Card>
     )

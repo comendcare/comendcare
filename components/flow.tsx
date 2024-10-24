@@ -70,12 +70,6 @@ const RoadmapFlowchart = ({
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
 
-    useEffect(() => {
-        setNodes(initNodes)
-        setEdges(initEdges)
-        setMilestones(initMilestones)
-    }, [initNodes, initEdges])
-
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
     // if a position is not provided, place in the center
@@ -102,6 +96,7 @@ const RoadmapFlowchart = ({
                 y: position ? position?.y : centerY
             },
             data: {
+                id: nanoid(),
                 nodeId: id,
                 title: `New Milestone`,
                 papers: [],

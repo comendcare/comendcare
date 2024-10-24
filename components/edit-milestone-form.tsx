@@ -55,6 +55,7 @@ import {
 import { DialogClose } from "@radix-ui/react-dialog"
 import { useReactFlow } from "@xyflow/react"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
+import { nanoid } from "nanoid"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 
@@ -75,6 +76,7 @@ const editMilestoneForm = z.object({
     papers: z.array(z.string()).optional(),
     tasks: z.array(
         z.object({
+            id: z.string(),
             name: z.string(),
             status: statusTypeSchema,
         })
@@ -438,7 +440,7 @@ export function EditMilestoneForm({
                                 e.preventDefault()
                                 form.setValue(
                                     'tasks',
-                                    [...field?.value || [], { name: 'New Task', status: 'TODO' }]
+                                    [...field?.value || [], { name: 'New Task', status: 'TODO', id: nanoid() }]
                                 )
                             }}>Add a task</Button>
                             </>

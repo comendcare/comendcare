@@ -8,7 +8,8 @@ export async function POST(request: Request) {
         await Promise.all(
             milestones.map(async (milestone: any) => {
                 const previousMilestone = await prisma.milestone.findUnique({
-                    where: { nodeId: milestone.nodeId },
+                    // where: { nodeId: milestone.nodeId },
+                    where: { id: milestone.id },
                     include: { tasks: true }
                 })
 
@@ -22,7 +23,8 @@ export async function POST(request: Request) {
                 // console.log(`tasks to create`, tasksToCreate)
 
                 await prisma.milestone.update({
-                    where: { nodeId: milestone.nodeId },
+                    // where: { nodeId: milestone.nodeId },
+                    where: { id: milestone.id },
                     include: { tasks: true },
                     data: {
                         title: milestone.title,
@@ -35,6 +37,7 @@ export async function POST(request: Request) {
                             deleteMany: tasksToDelete.map(task => ({ id: task.id })),
                             createMany: {
                                 data: tasksToCreate.map((task: any) => ({
+                                    id: task?.id,
                                     name: task?.name || "New Task",
                                     status: task?.status || "TODO",
                                 }))
