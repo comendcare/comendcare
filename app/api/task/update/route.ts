@@ -5,7 +5,7 @@ export async function POST(request: Request) {
     try {
         const { tasks } = await request.json()
 
-        console.log(`tasks:`, tasks)
+        // console.log(`tasks:`, tasks)
 
         await Promise.all(
             tasks.map(async (task: any) => {
@@ -15,7 +15,16 @@ export async function POST(request: Request) {
                     data: {
                         name: task.name,
                         status: task.status,
-                        description: task.description
+                        description: task.description,
+                        checklist: {
+                            deleteMany: {},
+                            createMany: {
+                                data: task.checklist.map((item: any) => ({
+                                    name: item?.name || "New Item",
+                                    complete: item?.complete || false
+                                }))
+                            }
+                        }
                     }
                 })
             })

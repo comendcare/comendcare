@@ -25,13 +25,23 @@ import { DeleteTaskDialogContent } from "./delete-task-dialog-content"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import StatusButton from "./milestone-status-button"
+import { nanoid } from "nanoid"
+import ChecklistCompleteButton from "./checklist-complete-button"
+import { FaTrash } from "react-icons/fa6"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 
 const editTaskForm = z.object({
     name: z.string(),
     status: statusTypeSchema,
-    description: z.string().optional()
+    description: z.string().optional(),
+    checklist: z.array(
+        z.object({
+            id: z.string(),
+            name: z.string(),
+            complete: z.boolean()
+        })
+    ).optional()
 })
 
 const selector = (state: RoadmapState) => ({
@@ -54,13 +64,15 @@ export function EditTaskForm({
         defaultValues: {
             name: taskData?.name,
             status: taskData?.status,
-            description: taskData?.description || undefined
+            description: taskData?.description || undefined,
+            checklist: taskData?.checklist || undefined
         }
     })
 
     const name = form.watch("name")
     const status = form.watch("status")
     const description = form.watch("description")
+    const checklist = form.watch("checklist")
 
     const handleFormSubmit = () => {
         console.log(`Handle Task Form Submit... `)
@@ -69,13 +81,15 @@ export function EditTaskForm({
             name,
             status,
             description,
+            checklist
         })
         setTask(
             taskData?.id,
             {
                 name,
                 status,
-                ...(description ? { description } : undefined)
+                ...(description ? { description } : undefined),
+                ...(checklist ? { checklist } : undefined)
             }
         )
         onClose()
@@ -148,6 +162,45 @@ export function EditTaskForm({
                 )}
                 />
 
+                <FormField
+                control={form.control}
+                name="checklist"
+                render={({ field }) => (
+                    <FormItem className="flex flex-col grow">
+                        <FormLabel className="text-xl">{`Checklist:`}</FormLabel>
+                        <FormControl>
+                            <>
+                            <ul className="flex flex-col gap-2">
+                                {field?.value?.map((checklistItem, index) => (
+                                    <ChecklistField 
+                                        index={index}
+                                        item={checklistItem}
+                                        onDelete={() => (
+                                            form.setValue('checklist', field?.value?.filter((t, i) => i !== index))
+                                        )}
+                                        onNameChange={(name) => {
+                                            form.setValue('checklist', field?.value?.map((t, i) => i === index ? {...t, name} : t))
+                                        }}
+                                        onCompleteChange={(complete) => {
+                                            form.setValue('checklist', field?.value?.map((t, i) => i === index ? {...t, complete} : t))
+                                        }}
+                                    />
+                                ))}
+                            </ul>
+                            <Button onClick={(e: any) => {
+                                e.preventDefault()
+                                form.setValue(
+                                    'checklist',
+                                    [...field?.value || [], { name: 'New Item', complete: false, id: nanoid() }]
+                                )
+                            }}>Add a checklist item</Button>
+                            </>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+                />
+
                 <span className="flex justify-end gap-4 flex-wrap">
                     <Dialog>
                         <DialogTrigger>
@@ -156,12 +209,48 @@ export function EditTaskForm({
                             </Button>
                         </DialogTrigger>
                         <DeleteTaskDialogContent taskData={taskData}/>
-                        {/* <DeleteMilestoneDialogContent milestoneData={milestoneData}/> */}
                     </Dialog>
                     <Button type="submit">Save Changes</Button>
                 </span>
             </form>
         </ScrollArea>
         </Form>
+    )
+}
+
+const ChecklistField = ({
+    index,
+    item,
+    onDelete,
+    onNameChange,
+    onCompleteChange
+}: {
+    index: number
+    item: any
+    onDelete: () => void
+    onNameChange: (newName: string) => void
+    onCompleteChange: (complete: boolean) => void
+}) => {
+    const deleteTask = (e: React.MouseEvent<HTMLElement>) => {
+        e.preventDefault()
+        onDelete()
+    }
+
+    const nameChanged = (e: React.FormEvent<HTMLInputElement>) => {
+        onNameChange(e.currentTarget.value)
+    }
+
+    return (
+        <li key={index} className="flex flex-row gap-2 items-center">
+            <ChecklistCompleteButton complete={item.complete} onClick={onCompleteChange}/>
+            <Input
+                placeholder={item.name}
+                value={item.name}
+                onChange={nameChanged}
+            />
+            <Button size="icon" onClick={deleteTask}>
+                <FaTrash />
+            </Button>
+        </li>
     )
 }

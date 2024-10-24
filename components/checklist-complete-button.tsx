@@ -1,10 +1,9 @@
 "use client"
-
-import React, { memo, useState } from "react"
+import React from "react"
 import { FaCheck } from "react-icons/fa6"
 import { Button } from "./ui/button"
 
-export default function TaskStatusButton({
+export default function ChecklistCompleteButton({
     complete,
     onClick
 }: {

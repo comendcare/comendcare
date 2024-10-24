@@ -19,6 +19,7 @@ import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useState } from "react"
 import { MilestoneDetails } from "./milestone-details"
 import { EditTaskForm } from "./edit-task-form"
+import { TaskDetails } from "./task-details"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -199,13 +200,13 @@ const TaskDetailsPanel = ({
             </span>
             {isEditing ? (
                 <EditTaskForm 
-                    // milestoneId={milestone.id}
                     taskData={task}
                     onClose={() => setIsEditing(false)}
                 />
             ) : (
                 // <MilestoneDetails milestoneData={milestone} />
-                <div>{task?.name}</div>
+                // <div>{task?.name}</div>
+                <TaskDetails taskData={task}/>
             )}
         </>
     )
