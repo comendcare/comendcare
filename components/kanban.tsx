@@ -44,15 +44,22 @@ export type ColumnId = (typeof defaultCols)[number]["id"]
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
+    setTask: state.setTask
 })
 
-export default function Kanban({ initTasks }: { initTasks: any[] }) {
+export default function KanbanView() {
     const { milestones } = useRoadmapStore(useShallow(selector))
+
+    return (
+        <Kanban tasks={milestones.map(milestone => milestone?.tasks || []).flat(1)}/>
+    )
+}
+
+function Kanban({ tasks }: { tasks: Task[] }) {
+    const { setTask } = useRoadmapStore(useShallow(selector))
     const [columns, setColumns] = useState<Column[]>(defaultCols)
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
     const columnsId = useMemo(() => columns.map(col => col.id), [columns])
-
-    const [tasks, setTasks] = useState<Task[]>(initTasks)
 
     const [activeColumn, setActiveColumn] = useState<Column | null>(null)
 
@@ -249,37 +256,60 @@ export default function Kanban({ initTasks }: { initTasks: any[] }) {
 
         // Im dropping a Task over another Task
         if (isActiveATask && isOverATask) {
-            setTasks(tasks => {
-                const activeIndex = tasks.findIndex(t => t.id === activeId)
-                const overIndex = tasks.findIndex(t => t.id === overId)
-                const activeTask = tasks[activeIndex]
-                const overTask = tasks[overIndex]
-                if (
-                    activeTask &&
-                    overTask &&
-                    activeTask.status !== overTask.status
-                ) {
-                    activeTask.status = overTask.status
-                    return arrayMove(tasks, activeIndex, overIndex - 1)
-                }
+            // setTasks(tasks => {
+            //     const activeIndex = tasks.findIndex((t: any) => t.id === activeId)
+            //     const overIndex = tasks.findIndex((t: any) => t.id === overId)
+            //     const activeTask = tasks[activeIndex]
+            //     const overTask = tasks[overIndex]
+            //     if (
+            //         activeTask &&
+            //         overTask &&
+            //         activeTask.status !== overTask.status
+            //     ) {
+            //         activeTask.status = overTask.status
+            //         return arrayMove(tasks, activeIndex, overIndex - 1)
+            //     }
 
-                return arrayMove(tasks, activeIndex, overIndex)
-            })
+            //     return arrayMove(tasks, activeIndex, overIndex)
+            // })
+            const activeIndex = tasks.findIndex((t: any) => t.id === activeId)
+            const overIndex = tasks.findIndex((t: any) => t.id === overId)
+            const activeTask = tasks[activeIndex]
+            const overTask = tasks[overIndex]
+            if (
+                activeTask &&
+                overTask &&
+                activeTask.status !== overTask.status
+            ) {
+                activeTask.status = overTask.status
+                // return arrayMove(tasks, activeIndex, overIndex - 1)
+            }
+
+            setTask(activeTask.id, { status: activeTask.status })
+            // return arrayMove(tasks, activeIndex, overIndex)
         }
 
         const isOverAColumn = overData?.type === "Column"
 
         // Im dropping a Task over a column
         if (isActiveATask && isOverAColumn) {
-            setTasks(tasks => {
-                const activeIndex = tasks.findIndex(t => t.id === activeId)
-                const activeTask = tasks[activeIndex]
-                if (activeTask) {
-                    activeTask.status = overId as ColumnId
-                    return arrayMove(tasks, activeIndex, activeIndex)
-                }
-                return tasks
-            })
+            // setTasks(tasks => {
+            //     const activeIndex = tasks.findIndex(t => t.id === activeId)
+            //     const activeTask = tasks[activeIndex]
+            //     if (activeTask) {
+            //         activeTask.status = overId as ColumnId
+            //         return arrayMove(tasks, activeIndex, activeIndex)
+            //     }
+            //     return tasks
+            // })
+            const activeIndex = tasks.findIndex(t => t.id === activeId)
+            const activeTask = tasks[activeIndex]
+            if (activeTask) {
+                activeTask.status = overId as ColumnId
+                setTask(activeTask.id, { status: activeTask.status })
+                // return arrayMove(tasks, activeIndex, activeIndex)
+            }
+            // return tasks
         }
     }
 
