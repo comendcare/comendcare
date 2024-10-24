@@ -42,6 +42,7 @@ export async function POST(request: Request) {
                         positionY: node.position?.y,
                         data: {
                             create: {
+                                id: node.data?.id,
                                 title: node.data?.title || "New Milestone",
                                 status: node.data?.status || "TODO"
                             }

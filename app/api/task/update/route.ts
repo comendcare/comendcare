@@ -5,10 +5,11 @@ export async function POST(request: Request) {
     try {
         const { tasks } = await request.json()
 
-        // console.log(`tasks:`, tasks)
+        console.log(`tasks:`, tasks)
 
         await Promise.all(
             tasks.map(async (task: any) => {
+                console.log(`id`, task.id)
                 await prisma.task.update({
                     where: { id: task.id },
                     data: {

@@ -15,6 +15,11 @@ import { debounce } from "lodash"
 export type RoadmapState = {
     selectedNodeId: string | null
     setSelectedNodeId: (id: string | null) => void
+    selectedTaskId: string | null,
+    setSelectedTaskId: (id: string | null) => void
+    // tasks: any[]
+    setTask: (taskId: string, newProperties: any) => void
+    // setTasks: (tasks: any[]) => void
     milestones: any[]
     setMilestone: (id: string, newProperties: any) => void
     setMilestones: (milestones: any[]) => void
@@ -35,6 +40,27 @@ export const useRoadmapStore = create<RoadmapState>()(
         selectedNodeId: null,
         setSelectedNodeId: (id: string | null) => {
             set({ selectedNodeId: id })
+        },
+        selectedTaskId: null,
+        setSelectedTaskId: (id: string | null) => {
+            set({ selectedTaskId: id })
+        },
+        setTask: (taskId: string, newProperties: any) => {
+            const milestones = get().milestones.map(milestone => {
+                if (milestone.tasks.map((task: any) => task.id).includes(taskId)) {
+                    return {
+                        ...milestone,
+                        tasks: milestone.tasks.map((task: any) => (
+                            task.id === taskId ? {...task, ...newProperties} : task
+                        ))
+                    }
+                } else {
+                    return milestone
+                }
+            })
+            set({ milestones })
+            const task = get().milestones.map(milestone => milestone?.tasks || []).flat(1).filter(task => task.id === taskId)
+            if (task) updateTasks(task)
         },
         milestones: [],
         setMilestone: (nodeId: string, newProperties: any) => {
@@ -123,11 +149,11 @@ export const useRoadmapStore = create<RoadmapState>()(
         //         saveToDatabase(state.nodes, state.edges, state.milestones)
         //     }, 500)
         // ),
-        // onSave: (pastState, currentState) => {
-        //     console.log(`Saved State: `, currentState)
-        //     debouncedSaveToDatabase(currentState.nodes, currentState.edges, currentState.milestones)
-        //     return
-        // },
+        onSave: (pastState, currentState) => {
+            console.log(`Saved State: `, currentState)
+            // debouncedSaveToDatabase(currentState.nodes, currentState.edges, currentState.milestones)
+            return
+        },
     })
 )
 
@@ -182,15 +208,61 @@ export const updateMilestones = async (
         })
 
         if (!response.ok) {
-            throw new Error("Failed to save flow")
+            throw new Error("Failed to save milestones")
         }
 
         const data = await response.json()
         console.log(data.message)
     } catch (error) {
-        console.error("Error saving flow:", error)
+        console.error("Error saving milestones:", error)
     }
 }
+
+export const updateTasks = async (
+    tasks: any[] // tasks to update
+) => {
+    try {
+        const response = await fetch("/api/task/update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ tasks })
+        })
+
+        if (!response.ok) {
+            throw new Error("Failed to save tasks")
+        }
+
+        const data = await response.json()
+        console.log(data.message)
+    } catch (error) {
+        console.error("Error saving tasks:", error)
+    }
+}
+
+// export const updateTasks = async (
+//     tasks: any[] // tasks to update
+// ) => {
+//     try {
+//         const response = await fetch("/api/milestone/update", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             },
+//             body: JSON.stringify({ tasks })
+//         })
+
+//         if (!response.ok) {
+//             throw new Error("Failed to save flow")
+//         }
+
+//         const data = await response.json()
+//         console.log(data.message)
+//     } catch (error) {
+//         console.error("Error saving flow:", error)
+//     }
+// }
 
 // export const saveToDatabase = async (
 //     nodes: Node[],

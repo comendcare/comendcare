@@ -22,6 +22,8 @@ import { type Task, TaskCard } from "@/components/task-card"
 import type { Column } from "@/components/board-column"
 import { hasDraggableData } from "@/lib/utils"
 import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { useShallow } from "zustand/react/shallow"
 
 const defaultCols = [
     {
@@ -40,7 +42,12 @@ const defaultCols = [
 
 export type ColumnId = (typeof defaultCols)[number]["id"]
 
+const selector = (state: RoadmapState) => ({
+    milestones: state.milestones,
+})
+
 export default function Kanban({ initTasks }: { initTasks: any[] }) {
+    const { milestones } = useRoadmapStore(useShallow(selector))
     const [columns, setColumns] = useState<Column[]>(defaultCols)
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
     const columnsId = useMemo(() => columns.map(col => col.id), [columns])

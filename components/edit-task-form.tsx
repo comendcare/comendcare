@@ -22,6 +22,8 @@ import {
     DialogTrigger
 } from "./ui/dialog"
 import { DeleteTaskDialogContent } from "./delete-task-dialog-content"
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { useShallow } from "zustand/react/shallow"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 
@@ -31,13 +33,20 @@ const editTaskForm = z.object({
     description: z.string().optional()
 })
 
+const selector = (state: RoadmapState) => ({
+    setTask: state.setTask
+})
+
 export function EditTaskForm({
+    // milestoneId,
     taskData,
     onClose
 }: {
+    // milestoneId: string
     taskData: any
     onClose: () => void
 }) {
+    const { setTask } = useRoadmapStore(useShallow(selector))
     const form = useForm<z.infer<typeof editTaskForm>>({
         mode: "onChange",
         resolver: zodResolver(editTaskForm),
@@ -54,19 +63,21 @@ export function EditTaskForm({
 
     const handleFormSubmit = () => {
         console.log(`Handle Task Form Submit... `)
-        // setMilestone(milestoneData?.nodeId, {
-        //     title,
-        //     ...(description !== undefined && description !== null
-        //         ? { description }
-        //         : undefined),
-        //     ...(timelineMonth ? { timelineMonth } : undefined),
-        //     ...(timelineYear ? { timelineYear } : undefined),
-        //     ...(budget ? { budget } : undefined),
-        //     papers,
-        //     tasks,
-        //     status
-        // })
-        // onClose()
+        console.log({
+            id: taskData?.id || "no id set",
+            name,
+            status,
+            description,
+        })
+        setTask(
+            taskData?.id,
+            {
+                name,
+                status,
+                ...(description ? { description } : undefined)
+            }
+        )
+        onClose()
     }
 
     return (
