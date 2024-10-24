@@ -44,17 +44,12 @@ export default async function RoadmapPage() {
         }
     })
 
-    // const dbTasks = await prisma.task.findMany({
-    //     include: { checklist: true }
-    // })
-
     return (
         <main className="flex flex-col items-center w-screen h-screen mx-auto">
             <Roadmap
                 initNodes={dbNodes || []}
                 initEdges={dbEdges || []}
                 initMilestones={dbMilestones || []}
-                // initTasks={dbTasks || []}
             />
         </main>
     )

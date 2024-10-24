@@ -28,15 +28,18 @@ import { useShallow } from "zustand/react/shallow"
 const defaultCols = [
     {
         id: "TODO" as const,
-        title: "Todo"
+        title: "Todo",
+        styling: "bg-red-100 border-red-600 text-red-800 hover-red-400"
     },
     {
         id: "INPROGRESS" as const,
-        title: "In progress"
+        title: "In progress",
+        styling: "bg-yellow-100 border-yellow-600 text-yellow-800"
     },
     {
         id: "DONE" as const,
-        title: "Done"
+        title: "Done",
+        styling: "bg-green-100 border-green-600 text-green-800"
     }
 ] satisfies Column[]
 

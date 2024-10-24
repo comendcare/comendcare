@@ -1,7 +1,7 @@
 import type { UniqueIdentifier } from "@dnd-kit/core"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { cva } from "class-variance-authority"
 import { GripVertical } from "lucide-react"
@@ -13,6 +13,7 @@ import { EditTaskForm } from "./edit-task-form"
 import { useState } from "react"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
+import ChecklistCompleteButton from "./checklist-complete-button"
 
 export interface Task {
     id: string
@@ -96,10 +97,22 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
                     <span className="sr-only">Move task</span>
                     <GripVertical />
                 </Button>
-                <p>{task.name}</p>
+                <div className="flex flex-col">
+                    <CardTitle className="text-lg">{task?.name}</CardTitle>
+                    <CardDescription>{task?.description}</CardDescription>
+                </div>
             </CardHeader>
             <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">
-                {task.description || ""}
+                <ol id="checklist" className="flex flex-col gap-2">
+                    {task?.checklist?.map(
+                        (item: any, index: number) => (
+                            <li key={index} className="flex gap-2 items-center">
+                                <ChecklistCompleteButton complete={item.complete} onClick={() => {}}/>
+                                <p>{item.name}</p>
+                            </li>
+                        )
+                    )}
+                </ol>
             </CardContent>
             <CardFooter>
                 <Button onClick={() => setSelectedTaskId(task?.id)}>Edit Task</Button>

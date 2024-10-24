@@ -9,8 +9,7 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import TaskStatusButton from "./task-status-button"
-import { FaCalendar, FaDollarSign } from "react-icons/fa6"
+import { FaCalendar } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
 import { truncate } from "@/lib/utils"
 
