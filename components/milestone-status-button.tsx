@@ -7,23 +7,25 @@ export type StatusType = "TODO" | "INPROGRESS" | "DONE"
 
 export default function StatusButton({
     status = "TODO",
+    disabled = false,
     onStatusChange
 }: {
     status?: StatusType
+    disabled?: boolean | undefined
     onStatusChange: (status: StatusType) => void
 }) {
     const StatusData = {
         TODO: {
-            text: "TODO",
-            styling: "bg-red-100 border-red-600 text-red-800 hover-red-400"
+            text: "To Do",
+            styling: "bg-red-100 border-red-600 text-red-800 hover-red-400 disabled:opacity-100"
         },
         INPROGRESS: {
-            text: "IN PROGRESS",
-            styling: "bg-yellow-100 border-yellow-600 text-yellow-800"
+            text: "In Progress",
+            styling: "bg-yellow-100 border-yellow-600 text-yellow-800 disabled:opacity-100"
         },
         DONE: {
-            text: "DONE",
-            styling: "bg-green-100 border-green-600 text-green-800"
+            text: "Done",
+            styling: "bg-green-100 border-green-600 text-green-800 disabled:opacity-100"
         }
     }
 
@@ -41,6 +43,7 @@ export default function StatusButton({
 
     return (
         <Button
+            disabled={disabled}
             className={`${StatusData[status].styling}`}
             onClick={handleStateChange}
         >

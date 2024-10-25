@@ -220,7 +220,7 @@ const TaskDetailsPanel = ({
     // const milestone = milestones.find(milestone => milestone.tasks.includes(selectedTaskId))
 
     const handleClose = () => {
-        setIsEditing(false)
+        // setIsEditing(false)
         handlePanelChange(false)
     }
 
@@ -246,11 +246,10 @@ const TaskDetailsPanel = ({
             {isEditing ? (
                 <EditTaskForm 
                     taskData={task}
-                    onClose={() => setIsEditing(false)}
+                    // onClose={() => setIsEditing(false)}
+                    onClose={() => {}}
                 />
             ) : (
-                // <MilestoneDetails milestoneData={milestone} />
-                // <div>{task?.name}</div>
                 <TaskDetails taskData={task}/>
             )}
         </>
@@ -268,7 +267,7 @@ const MilestoneDetailsPanel = ({
     const [isEditing, setIsEditing] = useState(true)
 
     const handleClose = () => {
-        setIsEditing(false)
+        // setIsEditing(false)
         handlePanelChange(false)
     }
 
@@ -294,7 +293,8 @@ const MilestoneDetailsPanel = ({
             {isEditing ? (
                 <EditMilestoneForm
                     milestoneData={milestone}
-                    onClose={() => setIsEditing(false)}
+                    // onClose={() => setIsEditing(false)}
+                    onClose={() => {}}
                 />
             ) : (
                 <MilestoneDetails milestoneData={milestone} />

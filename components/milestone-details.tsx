@@ -14,6 +14,7 @@ export function MilestoneDetails({ milestoneData }: { milestoneData: any }) {
                 <div className="flex flex-col grow gap-2">
                     <Label className="text-xl">Milestone Status:</Label>
                     <StatusButton
+                        disabled={true}
                         status={milestoneData.status}
                         onStatusChange={() => {}} // disabled
                     />
@@ -99,7 +100,7 @@ export function MilestoneDetails({ milestoneData }: { milestoneData: any }) {
                             {milestoneData.tasks.map(
                                 (task: TaskType, index: number) => (
                                     <li key={index} className="flex justify-between items-center">
-                                        <StatusButton status={task.status} onStatusChange={() => {}} />
+                                        <StatusButton disabled={true} status={task.status} onStatusChange={() => {}} />
                                         <p>{task.name}</p>
                                     </li>
                                 )

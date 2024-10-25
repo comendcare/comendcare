@@ -86,6 +86,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
             </CardContent>
             <CardFooter className="flex justify-between">
                 <StatusButton
+                    disabled={true}
                     status={props.data.status}
                     onStatusChange={() => {}}
                 />

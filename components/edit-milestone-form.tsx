@@ -36,6 +36,7 @@ import {
 } from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { nanoid } from "nanoid"
+import { toast } from "sonner"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 
@@ -155,6 +156,9 @@ export function EditMilestoneForm({
             papers,
             tasks,
             status
+        })
+        toast('Success!', {
+            description: 'The changes to your milestone have been successfully saved.'
         })
         onClose()
     }

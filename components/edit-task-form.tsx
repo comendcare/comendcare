@@ -28,6 +28,7 @@ import StatusButton from "./milestone-status-button"
 import { nanoid } from "nanoid"
 import { FaTrash } from "react-icons/fa6"
 import { Checkbox } from "./ui/checkbox"
+import { toast } from "sonner"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 
@@ -97,6 +98,9 @@ export function EditTaskForm({
                 ...(checklist ? { checklist } : undefined)
             }
         )
+        toast('Success!', {
+            description: 'The changes to your task have been successfully saved.'
+        })
         onClose()
     }
 
