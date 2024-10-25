@@ -28,7 +28,7 @@ import { useShallow } from "zustand/react/shallow"
 const defaultCols = [
     {
         id: "TODO" as const,
-        title: "Todo",
+        title: "To Do",
         styling: "bg-red-100 border-red-600 text-red-800 hover-red-400"
     },
     {

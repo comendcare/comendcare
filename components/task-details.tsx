@@ -15,6 +15,7 @@ export function TaskDetails({ taskData }: { taskData: any }) {
                 <div className="flex flex-col grow gap-2">
                     <Label className="text-xl">Task Status:</Label>
                     <StatusButton
+                        disabled={true}
                         status={taskData.status}
                         onStatusChange={() => {}} // disabled
                     />
