@@ -420,7 +420,8 @@ export function EditMilestoneForm({
                             <>
                             <ul className="flex flex-col gap-2"> 
                                 {field?.value?.map((task, index) => ( 
-                                    <TaskField 
+                                    <TaskField
+                                        key={index} 
                                         index={index} 
                                         task={task} 
                                         onDelete={() => (
