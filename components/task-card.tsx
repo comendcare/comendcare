@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { cva } from "class-variance-authority"
 import { GripVertical } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { ColumnId } from "@/components/kanban-board"
 import { StatusType } from "./milestone-status-button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
 import { EditTaskForm } from "./edit-task-form"
@@ -22,8 +21,6 @@ export interface Task {
     name: string
     description?: string
     checklist?: any[]
-    // columnId: ColumnId
-    // content: string
 }
 
 interface TaskCardProps {
