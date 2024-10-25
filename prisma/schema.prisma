@@ -138,6 +138,65 @@ model Roadmap {
   @@index([userId])
 }
 
+enum NodeType {
+  MILESTONE
+}
+
+enum StatusType {
+  TODO
+  INPROGRESS
+  DONE
+}
+
+model Node {
+  id        String     @id @unique @default(uuid())
+  type      String
+  positionX Int
+  positionY Int
+  data      Milestone?
+}
+
+model Milestone {
+  id            String     @id @unique @default(uuid())
+  node          Node       @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  nodeId        String     @unique
+  title         String
+  description   String?
+  timelineMonth String?
+  timelineYear  String?
+  budget        Int?
+  papers        String[]
+  notes         String?
+  status        StatusType
+  tasks         Task[]
+}
+
+model Task {
+  id          String          @id @unique @default(uuid())
+  status      StatusType
+  name        String
+  description String?
+  checklist   ChecklistItem[]
+  milestoneId String
+  milestone   Milestone       @relation(fields: [milestoneId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model ChecklistItem {
+  id       String  @id @unique @default(uuid())
+  name     String
+  complete Boolean
+  taskId   String
+  task     Task    @relation(fields: [taskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model Edge {
+  id     String  @id @unique @default(uuid())
+  source String
+  target String
+  type   String?
+  data   Json?
+}
+
 model Organization {
   id            String       @id @default(cuid())
   name          String?

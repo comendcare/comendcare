@@ -4,14 +4,16 @@ import { CSS } from "@dnd-kit/utilities"
 import { useMemo } from "react"
 import { Task, TaskCard } from "@/components/task-card"
 import { cva } from "class-variance-authority"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "./ui/button"
 import { GripVertical } from "lucide-react"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
+import { cn } from "@/lib/utils"
 
 export interface Column {
     id: UniqueIdentifier
     title: string
+    styling: string
 }
 
 export type ColumnType = "Column"
@@ -80,17 +82,11 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
                       : undefined
             })}
         >
-            <CardHeader className="p-4 font-semibold border-b-2 text-left flex flex-row space-between items-center">
-                <Button
-                    variant={"ghost"}
-                    {...attributes}
-                    {...listeners}
-                    className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
-                >
-                    <span className="sr-only">{`Move column: ${column.title}`}</span>
-                    <GripVertical />
-                </Button>
-                <span className="ml-auto"> {column.title}</span>
+            <CardHeader className={cn(
+                "p-4 font-semibold border-b-2 text-left flex flex-row space-between items-center",
+                column.styling
+            )}>
+                <CardTitle>{column.title}</CardTitle>
             </CardHeader>
             <ScrollArea>
                 <CardContent className="flex flex-grow flex-col gap-2 p-2">

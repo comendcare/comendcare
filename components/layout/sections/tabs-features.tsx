@@ -154,7 +154,7 @@ export default function TabsFeaturesSection() {
                     aria-live="polite"
                 >
                     <TabsList className="grid grid-row-3 items-start justify-start bg-transparent border-none shadow-none h-min">
-                        {tabs.map((tab) => (
+                        {tabs.map(tab => (
                             <TabsTrigger
                                 key={tab}
                                 value={tab}
@@ -203,21 +203,26 @@ export default function TabsFeaturesSection() {
                         ))}
                     </TabsList>
 
-                    {tabs.map((tab) => (
-                        activeTab === tab && (
-                            <TabsContent
-                                key={tab}
-                                value={tab}
-                                aria-labelledby={`${tab}-tab-title`}
-                                aria-describedby={`${tab}-tab-description`}
-                                className="flex justify-center items-center w-full max-w-7xl mx-auto bg-gradient-to-b p-8 from-80% from-[#87EBA4]/70 to-[#87CEEB]/70 to-100% rounded-lg"
-                            >
-                                <div className="relative w-[750px] h-[470px] max-w-7xl rounded-lg">
-                                    {tabContent[tab as keyof typeof tabContent].image}
-                                </div>
-                            </TabsContent>
-                        )
-                    ))}
+                    {tabs.map(
+                        tab =>
+                            activeTab === tab && (
+                                <TabsContent
+                                    key={tab}
+                                    value={tab}
+                                    aria-labelledby={`${tab}-tab-title`}
+                                    aria-describedby={`${tab}-tab-description`}
+                                    className="flex justify-center items-center w-full max-w-7xl mx-auto bg-gradient-to-b p-8 from-80% from-[#87EBA4]/70 to-[#87CEEB]/70 to-100% rounded-lg"
+                                >
+                                    <div className="relative w-[750px] h-[470px] max-w-7xl rounded-lg">
+                                        {
+                                            tabContent[
+                                                tab as keyof typeof tabContent
+                                            ].image
+                                        }
+                                    </div>
+                                </TabsContent>
+                            )
+                    )}
                 </Tabs>
             </div>
 

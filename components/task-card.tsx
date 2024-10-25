@@ -1,17 +1,26 @@
 import type { UniqueIdentifier } from "@dnd-kit/core"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { cva } from "class-variance-authority"
 import { GripVertical } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { ColumnId } from "@/components/kanban-board"
+import { StatusType } from "./milestone-status-button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
+import { EditTaskForm } from "./edit-task-form"
+import { useState } from "react"
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { useShallow } from "zustand/react/shallow"
+import ChecklistCompleteButton from "./checklist-complete-button"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export interface Task {
-    id: UniqueIdentifier
-    columnId: ColumnId
-    content: string
+    id: string
+    status: StatusType
+    name: string
+    description?: string
+    checklist?: any[]
 }
 
 interface TaskCardProps {
@@ -26,7 +35,12 @@ export interface TaskDragData {
     task: Task
 }
 
+const selector = (state: RoadmapState) => ({
+    setSelectedTaskId: state.setSelectedTaskId
+})
+
 export function TaskCard({ task, isOverlay }: TaskCardProps) {
+    const { setSelectedTaskId } = useRoadmapStore(useShallow(selector))
     const {
         setNodeRef,
         attributes,
@@ -44,6 +58,9 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
             roleDescription: "Task"
         }
     })
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
 
     const style = {
         transition,
@@ -67,8 +84,8 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
                 dragging: isOverlay
                     ? "overlay"
                     : isDragging
-                      ? "over"
-                      : undefined
+                    ? "over"
+                    : undefined
             })}
         >
             <CardHeader className="px-3 py-3 space-between flex flex-row border-b-2 border-secondary relative">
@@ -81,13 +98,34 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
                     <span className="sr-only">Move task</span>
                     <GripVertical />
                 </Button>
-                <Badge variant={"outline"} className="ml-auto font-semibold">
-                    Task
-                </Badge>
+                <div className="flex flex-col">
+                    <CardTitle className="text-lg">{task?.name}</CardTitle>
+                    <CardDescription>{task?.description}</CardDescription>
+                </div>
             </CardHeader>
             <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">
-                {task.content}
+                <ol id="checklist" className="flex flex-col gap-2">
+                    {task?.checklist?.map(
+                        (item: any, index: number) => (
+                            <li key={index} className="flex gap-2 items-center">
+                                <ChecklistCompleteButton complete={item.complete} onClick={() => {}}/>
+                                <p>{item.name}</p>
+                            </li>
+                        )
+                    )}
+                </ol>
             </CardContent>
+            <CardFooter>
+                <Button onClick={() => {
+                    setSelectedTaskId(task?.id)
+
+                    const params = new URLSearchParams(searchParams.toString())
+                    params.delete("task")
+                    params.set("task", task?.id)
+            
+                    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+                }}>Edit Task</Button>
+            </CardFooter>
         </Card>
     )
 }
