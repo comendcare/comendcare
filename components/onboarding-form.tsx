@@ -65,11 +65,11 @@ export default function OnboardingForm() {
             if (res.error) {
                 toast.error(res.error)
             } else {
-                va.track("Created Site");
-                const {id} = res;
-                router.refresh();
-                router.push(`/admin/organization/${id}`);
-                toast.success(`Successfully created organization!`);
+                va.track("Created Site")
+                const { id } = res
+                router.refresh()
+                router.push(`/admin/organization/${id}`)
+                toast.success(`Successfully created organization!`)
             }
         })
     }

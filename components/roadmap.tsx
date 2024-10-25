@@ -1,7 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { useNavStore } from "@/state/nav/navStore" // Zustand store
+import { useNavStore } from "@/state/nav/navStore"
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { useShallow } from "zustand/react/shallow"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import {
     ResizablePanel,
@@ -9,132 +11,132 @@ import {
     ResizableHandle
 } from "@/components/ui/resizable"
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
-import Flow from "@/components/flow"
-import Kanban from "@/components/kanban"
-import { PlateEditor } from "@/components/plate-editor"
-import { useCallback, useState } from "react"
+import { FlowView } from "@/components/flow"
+import { KanbanView } from "@/components/kanban"
 import { Button } from "./ui/button"
 import { FaX } from "react-icons/fa6"
-import {
-    addEdge,
-    MarkerType,
-    Position,
-    ReactFlowProvider,
-    useEdgesState,
-    useNodesState
-} from "@xyflow/react"
-import EditMilestoneForm from "./edit-milestone-form"
-import MilestoneStatusButton, { StatusType } from "./milestone-status-button"
-import type { Edge, Node } from "@xyflow/react"
+import { EditMilestoneForm } from "./edit-milestone-form"
+import { useEffect, useState } from "react"
+import { MilestoneDetails } from "./milestone-details"
+import { EditTaskForm } from "./edit-task-form"
+import { TaskDetails } from "./task-details"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
-const initNodes: Node[] = [
-    {
-        id: "1",
-        type: "milestone",
-        data: {
-            title: "Basic Science - Disease",
-            description:
-                "Complete the basic science for investigating our disease.",
-            subtasks: [
-                {
-                    name: "Literature search to undersand disease",
-                    complete: true
-                }
-            ],
-            notes: "",
-            status: "done"
-        },
-        position: { x: 0, y: 0 },
-        selected: false,
-        selectable: true
-    },
-    {
-        id: "2",
-        type: "milestone",
-        data: {
-            title: "Disease Models",
-            description: "Discover, construct, and phenotype disease models.",
-            deadline: new Date(),
-            stakeholders: ["Person 1", "Person 2"],
-            labels: ["Label 1", "Label 2"],
-            subtasks: [
-                {
-                    name: "Identify the best models currently available",
-                    complete: true
-                },
-                { name: "Construct Knock-in Mice", complete: true },
-                { name: "Phenotyping of Knock-in Mice", complete: false },
-                { name: "Construct Fibroblasts", complete: true },
-                { name: "Construct iPSCs", complete: true },
-                { name: "Phenotype iPSCs", complete: false }
-            ],
-            dependencies: ["Basic Science - Disease"],
-            budget: 100000,
-            notes: "Here are some notes as an example...",
-            status: "inprogress"
-        },
-        position: { x: 600, y: 0 },
-        selected: false,
-        selectable: true
-    },
-    {
-        id: "3",
-        type: "milestone",
-        data: {
-            title: "Pre-Clinical Design",
-            description: "Pre-clinical design and production.",
-            subtasks: [
-                { name: "Construct design", complete: false },
-                { name: "Plasmid production", complete: false },
-                { name: "AAV Production", complete: false }
-            ],
-            notes: "Here are some extra notes as an example...",
-            status: "todo"
-        },
-        position: { x: 1200, y: 0 },
-        selected: false,
-        selectable: true
-    }
-]
+const selector = (state: RoadmapState) => ({
+    selectedNodeId: state.selectedNodeId,
+    setSelectedNodeId: state.setSelectedNodeId,
+    selectedTaskId: state.selectedTaskId,
+    setSelectedTaskId: state.setSelectedTaskId,
+    nodes: state.nodes,
+    setNodes: state.setNodes,
+    edges: state.edges,
+    setEdges: state.setEdges,
+    milestones: state.milestones,
+    setMilestones: state.setMilestones
+})
 
-const initEdges: Edge[] = [
-    {
-        id: "e1-2",
-        source: "1",
-        target: "2",
-        markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 }
-    },
-    {
-        id: "e2-3",
-        source: "2",
-        target: "3",
-        markerEnd: { type: MarkerType.ArrowClosed, width: 20, height: 20 }
-    }
-]
-
-export function Roadmap() {
+export function Roadmap({
+    initNodes,
+    initEdges,
+    initMilestones,
+    // initTasks
+}: {
+    initNodes: any[]
+    initEdges: any[]
+    initMilestones: any[]
+    // initTasks: any[]
+}) {
     // Zustand state management
     const { defaultLayout, setLayout } = useNavStore()
-    const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
-    const [nodes, setNodes, onNodesChange] = useNodesState(initNodes)
-    const [edges, setEdges, onEdgesChange] = useEdgesState(initEdges)
+    const { 
+        selectedNodeId, 
+        setSelectedNodeId, 
+        selectedTaskId, 
+        setSelectedTaskId, 
+        nodes, 
+        setNodes, 
+        edges, 
+        setEdges, 
+        milestones, 
+        setMilestones 
+    } = useRoadmapStore(useShallow(selector))
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
 
-    const handlePanelChange = (open: boolean) => {
-        if (!open) setSelectedNodeId(null)
+    const urlView = searchParams.get("view")
+
+    const handleMilestonePanelChange = (open: boolean) => {
+        if (!open) {
+            setSelectedNodeId(null)
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("milestone")
+            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        }
+        if (open) {
+            setSelectedTaskId(null)
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("task")
+            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        }
     }
+
+    const handleTaskPanelChange = (open: boolean) => {
+        if (!open) {
+            setSelectedTaskId(null)
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("task")
+            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        }
+        if (open) {
+            setSelectedNodeId(null)
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("milestone")
+            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        }
+    }
+
+    const handleTabChange = (value: string) => {
+        // close all panels when switching tabs
+        setSelectedNodeId(null)
+        setSelectedTaskId(null)
+
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete("view")
+        params.delete("milestone")
+        params.delete("task")
+        params.set("view", value)
+
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    }
+
+    useEffect(() => {
+        setNodes(initNodes)
+        setEdges(initEdges)
+        setMilestones(initMilestones)
+
+        const params = new URLSearchParams(searchParams.toString())
+        const urlMilestone = params.get("milestone")
+        const urlTask = params.get("task")
+        if (urlMilestone) setSelectedNodeId(urlMilestone)
+        if (urlTask) setSelectedTaskId(urlTask)
+    }, [initNodes, initEdges])
 
     return (
         <TooltipProvider delayDuration={0}>
             <ResizablePanelGroup
                 direction="horizontal"
                 onLayout={(sizes: number[]) => {
-                    console.log(`set layout size: ${sizes}`)
                     setLayout(sizes) // Use Zustand's setLayout to save panel sizes
                 }}
                 className="h-full items-stretch"
             >
                 <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
-                    <Tabs defaultValue="roadmap">
+                    <Tabs defaultValue={urlView ? urlView : "roadmap"} onValueChange={handleTabChange}>
                         <TabsList>
                             <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
                             <TabsTrigger value="kanban">Kanban</TabsTrigger>
@@ -145,24 +147,14 @@ export function Roadmap() {
                             value="roadmap"
                             className="m-0 h-[calc(100vh-3.5rem)]"
                         >
-                            <ReactFlowProvider>
-                                <Flow
-                                    width={defaultLayout[0]}
-                                    selectedNodeId={selectedNodeId}
-                                    nodes={nodes}
-                                    edges={edges}
-                                    setNodes={setNodes}
-                                    setEdges={setEdges}
-                                    onNodesChange={onNodesChange}
-                                    onEdgesChange={onEdgesChange}
-                                    setSelectedNodeId={setSelectedNodeId}
-                                />
-                            </ReactFlowProvider>
+                            <FlowView
+                                width={defaultLayout[0]}
+                            />
                         </TabsContent>
 
                         {/* Kanban View */}
                         <TabsContent value="kanban">
-                            <Kanban />
+                            <KanbanView />
                         </TabsContent>
                     </Tabs>
                 </ResizablePanel>
@@ -176,27 +168,135 @@ export function Roadmap() {
                             minSize={30}
                             className="p-10 flex flex-col gap-4"
                         >
-                            <span className="flex flex-row justify-between items-center">
-                                <h1 className="text-2xl font-bold">
-                                    Edit Milestone Details
-                                </h1>
-                                <Button
-                                    onClick={() => handlePanelChange(false)}
-                                >
-                                    <FaX />
-                                </Button>
-                            </span>
-                            <EditMilestoneForm
-                                nodeData={
-                                    nodes.find(
-                                        node => node.id === selectedNodeId
-                                    )?.data
-                                }
+                            <MilestoneDetailsPanel
+                                milestone={milestones.find(
+                                    milestone =>
+                                        milestone.nodeId === selectedNodeId
+                                )}
+                                handlePanelChange={handleMilestonePanelChange}
+                            />
+                        </ResizablePanel>
+                    </>
+                )}
+
+                {selectedTaskId != null && (
+                    <>
+                        <ResizableHandle withHandle />
+
+                        <ResizablePanel
+                            defaultSize={defaultLayout[1]}
+                            minSize={30}
+                            className="p-10 flex flex-col gap-4"
+                        >
+                            <TaskDetailsPanel 
+                                milestones={milestones}
+                                selectedTaskId={selectedTaskId}
+                                handlePanelChange={handleTaskPanelChange}
                             />
                         </ResizablePanel>
                     </>
                 )}
             </ResizablePanelGroup>
         </TooltipProvider>
+    )
+}
+
+const TaskDetailsPanel = ({
+    milestones,
+    selectedTaskId,
+    // milestoneId,
+    // task,
+    handlePanelChange
+}: {
+    milestones: any[]
+    selectedTaskId: string
+    // milestoneId: string
+    // task: any
+    handlePanelChange: (open: boolean) => void
+}) => {
+    const [isEditing, setIsEditing] = useState(false)
+    const task = milestones.map(milestone => milestone.tasks).flat(1).find(task => task?.id === selectedTaskId)
+    // const milestone = milestones.find(milestone => milestone.tasks.includes(selectedTaskId))
+
+    const handleClose = () => {
+        setIsEditing(false)
+        handlePanelChange(false)
+    }
+
+    return (
+        <>
+            <span className="flex flex-row justify-between items-center gap-4">
+                <h1 className="text-2xl font-bold grow">
+                    {isEditing ? `Edit Task Details` : `Task Details`}
+                </h1>
+                {isEditing ? (
+                    <Button onClick={() => setIsEditing(false)}>
+                        Cancel Editing
+                    </Button>
+                ) : (
+                    <Button onClick={() => setIsEditing(true)}>
+                        Edit Task
+                    </Button>
+                )}
+                <Button onClick={handleClose}>
+                    <FaX />
+                </Button>
+            </span>
+            {isEditing ? (
+                <EditTaskForm 
+                    taskData={task}
+                    onClose={() => setIsEditing(false)}
+                />
+            ) : (
+                // <MilestoneDetails milestoneData={milestone} />
+                // <div>{task?.name}</div>
+                <TaskDetails taskData={task}/>
+            )}
+        </>
+    )
+}
+
+const MilestoneDetailsPanel = ({
+    milestone,
+    handlePanelChange
+}: {
+    milestone: any
+    handlePanelChange: (open: boolean) => void
+}) => {
+    const [isEditing, setIsEditing] = useState(false)
+
+    const handleClose = () => {
+        setIsEditing(false)
+        handlePanelChange(false)
+    }
+
+    return (
+        <>
+            <span className="flex flex-row justify-between items-center gap-4">
+                <h1 className="text-2xl font-bold grow">
+                    {isEditing ? `Edit Milestone Details` : `Milestone Details`}
+                </h1>
+                {isEditing ? (
+                    <Button onClick={() => setIsEditing(false)}>
+                        Cancel Editing
+                    </Button>
+                ) : (
+                    <Button onClick={() => setIsEditing(true)}>
+                        Edit Milestone
+                    </Button>
+                )}
+                <Button onClick={handleClose}>
+                    <FaX />
+                </Button>
+            </span>
+            {isEditing ? (
+                <EditMilestoneForm
+                    milestoneData={milestone}
+                    onClose={() => setIsEditing(false)}
+                />
+            ) : (
+                <MilestoneDetails milestoneData={milestone} />
+            )}
+        </>
     )
 }
