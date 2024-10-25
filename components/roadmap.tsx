@@ -124,7 +124,7 @@ export function Roadmap({
         const urlTask = params.get("task")
         if (urlMilestone) setSelectedNodeId(urlMilestone)
         if (urlTask) setSelectedTaskId(urlTask)
-    }, [initNodes, initEdges])
+    }, [])
 
     return (
         <TooltipProvider delayDuration={0}>
