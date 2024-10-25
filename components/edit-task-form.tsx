@@ -173,6 +173,7 @@ export function EditTaskForm({
                             <ul className="flex flex-col gap-2">
                                 {field?.value?.map((checklistItem, index) => (
                                     <ChecklistField 
+                                        key={index}
                                         index={index}
                                         item={checklistItem}
                                         onDelete={() => (
