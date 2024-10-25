@@ -26,13 +26,18 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import StatusButton from "./milestone-status-button"
 import { nanoid } from "nanoid"
-import ChecklistCompleteButton from "./checklist-complete-button"
 import { FaTrash } from "react-icons/fa6"
+import { Checkbox } from "./ui/checkbox"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 
 const editTaskForm = z.object({
-    name: z.string(),
+    name: z
+        .string({
+            required_error: "Please provide a name"
+        })
+        .min(1, "Name is required")
+        .max(100, "Name must be less than 100 characters"),
     status: statusTypeSchema,
     description: z.string().optional(),
     checklist: z.array(
@@ -243,7 +248,7 @@ const ChecklistField = ({
 
     return (
         <li key={index} className="flex flex-row gap-2 items-center">
-            <ChecklistCompleteButton complete={item.complete} onClick={onCompleteChange}/>
+            <Checkbox checked={item.complete} onCheckedChange={onCompleteChange}/>
             <Input
                 placeholder={item.name}
                 value={item.name}
