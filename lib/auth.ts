@@ -54,9 +54,26 @@ export const authOptions: NextAuthOptions = {
         //     }
         //     return "/app/roadmap"; // Redirect regular users
         // },
-        jwt: async ({token, user}) => {
+        jwt: async ({token, user, trigger, session}) => {
+            console.log("JWT")
+            if (trigger === 'update') {
+                console.log("UPDATED")
+                token.organizationId = session.organizationId;
+            }
             if (user) {
+                // Fetch the user's organizationId from the database
+                const dbUser = await prisma.user.findUnique({
+                    where: { id: user.id },
+                    include: { memberships: true },
+                });
+
+                // Extract organization IDs from the user's memberships
+                const organizationIds: string[] = dbUser?.memberships
+                    .map((membership) => membership.organizationId)
+                    .filter((id): id is string => !!id) || []
+
                 token.user = user;
+                token.organizationId = organizationIds[0] || null; // Default to the first ID, if any
             }
             return token;
         },
@@ -67,6 +84,7 @@ export const authOptions: NextAuthOptions = {
                 id: token.sub,
                 // @ts-expect-error
                 username: token?.user?.username || token?.user?.gh_username,
+                organizationId: token.organizationId as string | null, // Ensure type matches
             };
             return session;
         },

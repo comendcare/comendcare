@@ -8,10 +8,12 @@ declare module "next-auth" {
         user: {
             id: string
             bio?: string | null | undefined
+            organizationId?: string | null | undefined
         } & DefaultSession["user"]
     }
     interface User {
         id: string
         bio?: string | null | undefined
+        organizationId?: string | null | undefined
     }
 }
