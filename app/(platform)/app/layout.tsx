@@ -10,14 +10,35 @@ import {Cog, Store, User, Workflow} from "lucide-react";
 import {cn} from "@/lib/utils";
 import Image from "next/image";
 import logo from "@/public/logos/comend-logo.png";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import {FaCity, FaPlus} from "react-icons/fa6";
+import {useSession} from "next-auth/react";
 
 interface AppLayoutProps {
     children: React.ReactNode;
 }
 
 export default function AppLayout({children}: AppLayoutProps) {
+    const {data: session, update} = useSession();
     // Zustand state management
     const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} = useNavStore();
+
+    async function updateSession(organizationId: string) {
+        await update({
+            ...session,
+            organizationId: "HIIII"
+        })
+    }
+
+    console.log(session?.user)
 
     return (
         <div className="flex h-full w-full">
@@ -41,11 +62,35 @@ export default function AppLayout({children}: AppLayoutProps) {
                 >
                     <div
                         className={cn(
-                            "relative flex h-[52px] items-center justify-center",
+                            "relative flex h-[52px] items-center justify-around",
                             isCollapsed ? "h-[52px]" : "px-2"
                         )}
                     >
                         <Image priority src={logo} alt="Librarey logo" className="size-6"/>
+                        <Select
+                            defaultValue="apple"
+                            onValueChange={async (value) => {
+                                await updateSession(value)
+                            }}
+                        >
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder={
+                                    <div className="flex flex-row items-center justify-between gap-x-2">
+                                        <FaCity/>
+                                        Organization
+                                    </div>
+                                }/>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Organizations</SelectLabel>
+                                    <SelectItem value="apple">Apple</SelectItem>
+                                    <SelectItem value="banana">Banana</SelectItem>
+                                    <SelectItem value="blueberry">Blueberry</SelectItem>
+                                    <SelectItem value="grapes">Grapes</SelectItem>
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
                     </div>
                     <Separator/>
                     <AppNav
@@ -59,8 +104,8 @@ export default function AppLayout({children}: AppLayoutProps) {
                     />
                 </ResizablePanel>
 
-                 {/*Resizable Handle between panels */}
-                 <ResizableHandle withHandle/>
+                {/*Resizable Handle between panels */}
+                <ResizableHandle withHandle/>
 
                 {/* Main Content Panel */}
                 <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>

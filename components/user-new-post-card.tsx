@@ -42,7 +42,6 @@ export const UserNewPostCard = () => {
         // })
         console.log("form submitted");
     }
-    console.log(form.watch("text")?.length === 0)
 
     return (
         <Card>
