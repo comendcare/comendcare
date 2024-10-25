@@ -27,12 +27,8 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeId: state.setSelectedNodeId,
     selectedTaskId: state.selectedTaskId,
     setSelectedTaskId: state.setSelectedTaskId,
-    nodes: state.nodes,
-    setNodes: state.setNodes,
-    edges: state.edges,
-    setEdges: state.setEdges,
     milestones: state.milestones,
-    setMilestones: state.setMilestones
+    initState: state.initState
 })
 
 export function Roadmap({
@@ -53,12 +49,8 @@ export function Roadmap({
         setSelectedNodeId, 
         selectedTaskId, 
         setSelectedTaskId, 
-        nodes, 
-        setNodes, 
-        edges, 
-        setEdges, 
         milestones, 
-        setMilestones 
+        initState
     } = useRoadmapStore(useShallow(selector))
     const router = useRouter()
     const pathname = usePathname()
@@ -115,15 +107,11 @@ export function Roadmap({
     }
 
     useEffect(() => {
-        setNodes(initNodes)
-        setEdges(initEdges)
-        setMilestones(initMilestones)
-
         const params = new URLSearchParams(searchParams.toString())
-        const urlMilestone = params.get("milestone")
-        const urlTask = params.get("task")
-        if (urlMilestone) setSelectedNodeId(urlMilestone)
-        if (urlTask) setSelectedTaskId(urlTask)
+        const urlMilestone: string | null = params.get("milestone")
+        const urlTask: string | null = params.get("task")
+
+        initState(initNodes, initEdges, initMilestones, urlMilestone, urlTask)
     }, [])
 
     return (

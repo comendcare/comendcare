@@ -32,6 +32,7 @@ export type RoadmapState = {
     setEdges: (edges: Edge[]) => void
     addNode: (node: Node) => void
     deleteNode: (nodeId: string) => void
+    initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null) => void
     saveState: () => void
 }
 
@@ -131,6 +132,9 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ nodes, milestones, selectedNodeId: null })
             debounceUpdateFlow(nodes, get().edges)
         },
+        initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null) => {
+            set({ nodes, edges, milestones, selectedNodeId, selectedTaskId })
+        },
         saveState: () => {
             const state = get()
             set(state)
@@ -165,6 +169,7 @@ export const useRoadmapStore = create<RoadmapState>()(
 //     500
 // )
 
+// debounce flow updates, because the flow spams X/Y Position change values when dragging a node
 export const debounceUpdateFlow = debounce(
     (nodes: Node[], edges: Edge[]) => {
         updateFlow(nodes, edges)
