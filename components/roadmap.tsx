@@ -20,6 +20,7 @@ import { useEffect, useState } from "react"
 import { MilestoneDetails } from "./milestone-details"
 import { EditTaskForm } from "./edit-task-form"
 import { TaskDetails } from "./task-details"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -59,6 +60,11 @@ export function Roadmap({
         milestones, 
         setMilestones 
     } = useRoadmapStore(useShallow(selector))
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
+
+    const urlView = searchParams.get("view")
 
     const handleMilestonePanelChange = (open: boolean) => {
         if (!open) setSelectedNodeId(null)
@@ -70,10 +76,17 @@ export function Roadmap({
         if (open) setSelectedNodeId(null)
     }
 
-    const handleTabChange = () => {
+    const handleTabChange = (value: string) => {
         // close all panels when switching tabs
         setSelectedNodeId(null)
         setSelectedTaskId(null)
+
+        console.log(`value changed`, value)
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete("view")
+        params.set("view", value)
+
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
     }
 
     useEffect(() => {
@@ -92,7 +105,7 @@ export function Roadmap({
                 className="h-full items-stretch"
             >
                 <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
-                    <Tabs defaultValue="roadmap" onValueChange={handleTabChange}>
+                    <Tabs defaultValue={urlView ? urlView : "roadmap"} onValueChange={handleTabChange}>
                         <TabsList>
                             <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
                             <TabsTrigger value="kanban">Kanban</TabsTrigger>
