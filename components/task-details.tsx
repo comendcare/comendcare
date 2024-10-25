@@ -6,7 +6,7 @@ import StatusButton, { StatusType } from "./milestone-status-button"
 import { FaDollarSign } from "react-icons/fa6"
 import { Label } from "./ui/label"
 import { TaskType } from "./milestone-node"
-import ChecklistCompleteButton from "./checklist-complete-button"
+import { Checkbox } from "./ui/checkbox"
 
 export function TaskDetails({ taskData }: { taskData: any }) {
     return (
@@ -45,7 +45,7 @@ export function TaskDetails({ taskData }: { taskData: any }) {
                             {taskData.checklist.map(
                                 (item: any, index: number) => (
                                     <li key={index} className="flex gap-2 items-center">
-                                        <ChecklistCompleteButton complete={item.complete} onClick={() => {}}/>
+                                        <Checkbox checked={item.complete} disabled={true} />
                                         <p>{item.name}</p>
                                     </li>
                                 )

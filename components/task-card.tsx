@@ -12,8 +12,8 @@ import { EditTaskForm } from "./edit-task-form"
 import { useState } from "react"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import ChecklistCompleteButton from "./checklist-complete-button"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { Checkbox } from "./ui/checkbox"
 
 export interface Task {
     id: string
@@ -108,7 +108,7 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
                     {task?.checklist?.map(
                         (item: any, index: number) => (
                             <li key={index} className="flex gap-2 items-center">
-                                <ChecklistCompleteButton complete={item.complete} onClick={() => {}}/>
+                                <Checkbox checked={item.complete} disabled={true}/>
                                 <p>{item.name}</p>
                             </li>
                         )

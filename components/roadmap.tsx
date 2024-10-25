@@ -214,7 +214,8 @@ const TaskDetailsPanel = ({
     // task: any
     handlePanelChange: (open: boolean) => void
 }) => {
-    const [isEditing, setIsEditing] = useState(false)
+    // const [isEditing, setIsEditing] = useState(false)    // disabled while details view is disabled
+    const [isEditing, setIsEditing] = useState(true)
     const task = milestones.map(milestone => milestone.tasks).flat(1).find(task => task?.id === selectedTaskId)
     // const milestone = milestones.find(milestone => milestone.tasks.includes(selectedTaskId))
 
@@ -229,7 +230,7 @@ const TaskDetailsPanel = ({
                 <h1 className="text-2xl font-bold grow">
                     {isEditing ? `Edit Task Details` : `Task Details`}
                 </h1>
-                {isEditing ? (
+                {/* {isEditing ? (
                     <Button onClick={() => setIsEditing(false)}>
                         Cancel Editing
                     </Button>
@@ -237,7 +238,7 @@ const TaskDetailsPanel = ({
                     <Button onClick={() => setIsEditing(true)}>
                         Edit Task
                     </Button>
-                )}
+                )} */}
                 <Button onClick={handleClose}>
                     <FaX />
                 </Button>
@@ -263,7 +264,8 @@ const MilestoneDetailsPanel = ({
     milestone: any
     handlePanelChange: (open: boolean) => void
 }) => {
-    const [isEditing, setIsEditing] = useState(false)
+    // const [isEditing, setIsEditing] = useState(false)
+    const [isEditing, setIsEditing] = useState(true)
 
     const handleClose = () => {
         setIsEditing(false)
@@ -276,7 +278,7 @@ const MilestoneDetailsPanel = ({
                 <h1 className="text-2xl font-bold grow">
                     {isEditing ? `Edit Milestone Details` : `Milestone Details`}
                 </h1>
-                {isEditing ? (
+                {/* {isEditing ? (
                     <Button onClick={() => setIsEditing(false)}>
                         Cancel Editing
                     </Button>
@@ -284,7 +286,7 @@ const MilestoneDetailsPanel = ({
                     <Button onClick={() => setIsEditing(true)}>
                         Edit Milestone
                     </Button>
-                )}
+                )} */}
                 <Button onClick={handleClose}>
                     <FaX />
                 </Button>
