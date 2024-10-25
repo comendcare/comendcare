@@ -67,13 +67,37 @@ export function Roadmap({
     const urlView = searchParams.get("view")
 
     const handleMilestonePanelChange = (open: boolean) => {
-        if (!open) setSelectedNodeId(null)
-        if (open) setSelectedTaskId(null)
+        if (!open) {
+            setSelectedNodeId(null)
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("milestone")
+            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        }
+        if (open) {
+            setSelectedTaskId(null)
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("task")
+            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        }
     }
 
     const handleTaskPanelChange = (open: boolean) => {
-        if (!open) setSelectedTaskId(null)
-        if (open) setSelectedNodeId(null)
+        if (!open) {
+            setSelectedTaskId(null)
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("task")
+            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        }
+        if (open) {
+            setSelectedNodeId(null)
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("milestone")
+            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        }
     }
 
     const handleTabChange = (value: string) => {
@@ -81,9 +105,10 @@ export function Roadmap({
         setSelectedNodeId(null)
         setSelectedTaskId(null)
 
-        console.log(`value changed`, value)
         const params = new URLSearchParams(searchParams.toString())
         params.delete("view")
+        params.delete("milestone")
+        params.delete("task")
         params.set("view", value)
 
         router.push(`${pathname}?${params.toString()}`, { scroll: false })
@@ -93,6 +118,12 @@ export function Roadmap({
         setNodes(initNodes)
         setEdges(initEdges)
         setMilestones(initMilestones)
+
+        const params = new URLSearchParams(searchParams.toString())
+        const urlMilestone = params.get("milestone")
+        const urlTask = params.get("task")
+        if (urlMilestone) setSelectedNodeId(urlMilestone)
+        if (urlTask) setSelectedTaskId(urlTask)
     }, [initNodes, initEdges])
 
     return (

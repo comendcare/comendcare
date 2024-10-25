@@ -14,6 +14,7 @@ import { useState } from "react"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import ChecklistCompleteButton from "./checklist-complete-button"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export interface Task {
     id: string
@@ -60,6 +61,9 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
             roleDescription: "Task"
         }
     })
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
 
     const style = {
         transition,
@@ -115,7 +119,15 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
                 </ol>
             </CardContent>
             <CardFooter>
-                <Button onClick={() => setSelectedTaskId(task?.id)}>Edit Task</Button>
+                <Button onClick={() => {
+                    setSelectedTaskId(task?.id)
+
+                    const params = new URLSearchParams(searchParams.toString())
+                    params.delete("task")
+                    params.set("task", task?.id)
+            
+                    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+                }}>Edit Task</Button>
             </CardFooter>
         </Card>
     )

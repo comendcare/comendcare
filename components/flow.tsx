@@ -20,6 +20,7 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
 import { Dialog } from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 const proOptions = { hideAttribution: true }
 
@@ -53,6 +54,9 @@ const RoadmapFlowchart = ({
     } = useRoadmapStore(useShallow(selector))
     const { fitView } = useReactFlow()
     const store = useStoreApi()
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
     // const { undo, redo, clear } = useRoadmapStore.temporal.getState()
     const nodeTypes = { MILESTONE: MilestoneNode }
     const [milestoneData, setMilestoneData] = useState({})
@@ -114,7 +118,15 @@ const RoadmapFlowchart = ({
         ...node,
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
-            handleEditClick: (nodeId: string) => setSelectedNodeId(nodeId)
+            handleEditClick: (nodeId: string) => {
+                setSelectedNodeId(nodeId)
+
+                const params = new URLSearchParams(searchParams.toString())
+                params.delete("milestone")
+                params.set("milestone", nodeId)
+        
+                router.push(`${pathname}?${params.toString()}`, { scroll: false })
+            }
         }
     }))
 
