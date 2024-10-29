@@ -12,7 +12,17 @@ type NavState = {
 export const useNavStore = create<NavState>(set => ({
     isCollapsed: false, // Collapsed by default
     navCollapsedSize: 4, // Set the size when nav is collapsed
-    defaultLayout: [20, 32, 48], // Default layout sizes
+    defaultLayout: [20, 32], // Default layout sizes
+    setIsCollapsed: isCollapsed => set(() => ({ isCollapsed })),
+    setLayout: layout => set(() => ({ defaultLayout: layout })),
+    setNavState: (layout, isCollapsed) =>
+        set(() => ({ defaultLayout: layout, isCollapsed }))
+}))
+
+export const useSidebarStore = create<NavState>(set => ({
+    isCollapsed: false, // Collapsed by default
+    navCollapsedSize: 4, // Set the size when nav is collapsed
+    defaultLayout: [32, 20], // Default layout sizes
     setIsCollapsed: isCollapsed => set(() => ({ isCollapsed })),
     setLayout: layout => set(() => ({ defaultLayout: layout })),
     setNavState: (layout, isCollapsed) =>

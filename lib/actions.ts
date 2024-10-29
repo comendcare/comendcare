@@ -18,6 +18,35 @@ import {getBlurDataURL, getIp} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail} from "@/lib/emails";
 
+export async function createRoadmap() {
+    const roadmap = await prisma.roadmap.create({
+        data: {}
+    })
+
+    return roadmap
+}
+
+export async function getRoadmapId(orgId: string | null | undefined) {
+    if (!orgId) return 
+    
+    const organization = await prisma.organization.findUnique({
+        include: { roadmaps: true },
+        where: {
+            id: decodeURIComponent(orgId)
+        }
+    })
+
+    // const roadmap = await prisma.roadmap.findUnique({
+    //     where: { id: organization?.roadmaps[0].id }
+    // })
+
+    // temporary - re-enable above once organizations are set up
+    const roadmaps = await prisma.roadmap.findMany()
+
+    if (roadmaps.length > 0) return roadmaps[0].id
+    return
+}
+
 const nanoid = customAlphabet(
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
     7
@@ -252,30 +281,30 @@ export const getOrganizationFromRoadmapId = async (roadmapId: string) => {
     return roadmap?.organizationId
 }
 
-export const createRoadmap = withOrganizationAuth(
-    async (_: FormData, organization: Organization) => {
-        const session = await getSession()
-        if (!session?.user.id) {
-            return {
-                error: "Not authenticated"
-            }
-        }
-        const response = await prisma.roadmap.create({
-            data: {
-                organizationId: organization.id,
-                userId: session.user.id
-            }
-        })
+// export const createRoadmap = withOrganizationAuth(
+//     async (_: FormData, organization: Organization) => {
+//         const session = await getSession()
+//         if (!session?.user.id) {
+//             return {
+//                 error: "Not authenticated"
+//             }
+//         }
+//         const response = await prisma.roadmap.create({
+//             data: {
+//                 organizationId: organization.id,
+//                 userId: session.user.id
+//             }
+//         })
 
-        await revalidateTag(
-            `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-roadmaps`
-        )
-        organization.customDomain &&
-            (await revalidateTag(`${organization.customDomain}-roadmaps`))
+//         await revalidateTag(
+//             `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-roadmaps`
+//         )
+//         organization.customDomain &&
+//             (await revalidateTag(`${organization.customDomain}-roadmaps`))
 
-        return response
-    }
-)
+//         return response
+//     }
+// )
 
 // creating a separate function for this because we're not using FormData
 export const updateRoadmap = async (data: Roadmap) => {

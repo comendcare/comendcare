@@ -23,6 +23,8 @@ import {FaCity, FaPlus} from "react-icons/fa6";
 import {useSession} from "next-auth/react";
 import {Suspense} from "react";
 import Profile from "@/components/profile";
+import { getRoadmapId } from "@/lib/actions";
+import { useState } from "react";
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -33,12 +35,16 @@ export default function AppLayout({children}: AppLayoutProps) {
     // Zustand state management
     const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} =
         useNavStore()
+    const [roadmapId, setRoadmapId] = useState<string | undefined>(undefined)
 
     async function updateSession(organizationId: string) {
         await update({
             ...session,
-            organizationId: "HIIII"
+            organizationId: organizationId,
         })
+
+        const roadmapId = await getRoadmapId(organizationId)
+        setRoadmapId(roadmapId)
     }
 
     return (
@@ -97,7 +103,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                     <AppNav
                         isCollapsed={isCollapsed}
                         links={[
-                            {title: "Roadmap", label: "128", icon: Workflow, variant: "ghost", href: "/app/roadmap"},
+                            {title: "Roadmap", label: "128", icon: Workflow, variant: "ghost", href: roadmapId ? `/app/roadmap/${roadmapId}` : `/app/roadmap`},
                             {title: "Profile", icon: User, variant: "ghost", href: "/app/profile"},
                             {title: "Marketplace", label: "9", icon: Store, variant: "ghost", href: "/app/marketplace"},
                             {title: "Settings", icon: Cog, variant: "ghost", href: "/app/settings"},
