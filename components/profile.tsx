@@ -1,13 +1,26 @@
-import { getSession } from "@/lib/auth"
-import { redirect } from "next/navigation"
+"use client"
+
+import { useSession } from "next-auth/react"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import LogoutButton from "./logout-button"
 
-export default async function Profile() {
-    const session = await getSession()
-    if (!session?.user) {
-        redirect("/login")
+export default function Profile() {
+    const { data: session, status } = useSession()
+    const router = useRouter()
+
+    // Redirect to login if the user is not authenticated
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            router.push("/login")
+        }
+    }, [status, router])
+
+    // Handle loading state while session is being fetched
+    if (status === "loading") {
+        return <div>Loading...</div>
     }
 
     return (
@@ -18,16 +31,16 @@ export default async function Profile() {
             >
                 <Image
                     src={
-                        session.user.image ??
-                        `https://avatar.vercel.sh/${session.user.email}`
+                        session?.user?.image ??
+                        `https://avatar.vercel.sh/${session?.user?.email}`
                     }
                     width={40}
                     height={40}
-                    alt={session.user.name ?? "User avatar"}
+                    alt={session?.user?.name ?? "User avatar"}
                     className="h-6 w-6 rounded-full"
                 />
                 <span className="truncate text-sm font-medium">
-                    {session.user.name}
+                    {session?.user?.name}
                 </span>
             </Link>
             <LogoutButton />

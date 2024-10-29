@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
 
-export default function LoginButton() {
+export default function LoginButton({callback = "/"}: {callback?: string}) {
     const [loading, setLoading] = useState(false)
 
     // Get error message added by next/auth in URL.
@@ -25,7 +25,7 @@ export default function LoginButton() {
                 onClick={() => {
                     setLoading(true)
                     signIn("github", {
-                        callbackUrl: "http://app.localhost:3000/onboarding"
+                        callbackUrl: callback
                     })
                 }}
                 className={`${
