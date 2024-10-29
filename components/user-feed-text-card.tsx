@@ -50,15 +50,15 @@ export function UserFeedTextCard({content, blockquote}: UserFeedTextCardProps) {
                     </CardTitle>
                     <CardDescription className="pt-4">
                         {blockquote &&
-                            <blockquote className="p-4 my-4 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
-                                <p className="text-lg italic font-medium leading-relaxed text-gray-500 dark:text-white">
+                            <div className="p-4 my-4 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
+                                <div className="text-lg italic font-medium leading-relaxed text-gray-500 dark:text-white">
                                     {`"${blockquote}"`}
-                                </p>
-                            </blockquote>
+                                </div>
+                            </div>
                         }
-                        <p className="text-base text-black">
+                        <div className="text-base text-black">
                             {`${content}`}
-                        </p>
+                        </div>
                     </CardDescription>
                 </div>
 

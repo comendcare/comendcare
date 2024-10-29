@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/select";
 import {FaCity, FaPlus} from "react-icons/fa6";
 import {useSession} from "next-auth/react";
+import {Suspense} from "react";
+import Profile from "@/components/profile";
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -29,7 +31,7 @@ interface AppLayoutProps {
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, update} = useSession();
     // Zustand state management
-    const { defaultLayout, isCollapsed, setIsCollapsed, setLayout } =
+    const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} =
         useNavStore()
 
     async function updateSession(organizationId: string) {
@@ -38,8 +40,6 @@ export default function AppLayout({children}: AppLayoutProps) {
             organizationId: "HIIII"
         })
     }
-
-    console.log(session?.user)
 
     return (
         <div className="flex h-full w-full">
@@ -102,7 +102,11 @@ export default function AppLayout({children}: AppLayoutProps) {
                             {title: "Marketplace", label: "9", icon: Store, variant: "ghost", href: "/app/marketplace"},
                             {title: "Settings", icon: Cog, variant: "ghost", href: "/app/settings"},
                         ]}
-                    />
+                    >
+                        <Suspense fallback={<div>Loading...</div>}>
+                            <Profile/>
+                        </Suspense>
+                    </AppNav>
                 </ResizablePanel>
 
                 {/*Resizable Handle between panels */}

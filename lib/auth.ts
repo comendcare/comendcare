@@ -54,6 +54,29 @@ export const authOptions: NextAuthOptions = {
         //     }
         //     return "/app/roadmap"; // Redirect regular users
         // },
+        async signIn({ user, account, profile, email, credentials }) {
+            const ADMIN_WHITELIST = process.env.ADMIN_WHITELIST?.split(",").map(email => email.trim()) || []
+
+            const isAdmin = ADMIN_WHITELIST?.includes(user.email || "")
+
+            if (isAdmin) {
+                // Admins should proceed to the callback URL or their intended destination
+                return true
+            }
+
+            // Check if the user is new by querying the database
+            const existingUser = await prisma.user.findUnique({
+                where: { email: user.email || "" }
+            })
+
+            if (!existingUser) {
+                // Redirect new non-admin users to onboarding
+                return "/onboarding"
+            }
+
+            // Allow existing non-admin users to proceed to the intended destination
+            return true
+        },
         jwt: async ({token, user, trigger, session}) => {
             if (trigger === 'update') {
                 token.organizationId = session.organizationId;
