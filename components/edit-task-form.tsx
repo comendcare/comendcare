@@ -29,6 +29,25 @@ import { nanoid } from "nanoid"
 import { FaTrash } from "react-icons/fa6"
 import { Checkbox } from "./ui/checkbox"
 import { toast } from "sonner"
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { GripVertical } from "lucide-react"
+import {
+    DndContext,
+    type DragEndEvent,
+    type DragOverEvent,
+    DragOverlay,
+    type DragStartEvent,
+    useSensor,
+    useSensors,
+    KeyboardSensor,
+    Announcements,
+    UniqueIdentifier,
+    TouchSensor,
+    MouseSensor,
+    closestCorners
+} from "@dnd-kit/core"
+import { CSS } from "@dnd-kit/utilities"
+import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 
@@ -45,7 +64,7 @@ const editTaskForm = z.object({
         z.object({
             id: z.string(),
             name: z.string(),
-            complete: z.boolean()
+            complete: z.boolean(),
         })
     ).optional()
 })
@@ -95,7 +114,9 @@ export function EditTaskForm({
                 name,
                 status,
                 ...(description ? { description } : undefined),
-                ...(checklist ? { checklist } : undefined)
+                ...(checklist 
+                    ? { checklist: checklist.map((item, index) => ({...item, orderPosition: index})) } 
+                    : undefined)
             }
         )
         toast('Success!', {
@@ -103,6 +124,14 @@ export function EditTaskForm({
         })
         onClose()
     }
+
+    const sensors = useSensors(
+        useSensor(MouseSensor),
+        useSensor(TouchSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates
+        })
+    )
 
     return (
         <Form {...form}>
@@ -179,7 +208,18 @@ export function EditTaskForm({
                         <FormLabel className="text-xl">{`Checklist:`}</FormLabel>
                         <FormControl>
                             <>
+                            <DndContext collisionDetection={closestCorners} sensors={sensors} onDragEnd={(event) => {
+                                const { active, over } = event
+
+                                if (active.id === over?.id) return
+
+                                const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
+                                const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
+
+                                form.setValue('checklist', arrayMove(field?.value || [], originalPosition, newPosition))
+                            }}>
                             <ul className="flex flex-col gap-2">
+                                <SortableContext items={field?.value?.map(item => item.id) || []} strategy={verticalListSortingStrategy}>
                                 {field?.value?.map((checklistItem, index) => (
                                     <ChecklistField 
                                         key={index}
@@ -196,7 +236,9 @@ export function EditTaskForm({
                                         }}
                                     />
                                 ))}
+                                </SortableContext>
                             </ul>
+                            </DndContext>
                             <Button onClick={(e: any) => {
                                 e.preventDefault()
                                 form.setValue(
@@ -241,6 +283,19 @@ const ChecklistField = ({
     onNameChange: (newName: string) => void
     onCompleteChange: (complete: boolean) => void
 }) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition
+    } = useSortable({ id: item.id })
+
+    const style = {
+        transition,
+        transform: CSS.Translate.toString(transform)
+    }
+
     const deleteTask = (e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault()
         onDelete()
@@ -251,7 +306,17 @@ const ChecklistField = ({
     }
 
     return (
-        <li key={index} className="flex flex-row gap-2 items-center">
+        <li key={index} className="flex flex-row gap-2 items-center" ref={setNodeRef} style={style}>
+            <Button
+                type="button"
+                variant={"ghost"}
+                {...attributes}
+                {...listeners}
+                className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
+            >
+                <span className="sr-only">Move task</span>
+                <GripVertical />
+            </Button>
             <Checkbox checked={item.complete} onCheckedChange={onCompleteChange}/>
             <Input
                 placeholder={item.name}

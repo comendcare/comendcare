@@ -172,21 +172,24 @@ model Milestone {
 }
 
 model Task {
-  id          String          @id @unique @default(uuid())
-  status      StatusType
-  name        String
-  description String?
-  checklist   ChecklistItem[]
-  milestoneId String
-  milestone   Milestone       @relation(fields: [milestoneId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id             String          @id @unique @default(uuid())
+  status         StatusType
+  name           String
+  description    String?
+  checklist      ChecklistItem[]
+  milestoneId    String
+  milestone      Milestone       @relation(fields: [milestoneId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orderPosition  Int? // order position in the milestone task list
+  kanbanPosition Int? // order position within the kanban column
 }
 
 model ChecklistItem {
-  id       String  @id @unique @default(uuid())
-  name     String
-  complete Boolean
-  taskId   String
-  task     Task    @relation(fields: [taskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id            String  @id @unique @default(uuid())
+  name          String
+  complete      Boolean
+  taskId        String
+  task          Task    @relation(fields: [taskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orderPosition Int? // order position in the task checklist
 }
 
 model Edge {

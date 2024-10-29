@@ -21,7 +21,8 @@ export async function POST(request: Request) {
                             createMany: {
                                 data: task.checklist.map((item: any) => ({
                                     name: item?.name || "New Item",
-                                    complete: item?.complete || false
+                                    complete: item?.complete || false,
+                                    orderPosition: item?.orderPosition
                                 }))
                             }
                         }

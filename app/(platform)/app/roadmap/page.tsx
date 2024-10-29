@@ -38,7 +38,7 @@ export default async function RoadmapPage() {
         include: { 
             tasks: {
                 include: {
-                    checklist: true
+                    checklist: { orderBy: { orderPosition: 'asc' } }
                 }
             } 
         }
