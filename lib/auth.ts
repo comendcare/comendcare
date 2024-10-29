@@ -55,9 +55,7 @@ export const authOptions: NextAuthOptions = {
         //     return "/app/roadmap"; // Redirect regular users
         // },
         jwt: async ({token, user, trigger, session}) => {
-            console.log("JWT")
             if (trigger === 'update') {
-                console.log("UPDATED")
                 token.organizationId = session.organizationId;
             }
             if (user) {

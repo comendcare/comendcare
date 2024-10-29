@@ -34,6 +34,7 @@ const invitationFormSchema = z.object({
     slug: z.string().min(2, {
         message: "Your organization's slug must be at least 2 characters.",
     }),
+    looking: z.array(optionSchema).min(0),
     founded: z.string().min(2, {
         message: "The year that your organization was founded.",
     }),
@@ -60,6 +61,9 @@ const invitationFormSchema = z.object({
         message: "Your organization's description.",
     }),
     categories: z.array(optionSchema).min(0),
+    prevalence: z.string().min(1, {
+        message: "Your organization's description.",
+    }),
     population: z.string().min(1, {
         message: "Your organization's description.",
     }),
@@ -218,7 +222,7 @@ export default function OnboardingForm() {
                     name="role"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Name</FormLabel>
+                            <FormLabel>Role</FormLabel>
                             <FormControl>
                                 <Input type="text" placeholder="Founder and Chair" {...field} />
                             </FormControl>
@@ -263,6 +267,30 @@ export default function OnboardingForm() {
                                     id="name"
                                     autoComplete="name"
                                     {...field}
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="looking"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>{`Looking for`}</FormLabel>
+                            <FormDescription>{`What you're looking for and hoping to get from joining Comend.`}</FormDescription>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={OPTIONS}
+                                    placeholder="Select options that appeal to you..."
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
                                 />
                             </FormControl>
                             <FormMessage/>
@@ -378,7 +406,7 @@ export default function OnboardingForm() {
                     name="raised"
                     render={({field: {value, onChange}}) => (
                         <FormItem>
-                            <FormLabel>Price - {value}</FormLabel>
+                            <FormLabel>Raised - {value}</FormLabel>
                             <FormDescription>{`The total amount of funding raised to date by your patient group.`}</FormDescription>
                             <FormControl>
                                 <Slider
@@ -497,6 +525,25 @@ export default function OnboardingForm() {
                                             no results found.
                                         </p>
                                     }
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="prevalence"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>{`Estimated total prevalence`}</FormLabel>
+                            <FormDescription>{`The estimated total number of patients in the world.`}</FormDescription>
+                            <FormControl>
+                                <Input
+                                    type="number"
+                                    id="population"
+                                    {...field}
                                 />
                             </FormControl>
                             <FormMessage/>
