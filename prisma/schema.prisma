@@ -146,6 +146,9 @@ model Roadmap {
   organizationId String?
   user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId         String?
+  nodes          Node[]
+  edges          Edge[]
+  milestones     Milestone[]
 
   @@unique([slug, organizationId])
   @@index([organizationId])
@@ -168,6 +171,8 @@ model Node {
   positionX Int
   positionY Int
   data      Milestone?
+  roadmapId String
+  roadmap   Roadmap    @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Milestone {
@@ -183,6 +188,8 @@ model Milestone {
   notes         String?
   status        StatusType
   tasks         Task[]
+  roadmapId     String
+  roadmap       Roadmap    @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Task {
@@ -207,11 +214,13 @@ model ChecklistItem {
 }
 
 model Edge {
-  id     String  @id @unique @default(uuid())
-  source String
-  target String
-  type   String?
-  data   Json?
+  id        String  @id @unique @default(uuid())
+  source    String
+  target    String
+  type      String?
+  data      Json?
+  roadmapId String
+  roadmap   Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Organization {
