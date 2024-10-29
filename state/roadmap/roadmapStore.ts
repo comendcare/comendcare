@@ -13,6 +13,8 @@ import {
 import { debounce } from "lodash"
 
 export type RoadmapState = {
+    roadmapId: string | null
+    setRoadmapId: (id: string) => void
     selectedNodeId: string | null
     setSelectedNodeId: (id: string | null) => void
     selectedTaskId: string | null,
@@ -32,12 +34,16 @@ export type RoadmapState = {
     setEdges: (edges: Edge[]) => void
     addNode: (node: Node) => void
     deleteNode: (nodeId: string) => void
-    initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null) => void
+    initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void
     saveState: () => void
 }
 
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
+        roadmapId: null,
+        setRoadmapId: (id: string) => {
+            set({ roadmapId: id })
+        },
         selectedNodeId: null,
         setSelectedNodeId: (id: string | null) => {
             set({ selectedNodeId: id })
@@ -86,12 +92,12 @@ export const useRoadmapStore = create<RoadmapState>()(
                 nodeIds.includes(milestone.nodeId)
             )
             set({ nodes, milestones })
-            debounceUpdateFlow(nodes, get().edges)
+            debounceUpdateFlow(get().roadmapId, nodes, get().edges)
         },
         onEdgesChange: (changes: EdgeChange[]) => {
             const edges = applyEdgeChanges(changes, get().edges)
             set({ edges })
-            debounceUpdateFlow(get().nodes, edges)
+            debounceUpdateFlow(get().roadmapId, get().nodes, edges)
         },
         onConnect: (connection: any) => {
             const edges = addEdge(
@@ -106,21 +112,21 @@ export const useRoadmapStore = create<RoadmapState>()(
                 get().edges
             )
             set({ edges })
-            debounceUpdateFlow(get().nodes, edges)
+            debounceUpdateFlow(get().roadmapId, get().nodes, edges)
         },
         setNodes: (nodes: Node[]) => {
             set({ nodes })
-            debounceUpdateFlow(nodes, get().edges)
+            debounceUpdateFlow(get().roadmapId, nodes, get().edges)
         },
         setEdges: (edges: Edge[]) => {
             set({ edges })
-            debounceUpdateFlow(get().nodes, edges)
+            debounceUpdateFlow(get().roadmapId, get().nodes, edges)
         },
         addNode: (node: Node) => {
             const nodes = [...get().nodes, node]
             const milestones = [...get().milestones, node.data]
             set({ nodes, milestones })
-            debounceUpdateFlow(nodes, get().edges)
+            debounceUpdateFlow(get().roadmapId, nodes, get().edges)
             updateMilestones([node.data])
         },
         deleteNode: (nodeId: string | undefined) => {
@@ -130,15 +136,15 @@ export const useRoadmapStore = create<RoadmapState>()(
                 nodeIds.includes(milestone.nodeId)
             )
             set({ nodes, milestones, selectedNodeId: null })
-            debounceUpdateFlow(nodes, get().edges)
+            debounceUpdateFlow(get().roadmapId, nodes, get().edges)
         },
-        initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null) => {
-            set({ nodes, edges, milestones, selectedNodeId, selectedTaskId })
+        initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
+            set({ nodes, edges, milestones, selectedNodeId, selectedTaskId, roadmapId })
         },
         saveState: () => {
             const state = get()
             set(state)
-            debounceUpdateFlow(state.nodes, state.edges)
+            debounceUpdateFlow(state.roadmapId, state.nodes, state.edges)
             updateMilestones(state.milestones)
         }
     }),
@@ -171,12 +177,13 @@ export const useRoadmapStore = create<RoadmapState>()(
 
 // debounce flow updates, because the flow spams X/Y Position change values when dragging a node
 export const debounceUpdateFlow = debounce(
-    (nodes: Node[], edges: Edge[]) => {
-        updateFlow(nodes, edges)
+    (roadmapId: string | null, nodes: Node[], edges: Edge[]) => {
+        updateFlow(roadmapId, nodes, edges)
     }, 500
 )
 
 export const updateFlow = async (
+    roadmapId: string | null,
     nodes: Node[],
     edges: Edge[]
 ) => {
@@ -186,7 +193,7 @@ export const updateFlow = async (
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ nodes, edges }) // Send the nodes and edges as JSON
+            body: JSON.stringify({ roadmapId, nodes, edges }) // Send the nodes and edges as JSON
         })
 
         if (!response.ok) {

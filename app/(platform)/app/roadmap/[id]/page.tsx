@@ -13,26 +13,32 @@ export default async function RoadmapPage({
     if (!session) {
         redirect("/login")
     }
-    const data = await prisma.roadmap.findUnique({
-        where: {
-            id: decodeURIComponent(params.id)
-        },
-        include: {
-            organization: {
-                select: {
-                    subdomain: true
-                }
-            }
-        }
-    })
 
-    if (!data || data.userId !== session.user.id) {
-        notFound()
-    }
+    // const roadmap = await prisma.roadmap.findUnique({
+    //     where: {
+    //         id: decodeURIComponent(params.id)
+    //     },
+    //     include: {
+    //         // organization: {
+    //         //     select: {
+    //         //         subdomain: true
+    //         //     }
+    //         // }
+    //         nodes: true,
+    //         edges: true,
+    //         milestones: true
+    //     }
+    // })
+
+
+    // if (!data || data.userId !== session.user.id) {
+    //     notFound()
+    // }
     
     const dbNodes = await Promise.all(
         (
             await prisma.node.findMany({
+                where: { roadmapId: params.id },
                 include: { data: true }
             })
         ).map(async node => {
@@ -50,7 +56,9 @@ export default async function RoadmapPage({
     )
 
     const dbEdges = await Promise.all(
-        (await prisma.edge.findMany()).map(async edge => {
+        (await prisma.edge.findMany({
+            where: { roadmapId: params.id }
+        })).map(async edge => {
             const { id, source, target } = edge
 
             return {
@@ -62,6 +70,7 @@ export default async function RoadmapPage({
     )
 
     const dbMilestones = await prisma.milestone.findMany({
+        where: { roadmapId: params.id },
         include: { 
             tasks: {
                 orderBy: { orderPosition: 'asc' },
@@ -73,8 +82,9 @@ export default async function RoadmapPage({
     })
 
     return (
-        <main className="flex flex-col items-center w-screen h-screen mx-auto">
+        <main className="flex flex-col items-center h-screen mx-auto">
             <Roadmap
+                roadmapId={params.id}
                 initNodes={dbNodes || []}
                 initEdges={dbEdges || []}
                 initMilestones={dbMilestones || []}

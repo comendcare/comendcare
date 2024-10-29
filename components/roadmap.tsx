@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useNavStore } from "@/state/nav/navStore"
+import { useNavStore, useSidebarStore } from "@/state/nav/navStore"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -32,18 +32,20 @@ const selector = (state: RoadmapState) => ({
 })
 
 export function Roadmap({
+    roadmapId,
     initNodes,
     initEdges,
     initMilestones,
     // initTasks
 }: {
+    roadmapId: string
     initNodes: any[]
     initEdges: any[]
     initMilestones: any[]
     // initTasks: any[]
 }) {
     // Zustand state management
-    const { defaultLayout, setLayout } = useNavStore()
+    const { defaultLayout, setLayout } = useSidebarStore()
     const { 
         selectedNodeId, 
         setSelectedNodeId, 
@@ -111,7 +113,7 @@ export function Roadmap({
         const urlMilestone: string | null = params.get("milestone")
         const urlTask: string | null = params.get("task")
 
-        initState(initNodes, initEdges, initMilestones, urlMilestone, urlTask)
+        initState(initNodes, initEdges, initMilestones, urlMilestone, urlTask, roadmapId)
     }, [])
 
     return (
