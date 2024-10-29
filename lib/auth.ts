@@ -23,8 +23,9 @@ export const authOptions: NextAuthOptions = {
     ],
     pages: {
         signIn: `/login`,
-        verifyRequest: `/login`,
-        error: "/login" // Error code passed in query string as ?error=
+        verifyRequest: `/login/verify-request`,
+        error: "/login", // Error code passed in query string as ?error=
+        newUser: "/onboarding"
     },
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
@@ -44,9 +45,33 @@ export const authOptions: NextAuthOptions = {
         }
     },
     callbacks: {
-        jwt: async ({ token, user }) => {
+        // async signIn({ user, account, profile }) {
+        //     // Implement custom logic here to determine user type (admin vs normal)
+        //     const isAdmin = user.email?.endsWith("@comendcare.com"); // Example logic
+        //
+        //     if (isAdmin && process.env.ADMIN_WHITELIST?.includes(user.email!)) {
+        //         return "/admin"; // Redirect admins
+        //     }
+        //     return "/app/roadmap"; // Redirect regular users
+        // },
+        jwt: async ({token, user, trigger, session}) => {
+            if (trigger === 'update') {
+                token.organizationId = session.organizationId;
+            }
             if (user) {
-                token.user = user
+                // Fetch the user's organizationId from the database
+                const dbUser = await prisma.user.findUnique({
+                    where: { id: user.id },
+                    include: { memberships: true },
+                });
+
+                // Extract organization IDs from the user's memberships
+                const organizationIds: string[] = dbUser?.memberships
+                    .map((membership) => membership.organizationId)
+                    .filter((id): id is string => !!id) || []
+
+                token.user = user;
+                token.organizationId = organizationIds[0] || null; // Default to the first ID, if any
             }
             return token
         },
@@ -56,12 +81,13 @@ export const authOptions: NextAuthOptions = {
                 // @ts-expect-error
                 id: token.sub,
                 // @ts-expect-error
-                username: token?.user?.username || token?.user?.gh_username
-            }
-            return session
-        }
-    }
-}
+                username: token?.user?.username || token?.user?.gh_username,
+                organizationId: token.organizationId as string | null, // Ensure type matches
+            };
+            return session;
+        },
+    },
+};
 
 export function getSession() {
     return getServerSession(authOptions) as Promise<{

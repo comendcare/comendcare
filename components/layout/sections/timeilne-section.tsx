@@ -1,28 +1,27 @@
-"use client"
-import { cn } from "@/lib/utils"
-import Image from "next/image"
-import React, { useRef, useState } from "react"
-import { AnimatePresence, motion, useMotionValue } from "framer-motion"
-import NORDTeam from "@/public/team/nord-team.jpeg"
+"use client";
+import {cn} from "@/lib/utils";
+import Image from "next/image";
+import React, {useRef, useState} from "react";
+import {AnimatePresence, motion, useMotionValue} from "framer-motion";
+import NORDTeam from "@/public/team/nord-team.jpeg";
+import OGTeam from "@/public/team/og-team.jpeg";
+import GGTeam from "@/public/team/gg-team.jpg";
 import NYTeam from "@/public/team/ny-team.jpeg"
-import SDTeam from "@/public/team/sd-team.jpg"
-import TorontoTeam from "@/public/team/toronto-team.jpg"
 
 export function TimelineSection() {
     const timeline = [
         {
-            title: "Jan 2023",
+            title: "March 2023",
             content: (
                 <div className="flex flex-col">
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
                         Comend is founded
                     </h2>
                     <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
-                        We re-united to fix broken areas of healthcare after
-                        working in drug development and biomedical engineering.
+                        Flawnson and Albert re-united to address broken processes in translational research after working in drug discovery and biomedical engineering.
                     </p>
                     <Image
-                        src={SDTeam}
+                        src={OGTeam}
                         height="2000"
                         width="2000"
                         className="w-full rounded-xl object-cover object-left-top md:rounded-3xl"
@@ -33,16 +32,35 @@ export function TimelineSection() {
             )
         },
         {
-            title: "Apr 2023",
+            title: "July 2023",
             content: (
                 <div className="flex flex-col">
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
-                        First investment
+                        Librarey is born
                     </h2>
                     <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
-                        We received investment from Character Labs to build
-                        solutions for rare families. We met Sierra in one of our
-                        early user tests.
+                        With the support of Character Labs, we focused on co-designing solutions with and for rare families. That’s when we met Sierra and partnered to build Librarey which launched in the fall.
+                    </p>
+                    <Image
+                        src={NORDTeam}
+                        height="2000"
+                        width="2000"
+                        className="w-full rounded-xl object-cover object-left-top md:rounded-3xl"
+                        alt="Startup template image"
+                        fetchPriority="high"
+                    />
+                </div>
+            )
+        },
+        {
+            title: "February 2024",
+            content: (
+                <div className="flex flex-col">
+                    <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
+                        The team grows
+                    </h2>
+                    <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
+                        After partnering with NEXT AI and Drive Capital, our team grew with kindred spirits including Pepi, Betty, Megan, and more.
                     </p>
                     <Image
                         src={NYTeam}
@@ -60,34 +78,13 @@ export function TimelineSection() {
             content: (
                 <div className="flex flex-col">
                     <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
-                        Launched Librarey
+                        We commit
                     </h2>
                     <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
-                        {`With Sierra's help, we launched a free search platform for rare resources and attended rare disease conferences to gather feedback.`}
+                        After 16 months of boots-on-the-ground research and testing, we pick one of countless ideas to commit our resources to.
                     </p>
                     <Image
-                        src={NORDTeam}
-                        height="2000"
-                        width="2000"
-                        className="w-full rounded-xl object-cover object-left-top md:rounded-3xl"
-                        alt="Startup template image"
-                        fetchPriority="high"
-                    />
-                </div>
-            )
-        },
-        {
-            title: "June 2024",
-            content: (
-                <div className="flex flex-col">
-                    <h2 className="mt-8 text-xl font-bold text-neutral-600 dark:text-neutral-300 md:text-3xl">
-                        Team growth
-                    </h2>
-                    <p className="mb-8 mt-4 text-neutral-600 text-xl dark:text-neutral-300">
-                        {`We're currently working with several patient groups to build a new scientific communicator and research platform.`}
-                    </p>
-                    <Image
-                        src={TorontoTeam}
+                        src={GGTeam}
                         height="2000"
                         width="2000"
                         className="w-full rounded-xl object-cover object-left-top md:rounded-3xl"
@@ -118,10 +115,10 @@ export const StatsForChangelogMobile = ({ stats }: { stats: Stats[] }) => {
             {/* <div className="mx-auto block w-full max-w-7xl px-4 md:px-8 lg:hidden"> */}
             <div className="block lg:hidden max-w-7xl gap-8 px-4 md:px-8 py-16 md:py-24 mt-16">
                 <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
-                    {`We’re working to empower a patient-led future for research and development.`}
+                    {`We believe in the potential for rare disease patients and families to drive research and development.`}
                 </h2>
                 <p className="text-center text-base text-neutral-7000 font-sans dark:text-neutral-300 mt-4 mb-10">
-                    {`We believe that advancing new treatments begins by empowering patient groups, whose grassroots efforts are essential in advocating for the needs of patients.`}
+                    {`Advances in rare diseases will be extremely valuable for the future of medicine. Patient groups are driving those advances. We’re here to supercharge your approach with software.`}
                 </p>
                 {stats.map((stat, index) => (
                     <div
@@ -168,10 +165,10 @@ export const StatsForChangelogDesktop = ({ stats }: { stats: Stats[] }) => {
         <section className="relative container w-full mx-auto">
             <div className="hidden lg:grid max-w-7xl gap-8 mx-auto py-16 md:py-24 mt-16">
                 <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
-                    {`We’re working to empower a patient-led future for research and development.`}
+                    {`We believe in the potential for rare disease patients and families to drive research and development.`}
                 </h2>
                 <p className="text-center text-base text-neutral-7000 font-sans dark:text-neutral-300 mt-4 mb-10">
-                    {`We believe that advancing new treatments begins by empowering patient groups, whose grassroots efforts are essential in advocating for the needs of patients.`}
+                    {`Advances in rare diseases will be extremely valuable for the future of medicine. Patient groups are driving those advances. We’re here to supercharge your approach.`}
                 </p>
                 <div className="grid w-full grid-cols-4 gap-10">
                     {stats.map((stat, index) => (

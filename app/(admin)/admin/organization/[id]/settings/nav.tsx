@@ -11,30 +11,30 @@ export default function SiteSettingsNav() {
     const navItems = [
         {
             name: "General",
-            href: `/organization/${id}/settings`,
-            segment: null
+            href: `/admin/organization/${id}/settings`,
+            segment: null,
         },
         {
             name: "Domains",
-            href: `/organization/${id}/settings/domains`,
-            segment: "domains"
+            href: `/admin/organization/${id}/settings/domains`,
+            segment: "domains",
         },
         {
             name: "Appearance",
-            href: `/organization/${id}/settings/appearance`,
-            segment: "appearance"
+            href: `/admin/organization/${id}/settings/appearance`,
+            segment: "appearance",
         },
         {
             name: "Members",
-            href: `/organization/${id}/settings/members`,
-            segment: "members"
+            href: `/admin/organization/${id}/settings/members`,
+            segment: "members",
         },
         {
             name: "Invites",
-            href: `/organization/${id}/settings/invites`,
-            segment: "invites"
-        }
-    ]
+            href: `/admin/organization/${id}/settings/invites`,
+            segment: "invites",
+        },
+    ];
 
     return (
         <div className="flex space-x-4 border-b border-stone-200 pb-4 pt-2 dark:border-stone-700">

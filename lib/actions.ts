@@ -10,12 +10,13 @@ import {
     // getApexDomain,
     removeDomainFromVercelProject,
     // removeDomainFromVercelTeam,
-    validDomainRegex
-} from "@/lib/domains"
-import { put } from "@vercel/blob"
-import { customAlphabet } from "nanoid"
-import { getBlurDataURL } from "@/lib/utils"
-import { Session } from "next-auth"
+    validDomainRegex,
+} from "@/lib/domains";
+import {put} from "@vercel/blob";
+import {customAlphabet} from "nanoid";
+import {getBlurDataURL, getIp} from "@/lib/utils";
+import {Session} from "next-auth";
+import {sendInviteEmail} from "@/lib/emails";
 
 const nanoid = customAlphabet(
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -229,6 +230,15 @@ export const deleteOrganization = withOrganizationAuth(
         }
     }
 )
+
+export const getOrganizationFromOrganizationId = async (organizationId: string) => {
+    const organization = await prisma.organization.findUnique({
+        where: {
+            id: organizationId,
+        },
+    });
+    return organization
+};
 
 export const getOrganizationFromRoadmapId = async (roadmapId: string) => {
     const roadmap = await prisma.roadmap.findUnique({
@@ -453,12 +463,17 @@ export const editUser = async (
     }
 }
 
-// Invite user function with updated Site model
+// Invite user function with updated Organization model
 export async function inviteUser(
     session: Session | null,
     email: string = "therealflawnsontong@gmail.com",
     role: string = "admin",
-    organizationId: string = "Test"
+    ip: string,
+    organization: {
+        organizationId: string
+        organizationName: string
+        organizationImage: string
+    }
 ) {
     try {
         if (!session) {
@@ -470,10 +485,13 @@ export async function inviteUser(
             where: {
                 email: {
                     equals: lowerCaseEmail,
-                    mode: "insensitive"
-                }
+                    mode: 'insensitive',
+                },
+            },
+            select: {
+                image: true
             }
-        })
+        });
 
         let invitationId: string | undefined
         if (!userExists) {
@@ -481,7 +499,7 @@ export async function inviteUser(
                 data: {
                     email: lowerCaseEmail,
                     role: role,
-                    organizationId: organizationId // Updated to siteId
+                    organizationId: organization.organizationId
                 }
             })
             invitationId = ticket.id
@@ -489,18 +507,55 @@ export async function inviteUser(
             return ticket
         }
 
-        // Create member should happen AFTER the invited user accepts the invitation and creates and account.
-        // return await prisma.member.create({
-        //     data: {
-        //         email: lowerCaseEmail,
-        //         organizationId: site_id, // Updated field
-        //         role: role,
-        //         invitedById: session?.user?.id,
-        //         meta: {
-        //             invitationId,
-        //         },
-        //     },
-        // });
+        console.log({
+            invitee: {
+                name: "Test",
+                email: email,
+                image: userExists?.image
+            },
+            inviter: {
+                name: session?.user.name,
+                email: session?.user.email,
+                image: session?.user.image,
+                organizationName: organization.organizationName,
+                organizationImage: organization.organizationImage,
+                ip: ip,
+            },
+            inviteLink: invitationId
+        })
+
+        await sendInviteEmail(
+            {
+                invitee: {
+                    name: "Test",
+                    email: email,
+                    image: userExists?.image
+                },
+                inviter: {
+                    name: session?.user.name,
+                    email: session?.user.email,
+                    image: session?.user.image,
+                    organizationName: organization.organizationName,
+                    organizationImage: organization.organizationImage,
+                    ip: ip,
+                },
+                inviteLink: invitationId
+            }
+        )
+
+        console.log("email sent")
+
+        return await prisma.member.create({
+            data: {
+                email: lowerCaseEmail,
+                organizationId: organization.organizationId,
+                role: role,
+                invitedById: session?.user?.id,
+                meta: {
+                    invitationId,
+                },
+            },
+        });
     } catch (error) {
         console.error("Error inviting user:", error)
         throw new Error("Failed to invite user.")

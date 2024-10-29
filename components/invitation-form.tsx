@@ -1,21 +1,16 @@
 "use client"
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useSession } from "next-auth/react"
-import { inviteUser } from "@/lib/actions"
-import { useParams } from "next/navigation"
+import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Input} from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
+import {z} from "zod";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useSession} from "next-auth/react"
+import {getOrganizationFromOrganizationId, getOrganizationFromRoadmapId, inviteUser} from "@/lib/actions";
+import {useParams} from "next/navigation";
+import {getIp} from "@/lib/utils";
+import {useEffect, useState} from "react";
+import {Organization} from "@prisma/client";
 
 const invitationFormSchema = z.object({
     email: z.string().min(2, {
@@ -27,20 +22,31 @@ export default function InvitationForm() {
     const session = useSession()
     const params = useParams()
 
+    const [organization, setOrganization] = useState<Organization | null>();
+
+    useEffect(() => {
+        const organization = getOrganizationFromOrganizationId(params?.id as string).then((organization) => {
+            setOrganization(organization)
+        })
+    }, [setOrganization]);
+
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(invitationFormSchema)
     })
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
-        console.log(values)
         const invitation = await inviteUser(
             session.data,
-            "therealflawnsontong@gmail.com",
+            form.getValues("email"),
             "admin",
-            params?.id as string
+            await getIp(),
+            {
+                organizationId: params?.id as string,
+                organizationName: organization?.name as string,
+                organizationImage: organization?.image as string,
+            }
         )
-        console.log(invitation)
     }
 
     return (
