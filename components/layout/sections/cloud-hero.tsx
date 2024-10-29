@@ -269,12 +269,12 @@ export const CloudHeroSection = () => {
 
                 <motion.p
                     id="hero-description"
-                    initial={{ opacity: 0, y: 50 }}
-                    animate={{ opacity: 1, y: [50, -10, 0] }}
-                    transition={{ duration: 0.8, ease: [0.4, 0.0, 0.2, 1] }}
-                    className="max-w-screen-sm text-xl text-muted-foreground"
+                    initial={{opacity: 0, y: 50}}
+                    animate={{opacity: 1, y: [50, -10, 0]}}
+                    transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
+                    className="max-w-screen-sm text-xl"
                 >
-                    {`Create your research roadmap, connect with collaborators, and stay updated on the latest scientific breakthroughs.`}
+                    {`Develop your research strategy, network with potential partners, and protect your investments.`}
                 </motion.p>
             </div>
 

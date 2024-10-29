@@ -82,14 +82,12 @@ export function BetaSignup({
 
     return (
         <div className="flex flex-col justify-center items-center space-y-2">
-            {!inline && !isSubscribed && (
-                <Label className="text-base">
-                    🎉&nbsp;&nbsp;Join our beta testing community
-                </Label>
-            )}
-            {!inline && isSubscribed && (
-                <Label className="text-base">Thank you for joining!</Label>
-            )}
+            {!inline && !isSubscribed && <Label className="text-xl">
+                🎉&nbsp;&nbsp;Join our beta testing community
+            </Label>}
+            {!inline && isSubscribed && <Label className="text-base">
+                Thank you for joining!
+            </Label>}
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(handleBetaSignupSubmit)}

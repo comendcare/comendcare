@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import {useState} from "react";
 
 export default function CTA() {
-    const [closeCTA, setCloseCTA] = useState(false)
+    const [closeCTA, setCloseCTA] = useState(false);
     return (
         <div
             className={`${
@@ -28,7 +28,7 @@ export default function CTA() {
                     fill="none"
                     shapeRendering="geometricPrecision"
                 >
-                    <path d="M6 9l6 6 6-6" />
+                    <path d="M6 9l6 6 6-6"/>
                 </svg>
             </button>
             <div className="text-center lg:text-left">
@@ -40,8 +40,8 @@ export default function CTA() {
                         closeCTA ? "hidden lg:block" : ""
                     } mt-2 text-sm text-stone-700 dark:text-stone-300 lg:mt-0`}
                 >
-                    This is a demo site showcasing how to build a multi-tenant
-                    application with{" "}
+                    This is a demo site showcasing how to build a multi-tenant application
+                    with{" "}
                     <a
                         className="font-semibold text-black underline dark:text-white"
                         href="https://platformize.co"
@@ -76,5 +76,5 @@ export default function CTA() {
                 </a>
             </div>
         </div>
-    )
+    );
 }
