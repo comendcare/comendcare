@@ -576,7 +576,7 @@ export default function OnboardingForm() {
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>Relevant disease mechanisms</FormLabel>
-                            <FormDescription>{`The number of known patients (not the estimated total).`}</FormDescription>
+                            <FormDescription>{`The relevant mechanisms of your disorder`}</FormDescription>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -600,7 +600,7 @@ export default function OnboardingForm() {
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>Associated genes</FormLabel>
-                            <FormDescription>{`The number of known patients (not the estimated total).`}</FormDescription>
+                            <FormDescription>{`The genes associated with your disorder.`}</FormDescription>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -624,7 +624,7 @@ export default function OnboardingForm() {
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>Associated biomarkers</FormLabel>
-                            <FormDescription>{`The number of known patients (not the estimated total).`}</FormDescription>
+                            <FormDescription>{`The biomarkers that have been identified for your disorder.`}</FormDescription>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -648,7 +648,7 @@ export default function OnboardingForm() {
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>Associated signs and symptoms</FormLabel>
-                            <FormDescription>{`The number of known patients (not the estimated total).`}</FormDescription>
+                            <FormDescription>{`The hallmark signs and symptoms of your disorder.`}</FormDescription>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
