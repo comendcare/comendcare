@@ -204,7 +204,7 @@ export default function OrganizationOnboardingForm() {
                     name="name"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Name</FormLabel>
+                            <FormLabel>Your name</FormLabel>
                             <FormControl>
                                 <Input
                                     type="text"
@@ -230,7 +230,7 @@ export default function OrganizationOnboardingForm() {
                                 <Input type="text" placeholder="Founder and Chair" {...field} />
                             </FormControl>
                             <FormDescription>
-                                Your role at your patient organization
+                                Your role at your patient organization.
                             </FormDescription>
                             <FormMessage/>
                         </FormItem>
@@ -326,7 +326,7 @@ export default function OrganizationOnboardingForm() {
                     name="501c3"
                     render={({field}) => (
                         <FormItem className="space-y-3">
-                            <FormLabel>{`501c3 status`}</FormLabel>
+                            <FormLabel>{`What is your 501c3 status`}</FormLabel>
                             <FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>
                             <FormControl>
                                 <RadioGroup
@@ -390,6 +390,9 @@ export default function OrganizationOnboardingForm() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Bio</FormLabel>
+                            <FormDescription>
+                                This will be the public description of your organization.
+                            </FormDescription>
                             <FormControl>
                                 <Textarea
                                     placeholder="Tell us a little bit about yourself"
@@ -397,16 +400,12 @@ export default function OrganizationOnboardingForm() {
                                     {...field}
                                 />
                             </FormControl>
-                            <FormDescription>
-                                You can <span>@mention</span> other users and
-                                organizations.
-                            </FormDescription>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
 
-                <Button type="submit">Submit</Button>
+                <Button type="submit">Next</Button>
             </form>
         </Form>
     );

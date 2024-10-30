@@ -1,4 +1,7 @@
-import {FaCheck} from "react-icons/fa"
+'use client'; // This ensures the component is a client component
+
+import { usePathname } from 'next/navigation';
+import { FaCheck } from 'react-icons/fa';
 
 type StepStatus = 'complete' | 'current' | 'upcoming';
 
@@ -6,25 +9,46 @@ export interface Step {
     name: string;
     description: string;
     href: string;
-    status: StepStatus;
+    status?: StepStatus; // Optional since it will be calculated dynamically
 }
-
 
 function classNames(...classes: any[]) {
-    return classes.filter(Boolean).join(' ')
+    return classes.filter(Boolean).join(' ');
 }
 
-export default function Steps({steps}: {steps: Step[]}) {
+export default function Steps({ steps }: { steps: Step[] }) {
+    const pathname = usePathname(); // Get the current path
+
+    // Determine the status of each step dynamically
+    const updatedSteps = steps.map((step, index) => {
+        const isCurrent = pathname === step.href;
+        const isComplete = index < steps.findIndex((s) => s.href === pathname);
+
+        return {
+            ...step,
+            status: isCurrent ? 'current' : isComplete ? 'complete' : 'upcoming',
+        };
+    });
+
     return (
         <nav aria-label="Progress">
             <ol role="list" className="overflow-hidden">
-                {steps.map((step, stepIdx) => (
-                    <li key={step.name} className={classNames(stepIdx !== steps.length - 1 ? 'pb-10' : '', 'relative')}>
+                {updatedSteps.map((step, stepIdx) => (
+                    <li
+                        key={step.name}
+                        className={classNames(
+                            stepIdx !== updatedSteps.length - 1 ? 'pb-10' : '',
+                            'relative'
+                        )}
+                    >
                         {step.status === 'complete' ? (
                             <>
-                                {stepIdx !== steps.length - 1 ? (
-                                    <div aria-hidden="true" className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-indigo-600" />
-                                ) : null}
+                                {stepIdx !== updatedSteps.length - 1 && (
+                                    <div
+                                        aria-hidden="true"
+                                        className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-indigo-600"
+                                    />
+                                )}
                                 <a href={step.href} className="group relative flex items-start">
                                     <span className="flex h-9 items-center">
                                         <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 group-hover:bg-indigo-800">
@@ -39,9 +63,12 @@ export default function Steps({steps}: {steps: Step[]}) {
                             </>
                         ) : step.status === 'current' ? (
                             <>
-                                {stepIdx !== steps.length - 1 ? (
-                                    <div aria-hidden="true" className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300" />
-                                ) : null}
+                                {stepIdx !== updatedSteps.length - 1 && (
+                                    <div
+                                        aria-hidden="true"
+                                        className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300"
+                                    />
+                                )}
                                 <a href={step.href} aria-current="step" className="group relative flex items-start">
                                     <span aria-hidden="true" className="flex h-9 items-center">
                                         <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-indigo-600 bg-white">
@@ -56,9 +83,12 @@ export default function Steps({steps}: {steps: Step[]}) {
                             </>
                         ) : (
                             <>
-                                {stepIdx !== steps.length - 1 ? (
-                                    <div aria-hidden="true" className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300" />
-                                ) : null}
+                                {stepIdx !== updatedSteps.length - 1 && (
+                                    <div
+                                        aria-hidden="true"
+                                        className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300"
+                                    />
+                                )}
                                 <a href={step.href} className="group relative flex items-start">
                                     <span aria-hidden="true" className="flex h-9 items-center">
                                         <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-gray-300 bg-white group-hover:border-gray-400">
@@ -76,5 +106,5 @@ export default function Steps({steps}: {steps: Step[]}) {
                 ))}
             </ol>
         </nav>
-    )
+    );
 }
