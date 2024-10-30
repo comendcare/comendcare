@@ -1,5 +1,5 @@
 "use client"
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 
 import { BoardColumn, BoardContainer } from "@/components/board-column"
@@ -47,22 +47,35 @@ export type ColumnId = (typeof defaultCols)[number]["id"]
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
-    setTask: state.setTask
+    setTask: state.setTask,
+    setTasks: state.setTasks
 })
 
 export function KanbanView() {
     const { milestones } = useRoadmapStore(useShallow(selector))
 
     return (
-        <Kanban tasks={milestones.map(milestone => milestone?.tasks || []).flat(1)}/>
+        <Kanban initTasks={milestones.map(milestone => milestone?.tasks || []).flat(1)}/>
     )
 }
 
-function Kanban({ tasks }: { tasks: Task[] }) {
-    const { setTask } = useRoadmapStore(useShallow(selector))
+const sortKanbanTasks = (tasks: Task[]) => {
+    return tasks.sort((a: Task, b: Task) => {
+        if (a.kanbanPosition !== undefined && b.kanbanPosition !== undefined && a.kanbanPosition !== b.kanbanPosition) {
+            return a.kanbanPosition - b.kanbanPosition
+        }
+        return a.orderPosition - b.orderPosition
+    })
+}
+
+function Kanban({ initTasks }: { initTasks: Task[] }) {
+    const { setTask, setTasks: setDbTasks } = useRoadmapStore(useShallow(selector))
     const [columns, setColumns] = useState<Column[]>(defaultCols)
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
     const columnsId = useMemo(() => columns.map(col => col.id), [columns])
+
+    // kanban requires it's own state outside of the zustand state, so we can move things around properly
+    const [tasks, setTasks] = useState(sortKanbanTasks(initTasks))
 
     const [activeColumn, setActiveColumn] = useState<Column | null>(null)
 
@@ -75,6 +88,11 @@ function Kanban({ tasks }: { tasks: Task[] }) {
             coordinateGetter: coordinateGetter
         })
     )
+
+    useEffect(() => {
+        // ensure we're updating the kanban tasks state whenever the zustand tasks state changes
+        setTasks(sortKanbanTasks(initTasks))
+    }, [initTasks])
 
     function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
         const tasksInColumn = tasks.filter(task => task.status === columnId)
@@ -259,22 +277,23 @@ function Kanban({ tasks }: { tasks: Task[] }) {
 
         // Im dropping a Task over another Task
         if (isActiveATask && isOverATask) {
-            // setTasks(tasks => {
-            //     const activeIndex = tasks.findIndex((t: any) => t.id === activeId)
-            //     const overIndex = tasks.findIndex((t: any) => t.id === overId)
-            //     const activeTask = tasks[activeIndex]
-            //     const overTask = tasks[overIndex]
-            //     if (
-            //         activeTask &&
-            //         overTask &&
-            //         activeTask.status !== overTask.status
-            //     ) {
-            //         activeTask.status = overTask.status
-            //         return arrayMove(tasks, activeIndex, overIndex - 1)
-            //     }
+            setTasks(tasks => {
+                const activeIndex = tasks.findIndex((t: any) => t.id === activeId)
+                const overIndex = tasks.findIndex((t: any) => t.id === overId)
+                const activeTask = tasks[activeIndex]
+                const overTask = tasks[overIndex]
+                if (
+                    activeTask &&
+                    overTask &&
+                    activeTask.status !== overTask.status
+                ) {
+                    activeTask.status = overTask.status
+                    return arrayMove(tasks, activeIndex, overIndex - 1)
+                }
 
-            //     return arrayMove(tasks, activeIndex, overIndex)
-            // })
+                return arrayMove(tasks, activeIndex, overIndex)
+            })
+
             const activeIndex = tasks.findIndex((t: any) => t.id === activeId)
             const overIndex = tasks.findIndex((t: any) => t.id === overId)
             const activeTask = tasks[activeIndex]
@@ -285,34 +304,45 @@ function Kanban({ tasks }: { tasks: Task[] }) {
                 activeTask.status !== overTask.status
             ) {
                 activeTask.status = overTask.status
-                // return arrayMove(tasks, activeIndex, overIndex - 1)
+                return arrayMove(tasks, activeIndex, overIndex - 1)
             }
 
             setTask(activeTask.id, { status: activeTask.status })
-            // return arrayMove(tasks, activeIndex, overIndex)
+
+            const updatedTasks = arrayMove(tasks, activeIndex, overIndex)
+            setDbTasks(updatedTasks.map((task, index)=> (
+                {...task, kanbanPosition: index}
+            )))
+            return updatedTasks
         }
 
         const isOverAColumn = overData?.type === "Column"
 
         // Im dropping a Task over a column
         if (isActiveATask && isOverAColumn) {
-            // setTasks(tasks => {
-            //     const activeIndex = tasks.findIndex(t => t.id === activeId)
-            //     const activeTask = tasks[activeIndex]
-            //     if (activeTask) {
-            //         activeTask.status = overId as ColumnId
-            //         return arrayMove(tasks, activeIndex, activeIndex)
-            //     }
-            //     return tasks
-            // })
+            setTasks(tasks => {
+                const activeIndex = tasks.findIndex(t => t.id === activeId)
+                const activeTask = tasks[activeIndex]
+                if (activeTask) {
+                    activeTask.status = overId as ColumnId
+                    return arrayMove(tasks, activeIndex, activeIndex)
+                }
+                return tasks
+            })
+
             const activeIndex = tasks.findIndex(t => t.id === activeId)
             const activeTask = tasks[activeIndex]
             if (activeTask) {
                 activeTask.status = overId as ColumnId
                 setTask(activeTask.id, { status: activeTask.status })
-                // return arrayMove(tasks, activeIndex, activeIndex)
+
+                const updatedTasks = arrayMove(tasks, activeIndex, activeIndex)
+                setDbTasks(updatedTasks.map((task, index)=> (
+                    {...task, kanbanPosition: index}
+                )))
+                return updatedTasks
             }
-            // return tasks
+            return tasks
         }
     }
 

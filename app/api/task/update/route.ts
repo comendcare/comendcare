@@ -9,17 +9,18 @@ export async function POST(request: Request) {
 
         await Promise.all(
             tasks.map(async (task: any) => {
-                console.log(`id`, task.id)
                 await prisma.task.update({
                     where: { id: task.id },
                     data: {
                         name: task.name,
                         status: task.status,
                         description: task.description,
+                        orderPosition: task.orderPosition,
+                        kanbanPosition: task.kanbanPosition,
                         checklist: {
                             deleteMany: {},
                             createMany: {
-                                data: task.checklist.map((item: any) => ({
+                                data: (task.checklist || []).map((item: any) => ({
                                     name: item?.name || "New Item",
                                     complete: item?.complete || false,
                                     orderPosition: item?.orderPosition

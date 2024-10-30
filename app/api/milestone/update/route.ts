@@ -40,7 +40,8 @@ export async function POST(request: Request) {
                                     id: task?.id,
                                     name: task?.name || "New Task",
                                     status: task?.status || "TODO",
-                                    orderPosition: task?.orderPosition || 0
+                                    orderPosition: task.orderPosition || 0,
+                                    kanbanPosition: task.kanbanPosition || 0,
                                 }))
                             }
                         },
