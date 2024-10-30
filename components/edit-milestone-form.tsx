@@ -173,9 +173,11 @@ export function EditMilestoneForm({
             ...(timelineYear ? { timelineYear } : undefined),
             ...(budget ? { budget } : undefined),
             papers,
-            // tasks,
             ...(tasks 
-                ? { tasks: tasks.map((task, index) => ({...task, orderPosition: index}))}
+                ? { tasks: tasks.map((task, index) => ({
+                    ...task, 
+                    orderPosition: index
+                }))}
                 : undefined
             ),
             status

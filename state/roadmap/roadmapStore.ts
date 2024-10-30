@@ -21,7 +21,7 @@ export type RoadmapState = {
     setSelectedTaskId: (id: string | null) => void
     // tasks: any[]
     setTask: (taskId: string, newProperties: any) => void
-    // setTasks: (tasks: any[]) => void
+    setTasks: (tasks: any[]) => void
     milestones: any[]
     setMilestone: (id: string, newProperties: any) => void
     setMilestones: (milestones: any[]) => void
@@ -68,6 +68,16 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ milestones })
             const task = get().milestones.map(milestone => milestone?.tasks || []).flat(1).filter(task => task.id === taskId)
             if (task) updateTasks(task)
+        },
+        setTasks: (tasks: any[]) => {
+            const milestones = get().milestones.map(milestone => {
+                return {
+                    ...milestone,
+                    tasks: tasks.filter(task => task.milestoneId === milestone.id)
+                }
+            })
+            set({ milestones })
+            updateTasks(tasks)
         },
         milestones: [],
         setMilestone: (nodeId: string, newProperties: any) => {

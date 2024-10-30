@@ -20,7 +20,9 @@ export interface Task {
     status: StatusType
     name: string
     description?: string
-    checklist?: any[]
+    checklist?: any[],
+    orderPosition: number,
+    kanbanPosition: number,
 }
 
 interface TaskCardProps {
