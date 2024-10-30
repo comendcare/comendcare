@@ -69,8 +69,8 @@ export const PAGProfileDetailsCard = () => {
                                     Relevant topics
                                 </h3>
                                 <div className="flex flex-col sm:flex-row sm:flex-wrap sm:space-x-2">
-                                    {pag?.topics.map(item =>
-                                        <Badge className="flex text-sm">
+                                    {pag?.topics.map((item, index) =>
+                                        <Badge key={index} className="flex text-sm">
                                             {item.charAt(0).toUpperCase() + item.slice(1)}
                                         </Badge>
                                     )}

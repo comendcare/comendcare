@@ -70,7 +70,7 @@ export default function EditProfileHeaderDialog() {
                         Edit about
                     </DialogTitle>
                     <DialogDescription>
-                        Make changes to your profile here. Click save when you're done.
+                        {`Make changes to your profile here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
 

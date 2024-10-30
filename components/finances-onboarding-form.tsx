@@ -22,6 +22,9 @@ const optionSchema = z.object({
 });
 
 const invitationFormSchema = z.object({
+    raising: z.enum(["yes", "no-but", "no"], {
+        required_error: "You need to select a 501c3 status.",
+    }),
     raised: z.number().min(2, {
         message: "Your organization's description.",
     }),
@@ -33,90 +36,7 @@ const invitationFormSchema = z.object({
     }),
 })
 
-const OPTIONS: Option[] = [
-    {
-        id: '1',
-        label: 'nextjs',
-        value: 'Nextjs',
-        description: 'A React framework for building server-side rendered (SSR) and static web applications. It simplifies routing, API handling, and rendering optimizations.',
-        strengths: 'Out-of-the-box SSR and static site generation (SSG), built-in API routes, and strong developer tooling with performance optimizations.',
-    },
-    {
-        id: '2',
-        label: 'React',
-        value: 'react',
-        description: 'A popular JavaScript library for building user interfaces, especially for single-page applications (SPAs). React focuses on the component-based architecture.',
-        strengths: 'Highly reusable components, vast community support, and strong performance with Virtual DOM rendering.',
-    },
-    {
-        id: '3',
-        label: 'Remix',
-        value: 'remix',
-        description: 'A modern framework focused on seamless data fetching and SSR for web applications. Remix emphasizes web standards and progressive enhancement.',
-        strengths: 'Provides full-stack capabilities with SSR, optimized for caching and streaming, and excellent support for nested routing.',
-    },
-    {
-        id: '4',
-        label: 'Vite',
-        value: 'vite',
-        description: 'A fast, next-generation frontend build tool that offers a modern development experience with minimal configuration.',
-        strengths: 'Extremely fast hot module replacement (HMR), native support for modern JavaScript frameworks, and optimized builds with minimal configuration.',
-    },
-    {
-        id: '5',
-        label: 'Nuxt',
-        value: 'nuxt',
-        description: 'A framework built on top of Vue.js, offering server-side rendering, static site generation, and powerful meta handling.',
-        strengths: 'Provides SSR and static site generation, excellent support for SEO, and an integrated module ecosystem.',
-    },
-    {
-        id: '6',
-        label: 'Vue',
-        value: 'vue',
-        description: 'A progressive JavaScript framework for building user interfaces, known for its simplicity and ease of integration.',
-        strengths: 'Lightweight, flexible, and offers two-way data binding with a gentle learning curve.',
-    },
-    {
-        id: '7',
-        label: 'Svelte',
-        value: 'svelte',
-        description: 'A compiler-based framework that shifts work from the browser to build time, producing highly optimized JavaScript code.',
-        strengths: 'Produces highly efficient code, has no virtual DOM, and offers a straightforward syntax.',
-    },
-    {
-        id: '8',
-        label: 'Angular',
-        value: 'angular',
-        description: 'A robust, full-featured framework maintained by Google, designed for building large-scale, complex applications.',
-        strengths: 'Provides powerful tools for enterprise-level applications, strong TypeScript support, and a comprehensive framework out of the box.',
-    },
-    {
-        id: '9',
-        label: 'Ember',
-        value: 'ember',
-        disable: true,
-        description: 'A mature framework known for its convention-over-configuration approach, used primarily for ambitious web applications.',
-        strengths: 'Offers strong conventions, built-in best practices, and a cohesive ecosystem with long-term stability.',
-    },
-    {
-        id: '10',
-        label: 'Gatsby',
-        value: 'gatsby',
-        disable: true,
-        description: 'A React-based framework for building static websites and apps, with a focus on performance and data integration.',
-        strengths: 'Optimized for static site generation, supports rich plugins, and offers fast page loads with modern web practices.',
-    },
-    {
-        id: '11',
-        label: 'Astro',
-        value: 'astro',
-        description: 'A modern framework for building content-rich websites that ships minimal JavaScript to the browser.',
-        strengths: 'Ships minimal JavaScript by default, offers multi-framework support, and provides excellent performance for content-driven sites.',
-    },
-];
-
-export default function OrganizationOnboardingForm() {
-    const session = useSession()
+export default function FinancesOnboardingForm() {
     const router = useRouter()
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
@@ -154,6 +74,49 @@ export default function OrganizationOnboardingForm() {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-1/2">
+
+                <FormField
+                    control={form.control}
+                    name="raising"
+                    render={({field}) => (
+                        <FormItem className="space-y-3">
+                            <FormLabel>{`Are you currently raising money?`}</FormLabel>
+                            <FormControl>
+                                <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    className="flex flex-col space-y-1"
+                                >
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                        <FormControl>
+                                            <RadioGroupItem value="Yes"/>
+                                        </FormControl>
+                                        <FormLabel className="font-normal">
+                                            {`Yes I'm currently raising`}
+                                        </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                        <FormControl>
+                                            <RadioGroupItem value="no-but"/>
+                                        </FormControl>
+                                        <FormLabel className="font-normal">
+                                            {`No, but I'm planning to soon`}
+                                        </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                        <FormControl>
+                                            <RadioGroupItem value="no"/>
+                                        </FormControl>
+                                        <FormLabel className="font-normal">
+                                            {`No I'm not raising money`}
+                                        </FormLabel>
+                                    </FormItem>
+                                </RadioGroup>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
 
                 {/*<FormField*/}
                 {/*    control={form.control}*/}
@@ -241,7 +204,10 @@ export default function OrganizationOnboardingForm() {
                     )}
                 />
 
-                <Button type="submit">Submit</Button>
+                <div className="flex flex-row space-x-2">
+                    <Button onClick={() => router.push("/onboarding/organization")}>Previous</Button>
+                    <Button type="submit">Next</Button>
+                </div>
             </form>
         </Form>
     );

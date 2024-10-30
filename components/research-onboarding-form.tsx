@@ -14,6 +14,7 @@ import {useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
 import {Slider} from "@/components/ui/slider";
+import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -33,7 +34,8 @@ const invitationFormSchema = z.object({
     population: z.string().min(1, {
         message: "Your organization's description.",
     }),
-    mechanisms: z.array(optionSchema).min(0),
+    // mechanisms: z.array(optionSchema).min(0),
+    mechanisms: z.array(z.string()).min(0),
     genes: z.array(optionSchema).min(0),
     biomarkers: z.array(optionSchema).min(0),
     symptoms: z.array(optionSchema).min(0),
@@ -123,7 +125,16 @@ const OPTIONS: Option[] = [
     },
 ];
 
-export default function OrganizationOnboardingForm() {
+export const mechanisms = [
+    { id: "GENETIC_MUTATION", name: "Genetic mutation" },
+    { id: "CHROMOSOMAL_ABNORMALITY", name: "Chromosomal abnormality" },
+    { id: "IMMUNE_DYSFUNCTION", name: "Immune dysfunction" },
+    { id: "METABOLIC_DEFECT", name: "Metabolic pathway defect" },
+    { id: "MITOCHONDRIAL_ABNORMALITY", name: "Mitochondrial abnormality" },
+    { id: "EPIGENETIC_MODIFICATION", name: "Epigenetic modification" }
+];
+
+export default function ResearchOnboardingForm() {
     const session = useSession()
     const router = useRouter()
 
@@ -266,26 +277,58 @@ export default function OrganizationOnboardingForm() {
                     )}
                 />
 
+                {/*<FormField*/}
+                {/*    control={form.control}*/}
+                {/*    name="mechanisms"*/}
+                {/*    render={({field}) => (*/}
+                {/*        <FormItem>*/}
+                {/*            <FormLabel>Relevant disease mechanisms</FormLabel>*/}
+                {/*            <FormDescription>{`The relevant mechanisms of your disorder`}</FormDescription>*/}
+                {/*            <FormControl>*/}
+                {/*                <MultipleSelector*/}
+                {/*                    {...field}*/}
+                {/*                    defaultOptions={OPTIONS}*/}
+                {/*                    placeholder="Select the mechanisms that apply to your disorder..."*/}
+                {/*                    emptyIndicator={*/}
+                {/*                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
+                {/*                            no results found.*/}
+                {/*                        </p>*/}
+                {/*                    }*/}
+                {/*                />*/}
+                {/*            </FormControl>*/}
+                {/*            <FormMessage/>*/}
+                {/*        </FormItem>*/}
+                {/*    )}*/}
+                {/*/>*/}
+
                 <FormField
                     control={form.control}
                     name="mechanisms"
-                    render={({field}) => (
+                    render={({ field }) => (
                         <FormItem>
                             <FormLabel>Relevant disease mechanisms</FormLabel>
                             <FormDescription>{`The relevant mechanisms of your disorder`}</FormDescription>
                             <FormControl>
-                                <MultipleSelector
-                                    {...field}
-                                    defaultOptions={OPTIONS}
-                                    placeholder="Select the mechanisms that apply to your disorder..."
-                                    emptyIndicator={
-                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
+                                <ToggleGroup
+                                    type="multiple"
+                                    variant="outline"
+                                    value={field.value}
+                                    onValueChange={
+                                        field.onChange
                                     }
-                                />
+                                    className="w-fit flex flex-wrap gap-2 justify-start"
+                                >
+                                    {mechanisms.map(type => (
+                                        <ToggleGroupItem
+                                            key={type.id}
+                                            value={type.id}
+                                        >
+                                            {type.name}
+                                        </ToggleGroupItem>
+                                    ))}
+                                </ToggleGroup>
                             </FormControl>
-                            <FormMessage/>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
@@ -411,7 +454,11 @@ export default function OrganizationOnboardingForm() {
                     )}
                 />
 
-                <Button type="submit">Submit</Button>
+
+                <div className="flex flex-row space-x-2">
+                    <Button onClick={() => router.push("/onboarding/finances")}>Previous</Button>
+                    <Button type="submit">Next</Button>
+                </div>
             </form>
         </Form>
     );

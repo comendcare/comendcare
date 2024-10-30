@@ -625,6 +625,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                 //     {option.label}
                                                                 // </CommandItem>
                                                                 <SelectorItem
+                                                                    key={option.value}
                                                                     option={option}
                                                                     onSelect={() => {
                                                                         if (selected.length >= maxSelected) {

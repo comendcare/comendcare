@@ -25,7 +25,7 @@ export const authOptions: NextAuthOptions = {
         signIn: `/login`,
         verifyRequest: `/login/verify-request`,
         error: "/login", // Error code passed in query string as ?error=
-        newUser: "/onboarding"
+        newUser: "/onboarding/organization"
     },
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
