@@ -40,6 +40,7 @@ export async function POST(request: Request) {
                                     id: task?.id,
                                     name: task?.name || "New Task",
                                     status: task?.status || "TODO",
+                                    orderPosition: task?.orderPosition || 0
                                 }))
                             }
                         },
@@ -53,7 +54,8 @@ export async function POST(request: Request) {
                         where: { id: task.id },
                         data: {
                             name: task.name,
-                            status: task.status
+                            status: task.status,
+                            orderPosition: task.orderPosition || 0
                         }
                     })
                 }
