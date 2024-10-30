@@ -37,6 +37,25 @@ import {
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { nanoid } from "nanoid"
 import { toast } from "sonner"
+import {
+    DndContext,
+    type DragEndEvent,
+    type DragOverEvent,
+    DragOverlay,
+    type DragStartEvent,
+    useSensor,
+    useSensors,
+    KeyboardSensor,
+    Announcements,
+    UniqueIdentifier,
+    TouchSensor,
+    MouseSensor,
+    closestCorners
+} from "@dnd-kit/core"
+import { CSS } from "@dnd-kit/utilities"
+import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { GripVertical } from "lucide-react"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 
@@ -154,7 +173,11 @@ export function EditMilestoneForm({
             ...(timelineYear ? { timelineYear } : undefined),
             ...(budget ? { budget } : undefined),
             papers,
-            tasks,
+            // tasks,
+            ...(tasks 
+                ? { tasks: tasks.map((task, index) => ({...task, orderPosition: index}))}
+                : undefined
+            ),
             status
         })
         toast('Success!', {
@@ -162,6 +185,14 @@ export function EditMilestoneForm({
         })
         onClose()
     }
+
+    const sensors = useSensors(
+        useSensor(MouseSensor),
+        useSensor(TouchSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates
+        })
+    )
 
     return (
         <Form {...form}>
@@ -403,6 +434,59 @@ export function EditMilestoneForm({
                         <FormLabel className="text-xl">{`Tasks:`}</FormLabel>
                         <FormControl>
                             <>
+                            <DndContext collisionDetection={closestCorners} sensors={sensors} onDragEnd={(event) => {
+                                const { active, over } = event
+
+                                if (active.id === over?.id) return
+
+                                const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
+                                const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
+
+                                form.setValue('tasks', arrayMove(field?.value || [], originalPosition, newPosition))
+                            }}>
+                            <ul className="flex flex-col gap-2">
+                                <SortableContext items={field?.value?.map(item => item.id) || []} strategy={verticalListSortingStrategy}>
+                                {field?.value?.map((task, index) => ( 
+                                    <TaskField
+                                        key={index} 
+                                        index={index} 
+                                        task={task} 
+                                        onDelete={() => (
+                                            form.setValue('tasks', field?.value?.filter((t, i) => i !== index))
+                                        )}
+                                        onNameChange={(newName) => {
+                                            form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, name: newName} : t))
+                                        }}
+                                        onStatusChange={(status) => {
+                                            form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, status} : t))
+                                        }}
+                                    />
+                                ))}
+                                </SortableContext>
+                            </ul>
+                            </DndContext>
+                            <Button onClick={(e: any) => {
+                                e.preventDefault()
+                                form.setValue(
+                                    'tasks',
+                                    [...field?.value || [], { name: 'New Task', status: 'TODO', id: nanoid() }]
+                                )
+                            }}>Add a task</Button>
+                            </>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+                />
+
+                {/* <FormField
+                control={form.control}
+                name="tasks"
+                render={({ field }) => (
+                    <FormItem className="flex flex-col grow">
+                        <FormLabel className="text-xl">{`Tasks:`}</FormLabel>
+                        <FormControl>
+                            <>
                             <ul className="flex flex-col gap-2"> 
                                 {field?.value?.map((task, index) => ( 
                                     <TaskField
@@ -433,7 +517,7 @@ export function EditMilestoneForm({
                         <FormMessage/>
                     </FormItem>
                 )}
-                />
+                /> */}
 
                 <span className="flex justify-end gap-4 flex-wrap">
                     <Dialog>
@@ -501,6 +585,19 @@ const TaskField = ({
     // onCompleteChange: (complete: boolean) => void
     onStatusChange: (status: StatusType) => void
 }) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition
+    } = useSortable({ id: task.id || "" })
+
+    const style = {
+        transition,
+        transform: CSS.Translate.toString(transform)
+    }
+
     const deleteTask = (e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault()
         onDelete()
@@ -511,7 +608,17 @@ const TaskField = ({
     }
 
     return (
-        <li key={index} className="flex flex-row gap-2 items-center">
+        <li key={index} className="flex flex-row gap-2 items-center" ref={setNodeRef} style={style}>
+            <Button
+                type="button"
+                variant={"ghost"}
+                {...attributes}
+                {...listeners}
+                className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
+            >
+                <span className="sr-only">Move task</span>
+                <GripVertical />
+            </Button>
             <StatusButton status={task.status} onStatusChange={onStatusChange}/>
             <Input
                 placeholder={task.name}
