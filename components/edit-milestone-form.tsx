@@ -176,7 +176,8 @@ export function EditMilestoneForm({
             ...(tasks 
                 ? { tasks: tasks.map((task, index) => ({
                     ...task, 
-                    orderPosition: index
+                    orderPosition: index,
+                    milestoneId: milestoneData?.id
                 }))}
                 : undefined
             ),

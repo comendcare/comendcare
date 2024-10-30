@@ -91,6 +91,7 @@ function Kanban({ initTasks }: { initTasks: Task[] }) {
 
     useEffect(() => {
         // ensure we're updating the kanban tasks state whenever the zustand tasks state changes
+        // React doesn't automatically re-render the component when initTasks changes
         setTasks(sortKanbanTasks(initTasks))
     }, [initTasks])
 
@@ -230,6 +231,10 @@ function Kanban({ initTasks }: { initTasks: Task[] }) {
         setActiveColumn(null)
         setActiveTask(null)
 
+        setDbTasks(tasks.map((task, index)=> (
+            {...task, kanbanPosition: index}
+        )))
+
         const { active, over } = event
         if (!over) return
 
@@ -307,13 +312,7 @@ function Kanban({ initTasks }: { initTasks: Task[] }) {
                 return arrayMove(tasks, activeIndex, overIndex - 1)
             }
 
-            setTask(activeTask.id, { status: activeTask.status })
-
-            const updatedTasks = arrayMove(tasks, activeIndex, overIndex)
-            setDbTasks(updatedTasks.map((task, index)=> (
-                {...task, kanbanPosition: index}
-            )))
-            return updatedTasks
+            return arrayMove(tasks, activeIndex, overIndex)
         }
 
         const isOverAColumn = overData?.type === "Column"
@@ -334,13 +333,7 @@ function Kanban({ initTasks }: { initTasks: Task[] }) {
             const activeTask = tasks[activeIndex]
             if (activeTask) {
                 activeTask.status = overId as ColumnId
-                setTask(activeTask.id, { status: activeTask.status })
-
-                const updatedTasks = arrayMove(tasks, activeIndex, activeIndex)
-                setDbTasks(updatedTasks.map((task, index)=> (
-                    {...task, kanbanPosition: index}
-                )))
-                return updatedTasks
+                return arrayMove(tasks, activeIndex, activeIndex)
             }
             return tasks
         }
