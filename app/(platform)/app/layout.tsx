@@ -21,21 +21,29 @@ import {
 } from "@/components/ui/select";
 import {FaCity, FaPlus} from "react-icons/fa6";
 import {useSession} from "next-auth/react";
-import {Suspense} from "react";
+import {Suspense, useEffect} from "react";
 import Profile from "@/components/profile";
 import { getRoadmapId } from "@/lib/actions";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface AppLayoutProps {
     children: React.ReactNode
 }
 
 export default function AppLayout({children}: AppLayoutProps) {
-    const {data: session, update} = useSession();
+    const {data: session, update} = useSession()
+    const router = useRouter()
     // Zustand state management
     const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} =
         useNavStore()
     const [roadmapId, setRoadmapId] = useState<string | undefined>(undefined)
+
+    const setRoadmap = async (organizationId: string) => {
+        const roadmapId = await getRoadmapId(organizationId)
+        setRoadmapId(roadmapId)
+        // router.push(`/app/roadmap/${roadmapId}`)
+    }
 
     async function updateSession(organizationId: string) {
         await update({
@@ -43,9 +51,12 @@ export default function AppLayout({children}: AppLayoutProps) {
             organizationId: organizationId,
         })
 
-        const roadmapId = await getRoadmapId(organizationId)
-        setRoadmapId(roadmapId)
+        setRoadmap(organizationId)
     }
+
+    useEffect(() => {
+        setRoadmap("apple")
+    }, [])
 
     return (
         <div className="flex h-full w-full">
