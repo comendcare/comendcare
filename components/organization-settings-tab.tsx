@@ -83,7 +83,7 @@ export default function OrganizationSettingsTab() {
                             Account
                         </h1>
                         <p className="text-sm text-gray-700">
-                            Make changes to your account here. Click save when you're done.
+                            {`Make changes to your account here. Click save when you're done.`}
                         </p>
                     </div>
                 </div>
