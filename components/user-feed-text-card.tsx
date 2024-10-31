@@ -22,7 +22,7 @@ export function UserFeedTextCard({content, blockquote}: UserFeedTextCardProps) {
     return (
         <Card className="p-2">
             <CardHeader className="grid items-start gap-4">
-                <div className="space-y-1">
+                <div className="space-y-4">
                     <CardTitle>
                         <Link href="#" className="group block flex-shrink-0">
                             <div className="flex items-center">
@@ -48,7 +48,7 @@ export function UserFeedTextCard({content, blockquote}: UserFeedTextCardProps) {
                             </div>
                         </Link>
                     </CardTitle>
-                    <CardDescription className="pt-4">
+                    <CardDescription>
                         {blockquote &&
                             <div className="p-4 my-4 border-s-4 border-gray-300 bg-gray-50 dark:border-gray-500 dark:bg-gray-800">
                                 <div className="text-lg italic font-medium leading-relaxed text-gray-500 dark:text-white">
