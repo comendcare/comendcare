@@ -13,8 +13,8 @@ const milestones = [
     {text: "Natural history study ", highlight: "ongoing"},
     {text: "Gene therapy trial ", highlight: "1 month ago"},
     {text: "Patient advocacy group ", highlight: "501c3 status designated"},
-    {text: "Published in a peer-reviewed journal ", highlight: "last year"},
-    {text: "FDA orphan drug status approved"}
+    // {text: "Published in a peer-reviewed journal ", highlight: "last year"},
+    // {text: "FDA orphan drug status approved"}
 ]
 
 const pag = {
@@ -44,7 +44,7 @@ const pag = {
 export const PAGProfileDetailsCard = () => {
     faker.seed(235)
     return (
-        <Card className="">
+        <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     About
@@ -78,7 +78,7 @@ export const PAGProfileDetailsCard = () => {
                             </div>
                         </div>
                         <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                            Milestones
+                            Assets
                         </h3>
                         <ul className="space-y-4 text-left text-gray-500 dark:text-gray-400">
                             {faker.helpers.arrayElements(milestones, faker.number.int({
