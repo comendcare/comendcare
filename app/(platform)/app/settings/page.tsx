@@ -10,6 +10,9 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import OrganizationSettingsTab from "@/components/organization-settings-tab";
+import { getSession } from "@/lib/auth"
+import {faker} from "@faker-js/faker";
+import {createDicebearAvatar} from "@/lib/utils";
 
 const members = [
     {
@@ -58,45 +61,57 @@ const members = [
         invitedDate: '2024-05-18T08:30:00Z',
     },
 ];
-
-const invitees = [
-    {
-        name: 'Sophia Martinez',
-        department: 'Clinical Trials',
-        email: 'sophia.martinez@example.com',
-        role: 'Member',
-        image:
-            'https://images.unsplash.com/photo-1517841905240-472988babdf9?crop=faces&w=256&h=256&q=80',
-        invitedDate: '2024-10-01T10:00:00Z',
-    },
-    {
-        name: 'Liam O’Connor',
-        department: 'Bioinformatics',
-        email: 'liam.oconnor@example.com',
-        role: 'Admin',
-        image:
-            'https://images.unsplash.com/photo-1599566150163-29194dcaad36?crop=faces&w=256&h=256&q=80',
-        invitedDate: '2024-09-29T13:15:00Z',
-    },
-    {
-        name: 'Emma Williams',
-        department: 'Regulatory Affairs',
-        email: 'emma.williams@example.com',
-        role: 'Member',
-        image:
-            'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?crop=faces&w=256&h=256&q=80',
-        invitedDate: '2024-09-25T09:45:00Z',
-    },
-];
+//
+// const invitees = [
+//     {
+//         name: 'Sophia Martinez',
+//         email: 'sophia.martinez@example.com',
+//         role: 'Member',
+//         image:
+//             'https://images.unsplash.com/photo-1517841905240-472988babdf9?crop=faces&w=256&h=256&q=80',
+//         invitedDate: '2024-10-01T10:00:00Z',
+//     },
+//     {
+//         name: 'Liam O’Connor',
+//         email: 'liam.oconnor@example.com',
+//         role: 'Admin',
+//         image:
+//             'https://images.unsplash.com/photo-1599566150163-29194dcaad36?crop=faces&w=256&h=256&q=80',
+//         invitedDate: '2024-09-29T13:15:00Z',
+//     },
+//     {
+//         name: 'Emma Williams',
+//         email: 'emma.williams@example.com',
+//         role: 'Member',
+//         image:
+//             'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?crop=faces&w=256&h=256&q=80',
+//         invitedDate: '2024-09-25T09:45:00Z',
+//     },
+// ];
 
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+    const session = await getSession()
     const layout = cookies().get("react-resizable-panels:layout:platform")
     const collapsed = cookies().get("react-resizable-panels:collapsed")
 
     const defaultLayout = layout ? JSON.parse(layout.value) : undefined
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
+    const invitees = await prisma?.invitation.findMany({
+        where: {
+            organizationId: session?.user.organizationId
+        }
+    })
+
+    const members = await prisma?.member.findMany({
+        include: {
+            user: true
+        },
+        where: {
+            organizationId: session?.user.organizationId
+        }
+    })
 
     return (
         <main className="flex flex-col items-start w-full h-screen mx-auto p-8">
@@ -152,17 +167,17 @@ export default function ProfilePage() {
                                             </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-200 bg-white">
-                                            {members.map((person) => (
+                                            {members?.map((person) => (
                                                 <tr key={person.email}>
                                                     <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                                         <div className="flex items-center">
                                                             <div className="h-11 w-11 flex-shrink-0">
                                                                 <img className="h-11 w-11 rounded-full"
-                                                                     src={person.image} alt=""/>
+                                                                     src={person.user?.image || ""} alt=""/>
                                                             </div>
                                                             <div className="ml-4">
                                                                 <div
-                                                                    className="font-medium text-gray-900">{person.name}</div>
+                                                                    className="font-medium text-gray-900">{person.user?.name}</div>
                                                                 <div className="mt-1 text-gray-500">{person.email}</div>
                                                             </div>
                                                         </div>
@@ -178,11 +193,11 @@ export default function ProfilePage() {
                                                         {person.role}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                                        {new Date(person.invitedDate).toDateString()}
+                                                        {new Date(person.createdAt).toDateString()}
                                                     </td>
                                                     <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                                         <a href="#" className="text-black hover:text-black">
-                                                            Edit<span className="sr-only">, {person.name}</span>
+                                                            Edit<span className="sr-only">, {person.user?.name}</span>
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -216,7 +231,7 @@ export default function ProfilePage() {
                                             <tr>
                                                 <th scope="col"
                                                     className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
-                                                    Name
+                                                    Email
                                                 </th>
                                                 <th scope="col"
                                                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
@@ -232,18 +247,19 @@ export default function ProfilePage() {
                                             </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-200 bg-white">
-                                            {invitees.map((person) => (
+                                            {invitees?.map((person) => (
                                                 <tr key={person.email}>
                                                     <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                                         <div className="flex items-center">
                                                             <div className="h-11 w-11 flex-shrink-0">
                                                                 <img className="h-11 w-11 rounded-full"
-                                                                     src={person.image} alt=""/>
+                                                                     src={createDicebearAvatar(person.email, 50, 40, "identicon")} alt=""/>
                                                             </div>
                                                             <div className="ml-4">
                                                                 <div
-                                                                    className="font-medium text-gray-900">{person.name}</div>
-                                                                <div className="mt-1 text-gray-500">{person.email}</div>
+                                                                    className="font-medium text-gray-900">
+                                                                    {person.email}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -251,12 +267,12 @@ export default function ProfilePage() {
                                                         {person.role}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                                        {new Date(person.invitedDate).toDateString()}
+                                                        {new Date(person.createdAt.toDateString()).toDateString()}
                                                     </td>
                                                     <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger>
-                                                                Edit<span className="sr-only">, {person.name}</span>
+                                                                Edit<span className="sr-only">, {person.email}</span>
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent>
                                                                 <DropdownMenuItem className="text-red-600">

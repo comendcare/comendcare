@@ -20,6 +20,7 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import {FaUserPlus} from "react-icons/fa6";
+import {toast} from "sonner";
 
 const invitationFormSchema = z.object({
     email: z.string().min(3, {
@@ -30,15 +31,15 @@ const invitationFormSchema = z.object({
 export default function InviteUserToOrgDialog() {
     const session = useSession();
     const params = useParams()
-    console.log(session.data?.user)
 
     const [organization, setOrganization] = useState<Organization | null>();
 
     useEffect(() => {
-        const organization = getOrganizationFromOrganizationId(params?.id as string).then((organization) => {
+        session.data?.user?.organizationId ? getOrganizationFromOrganizationId(session.data?.user?.organizationId).then((organization) => {
             setOrganization(organization)
-        })
+        }) : toast.error("No organizationId not provided")
     }, [setOrganization]);
+    console.log(organization)
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
@@ -46,16 +47,18 @@ export default function InviteUserToOrgDialog() {
     })
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
-        const invitation = await inviteUser(
+        await inviteUser(
             session.data,
             form.getValues("email"),
             "admin",
             await getIp(),
             {
-                organizationId: params?.id as string,
+                organizationId: organization?.id as string,
                 organizationName: organization?.name as string,
                 organizationImage: organization?.image as string,
             }
+        ).then(
+            (res) => toast.success(`Invitation sucessfully sent to ${res.email}`)
         )
     }
 
