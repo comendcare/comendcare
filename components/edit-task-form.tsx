@@ -48,6 +48,7 @@ import {
 } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
 import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
+import { cva } from "class-variance-authority"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 
@@ -218,11 +219,11 @@ export function EditTaskForm({
 
                                 form.setValue('checklist', arrayMove(field?.value || [], originalPosition, newPosition))
                             }}>
-                            <ul className="flex flex-col gap-2">
+                            <ol className="flex flex-col gap-2">
                                 <SortableContext items={field?.value?.map(item => item.id) || []} strategy={verticalListSortingStrategy}>
                                 {field?.value?.map((checklistItem, index) => (
                                     <ChecklistField 
-                                        key={index}
+                                        key={checklistItem.id}
                                         index={index}
                                         item={checklistItem}
                                         onDelete={() => (
@@ -237,7 +238,7 @@ export function EditTaskForm({
                                     />
                                 ))}
                                 </SortableContext>
-                            </ul>
+                            </ol>
                             </DndContext>
                             <Button onClick={(e: any) => {
                                 e.preventDefault()
@@ -288,7 +289,8 @@ const ChecklistField = ({
         listeners,
         setNodeRef,
         transform,
-        transition
+        transition,
+        isDragging
     } = useSortable({ id: item.id })
 
     const style = {
@@ -305,8 +307,23 @@ const ChecklistField = ({
         onNameChange(e.currentTarget.value)
     }
 
+    const variants = cva("rounded-lg w-full flex flex-row items-center gap-2", {
+        variants: {
+            dragging: {
+                overlay: "ring-2 ring-primary"
+            }
+        }
+    })
+
     return (
-        <li key={index} className="flex flex-row gap-2 items-center" ref={setNodeRef} style={style}>
+        <li 
+            key={index}  
+            ref={setNodeRef} 
+            style={style}
+            className={variants({
+                dragging: isDragging ? "overlay" : undefined
+            })}
+        >
             <Button
                 type="button"
                 variant={"ghost"}
@@ -314,15 +331,18 @@ const ChecklistField = ({
                 {...listeners}
                 className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
             >
-                <span className="sr-only">Move task</span>
+                <span className="sr-only">Move checklist item</span>
                 <GripVertical />
             </Button>
             <Checkbox checked={item.complete} onCheckedChange={onCompleteChange}/>
-            <Input
-                placeholder={item.name}
-                value={item.name}
-                onChange={nameChanged}
-            />
+            <div className="grow">
+                <Input
+                    type="text"
+                    value={item.name}
+                    onChange={nameChanged}
+                    className="h-full"
+                />
+            </div>
             <Button size="icon" onClick={deleteTask}>
                 <FaTrash />
             </Button>
