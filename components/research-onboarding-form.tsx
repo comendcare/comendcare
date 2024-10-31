@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {createOrganization, createOrGetSite} from "@/lib/actions";
+import {createOrganization, createOrGetSite, updateOrganization} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -157,17 +157,20 @@ export default function ResearchOnboardingForm() {
 
         const formData = new FormData()
 
-        createOrganization(formData).then((res: any) => {
-            if (res.error) {
-                toast.error(res.error)
-            } else {
-                va.track("Created Site")
-                const { id } = res
-                router.refresh()
-                router.push(`/admin/organization/${id}`)
-                toast.success(`Successfully created organization!`)
-            }
-        })
+        if (session.data?.user.organizationId) {
+            updateOrganization(formData, session.data.user.organizationId, "key").then((res: any) => {
+                if (res.error) {
+                    toast.error(res.error)
+                } else {
+                    const { id } = res
+                    router.refresh()
+                    router.push("/app/profile")
+                    toast.success(`Successfully saved changes.`)
+                }
+            })
+        } else {
+            toast.error("You're not signed into an organization right now.")
+        }
     }
 
     return (

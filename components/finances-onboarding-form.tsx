@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {createOrganization, createOrGetSite} from "@/lib/actions";
+import {createOrganization, createOrGetSite, updateOrganization} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -15,28 +15,23 @@ import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
 import {Slider} from "@/components/ui/slider";
 
-const optionSchema = z.object({
-    label: z.string(),
-    value: z.string(),
-    disable: z.boolean().optional(),
-});
-
 const invitationFormSchema = z.object({
     raising: z.enum(["yes", "no-but", "no"], {
         required_error: "You need to select a 501c3 status.",
-    }),
+    }).optional(),
     raised: z.number().min(2, {
         message: "Your organization's description.",
-    }),
+    }).optional(),
     budget: z.string().min(2, {
         message: "Your organization's description.",
-    }),
+    }).optional(),
     deployed: z.string().min(2, {
         message: "Your organization's description.",
-    }),
+    }).optional(),
 })
 
 export default function FinancesOnboardingForm() {
+    const session = useSession()
     const router = useRouter()
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
@@ -58,17 +53,20 @@ export default function FinancesOnboardingForm() {
 
         const formData = new FormData()
 
-        createOrganization(formData).then((res: any) => {
-            if (res.error) {
-                toast.error(res.error)
-            } else {
-                va.track("Created Site")
-                const { id } = res
-                router.refresh()
-                router.push(`/admin/organization/${id}`)
-                toast.success(`Successfully created organization!`)
-            }
-        })
+        if (session.data?.user.organizationId) {
+            updateOrganization(formData, session.data.user.organizationId, "key").then((res: any) => {
+                if (res.error) {
+                    toast.error(res.error)
+                } else {
+                    const { id } = res
+                    router.refresh()
+                    router.push("/onboarding/research")
+                    toast.success(`Successfully saved changes.`)
+                }
+            })
+        } else {
+            toast.error("You're not signed into an organization right now.")
+        }
     }
 
     return (
@@ -150,7 +148,7 @@ export default function FinancesOnboardingForm() {
                                     min={0}
                                     max={1000000}
                                     step={50000}
-                                    defaultValue={[value]}
+                                    defaultValue={value ? [value] : [0]}
                                     onValueChange={(vals: number[]) => {
                                         onChange(vals[0]);
                                     }}

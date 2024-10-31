@@ -34,45 +34,19 @@ const invitationFormSchema = z.object({
     slug: z.string().min(2, {
         message: "Your organization's slug must be at least 2 characters."
     }),
-    looking: z.array(optionSchema).min(0),
+    looking: z.array(optionSchema).min(0).optional(),
     founded: z.string().min(2, {
         message: "The year that your organization was founded.",
-    }),
+    }).optional(),
     description: z.string().min(2, {
         message: "Your organization's description.",
     }),
     "501c3": z.enum(["yes", "no-but", "no"], {
         required_error: "You need to select a 501c3 status.",
-    }),
+    }).optional(),
     website: z.string().min(2, {
         message: "Your organization's website.",
-    }),
-    raised: z.number().min(2, {
-        message: "Your organization's description.",
-    }),
-    budget: z.string().min(2, {
-        message: "Your organization's description.",
-    }),
-    deployed: z.string().min(2, {
-        message: "Your organization's description.",
-    }),
-    modalities: z.array(optionSchema).min(0),
-    disorder: z.string().min(2, {
-        message: "Your organization's description.",
-    }),
-    categories: z.array(optionSchema).min(0),
-    prevalence: z.string().min(1, {
-        message: "Your organization's description.",
-    }),
-    population: z.string().min(1, {
-        message: "Your organization's description.",
-    }),
-    mechanisms: z.array(optionSchema).min(0),
-    genes: z.array(optionSchema).min(0),
-    biomarkers: z.array(optionSchema).min(0),
-    symptoms: z.array(optionSchema).min(0),
-    studies: z.array(optionSchema).min(0),
-    assets: z.array(optionSchema).min(0),
+    }).optional(),
 })
 
 const OPTIONS: Option[] = [
@@ -158,13 +132,21 @@ const OPTIONS: Option[] = [
 ];
 
 export default function OrganizationOnboardingForm() {
-    const session = useSession()
+    const {data: session, update} = useSession()
     const router = useRouter()
+    console.log(session)
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(invitationFormSchema)
     })
+
+    async function updateSession(organizationId: string) {
+        await update({
+            ...session,
+            organizationId: organizationId,
+        })
+    }
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
         // console.log(values)
@@ -179,18 +161,22 @@ export default function OrganizationOnboardingForm() {
         // console.log(createOrg)
 
         const formData = new FormData()
-        formData.append("name", values.orgName)
-        formData.append("subdomain", values.slug)
-        formData.append("description", values.description)
+        Object.entries(form.getValues()).forEach(([key, value]) => {
+            if (value !== undefined) {
+                formData.append(key, typeof value === "string" ? value : JSON.stringify(value));
+            }
+        });
 
         createOrganization(formData).then((res: any) => {
+            console.log(res)
             if (res.error) {
                 toast.error(res.error)
             } else {
-                va.track("Created Site")
-                const { id } = res
+                va.track("Created Organization")
+                // Update the session object with the newly created organizationId
+                updateSession(res.id)
                 router.refresh()
-                router.push(`/admin/organization/${id}`)
+                router.push("/onboarding/finances")
                 toast.success(`Successfully created organization!`)
             }
         })
@@ -336,7 +322,7 @@ export default function OrganizationOnboardingForm() {
                                 >
                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                         <FormControl>
-                                            <RadioGroupItem value="Yes"/>
+                                            <RadioGroupItem value="yes"/>
                                         </FormControl>
                                         <FormLabel className="font-normal">
                                             Yes I have a 501c3

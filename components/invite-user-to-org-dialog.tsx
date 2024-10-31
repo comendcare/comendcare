@@ -73,8 +73,8 @@ export default function InviteUserToOrgDialog() {
                         Invite user
                     </DialogTitle>
                     <DialogDescription>
-                        You can invite users by providing their email here.
-                        If they don't already have an account they will be asked to create one.
+                        {`You can invite users by providing their email here.
+                        If they don't already have an account they will be asked to create one.`}
                     </DialogDescription>
                 </DialogHeader>
 
