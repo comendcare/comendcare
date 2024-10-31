@@ -9,6 +9,9 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
     "@ariakit/react": "^0.4.11",
     "@customerio/cdp-analytics-node": "^0.2.3",

@@ -25,6 +25,7 @@ Multi-tenancy features are based off the way [Openpanel](https://github.com/Open
 | NextJS        | Handles serverside rendering, navigation, metadata, and higher-level frontend needs (for example, our product-tour is built with Onborda, which depends on NextJS). We also use server actions to access the database and write API calls. | https://nextjs.org/docs                                             | ^14            |                                                                            |
 | Next-Auth     | Our authentication package of choice. Integrates well with NextJS projects and easy to set up. We may eventually use Auth.js when it is stable.                                                                                            | https://next-auth.js.org/                                           | ^4.24.7        |                                                                            |
 | Zod           | For form validation and handling of complex/dynamic types in our frontend. This is often used in hand with react-hook-forms                                                                                                                | https://zod.dev/                                                    | ^3.22.4        |                                                                            |
+| Faker.js      | Used in development environments to generate dummy data for building interfaces or making mock API calls.                                                                                                                                  | https://zod.dev/                                                    | ^3.22.4        |                                                                            |
 | shadcn/ui     | Our component library of choice. Uses Radix in the backend (you may occasionally need to refer to documentation there)                                                                                                                     | https://ui.shadcn.com/                                              | latest         |                                                                            |
 | Tailwind CSS  | All styling is done with Tailwind, but we customize the global.css file as needed.                                                                                                                                                         | https://tailwindcss.com/                                            | ^3.3           |                                                                            |
 | React-icons   | We source all icons from this all-in-one package. We primarily use Font-Awesome’s set of icons but will occasionally use other sets if necessary.                                                                                          | https://react-icons.github.io/react-icons/                          | ^5.2.1         |                                                                            |
@@ -67,11 +68,12 @@ Multi-tenancy features are based off the way [Openpanel](https://github.com/Open
         - (optional) To check that the database has been created, enter psql mode (if you haven't already), and
           run `\list`. The comend-postgres database should be listed.
     4. Double-check your .env file in your comendcare repo contains the following environment
-       variable `DATABASE_URL="postgresql://postgres:comend@localhost:5432/comend-psql"`
+       variable `DATABASE_URL="postgresql://postgres:comend@localhost:5432/comend-psql"`.
 
-7. Prisma Migration - run `npx prisma migrate deploy` in the root directory to apply all migrations to the database
-8. Install dependances - run `npm install` in the comendcare root directory
-9. Run the app! - run `npm run dev` in the comendcare root directory
+5. Prisma Migration - run `npx prisma migrate deploy` in the root directory to apply all migrations to the database.
+   - Optionally you can seed the empty database with `prisma db seed` (if you want to reset, which will also trigger the seed script, run `prisma migrate reset`).
+6. Install dependances - run `npm install` in the comendcare root directory
+7. Run the app! - run `npm run dev` in the comendcare root directory
 
 ## Styling and Best Practices
 > We don't have these yet but will soon!
