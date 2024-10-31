@@ -51,6 +51,7 @@ import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
 import { cva } from "class-variance-authority"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
+const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
 const editTaskForm = z.object({
     name: z
@@ -134,6 +135,57 @@ export function EditTaskForm({
         })
     )
 
+    function getDraggedData(id: string) {
+        const name = checklist?.find(item => item.id === id)?.name
+        const position = (checklist?.findIndex(item => item.id === id) || 0) + 1
+        const length = checklist?.length || 0
+
+        return { name, position, length }
+    }
+
+    const announcements: Announcements = {
+        onDragStart({ active }) {
+            const data = getDraggedData(active?.id.toString())
+            const message = `Picked up checklist item ${data.name} at position ${data.position} of ${data.length}`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+        onDragOver({ active, over }) {
+            const activeData = getDraggedData(active?.id.toString())
+
+            if (over) {
+                const overData = getDraggedData(over?.id.toString())
+                const message = `Checklist item ${activeData.name} was moved over position ${overData.position} of ${activeData.length}.`
+                if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+                return message
+            }
+        
+            const message = `Checklist item ${activeData.name} is no longer over a droppable position.`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+        onDragEnd({ active, over }) {
+            const activeData = getDraggedData(active?.id.toString())
+
+            if (over) {
+                const overData = getDraggedData(over?.id.toString())
+                const message = `Checklist item ${activeData.name} was dropped into position ${overData.position} of ${activeData.length}`
+                if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+                return message
+            }
+        
+            const message = `Checklist item ${activeData} was dropped.`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+        onDragCancel({ active }) {
+            const activeData = getDraggedData(active?.id.toString())
+            const message = `Dragging was cancelled. Checklist item ${activeData.name} was dropped.`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+    }
+
     return (
         <Form {...form}>
         <ScrollArea>
@@ -209,16 +261,23 @@ export function EditTaskForm({
                         <FormLabel className="text-xl">{`Checklist:`}</FormLabel>
                         <FormControl>
                             <>
-                            <DndContext collisionDetection={closestCorners} sensors={sensors} onDragEnd={(event) => {
-                                const { active, over } = event
+                            <DndContext 
+                                accessibility={{
+                                    announcements
+                                }}
+                                collisionDetection={closestCorners} 
+                                sensors={sensors} 
+                                onDragEnd={(event) => {
+                                    const { active, over } = event
 
-                                if (active.id === over?.id) return
+                                    if (active.id === over?.id) return
 
-                                const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
-                                const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
+                                    const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
+                                    const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
 
-                                form.setValue('checklist', arrayMove(field?.value || [], originalPosition, newPosition))
-                            }}>
+                                    form.setValue('checklist', arrayMove(field?.value || [], originalPosition, newPosition))
+                                }}
+                            >
                             <ol className="flex flex-col gap-2">
                                 <SortableContext items={field?.value?.map(item => item.id) || []} strategy={verticalListSortingStrategy}>
                                 {field?.value?.map((checklistItem, index) => (

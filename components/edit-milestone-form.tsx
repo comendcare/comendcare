@@ -59,6 +59,7 @@ import { GripVertical } from "lucide-react"
 import { cva } from "class-variance-authority"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
+const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
 const editMilestoneForm = z.object({
     title: z
@@ -197,6 +198,57 @@ export function EditMilestoneForm({
             coordinateGetter: sortableKeyboardCoordinates
         })
     )
+
+    function getDraggedData(id: string) {
+        const name = tasks?.find(task => task.id === id)?.name
+        const position = (tasks?.findIndex(task => task.id === id) || 0) + 1
+        const length = tasks?.length || 0
+
+        return { name, position, length }
+    }
+
+    const announcements: Announcements = {
+        onDragStart({ active }) {
+            const data = getDraggedData(active?.id.toString())
+            const message = `Picked up task ${data.name} at position ${data.position} of ${data.length}`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+        onDragOver({ active, over }) {
+            const activeData = getDraggedData(active?.id.toString())
+
+            if (over) {
+                const overData = getDraggedData(over?.id.toString())
+                const message = `Task ${activeData.name} was moved over position ${overData.position} of ${activeData.length}.`
+                if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+                return message
+            }
+        
+            const message = `Task ${activeData.name} is no longer over a droppable position.`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+        onDragEnd({ active, over }) {
+            const activeData = getDraggedData(active?.id.toString())
+
+            if (over) {
+                const overData = getDraggedData(over?.id.toString())
+                const message = `Task ${activeData.name} was dropped into position ${overData.position} of ${activeData.length}`
+                if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+                return message
+            }
+        
+            const message = `Task ${activeData} was dropped.`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+        onDragCancel({ active }) {
+            const activeData = getDraggedData(active?.id.toString())
+            const message = `Dragging was cancelled. Task ${activeData.name} was dropped.`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+    }
 
     return (
         <Form {...form}>
@@ -438,16 +490,23 @@ export function EditMilestoneForm({
                         <FormLabel className="text-xl">{`Tasks:`}</FormLabel>
                         <FormControl>
                             <>
-                            <DndContext collisionDetection={closestCorners} sensors={sensors} onDragEnd={(event) => {
-                                const { active, over } = event
+                            <DndContext 
+                                accessibility={{
+                                    announcements
+                                }}
+                                collisionDetection={closestCorners} 
+                                sensors={sensors} 
+                                onDragEnd={(event) => {
+                                    const { active, over } = event
 
-                                if (active.id === over?.id) return
+                                    if (active.id === over?.id) return
 
-                                const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
-                                const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
+                                    const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
+                                    const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
 
-                                form.setValue('tasks', arrayMove(field?.value || [], originalPosition, newPosition))
-                            }}>
+                                    form.setValue('tasks', arrayMove(field?.value || [], originalPosition, newPosition))
+                                }}
+                            >
                             <ol className="flex flex-col gap-2">
                                 <SortableContext items={field?.value?.map(item => item.id) || []} strategy={verticalListSortingStrategy}>
                                 {field?.value?.map((task, index) => ( 
