@@ -18,12 +18,25 @@ import {getBlurDataURL, getIp} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail} from "@/lib/emails";
 
-export async function createRoadmap() {
+export async function createRoadmap(organizationId: string) {
     const roadmap = await prisma.roadmap.create({
-        data: {}
+        data: {
+            organization: {
+                connect: { id: organizationId }
+            }
+        }
     })
 
     return roadmap
+}
+
+export async function getUser(userId: string) {
+    const user = await prisma.user.findUnique({
+        include: { Organizations: true },
+        where: { id: userId }
+    })
+
+    return user
 }
 
 export async function getRoadmapId(orgId: string | null | undefined) {
@@ -36,15 +49,8 @@ export async function getRoadmapId(orgId: string | null | undefined) {
         }
     })
 
-    // const roadmap = await prisma.roadmap.findUnique({
-    //     where: { id: organization?.roadmaps[0].id }
-    // })
-
-    // temporary - re-enable above once organizations are set up
-    const roadmaps = await prisma.roadmap.findMany()
-
-    if (roadmaps.length > 0) return roadmaps[0].id
-    return
+    // for now we're just getting the first roadmap, in the future we may enable multiple roadmaps per-organziation
+    return organization?.roadmaps && organization?.roadmaps?.length > 0 ? organization?.roadmaps[0].id : undefined
 }
 
 const nanoid = customAlphabet(
