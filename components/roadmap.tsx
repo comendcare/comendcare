@@ -143,7 +143,10 @@ export function Roadmap({
                         </TabsContent>
 
                         {/* Kanban View */}
-                        <TabsContent value="kanban">
+                        <TabsContent 
+                            value="kanban"
+                            className="m-0 h-[calc(100vh-3.5rem)]"
+                        >
                             <KanbanView />
                         </TabsContent>
                     </Tabs>
