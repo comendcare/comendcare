@@ -56,6 +56,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { GripVertical } from "lucide-react"
+import { cva } from "class-variance-authority"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 
@@ -447,11 +448,11 @@ export function EditMilestoneForm({
 
                                 form.setValue('tasks', arrayMove(field?.value || [], originalPosition, newPosition))
                             }}>
-                            <ul className="flex flex-col gap-2">
+                            <ol className="flex flex-col gap-2">
                                 <SortableContext items={field?.value?.map(item => item.id) || []} strategy={verticalListSortingStrategy}>
                                 {field?.value?.map((task, index) => ( 
                                     <TaskField
-                                        key={index} 
+                                        key={task.id} 
                                         index={index} 
                                         task={task} 
                                         onDelete={() => (
@@ -466,7 +467,7 @@ export function EditMilestoneForm({
                                     />
                                 ))}
                                 </SortableContext>
-                            </ul>
+                            </ol>
                             </DndContext>
                             <Button onClick={(e: any) => {
                                 e.preventDefault()
@@ -481,46 +482,6 @@ export function EditMilestoneForm({
                     </FormItem>
                 )}
                 />
-
-                {/* <FormField
-                control={form.control}
-                name="tasks"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col grow">
-                        <FormLabel className="text-xl">{`Tasks:`}</FormLabel>
-                        <FormControl>
-                            <>
-                            <ul className="flex flex-col gap-2"> 
-                                {field?.value?.map((task, index) => ( 
-                                    <TaskField
-                                        key={index} 
-                                        index={index} 
-                                        task={task} 
-                                        onDelete={() => (
-                                            form.setValue('tasks', field?.value?.filter((t, i) => i !== index))
-                                        )}
-                                        onNameChange={(newName) => {
-                                            form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, name: newName} : t))
-                                        }}
-                                        onStatusChange={(status) => {
-                                            form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, status} : t))
-                                        }}
-                                    />
-                                ))}
-                            </ul>
-                            <Button onClick={(e: any) => {
-                                e.preventDefault()
-                                form.setValue(
-                                    'tasks',
-                                    [...field?.value || [], { name: 'New Task', status: 'TODO', id: nanoid() }]
-                                )
-                            }}>Add a task</Button>
-                            </>
-                        </FormControl>
-                        <FormMessage/>
-                    </FormItem>
-                )}
-                /> */}
 
                 <span className="flex justify-end gap-4 flex-wrap">
                     <Dialog>
@@ -593,7 +554,8 @@ const TaskField = ({
         listeners,
         setNodeRef,
         transform,
-        transition
+        transition,
+        isDragging
     } = useSortable({ id: task.id || "" })
 
     const style = {
@@ -610,8 +572,23 @@ const TaskField = ({
         onNameChange(e.currentTarget.value)
     }
 
+    const variants = cva("flex flex-row gap-2 items-center", {
+        variants: {
+            dragging: {
+                overlay: "ring-2 ring-primary"
+            }
+        }
+    })
+
     return (
-        <li key={index} className="flex flex-row gap-2 items-center" ref={setNodeRef} style={style}>
+        <li 
+            key={index} 
+            ref={setNodeRef} 
+            style={style}
+            className={variants({
+                dragging: isDragging ? "overlay" : undefined
+            })}
+        >
             <Button
                 type="button"
                 variant={"ghost"}
@@ -623,11 +600,14 @@ const TaskField = ({
                 <GripVertical />
             </Button>
             <StatusButton status={task.status} onStatusChange={onStatusChange}/>
-            <Input
-                placeholder={task.name}
-                value={task.name}
-                onChange={nameChanged}
-            />
+            <div className="grow">
+                <Input
+                    placeholder={task.name}
+                    value={task.name}
+                    onChange={nameChanged}
+                    className="h-full"
+                />
+            </div>
             <Button size="icon" onClick={deleteTask}>
                 <FaTrash />
             </Button>
