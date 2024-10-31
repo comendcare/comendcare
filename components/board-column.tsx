@@ -58,7 +58,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     }
 
     const variants = cva(
-        "h-[800px] max-h-[800px] w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+        "h-full max-h-[800px] w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
         {
             variants: {
                 dragging: {
@@ -88,7 +88,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
             )}>
                 <CardTitle>{column.title}</CardTitle>
             </CardHeader>
-            <ScrollArea>
+            <ScrollArea className="h-full">
                 <CardContent className="flex flex-grow flex-col gap-2 p-2">
                     <SortableContext items={tasksIds}>
                         {tasks.map(task => (
@@ -104,7 +104,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
 export function BoardContainer({ children }: { children: React.ReactNode }) {
     const dndContext = useDndContext()
 
-    const variations = cva("px-2 md:px-0 flex lg:justify-center pb-4", {
+    const variations = cva("h-full flex lg:justify-center", {
         variants: {
             dragging: {
                 default: "snap-x snap-mandatory",
@@ -118,8 +118,10 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
             className={variations({
                 dragging: dndContext.active ? "active" : "default"
             })}
+            type="auto"
         >
-            <div className="p-4 flex gap-4 items-center flex-row justify-center">
+            {/* calculate the same height as the parent TabsContent - because scroll areas don't like h-full >:( */}
+            <div className="h-[calc(100vh-3.5rem)] p-4 flex gap-4 items-center flex-row justify-center">
                 {children}
             </div>
             <ScrollBar orientation="horizontal" />
