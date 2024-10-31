@@ -20,7 +20,7 @@ import {sendInviteEmail} from "@/lib/emails";
 import {toast} from "sonner";
 
 
-export async function refetchMembersAndInvitees(organizationId: string | undefined) {
+export async function getMembersAndInvitees(organizationId: string | undefined) {
     if (organizationId) {
         const [fetchedMembers, fetchedInvitees] = await Promise.all([
             prisma?.member.findMany({

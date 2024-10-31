@@ -3,7 +3,7 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {getOrganizationFromOrganizationId, inviteUser, refetchMembersAndInvitees} from "@/lib/actions";
+import {getOrganizationFromOrganizationId, inviteUser, getMembersAndInvitees} from "@/lib/actions";
 import {getIp} from "@/lib/utils";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";

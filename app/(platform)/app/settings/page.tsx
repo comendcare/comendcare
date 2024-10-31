@@ -14,7 +14,7 @@ import { getSession } from "@/lib/auth"
 import {faker} from "@faker-js/faker";
 import {createDicebearAvatar} from "@/lib/utils";
 import {toast} from "sonner";
-import {refetchMembersAndInvitees} from "@/lib/actions";
+import {getMembersAndInvitees} from "@/lib/actions";
 
 
 export default async function ProfilePage() {
@@ -25,7 +25,7 @@ export default async function ProfilePage() {
     const defaultLayout = layout ? JSON.parse(layout.value) : undefined
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
-    const { fetchedMembers, fetchedInvitees } = await refetchMembersAndInvitees(session?.user.organizationId);
+    const { fetchedMembers, fetchedInvitees } = await getMembersAndInvitees(session?.user.organizationId);
 
     return (
         <main className="flex flex-col items-start w-full h-screen mx-auto p-8">
