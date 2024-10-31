@@ -1,10 +1,10 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import { Roadmap, Organization } from "@prisma/client"
-import { revalidateTag } from "next/cache"
-import { withRoadmapAuth, withOrganizationAuth } from "./auth"
-import { getSession } from "@/lib/auth"
+import {Roadmap, Organization} from "@prisma/client"
+import {revalidateTag} from "next/cache"
+import {withRoadmapAuth, withOrganizationAuth} from "./auth"
+import {getSession} from "@/lib/auth"
 import {
     addDomainToVercel,
     // getApexDomain,
@@ -17,12 +17,33 @@ import {customAlphabet} from "nanoid";
 import {getBlurDataURL, getIp} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail} from "@/lib/emails";
+import {toast} from "sonner";
+
+
+export async function refetchMembersAndInvitees(organizationId: string | undefined) {
+    if (organizationId) {
+        const [fetchedMembers, fetchedInvitees] = await Promise.all([
+            prisma?.member.findMany({
+                include: {user: true},
+                where: {organizationId},
+            }),
+            prisma?.invitation.findMany({
+                where: {organizationId},
+            }),
+        ]);
+
+        return {fetchedMembers, fetchedInvitees};
+    } else {
+        toast.error("No organizationId provided.")
+        return {}
+    }
+}
 
 export async function createRoadmap(organizationId: string) {
     const roadmap = await prisma.roadmap.create({
         data: {
             organization: {
-                connect: { id: organizationId }
+                connect: {id: organizationId}
             }
         }
     })
@@ -32,18 +53,18 @@ export async function createRoadmap(organizationId: string) {
 
 export async function getUser(userId: string) {
     const user = await prisma.user.findUnique({
-        include: { Organizations: true },
-        where: { id: userId }
+        include: {Organizations: true},
+        where: {id: userId}
     })
 
     return user
 }
 
 export async function getRoadmapId(orgId: string | null | undefined) {
-    if (!orgId) return 
-    
+    if (!orgId) return
+
     const organization = await prisma.organization.findUnique({
-        include: { roadmaps: true },
+        include: {roadmaps: true},
         where: {
             id: decodeURIComponent(orgId)
         }
@@ -65,7 +86,7 @@ export const createOrganization = async (formData: FormData) => {
             error: "Not authenticated"
         }
     }
-    const name = formData.get("name") as string
+    const name = formData.get("orgName") as string
     const description = formData.get("description") as string
     const subdomain = formData.get("subdomain") as string
 
@@ -80,6 +101,14 @@ export const createOrganization = async (formData: FormData) => {
                         id: session.user.id
                     }
                 }
+            }
+        })
+        await prisma.member.create({
+            data: {
+                userId: session.user.id,
+                email: session.user.email,
+                role: "admin", // Creator of organization is admin by default
+                organizationId: response.id
             }
         })
         await revalidateTag(
@@ -192,7 +221,7 @@ export const updateOrganization = withOrganizationAuth(
                 const file = formData.get(key) as File
                 const filename = `${nanoid()}.${file.type.split("/")[1]}`
 
-                const { url } = await put(filename, file, {
+                const {url} = await put(filename, file, {
                     access: "public"
                 })
 
@@ -205,7 +234,7 @@ export const updateOrganization = withOrganizationAuth(
                     },
                     data: {
                         [key]: url,
-                        ...(blurhash && { imageBlurhash: blurhash })
+                        ...(blurhash && {imageBlurhash: blurhash})
                     }
                 })
             } else {
@@ -227,7 +256,7 @@ export const updateOrganization = withOrganizationAuth(
                 `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
             organization.customDomain &&
-                (await revalidateTag(`${organization.customDomain}-metadata`))
+            (await revalidateTag(`${organization.customDomain}-metadata`))
 
             return response
         } catch (error: any) {
@@ -256,7 +285,7 @@ export const deleteOrganization = withOrganizationAuth(
                 `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
             response.customDomain &&
-                (await revalidateTag(`${organization.customDomain}-metadata`))
+            (await revalidateTag(`${organization.customDomain}-metadata`))
             return response
         } catch (error: any) {
             return {
@@ -354,9 +383,9 @@ export const updateRoadmap = async (data: Roadmap) => {
 
         // if the organization has a custom domain, we need to revalidate those tags too
         roadmap.organization?.customDomain &&
-            (await revalidateTag(
-                `${roadmap.organization?.customDomain}-roadmaps`
-            ),
+        (await revalidateTag(
+            `${roadmap.organization?.customDomain}-roadmaps`
+        ),
             await revalidateTag(
                 `${roadmap.organization?.customDomain}-${roadmap.slug}`
             ))
@@ -385,7 +414,7 @@ export const updateRoadmapMetadata = withRoadmapAuth(
                 const file = formData.get("image") as File
                 const filename = `${nanoid()}.${file.type.split("/")[1]}`
 
-                const { url } = await put(filename, file, {
+                const {url} = await put(filename, file, {
                     access: "public"
                 })
 
@@ -420,9 +449,9 @@ export const updateRoadmapMetadata = withRoadmapAuth(
 
             // if the organization has a custom domain, we need to revalidate those tags too
             roadmap.organization?.customDomain &&
-                (await revalidateTag(
-                    `${roadmap.organization?.customDomain}-roadmaps`
-                ),
+            (await revalidateTag(
+                `${roadmap.organization?.customDomain}-roadmaps`
+            ),
                 await revalidateTag(
                     `${roadmap.organization?.customDomain}-${roadmap.slug}`
                 ))
@@ -538,8 +567,6 @@ export async function inviteUser(
                 }
             })
             invitationId = ticket.id
-
-            return ticket
         }
 
         console.log({
@@ -576,9 +603,10 @@ export async function inviteUser(
                 },
                 inviteLink: invitationId
             }
-        )
+        ).then(() => {
+            console.log("email sent")
+        })
 
-        console.log("email sent")
 
         return await prisma.member.create({
             data: {
@@ -590,7 +618,11 @@ export async function inviteUser(
                     invitationId,
                 },
             },
-        });
+        }).then((res) => {
+            console.log(`Membership created for ${email}`)
+
+            return res
+        })
     } catch (error) {
         console.error("Error inviting user:", error)
         throw new Error("Failed to invite user.")

@@ -3,10 +3,10 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {getOrganizationFromOrganizationId, inviteUser} from "@/lib/actions";
+import {getOrganizationFromOrganizationId, inviteUser, refetchMembersAndInvitees} from "@/lib/actions";
 import {getIp} from "@/lib/utils";
 import {useSession} from "next-auth/react";
-import {useParams} from "next/navigation";
+import {useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
 import {Organization} from "@prisma/client";
 import {Input} from "@/components/ui/input";
@@ -30,7 +30,7 @@ const invitationFormSchema = z.object({
 
 export default function InviteUserToOrgDialog() {
     const session = useSession();
-    const params = useParams()
+    const router = useRouter()
 
     const [organization, setOrganization] = useState<Organization | null>();
 
@@ -39,7 +39,6 @@ export default function InviteUserToOrgDialog() {
             setOrganization(organization)
         }) : toast.error("No organizationId not provided")
     }, [setOrganization]);
-    console.log(organization)
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
@@ -58,7 +57,10 @@ export default function InviteUserToOrgDialog() {
                 organizationImage: organization?.image as string,
             }
         ).then(
-            (res) => toast.success(`Invitation sucessfully sent to ${res.email}`)
+            async (res) => {
+                router.refresh()
+                toast.success(`Invitation successfully sent to ${res.email}`)
+            }
         )
     }
 
