@@ -13,81 +13,8 @@ import OrganizationSettingsTab from "@/components/organization-settings-tab";
 import { getSession } from "@/lib/auth"
 import {faker} from "@faker-js/faker";
 import {createDicebearAvatar} from "@/lib/utils";
-
-const members = [
-    {
-        name: 'Alice Johnson',
-        department: 'Research',
-        email: 'alice.johnson@example.com',
-        role: 'Member',
-        image:
-            'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?crop=faces&w=256&h=256&q=80',
-        invitedDate: '2024-08-12T14:30:00Z',
-    },
-    {
-        name: 'Bob Smith',
-        department: 'Engineering',
-        email: 'bob.smith@example.com',
-        role: 'Member',
-        image:
-            'https://images.unsplash.com/photo-1607746882042-944635dfe10e?crop=faces&w=256&h=256&q=80',
-        invitedDate: '2024-09-15T09:45:00Z',
-    },
-    {
-        name: 'Charlie Nguyen',
-        department: 'Product Development',
-        email: 'charlie.nguyen@example.com',
-        role: 'Admin',
-        image:
-            'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?crop=faces&w=256&h=256&q=80',
-        invitedDate: '2024-07-23T12:00:00Z',
-    },
-    {
-        name: 'Dana Lee',
-        department: 'Marketing',
-        email: 'dana.lee@example.com',
-        role: 'Admin',
-        image:
-            'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?crop=faces&w=256&h=256&q=80',
-        invitedDate: '2024-06-30T17:15:00Z',
-    },
-    {
-        name: 'Ethan Kim',
-        department: 'Sales',
-        email: 'ethan.kim@example.com',
-        role: 'Member',
-        image:
-            'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?crop=faces&w=256&h=256&q=80',
-        invitedDate: '2024-05-18T08:30:00Z',
-    },
-];
-//
-// const invitees = [
-//     {
-//         name: 'Sophia Martinez',
-//         email: 'sophia.martinez@example.com',
-//         role: 'Member',
-//         image:
-//             'https://images.unsplash.com/photo-1517841905240-472988babdf9?crop=faces&w=256&h=256&q=80',
-//         invitedDate: '2024-10-01T10:00:00Z',
-//     },
-//     {
-//         name: 'Liam O’Connor',
-//         email: 'liam.oconnor@example.com',
-//         role: 'Admin',
-//         image:
-//             'https://images.unsplash.com/photo-1599566150163-29194dcaad36?crop=faces&w=256&h=256&q=80',
-//         invitedDate: '2024-09-29T13:15:00Z',
-//     },
-//     {
-//         name: 'Emma Williams',
-//         email: 'emma.williams@example.com',
-//         role: 'Member',
-//         image:
-//             'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?crop=faces&w=256&h=256&q=80',
-//         invitedDate: '2024-09-25T09:45:00Z',
-//     },
-// ];
+import {toast} from "sonner";
+import {refetchMembersAndInvitees} from "@/lib/actions";
 
 
 export default async function ProfilePage() {
@@ -98,20 +25,7 @@ export default async function ProfilePage() {
     const defaultLayout = layout ? JSON.parse(layout.value) : undefined
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
-    const invitees = await prisma?.invitation.findMany({
-        where: {
-            organizationId: session?.user.organizationId
-        }
-    })
-
-    const members = await prisma?.member.findMany({
-        include: {
-            user: true
-        },
-        where: {
-            organizationId: session?.user.organizationId
-        }
-    })
+    const { fetchedMembers, fetchedInvitees } = await refetchMembersAndInvitees(session?.user.organizationId);
 
     return (
         <main className="flex flex-col items-start w-full h-screen mx-auto p-8">
@@ -167,7 +81,7 @@ export default async function ProfilePage() {
                                             </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-200 bg-white">
-                                            {members?.map((person) => (
+                                            {fetchedMembers?.map((person) => (
                                                 <tr key={person.email}>
                                                     <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                                         <div className="flex items-center">
@@ -247,7 +161,7 @@ export default async function ProfilePage() {
                                             </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-200 bg-white">
-                                            {invitees?.map((person) => (
+                                            {fetchedInvitees?.map((person) => (
                                                 <tr key={person.email}>
                                                     <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                                         <div className="flex items-center">
