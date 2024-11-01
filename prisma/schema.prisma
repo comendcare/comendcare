@@ -23,63 +23,63 @@ model User {
   roadmaps        Roadmap[]
   firstName       String?
   lastName        String?
-  Organizations   Organization[]
+  organizations   Organization[]
   memberships     Member[]
   sentInvitations Member[]       @relation("invitedBy")
   deletedAt       DateTime?
 }
 
 model Member {
-  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   role           String
   email          String
   // userId is nullable because we want to allow invites to be sent to emails that are not registered
   userId         String?
-  user           User?         @relation(fields: [userId], references: [id])
+  user           User?        @relation(fields: [userId], references: [id])
   invitedById    String?
-  invitedBy      User?         @relation("invitedBy", fields: [invitedById], references: [id])
+  invitedBy      User?        @relation("invitedBy", fields: [invitedById], references: [id])
   // organizationId String
   // organization   Organization @relation(fields: [organizationId], references: [id])
   meta           Json?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @default(now()) @updatedAt
-  Organization   Organization? @relation(fields: [organizationId], references: [id])
-  organizationId String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
 }
 
 model Invitation {
   id             String        @id @default(cuid())
   email          String
   role           String        @db.VarChar
-  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id])
   organizationId String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @default(now()) @updatedAt
 }
 
 enum ClientType {
-  read
-  write
-  root
+  READ
+  WRITE
+  ROOT
 }
 
 enum IncorporationStatus {
-  yes
-  no
-  inProgress
+  YES
+  NO
+  INPROGRESS
 }
 
 enum Goal {
-  yes
-  no
-  inProgress
+  YES
+  NO
+  INPROGRESS
 }
 
 model Client {
   id               String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name             String
   secret           String?
-  type             ClientType @default(write)
+  type             ClientType @default(WRITE)
   organizationSlug String
   organizationId   String?
   cors             String?
@@ -87,7 +87,7 @@ model Client {
 
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @default(now()) @updatedAt
-  Organization Organization? @relation(fields: [organizationId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model Account {
@@ -257,8 +257,8 @@ model Organization {
   userId                      String?
   roadmaps                    Roadmap[]
   members                     Member[]
-  Client                      Client[]
-  Invitation                  Invitation[]
+  client                      Client[]
+  invitation                  Invitation[]
 
   @@index([userId])
 }
