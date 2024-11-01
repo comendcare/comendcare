@@ -17,7 +17,6 @@ import {customAlphabet} from "nanoid";
 import {getBlurDataURL, getIp} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail} from "@/lib/emails";
-import {toast} from "sonner";
 
 
 export async function getMembersAndInvitees(organizationId: string | undefined) {
@@ -34,7 +33,7 @@ export async function getMembersAndInvitees(organizationId: string | undefined) 
 
         return {fetchedMembers, fetchedInvitees};
     } else {
-        toast.error("No organizationId provided.")
+        console.log("No organizationId provided.")
         return {}
     }
 }
@@ -53,7 +52,7 @@ export async function createRoadmap(organizationId: string) {
 
 export async function getUser(userId: string) {
     const user = await prisma.user.findUnique({
-        include: {Organizations: true},
+        include: {organizations: true},
         where: {id: userId}
     })
 
@@ -609,11 +608,20 @@ export async function inviteUser(
 
 
         return await prisma.member.create({
+            // @ts-ignore
             data: {
                 email: lowerCaseEmail,
-                organizationId: organization.organizationId,
+                organization: {
+                    connect: {
+                        id: organization.organizationId
+                    }
+                },
                 role: role,
-                invitedById: session?.user?.id,
+                invitedBy: {
+                    connect: {
+                        id: session?.user?.id
+                    }
+                },
                 meta: {
                     invitationId,
                 },

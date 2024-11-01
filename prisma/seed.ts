@@ -3,6 +3,15 @@ import {PrismaClient} from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
+    const flawnson = await prisma.user.upsert({
+        where: {email: 'flawnsontong1@gmail.com'},
+        update: {},
+        create: {
+            email: 'flawnsontong1@gmail.com',
+            name: 'Flawnson Tong',
+        },
+    })
+
     const alice = await prisma.user.upsert({
         where: {email: 'alice@prisma.io'},
         update: {},
@@ -93,7 +102,7 @@ async function main() {
             subdomain: "celocyn",
             customDomain: "celocyn",
             dateFounded: "2012-07-14T15:23:45Z",
-            incorporationStatus: "yes",
+            incorporationStatus: "YES",
             website: "https://www.random.org/",
             moneyRaised: 5000000,
             moneyDeployed: 2000000,
@@ -113,20 +122,6 @@ async function main() {
                     id: bob.id
                 }
             },
-            members: {
-                createMany: {
-                    data: [
-                        {
-                            role: "admin",
-                            email: "bob@prisma.io"
-                        },
-                        {
-                            role: "admin",
-                            email: "alice@prisma.io"
-                        },
-                    ]
-                }
-            },
         },
     })
 
@@ -137,7 +132,7 @@ async function main() {
             subdomain: "arcadion",
             customDomain: "arcadionfoundation",
             dateFounded: "2015-03-21T10:30:00Z",
-            incorporationStatus: "yes",
+            incorporationStatus: "YES",
             website: "https://www.example.org/",
             moneyRaised: 3200000,
             moneyDeployed: 1200000,
@@ -154,27 +149,98 @@ async function main() {
             assetsUnderDevelopment: ["Gene therapy vector", "Patient-derived cell line"],
             user: {
                 connect: {
-                    id: alice.id
-                }
-            },
-            members: {
-                createMany: {
-                    data: [
-                        {
-                            role: "admin",
-                            email: "john.doe@example.com"
-                        },
-                        {
-                            role: "admin",
-                            email: "jane.smith@example.com"
-                        },
-                    ]
+                    id: flawnson.id
                 }
             },
         },
     });
 
     console.log(arcadion)
+
+    await prisma.member.create({
+        data: {
+            role: "admin",
+            email: "bob@prisma.io",
+            user: {
+                connect: {
+                    email: "bob@prisma.io",
+                },
+            },
+            organization: {
+                connect: {
+                    id: celocyn.id,
+                }
+            }
+        },
+    })
+
+    await prisma.member.create({
+        data: {
+            role: "admin",
+            email: "alice@prisma.io",
+            user: {
+                connect: {
+                    email: "alice@prisma.io",
+                },
+            },
+            organization: {
+                connect: {
+                    id: celocyn.id,
+                }
+            }
+        },
+    })
+
+    await prisma.member.create({
+        data: {
+            role: "admin",
+            email: "flawnsontong1@gmail.com",
+            user: {
+                connect: {
+                    email: "flawnsontong1@gmail.com",
+                },
+            },
+            organization: {
+                connect: {
+                    id: arcadion.id,
+                }
+            }
+        },
+    })
+
+    await prisma.member.create({
+        data: {
+            role: "admin",
+            email: "ivan@prisma.io",
+            user: {
+                connect: {
+                    email: "ivan@prisma.io",
+                },
+            },
+            organization: {
+                connect: {
+                    id: arcadion.id,
+                }
+            }
+        },
+    })
+
+    await prisma.member.create({
+        data: {
+            role: "admin",
+            email: "heidi@prisma.io",
+            user: {
+                connect: {
+                    email: "heidi@prisma.io",
+                },
+            },
+            organization: {
+                connect: {
+                    id: arcadion.id,
+                }
+            }
+        },
+    })
 }
 
 main()

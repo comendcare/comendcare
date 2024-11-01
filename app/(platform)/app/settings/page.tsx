@@ -10,7 +10,7 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import OrganizationSettingsTab from "@/components/organization-settings-tab";
-import { getSession } from "@/lib/auth"
+import {getSession} from "@/lib/auth"
 import {faker} from "@faker-js/faker";
 import {createDicebearAvatar} from "@/lib/utils";
 import {toast} from "sonner";
@@ -25,7 +25,7 @@ export default async function ProfilePage() {
     const defaultLayout = layout ? JSON.parse(layout.value) : undefined
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
-    const { fetchedMembers, fetchedInvitees } = await getMembersAndInvitees(session?.user.organizationId);
+    const {fetchedMembers, fetchedInvitees} = await getMembersAndInvitees(session?.user.organizationId);
 
     return (
         <main className="flex flex-col items-start w-full h-screen mx-auto p-8">
@@ -87,7 +87,9 @@ export default async function ProfilePage() {
                                                         <div className="flex items-center">
                                                             <div className="h-11 w-11 flex-shrink-0">
                                                                 <img className="h-11 w-11 rounded-full"
-                                                                     src={person.user?.image || ""} alt=""/>
+                                                                     src={person.user?.image || createDicebearAvatar(person.user?.name || faker.string.uuid(), 50, 40, "identicon")}
+                                                                     alt={`${person.user?.name}'s profile picture`}
+                                                                />
                                                             </div>
                                                             <div className="ml-4">
                                                                 <div
@@ -167,7 +169,8 @@ export default async function ProfilePage() {
                                                         <div className="flex items-center">
                                                             <div className="h-11 w-11 flex-shrink-0">
                                                                 <img className="h-11 w-11 rounded-full"
-                                                                     src={createDicebearAvatar(person.email, 50, 40, "identicon")} alt=""/>
+                                                                     src={createDicebearAvatar(person.email, 50, 40, "identicon")}
+                                                                     alt=""/>
                                                             </div>
                                                             <div className="ml-4">
                                                                 <div
