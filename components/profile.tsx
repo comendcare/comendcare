@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {FaArrowRightFromBracket} from "react-icons/fa6";
 
-export default function Profile({isCollapsed}: { isCollapsed: boolean }) {
+export default function Profile({isCollapsed = false}: {isCollapsed?: boolean }) {
     const {data: session, status} = useSession()
     const router = useRouter()
 
