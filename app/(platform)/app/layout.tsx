@@ -50,7 +50,7 @@ export default function AppLayout({children}: AppLayoutProps) {
             } else {
                 // org id is not in the session, pull it from the database
                 const user = await getUser(session.user.id)
-                const defaultOrganization = user?.Organizations && user.Organizations.length > 0 ? user.Organizations[0] : undefined
+                const defaultOrganization = user?.organizations && user.organizations.length > 0 ? user.organizations[0] : undefined
 
                 if (!defaultOrganization) {
                     console.error(`no organizations found for this user...`)
