@@ -1,14 +1,22 @@
 "use client"
 
-import { useSession } from "next-auth/react"
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import {signOut, useSession} from "next-auth/react"
+import {useEffect} from "react"
+import {useRouter} from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import LogoutButton from "./logout-button"
+import {
+    DropdownMenu,
+    DropdownMenuContent, DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import {FaArrowRightFromBracket} from "react-icons/fa6";
 
-export default function Profile() {
-    const { data: session, status } = useSession()
+export default function Profile({isCollapsed}: { isCollapsed: boolean }) {
+    const {data: session, status} = useSession()
     const router = useRouter()
 
     // Redirect to login if the user is not authenticated
@@ -23,7 +31,38 @@ export default function Profile() {
         return <div>Loading...</div>
     }
 
-    return (
+    return isCollapsed ? (
+        <div className="flex w-full items-center justify-center">
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Image
+                        src={
+                            session?.user?.image ??
+                            `https://avatar.vercel.sh/${session?.user?.email}`
+                        }
+                        width={40}
+                        height={40}
+                        alt={session?.user?.name ?? "User avatar"}
+                        className="h-8 w-8 rounded-full"
+                    />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    <DropdownMenuLabel
+                        onClick={() => router.push("/settings")}
+                    >
+                        My profile
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator/>
+                    <DropdownMenuItem
+                        onClick={() => signOut()}
+                    >
+                        <FaArrowRightFromBracket/>
+                        <span>Logout</span>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
+    ) : (
         <div className="flex w-full items-center justify-between">
             <Link
                 href="/settings"
@@ -43,7 +82,7 @@ export default function Profile() {
                     {session?.user?.name}
                 </span>
             </Link>
-            <LogoutButton />
+            <LogoutButton/>
         </div>
     )
 }

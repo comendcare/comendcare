@@ -23,9 +23,21 @@ import {FaCity, FaPlus} from "react-icons/fa6";
 import {useSession} from "next-auth/react";
 import {Suspense, useEffect} from "react";
 import Profile from "@/components/profile";
-import { getRoadmapId, getUser } from "@/lib/actions";
-import { useState } from "react";
+import {
+    getAllOrganizationsFromUserId,
+    getOrganizationFromOrganizationId,
+    getRoadmapId,
+    getUser
+} from "@/lib/actions";
+import {useState} from "react";
 import LoadingSpinner from "@/components/form/loading-spinner";
+import {Member, Organization} from "@prisma/client";
+import OrganizationSelector from "@/components/organization-selector";
+
+
+type MemberWithOrganization = Member & {
+    organization: Organization
+};
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -34,6 +46,7 @@ interface AppLayoutProps {
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, update} = useSession()
     const [isLoading, setIsLoading] = useState(true)
+    const [organizations, setOrganizations] = useState<MemberWithOrganization[]>([]);
 
     // Zustand state management
     const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} =
@@ -73,20 +86,28 @@ export default function AppLayout({children}: AppLayoutProps) {
     }
 
     useEffect(() => {
+        fetchOrganizations();
         handleSessionUpdate()
     }, [session])
 
+    const fetchOrganizations = async () => {
+        if (session) {
+            const orgs = await getAllOrganizationsFromUserId(session.user.id);
+            setOrganizations(orgs);
+        }
+    };
+
     return (
-        <div className="flex h-full w-full">
+        <div className="flex h-screen w-full">
             {isLoading ? (
-                <LoadingSpinner />
-            ): (
+                <LoadingSpinner/>
+            ) : (
                 <ResizablePanelGroup
                     direction="horizontal"
                     onLayout={(sizes: number[]) => {
                         setLayout(sizes) // Use Zustand's setLayout to save panel sizes
                     }}
-                    className="h-full w-full items-stretch"
+                    className="w-full items-stretch"
                 >
                     {/* Navigation Panel */}
                     <ResizablePanel
@@ -102,51 +123,40 @@ export default function AppLayout({children}: AppLayoutProps) {
                         <div
                             className={cn(
                                 "relative flex h-[52px] items-center justify-around",
-                                isCollapsed ? "h-[52px]" : "px-2"
+                                isCollapsed ? "h-[102px] flex-col" : "px-2"
                             )}
                         >
                             <Image priority src={logo} alt="Librarey logo" className="size-6"/>
                             {/* Disabled - only one roadmap per org for now... */}
-                            {/* <Select
-                                defaultValue={organization?.id || ""}
-                                onValueChange={async (value) => {
-                                    console.log(`org changed`, value)
-                                    await update({
-                                        ...session,
-                                        organizationId: value
-                                    })
-                                }}
-                            >
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder={
-                                        <div className="flex flex-row items-center justify-between gap-x-2">
-                                            <FaCity/>
-                                            Organization
-                                        </div>
-                                    }/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>Organizations</SelectLabel> 
-                                        {organizations?.map(org => (
-                                            <SelectItem value={org.id}>{org.name}</SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select> */}
+                            <OrganizationSelector
+                                isCollapsed={isCollapsed}
+                                organizations={organizations}
+                            />
                         </div>
                         <Separator/>
                         <AppNav
                             isCollapsed={isCollapsed}
                             links={[
-                                {title: "Roadmap", label: "128", icon: Workflow, variant: "ghost", href: roadmapId ? `/app/roadmap/${roadmapId}` : `/app/roadmap`},
+                                {
+                                    title: "Roadmap",
+                                    label: "128",
+                                    icon: Workflow,
+                                    variant: "ghost",
+                                    href: roadmapId ? `/app/roadmap/${roadmapId}` : `/app/roadmap`
+                                },
                                 {title: "Profile", icon: User, variant: "ghost", href: "/app/profile"},
-                                {title: "Marketplace", label: "9", icon: Store, variant: "ghost", href: "/app/marketplace"},
+                                {
+                                    title: "Marketplace",
+                                    label: "9",
+                                    icon: Store,
+                                    variant: "ghost",
+                                    href: "/app/marketplace"
+                                },
                                 {title: "Settings", icon: Cog, variant: "ghost", href: "/app/settings"},
                             ]}
                         >
                             <Suspense fallback={<div>Loading...</div>}>
-                                <Profile/>
+                                <Profile isCollapsed={isCollapsed}/>
                             </Suspense>
                         </AppNav>
                     </ResizablePanel>
@@ -155,7 +165,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                     <ResizableHandle withHandle/>
 
                     {/* Main Content Panel */}
-                    <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+                    <ResizablePanel defaultSize={defaultLayout[1]} minSize={30} className="overflow-y-auto">
                         {children}
                     </ResizablePanel>
                 </ResizablePanelGroup>
