@@ -16,7 +16,7 @@ export default function CreateRoadmapButton() {
         <button
             onClick={() =>
                 startTransition(async () => {
-                    const roadmap = await createRoadmap(null, id, null)
+                    const roadmap = await createRoadmap(id)
                     va.track("Created Roadmap")
                     router.refresh()
                     router.push(`/admin/roadmap/${roadmap.id}`)
