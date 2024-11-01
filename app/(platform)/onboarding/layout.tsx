@@ -25,12 +25,6 @@ const steps: Step[] = [
         href: '/onboarding/research',
         status: 'upcoming'
     },
-    {
-        name: 'Roadmap',
-        description: 'Get started with creating your first roadmap.',
-        href: '/onboarding/roadmap',
-        status: 'upcoming'
-    },
 ]
 
 export default function AuthLayout({children}: { children: ReactNode }) {
