@@ -33,7 +33,11 @@ export function AppNav({ links, isCollapsed, children }: NavProps) {
     return (
         <div
             data-collapsed={isCollapsed}
-            className="group h-[calc(100vh-53px)] px-2 flex flex-col justify-between gap-4 py-2 data-[collapsed=true]:py-2"
+            // className="group h-[calc(100vh-53px)] px-2 flex flex-col justify-between gap-4 py-2 data-[collapsed=true]:py-2"
+            className={cn(
+                "group h-[calc(100vh-53px)] px-2 flex flex-col justify-between gap-4 py-2 data-[collapsed=true]:py-2",
+                isCollapsed ? "h-[calc(100vh-103px)]" : ""
+            )}
         >
             <div>
                 <nav className="grid gap-1 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2">

@@ -303,6 +303,18 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
     return organization
 };
 
+export const getAllOrganizationsFromUserId = async (userId: string) => {
+    const memberships = await prisma.member.findMany({
+        where: {
+            userId: userId
+        },
+        include: {
+            organization: true
+        }
+    });
+    return memberships
+};
+
 export const getOrganizationFromRoadmapId = async (roadmapId: string) => {
     const roadmap = await prisma.roadmap.findUnique({
         where: {
