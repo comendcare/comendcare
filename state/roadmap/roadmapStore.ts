@@ -54,7 +54,7 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
         setTask: (taskId: string, newProperties: any) => {
             const milestones = get().milestones.map(milestone => {
-                if (milestone.tasks.map((task: any) => task.id).includes(taskId)) {
+                if (milestone?.tasks?.map((task: any) => task.id).includes(taskId)) {
                     return {
                         ...milestone,
                         tasks: milestone.tasks.map((task: any) => (
