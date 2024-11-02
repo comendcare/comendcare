@@ -122,7 +122,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                     >
                         <div
                             className={cn(
-                                "relative flex h-[52px] items-center justify-around",
+                                "relative flex h-[52px] items-center justify-around space-x-4",
                                 isCollapsed ? "h-[102px] flex-col" : "px-2"
                             )}
                         >
