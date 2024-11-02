@@ -1,12 +1,24 @@
-import { getServerSession, type NextAuthOptions } from "next-auth"
+import {getServerSession, type NextAuthOptions} from "next-auth"
 import GitHubProvider from "next-auth/providers/github"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import EmailProvider from "next-auth/providers/email";
+import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@/lib/prisma"
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
 
 export const authOptions: NextAuthOptions = {
     providers: [
+        EmailProvider({
+            server: {
+                host: process.env.EMAIL_SERVER_HOST,
+                port: process.env.EMAIL_SERVER_PORT,
+                auth: {
+                    user: process.env.EMAIL_SERVER_USER,
+                    pass: process.env.EMAIL_SERVER_PASSWORD
+                }
+            },
+            from: process.env.EMAIL_FROM
+        }),
         GitHubProvider({
             clientId: process.env.AUTH_GITHUB_ID as string,
             clientSecret: process.env.AUTH_GITHUB_SECRET as string,
@@ -29,7 +41,7 @@ export const authOptions: NextAuthOptions = {
         newUser: "/onboarding/organization"
     },
     adapter: PrismaAdapter(prisma),
-    session: { strategy: "jwt" },
+    session: {strategy: "jwt"},
     cookies: {
         sessionToken: {
             name: `${VERCEL_DEPLOYMENT ? "__Secure-" : ""}next-auth.session-token`,
@@ -55,28 +67,52 @@ export const authOptions: NextAuthOptions = {
         //     }
         //     return "/app/roadmap"; // Redirect regular users
         // },
-        async signIn({ user, account, profile, email, credentials }) {
-            const ADMIN_WHITELIST = process.env.ADMIN_WHITELIST?.split(",").map(email => email.trim()) || []
+        // async signIn({user, account, profile, email, credentials}) {
+        //     const ADMIN_WHITELIST = process.env.ADMIN_WHITELIST?.split(",").map(email => email.trim()) || []
+        //
+        //     const isAdmin = ADMIN_WHITELIST?.includes(user.email || "") || user.email?.endsWith("@comendcare.com"); // Example logic
+        //
+        //     if (isAdmin) {
+        //         // Admins should proceed to the callback URL or their intended destination
+        //         return true
+        //     }
+        //
+        //     // Check if the user is new by querying the database
+        //     const existingUser = await prisma.user.findUnique({
+        //         where: {email: user.email || ""}
+        //     })
+        //
+        //     if (!existingUser) {
+        //         // Redirect new non-admin users to onboarding
+        //         return "/onboarding"
+        //     }
+        //
+        //     // Allow existing non-admin users to proceed to the intended destination
+        //     return true
+        // },
+        async signIn({ user }) {
+            const ADMIN_WHITELIST = process.env.ADMIN_WHITELIST?.split(",").map(email => email.trim()) || [];
 
-            const isAdmin = ADMIN_WHITELIST?.includes(user.email || "")
+            // Determine if the user is an admin based on the whitelist or email domain
+            const isAdmin = ADMIN_WHITELIST.includes(user.email || "") || user.email?.endsWith("@comendcare.com");
 
+            // Skip onboarding for admins
             if (isAdmin) {
-                // Admins should proceed to the callback URL or their intended destination
-                return true
+                return true; // Allow admins to proceed without redirection
             }
 
-            // Check if the user is new by querying the database
+            // Check if the user exists in the database
             const existingUser = await prisma.user.findUnique({
                 where: { email: user.email || "" }
-            })
+            });
 
             if (!existingUser) {
                 // Redirect new non-admin users to onboarding
-                return "/onboarding"
+                return "/onboarding/organization";
             }
 
-            // Allow existing non-admin users to proceed to the intended destination
-            return true
+            // Allow existing non-admin users to proceed
+            return true;
         },
         jwt: async ({token, user, trigger, session}) => {
             if (trigger === 'update') {
@@ -85,8 +121,8 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 // Fetch the user's organizationId from the database
                 const dbUser = await prisma.user.findUnique({
-                    where: { id: user.id },
-                    include: { memberships: true },
+                    where: {id: user.id},
+                    include: {memberships: true},
                 });
 
                 // Extract organization IDs from the user's memberships
@@ -99,7 +135,7 @@ export const authOptions: NextAuthOptions = {
             }
             return token
         },
-        session: async ({ session, token }) => {
+        session: async ({session, token}) => {
             session.user = {
                 ...session.user,
                 // @ts-expect-error

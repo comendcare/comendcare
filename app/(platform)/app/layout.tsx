@@ -99,9 +99,9 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     return (
         <div className="flex h-screen w-full">
-            {isLoading ? (
-                <LoadingSpinner/>
-            ) : (
+            {/*{isLoading ? (*/}
+            {/*    <LoadingSpinner/>*/}
+            {/*) : (*/}
                 <ResizablePanelGroup
                     direction="horizontal"
                     onLayout={(sizes: number[]) => {
@@ -169,7 +169,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                         {children}
                     </ResizablePanel>
                 </ResizablePanelGroup>
-            )}
+            {/*)}*/}
         </div>
     )
 }
