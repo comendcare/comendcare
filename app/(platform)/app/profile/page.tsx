@@ -87,7 +87,7 @@ export default async function ProfilePage() {
 
                                 <div className="flex">
                                     <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                         src={createDicebearAvatar(pag?.dateJoined ?? "", 50, 40, "identicon")}
+                                         src={createDicebearAvatar(organization?.createdAt.toLocaleString() ?? "", 50, 40, "identicon")}
                                          alt=""/>
                                 </div>
 
@@ -96,24 +96,24 @@ export default async function ProfilePage() {
                                 >
                                     <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
                                         <h1 className="mt-6 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
-                                            {pag.groupName}
+                                            {organization?.name}
                                         </h1>
                                         <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                                             <div className="mt-2 flex items-center text-sm text-gray-500">
                                                 <FaPeopleGroup className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                                aria-hidden="true"/>
-                                                {pag.numberOfPatients}+ patients
+                                                {organization?.estimatedTotalPrevalence}+ patients
                                             </div>
                                             <div className="mt-2 flex items-center text-sm text-gray-500">
                                                 <FaCircleDollarToSlot className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                                       aria-hidden="true"
                                                 />
-                                                ${pag.amountRaised.toLocaleString()} raised
+                                                ${organization?.moneyRaised?.toLocaleString()} raised
                                             </div>
                                             <div className="mt-2 flex items-center text-sm text-gray-500">
                                                 <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                             aria-hidden="true"/>
-                                                Founded on {new Date(pag?.dateJoined ?? "").toDateString()}
+                                                Founded on {new Date(organization?.createdAt ?? "").toDateString()}
                                             </div>
                                         </div>
                                     </div>
@@ -142,7 +142,7 @@ export default async function ProfilePage() {
 
                     <div className="grid grid-cols-6 gap-4">
                         <div className="col-span-2 space-y-4">
-                            <PAGProfileDetailsCard/>
+                            <PAGProfileDetailsCard organization={organization}/>
                             <LineChartCard/>
                             <DonutChartCard/>
                         </div>

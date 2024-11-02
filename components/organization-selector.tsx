@@ -64,7 +64,7 @@ export default function OrganizationSelector({isCollapsed, organizations}: {
                 })
             }}
         >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full">
                 <SelectValue placeholder={
                     <div className="flex flex-row items-center justify-between gap-x-2">
                         <FaCity/>

@@ -5,6 +5,7 @@ import {cn} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
 import {Badge} from "@/components/ui/badge";
 import EditProfileAboutDialog from "@/components/edit-profile-about-dialog";
+import {Organization} from "@prisma/client";
 
 const milestones = [
     {text: "Identified biomarkers ", highlight: "2 years ago"},
@@ -41,7 +42,7 @@ const pag = {
     ]
 }
 
-export const PAGProfileDetailsCard = () => {
+export const PAGProfileDetailsCard = ({organization}: {organization: Organization | null}) => {
     faker.seed(235)
     return (
         <Card>
@@ -61,7 +62,7 @@ export const PAGProfileDetailsCard = () => {
                                     Description
                                 </h3>
                                 <p>
-                                    {pag?.description}
+                                    {organization?.description}
                                 </p>
                             </div>
                             <div className="space-y-2">
