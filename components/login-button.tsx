@@ -18,15 +18,7 @@ const signinFormSchema = z.object({
 
 export default function LoginButton({callback = "/"}: { callback?: string }) {
     const {data: session} = useSession()
-    const router = useRouter();
     console.log(session)
-
-    useEffect(() => {
-        if (session) {
-            // Redirect to /app/profile if the user is signed in
-            router.push("/app/profile")
-        }
-    }, [session])
 
     const [loading, setLoading] = useState(false)
     const [canSubmit, setCanSubmit] = useState(false)

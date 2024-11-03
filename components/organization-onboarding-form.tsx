@@ -13,7 +13,6 @@ import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
-import {Slider} from "@/components/ui/slider";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -76,6 +75,7 @@ const OPTIONS: Option[] = [
 export default function OrganizationOnboardingForm() {
     const {data: session, update} = useSession()
     const router = useRouter()
+    console.log(session)
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",

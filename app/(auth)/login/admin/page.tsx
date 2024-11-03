@@ -1,9 +1,29 @@
+"use client"
+
 import Image from "next/image";
 import LoginButton from "@/components/login-button";
-import {Suspense} from "react";
+import {Suspense, useEffect} from "react";
 import logo from "@/public/logos/comend-logo.png"
+import {useSearchParams} from "next/navigation";
+import {toast} from "sonner";
 
 export default function LoginPage() {
+    const searchParams = useSearchParams();
+    const error = searchParams.get("error");
+
+    useEffect(() => {
+        // Show toast based on the error parameter
+        if (error === "unauthenticated") {
+            toast.info("Please sign in", {
+                description: "You need to sign in to access this area.",
+            });
+        } else if (error === "notAdmin") {
+            toast.info("Access restricted", {
+                description: "You don't have permission to access this area.",
+            });
+        }
+    }, [error])
+
     return (
         <div
             className="mx-5 border border-stone-200 py-10 dark:border-stone-700 sm:mx-auto sm:w-full sm:max-w-md sm:rounded-lg sm:shadow-md">
@@ -25,7 +45,7 @@ export default function LoginPage() {
                             className="my-2 h-10 w-full rounded-md border border-stone-200 bg-stone-100 dark:border-stone-700 dark:bg-stone-800"/>
                     }
                 >
-                    <LoginButton/>
+                    <LoginButton callback="/admin" />
                 </Suspense>
             </div>
         </div>
