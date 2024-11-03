@@ -1,9 +1,23 @@
+"use client"
+
 import Image from "next/image";
 import LoginButton from "@/components/login-button";
-import {Suspense} from "react";
+import {Suspense, useEffect} from "react";
 import logo from "@/public/logos/comend-logo.png"
+import {useSession} from "next-auth/react";
+import {useRouter} from "next/navigation";
 
 export default function LoginPage() {
+    const {data: session} = useSession()
+    const router = useRouter();
+
+    useEffect(() => {
+        if (session) {
+            // Redirect to /app/profile if the user is signed in
+            router.push("/app/profile")
+        }
+    }, [session])
+
     return (
         <div className="mx-5 border border-stone-200 py-10 dark:border-stone-700 sm:mx-auto sm:w-full sm:max-w-md sm:rounded-lg sm:shadow-md">
             <Image

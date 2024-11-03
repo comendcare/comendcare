@@ -57,63 +57,9 @@ export const authOptions: NextAuthOptions = {
             }
         }
     },
+
     callbacks: {
-        // async signIn({ user, account, profile }) {
-        //     // Implement custom logic here to determine user type (admin vs normal)
-        //     const isAdmin = user.email?.endsWith("@comendcare.com"); // Example logic
-        //
-        //     if (isAdmin && process.env.ADMIN_WHITELIST?.includes(user.email!)) {
-        //         return "/admin"; // Redirect admins
-        //     }
-        //     return "/app/roadmap"; // Redirect regular users
-        // },
-        // async signIn({user, account, profile, email, credentials}) {
-        //     const ADMIN_WHITELIST = process.env.ADMIN_WHITELIST?.split(",").map(email => email.trim()) || []
-        //
-        //     const isAdmin = ADMIN_WHITELIST?.includes(user.email || "") || user.email?.endsWith("@comendcare.com"); // Example logic
-        //
-        //     if (isAdmin) {
-        //         // Admins should proceed to the callback URL or their intended destination
-        //         return true
-        //     }
-        //
-        //     // Check if the user is new by querying the database
-        //     const existingUser = await prisma.user.findUnique({
-        //         where: {email: user.email || ""}
-        //     })
-        //
-        //     if (!existingUser) {
-        //         // Redirect new non-admin users to onboarding
-        //         return "/onboarding"
-        //     }
-        //
-        //     // Allow existing non-admin users to proceed to the intended destination
-        //     return true
-        // },
-        async signIn({ user }) {
-            const ADMIN_WHITELIST = process.env.ADMIN_WHITELIST?.split(",").map(email => email.trim()) || [];
 
-            // Determine if the user is an admin based on the whitelist or email domain
-            const isAdmin = ADMIN_WHITELIST.includes(user.email || "") || user.email?.endsWith("@comendcare.com");
-
-            // Skip onboarding for admins
-            if (isAdmin) {
-                return true; // Allow admins to proceed without redirection
-            }
-
-            // Check if the user exists in the database
-            const existingUser = await prisma.user.findUnique({
-                where: { email: user.email || "" }
-            });
-
-            if (!existingUser) {
-                // Redirect new non-admin users to onboarding
-                return "/onboarding/organization";
-            }
-
-            // Allow existing non-admin users to proceed
-            return true;
-        },
         jwt: async ({token, user, trigger, session}) => {
             if (trigger === 'update') {
                 token.organizationId = session.organizationId;
@@ -135,6 +81,7 @@ export const authOptions: NextAuthOptions = {
             }
             return token
         },
+
         session: async ({session, token}) => {
             session.user = {
                 ...session.user,

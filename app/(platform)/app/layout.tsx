@@ -33,6 +33,7 @@ import {useState} from "react";
 import LoadingSpinner from "@/components/form/loading-spinner";
 import {Member, Organization} from "@prisma/client";
 import OrganizationSelector from "@/components/organization-selector";
+import {redirect} from "next/navigation";
 
 
 type MemberWithOrganization = Member & {
@@ -47,6 +48,10 @@ export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, update} = useSession()
     const [isLoading, setIsLoading] = useState(true)
     const [organizations, setOrganizations] = useState<MemberWithOrganization[]>([]);
+
+    if (!session) {
+        redirect("/login")
+    }
 
     // Zustand state management
     const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} =
