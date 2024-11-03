@@ -16,7 +16,7 @@ const signinFormSchema = z.object({
     email: z.string({required_error: "Email is required"}).email({message: "Invalid email format"}) // Custom error message is optional
 })
 
-export default function LoginButton({callback = "/"}: { callback?: string }) {
+export default function LoginForm({callback = "/"}: { callback?: string }) {
     const {data: session} = useSession()
     const router = useRouter()
 
@@ -239,24 +239,6 @@ export default function LoginButton({callback = "/"}: { callback?: string }) {
                                 Login with Github
                             </p>
                         </>
-                    )}
-                </Button>
-
-                <Button
-                    variant="outline"
-                    disabled={loading}
-                    onClick={() => {
-                        setLoading(true)
-                        signOut()
-                    }}
-                    className="w-full"
-                >
-                    {loading ? (
-                        <LoadingDots color="#A8A29E"/>
-                    ) : (
-                        <p className="text-sm font-medium text-stone-600 dark:text-stone-400">
-                            Sign out
-                        </p>
                     )}
                 </Button>
             </div>

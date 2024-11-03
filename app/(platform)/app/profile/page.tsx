@@ -3,7 +3,7 @@ import {
     FaCalendar, FaCircleDollarToSlot, FaEllipsis, FaPen,
     FaPencil, FaPeopleGroup, FaPhone, FaPlus,
 } from "react-icons/fa6";
-import {Button} from "@/components/ui/button";
+import {Button, buttonVariants} from "@/components/ui/button";
 import {LineChartCard} from "@/components/line-chart-card";
 import {DonutChartCard} from "@/components/donut-chart-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
@@ -16,6 +16,8 @@ import {PAGProfileRoadmapCard} from "@/components/pag-profile-roadmap-card";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {getOrganizationFromOrganizationId} from "@/lib/actions";
 import {getSession} from "@/lib/auth";
+import Image from "next/image"
+import Link from "next/link";
 
 const profile = {
     name: 'Ricardo Cooper',
@@ -98,15 +100,17 @@ export default async function ProfilePage() {
                                         <h1 className="mt-6 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
                                             {organization?.name}
                                         </h1>
-                                        <div className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+                                        <div
+                                            className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                                             <div className="mt-2 flex items-center text-sm text-gray-500">
                                                 <FaPeopleGroup className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                                aria-hidden="true"/>
                                                 {organization?.estimatedTotalPrevalence}+ patients
                                             </div>
                                             <div className="mt-2 flex items-center text-sm text-gray-500">
-                                                <FaCircleDollarToSlot className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                                      aria-hidden="true"
+                                                <FaCircleDollarToSlot
+                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                    aria-hidden="true"
                                                 />
                                                 ${organization?.moneyRaised?.toLocaleString()} raised
                                             </div>
@@ -176,8 +180,31 @@ export default async function ProfilePage() {
         )
     } else {
         return (
-            <div>
-                {`You don't have an organization`}
+            <div className="h-full flex flex-col items-center justify-center py-20">
+                <Image
+                    alt="missing roadmap"
+                    src="https://illustrations.popsy.co/gray/success.svg"
+                    width={400}
+                    height={400}
+                    className="dark:hidden"
+                />
+                <Image
+                    alt="missing roadmap"
+                    src="https://illustrations.popsy.co/white/success.svg"
+                    width={400}
+                    height={400}
+                    className="hidden dark:block"
+                />
+                <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                    No organization yet.
+                </p>
+                <Link
+                    href="/onboarding/organization"
+                    className={cn(buttonVariants({variant: "default"}), "gap-x-2 mt-8")}
+                >
+                    <FaPlus/>
+                    Create an organization
+                </Link>
             </div>
         )
     }
