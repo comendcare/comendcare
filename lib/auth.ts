@@ -37,7 +37,7 @@ export const authOptions: NextAuthOptions = {
     pages: {
         signIn: `/login`,
         verifyRequest: `/login/verify-request`,
-        error: "/login", // Error code passed in query string as ?error=
+        error: "/error", // Error code passed in query string as ?error=
         newUser: "/onboarding/organization"
     },
     adapter: PrismaAdapter(prisma),
@@ -94,6 +94,7 @@ export const authOptions: NextAuthOptions = {
             return session;
         },
     },
+    debug: process.env.VERCEL_URL === "development",
 };
 
 export function getSession() {

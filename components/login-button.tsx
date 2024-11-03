@@ -18,7 +18,7 @@ const signinFormSchema = z.object({
 
 export default function LoginButton({callback = "/"}: { callback?: string }) {
     const {data: session} = useSession()
-    console.log(session)
+    const router = useRouter()
 
     const [loading, setLoading] = useState(false)
     const [canSubmit, setCanSubmit] = useState(false)
@@ -74,13 +74,27 @@ export default function LoginButton({callback = "/"}: { callback?: string }) {
                     <Button
                         type="submit"
                         variant="outline"
-                        className="transition duration-300 ease-in-out disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                        onClick={() => {
-                            signIn("email", {
-                                callbackUrl: callback
-                            })
+                        onClick={async (e) => {
+                            e.preventDefault();
+                            setLoading(true);
+
+                            // Trigger the signIn for email
+                            const result = await signIn("email", {
+                                email,
+                                redirect: false, // Prevent automatic redirect
+                                callbackUrl: callback,
+                            });
+
+                            // Check if signIn succeeded, then manually route to verify page
+                            if (result?.ok) {
+                                router.push("/login/verify-request");
+                            } else {
+                                toast.error("There was an error signing in. Please try again.");
+                            }
+                            setLoading(false);
                         }}
                         disabled={!canSubmit || !form.formState.isValid}
+                        className="w-full"
                     >
                         {`Sign in`}
                     </Button>

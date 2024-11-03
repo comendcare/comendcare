@@ -5,7 +5,7 @@ export default function VerifyRequest() {
         <main className="min-h-[calc(100vh-136px)] flex flex-grow items-center justify-center">
             <div className="text-center">
                 <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-                    {`Check your email to get started on Librarey`}
+                    {`Check your email to get started on Comend`}
                 </h1>
                 <p className="mt-6 text-base leading-7 text-gray-600">
                     {`Click the link in the message we've sent you to sign into your account.`}
