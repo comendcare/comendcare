@@ -1,5 +1,8 @@
 import {getServerSession, type NextAuthOptions} from "next-auth"
 import GitHubProvider from "next-auth/providers/github"
+import GoogleProvider from "next-auth/providers/google"
+import FacebookProvider from "next-auth/providers/facebook"
+import LinkedInProvider from "next-auth/providers/linkedin"
 import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@/lib/prisma"
@@ -18,6 +21,55 @@ export const authOptions: NextAuthOptions = {
                 }
             },
             from: process.env.EMAIL_FROM
+        }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID as string,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+            allowDangerousEmailAccountLinking: true,
+            profile(profile, tokens) {
+                // You can use the tokens, in case you want to fetch more profile information
+                // For example several OAuth providers do not return email by default.
+                // Depending on your provider, will have tokens like `access_token`, `id_token` and or `refresh_token`
+                return {
+                    id: profile.sub,
+                    name: profile.name,
+                    email: profile.email,
+                    image: profile.picture,
+                }
+            }
+        }),
+        FacebookProvider({
+            clientId: process.env.FACEBOOK_CLIENT_ID as string,
+            clientSecret: process.env.FACEBOOK_CLIENT_SECRET as string,
+            allowDangerousEmailAccountLinking: true,
+            profile(profile) {
+                return {
+                    id: profile.id,
+                    name: profile.name,
+                    email: profile.email,
+                    image: profile.picture.data.url,
+                }
+            },
+        }),
+        LinkedInProvider({
+            clientId: process.env.LINKEDIN_CLIENT_ID as string,
+            clientSecret: process.env.LINKEDIN_CLIENT_SECRET as string,
+            allowDangerousEmailAccountLinking: true,
+            async profile(profile, tokens) {
+                const emailResponse = await fetch(
+                    "https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))",
+                    {headers: {Authorization: `Bearer ${tokens.access_token}`}}
+                )
+                const emailData = await emailResponse.json()
+                return {
+                    id: profile.id,
+                    name: `${profile.localizedFirstName} ${profile.localizedLastName}`,
+                    email: emailData?.elements?.[0]?.["handle~"]?.emailAddress,
+                    image:
+                    profile.profilePicture?.["displayImage~"]?.elements?.[0]
+                        ?.identifiers?.[0]?.identifier,
+                }
+            }
         }),
         GitHubProvider({
             clientId: process.env.AUTH_GITHUB_ID as string,
