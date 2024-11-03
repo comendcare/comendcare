@@ -115,6 +115,9 @@ The `.env` contains a variable `NEXT_PUBLIC_ROOT_DOMAIN` that must be configured
 Specifically, each branch's deployment on Vercel will need to define its own `NEXT_PUBLIC_ROOT_DOMAIN` (because each branch deployment has a unique domain name).
 If you don't specify a `NEXT_PUBLIC_ROOT_DOMAIN`, the branch deployment might still succeed, but attempting to open the branch deployment will lead to a 404 (due to middleware.ts relying on `NEXT_PUBLIC_ROOT_DOMAIN` to work).
 
+If the main domain ever changes (for marketing or SEO reasons for example) and we end up switching to a different domain, you MUST update the `NEXT_PUBLIC_ROOT_DOMAIN` or else the landing page will 404.
+This is also sensitive to `www.` and root domains, so make sure the domains are configured correctly in production.
+
 ### Database
 There is a specific setup required because our backend and database are hosted on two different platforms.
 It's easy to access CloudSQL when deploying a backend on Cloud Run, but due to security concerns, accessing the deployed

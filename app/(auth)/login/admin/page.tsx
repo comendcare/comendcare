@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image";
-import LoginButton from "@/components/login-button";
+import LoginForm from "@/components/login-form";
 import {Suspense, useEffect} from "react";
 import logo from "@/public/logos/comend-logo.png"
 import {useSearchParams} from "next/navigation";
@@ -45,7 +45,7 @@ export default function LoginPage() {
                             className="my-2 h-10 w-full rounded-md border border-stone-200 bg-stone-100 dark:border-stone-700 dark:bg-stone-800"/>
                     }
                 >
-                    <LoginButton callback="/admin" />
+                    <LoginForm callback="/admin" />
                 </Suspense>
             </div>
         </div>

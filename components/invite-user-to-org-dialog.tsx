@@ -37,7 +37,7 @@ export default function InviteUserToOrgDialog() {
     useEffect(() => {
         session.data?.user?.organizationId ? getOrganizationFromOrganizationId(session.data?.user?.organizationId).then((organization) => {
             setOrganization(organization)
-        }) : toast.error("No organizationId not provided")
+        }) : toast.error("No organizationId provided")
     }, [setOrganization]);
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
