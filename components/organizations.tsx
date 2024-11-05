@@ -9,16 +9,12 @@ export default async function Organizations({ limit }: { limit?: number }) {
     if (!session) {
         redirect("/login")
     }
+
     const organizations = await prisma.organization.findMany({
-        where: {
-            user: {
-                id: session.user.id as string
-            }
-        },
         orderBy: {
             createdAt: "asc"
         },
-        ...(limit ? { take: limit } : {})
+        // ...(limit ? { take: limit } : {})
     })
 
     return organizations.length > 0 ? (

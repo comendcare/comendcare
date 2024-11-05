@@ -303,6 +303,16 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
     return organization
 };
 
+export const getAllOrganizations = async () => {
+    const organizations = await prisma.organization.findMany({
+        orderBy: {
+            createdAt: "asc"
+        },
+    })
+
+    return organizations
+};
+
 export const getAllOrganizationsFromUserId = async (userId: string) => {
     const memberships = await prisma.member.findMany({
         where: {

@@ -6,13 +6,16 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {createOrganization, createOrGetSite} from "@/lib/actions";
+import {createOrganization, getAllOrganizations} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
+import {useEffect, useState} from "react";
+import {Label} from "@/components/ui/label";
+import {Switch} from "@/components/ui/switch";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -20,13 +23,11 @@ const optionSchema = z.object({
     disable: z.boolean().optional(),
 });
 
-const invitationFormSchema = z.object({
-    name: z.string().min(2, {
-        message: "Your name must be at least 2 characters."
-    }),
-    role: z.string().min(2, {
-        message: "Your role must be at least 2 characters.",
-    }),
+const joinOrgFormSchema = z.object({
+    org: z.array(optionSchema).min(0).optional(),
+})
+
+const newOrgFormSchema = z.object({
     orgName: z.string().min(2, {
         message: "Your organization's name must be at least 2 characters."
     }),
@@ -75,11 +76,34 @@ const OPTIONS: Option[] = [
 export default function OrganizationOnboardingForm() {
     const {data: session, update} = useSession()
     const router = useRouter()
-    console.log(session)
+    const [isNewOrganization, setIsNewOrganization] = useState(true)
+    const [organizations, setOrganizations] = useState<Option[]>([])
+    console.log(organizations)
 
-    const form = useForm<z.infer<typeof invitationFormSchema>>({
+    useEffect(() => {
+        fetchOrganizations();
+    }, [])
+
+    const fetchOrganizations = async () => {
+        await getAllOrganizations().then((res) => {
+            const options: Option[] = res.map((org, index) => ({
+                value: org.id || index.toString(),
+                label: org.name || "",
+                description: org.description || "",
+            }))
+
+            setOrganizations(options)
+        })
+    };
+
+    const joinOrgForm = useForm<z.infer<typeof joinOrgFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(invitationFormSchema)
+        resolver: zodResolver(joinOrgFormSchema)
+    })
+
+    const newOrgForm = useForm<z.infer<typeof newOrgFormSchema>>({
+        mode: "onChange",
+        resolver: zodResolver(newOrgFormSchema)
     })
 
     async function updateSession(organizationId: string) {
@@ -89,20 +113,29 @@ export default function OrganizationOnboardingForm() {
         })
     }
 
-    async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
+    async function joinOrgOnSubmit(values: z.infer<typeof joinOrgFormSchema>) {
+        const formData = new FormData()
+        Object.entries(newOrgForm.getValues()).forEach(([key, value]) => {
+            if (value !== undefined) {
+                formData.append(key, typeof value === "string" ? value : JSON.stringify(value));
+            }
+        });
+    }
+
+    async function newOrgOnSubmit(values: z.infer<typeof newOrgFormSchema>) {
         // console.log(values)
         // const createOrg = await createOrGetSite({
-        //         siteName: form.getValues("orgName"),
-        //         siteSlug: form.getValues("slug")
+        //         siteName: newOrgForm.getValues("orgName"),
+        //         siteSlug: newOrgForm.getValues("slug")
         //     },
         //     session.data?.user.id,
-        //     form.getValues("description")
+        //     newOrgForm.getValues("description")
         // )
         //
         // console.log(createOrg)
 
         const formData = new FormData()
-        Object.entries(form.getValues()).forEach(([key, value]) => {
+        Object.entries(newOrgForm.getValues()).forEach(([key, value]) => {
             if (value !== undefined) {
                 formData.append(key, typeof value === "string" ? value : JSON.stringify(value));
             }
@@ -124,217 +157,238 @@ export default function OrganizationOnboardingForm() {
     }
 
     return (
-        <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-1/2">
-                <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Your name</FormLabel>
-                            <FormControl>
-                                <Input
-                                    type="text"
-                                    placeholder="Spongebob Squarepants"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormDescription>
-                                This is your public display name.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+        <div className="space-y-4">
+            {/* Toggle between joining or creating an organization */}
+            <div className="flex items-center space-x-2">
+                <Switch
+                    id="new-organization"
+                    checked={isNewOrganization}
+                    onCheckedChange={() => setIsNewOrganization(!isNewOrganization)}
                 />
+                <Label htmlFor="new-organization">
+                    {isNewOrganization ? "Join an existing organization instead" : "Create a new organization instead"}
+                </Label>
+            </div>
 
-                <FormField
-                    control={form.control}
-                    name="role"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Role</FormLabel>
-                            <FormControl>
-                                <Input type="text" placeholder="Founder and Chair" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                Your role at your patient organization.
-                            </FormDescription>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+            {/* Conditionally render newOrgForm based on the toggle state */}
+            {isNewOrganization ? (
+                // Form to create a new organization
+                <Form {...newOrgForm}>
+                    <form onSubmit={newOrgForm.handleSubmit(newOrgOnSubmit)} className="space-y-8 w-1/2">
 
-                <FormField
-                    control={form.control}
-                    name="orgName"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{`Organization name`}</FormLabel>
-                            <FormDescription>{`The name of your organization`}</FormDescription>
-                            <FormControl>
-                                <Input
-                                    type="text"
-                                    id="name"
-                                    autoComplete="name"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                        <FormField
+                            control={newOrgForm.control}
+                            name="orgName"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>{`Organization name`}</FormLabel>
+                                    <FormDescription>{`The name of your organization`}</FormDescription>
+                                    <FormControl>
+                                        <Input
+                                            type="text"
+                                            id="name"
+                                            autoComplete="name"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
 
-                <FormField
-                    control={form.control}
-                    name="slug"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{`Nickname`}</FormLabel>
-                            <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
-                            <FormControl>
-                                <Input
-                                    type="text"
-                                    id="name"
-                                    autoComplete="name"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                        <FormField
+                            control={newOrgForm.control}
+                            name="slug"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>{`Nickname`}</FormLabel>
+                                    <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
+                                    <FormControl>
+                                        <Input
+                                            type="text"
+                                            id="name"
+                                            autoComplete="name"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
 
-                <FormField
-                    control={form.control}
-                    name="looking"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>{`Looking for`}</FormLabel>
-                            <FormDescription>{`What you're looking for and hoping to get from joining Comend.`}</FormDescription>
-                            <FormControl>
-                                <MultipleSelector
-                                    {...field}
-                                    defaultOptions={OPTIONS}
-                                    placeholder="Select options that appeal to you..."
-                                    emptyIndicator={
-                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
-                                    }
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+                        <FormField
+                            control={newOrgForm.control}
+                            name="looking"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>{`Looking for`}</FormLabel>
+                                    <FormDescription>{`What you're looking for and hoping to get from joining Comend.`}</FormDescription>
+                                    <FormControl>
+                                        <MultipleSelector
+                                            {...field}
+                                            defaultOptions={OPTIONS}
+                                            placeholder="Select options that appeal to you..."
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
 
-                <FormField
-                    control={form.control}
-                    name="founded"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>{`Year founded`}</FormLabel>
-                            <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
-                            <FormControl>
-                                <Input
-                                    type="text"
-                                    id="name"
-                                    autoComplete="name"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+                        <FormField
+                            control={newOrgForm.control}
+                            name="founded"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>{`Year founded`}</FormLabel>
+                                    <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
+                                    <FormControl>
+                                        <Input
+                                            type="text"
+                                            id="name"
+                                            autoComplete="name"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
 
-                <FormField
-                    control={form.control}
-                    name="501c3"
-                    render={({field}) => (
-                        <FormItem className="space-y-3">
-                            <FormLabel>{`What is your 501c3 status`}</FormLabel>
-                            <FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>
-                            <FormControl>
-                                <RadioGroup
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                    className="flex flex-col space-y-1"
-                                >
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="yes"/>
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            Yes I have a 501c3
+                        <FormField
+                            control={newOrgForm.control}
+                            name="501c3"
+                            render={({field}) => (
+                                <FormItem className="space-y-3">
+                                    <FormLabel>{`What is your 501c3 status`}</FormLabel>
+                                    <FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>
+                                    <FormControl>
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                            className="flex flex-col space-y-1"
+                                        >
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl>
+                                                    <RadioGroupItem value="yes"/>
+                                                </FormControl>
+                                                <FormLabel className="font-normal">
+                                                    Yes I have a 501c3
+                                                </FormLabel>
+                                            </FormItem>
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl>
+                                                    <RadioGroupItem value="no-but"/>
+                                                </FormControl>
+                                                <FormLabel className="font-normal">
+                                                    {`No, but I'm working on it`}
+                                                </FormLabel>
+                                            </FormItem>
+                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                <FormControl>
+                                                    <RadioGroupItem value="no"/>
+                                                </FormControl>
+                                                <FormLabel className="font-normal">
+                                                    {`No I don't have a 501c3`}
+                                                </FormLabel>
+                                            </FormItem>
+                                        </RadioGroup>
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={newOrgForm.control}
+                            name="website"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>{`Website`}</FormLabel>
+                                    <FormDescription>{`Your patient group's website URL.`}</FormDescription>
+                                    <FormControl>
+                                        <Input
+                                            type="url"
+                                            id="website"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={newOrgForm.control}
+                            name="description"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Bio</FormLabel>
+                                    <FormDescription>
+                                        This will be the public description of your organization.
+                                    </FormDescription>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder="Tell us a little bit about yourself"
+                                            className="resize-none"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <div className="flex flex-row space-x-2">
+                            <Button onClick={() => router.push("/onboarding/user")}>Previous</Button>
+                            <Button type="submit">Next</Button>
+                        </div>
+                    </form>
+                </Form>
+            ) : (
+                // Form to join an existing organization
+                <div className="space-x-4">
+                    <h3 className="text-lg font-semibold">Join an Existing Organization</h3>
+                    <Form {...joinOrgForm}>
+                        <form onSubmit={joinOrgForm.handleSubmit(joinOrgOnSubmit)} className="space-y-8">
+                            <FormField
+                                control={joinOrgForm.control}
+                                name="org"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            Organization name
                                         </FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
                                         <FormControl>
-                                            <RadioGroupItem value="no-but"/>
+                                            <MultipleSelector
+                                                {...field}
+                                                maxSelected={1}
+                                                defaultOptions={organizations}
+                                                placeholder="Select your organization..."
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                            />
                                         </FormControl>
-                                        <FormLabel className="font-normal">
-                                            {`No, but I'm working on it`}
-                                        </FormLabel>
+                                        <FormDescription>
+                                            The invitation to your organization will be sent here.
+                                        </FormDescription>
+                                        <FormMessage/>
                                     </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="no"/>
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            {`No I don't have a 501c3`}
-                                        </FormLabel>
-                                    </FormItem>
-                                </RadioGroup>
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="website"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>{`Website`}</FormLabel>
-                            <FormDescription>{`Your patient group's website URL.`}</FormDescription>
-                            <FormControl>
-                                <Input
-                                    type="url"
-                                    id="website"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Bio</FormLabel>
-                            <FormDescription>
-                                This will be the public description of your organization.
-                            </FormDescription>
-                            <FormControl>
-                                <Textarea
-                                    placeholder="Tell us a little bit about yourself"
-                                    className="resize-none"
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-
-                <Button type="submit">Next</Button>
-            </form>
-        </Form>
+                                )}
+                            />
+                            <Button type="submit" className="">Join Organization</Button>
+                        </form>
+                    </Form>
+                </div>
+            )}
+        </div>
     );
-
 }

@@ -117,6 +117,8 @@ If you don't specify a `NEXT_PUBLIC_ROOT_DOMAIN`, the branch deployment might st
 
 If the main domain ever changes (for marketing or SEO reasons for example) and we end up switching to a different domain, you MUST update the `NEXT_PUBLIC_ROOT_DOMAIN` or else the landing page will 404.
 This is also sensitive to `www.` and root domains, so make sure the domains are configured correctly in production.
+Additionally, internal APIs might require the root/primary domain to be noted in configuration.
+For example, Librarey's API is called for the Librarey landing page section, and so the domain must be allowed by CORS.
 
 ### Database
 There is a specific setup required because our backend and database are hosted on two different platforms.
