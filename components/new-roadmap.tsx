@@ -19,7 +19,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { createRoadmap } from "@/lib/actions";
 import { truncate } from "@/lib/utils";
-import { FaCalendar } from "react-icons/fa6";
+import { FaCalendar, FaListCheck } from "react-icons/fa6";
 
 const newRoadmapFormSchema = z.object({})
 
@@ -84,6 +84,15 @@ const sampleMilestones = [
                     { name: 'checklist item 1', complete: true },
                     { name: 'checklist item 2', commplete: false},
                     { name: 'checklist item 3', complete: false }
+                ]
+            },
+            {
+                name: 'Task 2',
+                status: 'TODO',
+                orderPosition: 0,
+                kanbanPosition: 0,
+                checklist: [
+                    { name: 'checklist item 1', complete: true }
                 ]
             }
         ]
@@ -160,28 +169,28 @@ export default function NewRoadmapForm() {
                 opts={{
                     align: "start"
                 }}
-                className="w-full max-w-sm overflow-visible"
+                className="w-full max-w-sm"
             >
-                <CarouselContent className="overflow-visible">
+                <CarouselContent>
                     {sampleMilestones.map((milestoneData, index) => (
-                        <CarouselItem key={index} className="lg:basis-1/2 overflow-visible">
+                        <CarouselItem key={index} className="lg:basis-1/2">
                             <button onClick={() => createTemplateRoadmap({ milestones: [milestoneData] })}>
-                            <Card className="bg-white shadow-sm rounded-lg overflow-hidden">
+                            <Card className="bg-white shadow-sm rounded-lg overflow-hidden text-left">
                                 <CardHeader>
                                     <CardTitle>{milestoneData.title}</CardTitle>
-                                    {/* Description length in node is truncated to 200 characters. */}
                                     <CardDescription>
                                         {milestoneData.description}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="flex flex-col gap-8">
-                                    {(milestoneData.timelineMonth || milestoneData.timelineYear) && (
-                                        <span className="flex gap-2 items-center text-bottom">
-                                            <FaCalendar size={24} />
-                                            <p>{milestoneData.timelineMonth}</p>
-                                            <p>{milestoneData.timelineYear}</p>
-                                        </span>
-                                    )}
+                                    <ul className="flex flex-col gap-2">
+                                        {milestoneData.tasks?.map((task, index) => (
+                                            <li key={index} className="flex flex-row gap-2 items-center">
+                                                <FaListCheck />
+                                                <p>{task.name}</p>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </CardContent>
                             </Card>
                             </button>
