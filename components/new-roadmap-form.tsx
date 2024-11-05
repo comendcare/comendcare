@@ -22,6 +22,49 @@ import { createRoadmap } from "@/lib/actions";
 
 const newRoadmapFormSchema = z.object({})
 
+export const sampleRoadmap1 = {
+    milestones: [
+        {
+            title: 'Milestone 1',
+            description: 'This is the first Milestone',
+            timelineMonth: 'May',
+            timelineYear: '2025',
+            budget: 100000,
+            papers: [],
+            tasks: [
+                {
+                    name: 'Task 1',
+                    status: 'TODO',
+                    orderPosition: 0,
+                    kanbanPosition: 0,
+                    checklist: [
+                        { name: 'checklist item 1', complete: true },
+                        { name: 'checklist item 2', commplete: false},
+                        { name: 'checklist item 3', complete: false }
+                    ]
+                }
+            ]
+        },
+        {
+            title: 'Milestone 2',
+            description: 'This is my second milestone...',
+            timelineMonth: 'October',
+            timelineYear: '2030',
+            budget: 100000,
+            papers: [],
+            tasks: [
+                {
+                    name: 'First task',
+                    status: 'TODO',
+                    orderPosition: 0,
+                    kanbanPosition: 0,
+                    checklist: []
+                }
+            ]
+        }
+    ]
+}
+
 export default function NewRoadmapForm() {
     const {data: session} = useSession()
     const router = useRouter()
@@ -35,7 +78,7 @@ export default function NewRoadmapForm() {
         console.log(`submit form`, values)
 
         if (session?.user?.organizationId) {
-            const roadmap = await createRoadmap(session.user.organizationId)
+            const roadmap = await createRoadmap(session.user.organizationId, sampleRoadmap1)
             router.push(`/app/roadmap/${roadmap.id}`)
         } else {
             console.error(`organization id is not defined in the session:`, session)
