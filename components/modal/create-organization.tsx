@@ -15,7 +15,7 @@ export default function CreateOrganizationModal() {
     const modal = useModal()
 
     const [data, setData] = useState({
-        name: "",
+        orgName: "",
         subdomain: "",
         description: ""
     })
@@ -23,12 +23,12 @@ export default function CreateOrganizationModal() {
     useEffect(() => {
         setData(prev => ({
             ...prev,
-            subdomain: prev.name
+            subdomain: prev.orgName
                 .toLowerCase()
                 .trim()
                 .replace(/[\W_]+/g, "-")
         }))
-    }, [data.name])
+    }, [data.orgName])
 
     return (
         <form
@@ -55,19 +55,19 @@ export default function CreateOrganizationModal() {
 
                 <div className="flex flex-col space-y-2">
                     <label
-                        htmlFor="name"
+                        htmlFor="orgName"
                         className="text-sm font-medium text-stone-500 dark:text-stone-400"
                     >
                         Organization Name
                     </label>
                     <input
-                        name="name"
+                        name="orgName"
                         type="text"
                         placeholder="My Awesome Organization"
                         autoFocus
-                        value={data.name}
+                        value={data.orgName}
                         onChange={e =>
-                            setData({ ...data, name: e.target.value })
+                            setData({ ...data, orgName: e.target.value })
                         }
                         maxLength={32}
                         required

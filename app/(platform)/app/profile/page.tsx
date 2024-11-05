@@ -71,11 +71,12 @@ export default async function ProfilePage() {
     const defaultLayout = layout ? JSON.parse(layout.value) : undefined
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
-    console.log(session?.user.organizationId)
+    let organization = null
     if (session?.user.organizationId) {
-        const organization = await getOrganizationFromOrganizationId(session?.user.organizationId)
-        console.log(organization)
+        organization = await getOrganizationFromOrganizationId(session?.user.organizationId)
+    }
 
+    if (organization) {
         return (
             <main className="flex flex-col items-center w-full max-w-7xl mx-auto">
                 <div className="flex flex-col space-y-8 my-8">
@@ -182,14 +183,14 @@ export default async function ProfilePage() {
         return (
             <div className="h-full flex flex-col items-center justify-center py-20">
                 <Image
-                    alt="missing roadmap"
+                    alt="No organization"
                     src="https://illustrations.popsy.co/gray/success.svg"
                     width={400}
                     height={400}
                     className="dark:hidden"
                 />
                 <Image
-                    alt="missing roadmap"
+                    alt="No organization"
                     src="https://illustrations.popsy.co/white/success.svg"
                     width={400}
                     height={400}

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { useParams, useRouter } from "next/navigation"
 import { useFormStatus } from "react-dom"
 import { toast } from "sonner"
-import { deleteRoadmap } from "@/lib/actions"
+import {deleteOrganization, deleteRoadmap} from "@/lib/actions"
 import va from "@vercel/analytics"
 
 export default function DeleteOrganizationForm({
@@ -21,18 +21,30 @@ export default function DeleteOrganizationForm({
                 window.confirm(
                     "Are you sure you want to delete your organization?"
                 ) &&
-                deleteRoadmap(data, id, "delete")
+                deleteOrganization(data, id, "delete")
                     .then(async res => {
                         if (res.error) {
                             toast.error(res.error)
                         } else {
                             va.track("Deleted Organization")
                             router.refresh()
-                            router.push("/organizations")
+                            router.push("admin/organizations")
                             toast.success(`Successfully deleted organization!`)
                         }
                     })
                     .catch((err: Error) => toast.error(err.message))
+                // deleteRoadmap(data, id, "delete")
+                //     .then(async res => {
+                //         if (res.error) {
+                //             toast.error(res.error)
+                //         } else {
+                //             va.track("Deleted Organization")
+                //             router.refresh()
+                //             router.push("/organizations")
+                //             toast.success(`Successfully deleted organization!`)
+                //         }
+                //     })
+                //     .catch((err: Error) => toast.error(err.message))
             }
             className="rounded-lg border border-red-600 bg-white dark:bg-black"
         >
