@@ -161,6 +161,7 @@ export default function ResearchOnboardingForm() {
             updateOrganization(formData, session.data.user.organizationId, "key").then((res: any) => {
                 if (res.error) {
                     toast.error(res.error)
+                    router.push("/app/profile")
                 } else {
                     const { id } = res
                     router.refresh()
