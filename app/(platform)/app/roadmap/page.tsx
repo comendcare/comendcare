@@ -1,6 +1,6 @@
 "use client"
 
-import NewRoadmapForm from "@/components/new-roadmap-form"
+import NewRoadmapForm from "@/components/new-roadmap"
 import NoOrganization from "@/components/no-organization"
 import { getRoadmapId } from "@/lib/actions"
 import { useSession } from "next-auth/react"
