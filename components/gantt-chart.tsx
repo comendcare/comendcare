@@ -121,7 +121,7 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
       <ScrollArea className="h-full w-full">
         <ChartContainer
             config={chartConfig}
-            className="aspect-auto h-full"
+            className="aspect-auto h-full max-h-[500px]"
         >
             <ScatterChart
                 data={chartData}
@@ -152,13 +152,21 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
                     wrapperStyle={{ zIndex: 100 }}
                 />
                 <Scatter
-                    data={chartData.map(dataPoint => (
+                    data={chartData.map((dataPoint): {
+                      x: number
+                      z: number
+                      y: number
+                      id: number
+                      item: string
+                    } => (
                       {
-                        ...dataPoint,
-                        ...(dataPoint.x === undefined ? { x: xDomain[0] } : undefined),
-                        ...(dataPoint.z === undefined ? { z: xDomain[1] } : undefined)
+                        x: dataPoint.x || xDomain[0],
+                        z: dataPoint.z || xDomain[1],
+                        y: dataPoint.y,
+                        id: dataPoint.id,
+                        item: dataPoint.item
                       }
-                    ))}
+                    )).sort((a, b) => new Date(a.x).valueOf() - new Date(b.x).valueOf())}
                     fill="hsl(var(--chart-1))"
                     shape={<CustomBar/>}
                 ></Scatter>
