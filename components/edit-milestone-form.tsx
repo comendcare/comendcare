@@ -62,37 +62,15 @@ import { Popover, PopoverContent } from "./ui/popover"
 import { PopoverTrigger } from "./plate-ui/popover"
 import { Calendar } from "./ui/calendar"
 import { format } from "date-fns"
-import { cn } from "@/lib/utils"
+import { cn, monthsList } from "@/lib/utils"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
-const editMilestoneForm = z.object({
-    title: z
-        .string({
-            required_error: "Please provide a title."
-        })
-        .min(1, "Title is required")
-        .max(100, "Title must be less than 100 characters"),
-    description: z
-        .string()
-        .max(1000, "Description must be less than 1000 characters")
-        .optional(),
-    startDate: z.date().optional(),
-    endDate: z.date().optional(),
-    // timelineMonth: z.string().optional(),
-    // timelineYear: z.string().optional(),
-    budget: z.number().optional(),
-    papers: z.array(z.string()).optional(),
-    tasks: z.array(
-        z.object({
-            id: z.string(),
-            name: z.string(),
-            status: statusTypeSchema,
-        })
-    ).optional(),
-    status: z.string()
-})
+interface TimelineDateType {
+    month?: string | undefined,
+    year?: string | undefined
+}
 
 const today = new Date()
 
@@ -122,16 +100,86 @@ export function EditMilestoneForm({
         useShallow(selector)
     )
 
+    const validateTimeline = (): boolean => {
+        console.log(`validate timeline`, startDate, endDate)
+        const now = new Date()
+        const startDateValue = startDate.month !== undefined || startDate.year !== undefined 
+            ? (new Date(
+                    startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
+                    startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
+                    1
+                )).valueOf()
+            : undefined
+    
+        const endDateValue = endDate.month !== undefined || endDate.year !== undefined 
+            ? (new Date(
+                    endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
+                    endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
+                    1
+                )).valueOf()
+            : undefined
+    
+        if (startDateValue !== undefined && endDateValue !== undefined) return startDateValue <= endDateValue
+        return true
+    }
+
+    const editMilestoneForm = z.object({
+        title: z
+            .string({
+                required_error: "Please provide a title."
+            })
+            .min(1, "Title is required")
+            .max(100, "Title must be less than 100 characters"),
+        description: z
+            .string()
+            .max(1000, "Description must be less than 1000 characters")
+            .optional(),
+        startDate: z.object({
+            month: z.string().optional(),
+            year: z.string().optional(),
+        }),
+        // startDate: z.object({
+        //     month: z.string().optional(),
+        //     year: z.string().optional(),
+        // }).refine(validateTimeline, { 
+        //     message: "Start date must occur before end date."
+        // }),
+        endDate: z.object({
+            month: z.string().optional(),
+            year: z.string().optional()
+        }),
+        // endDate: z.object({
+        //     month: z.string().optional(),
+        //     year: z.string().optional()
+        // }).refine(validateTimeline, { 
+        //     message: "End date must occur after start date."
+        // }),
+        budget: z.number().optional(),
+        papers: z.array(z.string()).optional(),
+        tasks: z.array(
+            z.object({
+                id: z.string(),
+                name: z.string(),
+                status: statusTypeSchema,
+            })
+        ).optional(),
+        status: z.string()
+    })
+
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            startDate: milestoneData?.startDate || undefined,
-            endDate: milestoneData?.endDate || undefined,
-            // timelineMonth: milestoneData?.timelineMonth || undefined,
-            // timelineYear: milestoneData?.timelineYear || undefined,
+            startDate: {
+                month: milestoneData?.startDate?.getMonth() ? monthsList[milestoneData?.startDate?.getMonth()] : undefined,
+                year: milestoneData?.startDate?.getFullYear()?.toString() || undefined
+            },
+            endDate: {
+                month: milestoneData?.endDate?.getMonth() ? monthsList[milestoneData?.endDate?.getMonth()] : undefined,
+                year: milestoneData?.endDate?.getFullYear()?.toString()|| undefined
+            },
             budget: milestoneData?.budget || undefined,
             papers: milestoneData?.papers || undefined,
             tasks: milestoneData?.tasks || [],
@@ -143,8 +191,6 @@ export function EditMilestoneForm({
     const description = form.watch("description")
     const startDate = form.watch("startDate")
     const endDate = form.watch("endDate")
-    // const timelineMonth = form.watch("timelineMonth")
-    // const timelineYear = form.watch("timelineYear")
     const budget = form.watch("budget")
     const papers = form.watch("papers")
     const tasks = form.watch("tasks")
@@ -159,21 +205,26 @@ export function EditMilestoneForm({
             description,
             startDate,
             endDate,
-            // timelineMonth,
-            // timelineYear,
             budget,
             tasks,
             status
         })
+        const now = new Date()
         setMilestone(milestoneData?.nodeId, {
             title,
             ...(description !== undefined && description !== null
                 ? { description }
                 : undefined),
-            ...(startDate ? { startDate } : undefined),
-            ...(endDate ? { endDate } : undefined),
-            // ...(timelineMonth ? { timelineMonth } : undefined),
-            // ...(timelineYear ? { timelineYear } : undefined),
+            ...(startDate.month !== undefined || startDate.year !== undefined ? { startDate: new Date(
+                startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
+                startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
+                1
+            ) } : undefined),
+            ...(endDate.month !== undefined || endDate.year !== undefined ? { endDate: new Date(
+                endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
+                endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
+                1
+            ) } : undefined),
             ...(budget ? { budget } : undefined),
             papers,
             ...(tasks 
@@ -321,82 +372,16 @@ export function EditMilestoneForm({
                 <span className="flex flex-col gap-2">
                     <FormLabel className="text-xl">{`Timeline:`}</FormLabel>
                     <FormDescription>{`Enter this milestone's completion timeline (past or future)`}</FormDescription>
-                    {/* <span className="flex flex-col md:flex-row gap-4"> */}
-                        <FormField 
-                            control={form.control}
-                            name="startDate"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-md">{`Start Date:`}</FormLabel>
-                                <FormControl>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                            variant={"outline"}
-                                            className={cn(
-                                                "w-[280px] justify-start text-left font-normal",
-                                                !field.value && "text-muted-foreground"
-                                            )}
-                                            >
-                                            <CalendarIcon className="mr-2 h-4 w-4" />
-                                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value}
-                                                onSelect={field.onChange}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </FormControl>
-                                <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
 
+                    <FormItem>
+                        <FormLabel className="text-lg">{`Start:`}</FormLabel>
+                        <span className="w-full grid grid-cols-2 gap-4">
                         <FormField 
                             control={form.control}
-                            name="endDate"
+                            name="startDate.month"
                             render={({ field }) => (
-                                <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-md">{`End Date:`}</FormLabel>
-                                <FormControl>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                            variant={"outline"}
-                                            className={cn(
-                                                "w-[280px] justify-start text-left font-normal",
-                                                !field.value && "text-muted-foreground"
-                                            )}
-                                            >
-                                            <CalendarIcon className="mr-2 h-4 w-4" />
-                                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                            </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value}
-                                                onSelect={field.onChange}
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
-                                </FormControl>
-                                <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-                        {/* <FormField
-                        control={form.control}
-                        name="timelineMonth"
-                        render={({ field }) => (
-                            <FormItem className="grow">
-                                <FormLabel>{`Month:`}</FormLabel>
+                                <FormItem>
+                                <FormLabel>Month:</FormLabel>
                                 <Select
                                     onValueChange={field.onChange}
                                     defaultValue={field.value}
@@ -422,46 +407,122 @@ export function EditMilestoneForm({
                                         )}
                                     </SelectContent>
                                 </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        /> */}
-                        {/* <FormField
-                        control={form.control}
-                        name="timelineYear"
-                        render={({ field }) => (
-                            <FormItem className="grow">
-                                <FormLabel>{`Year:`}</FormLabel>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField 
+                            control={form.control}
+                            name="startDate.year"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Year:</FormLabel>
+                                    <Select
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a year" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {getYearsList().map(
+                                                (
+                                                    year: string,
+                                                    index: number
+                                                ) => (
+                                                    <SelectItem
+                                                        value={year}
+                                                        key={index}
+                                                    >
+                                                        {year}
+                                                    </SelectItem>
+                                                )
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </FormItem>
+                            )}
+                        />
+                        </span>
+                        <FormMessage />
+                    </FormItem>
+
+                    <FormItem>
+                        <FormLabel className="text-lg">{`End:`}</FormLabel>
+                        <span className="w-full grid grid-cols-2 gap-4">
+                        <FormField 
+                            control={form.control}
+                            name="endDate.month"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Month:</FormLabel>
                                 <Select
                                     onValueChange={field.onChange}
-                                    defaultValue={field.value?.toString()}
+                                    defaultValue={field.value}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Select a year" />
+                                            <SelectValue placeholder="Select a month" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {getYearsList().map(
+                                        {monthsList.map(
                                             (
-                                                year: string,
+                                                month: string,
                                                 index: number
                                             ) => (
                                                 <SelectItem
-                                                    value={year}
+                                                    value={month}
                                                     key={index}
                                                 >
-                                                    {year}
+                                                    {month}
                                                 </SelectItem>
                                             )
                                         )}
                                     </SelectContent>
                                 </Select>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        /> */}
-                    {/* </span> */}
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField 
+                            control={form.control}
+                            name="endDate.year"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Year:</FormLabel>
+                                    <Select
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a year" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {getYearsList().map(
+                                                (
+                                                    year: string,
+                                                    index: number
+                                                ) => (
+                                                    <SelectItem
+                                                        value={year}
+                                                        key={index}
+                                                    >
+                                                        {year}
+                                                    </SelectItem>
+                                                )
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </FormItem>
+                            )}
+                        />
+                        </span>
+                    </FormItem>
                 </span>
 
                 <FormField
