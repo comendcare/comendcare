@@ -29,6 +29,7 @@ import { useShallow } from "zustand/react/shallow";
 import { Task } from "./task-card";
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
 // import Socials from "@/components/socials";
 // import { ganttChartDataGenerator } from "@/lib/utils";
 
@@ -95,8 +96,8 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
       currentTick.setHours(0, 0, 0, 0);
   
       while (currentTick.valueOf() <= maxDate) {
-        ticks.push(currentTick.valueOf());
-        currentTick.setDate(currentTick.getDate() + 7);
+        ticks.push(currentTick.valueOf())
+        currentTick.setMonth(currentTick.getMonth() + 1)
       }
   
       return ticks;
@@ -104,13 +105,14 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
   
     const formatXAxis = (tickItem: number) => {
       const date = new Date(tickItem);
-      return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+      return `${date.getMonth() + 1}/${date.getFullYear()}`;
     };
   
     return (
+      <ScrollArea className="h-full w-full">
         <ChartContainer
             config={chartConfig}
-            className="aspect-auto h-full w-full"
+            className="aspect-auto h-full"
         >
             <ScatterChart
                 data={chartData}
@@ -147,6 +149,7 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
                 ></Scatter>
             </ScatterChart>
         </ChartContainer>
+      </ScrollArea>
     );
 }
 
