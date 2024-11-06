@@ -8,25 +8,36 @@ datasource db {
 }
 
 model User {
-  id              String         @id @default(cuid())
-  name            String?
+  id                   String         @id @default(cuid())
+  name                 String?
   // if you are using Github OAuth, you can get rid of the username attribute (that is for Twitter OAuth)
-  username        String?
-  gh_username     String?
-  email           String?        @unique
-  emailVerified   DateTime?
-  image           String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  accounts        Account[]
-  sessions        Session[]
-  roadmaps        Roadmap[]
-  firstName       String?
-  lastName        String?
-  organizations   Organization[]
-  memberships     Member[]
-  sentInvitations Member[]       @relation("invitedBy")
-  deletedAt       DateTime?
+  username             String?
+  title                String?
+  gh_username          String?
+  email                String?        @unique
+  emailVerified        DateTime?
+  image                String?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  accounts             Account[]
+  sessions             Session[]
+  roadmaps             Roadmap[]
+  firstName            String?
+  lastName             String?
+  organizations        Organization[]
+  memberships          Member[]
+  sentInvitations      Member[]       @relation("invitedBy")
+  deletedAt            DateTime?
+  notificationSettings Boolean        @default(false)
+  address1             String?
+  address2             String?
+  formattedAddress     String?
+  city                 String?
+  region               String?
+  postalCode           String?
+  country              String?
+  lat                  Float?
+  lng                  Float?
 }
 
 model Member {
@@ -251,6 +262,15 @@ model Organization {
   associatedSignsAndSymptoms  String[]
   existingDatabasesAndStudies String[]
   assetsUnderDevelopment      String[]
+  address1                    String?
+  address2                    String?
+  formattedAddress            String?
+  city                        String?
+  region                      String?
+  postalCode                  String?
+  country                     String?
+  lat                         Float?
+  lng                         Float?
   createdAt                   DateTime             @default(now())
   updatedAt                   DateTime             @updatedAt
   user                        User?                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)

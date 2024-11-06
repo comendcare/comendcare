@@ -6,6 +6,8 @@ import {TaskDragData} from "@/components/task-card";
 import {personas, identicon} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 
+export const mapsFetcher = (url: string) => fetch(url).then((r) => r.json());
+
 type DraggableData = ColumnDragData | TaskDragData
 
 export function hasDraggableData<T extends Active | Over>(

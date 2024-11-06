@@ -10,31 +10,77 @@ import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {editUser} from "@/lib/actions";
-import {Separator} from "@/components/ui/separator"; // Make sure editUser is correctly imported
+import {Separator} from "@/components/ui/separator";
+import {Checkbox} from "@/components/ui/checkbox";
+import {Label} from "@/components/ui/label";
+import {AutocompleteComponent} from "@/components/autocomplete";
+import {AddressType} from "@/lib/types";
+import {useEffect, useState} from "react";
 
 const invitationFormSchema = z.object({
     name: z.string().min(2, {
         message: "Your name must be at least 2 characters."
     }),
-    role: z.string().min(2, {
+    title: z.string().min(2, {
         message: "Your role must be at least 2 characters.",
     }),
+    notificationSettings: z.boolean().default(false),
+    address: z.object({
+        address1: z.string().optional(),
+        address2: z.string().optional(),
+        formattedAddress: z.string(),
+        city: z.string().optional(),
+        region: z.string().optional(),
+        postalCode: z.string().optional(),
+        country: z.string().optional(),
+        lat: z.number().optional(),
+        lng: z.number().optional(),
+    })
 });
 
 export default function UserOnboardingForm() {
     const {data: session, update} = useSession();
+    const [address, setAddress] = useState<AddressType>({
+        address1: "",
+        address2: "",
+        formattedAddress: "",
+        city: "",
+        region: "",
+        postalCode: "",
+        country: "",
+        lat: 0,
+        lng: 0,
+    });
+    const [searchInput, setSearchInput] = useState("");
+
     const router = useRouter();
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(invitationFormSchema),
+        defaultValues: {
+            notificationSettings: true,
+        },
     });
+
+    // Sync form's address fields with address state
+    useEffect(() => {
+        form.setValue("address", address);
+    }, [address, form]);
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
         const formData = new FormData();
+
         Object.entries(values).forEach(([key, value]) => {
             if (value !== undefined) {
-                formData.append(key, value);
+                if (typeof value === "object" && value !== null) {
+                    // Append nested address fields
+                    Object.entries(value).forEach(([subKey, subValue]) => {
+                        formData.append(`${key}.${subKey}`, subValue?.toString() ?? "");
+                    });
+                } else {
+                    formData.append(key, value.toString());
+                }
             }
         });
 
@@ -98,7 +144,7 @@ export default function UserOnboardingForm() {
 
                     <FormField
                         control={form.control}
-                        name="role"
+                        name="title"
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel>Role</FormLabel>
@@ -109,6 +155,51 @@ export default function UserOnboardingForm() {
                                     Your role or title at your patient organization.
                                 </FormDescription>
                                 <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="address"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Address</FormLabel>
+                                <FormControl>
+                                    <AutocompleteComponent
+                                        address={address}
+                                        setAddress={setAddress}
+                                        searchInput={searchInput}
+                                        setSearchInput={setSearchInput}
+                                    />
+                                </FormControl>
+                                <FormDescription>
+                                    Your address.
+                                </FormDescription>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="notificationSettings"
+                        render={({field}) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                <FormControl>
+                                    <Checkbox
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <div className="space-y-1 leading-none">
+                                    <FormLabel>
+                                        Allow us to contact you regarding platform changes and notifications.
+                                    </FormLabel>
+                                    <FormDescription>
+                                        You can manage your mobile notifications in your user settings page.
+                                    </FormDescription>
+                                </div>
                             </FormItem>
                         )}
                     />
