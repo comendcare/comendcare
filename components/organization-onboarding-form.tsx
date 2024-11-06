@@ -16,6 +16,7 @@ import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
 import {useEffect, useState} from "react";
 import {Label} from "@/components/ui/label";
 import {Switch} from "@/components/ui/switch";
+import {Separator} from "@/components/ui/separator";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -30,6 +31,8 @@ const joinOrgFormSchema = z.object({
 const newOrgFormSchema = z.object({
     orgName: z.string().min(2, {
         message: "Your organization's name must be at least 2 characters."
+    }).max(32, {
+        message: "Your organization's name must be a maximum of 32 characters."
     }),
     slug: z.string().min(2, {
         message: "Your organization's slug must be at least 2 characters."
@@ -37,7 +40,7 @@ const newOrgFormSchema = z.object({
     looking: z.array(optionSchema).min(0).optional(),
     founded: z.string().min(2, {
         message: "The year that your organization was founded.",
-    }).optional(),
+    }),
     description: z.string().min(2, {
         message: "Your organization's description.",
     }),
@@ -103,7 +106,10 @@ export default function OrganizationOnboardingForm() {
 
     const newOrgForm = useForm<z.infer<typeof newOrgFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(newOrgFormSchema)
+        resolver: zodResolver(newOrgFormSchema),
+        defaultValues: {
+            slug: ""
+        }
     })
 
     async function updateSession(organizationId: string) {
@@ -155,9 +161,23 @@ export default function OrganizationOnboardingForm() {
             }
         })
     }
+    console.log(newOrgForm.formState.errors.slug)
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 w-1/2">
+            <div className="space-y-2">
+                <h1 className="text-xl font-semibold">
+                    Organization onboarding
+                </h1>
+                <p>
+                    {`Welcome ${"James"}, we have a few questions about your organization to help get your profile started.
+                    You can join an organization if it already exists on Comend, or create a new one.
+                    `}
+                </p>
+            </div>
+
+            <Separator/>
+
             {/* Toggle between joining or creating an organization */}
             <div className="flex items-center space-x-2">
                 <Switch
@@ -165,7 +185,10 @@ export default function OrganizationOnboardingForm() {
                     checked={isNewOrganization}
                     onCheckedChange={() => setIsNewOrganization(!isNewOrganization)}
                 />
-                <Label htmlFor="new-organization">
+                <Label
+                    htmlFor="new-organization"
+                    className="text-base"
+                >
                     {isNewOrganization ? "Join an existing organization instead" : "Create a new organization instead"}
                 </Label>
             </div>
@@ -174,14 +197,14 @@ export default function OrganizationOnboardingForm() {
             {isNewOrganization ? (
                 // Form to create a new organization
                 <Form {...newOrgForm}>
-                    <form onSubmit={newOrgForm.handleSubmit(newOrgOnSubmit)} className="space-y-8 w-1/2">
+                    <form onSubmit={newOrgForm.handleSubmit(newOrgOnSubmit)} className="space-y-8">
 
                         <FormField
                             control={newOrgForm.control}
                             name="orgName"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>{`Organization name`}</FormLabel>
+                                    <FormLabel>{`Organization name (required)`}</FormLabel>
                                     <FormDescription>{`The name of your organization`}</FormDescription>
                                     <FormControl>
                                         <Input
@@ -201,7 +224,7 @@ export default function OrganizationOnboardingForm() {
                             name="slug"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>{`Nickname`}</FormLabel>
+                                    <FormLabel>{`Nickname (required)`}</FormLabel>
                                     <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
                                     <FormControl>
                                         <Input
@@ -212,27 +235,30 @@ export default function OrganizationOnboardingForm() {
                                         />
                                     </FormControl>
                                     <FormMessage/>
+                                    {
+                                        newOrgForm.watch("slug") && !newOrgForm.formState.errors.slug &&
+                                        <FormDescription>
+                                            <p>
+                                                {`Your organization's domain will be ${newOrgForm.watch("slug")}.comend.io`}
+                                            </p>
+                                        </FormDescription>
+                                    }
                                 </FormItem>
                             )}
                         />
 
                         <FormField
                             control={newOrgForm.control}
-                            name="looking"
+                            name="website"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>{`Looking for`}</FormLabel>
-                                    <FormDescription>{`What you're looking for and hoping to get from joining Comend.`}</FormDescription>
+                                    <FormLabel>{`Website`}</FormLabel>
+                                    <FormDescription>{`Your patient group's website URL.`}</FormDescription>
                                     <FormControl>
-                                        <MultipleSelector
+                                        <Input
+                                            type="url"
+                                            id="website"
                                             {...field}
-                                            defaultOptions={OPTIONS}
-                                            placeholder="Select options that appeal to you..."
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
                                         />
                                     </FormControl>
                                     <FormMessage/>
@@ -245,13 +271,34 @@ export default function OrganizationOnboardingForm() {
                             name="founded"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>{`Year founded`}</FormLabel>
+                                    <FormLabel>{`Year founded (required)`}</FormLabel>
                                     <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
                                     <FormControl>
                                         <Input
                                             type="text"
                                             id="name"
                                             autoComplete="name"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={newOrgForm.control}
+                            name="description"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Description</FormLabel>
+                                    <FormDescription>
+                                        This will be the public description of your organization.
+                                    </FormDescription>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder="Tell us a little bit about yourself"
+                                            className="resize-none"
                                             {...field}
                                         />
                                     </FormControl>
@@ -306,37 +353,21 @@ export default function OrganizationOnboardingForm() {
 
                         <FormField
                             control={newOrgForm.control}
-                            name="website"
+                            name="looking"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>{`Website`}</FormLabel>
-                                    <FormDescription>{`Your patient group's website URL.`}</FormDescription>
+                                    <FormLabel>{`Looking for`}</FormLabel>
+                                    <FormDescription>{`What your organization is looking for and hoping to get from joining Comend.`}</FormDescription>
                                     <FormControl>
-                                        <Input
-                                            type="url"
-                                            id="website"
+                                        <MultipleSelector
                                             {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={newOrgForm.control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Bio</FormLabel>
-                                    <FormDescription>
-                                        This will be the public description of your organization.
-                                    </FormDescription>
-                                    <FormControl>
-                                        <Textarea
-                                            placeholder="Tell us a little bit about yourself"
-                                            className="resize-none"
-                                            {...field}
+                                            defaultOptions={OPTIONS}
+                                            placeholder="Select options that appeal to you..."
+                                            emptyIndicator={
+                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                    no results found.
+                                                </p>
+                                            }
                                         />
                                     </FormControl>
                                     <FormMessage/>
@@ -352,8 +383,7 @@ export default function OrganizationOnboardingForm() {
                 </Form>
             ) : (
                 // Form to join an existing organization
-                <div className="space-x-4">
-                    <h3 className="text-lg font-semibold">Join an Existing Organization</h3>
+                <div>
                     <Form {...joinOrgForm}>
                         <form onSubmit={joinOrgForm.handleSubmit(joinOrgOnSubmit)} className="space-y-8">
                             <FormField
