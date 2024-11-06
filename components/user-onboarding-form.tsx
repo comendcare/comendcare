@@ -12,30 +12,23 @@ import {useRouter} from "next/navigation";
 import {editUser} from "@/lib/actions";
 import {Separator} from "@/components/ui/separator";
 import {Checkbox} from "@/components/ui/checkbox";
-import {Label} from "@/components/ui/label";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {AddressType} from "@/lib/types";
 import {useEffect, useState} from "react";
 
 const invitationFormSchema = z.object({
-    name: z.string().min(2, {
-        message: "Your name must be at least 2 characters."
-    }),
-    title: z.string().min(2, {
-        message: "Your role must be at least 2 characters.",
-    }),
+    name: z.string().min(2, { message: "Your name must be at least 2 characters." }),
+    title: z.string().min(2, { message: "Your role must be at least 2 characters." }),
     notificationSettings: z.boolean().default(false),
-    address: z.object({
-        address1: z.string().optional(),
-        address2: z.string().optional(),
-        formattedAddress: z.string(),
-        city: z.string().optional(),
-        region: z.string().optional(),
-        postalCode: z.string().optional(),
-        country: z.string().optional(),
-        lat: z.number().optional(),
-        lng: z.number().optional(),
-    })
+    address1: z.string().optional(),
+    address2: z.string().optional(),
+    formattedAddress: z.string(),
+    city: z.string().optional(),
+    region: z.string().optional(),
+    postalCode: z.string().optional(),
+    country: z.string().optional(),
+    lat: z.number().optional(),
+    lng: z.number().optional(),
 });
 
 export default function UserOnboardingForm() {
@@ -63,9 +56,16 @@ export default function UserOnboardingForm() {
         },
     });
 
-    // Sync form's address fields with address state
     useEffect(() => {
-        form.setValue("address", address);
+        form.setValue("address1", address.address1);
+        form.setValue("address2", address.address2);
+        form.setValue("formattedAddress", address.formattedAddress);
+        form.setValue("city", address.city);
+        form.setValue("region", address.region);
+        form.setValue("postalCode", address.postalCode);
+        form.setValue("country", address.country);
+        form.setValue("lat", address.lat);
+        form.setValue("lng", address.lng);
     }, [address, form]);
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
@@ -73,14 +73,7 @@ export default function UserOnboardingForm() {
 
         Object.entries(values).forEach(([key, value]) => {
             if (value !== undefined) {
-                if (typeof value === "object" && value !== null) {
-                    // Append nested address fields
-                    Object.entries(value).forEach(([subKey, subValue]) => {
-                        formData.append(`${key}.${subKey}`, subValue?.toString() ?? "");
-                    });
-                } else {
-                    formData.append(key, value.toString());
-                }
+                formData.append(key, value.toString());
             }
         });
 
@@ -161,7 +154,7 @@ export default function UserOnboardingForm() {
 
                     <FormField
                         control={form.control}
-                        name="address"
+                        name="formattedAddress"
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel>Address</FormLabel>
