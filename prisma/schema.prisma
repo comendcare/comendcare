@@ -176,20 +176,20 @@ model Node {
 }
 
 model Milestone {
-  id            String     @id @unique @default(uuid())
-  node          Node?      @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  nodeId        String?    @unique
-  title         String
-  description   String?
-  timelineMonth String?
-  timelineYear  String?
-  budget        Int?
-  papers        String[]
-  notes         String?
-  status        StatusType
-  tasks         Task[]
-  roadmapId     String
-  roadmap       Roadmap    @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id          String     @id @unique @default(uuid())
+  node        Node?      @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  nodeId      String?    @unique
+  title       String
+  description String?
+  startDate   DateTime?
+  endDate     DateTime?
+  budget      Int?
+  papers      String[]
+  notes       String?
+  status      StatusType
+  tasks       Task[]
+  roadmapId   String
+  roadmap     Roadmap    @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Task {

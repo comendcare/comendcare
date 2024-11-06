@@ -11,15 +11,17 @@ import {
 } from "./ui/card"
 import { FaCalendar } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
-import { truncate } from "@/lib/utils"
+import { truncate, monthsList } from "@/lib/utils"
 
 export type MilestoneNode = Node<
     {
         nodeId: string
         title: string
         description?: string
-        timelineMonth?: string
-        timelineYear?: string
+        // timelineMonth?: string
+        // timelineYear?: string
+        startDate?: Date,
+        endDate?: Date,
         budget?: number
         papers?: string[]
         stakeholders?: string[]
@@ -48,6 +50,31 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
         }
     }
 
+    const DateView = ({startDate, endDate}: {startDate: Date | undefined, endDate: Date | undefined}) => {
+        if (startDate && endDate) {
+            return (
+                <span className="flex gap-2 items-center text-bottom">
+                    <FaCalendar size={24} />
+                    <p>{`${monthsList[startDate.getMonth()]} ${startDate.getFullYear()} - ${monthsList[endDate.getMonth()]} ${endDate.getFullYear()}`}</p>
+                </span>
+            )
+        } else if (startDate) {
+            return (
+                <span className="flex gap-2 items-center text-bottom">
+                    <FaCalendar size={24} />
+                    <p>{`${monthsList[startDate.getMonth()]} ${startDate.getFullYear()}`}</p>
+                </span>
+            )
+        } else if (endDate) {
+            return (
+                <span className="flex gap-2 items-center text-bottom">
+                    <FaCalendar size={24} />
+                    <p>{`${monthsList[endDate.getMonth()]} ${endDate.getFullYear()}`}</p>
+                </span>
+            )
+        }
+    }
+
     return (
         <Card className="w-[350px]">
             <CardHeader>
@@ -58,12 +85,8 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-8">
-                {(props.data?.timelineMonth || props.data?.timelineYear) && (
-                    <span className="flex gap-2 items-center text-bottom">
-                        <FaCalendar size={24} />
-                        <p>{props.data?.timelineMonth}</p>
-                        <p>{props.data?.timelineYear}</p>
-                    </span>
+                {(props.data?.startDate?.getMonth() || props.data?.endDate?.getFullYear()) && (
+                    <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
                 )}
 
                 {/* Related Ticket: https://www.notion.so/comend/Milestone-Tasks-122801a6fddc80c69584f329f57f82fd?pvs=4 */}

@@ -27,6 +27,8 @@ import {
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { Task } from "./task-card";
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { Button } from "./ui/button";
 // import Socials from "@/components/socials";
 // import { ganttChartDataGenerator } from "@/lib/utils";
 
@@ -47,6 +49,7 @@ import { Task } from "./task-card";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
+    setSelectedNodeId: state.setSelectedNodeId,
     setTask: state.setTask,
     setTasks: state.setTasks
 })
@@ -61,12 +64,13 @@ export function GanttChartView() {
 
 function GanttChart({ initMilestones }: { initMilestones: any[] }) {
     const [chartData, setChartData] = useState<DataPoint[]>([]);
+    const { milestones } = useRoadmapStore(useShallow(selector))
 
     useEffect(() => {
-      const data = ganttChartDataGenerator(initMilestones, 20, 60);
+      const data = ganttChartDataGenerator(milestones, 20, 60);
       const parsedData = data.map((d, i) => ({
-        x: d.startDate ? new Date(d.start_date).valueOf() : (new Date().valueOf()) - 10000000,
-        z: d.end_date ? new Date(d.end_date).valueOf() : (new Date().valueOf()) + 10000000,
+        x: d.start_date ? new Date(d.start_date).valueOf() : (new Date().valueOf()) - 1000000000,
+        z: d.end_date ? new Date(d.end_date).valueOf() : (new Date().valueOf()) + 1000000000,
         y: i,
         id: d.id,
         item: d.item,
@@ -100,7 +104,7 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
   
     const formatXAxis = (tickItem: number) => {
       const date = new Date(tickItem);
-      return `${date.getDate()}/${date.getMonth() + 1}`;
+      return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
     };
   
     return (
@@ -128,7 +132,7 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
                     dataKey="y"
                     name="weight"
                     domain={yDomain}
-                    padding={{ top: 10, bottom: 10 }}
+                    padding={{ top: 50, bottom: 50 }}
                     style={{ userSelect: "none" }}
                 />
                 <ChartTooltip
@@ -139,7 +143,7 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
                 <Scatter
                     data={chartData}
                     fill="hsl(var(--chart-1))"
-                    shape={<CustomBar />}
+                    shape={<CustomBar/>}
                 ></Scatter>
             </ScatterChart>
         </ChartContainer>
@@ -149,7 +153,13 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
 const CustomBar = (props: any) => {
     const { cx, cy, fill, payload, xAxis } = props;
     const barWidth = xAxis.scale(payload.z) - xAxis.scale(payload.x);
-    const barHeight = 25;
+    const barHeight = 40;
+    const {
+        setSelectedNodeId,
+    } = useRoadmapStore(useShallow(selector))
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
   
     const truncateText = (text: string, maxWidth: number) => {
       const charWidth = 5;
@@ -161,31 +171,25 @@ const CustomBar = (props: any) => {
     };
   
     const truncatedText = truncateText(payload.item, barWidth);
+
+    const handleEditClick = (nodeId: string) => {
+        setSelectedNodeId(nodeId)
+
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete("milestone")
+        params.set("milestone", nodeId)
+
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    }
   
     return (
-      <g>
-        <rect
-          x={cx}
-          y={cy - barHeight / 2}
-          width={barWidth}
-          height={barHeight}
-          fill={fill}
-          rx={4}
-          ry={4}
-        />
-        <text
-          x={cx + 5}
-          y={cy - 3}
-          dy={4}
-          fill="#fff"
-          fontSize={10}
-          textAnchor="start"
-          dominantBaseline="middle"
-          style={{ userSelect: "none" }}
-        >
-          <tspan>{truncatedText}</tspan>
-        </text>
-      </g>
+        <g>
+            <foreignObject x={cx} y={cy - barHeight / 2} width={barWidth} height={40}>
+            <Button className="h-full w-full" onClick={() => { handleEditClick(payload.itemNodeId) }}>
+                {truncatedText}
+            </Button>
+            </foreignObject>
+        </g>
     );
   };
   
@@ -203,7 +207,7 @@ const CustomBar = (props: any) => {
     return null;
   };
 
-  const ganttChartDataGenerator = (initMilestones: any[], n: number, durationInDays: number) => {
+  const ganttChartDataGenerator = (milestones: any[], n: number, durationInDays: number) => {
     const data: any[] = [];
     const startDate = new Date();
     const endDate = new Date(
@@ -221,12 +225,13 @@ const CustomBar = (props: any) => {
     };
   
     // Generate tasks
-    initMilestones.forEach((milestones, index) => {
+    milestones.forEach((milestone, index) => {
         data.push({
             id: index + 1,
-            item: milestones.title,
-            // start_date: start.toISOString(),
-            // end_date: end.toISOString(),
+            item: milestone.title,
+            itemNodeId: milestone.nodeId,
+            start_date: milestone.startDate?.toISOString(),
+            end_date: milestone.endDate?.toISOString()
         });
     })
     // for (let i = 0; i < n; i++) {
