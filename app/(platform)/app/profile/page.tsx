@@ -75,6 +75,7 @@ export default async function ProfilePage() {
     if (session?.user.organizationId) {
         organization = await getOrganizationFromOrganizationId(session?.user.organizationId)
     }
+    console.log(session?.user.organizationId)
 
     if (organization) {
         return (
@@ -197,7 +198,7 @@ export default async function ProfilePage() {
                     className="hidden dark:block"
                 />
                 <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                    No organization yet.
+                    {`You're not part of an organization yet.`}
                 </p>
                 <Link
                     href="/onboarding/organization"
