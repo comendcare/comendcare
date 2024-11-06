@@ -1,26 +1,73 @@
-'use client'; // This ensures the component is a client component
+'use client';
 
 import { usePathname } from 'next/navigation';
 import { FaCheck } from 'react-icons/fa';
+import { useOnboardingStore } from '@/state/onboarding/onboardingStore';
+import { useSession } from 'next-auth/react';
 
-type StepStatus = 'complete' | 'current' | 'upcoming';
+type StepStatus = 'complete' | 'current' | 'upcoming' | 'disabled';
 
 export interface Step {
     name: string;
     description: string;
     href: string;
-    status?: StepStatus; // Optional since it will be calculated dynamically
+    status?: StepStatus;
 }
 
 function classNames(...classes: any[]) {
     return classes.filter(Boolean).join(' ');
 }
 
-export default function Steps({ steps }: { steps: Step[] }) {
-    const pathname = usePathname(); // Get the current path
+const allSteps: Step[] = [
+    {
+        name: 'About you',
+        description: 'Your profile information.',
+        href: '/onboarding/user',
+        status: 'complete'
+    },
+    {
+        name: 'Organization',
+        description: 'Basic information about your organization.',
+        href: '/onboarding/organization',
+        status: 'complete'
+    },
+    {
+        name: 'Finances',
+        description: 'Your budget and raising efforts.',
+        href: '/onboarding/finances',
+        status: 'upcoming'
+    },
+    {
+        name: 'Research',
+        description: 'The current research efforts in your disorder.',
+        href: '/onboarding/research',
+        status: 'upcoming'
+    },
+];
+
+export default function OnboardingSteps() {
+    const pathname = usePathname();
+    const session = useSession();
+    const isNewOrganization = useOnboardingStore((state) => state.isNewOrganization);
+    console.log(session.data?.user.organizationId)
+
+    // Check if user has an organization
+    const hasOrganization = Boolean(session.data?.user.organizationId);
+
+    // Determine which steps to show based on `isNewOrganization` and `hasOrganization`
+    const steps = isNewOrganization
+        ? allSteps.map((step) =>
+            // If user is creating a new organization but no organizationId exists, disable "Finances" and "Research"
+            !hasOrganization && ['Finances', 'Research'].includes(step.name)
+                ? { ...step, status: 'disabled' }
+                : step
+        )
+        : allSteps.filter((step) => !['Finances', 'Research'].includes(step.name)); // Filter out if not a new organization
 
     // Determine the status of each step dynamically
     const updatedSteps = steps.map((step, index) => {
+        if (step.status === 'disabled') return step;
+
         const isCurrent = pathname === step.href;
         const isComplete = index < steps.findIndex((s) => s.href === pathname);
 
@@ -81,7 +128,7 @@ export default function Steps({ steps }: { steps: Step[] }) {
                                     </span>
                                 </a>
                             </>
-                        ) : (
+                        ) : step.status === 'upcoming' ? (
                             <>
                                 {stepIdx !== updatedSteps.length - 1 && (
                                     <div
@@ -100,6 +147,26 @@ export default function Steps({ steps }: { steps: Step[] }) {
                                         <span className="text-sm text-gray-500">{step.description}</span>
                                     </span>
                                 </a>
+                            </>
+                        ) : (
+                            <>
+                                {stepIdx !== updatedSteps.length - 1 && (
+                                    <div
+                                        aria-hidden="true"
+                                        className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-gray-300"
+                                    />
+                                )}
+                                <div className="group relative flex items-start cursor-not-allowed opacity-50">
+                                    <span aria-hidden="true" className="flex h-9 items-center">
+                                        <span className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-gray-300 bg-white">
+                                            <span className="h-2.5 w-2.5 rounded-full bg-gray-300" />
+                                        </span>
+                                    </span>
+                                    <span className="ml-4 flex min-w-0 flex-col">
+                                        <span className="text-sm font-medium text-gray-500">{step.name}</span>
+                                        <span className="text-sm text-gray-500">{step.description}</span>
+                                    </span>
+                                </div>
                             </>
                         )}
                     </li>

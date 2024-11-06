@@ -2,7 +2,6 @@ import {ReactNode, Suspense} from "react";
 import Profile from "@/components/profile";
 import AdminNav from "@/components/admin-nav";
 import {redirect} from "next/navigation";
-import {useSession} from "next-auth/react";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/lib/auth";
 

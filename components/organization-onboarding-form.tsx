@@ -17,6 +17,8 @@ import {useEffect, useState} from "react";
 import {Label} from "@/components/ui/label";
 import {Switch} from "@/components/ui/switch";
 import {Separator} from "@/components/ui/separator";
+import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
+
 
 const optionSchema = z.object({
     label: z.string(),
@@ -79,9 +81,9 @@ const OPTIONS: Option[] = [
 export default function OrganizationOnboardingForm() {
     const {data: session, update} = useSession()
     const router = useRouter()
-    const [isNewOrganization, setIsNewOrganization] = useState(true)
+    // const [isNewOrganization, setIsNewOrganization] = useState(true)
     const [organizations, setOrganizations] = useState<Option[]>([])
-    console.log(organizations)
+    const { isNewOrganization, toggleIsNewOrganization } = useOnboardingStore();
 
     useEffect(() => {
         fetchOrganizations();
@@ -161,7 +163,6 @@ export default function OrganizationOnboardingForm() {
             }
         })
     }
-    console.log(newOrgForm.formState.errors.slug)
 
     return (
         <div className="space-y-4 w-1/2">
@@ -183,7 +184,7 @@ export default function OrganizationOnboardingForm() {
                 <Switch
                     id="new-organization"
                     checked={isNewOrganization}
-                    onCheckedChange={() => setIsNewOrganization(!isNewOrganization)}
+                    onCheckedChange={toggleIsNewOrganization}
                 />
                 <Label
                     htmlFor="new-organization"

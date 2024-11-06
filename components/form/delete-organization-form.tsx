@@ -7,6 +7,7 @@ import { useFormStatus } from "react-dom"
 import { toast } from "sonner"
 import {deleteOrganization, deleteRoadmap} from "@/lib/actions"
 import va from "@vercel/analytics"
+import {useSession} from "next-auth/react";
 
 export default function DeleteOrganizationForm({
     organizationName
@@ -15,6 +16,7 @@ export default function DeleteOrganizationForm({
 }) {
     const { id } = useParams() as { id: string }
     const router = useRouter()
+    const {data: session, update} = useSession()
     return (
         <form
             action={async (data: FormData) =>
@@ -26,6 +28,10 @@ export default function DeleteOrganizationForm({
                         if (res.error) {
                             toast.error(res.error)
                         } else {
+                            await update({
+                                ...session,
+                                organizationId: undefined
+                            })
                             va.track("Deleted Organization")
                             router.refresh()
                             router.push("admin/organizations")
