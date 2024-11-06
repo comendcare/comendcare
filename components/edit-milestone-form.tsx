@@ -55,8 +55,14 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { GripVertical } from "lucide-react"
+import { CalendarIcon, GripVertical } from "lucide-react"
 import { cva } from "class-variance-authority"
+import { DatePicker } from "@tremor/react"
+import { Popover, PopoverContent } from "./ui/popover"
+import { PopoverTrigger } from "./plate-ui/popover"
+import { Calendar } from "./ui/calendar"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -72,8 +78,10 @@ const editMilestoneForm = z.object({
         .string()
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
-    timelineMonth: z.string().optional(),
-    timelineYear: z.string().optional(),
+    startDate: z.date().optional(),
+    endDate: z.date().optional(),
+    // timelineMonth: z.string().optional(),
+    // timelineYear: z.string().optional(),
     budget: z.number().optional(),
     papers: z.array(z.string()).optional(),
     tasks: z.array(
@@ -85,21 +93,6 @@ const editMilestoneForm = z.object({
     ).optional(),
     status: z.string()
 })
-
-const monthsList = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December"
-]
 
 const today = new Date()
 
@@ -135,8 +128,10 @@ export function EditMilestoneForm({
         defaultValues: {
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            timelineMonth: milestoneData?.timelineMonth || undefined,
-            timelineYear: milestoneData?.timelineYear || undefined,
+            startDate: milestoneData?.startDate || undefined,
+            endDate: milestoneData?.endDate || undefined,
+            // timelineMonth: milestoneData?.timelineMonth || undefined,
+            // timelineYear: milestoneData?.timelineYear || undefined,
             budget: milestoneData?.budget || undefined,
             papers: milestoneData?.papers || undefined,
             tasks: milestoneData?.tasks || [],
@@ -146,8 +141,10 @@ export function EditMilestoneForm({
 
     const title = form.watch("title")
     const description = form.watch("description")
-    const timelineMonth = form.watch("timelineMonth")
-    const timelineYear = form.watch("timelineYear")
+    const startDate = form.watch("startDate")
+    const endDate = form.watch("endDate")
+    // const timelineMonth = form.watch("timelineMonth")
+    // const timelineYear = form.watch("timelineYear")
     const budget = form.watch("budget")
     const papers = form.watch("papers")
     const tasks = form.watch("tasks")
@@ -160,8 +157,10 @@ export function EditMilestoneForm({
             nodeId: milestoneData?.nodeId || "no associated node",
             title,
             description,
-            timelineMonth,
-            timelineYear,
+            startDate,
+            endDate,
+            // timelineMonth,
+            // timelineYear,
             budget,
             tasks,
             status
@@ -171,8 +170,10 @@ export function EditMilestoneForm({
             ...(description !== undefined && description !== null
                 ? { description }
                 : undefined),
-            ...(timelineMonth ? { timelineMonth } : undefined),
-            ...(timelineYear ? { timelineYear } : undefined),
+            ...(startDate ? { startDate } : undefined),
+            ...(endDate ? { endDate } : undefined),
+            // ...(timelineMonth ? { timelineMonth } : undefined),
+            // ...(timelineYear ? { timelineYear } : undefined),
             ...(budget ? { budget } : undefined),
             papers,
             ...(tasks 
@@ -320,8 +321,77 @@ export function EditMilestoneForm({
                 <span className="flex flex-col gap-2">
                     <FormLabel className="text-xl">{`Timeline:`}</FormLabel>
                     <FormDescription>{`Enter this milestone's completion timeline (past or future)`}</FormDescription>
-                    <span className="flex flex-col md:flex-row gap-4">
-                        <FormField
+                    {/* <span className="flex flex-col md:flex-row gap-4"> */}
+                        <FormField 
+                            control={form.control}
+                            name="startDate"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col grow">
+                                <FormLabel className="text-md">{`Start Date:`}</FormLabel>
+                                <FormControl>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-[280px] justify-start text-left font-normal",
+                                                !field.value && "text-muted-foreground"
+                                            )}
+                                            >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value}
+                                                onSelect={field.onChange}
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </FormControl>
+                                <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField 
+                            control={form.control}
+                            name="endDate"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col grow">
+                                <FormLabel className="text-md">{`End Date:`}</FormLabel>
+                                <FormControl>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-[280px] justify-start text-left font-normal",
+                                                !field.value && "text-muted-foreground"
+                                            )}
+                                            >
+                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0">
+                                            <Calendar
+                                                mode="single"
+                                                selected={field.value}
+                                                onSelect={field.onChange}
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </FormControl>
+                                <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+                        {/* <FormField
                         control={form.control}
                         name="timelineMonth"
                         render={({ field }) => (
@@ -355,8 +425,8 @@ export function EditMilestoneForm({
                                 <FormMessage />
                             </FormItem>
                         )}
-                        />
-                        <FormField
+                        /> */}
+                        {/* <FormField
                         control={form.control}
                         name="timelineYear"
                         render={({ field }) => (
@@ -390,8 +460,8 @@ export function EditMilestoneForm({
                                 <FormMessage />
                             </FormItem>
                         )}
-                        />
-                    </span>
+                        /> */}
+                    {/* </span> */}
                 </span>
 
                 <FormField
