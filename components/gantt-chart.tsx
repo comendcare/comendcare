@@ -41,8 +41,8 @@ import { ScrollArea } from "./ui/scroll-area";
   };
   
   type DataPoint = {
-    x: number;
-    z: number;
+    x: number | undefined;
+    z: number | undefined;
     y: number;
     id: number;
     item: string;
@@ -70,27 +70,36 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
     useEffect(() => {
       const data = ganttChartDataGenerator(milestones, 20, 60);
       const parsedData = data.map((d, i) => ({
-        x: d.start_date ? new Date(d.start_date).valueOf() : (new Date().valueOf()) - 1000000000,
-        z: d.end_date ? new Date(d.end_date).valueOf() : (new Date().valueOf()) + 1000000000,
+        x: d.start_date ? new Date(d.start_date).valueOf() : undefined,
+        z: d.end_date ? new Date(d.end_date).valueOf() : undefined,
         y: i,
         id: d.id,
         item: d.item,
       }));
 
-      console.log(`chart data`, parsedData)
       setChartData(parsedData);
     }, []);
   
     const xDomain = useMemo(() => {
-      const min = Math.min(...chartData.map((d) => d.x));
-      const max = Math.max(...chartData.map((d) => d.z));
+      const now = new Date()
+      let filteredXData = chartData.map(d => d.x).filter(d => d !== undefined)
+      let filteredZData = chartData.map(d => d.z).filter(d => d !== undefined)
+      if (filteredXData.length <= 0) filteredXData = [now.valueOf() - 100000000]
+      if (filteredZData.length <= 0) filteredZData = [now.valueOf() + 100000000]
+      const min = Math.min(...filteredXData);
+      const max = Math.max(...filteredZData);
       return [min - 1000 * 60 * 60 * 24, max + 1000 * 60 * 60 * 24];
     }, [chartData]);
   
     const yDomain = useMemo(() => [0, chartData.length - 1], [chartData]);
     const generateTicks = () => {
-      const minDate = Math.min(...chartData.map((d) => d.x));
-      const maxDate = Math.max(...chartData.map((d) => d.z));
+      const now = new Date()
+      let filteredXData = chartData.map(d => d.x).filter(d => d !== undefined)
+      let filteredZData = chartData.map(d => d.z).filter(d => d !== undefined)
+      if (filteredXData.length <= 0) filteredXData = [now.valueOf() - 100000000]
+      if (filteredZData.length <= 0) filteredZData = [now.valueOf() + 100000000]
+      const minDate = Math.min(...filteredXData);
+      const maxDate = Math.max(...filteredZData);
       const ticks = [];
       let currentTick = new Date(minDate);
       currentTick.setHours(0, 0, 0, 0);
@@ -143,7 +152,13 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
                     wrapperStyle={{ zIndex: 100 }}
                 />
                 <Scatter
-                    data={chartData}
+                    data={chartData.map(dataPoint => (
+                      {
+                        ...dataPoint,
+                        ...(dataPoint.x === undefined ? { x: xDomain[0] } : undefined),
+                        ...(dataPoint.z === undefined ? { z: xDomain[1] } : undefined)
+                      }
+                    ))}
                     fill="hsl(var(--chart-1))"
                     shape={<CustomBar/>}
                 ></Scatter>
