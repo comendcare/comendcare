@@ -18,6 +18,8 @@ import {Label} from "@/components/ui/label";
 import {Switch} from "@/components/ui/switch";
 import {Separator} from "@/components/ui/separator";
 import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
+import {AutocompleteComponent} from "@/components/autocomplete";
+import {AddressType} from "@/lib/types";
 
 
 const optionSchema = z.object({
@@ -46,12 +48,23 @@ const newOrgFormSchema = z.object({
     description: z.string().min(2, {
         message: "Your organization's description.",
     }),
-    "501c3": z.enum(["yes", "no-but", "no"], {
-        required_error: "You need to select a 501c3 status.",
-    }).optional(),
     website: z.string().min(2, {
         message: "Your organization's website.",
     }).optional(),
+    "501c3": z.enum(["yes", "no-but", "no"], {
+        required_error: "You need to select a 501c3 status.",
+    }).optional(),
+    address: z.object({
+        address1: z.string().optional(),
+        address2: z.string().optional(),
+        formattedAddress: z.string(),
+        city: z.string().optional(),
+        region: z.string().optional(),
+        postalCode: z.string().optional(),
+        country: z.string().optional(),
+        lat: z.number().optional(),
+        lng: z.number().optional(),
+    })
 })
 
 const OPTIONS: Option[] = [
@@ -83,6 +96,18 @@ export default function OrganizationOnboardingForm() {
     const router = useRouter()
     // const [isNewOrganization, setIsNewOrganization] = useState(true)
     const [organizations, setOrganizations] = useState<Option[]>([])
+    const [address, setAddress] = useState<AddressType>({
+        address1: "",
+        address2: "",
+        formattedAddress: "",
+        city: "",
+        region: "",
+        postalCode: "",
+        country: "",
+        lat: 0,
+        lng: 0,
+    });
+    const [searchInput, setSearchInput] = useState("");
     const { isNewOrganization, toggleIsNewOrganization } = useOnboardingStore();
 
     useEffect(() => {
@@ -114,6 +139,11 @@ export default function OrganizationOnboardingForm() {
         }
     })
 
+    // Sync form's address fields with address state
+    useEffect(() => {
+        newOrgForm.setValue("address", address);
+    }, [address, newOrgForm]);
+
     async function updateSession(organizationId: string) {
         await update({
             ...session,
@@ -143,14 +173,21 @@ export default function OrganizationOnboardingForm() {
         // console.log(createOrg)
 
         const formData = new FormData()
-        Object.entries(newOrgForm.getValues()).forEach(([key, value]) => {
+
+        Object.entries(values).forEach(([key, value]) => {
             if (value !== undefined) {
-                formData.append(key, typeof value === "string" ? value : JSON.stringify(value));
+                if (typeof value === "object" && value !== null && key === "address") {
+                    // Handle nested address object
+                    Object.entries(value).forEach(([subKey, subValue]) => {
+                        formData.append(`${key}.${subKey}`, subValue?.toString() ?? "");
+                    });
+                } else {
+                    formData.append(key, value.toString());
+                }
             }
         });
 
         createOrganization(formData).then((res: any) => {
-            console.log(res)
             if (res.error) {
                 toast.error(res.error)
             } else {
@@ -347,6 +384,28 @@ export default function OrganizationOnboardingForm() {
                                             </FormItem>
                                         </RadioGroup>
                                     </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={newOrgForm.control}
+                            name="address"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Address</FormLabel>
+                                    <FormControl>
+                                        <AutocompleteComponent
+                                            address={address}
+                                            setAddress={setAddress}
+                                            searchInput={searchInput}
+                                            setSearchInput={setSearchInput}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        {`Your organization's address.`}
+                                    </FormDescription>
                                     <FormMessage/>
                                 </FormItem>
                             )}
