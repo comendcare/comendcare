@@ -29,8 +29,10 @@ export async function POST(request: Request) {
                     data: {
                         title: milestone.title,
                         description: milestone.description,
-                        timelineMonth: milestone.timelineMonth,
-                        timelineYear: milestone.timelineYear,
+                        startDate: milestone.startDate,
+                        endDate: milestone.endDate,
+                        // timelineMonth: milestone.timelineMonth,
+                        // timelineYear: milestone.timelineYear,
                         budget: milestone.budget,
                         papers: milestone.papers,
                         tasks: {

@@ -21,6 +21,7 @@ import { MilestoneDetails } from "./milestone-details"
 import { EditTaskForm } from "./edit-task-form"
 import { TaskDetails } from "./task-details"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { GanttChartView } from "./gantt-chart"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -129,6 +130,7 @@ export function Roadmap({
                     <Tabs defaultValue={urlView ? urlView : "roadmap"} onValueChange={handleTabChange}>
                         <TabsList>
                             <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
+                            <TabsTrigger value="gantt">Gantt Chart</TabsTrigger>
                             <TabsTrigger value="kanban">Kanban</TabsTrigger>
                         </TabsList>
 
@@ -140,6 +142,14 @@ export function Roadmap({
                             <FlowView
                                 width={defaultLayout[0]}
                             />
+                        </TabsContent>
+
+                        {/* Gantt Chart View */}
+                        <TabsContent
+                            value="gantt"
+                            className="m-0 h-[calc(100vh-3.5rem)]"
+                        >
+                            <GanttChartView />
                         </TabsContent>
 
                         {/* Kanban View */}
