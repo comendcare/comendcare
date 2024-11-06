@@ -8,6 +8,21 @@ import {createAvatar} from "@dicebear/core";
 
 export const mapsFetcher = (url: string) => fetch(url).then((r) => r.json());
 
+export const monthsList = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December'
+]
+
 type DraggableData = ColumnDragData | TaskDragData
 
 export function hasDraggableData<T extends Active | Over>(
