@@ -104,18 +104,23 @@ export default async function ProfilePage() {
                                         </h1>
                                         <div
                                             className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-                                            <div className="mt-2 flex items-center text-sm text-gray-500">
-                                                <FaPeopleGroup className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                               aria-hidden="true"/>
-                                                {organization?.estimatedTotalPrevalence}+ patients
-                                            </div>
-                                            <div className="mt-2 flex items-center text-sm text-gray-500">
-                                                <FaCircleDollarToSlot
-                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                    aria-hidden="true"
-                                                />
-                                                ${organization?.moneyRaised?.toLocaleString()} raised
-                                            </div>
+                                            {organization?.estimatedTotalPrevalence &&
+                                                <div className="mt-2 flex items-center text-sm text-gray-500">
+                                                    <FaPeopleGroup
+                                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                        aria-hidden="true"/>
+                                                    {organization?.estimatedTotalPrevalence}+ patients
+                                                </div>
+                                            }
+                                            {organization?.moneyRaised &&
+                                                <div className="mt-2 flex items-center text-sm text-gray-500">
+                                                    <FaCircleDollarToSlot
+                                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                        aria-hidden="true"
+                                                    />
+                                                    ${organization?.moneyRaised?.toLocaleString()} raised
+                                                </div>
+                                            }
                                             <div className="mt-2 flex items-center text-sm text-gray-500">
                                                 <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                             aria-hidden="true"/>
