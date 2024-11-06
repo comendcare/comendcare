@@ -54,17 +54,15 @@ const newOrgFormSchema = z.object({
     "501c3": z.enum(["yes", "no-but", "no"], {
         required_error: "You need to select a 501c3 status.",
     }).optional(),
-    address: z.object({
-        address1: z.string().optional(),
-        address2: z.string().optional(),
-        formattedAddress: z.string(),
-        city: z.string().optional(),
-        region: z.string().optional(),
-        postalCode: z.string().optional(),
-        country: z.string().optional(),
-        lat: z.number().optional(),
-        lng: z.number().optional(),
-    })
+    address1: z.string().optional(),
+    address2: z.string().optional(),
+    formattedAddress: z.string(),
+    city: z.string().optional(),
+    region: z.string().optional(),
+    postalCode: z.string().optional(),
+    country: z.string().optional(),
+    lat: z.number().optional(),
+    lng: z.number().optional(),
 })
 
 const OPTIONS: Option[] = [
@@ -139,9 +137,16 @@ export default function OrganizationOnboardingForm() {
         }
     })
 
-    // Sync form's address fields with address state
     useEffect(() => {
-        newOrgForm.setValue("address", address);
+        newOrgForm.setValue("address1", address.address1);
+        newOrgForm.setValue("address2", address.address2);
+        newOrgForm.setValue("formattedAddress", address.formattedAddress);
+        newOrgForm.setValue("city", address.city);
+        newOrgForm.setValue("region", address.region);
+        newOrgForm.setValue("postalCode", address.postalCode);
+        newOrgForm.setValue("country", address.country);
+        newOrgForm.setValue("lat", address.lat);
+        newOrgForm.setValue("lng", address.lng);
     }, [address, newOrgForm]);
 
     async function updateSession(organizationId: string) {
@@ -176,14 +181,7 @@ export default function OrganizationOnboardingForm() {
 
         Object.entries(values).forEach(([key, value]) => {
             if (value !== undefined) {
-                if (typeof value === "object" && value !== null && key === "address") {
-                    // Handle nested address object
-                    Object.entries(value).forEach(([subKey, subValue]) => {
-                        formData.append(`${key}.${subKey}`, subValue?.toString() ?? "");
-                    });
-                } else {
-                    formData.append(key, value.toString());
-                }
+                formData.append(key, value.toString());
             }
         });
 
@@ -391,7 +389,7 @@ export default function OrganizationOnboardingForm() {
 
                         <FormField
                             control={newOrgForm.control}
-                            name="address"
+                            name="formattedAddress"
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Address</FormLabel>

@@ -50,7 +50,6 @@ export default function OnboardingSteps() {
     const pathname = usePathname();
     const session = useSession();
     const isNewOrganization = useOnboardingStore((state) => state.isNewOrganization);
-    console.log(session.data?.user.organizationId)
 
     // Check if user has an organization
     const hasOrganization = Boolean(session.data?.user.organizationId);
