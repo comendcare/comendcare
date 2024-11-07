@@ -5,6 +5,7 @@ import type { Metadata, ResolvingMetadata } from "next"
 // Import Montserrat Display and Source Sans Pro
 import { Poppins, Source_Sans_3 } from "next/font/google"
 import { Providers } from "@/app/providers"
+import { FeedbackForm } from "@/components/feedback"
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -86,6 +87,7 @@ export default function RootLayout({
                         disableTransitionOnChange
                     >
                         {children}
+                        <FeedbackForm />
                     </ThemeProvider>
                 </Providers>
             </body>
