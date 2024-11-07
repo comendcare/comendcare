@@ -108,15 +108,15 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
             })
         )
 
-        // for (let i = 1; i < nodes.length; i++) {
-        //     await prisma.edge.create({
-        //         data: {
-        //             roadmapId: roadmap.id,
-        //             source: nodes[i-1]?.id,
-        //             target: nodes[i]?.id
-        //         }
-        //     })
-        // }
+        for (let i = 0; i < nodes.length-1; i++) {
+            await prisma.edge.create({
+                data: {
+                    roadmap: { connect: { id: roadmap.id } },
+                    source: nodes[i]?.id,
+                    target: nodes[i+1]?.id
+                }
+            })
+        }
     }
 
     return roadmap
