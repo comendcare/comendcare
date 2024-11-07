@@ -10,16 +10,6 @@ import {Cog, Store, User, Workflow} from "lucide-react";
 import {cn} from "@/lib/utils";
 import Image from "next/image";
 import logo from "@/public/logos/comend-logo.png";
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue
-} from "@/components/ui/select";
-import {FaCity, FaPlus} from "react-icons/fa6";
 import {useSession} from "next-auth/react";
 import {Suspense, useEffect} from "react";
 import Profile from "@/components/profile";
@@ -34,6 +24,8 @@ import LoadingSpinner from "@/components/form/loading-spinner";
 import {Member, Organization} from "@prisma/client";
 import OrganizationSelector from "@/components/organization-selector";
 import {redirect} from "next/navigation";
+import {Button} from "@/components/ui/button";
+import {FaPlus} from "react-icons/fa6";
 
 
 type MemberWithOrganization = Member & {
@@ -89,6 +81,7 @@ export default function AppLayout({children}: AppLayoutProps) {
             setIsLoading(false)
         }
     }
+    console.log(session.user.organizationId)
 
     useEffect(() => {
         fetchOrganizations()
@@ -128,15 +121,19 @@ export default function AppLayout({children}: AppLayoutProps) {
                         <div
                             className={cn(
                                 "relative flex h-[52px] items-center justify-around space-x-4",
-                                isCollapsed ? "h-[102px] flex-col" : "px-2"
+                                isCollapsed ? "h-[102px] flex-col space-x-0" : "px-2"
                             )}
                         >
                             <Image priority src={logo} alt="Librarey logo" className="size-6"/>
-                            {/* Disabled - only one roadmap per org for now... */}
-                            <OrganizationSelector
-                                isCollapsed={isCollapsed}
-                                organizations={organizations}
-                            />
+                            {session.user.organizationId ?
+                                <OrganizationSelector
+                                    isCollapsed={isCollapsed}
+                                    organizations={organizations}
+                                />
+                                : <Button>
+                                    {isCollapsed ? <FaPlus/> : "Create or join an organization"}
+                                </Button>
+                            }
                         </div>
                         <Separator/>
                         <AppNav

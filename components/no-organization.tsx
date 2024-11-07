@@ -31,7 +31,7 @@ export default function NoOrganization() {
                 className={cn(buttonVariants({variant: "default"}), "gap-x-2 mt-8")}
             >
                 <FaPlus/>
-                Create an organization
+                Join an organization
             </Link>
         </div>
     )

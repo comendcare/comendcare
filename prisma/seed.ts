@@ -1,4 +1,5 @@
 import {PrismaClient} from '@prisma/client'
+import { signOut } from 'next-auth/react'
 
 const prisma = new PrismaClient()
 
@@ -119,7 +120,8 @@ async function main() {
             interestedModalities: ["AAV", "ASO"],
             diseaseName: "Celocyn Syndrome",
             diseaseCategories: ["Neuroencephalomyelopathy"],
-            estimatedTotalPrevalence: 200,
+            prevalenceNumerator: 1,
+            prevalenceDenominator: 1000000,
             numberOfIdentifiedPatients: 37,
             relevantDiseaseMechanisms: ["Neurology"],
             associatedGenes: ["GEL3", "M4SF"],
@@ -152,7 +154,8 @@ async function main() {
             interestedModalities: ["Gene Therapy", "CRISPR"],
             diseaseName: "Arcadion Disease",
             diseaseCategories: ["Neurodegenerative Disorder"],
-            estimatedTotalPrevalence: 150,
+            prevalenceNumerator: 1,
+            prevalenceDenominator: 700000,
             numberOfIdentifiedPatients: 22,
             relevantDiseaseMechanisms: ["Genetic Mutation", "Mitochondrial Dysfunction"],
             associatedGenes: ["ARC1", "NEU4"],
