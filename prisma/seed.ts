@@ -12,6 +12,15 @@ async function main() {
         },
     })
 
+    const megan = await prisma.user.upsert({
+        where: { email: 'megan@comendcare.com' },
+        update: {},
+        create: { 
+            email: 'megan@comendcare.com',
+            name: 'Megan McClure'
+        }
+    })
+
     const alice = await prisma.user.upsert({
         where: {email: 'alice@prisma.io'},
         update: {},
@@ -119,7 +128,7 @@ async function main() {
             assetsUnderDevelopment: ["Mouse model", "Cell line"],
             user: {
                 connect: {
-                    id: bob.id
+                    id: megan.id
                 }
             },
         },
@@ -166,10 +175,10 @@ async function main() {
     await prisma.member.create({
         data: {
             role: "admin",
-            email: "bob@prisma.io",
+            email: "megan@comendcare.com",
             user: {
                 connect: {
-                    email: "bob@prisma.io",
+                    email: "megan@comendcare.com",
                 },
             },
             organization: {
@@ -204,6 +213,23 @@ async function main() {
             user: {
                 connect: {
                     email: "flawnsontong1@gmail.com",
+                },
+            },
+            organization: {
+                connect: {
+                    id: arcadion.id,
+                }
+            }
+        },
+    })
+
+    await prisma.member.create({
+        data: {
+            role: "admin",
+            email: "megan@comendcare.com",
+            user: {
+                connect: {
+                    email: "megan@comendcare.com",
                 },
             },
             organization: {
