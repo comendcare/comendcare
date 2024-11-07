@@ -105,6 +105,8 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                         })
                     )))
                 }
+
+                return node
             })
         )
 
