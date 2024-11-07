@@ -18,8 +18,6 @@ export type MilestoneNode = Node<
         nodeId: string
         title: string
         description?: string
-        // timelineMonth?: string
-        // timelineYear?: string
         startDate?: Date,
         endDate?: Date,
         budget?: number

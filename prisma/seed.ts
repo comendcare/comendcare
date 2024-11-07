@@ -97,7 +97,7 @@ async function main() {
 
     const celocyn = await prisma.organization.create({
         data: {
-            name: "Celocyn Synrdome Foundation",
+            name: "Celocyn Syndrome Foundation",
             description: "The Celocyn Syndrome Foundation supports research and advocacy for Celocyn Syndrome, a progressive and degenerative disorder affecting the brain. Since founding in 2012 we're raised millions for the development of treatments, some of which are now in clinical trials.",
             subdomain: "celocyn",
             customDomain: "celocyn",
@@ -124,6 +124,9 @@ async function main() {
             },
         },
     })
+
+    // create Celocyn Syndrome Foundation Roadmap
+    const celocynRoadmap = await createRoadmap(celocyn.id, exampleASORoadmap)
 
     const arcadion = await prisma.organization.create({
         data: {
@@ -154,6 +157,9 @@ async function main() {
             },
         },
     });
+
+    // create Arcadion Disease Foundation roadmap
+    const arcadionRoadmap = await createRoadmap(arcadion.id, exampleASORoadmap)
 
     console.log(arcadion)
 
@@ -241,6 +247,166 @@ async function main() {
             }
         },
     })
+}
+
+const exampleASORoadmap = {
+    title: 'ASO Roadmap',
+    description: 'By developing an ASO therapy, we aim to address the underlying genetic cause of our rare disease. Our plan outlines each stage, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
+    milestones: [
+        {
+            title: 'Natural History Study',
+            description: 'Our observational research effort that follows individuals with a specific disease over time, collecting data on how the disease develops and progresses without intervention.',
+            status: 'INPROGRESS',
+            startDate: new Date(2019, 1, 1),
+            papers: [],
+            tasks: []
+        },
+        {
+            title: 'Review Literature',
+            description: 'Examine existing research to better understand the disease, identify gaps in knowledge, and assess the latest findings on potential treatments.',
+            status: 'DONE',
+            startDate: new Date(2020, 5, 12),
+            endDate: new Date(2021, 1, 3),
+            papers: [],
+            tasks: []
+        },
+        {
+            title: 'Identify Existing Disease Models',
+            description: 'Research and evaluate lab models.',
+            status: 'INPROGRESS',
+            startDate: new Date(2023, 3, 3),
+            endDate: new Date(2025, 1, 1),
+            papers: [],
+            tasks: []
+        },
+        {
+            title: 'Construct Mouse Models',
+            description: '',
+            status: 'INPROGRESS',
+            startDate: new Date(2024, 5, 5),
+            papers: [],
+            tasks: [
+                { name: 'Secure Funding', status: 'INPROGRESS' },
+                { name: 'Ethical Standards Advocacy', status: 'INPROGRESS' },
+                { name: 'Prioritize Model Features', description: 'Work with researchers to prioritize features in the model that most directly address patient needs and research goals.' }
+            ]
+        },
+        {
+            title: 'Construct Patient-Derived Cells',
+            description: 'Work with researchers to create cell lines that replicate disease characteristics.',
+            papers: [],
+            startDate: new Date(2026, 1, 1),
+            tasks: [
+                { name: 'Coordinate Patient Participation' },
+                { name: 'Secure Funding' },
+                { name: 'Determine Cell Model Relevancy', description: 'Determine if each cell model is relevant for testing therapies and studying disease mechanisms that refect our patients real experiences.'}
+            ]
+        },
+        {
+            title: 'Design ASO Construct',
+            description: 'Design an ASO (Antisense Oligonucleotide) construct that specifically targets the genetic mutations driving our disease.',
+            startDate: new Date(2027, 1, 1),
+            papers: [],
+            tasks: []
+        },
+        {
+            title: 'Produce Plasmid',
+            description: 'Create a DNA template essential for developing and testing therapies.',
+            startDate: new Date(2028, 1, 1),
+            papers: [],
+            tasks: []
+        },
+        {
+            title: 'Proof-Of-Concept Study',
+            startDate: new Date(2029, 1, 1),
+            description: 'Design and conduct initial experiments to demonstrate that a potential therapy or intervention can effectively target the disease.',
+            papers: [],
+            tasks: []
+        },
+        {
+            title: 'Animal Toxicology Study',
+            startDate: new Date(2030, 1, 1),
+            description: 'Conduct preclinical trials to evaluate the safety and potential side effects of a therapy.',
+            papers: [],
+            tasks: []
+        }
+    ]
+}
+
+async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
+    const roadmap = await prisma.roadmap.create({
+        data: {
+            organization: {
+                connect: { id: organizationId }
+            },
+            title: roadmapTemplate.title || '',
+            description: roadmapTemplate.description || ''
+        }
+    })
+
+    // if a roadmap template was provided, create the relevant nodes, milestones, and edges
+    if (roadmapTemplate?.milestones) {
+        const milestones = roadmapTemplate.milestones
+
+        const nodes = await Promise.all(
+            milestones.map(async (milestone: any, index: number) => {
+                // create Node & associated Milestone
+                const node = await prisma.node.create({
+                    data: {
+                        roadmapId: roadmap.id,
+                        type: 'MILESTONE',
+                        positionX: index * 500,
+                        positionY: 0,
+                        data: {
+                            create: {
+                                roadmapId: roadmap.id,
+                                status: milestone.status || "TODO",
+                                title: milestone.title,
+                                ...(milestone.description ? { description: milestone.description } : undefined),
+                                ...(milestone.startDate ? { startDate: milestone.startDate } : undefined),
+                                ...(milestone.endDate ? { endDate: milestone.endDate } : undefined),
+                                ...(milestone.budget ? { budget: milestone.budget } : undefined),
+                                papers: milestone.papers || []
+                            }
+                        }
+                    }
+                })
+
+                // grab milestone so we can add tasks
+                // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
+                const newMilestone = await prisma.milestone.findUnique({
+                    where: { nodeId: node.id },
+                    include: { tasks: true }
+                })
+
+                // create tasks for relevant milestone
+                if (newMilestone) {
+                    await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
+                        await prisma.task.create({
+                            data: {
+                                milestoneId: newMilestone?.id,
+                                status: task.status || "TODO",
+                                name: task.name,
+                                orderPosition: index,
+                                kanbanPosition: index,
+                                checklist: {
+                                    createMany: {
+                                        data: (task.checklist || []).map((item: any, index: number) => ({
+                                            name: item.name,
+                                            complete: item.complete || false,
+                                            orderPosition: index
+                                        }))
+                                    }
+                                }
+                            }
+                        })
+                    )))
+                }
+            })
+        )
+    }
+
+    return roadmap
 }
 
 main()
