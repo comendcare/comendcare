@@ -87,7 +87,7 @@ export default function RootLayout({
                         disableTransitionOnChange
                     >
                         {children}
-                        <FeedbackForm />
+                        {/* <FeedbackForm /> */}
                     </ThemeProvider>
                 </Providers>
             </body>
