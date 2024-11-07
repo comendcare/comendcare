@@ -13,14 +13,14 @@ async function main() {
         },
     })
 
-    const megan = await prisma.user.upsert({
-        where: { email: 'megan@comendcare.com' },
-        update: {},
-        create: { 
-            email: 'megan@comendcare.com',
-            name: 'Megan McClure'
-        }
-    })
+    // const megan = await prisma.user.upsert({
+    //     where: { email: 'megan@comendcare.com' },
+    //     update: {},
+    //     create: { 
+    //         email: 'megan@comendcare.com',
+    //         name: 'Megan McClure'
+    //     }
+    // })
 
     const alice = await prisma.user.upsert({
         where: {email: 'alice@prisma.io'},
@@ -130,7 +130,7 @@ async function main() {
             assetsUnderDevelopment: ["Mouse model", "Cell line"],
             user: {
                 connect: {
-                    id: megan.id
+                    id: bob.id
                 }
             },
         },
@@ -175,22 +175,22 @@ async function main() {
 
     console.log(arcadion)
 
-    await prisma.member.create({
-        data: {
-            role: "admin",
-            email: "megan@comendcare.com",
-            user: {
-                connect: {
-                    email: "megan@comendcare.com",
-                },
-            },
-            organization: {
-                connect: {
-                    id: celocyn.id,
-                }
-            }
-        },
-    })
+    // await prisma.member.create({
+    //     data: {
+    //         role: "admin",
+    //         email: "megan@comendcare.com",
+    //         user: {
+    //             connect: {
+    //                 email: "megan@comendcare.com",
+    //             },
+    //         },
+    //         organization: {
+    //             connect: {
+    //                 id: celocyn.id,
+    //             }
+    //         }
+    //     },
+    // })
 
     await prisma.member.create({
         data: {
@@ -226,22 +226,22 @@ async function main() {
         },
     })
 
-    await prisma.member.create({
-        data: {
-            role: "admin",
-            email: "megan@comendcare.com",
-            user: {
-                connect: {
-                    email: "megan@comendcare.com",
-                },
-            },
-            organization: {
-                connect: {
-                    id: arcadion.id,
-                }
-            }
-        },
-    })
+    // await prisma.member.create({
+    //     data: {
+    //         role: "admin",
+    //         email: "megan@comendcare.com",
+    //         user: {
+    //             connect: {
+    //                 email: "megan@comendcare.com",
+    //             },
+    //         },
+    //         organization: {
+    //             connect: {
+    //                 id: arcadion.id,
+    //             }
+    //         }
+    //     },
+    // })
 
     await prisma.member.create({
         data: {
