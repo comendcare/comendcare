@@ -104,12 +104,12 @@ export default async function ProfilePage() {
                                         </h1>
                                         <div
                                             className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-                                            {organization?.estimatedTotalPrevalence &&
+                                            {organization?.numberOfIdentifiedPatients &&
                                                 <div className="mt-2 flex items-center text-sm text-gray-500">
                                                     <FaPeopleGroup
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"/>
-                                                    {organization?.estimatedTotalPrevalence}+ patients
+                                                    {organization?.numberOfIdentifiedPatients}+ patients
                                                 </div>
                                             }
                                             {organization?.moneyRaised &&
@@ -210,7 +210,7 @@ export default async function ProfilePage() {
                     className={cn(buttonVariants({variant: "default"}), "gap-x-2 mt-8")}
                 >
                     <FaPlus/>
-                    Create an organization
+                    Join an organization
                 </Link>
             </div>
         )

@@ -31,7 +31,10 @@ const invitationFormSchema = z.object({
         message: "Your organization's description.",
     }),
     categories: z.array(optionSchema).min(0),
-    prevalence: z.string().min(1, {
+    prevalenceNumerator: z.string().min(1, {
+        message: "Your organization's description.",
+    }),
+    prevalenceDenominator: z.string().min(1, {
         message: "Your organization's description.",
     }),
     population: z.string().min(1, {
@@ -290,17 +293,38 @@ export default function ResearchOnboardingForm() {
 
                         <FormField
                             control={form.control}
-                            name="prevalence"
+                            name="prevalenceNumerator"
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>{`Estimated total prevalence`}</FormLabel>
                                     <FormDescription>{`The estimated total number of patients in the world.`}</FormDescription>
                                     <FormControl>
-                                        <Input
-                                            type="number"
-                                            id="population"
-                                            {...field}
-                                        />
+                                        <div className="flex flex-row items-end justify-start">
+                                            <Input
+                                                type="number"
+                                                id="population"
+                                                {...field}
+                                                className="w-16"
+                                            />
+                                            &nbsp;in&nbsp;
+                                            <FormField
+                                                control={form.control}
+                                                name="prevalenceDenominator"
+                                                render={({field}) => (
+                                                    <FormItem>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                id="population"
+                                                                {...field}
+                                                                className="w-32"
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage/>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>

@@ -32,17 +32,13 @@ export default function OrganizationSelector({isCollapsed, organizations}: {
                 })
             }}
         >
-            <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={
-                    <div className="flex flex-row items-center justify-between gap-x-2">
-                        <FaCity/>
-                        Organization
-                    </div>
-                }/>
+            <SelectTrigger className="w-[48px]">
+                <div className="flex flex-row items-center justify-between">
+                    <FaCity/>
+                </div>
             </SelectTrigger>
             <SelectContent>
                 <SelectGroup>
-                    <SelectLabel>Organizations</SelectLabel>
                     {organizations?.map(org => (
                         <SelectItem
                             key={org.organization.id}
@@ -74,11 +70,11 @@ export default function OrganizationSelector({isCollapsed, organizations}: {
             </SelectTrigger>
             <SelectContent>
                 <SelectGroup>
-                    <SelectLabel>Organizations</SelectLabel>
                     {organizations?.map(org => (
                         <SelectItem
                             key={org.organization.id}
-                            value={org.organization.id}>
+                            value={org.organization.id}
+                        >
                             {org.organization.name}
                         </SelectItem>
                     ))}

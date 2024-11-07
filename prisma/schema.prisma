@@ -255,7 +255,8 @@ model Organization {
   interestedModalities        String[]
   diseaseName                 String?
   diseaseCategories           String[]
-  estimatedTotalPrevalence    Int?
+  prevalenceNumerator         Int?
+  prevalenceDenominator       Int?
   numberOfIdentifiedPatients  Int?
   relevantDiseaseMechanisms   String[]
   associatedGenes             String[]
