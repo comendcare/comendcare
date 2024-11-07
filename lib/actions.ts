@@ -66,8 +66,8 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                                 status: milestone.status || "TODO",
                                 title: milestone.title,
                                 ...(milestone.description ? { description: milestone.description } : undefined),
-                                ...(milestone.timelineMonth ? { timelineMonth: milestone.timelineMonth } : undefined),
-                                ...(milestone.timelineYear ? { timelineYear: milestone.timelineYear } : undefined),
+                                ...(milestone.startDate ? { startDate: milestone.startDate } : undefined),
+                                ...(milestone.endDate ? { endDate: milestone.endDate } : undefined),
                                 ...(milestone.budget ? { budget: milestone.budget } : undefined),
                                 papers: milestone.papers || []
                             }

@@ -23,55 +23,10 @@ import { FaCalendar, FaListCheck } from "react-icons/fa6";
 
 const newRoadmapFormSchema = z.object({})
 
-// export const sampleRoadmap1 = {
-//     milestones: [
-//         {
-//             title: 'Milestone 1',
-//             description: 'This is the first Milestone',
-//             timelineMonth: 'May',
-//             timelineYear: '2025',
-//             budget: 100000,
-//             papers: [],
-//             tasks: [
-//                 {
-//                     name: 'Task 1',
-//                     status: 'TODO',
-//                     orderPosition: 0,
-//                     kanbanPosition: 0,
-//                     checklist: [
-//                         { name: 'checklist item 1', complete: true },
-//                         { name: 'checklist item 2', commplete: false},
-//                         { name: 'checklist item 3', complete: false }
-//                     ]
-//                 }
-//             ]
-//         },
-//         {
-//             title: 'Milestone 2',
-//             description: 'This is my second milestone...',
-//             timelineMonth: 'October',
-//             timelineYear: '2030',
-//             budget: 100000,
-//             papers: [],
-//             tasks: [
-//                 {
-//                     name: 'First task',
-//                     status: 'TODO',
-//                     orderPosition: 0,
-//                     kanbanPosition: 0,
-//                     checklist: []
-//                 }
-//             ]
-//         }
-//     ]
-// }
-
 const sampleMilestones = [
     {
         title: 'Milestone 1',
         description: 'This is the first Milestone',
-        timelineMonth: 'May',
-        timelineYear: '2025',
         budget: 100000,
         papers: [],
         tasks: [
@@ -100,8 +55,6 @@ const sampleMilestones = [
     {
         title: 'Milestone 2',
         description: 'This is my second milestone...',
-        timelineMonth: 'October',
-        timelineYear: '2030',
         budget: 100000,
         papers: [],
         tasks: [
@@ -117,8 +70,6 @@ const sampleMilestones = [
     {
         title: 'Milestone 3',
         description: 'This is my third milestone...',
-        timelineMonth: 'November',
-        timelineYear: '2026',
         budget: 100000,
         papers: [],
         tasks: [
