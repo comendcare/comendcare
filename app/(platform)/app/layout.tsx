@@ -67,21 +67,21 @@ export default function AppLayout({children}: AppLayoutProps) {
                 orgId = session.user.organizationId
             } else {
                 // org id is not in the session, pull it from the database
-                const user = await getUser(session.user.id)
-                const defaultOrganization = user?.organizations && user.organizations.length > 0 ? user.organizations[0] : undefined
+                // const user = await getUser(session.user.id)
+                // const defaultOrganization = user?.organizations && user.organizations.length > 0 ? user.organizations[0] : undefined
 
-                if (!defaultOrganization) {
-                    console.error(`no organizations found for this user...`)
-                    return
-                }
+                // if (!defaultOrganization) {
+                //     console.error(`no organizations found for this user...`)
+                //     return
+                // }
 
-                orgId = defaultOrganization.id
+                // orgId = defaultOrganization.id
 
-                // add orgId to session, since it was previously undefiend
-                await update({
-                    ...session,
-                    organizationId: orgId
-                })
+                // // add orgId to session, since it was previously undefiend
+                // await update({
+                //     ...session,
+                //     organizationId: orgId
+                // })
             }
 
             const roadmapId = await getRoadmapId(orgId)
@@ -91,7 +91,7 @@ export default function AppLayout({children}: AppLayoutProps) {
     }
 
     useEffect(() => {
-        fetchOrganizations();
+        fetchOrganizations()
         handleSessionUpdate()
     }, [session])
 
@@ -142,17 +142,17 @@ export default function AppLayout({children}: AppLayoutProps) {
                         <AppNav
                             isCollapsed={isCollapsed}
                             links={[
+                                {title: "Profile", icon: User, variant: "ghost", href: "/app/profile"},
                                 {
                                     title: "Roadmap",
-                                    label: "128",
+                                    // label: "128",
                                     icon: Workflow,
                                     variant: "ghost",
                                     href: roadmapId ? `/app/roadmap/${roadmapId}` : `/app/roadmap`
                                 },
-                                {title: "Profile", icon: User, variant: "ghost", href: "/app/profile"},
                                 {
                                     title: "Marketplace",
-                                    label: "9",
+                                    // label: "9",
                                     icon: Store,
                                     variant: "ghost",
                                     href: "/app/marketplace"
