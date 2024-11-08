@@ -119,7 +119,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                     //     height: 20,
                     //     color: 'black'
                     // },
-                    // style: { stroke: 'black' }
+                    style: { stroke: 'black' }
                 },
                 get().edges
             )
@@ -159,7 +159,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 //     height: 20,
                 //     color: 'black'
                 // },
-                // style: { stroke: 'black' }
+                style: { stroke: 'black' }
             }))
             set({ nodes, edges: edgesWithMarker, milestones, selectedNodeId, selectedTaskId, roadmapId })
         },

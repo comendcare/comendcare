@@ -93,14 +93,14 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
             <Handle
                 type="target"
                 position={Position.Left}
-                className="z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-grey-800 border-2"
+                className="z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2"
             >
                 <FaPlus className="pointer-events-none" />
             </Handle>
             <Handle
                 type="source"
                 position={Position.Right}
-                className="z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-grey-800 border-2"
+                className="z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2"
             >
                 <FaPlus className="pointer-events-none" />
             </Handle>
