@@ -30,7 +30,7 @@ import { useShallow } from "zustand/react/shallow";
 import { Task } from "./task-card";
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "./ui/button";
-import { ScrollArea } from "./ui/scroll-area";
+import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import StatusButton from "./milestone-status-button";
 import { truncate } from "@/lib/utils";
 import { DateView } from "./miletone-date-view";
@@ -59,6 +59,53 @@ const selector = (state: RoadmapState) => ({
 })
 
 export function GanttChartView() {
+  const { milestones, setSelectedNodeId } = useRoadmapStore(useShallow(selector))
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const handleEditClick = (nodeId: string) => {
+    setSelectedNodeId(nodeId)
+
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete("milestone")
+    params.set("milestone", nodeId)
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+  }
+
+  return (
+    <ScrollArea className="h-full w-full">
+      <div className="flex flex-row p-4 h-full">
+        <Card className="w-60">
+          <ScrollArea className="h-full">
+          <CardHeader>
+            <CardTitle>Milestones</CardTitle>
+            <CardDescription>
+              Please add a start date and end date to these milestones to include them in the gantt chart.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="flex flex-col gap-2">
+              {milestones.filter(milestone => milestone.startDate == undefined || milestone.endDate === undefined).map(milestone => (
+                <li className="w-full">
+                  <Button className="w-full whitespace-normal h-auto" onClick={() => handleEditClick(milestone.nodeId)}>
+                    <p className="text-wrap">{milestone.title}</p>
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+          </ScrollArea>
+        </Card>
+        <GanttChart />
+      </div>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
+  )
+}
+
+export function GanttChart() {
     const [chartData, setChartData] = useState<DataPoint[]>([]);
     const { milestones } = useRoadmapStore(useShallow(selector))
 
@@ -110,65 +157,63 @@ export function GanttChartView() {
     }
   
     return (
-      <ScrollArea className="h-full w-full">
-        <ChartContainer
-            config={chartConfig}
-            className="aspect-auto h-full w-full max-h-[500px] min-w-200px"
-        >
-            <ScatterChart
-                data={chartData}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-            >
-                <CartesianGrid vertical={false} />
-                <XAxis
-                    type="number"
-                    dataKey="x"
-                    domain={xDomain}
-                    ticks={generateXTicks()}
-                    tickFormatter={formatXAxis}
-                    padding={{ left: 30, right: 30 }}
-                    style={{ userSelect: "none" }}
-                />
-                <YAxis
-                    type="number"
-                    dataKey="y"
-                    name="weight"
-                    domain={yDomain}
-                    tickCount={chartData.length}
-                    tickFormatter={formatYAxis}
-                    padding={{ top: 50, bottom: 50 }}
-                    style={{ userSelect: "none" }}
-                    width={150}
-                />
-                <ChartTooltip
-                    content={<CustomTooltip />}
-                    cursor={{ strokeDasharray: "3 3", opacity: 0.3 }}
-                    wrapperStyle={{ zIndex: 100 }}
-                />
-                <Scatter
-                    data={chartData.map((dataPoint): {
-                      x: number
-                      z: number
-                      y: number
-                      id: number
-                      item: string
-                      milestoneData: any
-                    } => (
-                      {
-                        x: dataPoint.x || xDomain[0],
-                        z: dataPoint.z || xDomain[1],
-                        y: dataPoint.y,
-                        id: dataPoint.id,
-                        item: dataPoint.item,
-                        milestoneData: dataPoint.milestoneData
-                      }
-                    )).sort((a, b) => new Date(a.x).valueOf() - new Date(b.x).valueOf())}
-                    fill="hsl(var(--chart-1))"
-                    shape={<CustomBar/>}
-                ></Scatter>
-            </ScatterChart>
-        </ChartContainer>
-      </ScrollArea>
+      <ChartContainer
+          config={chartConfig}
+          className="h-full w-full"
+      >
+          <ScatterChart
+              data={chartData}
+              margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+          >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                  type="number"
+                  dataKey="x"
+                  domain={xDomain}
+                  ticks={generateXTicks()}
+                  tickFormatter={formatXAxis}
+                  padding={{ left: 30, right: 30 }}
+                  style={{ userSelect: "none" }}
+              />
+              <YAxis
+                  type="number"
+                  dataKey="y"
+                  name="weight"
+                  domain={yDomain}
+                  tickCount={chartData.length}
+                  tickFormatter={formatYAxis}
+                  padding={{ top: 50, bottom: 50 }}
+                  style={{ userSelect: "none" }}
+                  width={150}
+              />
+              <ChartTooltip
+                  content={<CustomTooltip />}
+                  cursor={{ strokeDasharray: "3 3", opacity: 0.3 }}
+                  wrapperStyle={{ zIndex: 100 }}
+              />
+              <Scatter
+                  data={chartData.map((dataPoint): {
+                    x: number
+                    z: number
+                    y: number
+                    id: number
+                    item: string
+                    milestoneData: any
+                  } => (
+                    {
+                      x: dataPoint.x || xDomain[0],
+                      z: dataPoint.z || xDomain[1],
+                      y: dataPoint.y,
+                      id: dataPoint.id,
+                      item: dataPoint.item,
+                      milestoneData: dataPoint.milestoneData
+                    }
+                  )).sort((a, b) => new Date(a.x).valueOf() - new Date(b.x).valueOf())}
+                  fill="hsl(var(--chart-1))"
+                  shape={<CustomBar/>}
+              ></Scatter>
+          </ScatterChart>
+      </ChartContainer>
     )
 }
 
