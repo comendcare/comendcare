@@ -113,11 +113,13 @@ export const useRoadmapStore = create<RoadmapState>()(
             const edges = addEdge(
                 {
                     ...connection,
-                    markerEnd: {
-                        type: MarkerType.ArrowClosed,
-                        width: 20,
-                        height: 20
-                    }
+                    // markerEnd: {
+                    //     type: MarkerType.ArrowClosed,
+                    //     width: 20,
+                    //     height: 20,
+                    //     color: 'black'
+                    // },
+                    // style: { stroke: 'black' }
                 },
                 get().edges
             )
@@ -149,7 +151,17 @@ export const useRoadmapStore = create<RoadmapState>()(
             debounceUpdateFlow(get().roadmapId, nodes, get().edges)
         },
         initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
-            set({ nodes, edges, milestones, selectedNodeId, selectedTaskId, roadmapId })
+            const edgesWithMarker = edges.map(edge => ({
+                ...edge,
+                // markerEnd: {
+                //     type: MarkerType.ArrowClosed,
+                //     width: 20,
+                //     height: 20,
+                //     color: 'black'
+                // },
+                // style: { stroke: 'black' }
+            }))
+            set({ nodes, edges: edgesWithMarker, milestones, selectedNodeId, selectedTaskId, roadmapId })
         },
         saveState: () => {
             const state = get()

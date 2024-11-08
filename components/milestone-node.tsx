@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import { FaCalendar } from "react-icons/fa6"
+import { FaArrowRight, FaCalendar, FaPlus } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
 import { truncate, monthsList } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
@@ -90,8 +90,20 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
                 <Button onClick={handleEditClick}>{`Details`}</Button>
             </CardFooter>
 
-            <Handle type="target" position={Position.Left} className="h-16" />
-            <Handle type="source" position={Position.Right} className="h-16" />
+            <Handle
+                type="target"
+                position={Position.Left}
+                className="z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-grey-800 border-2"
+            >
+                <FaPlus className="pointer-events-none" />
+            </Handle>
+            <Handle
+                type="source"
+                position={Position.Right}
+                className="z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-grey-800 border-2"
+            >
+                <FaPlus className="pointer-events-none" />
+            </Handle>
         </Card>
     )
 }
