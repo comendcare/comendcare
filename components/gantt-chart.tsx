@@ -34,8 +34,6 @@ import { ScrollArea } from "./ui/scroll-area";
 import StatusButton from "./milestone-status-button";
 import { truncate } from "@/lib/utils";
 import { DateView } from "./miletone-date-view";
-// import Socials from "@/components/socials";
-// import { ganttChartDataGenerator } from "@/lib/utils";
 
   const chartConfig: ChartConfig = {
     item: {
@@ -45,8 +43,8 @@ import { DateView } from "./miletone-date-view";
   };
   
   type DataPoint = {
-    x: number | undefined
-    z: number | undefined
+    x: number
+    z: number
     y: number
     id: number
     item: string
@@ -67,8 +65,8 @@ export function GanttChartView() {
     useEffect(() => {
       const data = ganttChartDataGenerator(milestones, 20, 60);
       const parsedData = data.map((d, i) => ({
-        x: d.start_date ? new Date(d.start_date).valueOf() : undefined,
-        z: d.end_date ? new Date(d.end_date).valueOf() : undefined,
+        x: new Date(d.start_date).valueOf(),
+        z: new Date(d.end_date).valueOf(),
         y: i,
         id: d.id,
         item: d.item,
@@ -79,47 +77,43 @@ export function GanttChartView() {
     }, [milestones]);
   
     const xDomain = useMemo(() => {
-      const now = new Date()
-      let filteredXData = chartData.map(d => d.x).filter(d => d !== undefined)
-      let filteredZData = chartData.map(d => d.z).filter(d => d !== undefined)
-      if (filteredXData.length <= 0) filteredXData = [now.valueOf() - 100000000]
-      if (filteredZData.length <= 0) filteredZData = [now.valueOf() + 100000000]
-      const min = Math.min(...filteredXData);
-      const max = Math.max(...filteredZData);
-      return [min - 1000 * 60 * 60 * 24, max + 1000 * 60 * 60 * 24];
-    }, [chartData]);
-  
-    const yDomain = useMemo(() => [0, chartData.length - 1], [chartData]);
-    const generateTicks = () => {
-      const now = new Date()
-      let filteredXData = chartData.map(d => d.x).filter(d => d !== undefined)
-      let filteredZData = chartData.map(d => d.z).filter(d => d !== undefined)
-      if (filteredXData.length <= 0) filteredXData = [now.valueOf() - 100000000]
-      if (filteredZData.length <= 0) filteredZData = [now.valueOf() + 100000000]
-      const minDate = Math.min(...filteredXData);
-      const maxDate = Math.max(...filteredZData);
-      const ticks = [];
-      let currentTick = new Date(minDate);
-      currentTick.setHours(0, 0, 0, 0);
+      const min = Math.min(...chartData.map(d => d.x))
+      const max = Math.max(...chartData.map(d => d.z))
+      return [min - 1000 * 60 * 60 * 24, max + 1000 * 60 * 60 * 24]
+    }, [chartData])
+
+    const generateXTicks = () => {
+      const minDate = Math.min(...chartData.map(d => d.x))
+      const maxDate = Math.max(...chartData.map(d => d.z))
+      const ticks = []
+      let currentTick = new Date(minDate)
+      currentTick.setHours(0, 0, 0, 0)
   
       while (currentTick.valueOf() <= maxDate) {
         ticks.push(currentTick.valueOf())
         currentTick.setMonth(currentTick.getMonth() + 1)
       }
   
-      return ticks;
-    };
+      return ticks
+    }
   
     const formatXAxis = (tickItem: number) => {
-      const date = new Date(tickItem);
-      return `${date.getMonth() + 1}/${date.getFullYear()}`;
-    };
+      const date = new Date(tickItem)
+      return `${date.getMonth() + 1}/${date.getFullYear()}`
+    }
+  
+    const yDomain = useMemo(() => [0, chartData.length - 1], [chartData])
+
+    const formatYAxis = (tickIndex: number) => {
+      const dataPoint = chartData[tickIndex]
+      return dataPoint?.milestoneData?.title || ''
+    }
   
     return (
       <ScrollArea className="h-full w-full">
         <ChartContainer
             config={chartConfig}
-            className="aspect-auto h-full max-h-[500px]"
+            className="aspect-auto h-full w-full max-h-[500px] min-w-200px"
         >
             <ScatterChart
                 data={chartData}
@@ -130,19 +124,21 @@ export function GanttChartView() {
                     type="number"
                     dataKey="x"
                     domain={xDomain}
-                    ticks={generateTicks()}
+                    ticks={generateXTicks()}
                     tickFormatter={formatXAxis}
                     padding={{ left: 30, right: 30 }}
                     style={{ userSelect: "none" }}
                 />
                 <YAxis
-                    hide
                     type="number"
                     dataKey="y"
                     name="weight"
                     domain={yDomain}
+                    tickCount={chartData.length}
+                    tickFormatter={formatYAxis}
                     padding={{ top: 50, bottom: 50 }}
                     style={{ userSelect: "none" }}
+                    width={150}
                 />
                 <ChartTooltip
                     content={<CustomTooltip />}
@@ -173,7 +169,7 @@ export function GanttChartView() {
             </ScatterChart>
         </ChartContainer>
       </ScrollArea>
-    );
+    )
 }
 
 const CustomBar = (props: any) => {
@@ -255,13 +251,15 @@ const CustomBar = (props: any) => {
   
     // Generate tasks
     milestones.forEach((milestone, index) => {
+      if (milestone.startDate && milestone.endDate) {
         data.push({
-            id: index + 1,
-            item: milestone.title,
-            start_date: milestone.startDate?.toISOString(),
-            end_date: milestone.endDate?.toISOString(),
-            milestoneData: milestone
-        });
+          id: index + 1,
+          item: milestone.title,
+          start_date: milestone.startDate?.toISOString(),
+          end_date: milestone.endDate?.toISOString(),
+          milestoneData: milestone
+        })
+      }
     })
   
     return data;
