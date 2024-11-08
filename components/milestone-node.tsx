@@ -11,7 +11,7 @@ import {
 } from "./ui/card"
 import { FaArrowRight, FaCalendar, FaPlus } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
-import { truncate, monthsList } from "@/lib/utils"
+import { truncate, monthsList, cn } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
 
 export type MilestoneNode = Node<
@@ -29,7 +29,8 @@ export type MilestoneNode = Node<
         dependencies?: string[]
         notes?: string
         status: StatusType
-        handleEditClick: (nodeId: string) => void
+        handleEditClick: (nodeId: string) => void,
+        onboardingMilestone: boolean
     },
     "MILESTONE"
 >
@@ -50,7 +51,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
     }
 
     return (
-        <Card className="w-[350px]">
+        <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "roadmap-tour-step2" : "")}>
             <CardHeader>
                 <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
                 {/* Description length in node is truncated to 200 characters. */}
@@ -100,7 +101,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
             <Handle
                 type="source"
                 position={Position.Right}
-                className="z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2"
+                className={cn("z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2", props.data?.onboardingMilestone ? "roadmap-tour-step3": "")}
             >
                 <FaPlus className="pointer-events-none" />
             </Handle>

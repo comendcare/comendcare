@@ -5,6 +5,9 @@ import type { Metadata, ResolvingMetadata } from "next"
 // Import Montserrat Display and Source Sans Pro
 import { Poppins, Source_Sans_3 } from "next/font/google"
 import { Providers } from "@/app/providers"
+import { Onborda } from "onborda"
+import OnboardingCard from "@/components/ui/onboarding-card"
+import { Tour } from "onborda/dist/types"
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -66,6 +69,79 @@ export async function generateMetadata(): Promise<Metadata> {
     }
 }
 
+const steps: Tour[] = [
+    {
+        tour: "roadmap-tour",
+        steps: [
+            {
+                icon: <>👋</>,
+                title: "Adding a Milestone",
+                content: <>{`Start building your roadmap by adding a new milestone.`}</>,
+                selector: ".roadmap-tour-step1",
+                side: "top" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+            {
+                icon: <>⭐</>,
+                title: "Milestones",
+                content: <>{`Milestones are the goals and projects that make up your research map. You can click the 'Details' button to edit the contents of each milestone.`}</>,
+                selector: ".roadmap-tour-step2",
+                side: "top" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+            {
+                icon: <>⭐</>,
+                title: "Connecting Milestones",
+                content: <>{`Once you've created more than one milestone, you can create relationships between them by dragging from the + icon.`}</>,
+                selector: ".roadmap-tour-step3",
+                side: "top" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+        ]
+    },
+    {
+        tour: "empty-roadmap-tour",
+        steps: [
+            {
+                icon: <>👋</>,
+                title: "Adding a Milestone",
+                content: <>{`Start building your roadmap by adding a new milestone.`}</>,
+                selector: ".empty-roadmap-tour-step1",
+                side: "top" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+            {
+                icon: <>⭐</>,
+                title: "Milestones",
+                content: <>{`Milestones are the goals and projects that make up your research map. You can click the 'Details' button to edit the contents of each milestone.`}</>,
+                selector: ".roadmap-tour-step2",
+                side: "top" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+            {
+                icon: <>⭐</>,
+                title: "Connecting Milestones",
+                content: <>{`Once you've created more than one milestone, you can create relationships between them by dragging from the + icon.`}</>,
+                selector: ".roadmap-tour-step3",
+                side: "top" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+        ]
+    }
+]
+
 export default function RootLayout({
     children
 }: {
@@ -85,7 +161,9 @@ export default function RootLayout({
                         enableSystem={false}
                         disableTransitionOnChange
                     >
-                        {children}
+                        <Onborda steps={steps} cardComponent={OnboardingCard}>
+                            {children}
+                        </Onborda>
                     </ThemeProvider>
                 </Providers>
             </body>

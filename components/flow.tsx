@@ -21,6 +21,7 @@ import { nanoid } from "nanoid"
 import { Dialog } from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useOnborda } from "onborda"
 
 const proOptions = { hideAttribution: true }
 
@@ -61,6 +62,7 @@ const RoadmapFlowchart = ({
     const nodeTypes = { MILESTONE: MilestoneNode }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const { startOnborda } = useOnborda()
 
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
@@ -114,7 +116,7 @@ const RoadmapFlowchart = ({
 
     // add handleEditClick() callback to nodes in the flow
     // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
-    const updatedNodes = nodes.map((node: Node) => ({
+    const updatedNodes = nodes.map((node: Node, index: number) => ({
         ...node,
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
@@ -126,7 +128,9 @@ const RoadmapFlowchart = ({
                 params.set("milestone", nodeId)
         
                 router.push(`${pathname}?${params.toString()}`, { scroll: false })
-            }
+            },
+            // first node is the onboarding node
+            onboardingMilestone: index === 0
         }
     }))
 
@@ -134,17 +138,24 @@ const RoadmapFlowchart = ({
     useEffect(() => {
         const timer = setTimeout(() => {
             if (selectedNodeId) {
-                fitView({ nodes: [{ id: selectedNodeId }], padding: 1 })
+                fitView({ nodes: [{ id: selectedNodeId }], padding: 2 })
             } else {
-                fitView()
+                fitView({ padding: 2 })
             }
         }, 1) // Delay by a short time to allow layout adjustment
 
         return () => clearTimeout(timer)
     }, [width, selectedNodeId])
 
+    useEffect(() => {
+        if (nodes.length > 0) startOnborda('roadmap-tour')
+        else startOnborda('empty-roadmap-tour')
+    }, [nodes])
+
+    const disabled = true
+
     return (
-        <>
+        <div className="h-full">
         <ReactFlow
             width={width}
             nodes={updatedNodes}
@@ -156,23 +167,31 @@ const RoadmapFlowchart = ({
             nodeTypes={nodeTypes}
             fitView
             proOptions={proOptions}
+            // edgesUpdatable={!disabled}
+            // edgesFocusable={!disabled}
+            // nodesDraggable={!disabled}
+            nodesConnectable={!disabled}
+            nodesFocusable={!disabled}
+            draggable={!disabled}
+            panOnDrag={!disabled}
+            elementsSelectable={!disabled}
         >
             <MiniMap />
             <Controls>
-                <Button onClick={() => addMilestone()}>Add Milestone</Button>
+                <Button className="roadmap-tour-step1 empty-roadmap-tour-step1" onClick={() => addMilestone()}>Add Milestone</Button>
             </Controls>
         </ReactFlow>
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
         </Dialog>
-        </>
+        </div>
     )
 }
 
 export function FlowView(props: any) {
     return (
-        <ReactFlowProvider>
+        // <ReactFlowProvider>
             <RoadmapFlowchart {...props} />
-        </ReactFlowProvider>
+        // </ReactFlowProvider>
     )
 }
