@@ -41,11 +41,12 @@ import { ScrollArea } from "./ui/scroll-area";
   };
   
   type DataPoint = {
-    x: number | undefined;
-    z: number | undefined;
-    y: number;
-    id: number;
-    item: string;
+    x: number | undefined
+    z: number | undefined
+    y: number
+    id: number
+    item: string
+    milestoneData: any
   };
 
 const selector = (state: RoadmapState) => ({
@@ -75,10 +76,11 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
         y: i,
         id: d.id,
         item: d.item,
+        milestoneData: d.milestoneData
       }));
 
       setChartData(parsedData);
-    }, []);
+    }, [milestones]);
   
     const xDomain = useMemo(() => {
       const now = new Date()
@@ -158,13 +160,15 @@ function GanttChart({ initMilestones }: { initMilestones: any[] }) {
                       y: number
                       id: number
                       item: string
+                      milestoneData: any
                     } => (
                       {
                         x: dataPoint.x || xDomain[0],
                         z: dataPoint.z || xDomain[1],
                         y: dataPoint.y,
                         id: dataPoint.id,
-                        item: dataPoint.item
+                        item: dataPoint.item,
+                        milestoneData: dataPoint.milestoneData
                       }
                     )).sort((a, b) => new Date(a.x).valueOf() - new Date(b.x).valueOf())}
                     fill="hsl(var(--chart-1))"
@@ -188,7 +192,7 @@ const CustomBar = (props: any) => {
     const searchParams = useSearchParams()
   
     const truncateText = (text: string, maxWidth: number) => {
-      const charWidth = 5;
+      const charWidth = 7;
       const maxChars = Math.floor(maxWidth / charWidth);
       if (text.length > maxChars) {
         return text.slice(0, maxChars - 3) + "...";
@@ -198,20 +202,21 @@ const CustomBar = (props: any) => {
   
     const truncatedText = truncateText(payload.item, barWidth);
 
-    const handleEditClick = (nodeId: string) => {
-        setSelectedNodeId(nodeId)
+    const handleEditClick = (payload: DataPoint) => {
+      const nodeId = payload.milestoneData.nodeId
+      setSelectedNodeId(nodeId)
 
-        const params = new URLSearchParams(searchParams.toString())
-        params.delete("milestone")
-        params.set("milestone", nodeId)
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete("milestone")
+      params.set("milestone", nodeId)
 
-        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
     }
   
     return (
         <g>
             <foreignObject x={cx} y={cy - barHeight / 2} width={barWidth} height={40}>
-            <Button className="h-full w-full" onClick={() => { handleEditClick(payload.itemNodeId) }}>
+            <Button className="h-full w-full" onClick={() => { handleEditClick(payload) }}>
                 {truncatedText}
             </Button>
             </foreignObject>
@@ -255,9 +260,9 @@ const CustomBar = (props: any) => {
         data.push({
             id: index + 1,
             item: milestone.title,
-            itemNodeId: milestone.nodeId,
             start_date: milestone.startDate?.toISOString(),
-            end_date: milestone.endDate?.toISOString()
+            end_date: milestone.endDate?.toISOString(),
+            milestoneData: milestone
         });
     })
     // for (let i = 0; i < n; i++) {
