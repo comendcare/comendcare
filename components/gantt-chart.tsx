@@ -16,6 +16,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -30,6 +31,9 @@ import { Task } from "./task-card";
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
+import StatusButton from "./milestone-status-button";
+import { truncate } from "@/lib/utils";
+import { DateView } from "./miletone-date-view";
 // import Socials from "@/components/socials";
 // import { ganttChartDataGenerator } from "@/lib/utils";
 
@@ -57,14 +61,6 @@ const selector = (state: RoadmapState) => ({
 })
 
 export function GanttChartView() {
-    const { milestones } = useRoadmapStore(useShallow(selector))
-
-    return (
-        <GanttChart initMilestones={milestones}/>
-    )
-}
-
-function GanttChart({ initMilestones }: { initMilestones: any[] }) {
     const [chartData, setChartData] = useState<DataPoint[]>([]);
     const { milestones } = useRoadmapStore(useShallow(selector))
 
@@ -228,11 +224,27 @@ const CustomBar = (props: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="p-2 border bg-secondary rounded shadow">
-          <p className="font-bold">{data.item}</p>
-          <p>Start: {new Date(data.x).toLocaleDateString()}</p>
-          <p>End: {new Date(data.z).toLocaleDateString()}</p>
-        </div>
+        <Card className="w-[350px]">
+            <CardHeader>
+                <CardTitle>{data?.milestoneData?.title || "New Milestone"}</CardTitle>
+                {/* Description length in node is truncated to 200 characters. */}
+                <CardDescription>
+                    {truncate(data?.milestoneData?.description || "", 200)}
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-8">
+                {(data?.milestoneData?.startDate?.getMonth() || data?.milestoneData?.endDate?.getFullYear()) && (
+                    <DateView startDate={data?.milestoneData?.startDate} endDate={data?.milestoneData?.endDate}/>
+                )}
+            </CardContent>
+            <CardFooter className="flex justify-between">
+                <StatusButton
+                    disabled={true}
+                    status={data?.milestoneData?.status || "TODO"}
+                    onStatusChange={() => {}}
+                />
+            </CardFooter>
+        </Card>
       );
     }
     return null;
@@ -240,20 +252,6 @@ const CustomBar = (props: any) => {
 
   const ganttChartDataGenerator = (milestones: any[], n: number, durationInDays: number) => {
     const data: any[] = [];
-    const startDate = new Date();
-    const endDate = new Date(
-      startDate.getTime() + durationInDays * 24 * 60 * 60 * 1000
-    );
-  
-    const getRandomDate = (start: Date, end: Date) => {
-      return new Date(
-        start.getTime() + Math.random() * (end.getTime() - start.getTime())
-      );
-    };
-  
-    const getRandomDuration = (minDays: number, maxDays: number) => {
-      return Math.floor(Math.random() * (maxDays - minDays + 1) + minDays);
-    };
   
     // Generate tasks
     milestones.forEach((milestone, index) => {
@@ -265,42 +263,6 @@ const CustomBar = (props: any) => {
             milestoneData: milestone
         });
     })
-    // for (let i = 0; i < n; i++) {
-    //   const taskDuration = getRandomDuration(
-    //     1,
-    //     Math.max(2, Math.floor(durationInDays / 10))
-    //   ); // Ensure some short tasks
-    //   let start = getRandomDate(
-    //     startDate,
-    //     new Date(endDate.getTime() - taskDuration * 24 * 60 * 60 * 1000)
-    //   );
-    //   let end = new Date(start.getTime() + taskDuration * 24 * 60 * 60 * 1000);
-  
-    //   // Ensure some tasks overlap
-    //   if (i > 0 && Math.random() < 0.4) {
-    //     const prevTask = data[data.length - 1];
-    //     start = getRandomDate(
-    //       new Date(prevTask.start_date),
-    //       new Date(prevTask.end_date)
-    //     );
-    //     end = new Date(start.getTime() + taskDuration * 24 * 60 * 60 * 1000);
-  
-    //     // Adjust end date if it exceeds the project end date
-    //     if (end > endDate) {
-    //       end = endDate;
-    //     }
-    //   }
-  
-    //   data.push({
-    //     id: i + 1,
-    //     item: `Task ${i + 1}`,
-    //     start_date: start.toISOString(),
-    //     end_date: end.toISOString(),
-    //   });
-    // }
-  
-    // sort
-    // data.sort((a, b) => new Date(a.start_date).valueOf() - new Date(b.start_date).valueOf());
   
     return data;
   };
