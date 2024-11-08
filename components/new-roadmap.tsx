@@ -156,7 +156,7 @@ export default function NewRoadmapForm() {
                                         <ul className="flex flex-col gap-2">
                                             {milestoneData.tasks?.map((task, index) => (
                                                 <li key={index} className="flex flex-row gap-2 items-center">
-                                                    <FaCheck size={20} className="h-4 w-4"/>
+                                                    <FaCheck size={20} className="h-4 w-4 text-green-500"/>
                                                     <p className="grow">{task.name}</p>
                                                 </li>
                                             ))}
