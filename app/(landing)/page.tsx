@@ -15,7 +15,6 @@ import WhatElseSection from "@/components/layout/sections/what-else-section"
 import { CloudHeroSection } from "@/components/layout/sections/cloud-hero"
 import { BetaSignup } from "@/components/beta-signup"
 import JoinWaitlistSection from "@/components/layout/sections/join-waitlist-section"
-import AnalyticsScripts from "@/lib/mixpanel"
 
 export default function App() {
     const [isSubscribed, setIsSubscribed] = useState<boolean>(false)
@@ -54,7 +53,6 @@ export default function App() {
                 isSubscribedCallback={betaSubscribeCallback}
                 isSubscribed={isSubscribed}
             />
-            <AnalyticsScripts />
         </>
     )
 }
