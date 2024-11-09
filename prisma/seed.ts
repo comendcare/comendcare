@@ -1,5 +1,5 @@
+// This seed script is meant to help during development, and not to be used to seed production databases
 import {PrismaClient} from '@prisma/client'
-import { signOut } from 'next-auth/react'
 
 const prisma = new PrismaClient()
 
@@ -276,6 +276,9 @@ async function main() {
             }
         },
     })
+
+    await createConditions()
+
 }
 
 const exampleASORoadmap = {
@@ -360,6 +363,50 @@ const exampleASORoadmap = {
             tasks: []
         }
     ]
+}
+
+async function createConditions() {
+    const whiteSuttonSyndrome = await prisma.condition.create({
+        data: {
+            name: "White Sutton Syndrome",
+            slug: "white-sutton-syndrome",
+            nordURL: "https://rarediseases.org/rare-diseases/white-sutton-syndrome/",
+            gardURL: "https://www.ncbi.nlm.nih.gov/gard/white-sutton-syndrome/",
+            description: "White Sutton Syndrome is a genetic condition that affects the development of multiple systems in the body.",
+            interestedModalities: ["Gene Therapy", "Small Molecule"],
+            diseaseCategories: ["Genetic Syndrome"],
+            prevalenceNumerator: 1,
+            prevalenceDenominator: 50000,
+            numberOfIdentifiedPatients: 100,
+            relevantDiseaseMechanisms: ["Genetic Mutation"],
+            associatedGenes: ["PAX5"],
+            associatedSignsAndSymptoms: ["Developmental delay", "Speech impairment"],
+            existingDatabasesAndStudies: ["White Sutton Syndrome Patient Registry"],
+            assetsUnderDevelopment: ["Patient-derived cell models"]
+        }
+    });
+
+    const warsawBreakageSyndrome = await prisma.condition.create({
+        data: {
+            name: "Warsaw Breakage Syndrome",
+            slug: "warsaw-breakage-syndrome",
+            nordURL: "https://rarediseases.org/rare-diseases/warsaw-breakage-syndrome/",
+            gardURL: "https://www.ncbi.nlm.nih.gov/gard/warsaw-breakage-syndrome/",
+            description: "Warsaw Breakage Syndrome is a rare genetic disorder characterized by developmental delay, microcephaly, and distinctive facial features.",
+            interestedModalities: ["CRISPR", "AAV"],
+            diseaseCategories: ["Genetic Disorder", "DNA Repair Deficiency"],
+            prevalenceNumerator: 1,
+            prevalenceDenominator: 1000000,
+            numberOfIdentifiedPatients: 30,
+            relevantDiseaseMechanisms: ["DNA Repair Deficiency"],
+            associatedGenes: ["DDB2"],
+            associatedSignsAndSymptoms: ["Microcephaly", "Growth retardation"],
+            existingDatabasesAndStudies: ["Warsaw Breakage Syndrome Natural History Study"],
+            assetsUnderDevelopment: ["Animal model"]
+        }
+    });
+
+    console.log("Conditions created:", { whiteSuttonSyndrome, warsawBreakageSyndrome });
 }
 
 async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
