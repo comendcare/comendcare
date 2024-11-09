@@ -88,7 +88,7 @@ export function GanttChartView() {
           <CardContent>
             <ul className="flex flex-col gap-2">
               {milestones.filter(milestone => milestone.startDate == undefined || milestone.endDate === undefined).map(milestone => (
-                <li className="w-full">
+                <li key={milestone.nodeId} className="w-full">
                   <Button className="w-full whitespace-normal h-auto" onClick={() => handleEditClick(milestone.nodeId)}>
                     <p className="text-wrap">{milestone.title}</p>
                   </Button>
