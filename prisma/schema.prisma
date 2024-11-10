@@ -36,8 +36,8 @@ model User {
   region               String?
   postalCode           String?
   country              String?
-  lat                  String?
-  lng                  String?
+  lat                  Float?
+  lng                  Float?
 }
 
 model Member {
