@@ -587,40 +587,37 @@ export const deleteRoadmap = withRoadmapAuth(
 )
 
 export const editUser = async (
-    formData: FormData,
     _id: unknown,
-    key: string
+    data: { [key: string]: unknown }
 ) => {
-    const session = await getSession()
+    const session = await getSession();
     if (!session?.user.id) {
         return {
             error: "Not authenticated"
-        }
+        };
     }
-    const value = formData.get(key) as string
 
     try {
         const response = await prisma.user.update({
             where: {
                 id: session.user.id
             },
-            data: {
-                [key]: value
-            }
-        })
-        return response
+            data: data, // Pass the data object directly
+        });
+        return response;
     } catch (error: any) {
         if (error.code === "P2002") {
+            const field = Object.keys(data)[0]; // Identify which field caused the conflict
             return {
-                error: `This ${key} is already in use`
-            }
+                error: `This ${field} is already in use`
+            };
         } else {
             return {
                 error: error.message
-            }
+            };
         }
     }
-}
+};
 
 // Invite user function with updated Organization model
 export async function inviteUser(

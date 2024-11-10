@@ -102,8 +102,8 @@ export default function AddressAutoComplete(props: AddressAutoCompleteProps) {
                                 region: "",
                                 postalCode: "",
                                 country: "",
-                                lat: 0,
-                                lng: 0,
+                                lat: "0",
+                                lng: "0",
                             });
                         }}
                         size="icon"
