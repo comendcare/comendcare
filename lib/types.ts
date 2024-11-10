@@ -7,8 +7,8 @@ export interface AddressType {
     region: string;
     postalCode: string;
     country: string;
-    lat: number;
-    lng: number;
+    lat: string;
+    lng: string;
 }
 
 export type DomainVerificationStatusProps =

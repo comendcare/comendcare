@@ -9,7 +9,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {editUser} from "@/lib/actions";
+import {editUser, getUser} from "@/lib/actions";
 import {Separator} from "@/components/ui/separator";
 import {Checkbox} from "@/components/ui/checkbox";
 import {AutocompleteComponent} from "@/components/autocomplete";
@@ -27,12 +27,14 @@ const invitationFormSchema = z.object({
     region: z.string().optional(),
     postalCode: z.string().optional(),
     country: z.string().optional(),
-    lat: z.number().optional(),
-    lng: z.number().optional(),
+    lat: z.string().optional(),
+    lng: z.string().optional(),
 });
 
 export default function UserOnboardingForm() {
+    const router = useRouter();
     const {data: session, update} = useSession();
+    const [searchInput, setSearchInput] = useState("");
     const [address, setAddress] = useState<AddressType>({
         address1: "",
         address2: "",
@@ -41,20 +43,46 @@ export default function UserOnboardingForm() {
         region: "",
         postalCode: "",
         country: "",
-        lat: 0,
-        lng: 0,
+        lat: "",
+        lng: "",
     });
-    const [searchInput, setSearchInput] = useState("");
+    console.log(session)
 
-    const router = useRouter();
+    const [defaultValues, setDefaultValues] = useState<z.infer<typeof invitationFormSchema> | undefined>(undefined);
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(invitationFormSchema),
-        defaultValues: {
-            notificationSettings: true,
-        },
+        defaultValues
     });
+
+    useEffect(() => {
+        async function fetchUserData() {
+            if (session?.user?.id) {
+                const userData = await getUser(session.user.id);
+                if (userData) {
+                    const fetchedValues = {
+                        name: userData.name || "",
+                        title: userData.title || "",
+                        notificationSettings: userData.notificationSettings ?? true,
+                        address1: userData.address1 || "",
+                        address2: userData.address2 || "",
+                        formattedAddress: userData.formattedAddress || "",
+                        city: userData.city || "",
+                        region: userData.region || "",
+                        postalCode: userData.postalCode || "",
+                        country: userData.country || "",
+                        lat: userData.lat || "0",
+                        lng: userData.lng || "0",
+                    };
+                    setDefaultValues(fetchedValues);
+                    setAddress(fetchedValues); // Set address state as well
+                    form.reset(fetchedValues); // Reset form with fetched data
+                }
+            }
+        }
+        fetchUserData();
+    }, [session, form])
 
     useEffect(() => {
         form.setValue("address1", address.address1);
@@ -79,7 +107,7 @@ export default function UserOnboardingForm() {
 
         // For each form field, call editUser to update the user profile
         for (const [key, value] of Object.entries(values)) {
-            await editUser(formData, session?.user.id, key).then(
+            await editUser(formData, session?.user?.id, key).then(
                 (res: any) => {
                     if (res.error) {
                         toast.error(res.error);

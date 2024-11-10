@@ -135,6 +135,27 @@ export const authOptions: NextAuthOptions = {
         },
 
         session: async ({session, token}) => {
+            // Check if the user still exists in the database
+            const dbUser = await prisma.user.findUnique({
+                where: {id: token.sub},
+            });
+
+            // If the user does not exist, return null to terminate the session
+            if (!dbUser) {
+                // Continue with your existing session logic
+                session.user = {
+                    ...session.user,
+                    // @ts-expect-error
+                    id: token.sub,
+                    // @ts-expect-error
+                    username: token?.user?.username || token?.user?.gh_username,
+                    organizationId: token.organizationId as string | null, // Ensure type matches
+                };
+
+                return session
+            }
+
+            // Continue with your existing session logic
             session.user = {
                 ...session.user,
                 // @ts-expect-error
@@ -143,8 +164,9 @@ export const authOptions: NextAuthOptions = {
                 username: token?.user?.username || token?.user?.gh_username,
                 organizationId: token.organizationId as string | null, // Ensure type matches
             };
+
             return session;
-        },
+        }
     },
     debug: process.env.VERCEL_URL === "development",
 };
