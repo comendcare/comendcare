@@ -366,47 +366,47 @@ const exampleASORoadmap = {
 }
 
 async function createConditions() {
-    const whiteSuttonSyndrome = await prisma.condition.create({
+    const celocynSyndrome = await prisma.condition.create({
         data: {
-            name: "White Sutton Syndrome",
-            slug: "white-sutton-syndrome",
-            nordURL: "https://rarediseases.org/rare-diseases/white-sutton-syndrome/",
-            gardURL: "https://www.ncbi.nlm.nih.gov/gard/white-sutton-syndrome/",
-            description: "White Sutton Syndrome is a genetic condition that affects the development of multiple systems in the body.",
-            interestedModalities: ["Gene Therapy", "Small Molecule"],
-            diseaseCategories: ["Genetic Syndrome"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 50000,
-            numberOfIdentifiedPatients: 100,
-            relevantDiseaseMechanisms: ["Genetic Mutation"],
-            associatedGenes: ["PAX5"],
-            associatedSignsAndSymptoms: ["Developmental delay", "Speech impairment"],
-            existingDatabasesAndStudies: ["White Sutton Syndrome Patient Registry"],
-            assetsUnderDevelopment: ["Patient-derived cell models"]
-        }
-    });
-
-    const warsawBreakageSyndrome = await prisma.condition.create({
-        data: {
-            name: "Warsaw Breakage Syndrome",
-            slug: "warsaw-breakage-syndrome",
-            nordURL: "https://rarediseases.org/rare-diseases/warsaw-breakage-syndrome/",
-            gardURL: "https://www.ncbi.nlm.nih.gov/gard/warsaw-breakage-syndrome/",
-            description: "Warsaw Breakage Syndrome is a rare genetic disorder characterized by developmental delay, microcephaly, and distinctive facial features.",
-            interestedModalities: ["CRISPR", "AAV"],
-            diseaseCategories: ["Genetic Disorder", "DNA Repair Deficiency"],
+            name: "Celocyn Syndrome",
+            slug: "celocyn-syndrome",
+            nordURL: "https://rarediseases.org/rare-diseases/celocyn-syndrome/",
+            gardURL: "https://www.ncbi.nlm.nih.gov/gard/celocyn-syndrome/",
+            description: "Celocyn Syndrome is a progressive and degenerative disorder affecting the brain, characterized by severe neurological symptoms.",
+            interestedModalities: ["AAV", "ASO"],
+            diseaseCategories: ["Neuroencephalomyelopathy"],
             prevalenceNumerator: 1,
             prevalenceDenominator: 1000000,
-            numberOfIdentifiedPatients: 30,
-            relevantDiseaseMechanisms: ["DNA Repair Deficiency"],
-            associatedGenes: ["DDB2"],
-            associatedSignsAndSymptoms: ["Microcephaly", "Growth retardation"],
-            existingDatabasesAndStudies: ["Warsaw Breakage Syndrome Natural History Study"],
-            assetsUnderDevelopment: ["Animal model"]
+            numberOfIdentifiedPatients: 37,
+            relevantDiseaseMechanisms: ["Neurology"],
+            associatedGenes: ["GEL3", "M4SF"],
+            associatedSignsAndSymptoms: ["Severe migraines", "Early onset dementia"],
+            existingDatabasesAndStudies: ["Celocyn Syndrome Registry"],
+            assetsUnderDevelopment: ["Mouse model", "Cell line"]
         }
     });
 
-    console.log("Conditions created:", { whiteSuttonSyndrome, warsawBreakageSyndrome });
+    const arcadionDisease = await prisma.condition.create({
+        data: {
+            name: "Arcadion Disease",
+            slug: "arcadion-disease",
+            nordURL: "https://rarediseases.org/rare-diseases/arcadion-disease/",
+            gardURL: "https://www.ncbi.nlm.nih.gov/gard/arcadion-disease/",
+            description: "Arcadion Disease is a progressive and degenerative disorder affecting the central nervous system, leading to severe physical and cognitive decline.",
+            interestedModalities: ["Gene Therapy", "CRISPR"],
+            diseaseCategories: ["Neurodegenerative Disorder"],
+            prevalenceNumerator: 1,
+            prevalenceDenominator: 700000,
+            numberOfIdentifiedPatients: 22,
+            relevantDiseaseMechanisms: ["Genetic Mutation", "Mitochondrial Dysfunction"],
+            associatedGenes: ["ARC1", "NEU4"],
+            associatedSignsAndSymptoms: ["Muscle weakness", "Memory loss", "Difficulty swallowing"],
+            existingDatabasesAndStudies: ["Arcadion Patient Registry", "Arcadion Disease Natural History Study"],
+            assetsUnderDevelopment: ["Gene therapy vector", "Patient-derived cell line"]
+        }
+    });
+
+    console.log("Conditions created:", { celocynSyndrome, arcadionDisease });
 }
 
 async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {

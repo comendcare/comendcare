@@ -75,7 +75,6 @@ export default async function ProfilePage() {
     if (session?.user.organizationId) {
         organization = await getOrganizationFromOrganizationId(session?.user.organizationId)
     }
-    console.log(session?.user.organizationId)
 
     if (organization) {
         return (
@@ -140,7 +139,7 @@ export default async function ProfilePage() {
                                             <FaPlus/>
                                             Add post
                                         </Button>
-                                        <ProfileDropdown/>
+                                        <ProfileDropdown subdomain={organization.subdomain}/>
                                     </div>
                                 </div>
 
