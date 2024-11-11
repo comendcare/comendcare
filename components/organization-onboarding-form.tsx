@@ -102,8 +102,8 @@ export default function OrganizationOnboardingForm() {
         region: "",
         postalCode: "",
         country: "",
-        lat: "0",
-        lng: "0",
+        lat: 0,
+        lng: 0,
     });
     const [searchInput, setSearchInput] = useState("");
     const { isNewOrganization, toggleIsNewOrganization } = useOnboardingStore();
