@@ -103,13 +103,16 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         let onboardingNodeId: string | undefined = nodes[0]?.id
 
         // execute any actions that need to occur before we move to the next step
-        if (step.selector === '.empty-roadmap-tour-step1') {
-            const newNode = addMilestone()
-            onboardingNodeId = newNode.id
+        if (step.selector === '.roadmap-tour-step1') {
+            // if there are no nodes, we create one to use for the onboarding flow
+            if (nodes.length <= 0) {
+                const newNode = addMilestone()
+                onboardingNodeId = newNode.id
+            }
+
             fitView({ nodes: [{ id: onboardingNodeId }], padding: 2 })
-        } else if (step.selector === '.roadmap-tour-step1') {
-            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2 })
-        } else if (step.selector === '.roadmap-tour-step2') {
+        }
+        if (step.selector === '.roadmap-tour-step2') {
             setSelectedNodeId(onboardingNodeId)
 
             const params = new URLSearchParams(searchParams.toString())
@@ -123,18 +126,8 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
                 console.log(`scroll area`, element)
                 element.scrollIntoView({block: "end", inline: "nearest", behavior: "smooth"}) // scroll to bottom
             }
-            // scrollRef.current?.scrollToBottom()
-
-            // await new Promise(resolve => setTimeout(resolve, 1000))
-            // nextStep()
-            // setSelectedNodeId(null)
-
-            // const params = new URLSearchParams(searchParams.toString())
-            // params.delete("milestone")
-            // router.push(`${pathname}?${params.toString()}`, { scroll: false })
 
             await new Promise(resolve => setTimeout(resolve, 500))
-            // fitView({ nodes: [{ id: onboardingNodeId }], padding: 2 })
         }
         
         await new Promise(resolve => setTimeout(resolve, 500))

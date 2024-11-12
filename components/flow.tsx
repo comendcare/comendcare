@@ -175,8 +175,7 @@ const RoadmapFlowchart = ({
     }, [nodes])
 
     const startOnbordaAndRemoveToast = () => {
-        if (nodes.length > 0) startOnborda('roadmap-tour')
-        else startOnborda('empty-roadmap-tour')
+        startOnborda('roadmap-tour')
         setUserAsReturning()
         toast.dismiss()
     }
