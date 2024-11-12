@@ -18,7 +18,6 @@ import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {editUser, getUser} from "@/lib/actions";
-import {Separator} from "@/components/ui/separator";
 import {Checkbox} from "@/components/ui/checkbox";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {AddressType} from "@/lib/types";
