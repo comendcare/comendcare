@@ -78,7 +78,7 @@ const steps: Tour[] = [
             {
                 icon: <>👋</>,
                 title: "Adding a Milestone",
-                content: <>{`Start building your roadmap by adding a new milestone.`}</>,
+                content: <>{`Start building your research map by adding a new milestone.`}</>,
                 selector: ".roadmap-tour-step1",
                 side: "top" as any,
                 showControls: true,

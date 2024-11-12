@@ -22,6 +22,8 @@ import { Dialog } from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useOnborda } from "./onborda/OnbordaContext"
+import { toast } from "sonner"
+import { isNewUser, setUserAsReturning } from "@/lib/utils"
 
 const proOptions = { hideAttribution: true }
 
@@ -148,9 +150,36 @@ const RoadmapFlowchart = ({
     }, [width, selectedNodeId])
 
     useEffect(() => {
+        if (isNewUser()) {
+            toast("Welcome to your research map!", {
+                id: "onborda",
+                duration: 300000,
+                description: `Would you like to take a quick tour?`,
+                action: (
+                    <div className="flex flex-col space-y-2 ml-4">
+                        <Button
+                            onClick={startOnbordaAndRemoveToast}
+                        >{`Yes please!`}</Button>
+                        <Button
+                            onClick={() => {
+                                toast.dismiss()
+                                setUserAsReturning()
+                            }}
+                        >
+                            {`No thanks!`}
+                        </Button>
+                    </div>
+                )
+            })
+        }
+    }, [nodes])
+
+    const startOnbordaAndRemoveToast = () => {
         if (nodes.length > 0) startOnborda('roadmap-tour')
         else startOnborda('empty-roadmap-tour')
-    }, [nodes])
+        setUserAsReturning()
+        toast.dismiss()
+    }
 
     return (
         <div className="h-full">
