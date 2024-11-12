@@ -18,6 +18,8 @@ import {getOrganizationFromOrganizationId} from "@/lib/actions";
 import {getSession} from "@/lib/auth";
 import Image from "next/image"
 import Link from "next/link";
+import {PAGProfileAnalyticsCard} from "@/components/pag-profile-analytics-card";
+import {OpenRFPsCard} from "@/components/open-rfps-card";
 
 const profile = {
     name: 'Ricardo Cooper',
@@ -104,7 +106,7 @@ export default async function ProfilePage() {
                                         <div
                                             className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                                             {organization?.numberOfIdentifiedPatients &&
-                                                <div className="mt-2 flex items-center text-sm text-gray-500">
+                                                <div className="mt-2 flex items-center text-gray-500">
                                                     <FaPeopleGroup
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"/>
@@ -112,7 +114,7 @@ export default async function ProfilePage() {
                                                 </div>
                                             }
                                             {organization?.moneyRaised &&
-                                                <div className="mt-2 flex items-center text-sm text-gray-500">
+                                                <div className="mt-2 flex items-center text-gray-500">
                                                     <FaCircleDollarToSlot
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"
@@ -120,7 +122,7 @@ export default async function ProfilePage() {
                                                     ${organization?.moneyRaised?.toLocaleString()} raised
                                                 </div>
                                             }
-                                            <div className="mt-2 flex items-center text-sm text-gray-500">
+                                            <div className="mt-2 flex items-center text-gray-500">
                                                 <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                             aria-hidden="true"/>
                                                 Founded on {new Date(organization?.createdAt ?? "").toDateString()}
@@ -153,11 +155,13 @@ export default async function ProfilePage() {
                     <div className="grid grid-cols-6 gap-4">
                         <div className="col-span-2 space-y-4">
                             <PAGProfileDetailsCard organization={organization}/>
-                            <LineChartCard/>
+                            {/*<LineChartCard/>*/}
+                            <OpenRFPsCard/>
                             <DonutChartCard/>
                         </div>
 
                         <div className="col-span-4 flex flex-col space-y-4">
+                            <PAGProfileAnalyticsCard/>
                             <PAGProfileRoadmapCard/>
                             <Card>
                                 <CardHeader>

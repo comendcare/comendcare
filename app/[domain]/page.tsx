@@ -6,6 +6,7 @@ import { placeholderBlurhash, toDateString } from "@/lib/utils"
 import BlogCard from "@/components/blog-card"
 import { getRoadmapsForOrganization, getOrganizationData } from "@/lib/fetchers"
 import Image from "next/image"
+import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -49,7 +50,8 @@ export default async function OrganizationHomePage({
     }
 
     return (
-        <>
+        <main className="flex flex-col items-center w-full max-w-7xl mx-auto">
+            <PAGPublicProfileHeader/>
             <div className="mb-20 w-full">
                 {roadmaps.length > 0 ? (
                     <div className="mx-auto w-full max-w-screen-xl md:mb-28 lg:w-5/6">
@@ -144,6 +146,6 @@ export default async function OrganizationHomePage({
                     </div>
                 </div>
             )}
-        </>
+        </main>
     )
 }
