@@ -1,4 +1,4 @@
-import { ProjectNav } from "@/components/project-nav"
+import { MarketplaceNav } from "@/components/marketplace-nav"
 
 export default function Browse() {
     return (

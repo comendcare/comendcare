@@ -34,7 +34,7 @@ interface ExamplesNavProps extends React.HTMLAttributes<HTMLDivElement> {
     projectId: string
 }
 
-export function ProjectNav({
+export function MarketplaceNav({
                                className,
                                projectId,
                                ...props
