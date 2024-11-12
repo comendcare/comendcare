@@ -1,19 +1,33 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import {usePathname} from "next/navigation"
 
-import { cn } from "@/lib/utils"
+import {cn} from "@/lib/utils"
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {Button} from "@/components/ui/button";
 
 const links = [
     {
+        name: "Patient groups",
+        href: "/patient-groups",
+        comingSoon: false
+    },
+    {
         name: "Researchers",
-        href: "/researchers"
+        href: "/researchers",
+        comingSoon: true
     },
     {
         name: "Contractors",
-        href: "/contractors"
-    }
+        href: "/contractors",
+        comingSoon: true
+    },
+    {
+        name: "Grants",
+        href: "/grants",
+        comingSoon: true
+    },
 ]
 
 interface ExamplesNavProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -21,29 +35,48 @@ interface ExamplesNavProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function ProjectNav({
-    className,
-    projectId,
-    ...props
-}: ExamplesNavProps) {
+                               className,
+                               projectId,
+                               ...props
+                           }: ExamplesNavProps) {
     const pathname = usePathname()
 
     return (
-        <div className={cn("mb-4 flex items-center", className)} {...props}>
-            {links.map((link, index) => (
-                <Link
-                    href={"/app/marketplace/" + link.href}
-                    key={link.href}
-                    className={cn(
-                        "flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                        pathname?.endsWith(link.href) ||
-                            (index === 0 && pathname === "/")
-                            ? "bg-muted font-medium text-primary"
-                            : "text-muted-foreground"
-                    )}
-                >
-                    {link.name}
-                </Link>
-            ))}
-        </div>
+        <TooltipProvider>
+            <div className={cn("mx-auto my-4 flex items-center", className)} {...props}>
+                {links.map((link, index) => (
+                    link.comingSoon ?
+                        <Tooltip key={link.href} delayDuration={0}>
+                            <TooltipTrigger asChild>
+                                <div
+                                    className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm text-muted-foreground transition-colors"
+                                >
+                                    {link.name}
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>
+                                    Coming soon!
+                                </p>
+                            </TooltipContent>
+                        </Tooltip>
+                        :
+                        <Link
+                            href={"/app/marketplace/" + link.href}
+                            key={link.href}
+                            className={cn(
+                                "flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
+                                pathname?.endsWith(link.href) ||
+                                (index === 0 && pathname === "/")
+                                    ? "bg-muted font-medium text-primary"
+                                    : "text-muted-foreground",
+                                link.comingSoon ? "pointer-events-none opacity-60" : "" // Disable click and add opacity
+                            )}
+                        >
+                            {link.name}
+                        </Link>
+                ))}
+            </div>
+        </TooltipProvider>
     )
 }

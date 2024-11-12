@@ -1,5 +1,5 @@
-import { Metadata } from "next"
-import { ProjectNav } from "@/components/project-nav"
+import {Metadata} from "next"
+import {ProjectNav} from "@/components/project-nav"
 
 export const metadata: Metadata = {
     title: "Comend",
@@ -10,12 +10,10 @@ interface ProjectLayoutProps {
     children: React.ReactNode
 }
 
-export default function ProjectLayout({ children }: ProjectLayoutProps) {
+export default function ProjectLayout({children}: ProjectLayoutProps) {
     return (
-        <div className="container relative">
-            <div className="sticky left-0 top-10 w-full min-h-40 z-10">
-                <ProjectNav projectId={""} />
-            </div>
+        <div className="container relative flex flex-col items-center">
+            <ProjectNav projectId={""}/>
             {children}
         </div>
     )
