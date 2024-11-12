@@ -416,7 +416,8 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                 connect: { id: organizationId }
             },
             title: roadmapTemplate.title || '',
-            description: roadmapTemplate.description || ''
+            description: roadmapTemplate.description || '',
+            published: true
         }
     })
 
