@@ -98,7 +98,6 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
     }
 
     const handleNextStep = async (e: any) => {
-        console.log(`step`, step)
         e.preventDefault()
         let onboardingNodeId: string | undefined = nodes[0]?.id
 
@@ -123,7 +122,6 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         } else if (step.selector === '.roadmap-tour-step3') {
             const element = document.getElementById("edit-milestone-scroll-area")
             if (element) {
-                console.log(`scroll area`, element)
                 element.scrollIntoView({block: "end", inline: "nearest", behavior: "smooth"}) // scroll to bottom
             }
 

@@ -90,7 +90,7 @@ const steps: Tour[] = [
                 title: "Milestones",
                 content: <>{`Milestones are the goals and projects that make up your research map. You can click the 'Details' button to edit the contents of each milestone.`}</>,
                 selector: ".roadmap-tour-step2",
-                side: "top" as any,
+                side: "left" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10
@@ -120,7 +120,7 @@ const steps: Tour[] = [
                 title: "Connecting Milestones",
                 content: <>{`Once you've created more than one milestone, you can create relationships between them by dragging from the + icon.`}</>,
                 selector: ".roadmap-tour-step5",
-                side: "top" as any,
+                side: "left" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10
@@ -133,7 +133,7 @@ const steps: Tour[] = [
                     <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
                 </>,
                 selector: ".roadmap-tour-step5",
-                side: "top" as any,
+                side: "left" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10

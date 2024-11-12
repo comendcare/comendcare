@@ -24,6 +24,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { toast } from "sonner"
 import { isNewUser, setUserAsReturning } from "@/lib/utils"
+import { FaQuestion } from "react-icons/fa6"
 
 const proOptions = { hideAttribution: true }
 
