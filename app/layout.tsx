@@ -103,16 +103,16 @@ const steps: Tour[] = [
                 pointerPadding: 10,
                 pointerRadius: 10
             },
-            // {
-            //     icon: <>⭐</>,
-            //     title: "Saving a Milestone",
-            //     content: <>{`Click the save button to submit your changes.`}</>,
-            //     selector: ".roadmap-tour-step4",
-            //     side: "left" as any,
-            //     showControls: true,
-            //     pointerPadding: 10,
-            //     pointerRadius: 10
-            // },
+            {
+                icon: <>⭐</>,
+                title: "Saving a Milestone",
+                content: <>{`Click the save button to submit your changes.`}</>,
+                selector: ".roadmap-tour-step4",
+                side: "top-right" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
             {
                 icon: <>⭐</>,
                 title: "Connecting Milestones",
@@ -168,16 +168,16 @@ const steps: Tour[] = [
                 pointerPadding: 10,
                 pointerRadius: 10,
             },
-            // {
-            //     icon: <>⭐</>,
-            //     title: "Saving a Milestone",
-            //     content: <>{`Click the save button to submit your changes.`}</>,
-            //     selector: ".roadmap-tour-step4",
-            //     side: "left" as any,
-            //     showControls: true,
-            //     pointerPadding: 10,
-            //     pointerRadius: 10
-            // },
+            {
+                icon: <>⭐</>,
+                title: "Saving a Milestone",
+                content: <>{`Click the save button to submit your changes.`}</>,
+                selector: ".roadmap-tour-step4",
+                side: "top-right" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
             {
                 icon: <>⭐</>,
                 title: "Connecting Milestones",

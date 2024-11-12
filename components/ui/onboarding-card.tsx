@@ -118,23 +118,23 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
     
             router.push(`${pathname}?${params.toString()}`, { scroll: false })
         } else if (step.selector === '.roadmap-tour-step3') {
-            // const element = document.getElementById("edit-milestone-scroll-area")
-            // if (element) {
-            //     console.log(`scroll area`, element)
-            //     element.scrollIntoView({block: "end", inline: "nearest", behavior: "smooth"}) // scroll to bottom
-            // }
+            const element = document.getElementById("edit-milestone-scroll-area")
+            if (element) {
+                console.log(`scroll area`, element)
+                element.scrollIntoView({block: "end", inline: "nearest", behavior: "smooth"}) // scroll to bottom
+            }
             // scrollRef.current?.scrollToBottom()
 
             // await new Promise(resolve => setTimeout(resolve, 1000))
             // nextStep()
-            setSelectedNodeId(null)
+            // setSelectedNodeId(null)
 
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete("milestone")
-            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+            // const params = new URLSearchParams(searchParams.toString())
+            // params.delete("milestone")
+            // router.push(`${pathname}?${params.toString()}`, { scroll: false })
 
             await new Promise(resolve => setTimeout(resolve, 500))
-            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2 })
+            // fitView({ nodes: [{ id: onboardingNodeId }], padding: 2 })
         }
         
         await new Promise(resolve => setTimeout(resolve, 500))

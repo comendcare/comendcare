@@ -21,7 +21,6 @@ import { nanoid } from "nanoid"
 import { Dialog } from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-// import { useOnborda } from "onborda"
 import { useOnborda } from "./onborda/OnbordaContext"
 
 const proOptions = { hideAttribution: true }
@@ -157,9 +156,6 @@ const RoadmapFlowchart = ({
 
     return (
         <div className="h-full">
-        {onboardingActive && (
-            <div className="fixed top-0 left-0 w-full h-full bg-white bg-opacity-50 z-50 pointer-events-auto" />
-        )}
         <ReactFlow
             width={width}
             nodes={updatedNodes}
