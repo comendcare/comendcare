@@ -8,6 +8,8 @@ import { Providers } from "@/app/providers"
 import Onborda from "@/components/onborda/Onborda"
 import OnboardingCard from "@/components/ui/onboarding-card"
 import { Tour } from "@/components/onborda/types"
+import gif1 from "@/public/onboarding-gif-1.gif"
+import Image from "next/image"
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -96,7 +98,7 @@ const steps: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Editing Milestones",
-                content: <>{`You can edit the details of a milestone in the edit panel. Once you're finished editing, click the save button to submit your changes.`}</>,
+                content: <>{`You can edit the details of a milestone in the edit panel.`}</>,
                 selector: ".roadmap-tour-step3",
                 side: "left" as any,
                 showControls: true,
@@ -126,7 +128,10 @@ const steps: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Re-Ordering Milestones",
-                content: <>{`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}</>,
+                content: <>
+                    {`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}
+                    <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
+                </>,
                 selector: ".roadmap-tour-step5",
                 side: "top" as any,
                 showControls: true,
@@ -166,7 +171,7 @@ const steps: Tour[] = [
                 side: "left" as any,
                 showControls: true,
                 pointerPadding: 10,
-                pointerRadius: 10,
+                pointerRadius: 10
             },
             {
                 icon: <>⭐</>,
@@ -191,7 +196,10 @@ const steps: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Re-Ordering Milestones",
-                content: <>{`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}</>,
+                content: <>
+                    {`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}
+                    <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
+                </>,
                 selector: ".roadmap-tour-step5",
                 side: "top" as any,
                 showControls: true,

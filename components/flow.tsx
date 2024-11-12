@@ -26,7 +26,6 @@ import { useOnborda } from "./onborda/OnbordaContext"
 const proOptions = { hideAttribution: true }
 
 const selector = (state: RoadmapState) => ({
-    onboardingActive: state.onboardingActive,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
@@ -44,7 +43,6 @@ const RoadmapFlowchart = ({
     width: number
 }) => {
     const {
-        onboardingActive,
         selectedNodeId,
         setSelectedNodeId,
         milestones,
@@ -167,16 +165,6 @@ const RoadmapFlowchart = ({
             nodeTypes={nodeTypes}
             fitView
             proOptions={proOptions}
-            edgesFocusable={onboardingActive}
-            nodesDraggable={onboardingActive}
-            nodesConnectable={onboardingActive}
-            nodesFocusable={onboardingActive}
-            draggable={onboardingActive}
-            panOnDrag={onboardingActive}
-            elementsSelectable={onboardingActive}
-            zoomOnScroll={onboardingActive}
-            panOnScroll={onboardingActive}
-            preventScrolling={onboardingActive}
         >
             <MiniMap />
             <Controls>
