@@ -4,17 +4,22 @@ import * as React from "react"
 import { useNavStore, useSidebarStore } from "@/state/nav/navStore"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import { TooltipProvider } from "@/components/ui/tooltip"
 import {
     ResizablePanel,
     ResizablePanelGroup,
     ResizableHandle
 } from "@/components/ui/resizable"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+  } from "@/components/ui/tooltip"
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
 import { FlowView } from "@/components/flow"
 import { KanbanView } from "@/components/kanban"
 import { Button } from "./ui/button"
-import { FaX } from "react-icons/fa6"
+import { FaQuestion, FaX } from "react-icons/fa6"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useState } from "react"
 import { MilestoneDetails } from "./milestone-details"
@@ -22,6 +27,7 @@ import { EditTaskForm } from "./edit-task-form"
 import { TaskDetails } from "./task-details"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { GanttChartView } from "./gantt-chart"
+import { useOnborda } from "./onborda/OnbordaContext"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -58,6 +64,7 @@ export function Roadmap({
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
+    const { startOnborda } = useOnborda()
 
     const urlView = searchParams.get("view")
 
@@ -96,6 +103,8 @@ export function Roadmap({
     }
 
     const handleTabChange = (value: string) => {
+        setView(value) // for the onboarding tutorial
+
         // close all panels when switching tabs
         setSelectedNodeId(null)
         setSelectedTaskId(null)
@@ -117,6 +126,8 @@ export function Roadmap({
         initState(initNodes, initEdges, initMilestones, urlMilestone, urlTask, roadmapId)
     }, [])
 
+    const [view, setView] = useState(urlView ? urlView : "roadmap")
+
     return (
         <TooltipProvider delayDuration={0}>
             <ResizablePanelGroup
@@ -132,6 +143,25 @@ export function Roadmap({
                             <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
                             <TabsTrigger value="gantt">Gantt Chart</TabsTrigger>
                             <TabsTrigger value="kanban">Kanban</TabsTrigger>
+
+                            {view === 'roadmap' && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button 
+                                            size="icon" 
+                                            variant="ghost" 
+                                            onClick={() => {
+                                                startOnborda('roadmap-tour')
+                                            }}
+                                        >
+                                            <FaQuestion/>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Click to view the research map onboarding tutorial</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
                         </TabsList>
 
                         {/* Roadmap View */}
@@ -169,7 +199,7 @@ export function Roadmap({
                         <ResizablePanel
                             defaultSize={defaultLayout[1]}
                             minSize={30}
-                            className="p-10 flex flex-col gap-4"
+                            className="p-10 h-full flex flex-col gap-4"
                         >
                             <MilestoneDetailsPanel
                                 milestone={milestones.find(

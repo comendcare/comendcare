@@ -13,6 +13,8 @@ import {
 import { debounce } from "lodash"
 
 export type RoadmapState = {
+    onboardingActive: boolean,
+    setOnboardingActive: (active: boolean) => void,
     roadmapId: string | null
     setRoadmapId: (id: string) => void
     selectedNodeId: string | null
@@ -40,6 +42,10 @@ export type RoadmapState = {
 
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
+        onboardingActive: true,
+        setOnboardingActive: (active: boolean) => {
+            set({ onboardingActive: active })
+        },
         roadmapId: null,
         setRoadmapId: (id: string) => {
             set({ roadmapId: id })
