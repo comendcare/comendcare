@@ -2,7 +2,7 @@
 import Image from "next/image"
 import React, { useEffect, useId, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { useOutsideClick } from "@/hooks/use-outside-click"
+import { useOutsideClick } from "@/lib/hooks/use-outside-click"
 import Albert from "@/public/profiles/Albert.jpeg"
 import Flawnson from "@/public/profiles/Flawnson.jpg"
 import Sierra from "@/public/profiles/Sierra.jpeg"

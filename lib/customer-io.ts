@@ -2,6 +2,7 @@
 import Analytics from "@customerio/cdp-analytics-node"
 import { nanoid } from "@reduxjs/toolkit";
 import { APIClient, SendEmailRequest } from "customerio-node"
+import { Session } from "next-auth";
 
 // NodeJS CustomerIO docs: https://customer.io/docs/cdp/sources/connections/servers/node/
 
@@ -15,6 +16,23 @@ class CustomerIO {
             host: 'https://cdp.customer.io',
         })
     }
+
+    static getInstance(): CustomerIO {
+        if (!CustomerIO.instance) CustomerIO.instance = new CustomerIO()
+        return CustomerIO.instance
+    }
+}
+
+export async function customerIOIdentify(distinctId: string, session: Session) {
+    const instance = CustomerIO.getInstance()
+
+    instance.analytics.identify({
+        userId: distinctId,
+        traits: {
+            name: session.user.name,
+            email: session.user.email,
+        }
+    })
 }
 
 export async function getCustomerIOInstance(): Promise<CustomerIO> {

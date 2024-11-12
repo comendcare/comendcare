@@ -1,7 +1,14 @@
-import { unstable_cache } from "next/cache"
+import {unstable_cache} from "next/cache"
 import prisma from "@/lib/prisma"
-import { serialize } from "next-mdx-remote/serialize"
-import { replaceExamples, replaceTweets } from "@/lib/remark-plugins"
+import {serialize} from "next-mdx-remote/serialize"
+import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
+
+export async function getDisorderData(slug: string) {
+    return prisma.condition.findUnique({
+        where: slug ? {slug} : {slug: slug},
+        include: {organizations: true}
+    })
+}
 
 export async function getOrganizationData(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
@@ -11,8 +18,8 @@ export async function getOrganizationData(domain: string) {
     return await unstable_cache(
         async () => {
             return prisma.organization.findUnique({
-                where: subdomain ? { subdomain } : { customDomain: domain },
-                include: { user: true }
+                where: subdomain ? {subdomain} : {customDomain: domain},
+                include: {user: true}
             })
         },
         [`${domain}-metadata`],
@@ -33,8 +40,8 @@ export async function getRoadmapsForOrganization(domain: string) {
             return prisma.roadmap.findMany({
                 where: {
                     organization: subdomain
-                        ? { subdomain }
-                        : { customDomain: domain },
+                        ? {subdomain}
+                        : {customDomain: domain},
                     published: true
                 },
                 select: {
@@ -70,8 +77,8 @@ export async function getRoadmapData(domain: string, slug: string) {
             const data = await prisma.roadmap.findFirst({
                 where: {
                     organization: subdomain
-                        ? { subdomain }
-                        : { customDomain: domain },
+                        ? {subdomain}
+                        : {customDomain: domain},
                     slug,
                     published: true
                 },
@@ -91,8 +98,8 @@ export async function getRoadmapData(domain: string, slug: string) {
                 prisma.roadmap.findMany({
                     where: {
                         organization: subdomain
-                            ? { subdomain }
-                            : { customDomain: domain },
+                            ? {subdomain}
+                            : {customDomain: domain},
                         published: true,
                         NOT: {
                             id: data.id

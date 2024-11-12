@@ -1,6 +1,14 @@
-"use client"
+"use client";
 
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {z} from "zod";
@@ -9,7 +17,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {editUser} from "@/lib/actions";
+import {editUser, getUser} from "@/lib/actions";
 import {Separator} from "@/components/ui/separator";
 import {Checkbox} from "@/components/ui/checkbox";
 import {AutocompleteComponent} from "@/components/autocomplete";
@@ -17,12 +25,12 @@ import {AddressType} from "@/lib/types";
 import {useEffect, useState} from "react";
 
 const invitationFormSchema = z.object({
-    name: z.string().min(2, { message: "Your name must be at least 2 characters." }),
-    title: z.string().min(2, { message: "Your role must be at least 2 characters." }),
+    name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
+    title: z.string().min(2, {message: "Your role must be at least 2 characters."}),
     notificationSettings: z.boolean().default(false),
     address1: z.string().optional(),
     address2: z.string().optional(),
-    formattedAddress: z.string(),
+    formattedAddress: z.string().optional(),
     city: z.string().optional(),
     region: z.string().optional(),
     postalCode: z.string().optional(),
@@ -32,7 +40,9 @@ const invitationFormSchema = z.object({
 });
 
 export default function UserOnboardingForm() {
-    const {data: session, update} = useSession();
+    const router = useRouter();
+    const {data: session} = useSession();
+    const [searchInput, setSearchInput] = useState("");
     const [address, setAddress] = useState<AddressType>({
         address1: "",
         address2: "",
@@ -44,17 +54,43 @@ export default function UserOnboardingForm() {
         lat: 0,
         lng: 0,
     });
-    const [searchInput, setSearchInput] = useState("");
 
-    const router = useRouter();
+    const [defaultValues, setDefaultValues] = useState<z.infer<typeof invitationFormSchema> | undefined>(undefined);
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(invitationFormSchema),
-        defaultValues: {
-            notificationSettings: true,
-        },
+        defaultValues,
     });
+
+    useEffect(() => {
+        async function fetchUserData() {
+            if (session?.user?.id) {
+                const userData = await getUser(session.user.id);
+                if (userData) {
+                    const fetchedValues = {
+                        name: userData.name || "",
+                        title: userData.title || "",
+                        notificationSettings: userData.notificationSettings ?? true,
+                        address1: userData.address1 || "",
+                        address2: userData.address2 || "",
+                        formattedAddress: userData.formattedAddress || "",
+                        city: userData.city || "",
+                        region: userData.region || "",
+                        postalCode: userData.postalCode || "",
+                        country: userData.country || "",
+                        lat: userData.lat || 0,
+                        lng: userData.lng || 0,
+                    };
+                    setDefaultValues(fetchedValues);
+                    setAddress(fetchedValues); // Set address state as well
+                    form.reset(fetchedValues); // Reset form with fetched data
+                }
+            }
+        }
+
+        fetchUserData();
+    }, [session, form]);
 
     useEffect(() => {
         form.setValue("address1", address.address1);
@@ -69,52 +105,42 @@ export default function UserOnboardingForm() {
     }, [address, form]);
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
-        const formData = new FormData();
 
-        Object.entries(values).forEach(([key, value]) => {
-            if (value !== undefined) {
-                formData.append(key, value.toString());
-            }
-        });
-
-        // For each form field, call editUser to update the user profile
-        for (const [key, value] of Object.entries(values)) {
-            await editUser(formData, session?.user.id, key).then(
-                (res: any) => {
-                    if (res.error) {
-                        toast.error(res.error);
-                        return; // Exit early if there's an error
-                    } else {
-                        // If all fields are successfully updated, proceed
-                        toast.success("Successfully updated user profile!");
-                        router.refresh();
-                        router.push("/onboarding/organization");
-                    }
+        try {
+            // For each form field, call editUser to update the user profile
+            for (const [key, value] of Object.entries(values)) {
+                const res: any = await editUser(session?.user?.id as string, {[key]: value});
+                if (res?.error) {
+                    toast.error(res.error);
+                    return; // Exit early if there's an error
                 }
-            )
+            }
+
+            // If all fields are successfully updated, proceed
+            toast.success("Successfully updated user profile!");
+            router.refresh();
+            router.push("/onboarding/organization");
+        } catch (error) {
+            toast.error("An error occurred while updating your profile.");
         }
     }
 
     return (
-        <div className="space-y-4 w-1/2">
-            <div className="space-y-2">
-                <h1 className="text-xl font-semibold">
-                    Profile onboarding
-                </h1>
-                <p>
-                    {`Welcome to onboarding! We have a few questions to better understand how we can help you.
-                    All questions in this form are optional unless marked as (required).
-                    `}
-                </p>
-                <p className="font-semibold">
-                    {`Nothing that you share here will be shared with others, and you have complete control of what info is made public on your organization profile and research plan.`}
-                </p>
-            </div>
-
-            <Separator/>
 
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <form
+                    // onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}
+                    onSubmit={form.handleSubmit(
+                        onSubmit,
+                        (errors) => {
+                            console.log("Validation errors:", errors);
+                            if (Object.keys(errors).length > 0) {
+                                toast.error("Please correct the highlighted errors.");
+                            }
+                        }
+                    )}
+                    className="space-y-8"
+                >
                     <FormField
                         control={form.control}
                         name="name"
@@ -122,14 +148,9 @@ export default function UserOnboardingForm() {
                             <FormItem>
                                 <FormLabel>Your name (required)</FormLabel>
                                 <FormControl>
-                                    <Input
-                                        type="text"
-                                        {...field}
-                                    />
+                                    <Input type="text" {...field} />
                                 </FormControl>
-                                <FormDescription>
-                                    This is your public display name.
-                                </FormDescription>
+                                <FormDescription>This is your public display name.</FormDescription>
                                 <FormMessage/>
                             </FormItem>
                         )}
@@ -144,9 +165,7 @@ export default function UserOnboardingForm() {
                                 <FormControl>
                                     <Input type="text" {...field} />
                                 </FormControl>
-                                <FormDescription>
-                                    Your role or title at your patient organization.
-                                </FormDescription>
+                                <FormDescription>Your role or title at your patient organization.</FormDescription>
                                 <FormMessage/>
                             </FormItem>
                         )}
@@ -166,9 +185,7 @@ export default function UserOnboardingForm() {
                                         setSearchInput={setSearchInput}
                                     />
                                 </FormControl>
-                                <FormDescription>
-                                    Your address.
-                                </FormDescription>
+                                <FormDescription>Your address.</FormDescription>
                                 <FormMessage/>
                             </FormItem>
                         )}
@@ -200,6 +217,5 @@ export default function UserOnboardingForm() {
                     <Button type="submit">Next</Button>
                 </form>
             </Form>
-        </div>
     );
 }

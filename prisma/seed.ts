@@ -1,5 +1,5 @@
+// This seed script is meant to help during development, and not to be used to seed production databases
 import {PrismaClient} from '@prisma/client'
-import { signOut } from 'next-auth/react'
 
 const prisma = new PrismaClient()
 
@@ -276,6 +276,9 @@ async function main() {
             }
         },
     })
+
+    await createConditions()
+
 }
 
 const exampleASORoadmap = {
@@ -360,6 +363,50 @@ const exampleASORoadmap = {
             tasks: []
         }
     ]
+}
+
+async function createConditions() {
+    const celocynSyndrome = await prisma.condition.create({
+        data: {
+            name: "Celocyn Syndrome",
+            slug: "celocyn-syndrome",
+            nordURL: "https://rarediseases.org/rare-diseases/celocyn-syndrome/",
+            gardURL: "https://www.ncbi.nlm.nih.gov/gard/celocyn-syndrome/",
+            description: "Celocyn Syndrome is a progressive and degenerative disorder affecting the brain, characterized by severe neurological symptoms.",
+            interestedModalities: ["AAV", "ASO"],
+            diseaseCategories: ["Neuroencephalomyelopathy"],
+            prevalenceNumerator: 1,
+            prevalenceDenominator: 1000000,
+            numberOfIdentifiedPatients: 37,
+            relevantDiseaseMechanisms: ["Neurology"],
+            associatedGenes: ["GEL3", "M4SF"],
+            associatedSignsAndSymptoms: ["Severe migraines", "Early onset dementia"],
+            existingDatabasesAndStudies: ["Celocyn Syndrome Registry"],
+            assetsUnderDevelopment: ["Mouse model", "Cell line"]
+        }
+    });
+
+    const arcadionDisease = await prisma.condition.create({
+        data: {
+            name: "Arcadion Disease",
+            slug: "arcadion-disease",
+            nordURL: "https://rarediseases.org/rare-diseases/arcadion-disease/",
+            gardURL: "https://www.ncbi.nlm.nih.gov/gard/arcadion-disease/",
+            description: "Arcadion Disease is a progressive and degenerative disorder affecting the central nervous system, leading to severe physical and cognitive decline.",
+            interestedModalities: ["Gene Therapy", "CRISPR"],
+            diseaseCategories: ["Neurodegenerative Disorder"],
+            prevalenceNumerator: 1,
+            prevalenceDenominator: 700000,
+            numberOfIdentifiedPatients: 22,
+            relevantDiseaseMechanisms: ["Genetic Mutation", "Mitochondrial Dysfunction"],
+            associatedGenes: ["ARC1", "NEU4"],
+            associatedSignsAndSymptoms: ["Muscle weakness", "Memory loss", "Difficulty swallowing"],
+            existingDatabasesAndStudies: ["Arcadion Patient Registry", "Arcadion Disease Natural History Study"],
+            assetsUnderDevelopment: ["Gene therapy vector", "Patient-derived cell line"]
+        }
+    });
+
+    console.log("Conditions created:", { celocynSyndrome, arcadionDisease });
 }
 
 async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {

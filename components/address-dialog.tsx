@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import {Button} from "@/components/ui/button";
 import {
     Dialog,
     DialogContent,
@@ -9,14 +9,14 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
 import type React from "react";
-import { type FormEvent, useEffect, useState } from "react";
-import { type ZodError, z } from "zod";
+import {type FormEvent, useEffect, useState} from "react";
+import {type ZodError, z} from "zod";
 import type {AddressType} from "@/lib/types";
-import { FormMessages } from "@/components/form-messages";
-import { Loader2 } from "lucide-react";
+import {FormMessages} from "@/components/form-messages";
+import {Loader2} from "lucide-react";
 
 interface AddressDialogProps {
     open: boolean;
@@ -42,50 +42,13 @@ interface AddressFields {
  * This Schema makes sure that the required fields are filled.
  */
 export function createAddressSchema(address: AddressFields) {
-    let schema = {};
-
-    if (address.address1 !== "") {
-        schema = {
-            ...schema,
-            address1: z.string().min(1, {
-                message: "Address line 1 is required",
-            }),
-        };
-    }
-
-    schema = {
-        ...schema,
+    return z.object({
+        address1: address.address1 ? z.string().min(1, { message: "Address line 1 is required" }) : z.string().optional(),
         address2: z.string().optional(),
-    };
-
-    if (address.city !== "") {
-        schema = {
-            ...schema,
-            city: z.string().min(1, {
-                message: "City is required",
-            }),
-        };
-    }
-
-    if (address.region !== "") {
-        schema = {
-            ...schema,
-            region: z.string().min(1, {
-                message: "State is required",
-            }),
-        };
-    }
-
-    if (address.postalCode !== "") {
-        schema = {
-            ...schema,
-            postalCode: z.string().min(1, {
-                message: "Postal code is required",
-            }),
-        };
-    }
-
-    return z.object(schema);
+        city: address.city ? z.string().min(1, { message: "City is required" }) : z.string().optional(),
+        region: address.region ? z.string().min(1, { message: "State is required" }) : z.string().optional(),
+        postalCode: address.postalCode ? z.string().min(1, { message: "Postal code is required" }) : z.string().optional(),
+    });
 }
 
 export default function AddressDialog(
@@ -171,7 +134,7 @@ export default function AddressDialog(
      * Handle form submission and save the address
      */
     const handleSave = (e: FormEvent) => {
-        e.preventDefault();
+        // e.preventDefault();
         try {
             addressSchema.parse({
                 address1,
@@ -245,10 +208,11 @@ export default function AddressDialog(
 
                 {isLoading ? (
                     <div className="h-52 flex items-center justify-center">
-                        <Loader2 className="size-6 animate-spin" />
+                        <Loader2 className="size-6 animate-spin"/>
                     </div>
                 ) : (
-                    <form onSubmit={handleSave}>
+                    // <form onSubmit={handleSave}>
+                    <div>
                         <div className="space-y-4 py-7">
                             <div className="space-y-0.5">
                                 <Label htmlFor="address1">Address line 1</Label>
@@ -365,9 +329,13 @@ export default function AddressDialog(
                             >
                                 Cancel
                             </Button>
-                            <Button type="submit">Save</Button>
+                            <Button
+                                onClick={handleSave}
+                            >
+                                Save
+                            </Button>
                         </DialogFooter>
-                    </form>
+                    </div>
                 )}
             </DialogContent>
         </Dialog>

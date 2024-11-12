@@ -109,20 +109,21 @@ export default function OrganizationOnboardingForm() {
     const { isNewOrganization, toggleIsNewOrganization } = useOnboardingStore();
 
     useEffect(() => {
+
+        const fetchOrganizations = async () => {
+            await getAllOrganizations().then((res) => {
+                const options: Option[] = res.map((org, index) => ({
+                    value: org.id || index.toString(),
+                    label: org.name || "",
+                    description: org.description || "",
+                }))
+
+                setOrganizations(options)
+            })
+        };
+
         fetchOrganizations();
     }, [])
-
-    const fetchOrganizations = async () => {
-        await getAllOrganizations().then((res) => {
-            const options: Option[] = res.map((org, index) => ({
-                value: org.id || index.toString(),
-                label: org.name || "",
-                description: org.description || "",
-            }))
-
-            setOrganizations(options)
-        })
-    };
 
     const joinOrgForm = useForm<z.infer<typeof joinOrgFormSchema>>({
         mode: "onChange",
@@ -453,20 +454,26 @@ export default function OrganizationOnboardingForm() {
                                             Organization name
                                         </FormLabel>
                                         <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                maxSelected={1}
-                                                defaultOptions={organizations}
-                                                placeholder="Select your organization..."
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                            />
+                                            <>
+                                                {organizations.length > 0 ? (
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        maxSelected={1}
+                                                        defaultOptions={organizations}
+                                                        placeholder="Select your organization..."
+                                                        emptyIndicator={
+                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                no results found.
+                                                            </p>
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <p>Loading organizations...</p>
+                                                )}
+                                            </>
                                         </FormControl>
                                         <FormDescription>
-                                            The invitation to your organization will be sent here.
+                                            Your request to join the organization will be sent.
                                         </FormDescription>
                                         <FormMessage/>
                                     </FormItem>

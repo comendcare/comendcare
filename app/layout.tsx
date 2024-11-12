@@ -10,6 +10,7 @@ import OnboardingCard from "@/components/ui/onboarding-card"
 import { Tour } from "@/components/onborda/types"
 import gif1 from "@/public/onboarding-gif-1.gif"
 import Image from "next/image"
+import { FeedbackForm } from "@/components/feedback"
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -163,6 +164,7 @@ export default function RootLayout({
                     >
                         <Onborda steps={steps} cardComponent={OnboardingCard}>
                             {children}
+                            {/* <FeedbackForm /> */}
                         </Onborda>
                     </ThemeProvider>
                 </Providers>

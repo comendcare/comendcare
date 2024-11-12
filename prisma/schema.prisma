@@ -36,8 +36,8 @@ model User {
   region               String?
   postalCode           String?
   country              String?
-  lat                  String?
-  lng                  String?
+  lat                  Float?
+  lng                  Float?
 }
 
 model Member {
@@ -280,8 +280,31 @@ model Organization {
   members                     Member[]
   client                      Client[]
   invitation                  Invitation[]
+  condition                   Condition[]
 
   @@index([userId])
+}
+
+model Condition {
+  id                          String         @id @default(cuid())
+  name                        String
+  slug                        String         @unique
+  nordURL                     String?
+  gardURL                     String?
+  description                 String?        @db.Text
+  interestedModalities        String[]
+  diseaseCategories           String[]
+  prevalenceNumerator         Int?
+  prevalenceDenominator       Int?
+  numberOfIdentifiedPatients  Int?
+  relevantDiseaseMechanisms   String[]
+  associatedGenes             String[]
+  associatedSignsAndSymptoms  String[]
+  existingDatabasesAndStudies String[]
+  assetsUnderDevelopment      String[]
+  createdAt                   DateTime       @default(now())
+  updatedAt                   DateTime       @updatedAt
+  organizations               Organization[]
 }
 
 model Example {
