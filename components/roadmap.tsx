@@ -199,7 +199,6 @@ export function Roadmap({
                         <ResizablePanel
                             defaultSize={defaultLayout[1]}
                             minSize={30}
-                            // className="p-10 h-full flex flex-col gap-4 roadmap-tour-step3"
                             className="p-10 h-full flex flex-col gap-4"
                         >
                             <MilestoneDetailsPanel

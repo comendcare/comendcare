@@ -40,7 +40,7 @@ const selector = (state: RoadmapState) => ({
     addNode: state.addNode,
 })
 
-const RoadmapFlowchart = ({
+export const FlowView = ({
     width,
 }: {
     width: number
@@ -182,7 +182,7 @@ const RoadmapFlowchart = ({
     }
 
     return (
-        <div className="h-full">
+        <>
         <ReactFlow
             width={width}
             nodes={updatedNodes}
@@ -203,14 +203,6 @@ const RoadmapFlowchart = ({
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
         </Dialog>
-        </div>
-    )
-}
-
-export function FlowView(props: any) {
-    return (
-        // <ReactFlowProvider>
-            <RoadmapFlowchart {...props} />
-        // </ReactFlowProvider>
+        </>
     )
 }
