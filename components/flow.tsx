@@ -21,6 +21,10 @@ import { nanoid } from "nanoid"
 import { Dialog } from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useOnborda } from "./onborda/OnbordaContext"
+import { toast } from "sonner"
+import { isNewUser, setUserAsReturning } from "@/lib/utils"
+import { FaQuestion } from "react-icons/fa6"
 
 const proOptions = { hideAttribution: true }
 
@@ -36,7 +40,7 @@ const selector = (state: RoadmapState) => ({
     addNode: state.addNode,
 })
 
-const RoadmapFlowchart = ({
+export const FlowView = ({
     width,
 }: {
     width: number
@@ -61,6 +65,7 @@ const RoadmapFlowchart = ({
     const nodeTypes = { MILESTONE: MilestoneNode }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const { startOnborda } = useOnborda()
 
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
@@ -114,7 +119,7 @@ const RoadmapFlowchart = ({
 
     // add handleEditClick() callback to nodes in the flow
     // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
-    const updatedNodes = nodes.map((node: Node) => ({
+    const updatedNodes = nodes.map((node: Node, index: number) => ({
         ...node,
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
@@ -126,7 +131,9 @@ const RoadmapFlowchart = ({
                 params.set("milestone", nodeId)
         
                 router.push(`${pathname}?${params.toString()}`, { scroll: false })
-            }
+            },
+            // first node is the onboarding node
+            onboardingMilestone: index === 0
         }
     }))
 
@@ -134,14 +141,45 @@ const RoadmapFlowchart = ({
     useEffect(() => {
         const timer = setTimeout(() => {
             if (selectedNodeId) {
-                fitView({ nodes: [{ id: selectedNodeId }], padding: 1 })
+                fitView({ nodes: [{ id: selectedNodeId }], padding: 2 })
             } else {
-                fitView()
+                fitView({ padding: 2 })
             }
         }, 1) // Delay by a short time to allow layout adjustment
 
         return () => clearTimeout(timer)
     }, [width, selectedNodeId])
+
+    useEffect(() => {
+        if (isNewUser()) {
+            toast("Welcome to your research map!", {
+                id: "onborda",
+                duration: 300000,
+                description: `Would you like to take a quick tour?`,
+                action: (
+                    <div className="flex flex-col space-y-2 ml-4">
+                        <Button
+                            onClick={startOnbordaAndRemoveToast}
+                        >{`Yes please!`}</Button>
+                        <Button
+                            onClick={() => {
+                                toast.dismiss()
+                                setUserAsReturning()
+                            }}
+                        >
+                            {`No thanks!`}
+                        </Button>
+                    </div>
+                )
+            })
+        }
+    }, [nodes])
+
+    const startOnbordaAndRemoveToast = () => {
+        startOnborda('roadmap-tour')
+        setUserAsReturning()
+        toast.dismiss()
+    }
 
     return (
         <>
@@ -159,20 +197,12 @@ const RoadmapFlowchart = ({
         >
             <MiniMap />
             <Controls>
-                <Button onClick={() => addMilestone()}>Add Milestone</Button>
+                <Button className="roadmap-tour-step1 empty-roadmap-tour-step1" onClick={() => addMilestone()}>Add Milestone</Button>
             </Controls>
         </ReactFlow>
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
         </Dialog>
         </>
-    )
-}
-
-export function FlowView(props: any) {
-    return (
-        <ReactFlowProvider>
-            <RoadmapFlowchart {...props} />
-        </ReactFlowProvider>
     )
 }

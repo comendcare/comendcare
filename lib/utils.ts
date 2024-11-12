@@ -23,6 +23,15 @@ export const monthsList = [
   'December'
 ]
 
+export const isNewUser = () => {
+    const isNew = localStorage.getItem("isNewUser")
+    return isNew === null
+}
+
+export const setUserAsReturning = () => {
+    localStorage.setItem("isNewUser", "false")
+}
+
 type DraggableData = ColumnDragData | TaskDragData
 
 export function hasDraggableData<T extends Active | Over>(
