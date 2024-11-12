@@ -48,10 +48,11 @@ export default async function OrganizationHomePage({
     if (!data) {
         notFound()
     }
+    console.log(roadmaps)
 
     return (
-        <main className="flex flex-col items-center w-full max-w-7xl mx-auto">
-            <PAGPublicProfileHeader/>
+        <main className="flex flex-col items-center w-full max-w-7xl mx-auto mt-8">
+            <PAGPublicProfileHeader organization={data}/>
             <div className="mb-20 w-full">
                 {roadmaps.length > 0 ? (
                     <div className="mx-auto w-full max-w-screen-xl md:mb-28 lg:w-5/6">

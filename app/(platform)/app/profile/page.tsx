@@ -10,7 +10,7 @@ import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PAGProfileDetailsCard} from "@/components/pag-profile-details-card";
 import {cn, createDicebearAvatar} from "@/lib/utils";
-import ProfileDropdown from "@/components/profile-dropdown";
+import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditProfileHeaderDialog from "@/components/edit-profile-header-dialog";
 import {PAGProfileRoadmapCard} from "@/components/pag-profile-roadmap-card";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
@@ -141,7 +141,7 @@ export default async function ProfilePage() {
                                             <FaPlus/>
                                             Add post
                                         </Button>
-                                        <ProfileDropdown subdomain={organization.subdomain}/>
+                                        <PrivateProfileDropdown subdomain={organization.subdomain}/>
                                     </div>
                                 </div>
 
