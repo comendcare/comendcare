@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
 
 export default function MarketplacePage() {
-    redirect("/app/marketplace/researchers")
+    redirect("/app/marketplace/patient-groups")
 }

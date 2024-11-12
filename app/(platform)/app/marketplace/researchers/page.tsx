@@ -67,7 +67,7 @@ export default function BudgetPage({
 
     return (
         <main className="flex flex-col items-center w-full h-screen mx-auto">
-            <div className="max-w-7xl flex flex-col w-full p-4 mt-72">
+            <div className="max-w-7xl flex flex-col w-full p-4">
                 <div className="grid grid-cols-2 gap-8">
                     <div className="space-y-2">
                         <InputDropdown />
