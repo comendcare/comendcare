@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useRef } from "react"
-import type { CardComponentProps } from "onborda"
-import { useOnborda } from "onborda"
+import type { CardComponentProps } from "../onborda/types"
+import { useOnborda } from "../onborda/OnbordaContext"
 import { XIcon } from "lucide-react"
 import confetti from "canvas-confetti"
 import { Button } from "@/components/ui/button"
@@ -10,10 +10,13 @@ import { ReactFlowProvider, useReactFlow, useStoreApi } from "@xyflow/react"
 import { nanoid } from "nanoid"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 const selector = (state: RoadmapState) => ({
+    setOnboardingActive: state.setOnboardingActive,
     nodes: state.nodes,
     addNode: state.addNode,
+    setSelectedNodeId: state.setSelectedNodeId
 })
 
 
@@ -23,10 +26,15 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
     const cardRef = useRef<HTMLDivElement>(null)
     const store = useStoreApi()
     const { fitView } = useReactFlow()
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
 
     const {
+        setOnboardingActive,
         nodes,
         addNode,
+        setSelectedNodeId
     } = useRoadmapStore(useShallow(selector))
 
     function handleConfetti() {
@@ -39,6 +47,8 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
     }
 
     useEffect(() => {
+        setOnboardingActive(false)
+
         const handleClickOutside = (event: MouseEvent) => {
             if (cardRef.current && !cardRef.current.contains(event.target as Node)) {
                 closeOnborda()
@@ -87,28 +97,52 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         return newNode
     }
 
-    const handleNextStep = async () => {
+    const handleNextStep = async (e: any) => {
         console.log(`step`, step)
-        let selectedNodeId: string | undefined = nodes[0]?.id
+        e.preventDefault()
+        let onboardingNodeId: string | undefined = nodes[0]?.id
 
-        if (step.selector === ".empty-roadmap-tour-step1") {
+        // execute any actions that need to occur before we move to the next step
+        if (step.selector === '.empty-roadmap-tour-step1') {
             const newNode = addMilestone()
-            selectedNodeId = newNode.id
+            onboardingNodeId = newNode.id
+            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2 })
+        } else if (step.selector === '.roadmap-tour-step1') {
+            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2 })
+        } else if (step.selector === '.roadmap-tour-step2') {
+            setSelectedNodeId(onboardingNodeId)
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("milestone")
+            params.set("milestone", onboardingNodeId)
+    
+            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        } else if (step.selector === '.roadmap-tour-step3') {
+            // const element = document.getElementById("edit-milestone-scroll-area")
+            // if (element) {
+            //     console.log(`scroll area`, element)
+            //     element.scrollIntoView({block: "end", inline: "nearest", behavior: "smooth"}) // scroll to bottom
+            // }
+            // scrollRef.current?.scrollToBottom()
+
+            // await new Promise(resolve => setTimeout(resolve, 1000))
+            // nextStep()
+            setSelectedNodeId(null)
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("milestone")
+            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+
+            await new Promise(resolve => setTimeout(resolve, 500))
+            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2 })
         }
-
+        
         await new Promise(resolve => setTimeout(resolve, 500))
-
-        if (selectedNodeId) {
-            if (selectedNodeId) fitView({ nodes: [{ id: selectedNodeId }], padding: 2 })
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 500))
-
         nextStep()
     }
 
     return (
-        <Card ref={cardRef} className="border-0 rounded-3xl w-max max-w-[550px] pointer-events-auto">
+        <Card ref={cardRef} className="border-0 rounded-3xl w-max max-w-[400px] pointer-events-auto">
             <CardHeader>
                 <div className="flex items-start justify-between w-full">
                     <div>

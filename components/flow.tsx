@@ -21,11 +21,13 @@ import { nanoid } from "nanoid"
 import { Dialog } from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useOnborda } from "onborda"
+// import { useOnborda } from "onborda"
+import { useOnborda } from "./onborda/OnbordaContext"
 
 const proOptions = { hideAttribution: true }
 
 const selector = (state: RoadmapState) => ({
+    onboardingActive: state.onboardingActive,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
@@ -43,6 +45,7 @@ const RoadmapFlowchart = ({
     width: number
 }) => {
     const {
+        onboardingActive,
         selectedNodeId,
         setSelectedNodeId,
         milestones,
@@ -152,10 +155,11 @@ const RoadmapFlowchart = ({
         else startOnborda('empty-roadmap-tour')
     }, [nodes])
 
-    const disabled = true
-
     return (
         <div className="h-full">
+        {onboardingActive && (
+            <div className="fixed top-0 left-0 w-full h-full bg-white bg-opacity-50 z-50 pointer-events-auto" />
+        )}
         <ReactFlow
             width={width}
             nodes={updatedNodes}
@@ -167,14 +171,16 @@ const RoadmapFlowchart = ({
             nodeTypes={nodeTypes}
             fitView
             proOptions={proOptions}
-            // edgesUpdatable={!disabled}
-            // edgesFocusable={!disabled}
-            // nodesDraggable={!disabled}
-            nodesConnectable={!disabled}
-            nodesFocusable={!disabled}
-            draggable={!disabled}
-            panOnDrag={!disabled}
-            elementsSelectable={!disabled}
+            edgesFocusable={onboardingActive}
+            nodesDraggable={onboardingActive}
+            nodesConnectable={onboardingActive}
+            nodesFocusable={onboardingActive}
+            draggable={onboardingActive}
+            panOnDrag={onboardingActive}
+            elementsSelectable={onboardingActive}
+            zoomOnScroll={onboardingActive}
+            panOnScroll={onboardingActive}
+            preventScrolling={onboardingActive}
         >
             <MiniMap />
             <Controls>

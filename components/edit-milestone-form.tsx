@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import React from "react"
+import React, { createRef, useImperativeHandle, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import {
@@ -304,7 +304,7 @@ export function EditMilestoneForm({
 
     return (
         <Form {...form}>
-        <ScrollArea>
+        <ScrollArea id="edit-milestone-scroll-area">
             <form
                 onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                 className="flex flex-col gap-8 pr-4"
@@ -682,7 +682,7 @@ export function EditMilestoneForm({
                         </DialogTrigger>
                         <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
                     </Dialog>
-                    <Button type="submit">Save Changes</Button>
+                    <Button type="submit" className="roadmap-tour-step4">Save Changes</Button>
                 </span>
             </form>
         </ScrollArea>

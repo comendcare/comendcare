@@ -5,9 +5,9 @@ import type { Metadata, ResolvingMetadata } from "next"
 // Import Montserrat Display and Source Sans Pro
 import { Poppins, Source_Sans_3 } from "next/font/google"
 import { Providers } from "@/app/providers"
-import { Onborda } from "onborda"
+import Onborda from "@/components/onborda/Onborda"
 import OnboardingCard from "@/components/ui/onboarding-card"
-import { Tour } from "onborda/dist/types"
+import { Tour } from "@/components/onborda/types"
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -95,9 +95,39 @@ const steps: Tour[] = [
             },
             {
                 icon: <>⭐</>,
+                title: "Editing Milestones",
+                content: <>{`You can edit the details of a milestone in the edit panel. Once you're finished editing, click the save button to submit your changes.`}</>,
+                selector: ".roadmap-tour-step3",
+                side: "left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+            // {
+            //     icon: <>⭐</>,
+            //     title: "Saving a Milestone",
+            //     content: <>{`Click the save button to submit your changes.`}</>,
+            //     selector: ".roadmap-tour-step4",
+            //     side: "left" as any,
+            //     showControls: true,
+            //     pointerPadding: 10,
+            //     pointerRadius: 10
+            // },
+            {
+                icon: <>⭐</>,
                 title: "Connecting Milestones",
                 content: <>{`Once you've created more than one milestone, you can create relationships between them by dragging from the + icon.`}</>,
-                selector: ".roadmap-tour-step3",
+                selector: ".roadmap-tour-step5",
+                side: "top" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+            {
+                icon: <>⭐</>,
+                title: "Re-Ordering Milestones",
+                content: <>{`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}</>,
+                selector: ".roadmap-tour-step5",
                 side: "top" as any,
                 showControls: true,
                 pointerPadding: 10,
@@ -111,7 +141,7 @@ const steps: Tour[] = [
             {
                 icon: <>👋</>,
                 title: "Adding a Milestone",
-                content: <>{`Start building your roadmap by adding a new milestone.`}</>,
+                content: <>{`Start building your research map by adding a new milestone.`}</>,
                 selector: ".empty-roadmap-tour-step1",
                 side: "top" as any,
                 showControls: true,
@@ -130,9 +160,39 @@ const steps: Tour[] = [
             },
             {
                 icon: <>⭐</>,
+                title: "Editing Milestones",
+                content: <>{`You can edit the details of a milestone in the edit panel.`}</>,
+                selector: ".roadmap-tour-step3",
+                side: "left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+            // {
+            //     icon: <>⭐</>,
+            //     title: "Saving a Milestone",
+            //     content: <>{`Click the save button to submit your changes.`}</>,
+            //     selector: ".roadmap-tour-step4",
+            //     side: "left" as any,
+            //     showControls: true,
+            //     pointerPadding: 10,
+            //     pointerRadius: 10
+            // },
+            {
+                icon: <>⭐</>,
                 title: "Connecting Milestones",
                 content: <>{`Once you've created more than one milestone, you can create relationships between them by dragging from the + icon.`}</>,
-                selector: ".roadmap-tour-step3",
+                selector: ".roadmap-tour-step5",
+                side: "top" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+            {
+                icon: <>⭐</>,
+                title: "Re-Ordering Milestones",
+                content: <>{`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}</>,
+                selector: ".roadmap-tour-step5",
                 side: "top" as any,
                 showControls: true,
                 pointerPadding: 10,

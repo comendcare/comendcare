@@ -101,7 +101,8 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
             <Handle
                 type="source"
                 position={Position.Right}
-                className={cn("z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2", props.data?.onboardingMilestone ? "roadmap-tour-step3": "")}
+                className={cn("z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2", props.data?.onboardingMilestone ? "roadmap-tour-step5": "")}
+                // className={cn("z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2")}
             >
                 <FaPlus className="pointer-events-none" />
             </Handle>
