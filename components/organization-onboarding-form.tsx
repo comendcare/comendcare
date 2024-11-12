@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {createOrganization, getAllOrganizations} from "@/lib/actions";
+import {checkSubdomainAvailability, createOrganization, getAllOrganizations} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -20,6 +20,7 @@ import {Separator} from "@/components/ui/separator";
 import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {AddressType} from "@/lib/types";
+import {useDebounce} from "use-debounce";
 
 
 const optionSchema = z.object({
@@ -38,8 +39,8 @@ const newOrgFormSchema = z.object({
     }).max(32, {
         message: "Your organization's name must be a maximum of 32 characters."
     }),
-    slug: z.string().min(2, {
-        message: "Your organization's slug must be at least 2 characters."
+    subdomain: z.string().min(2, {
+        message: "Your organization's nickname must be at least 2 characters."
     }),
     looking: z.array(optionSchema).min(0).optional(),
     founded: z.string().min(2, {
@@ -134,9 +135,30 @@ export default function OrganizationOnboardingForm() {
         mode: "onChange",
         resolver: zodResolver(newOrgFormSchema),
         defaultValues: {
-            slug: ""
+            subdomain: ""
         }
     })
+
+    const [debouncedNickname] = useDebounce(newOrgForm.watch("subdomain"), 500); // Extract just the debounced value
+
+    useEffect(() => {
+        // Trigger validation whenever the debounced nickname changes
+        if (debouncedNickname) {
+            checkSubdomainAvailability(debouncedNickname).then((isAvailable) => {
+                if (!isAvailable) {
+                    newOrgForm.setError("subdomain", {
+                        type: "manual",
+                        message: "This nickname is already taken. Please choose another.",
+                    });
+                    console.log("Not available")
+                } else {
+                    newOrgForm.clearErrors("subdomain");
+                    console.log("Available")
+                }
+            });
+        }
+        console.log(debouncedNickname)
+    }, [debouncedNickname, checkSubdomainAvailability, newOrgForm])
 
     useEffect(() => {
         newOrgForm.setValue("address1", address.address1);
@@ -170,7 +192,7 @@ export default function OrganizationOnboardingForm() {
         // console.log(values)
         // const createOrg = await createOrGetSite({
         //         siteName: newOrgForm.getValues("orgName"),
-        //         siteSlug: newOrgForm.getValues("slug")
+        //         siteSlug: newOrgForm.getValues("subdomain")
         //     },
         //     session.data?.user.id,
         //     newOrgForm.getValues("description")
@@ -258,7 +280,7 @@ export default function OrganizationOnboardingForm() {
 
                         <FormField
                             control={newOrgForm.control}
-                            name="slug"
+                            name="subdomain"
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>{`Nickname (required)`}</FormLabel>
@@ -273,10 +295,10 @@ export default function OrganizationOnboardingForm() {
                                     </FormControl>
                                     <FormMessage/>
                                     {
-                                        newOrgForm.watch("slug") && !newOrgForm.formState.errors.slug &&
+                                        newOrgForm.watch("subdomain") && !newOrgForm.formState.errors.subdomain &&
                                         <FormDescription>
                                             <p>
-                                                {`Your organization's domain will be ${newOrgForm.watch("slug")}.comend.io`}
+                                                {`Your organization's domain will be ${newOrgForm.watch("subdomain")}.comend.io`}
                                             </p>
                                         </FormDescription>
                                     }

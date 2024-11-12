@@ -731,7 +731,7 @@ export async function inviteUser(
 }
 
 // Create or get organization (replaces organization logic with organization logic)
-export async function createOrGetSite(
+export async function createOrGetOrganization(
     input: {
         siteName: string
         siteSlug: string
@@ -778,7 +778,7 @@ export async function createOrGetSite(
         }
 
         // If neither name nor slug was provided or used, throw an error
-        throw new Error("Site name or slug must be provided")
+        throw new Error("Organization name or slug must be provided")
     } catch (error) {
         console.error("Error creating or retrieving organization:", error)
         throw new Error("Failed to create or retrieve organization.")
@@ -786,7 +786,7 @@ export async function createOrGetSite(
 }
 
 // Add a member to the organization
-export async function addMemberToSite(
+export async function addMemberToOrganization(
     organizationId: string,
     session: Session | null
 ) {
@@ -813,5 +813,19 @@ export async function addMemberToSite(
     } catch (error) {
         console.error("Error adding member to organization:", error)
         throw new Error("Failed to add member to organization.")
+    }
+}
+
+export async function checkSubdomainAvailability(nickname: string) {
+    try {
+        const existingOrg = await prisma.organization.findUnique({
+            where: { subdomain: nickname },
+        });
+        console.log(`serverside: ${existingOrg}`)
+
+        return !existingOrg
+    } catch (error: any) {
+        console.error("Database error checking subdomain availability:", error);
+        return { error: "Database error. Please try again later." };
     }
 }
