@@ -152,7 +152,7 @@ export const FlowView = ({
 
     useEffect(() => {
         if (isNewUser()) {
-            toast("Welcome to your research map!", {
+            toast("Welcome to your research plan!", {
                 id: "onborda",
                 duration: 300000,
                 description: `Would you like to take a quick tour?`,
@@ -176,7 +176,7 @@ export const FlowView = ({
     }, [nodes])
 
     const startOnbordaAndRemoveToast = () => {
-        startOnborda('roadmap-tour')
+        startOnborda('research-plan-tour')
         setUserAsReturning()
         toast.dismiss()
     }
@@ -197,7 +197,7 @@ export const FlowView = ({
         >
             <MiniMap />
             <Controls>
-                <Button className="roadmap-tour-step1 empty-roadmap-tour-step1" onClick={() => addMilestone()}>Add Milestone</Button>
+                <Button className="research-plan-tour-step1" onClick={() => addMilestone()}>Add Milestone</Button>
             </Controls>
         </ReactFlow>
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>

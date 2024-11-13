@@ -304,7 +304,7 @@ export function EditMilestoneForm({
 
     return (
         <Form {...form}>
-        <ScrollArea className="roadmap-tour-step3">
+        <ScrollArea className="research-plan-tour-step3">
             <form
                 onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                 className="flex flex-col gap-8 pr-4"
@@ -682,7 +682,7 @@ export function EditMilestoneForm({
                         </DialogTrigger>
                         <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
                     </Dialog>
-                    <Button type="submit" id="edit-milestone-scroll-area" className="roadmap-tour-step4">Save Changes</Button>
+                    <Button type="submit" id="edit-milestone-scroll-area" className="research-plan-tour-step4">Save Changes</Button>
                 </span>
             </form>
         </ScrollArea>

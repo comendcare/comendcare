@@ -102,7 +102,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         let onboardingNodeId: string | undefined = nodes[0]?.id
 
         // execute any actions that need to occur before we move to the next step
-        if (step.selector === '.roadmap-tour-step1') {
+        if (step.selector === '.research-plan-tour-step1') {
             // if there are no nodes, we create one to use for the onboarding flow
             if (nodes.length <= 0) {
                 const newNode = addMilestone()
@@ -111,7 +111,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
 
             fitView({ nodes: [{ id: onboardingNodeId }], padding: 2 })
         }
-        if (step.selector === '.roadmap-tour-step2') {
+        if (step.selector === '.research-plan-tour-step2') {
             setSelectedNodeId(onboardingNodeId)
 
             const params = new URLSearchParams(searchParams.toString())
@@ -119,7 +119,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
             params.set("milestone", onboardingNodeId)
     
             router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        } else if (step.selector === '.roadmap-tour-step3') {
+        } else if (step.selector === '.research-plan-tour-step3') {
             const element = document.getElementById("edit-milestone-scroll-area")
             if (element) {
                 element.scrollIntoView({block: "end", inline: "nearest", behavior: "smooth"}) // scroll to bottom
