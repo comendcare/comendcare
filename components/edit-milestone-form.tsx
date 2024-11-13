@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import React, { createRef, useImperativeHandle, useRef } from "react"
+import React, { createRef, useCallback, useEffect, useImperativeHandle, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import {
@@ -65,6 +65,7 @@ import { format } from "date-fns"
 import { cn, monthsList } from "@/lib/utils"
 import { Switch } from "./ui/switch"
 import { PrivateBadge } from "./private-badge"
+import { debounce } from "lodash"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -101,29 +102,6 @@ export function EditMilestoneForm({
     const { setMilestone } = useRoadmapStore(
         useShallow(selector)
     )
-
-    const validateTimeline = (): boolean => {
-        console.log(`validate timeline`, startDate, endDate)
-        const now = new Date()
-        const startDateValue = startDate.month !== undefined || startDate.year !== undefined 
-            ? (new Date(
-                    startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
-                    startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
-                    1
-                )).valueOf()
-            : undefined
-    
-        const endDateValue = endDate.month !== undefined || endDate.year !== undefined 
-            ? (new Date(
-                    endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
-                    endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
-                    1
-                )).valueOf()
-            : undefined
-    
-        if (startDateValue !== undefined && endDateValue !== undefined) return startDateValue <= endDateValue
-        return true
-    }
 
     const editMilestoneForm = z.object({
         title: z
@@ -201,21 +179,25 @@ export function EditMilestoneForm({
     const status = form.watch("status")
     const isPrivate = form.watch("private")
 
-    const handleMilestoneFormSubmit = () => {
-        console.log(`Handle Milstone Form Submit... `)
-        console.log({
-            id: milestoneData?.id || "no id set",
-            nodeId: milestoneData?.nodeId || "no associated node",
-            title,
-            description,
-            startDate,
-            endDate,
-            budget,
-            tasks,
-            status,
-            isPrivate
-        })
+    // callback ensures we're not creating a new debounce every time this is called
+    const debounceUpdates = useCallback(
+        debounce(
+            (updatedValues) => handleMilestoneFormSubmit(updatedValues),
+            500
+        ), []
+    )
+
+    useEffect(() => {
+        // callback in debounceUpdates holds onto the state of the time it was created
+        // we can't use the form.watch values directly (since they'll be outdated)
+        // we must pass in the most up to date values in the form
+        debounceUpdates({title, description, startDate, endDate, budget, papers, tasks, status, private: isPrivate })
+    }, [title, description, budget, papers, tasks, status, isPrivate])
+
+    const handleMilestoneFormSubmit = (values: z.infer<typeof editMilestoneForm>) => {
+        const { title, description, startDate, endDate, budget, papers, tasks, status, private: isPrivate } = values;
         const now = new Date()
+        
         setMilestone(milestoneData?.nodeId, {
             title,
             ...(description !== undefined && description !== null
@@ -234,7 +216,7 @@ export function EditMilestoneForm({
             ...(budget ? { budget } : undefined),
             papers,
             ...(tasks 
-                ? { tasks: tasks.map((task, index) => ({
+                ? { tasks: tasks.map((task: any, index: number) => ({
                     ...task, 
                     orderPosition: index,
                     milestoneId: milestoneData?.id
@@ -245,6 +227,7 @@ export function EditMilestoneForm({
             private: isPrivate || false
         })
         toast('Success!', {
+            position: "bottom-left",
             description: 'The changes to your milestone have been successfully saved.'
         })
         onClose()
@@ -410,7 +393,22 @@ export function EditMilestoneForm({
                                 <FormItem>
                                 <FormLabel>Month:</FormLabel>
                                 <Select
-                                    onValueChange={field.onChange}
+                                    onValueChange={(value: string) => {
+                                        field.onChange(value)
+                                        // we have to manually do this because changing startDate.month
+                                        // doesn't trigger a change on form.watch('startDate')
+                                        handleMilestoneFormSubmit({
+                                            title,
+                                            description,
+                                            startDate,
+                                            endDate,
+                                            budget,
+                                            papers,
+                                            tasks,
+                                            status,
+                                            private: isPrivate,
+                                        })
+                                    }}
                                     defaultValue={field.value}
                                 >
                                     <FormControl>
@@ -445,7 +443,23 @@ export function EditMilestoneForm({
                                 <FormItem>
                                 <FormLabel>Year:</FormLabel>
                                     <Select
-                                        onValueChange={field.onChange}
+                                        // onValueChange={field.onChange}
+                                        onValueChange={(value: string) => {
+                                            field.onChange(value)
+                                            // we have to manually do this because changing startDate.year
+                                            // doesn't trigger a change on form.watch('startDate')
+                                            handleMilestoneFormSubmit({
+                                                title,
+                                                description,
+                                                startDate,
+                                                endDate,
+                                                budget,
+                                                papers,
+                                                tasks,
+                                                status,
+                                                private: isPrivate,
+                                            })
+                                        }}
                                         defaultValue={field.value}
                                     >
                                         <FormControl>
@@ -486,7 +500,23 @@ export function EditMilestoneForm({
                                 <FormItem>
                                 <FormLabel>Month:</FormLabel>
                                 <Select
-                                    onValueChange={field.onChange}
+                                    // onValueChange={field.onChange}
+                                    onValueChange={(value: string) => {
+                                        field.onChange(value)
+                                        // we have to manually do this because changing endDate.month
+                                        // doesn't trigger a change on form.watch('endDate')
+                                        handleMilestoneFormSubmit({
+                                            title,
+                                            description,
+                                            startDate,
+                                            endDate,
+                                            budget,
+                                            papers,
+                                            tasks,
+                                            status,
+                                            private: isPrivate,
+                                        })
+                                    }}
                                     defaultValue={field.value}
                                 >
                                     <FormControl>
@@ -521,7 +551,23 @@ export function EditMilestoneForm({
                                 <FormItem>
                                 <FormLabel>Year:</FormLabel>
                                     <Select
-                                        onValueChange={field.onChange}
+                                        // onValueChange={field.onChange}
+                                        onValueChange={(value: string) => {
+                                            field.onChange(value)
+                                            // we have to manually do this because changing endDate.year
+                                            // doesn't trigger a change on form.watch('endDate')
+                                            handleMilestoneFormSubmit({
+                                                title,
+                                                description,
+                                                startDate,
+                                                endDate,
+                                                budget,
+                                                papers,
+                                                tasks,
+                                                status,
+                                                private: isPrivate,
+                                            })
+                                        }}
                                         defaultValue={field.value}
                                     >
                                         <FormControl>
