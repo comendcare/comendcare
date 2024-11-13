@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import React from "react"
+import React, { useCallback, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import {
@@ -49,6 +49,7 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
 import { cva } from "class-variance-authority"
+import { debounce } from "lodash"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -101,15 +102,24 @@ export function EditTaskForm({
     const description = form.watch("description")
     const checklist = form.watch("checklist")
 
-    const handleFormSubmit = () => {
-        console.log(`Handle Task Form Submit... `)
-        console.log({
-            id: taskData?.id || "no id set",
-            name,
-            status,
-            description,
-            checklist
-        })
+    // callback ensures we're not creating a new debounce every time this is called
+    const debounceUpdates = useCallback(
+        debounce(
+            (updatedValues) => handleFormSubmit(updatedValues),
+            500
+        ), []
+    )
+
+    useEffect(() => {
+        // callback in debounceUpdates holds onto the state of the time it was created
+        // we can't use the form.watch values directly (since they'll be outdated)
+        // we must pass in the most up to date values in the form
+        debounceUpdates({name, status, description, checklist})
+    }, [name, status, description, checklist])
+
+    const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
+        const { name, status, description, checklist } = values
+
         setTask(
             taskData?.id,
             {
@@ -122,6 +132,7 @@ export function EditTaskForm({
             }
         )
         toast('Success!', {
+            position: "bottom-left",
             description: 'The changes to your task have been successfully saved.'
         })
         onClose()
