@@ -443,7 +443,8 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                                 ...(milestone.startDate ? { startDate: milestone.startDate } : undefined),
                                 ...(milestone.endDate ? { endDate: milestone.endDate } : undefined),
                                 ...(milestone.budget ? { budget: milestone.budget } : undefined),
-                                papers: milestone.papers || []
+                                papers: milestone.papers || [],
+                                private: milestone.private || false
                             }
                         }
                     }

@@ -2,7 +2,7 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {ResponsiveContainer, PieChart, Pie, Label} from "recharts";
 import {cn} from "@/lib/utils";
-import {FaEye} from "react-icons/fa6";
+import { PrivateBadge } from "./private-badge";
 
 const formsData = [
     {
@@ -30,10 +30,7 @@ export const DonutChartCard = () => {
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     Milestones
                 </CardTitle>
-                <p className="inline-flex items-center gap-x-2 text-gray-500 text-sm">
-                    <FaEye/>
-                    Only visible to you
-                </p>
+                <PrivateBadge />
             </CardHeader>
 
             <CardContent>
