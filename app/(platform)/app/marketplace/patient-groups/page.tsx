@@ -37,8 +37,8 @@ export default function PatientGroupsPage({
                 <div className="flex flex-col gap-4">
                     <Input className="w-full max-w-[500px] justify-self-center" placeholder="search"/>
                     <div className="w-full flex flex-row flex-wrap gap-4 justify-between">
-                        {pags.map(pag => (
-                            <Card className="grow">
+                        {pags.map((pag, index) => (
+                            <Card key={index} className="grow">
                                 <CardHeader>
                                     <CardTitle>{pag.name}</CardTitle>
                                     <CardDescription>{pag.description}</CardDescription>
