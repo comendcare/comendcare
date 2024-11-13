@@ -51,7 +51,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
     }
 
     return (
-        <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "roadmap-tour-step2" : "")}>
+        <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "")}>
             <CardHeader>
                 <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
                 {/* Description length in node is truncated to 200 characters. */}
@@ -101,7 +101,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
             <Handle
                 type="source"
                 position={Position.Right}
-                className={cn("z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2", props.data?.onboardingMilestone ? "roadmap-tour-step5": "")}
+                className={cn("z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2", props.data?.onboardingMilestone ? "research-plan-tour-step5": "")}
             >
                 <FaPlus className="pointer-events-none" />
             </Handle>

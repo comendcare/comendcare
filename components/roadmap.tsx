@@ -126,7 +126,7 @@ export function Roadmap({
         initState(initNodes, initEdges, initMilestones, urlMilestone, urlTask, roadmapId)
     }, [])
 
-    const [view, setView] = useState(urlView ? urlView : "roadmap")
+    const [view, setView] = useState(urlView ? urlView : "flow")
 
     return (
         <TooltipProvider delayDuration={0}>
@@ -138,35 +138,35 @@ export function Roadmap({
                 className="h-full items-stretch"
             >
                 <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
-                    <Tabs defaultValue={urlView ? urlView : "roadmap"} onValueChange={handleTabChange}>
+                    <Tabs defaultValue={urlView ? urlView : "flow"} onValueChange={handleTabChange}>
                         <TabsList>
-                            <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
-                            <TabsTrigger value="gantt">Gantt Chart</TabsTrigger>
-                            <TabsTrigger value="kanban">Kanban</TabsTrigger>
+                            <TabsTrigger value="flow">Flow View</TabsTrigger>
+                            <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger>
+                            <TabsTrigger value="kanban">Kanban View</TabsTrigger>
 
-                            {view === 'roadmap' && (
+                            {view === 'flow' && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button 
                                             size="icon" 
                                             variant="ghost" 
                                             onClick={() => {
-                                                startOnborda('roadmap-tour')
+                                                startOnborda('research-plan-tour')
                                             }}
                                         >
                                             <FaQuestion/>
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>Click to view the research map onboarding tutorial</p>
+                                        <p>Click to view the research plan onboarding tutorial</p>
                                     </TooltipContent>
                                 </Tooltip>
                             )}
                         </TabsList>
 
-                        {/* Roadmap View */}
+                        {/* Flow View */}
                         <TabsContent
-                            value="roadmap"
+                            value="flow"
                             className="m-0 h-[calc(100vh-3.5rem)]"
                         >
                             <FlowView

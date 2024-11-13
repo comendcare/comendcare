@@ -74,13 +74,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const steps: Tour[] = [
     {
-        tour: "roadmap-tour",
+        tour: "research-plan-tour",
         steps: [
             {
                 icon: <>👋</>,
                 title: "Adding a Milestone",
-                content: <>{`Start building your research map by adding a new milestone.`}</>,
-                selector: ".roadmap-tour-step1",
+                content: <>{`Start building your research plan by adding a new milestone.`}</>,
+                selector: ".research-plan-tour-step1",
                 side: "top" as any,
                 showControls: true,
                 pointerPadding: 10,
@@ -89,8 +89,8 @@ const steps: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Milestones",
-                content: <>{`Milestones are the goals and projects that make up your research map. You can click the 'Details' button to edit the contents of each milestone.`}</>,
-                selector: ".roadmap-tour-step2",
+                content: <>{`Milestones are the goals and projects that make up your research plan. You can click the 'Details' button to edit the contents of each milestone.`}</>,
+                selector: ".research-plan-tour-step2",
                 side: "left" as any,
                 showControls: true,
                 pointerPadding: 10,
@@ -100,7 +100,7 @@ const steps: Tour[] = [
                 icon: <>⭐</>,
                 title: "Editing Milestones",
                 content: <>{`You can edit the details of a milestone in the edit panel.`}</>,
-                selector: ".roadmap-tour-step3",
+                selector: ".research-plan-tour-step3",
                 side: "left" as any,
                 showControls: true,
                 pointerPadding: 10,
@@ -110,7 +110,7 @@ const steps: Tour[] = [
                 icon: <>⭐</>,
                 title: "Saving a Milestone",
                 content: <>{`Click the save button to submit your changes.`}</>,
-                selector: ".roadmap-tour-step4",
+                selector: ".research-plan-tour-step4",
                 side: "top-right" as any,
                 showControls: true,
                 pointerPadding: 10,
@@ -120,7 +120,7 @@ const steps: Tour[] = [
                 icon: <>⭐</>,
                 title: "Connecting Milestones",
                 content: <>{`Once you've created more than one milestone, you can create relationships between them by dragging from the + icon.`}</>,
-                selector: ".roadmap-tour-step5",
+                selector: ".research-plan-tour-step5",
                 side: "left" as any,
                 showControls: true,
                 pointerPadding: 10,
@@ -133,7 +133,7 @@ const steps: Tour[] = [
                     {`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}
                     <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
                 </>,
-                selector: ".roadmap-tour-step5",
+                selector: ".research-plan-tour-step5",
                 side: "left" as any,
                 showControls: true,
                 pointerPadding: 10,
