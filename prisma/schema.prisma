@@ -201,6 +201,7 @@ model Milestone {
   tasks       Task[]
   roadmapId   String
   roadmap     Roadmap    @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  private     Boolean    @default(false)
 }
 
 model Task {

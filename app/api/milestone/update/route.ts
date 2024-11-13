@@ -45,7 +45,8 @@ export async function POST(request: Request) {
                                 }))
                             }
                         },
-                        status: milestone.status || "TODO"
+                        status: milestone.status || "TODO",
+                        private: milestone.private || false
                     }
                 })
 

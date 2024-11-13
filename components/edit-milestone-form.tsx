@@ -63,6 +63,8 @@ import { PopoverTrigger } from "./plate-ui/popover"
 import { Calendar } from "./ui/calendar"
 import { format } from "date-fns"
 import { cn, monthsList } from "@/lib/utils"
+import { Switch } from "./ui/switch"
+import { PrivateBadge } from "./private-badge"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -163,7 +165,8 @@ export function EditMilestoneForm({
                 status: statusTypeSchema,
             })
         ).optional(),
-        status: z.string()
+        status: z.string(),
+        private: z.boolean()
     })
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -183,7 +186,8 @@ export function EditMilestoneForm({
             budget: milestoneData?.budget || undefined,
             papers: milestoneData?.papers || undefined,
             tasks: milestoneData?.tasks || [],
-            status: milestoneData?.status || "TODO"
+            status: milestoneData?.status || "TODO",
+            private: milestoneData?.private || false
         }
     })
 
@@ -195,6 +199,7 @@ export function EditMilestoneForm({
     const papers = form.watch("papers")
     const tasks = form.watch("tasks")
     const status = form.watch("status")
+    const isPrivate = form.watch("private")
 
     const handleMilestoneFormSubmit = () => {
         console.log(`Handle Milstone Form Submit... `)
@@ -207,7 +212,8 @@ export function EditMilestoneForm({
             endDate,
             budget,
             tasks,
-            status
+            status,
+            isPrivate
         })
         const now = new Date()
         setMilestone(milestoneData?.nodeId, {
@@ -235,7 +241,8 @@ export function EditMilestoneForm({
                 }))}
                 : undefined
             ),
-            status
+            status,
+            private: isPrivate || false
         })
         toast('Success!', {
             description: 'The changes to your milestone have been successfully saved.'
@@ -309,6 +316,26 @@ export function EditMilestoneForm({
                 onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                 className="flex flex-col gap-8 pr-4"
             >
+                <FormField
+                control={form.control}
+                name="private"
+                render={({ field }) => (
+                    <FormItem className="flex flex-row grow items-center justify-between">
+                        <FormLabel className="text-xl mt-2">{`Private`}</FormLabel>
+                        {isPrivate && (
+                            <PrivateBadge />
+                        )}
+                        <FormControl>
+                            <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+                />
+
                 <FormField
                 control={form.control}
                 name="status"

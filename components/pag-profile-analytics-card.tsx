@@ -1,10 +1,11 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
-import {FaEye, FaPen} from "react-icons/fa6";
+import {FaPen} from "react-icons/fa6";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {Line, LineChart, ResponsiveContainer} from "recharts";
+import { PrivateBadge } from "./private-badge";
 
 const viewsData = [
     {
@@ -85,10 +86,7 @@ export const PAGProfileAnalyticsCard = () => {
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     Analytics
                 </CardTitle>
-                <p className="inline-flex items-center gap-x-2 text-gray-500 text-sm">
-                    <FaEye/>
-                    Only visible to you
-                </p>
+                <PrivateBadge />
             </CardHeader>
 
             <CardContent className="grid grid-cols-2 gap-4">

@@ -13,6 +13,7 @@ import { FaArrowRight, FaCalendar, FaPlus } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
 import { truncate, monthsList, cn } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
+import { PrivateBadge } from "./private-badge"
 
 export type MilestoneNode = Node<
     {
@@ -30,7 +31,8 @@ export type MilestoneNode = Node<
         notes?: string
         status: StatusType
         handleEditClick: (nodeId: string) => void,
-        onboardingMilestone: boolean
+        onboardingMilestone: boolean,
+        private: boolean
     },
     "MILESTONE"
 >
@@ -53,6 +55,9 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
     return (
         <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "")}>
             <CardHeader>
+                {props.data?.private && (
+                    <PrivateBadge className="-mt-2 justify-end" />
+                )}
                 <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
                 {/* Description length in node is truncated to 200 characters. */}
                 <CardDescription>
