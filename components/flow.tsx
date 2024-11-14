@@ -72,7 +72,7 @@ export const FlowView = ({
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
     // if a position is not provided, place in the center
-    const addMilestone = (position?: { x: number; y: number }) => {
+    const addMilestone = (defaultData: any, position?: { x: number; y: number }) => {
         // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
         const {
             height,
@@ -97,10 +97,11 @@ export const FlowView = ({
             data: {
                 id: nanoid(),
                 nodeId: id,
-                title: `New Milestone`,
-                papers: [],
-                // tasks: [],
-                status: "TODO"
+                title: defaultData?.title || `New Milestone`,
+                ...(defaultData?.description ? { description: defaultData.description } : undefined),
+                papers: defaultData?.papers || [],
+                tasks: defaultData?.tasks || [],
+                status: defaultData?.status || "TODO"
             }
         }
 
