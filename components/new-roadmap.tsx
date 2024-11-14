@@ -147,8 +147,12 @@ export default function NewRoadmapForm() {
         <ScrollArea className="h-full w-full">
             <div className="flex flex-col justify-left gap-12 p-20">
                 <span className="flex flex-col gap-2">
-                    <h1 className="text-3xl text-bold text-primary">Get going faster with a Milestone or Research Plan Template</h1>
-                    <p className="text-muted-foreground">Milestones are the nodes that make up your Research Plan. We've put together some templates to get you started.</p>
+                    <h1 className="text-3xl text-bold text-primary">
+                        {`Get going faster with a Milestone or Research Plan Template`}
+                    </h1>
+                    <p className="text-muted-foreground">
+                        {`Milestones are the nodes that make up your Research Plan. We've put together some templates to get you started.`}
+                    </p>
                 </span>
 
                 <div className="flex flex-col gap-2 w-full">
