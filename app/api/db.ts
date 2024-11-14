@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client"
+// @ts-ignore
+import { withPulse } from '@prisma/extension-pulse'
 import { tmpdir } from "os"
 import fs from "fs"
 
@@ -6,7 +8,6 @@ import fs from "fs"
 function writeDecodedFile(filename: string, base64Content: string) {
     const filePath = `${tmpdir()}/${filename}`
     const contentBuffer = Buffer.from(base64Content, "base64")
-    console.log(filePath)
 
     fs.writeFile(filePath, contentBuffer, err => {
         if (err) {
@@ -58,6 +59,10 @@ export const db =
             process.env.NODE_ENV === "development"
                 ? ["info", "query", "error", "warn"]
                 : ["error"]
-    })
+    }).$extends(
+        withPulse({
+            apiKey: process.env['PULSE_API_KEY'] as string
+        })
+    ) as PrismaClient
 
 if (process.env.NODE_ENV === "development") globalForPrisma.prisma = db
