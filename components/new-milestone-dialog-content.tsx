@@ -48,7 +48,7 @@ export function NewMilestoneDialogContent({
             >
                 <CarouselContent>
                     {templateMilestones.map((milestoneData, index) => (
-                        <CarouselItem className="basis-1/2">
+                        <CarouselItem key={index} className="basis-1/2">
                             <DialogClose>
                             <button onClick={() => handleAddMilestone(milestoneData)}>
                                 <Card className="text-left">
