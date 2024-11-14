@@ -1,6 +1,4 @@
 import { PrismaClient } from "@prisma/client"
-// @ts-ignore
-import { withPulse } from '@prisma/extension-pulse'
 import { tmpdir } from "os"
 import fs from "fs"
 
@@ -59,10 +57,6 @@ export const db =
             process.env.NODE_ENV === "development"
                 ? ["info", "query", "error", "warn"]
                 : ["error"]
-    }).$extends(
-        withPulse({
-            apiKey: process.env['PULSE_API_KEY'] as string
-        })
-    ) as PrismaClient
+    })
 
 if (process.env.NODE_ENV === "development") globalForPrisma.prisma = db
