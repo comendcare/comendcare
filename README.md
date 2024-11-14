@@ -165,3 +165,21 @@ Running `npx prisma migrate dev --name "your message here"` will create a new mi
 do locally).
 The `prisma migrate deploy` command will apply existing migrations without creating a new one (which you will likely
 want to do remotely).
+
+## Typesense search
+We use Typesense as our search as a service platform.
+It comes with a lot of features out of the box, but the only special things to note is the initial setup with our stack.
+1. Typesense Cloud
+   - You can choose between self-hosting or using their hosted solution.
+   - They have a free tier suitable for development.
+   - Their setup/onboarding will provide you with an API key.
+2. Typesense Client
+   - Typesense has packages for popular languages including [javascript](https://github.com/typesense/typesense-js).
+3. Prisma Pulse 
+   - Requires a publicly available hosted database 
+   - Requires you to enable `cloudsql.enable_pglogical` and `cloudsql.logical_decoding` in the Google Cloud SQL instance. Guides [here](https://cloud.google.com/sql/docs/postgres/replication/configure-logical-replication) and [here](https://cloud.google.com/sql/docs/postgres/flags).
+   - You will also need to run `ALTER USER postgres WITH REPLICATION` and `ALTER SYSTEM SET wal_level = logical` (details [here](https://www.prisma.io/docs/pulse/database-setup/general-database-instructions))
+4. In a separate terminal/process, run `tsx lib/sync.ts`
+   - You can test if the syncing is working by opening prisma studio and triggering a change (create, update, or delete)
+
+> Just for emphasis; Prisma Pulse DOES NOT WORK WITH LOCALLY HOSTED DATABASES. This means you cannot connect to a database hosted locally, and you cannot stream events triggered to your local database.
