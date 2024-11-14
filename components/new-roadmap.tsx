@@ -145,15 +145,14 @@ export default function NewRoadmapForm() {
 
     return (
         <ScrollArea className="h-full w-full">
-            <div className="flex flex-col justify-left gap-8 p-20">
-            <span className="flex flex-col gap-2">
-            <h1 className="text-3xl text-bold text-primary">Get going faster with a Milestone or Research Plan Template</h1>
-            <p className="text-muted-foreground">Milestones are the nodes that make up your Research Plan. We've put together some templates to get you started.</p>
-            </span>
+            <div className="flex flex-col justify-left gap-12 p-20">
+                <span className="flex flex-col gap-2">
+                    <h1 className="text-3xl text-bold text-primary">Get going faster with a Milestone or Research Plan Template</h1>
+                    <p className="text-muted-foreground">Milestones are the nodes that make up your Research Plan. We've put together some templates to get you started.</p>
+                </span>
 
-            <div className="w-full flex flex-col gap-8">
                 <div className="flex flex-col gap-2 w-full">
-                <h2 className="text-xl">Start from a Milestone Template</h2>
+                <h2 className="text-xl text-bold">Start from a Milestone Template</h2>
                 <Carousel
                     opts={{
                         align: "start",
@@ -229,7 +228,7 @@ export default function NewRoadmapForm() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                <h2 className="text-xl">Start from a Research Plan Template</h2>
+                <h2 className="text-xl text-bold">Start from a Research Plan Template</h2>
                 <Carousel
                     opts={{
                         align: "start"
@@ -266,7 +265,6 @@ export default function NewRoadmapForm() {
                     <CarouselPrevious />
                     <CarouselNext />
                 </Carousel>
-                </div>
 
                 <span className="flex flex-col sm:flex-row gap-4">
                     <div className="flex flex-row space-x-2">
@@ -278,7 +276,7 @@ export default function NewRoadmapForm() {
                         </Button>
                     </div>
                 </span>
-            </div>
+                </div>
             </div>
         </ScrollArea>
     )
