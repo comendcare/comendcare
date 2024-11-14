@@ -144,7 +144,7 @@ async function main() {
             name: "Arcadion Disease Foundation",
             description: "The Arcadion Disease Foundation supports research and advocacy for Arcadion Disease, a progressive and degenerative disorder affecting the central nervous system.",
             subdomain: "arcadion",
-            customDomain: "arcadion",
+            customDomain: "arcadionfoundation",
             dateFounded: "2015-03-21T10:30:00Z",
             incorporationStatus: "YES",
             website: "https://www.example.org/",
@@ -169,168 +169,6 @@ async function main() {
             },
         },
     });
-
-    const lysogeneFoundation = await prisma.organization.create({
-        data: {
-            name: "Lysogene Foundation",
-            description: "The Lysogene Foundation is dedicated to finding a cure for Lysogene Syndrome, a severe genetic disorder that affects cellular lysosome function.",
-            subdomain: "lysogene",
-            customDomain: "lysogene",
-            dateFounded: "2013-08-17T09:00:00Z",
-            incorporationStatus: "YES",
-            website: "https://www.lysogene.org/",
-            moneyRaised: 1500000,
-            moneyDeployed: 700000,
-            researchBudget: 500000,
-            interestedModalities: ["Enzyme Replacement Therapy", "Gene Therapy"],
-            diseaseName: "Lysogene Syndrome",
-            diseaseCategories: ["Lysosomal Storage Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 500000,
-            numberOfIdentifiedPatients: 58,
-            relevantDiseaseMechanisms: ["Cellular Metabolism"],
-            associatedGenes: ["LYSO1"],
-            associatedSignsAndSymptoms: ["Organomegaly", "Developmental delay"],
-            existingDatabasesAndStudies: ["Lysogene Global Registry"],
-            assetsUnderDevelopment: ["Animal model", "Biomarker assays"],
-            user: {
-                connect: {
-                    id: alice.id
-                }
-            },
-        },
-    });
-
-    const neuroAidFoundation = await prisma.organization.create({
-        data: {
-            name: "NeuroAid Foundation",
-            description: "NeuroAid Foundation promotes research in rare neurodegenerative disorders to identify potential therapeutic pathways.",
-            subdomain: "neuroaid",
-            customDomain: "neuroaid",
-            dateFounded: "2010-05-12T12:45:00Z",
-            incorporationStatus: "YES",
-            website: "https://www.neuroaid.org/",
-            moneyRaised: 2500000,
-            moneyDeployed: 1000000,
-            researchBudget: 600000,
-            interestedModalities: ["Stem Cell Therapy", "RNA Therapy"],
-            diseaseName: "NeuroAid Disorder",
-            diseaseCategories: ["Neurodegenerative Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 800000,
-            numberOfIdentifiedPatients: 40,
-            relevantDiseaseMechanisms: ["Neuroinflammation", "Protein Aggregation"],
-            associatedGenes: ["NEUA", "NF4B"],
-            associatedSignsAndSymptoms: ["Loss of motor control", "Seizures"],
-            existingDatabasesAndStudies: ["NeuroAid Patient Database"],
-            assetsUnderDevelopment: ["Patient registry", "Preclinical model"],
-            user: {
-                connect: {
-                    id: charlie.id
-                }
-            },
-        },
-    });
-
-    const myoparFoundation = await prisma.organization.create({
-        data: {
-            name: "Myopar Foundation",
-            description: "Myopar Foundation supports patients and families affected by Myopar Disease, an inherited muscular disorder.",
-            subdomain: "myopar",
-            customDomain: "myopar",
-            dateFounded: "2018-09-28T08:00:00Z",
-            incorporationStatus: "YES",
-            website: "https://www.myopar.org/",
-            moneyRaised: 1800000,
-            moneyDeployed: 800000,
-            researchBudget: 450000,
-            interestedModalities: ["Gene Editing", "Cell Therapy"],
-            diseaseName: "Myopar Disease",
-            diseaseCategories: ["Muscular Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 200000,
-            numberOfIdentifiedPatients: 15,
-            relevantDiseaseMechanisms: ["Muscle Degeneration"],
-            associatedGenes: ["MYOP1", "MUS2"],
-            associatedSignsAndSymptoms: ["Muscle atrophy", "Fatigue", "Joint stiffness"],
-            existingDatabasesAndStudies: ["Myopar Patient Registry"],
-            assetsUnderDevelopment: ["Muscle cell line", "Gene editing vectors"],
-            user: {
-                connect: {
-                    id: dave.id
-                }
-            },
-        },
-    });
-
-    const cranioFoundation = await prisma.organization.create({
-        data: {
-            name: "Cranio Foundation",
-            description: "The Cranio Foundation supports research and advocacy for Cranio Syndrome, a craniofacial disorder with severe implications on bone structure.",
-            subdomain: "cranio",
-            customDomain: "cranio",
-            dateFounded: "2017-11-05T14:00:00Z",
-            incorporationStatus: "YES",
-            website: "https://www.cranio.org/",
-            moneyRaised: 2200000,
-            moneyDeployed: 1100000,
-            researchBudget: 500000,
-            interestedModalities: ["Tissue Engineering", "Bone Morphogenetic Proteins"],
-            diseaseName: "Cranio Syndrome",
-            diseaseCategories: ["Craniofacial Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 900000,
-            numberOfIdentifiedPatients: 25,
-            relevantDiseaseMechanisms: ["Bone Malformation"],
-            associatedGenes: ["CRN1"],
-            associatedSignsAndSymptoms: ["Facial deformity", "Respiratory issues"],
-            existingDatabasesAndStudies: ["Cranio Patient Database"],
-            assetsUnderDevelopment: ["3D-printed bone scaffolds", "Growth factor assays"],
-            user: {
-                connect: {
-                    id: eve.id
-                }
-            },
-        },
-    });
-
-    const nephroFoundation = await prisma.organization.create({
-        data: {
-            name: "Nephro Foundation",
-            description: "The Nephro Foundation advances research on Nephro Disease, a rare renal disorder affecting kidney function.",
-            subdomain: "nephro",
-            customDomain: "nephro",
-            dateFounded: "2014-04-02T16:30:00Z",
-            incorporationStatus: "YES",
-            website: "https://www.nephro.org/",
-            moneyRaised: 3000000,
-            moneyDeployed: 1400000,
-            researchBudget: 700000,
-            interestedModalities: ["Gene Therapy", "Small Molecule Therapy"],
-            diseaseName: "Nephro Disease",
-            diseaseCategories: ["Renal Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 600000,
-            numberOfIdentifiedPatients: 30,
-            relevantDiseaseMechanisms: ["Kidney Dysfunction"],
-            associatedGenes: ["NEP1", "REN4"],
-            associatedSignsAndSymptoms: ["Frequent urination", "High blood pressure"],
-            existingDatabasesAndStudies: ["Nephro Natural History Study"],
-            assetsUnderDevelopment: ["Kidney cell line", "Small molecule screening assays"],
-            user: {
-                connect: {
-                    id: frank.id
-                }
-            },
-        },
-    });
-
-// Create roadmaps for each foundation
-    const lysogeneRoadmap = await createRoadmap(lysogeneFoundation.id, exampleASORoadmap);
-    const neuroAidRoadmap = await createRoadmap(neuroAidFoundation.id, exampleASORoadmap);
-    const myoparRoadmap = await createRoadmap(myoparFoundation.id, exampleASORoadmap);
-    const cranioRoadmap = await createRoadmap(cranioFoundation.id, exampleASORoadmap);
-    const nephroRoadmap = await createRoadmap(nephroFoundation.id, exampleASORoadmap);
 
     // create Arcadion Disease Foundation roadmap
     const arcadionRoadmap = await createRoadmap(arcadion.id, exampleASORoadmap)
@@ -440,6 +278,7 @@ async function main() {
     })
 
     await createConditions()
+
 }
 
 const exampleASORoadmap = {
@@ -479,12 +318,9 @@ const exampleASORoadmap = {
             startDate: new Date(2024, 5, 5),
             papers: [],
             tasks: [
-                {name: 'Secure Funding', status: 'INPROGRESS'},
-                {name: 'Ethical Standards Advocacy', status: 'INPROGRESS'},
-                {
-                    name: 'Prioritize Model Features',
-                    description: 'Work with researchers to prioritize features in the model that most directly address patient needs and research goals.'
-                }
+                { name: 'Secure Funding', status: 'INPROGRESS' },
+                { name: 'Ethical Standards Advocacy', status: 'INPROGRESS' },
+                { name: 'Prioritize Model Features', description: 'Work with researchers to prioritize features in the model that most directly address patient needs and research goals.' }
             ]
         },
         {
@@ -493,12 +329,9 @@ const exampleASORoadmap = {
             papers: [],
             startDate: new Date(2026, 1, 1),
             tasks: [
-                {name: 'Coordinate Patient Participation'},
-                {name: 'Secure Funding'},
-                {
-                    name: 'Determine Cell Model Relevancy',
-                    description: 'Determine if each cell model is relevant for testing therapies and studying disease mechanisms that refect our patients real experiences.'
-                }
+                { name: 'Coordinate Patient Participation' },
+                { name: 'Secure Funding' },
+                { name: 'Determine Cell Model Relevancy', description: 'Determine if each cell model is relevant for testing therapies and studying disease mechanisms that refect our patients real experiences.'}
             ]
         },
         {
@@ -573,14 +406,14 @@ async function createConditions() {
         }
     });
 
-    console.log("Conditions created:", {celocynSyndrome, arcadionDisease});
+    console.log("Conditions created:", { celocynSyndrome, arcadionDisease });
 }
 
 async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
     const roadmap = await prisma.roadmap.create({
         data: {
             organization: {
-                connect: {id: organizationId}
+                connect: { id: organizationId }
             },
             title: roadmapTemplate.title || '',
             description: roadmapTemplate.description || '',
@@ -606,12 +439,11 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                                 roadmapId: roadmap.id,
                                 status: milestone.status || "TODO",
                                 title: milestone.title,
-                                ...(milestone.description ? {description: milestone.description} : undefined),
-                                ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
-                                ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
-                                ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                papers: milestone.papers || [],
-                                private: milestone.private || false
+                                ...(milestone.description ? { description: milestone.description } : undefined),
+                                ...(milestone.startDate ? { startDate: milestone.startDate } : undefined),
+                                ...(milestone.endDate ? { endDate: milestone.endDate } : undefined),
+                                ...(milestone.budget ? { budget: milestone.budget } : undefined),
+                                papers: milestone.papers || []
                             }
                         }
                     }
@@ -620,8 +452,8 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                 // grab milestone so we can add tasks
                 // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
                 const newMilestone = await prisma.milestone.findUnique({
-                    where: {nodeId: node.id},
-                    include: {tasks: true}
+                    where: { nodeId: node.id },
+                    include: { tasks: true }
                 })
 
                 // create tasks for relevant milestone
@@ -652,12 +484,12 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
             })
         )
 
-        for (let i = 0; i < nodes.length - 1; i++) {
+        for (let i = 0; i < nodes.length-1; i++) {
             const edge = await prisma.edge.create({
                 data: {
-                    roadmap: {connect: {id: roadmap.id}},
+                    roadmap: { connect: { id: roadmap.id } },
                     source: nodes[i]?.id,
-                    target: nodes[i + 1]?.id
+                    target: nodes[i+1]?.id
                 }
             })
         }
