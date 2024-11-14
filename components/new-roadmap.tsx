@@ -17,9 +17,13 @@ import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { createRoadmap } from "@/lib/actions";
-import { truncate } from "@/lib/utils";
+import { cn, truncate } from "@/lib/utils";
 import { FaCalendar, FaCheck, FaListCheck } from "react-icons/fa6";
 import { ScrollArea } from "./ui/scroll-area";
+import { useEffect, useState } from "react";
+import { Checkbox } from "./ui/checkbox";
+import { Indicator } from "@radix-ui/react-checkbox";
+import { CheckBubble } from "./check-bubble";
 
 const newRoadmapFormSchema = z.object({})
 
@@ -92,15 +96,29 @@ const sampleMilestones = [
 
 const sampleRoadmaps = [
     {
-        title: 'ASO Roadmap',
+        title: 'ASO Research Plan',
         description: 'By developing an ASO therapy, we aim to address the underlying genetic cause of our rare disease. Our plan outlines each stage, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
         milestones: sampleMilestones
     }
 ]
 
+const emptyMilestoneRoadmap = {
+    title: '',
+    description: '',
+    milestones: [
+        {
+            title: 'New Milestone',
+            description: '',
+            papers: [],
+            tasks: []
+        }
+    ]
+}
+
 export default function NewRoadmapForm() {
     const {data: session} = useSession()
     const router = useRouter()
+    const [customMilestones, setCustomMilestones] = useState<any[]>([])
 
     const form = useForm<z.infer<typeof newRoadmapFormSchema>>({
         mode: "onChange",
@@ -127,31 +145,45 @@ export default function NewRoadmapForm() {
 
     return (
         <ScrollArea className="h-full w-full">
-            <div className="flex flex-col justify-left gap-8 p-20">
-            <h1 className="text-3xl text-bold">Create your Roadmap</h1>
+            <div className="flex flex-col justify-left gap-12 p-20">
+                <span className="flex flex-col gap-2">
+                    <h1 className="text-3xl text-bold text-primary">Get going faster with a Milestone or Research Plan Template</h1>
+                    <p className="text-muted-foreground">Milestones are the nodes that make up your Research Plan. We've put together some templates to get you started.</p>
+                </span>
 
-            <div className="w-full flex flex-col">
-                <div className="flex flex-col gap-4 w-full">
-                <p>Start from a milestone template.</p>
+                <div className="flex flex-col gap-2 w-full">
+                <h2 className="text-xl text-bold">Start from a Milestone Template</h2>
                 <Carousel
                     opts={{
                         align: "start",
                         loop: true
                     }}
-                    className="w-full"
+                    className="w-full overflow-visible"
                 >
-                    <CarouselContent>
+                    <CarouselContent className="overflow-visible p-2">
                         {sampleMilestones.map((milestoneData, index) => (
-                            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 2xl:basis-1/4">
-                                <button onClick={() => createTemplateRoadmap({ milestones: [milestoneData] })}>
-                                <Card className="bg-white shadow-sm rounded-lg overflow-hidden text-left">
+                            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 2xl:basis-1/4 overflow-visible">
+                                {/* <button onClick={() => createTemplateRoadmap({ milestones: [milestoneData] })}> */}
+                                <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
                                     <CardHeader>
+                                        <CheckBubble data={milestoneData} onCheckedChanged={
+                                            (checked: boolean) => {
+                                                if (checked) {
+                                                    setCustomMilestones([...customMilestones, milestoneData])
+                                                } else {
+                                                    setCustomMilestones(customMilestones.filter(m => (
+                                                        m.title !== milestoneData.title &&
+                                                        m.description !== milestoneData.description
+                                                    )))
+                                                }
+                                            }
+                                        }/>
                                         <CardTitle>{milestoneData.title}</CardTitle>
                                         <CardDescription>
                                             {milestoneData.description}
                                         </CardDescription>
                                     </CardHeader>
-                                    <CardContent className="flex flex-col gap-8">
+                                    <CardContent className="flex flex-col gap-8 overflow-visible">
                                         <ul className="flex flex-col gap-2">
                                             {milestoneData.tasks?.map((task, index) => (
                                                 <li key={index} className="flex flex-row gap-2 items-center">
@@ -162,17 +194,41 @@ export default function NewRoadmapForm() {
                                         </ul>
                                     </CardContent>
                                 </Card>
-                                </button>
+                                {/* </button> */}
                             </CarouselItem>
                         ))}
                     </CarouselContent>
                     <CarouselPrevious />
                     <CarouselNext />
                 </Carousel>
+
+                <span className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-row space-x-2">
+                    <Button
+                        onClick={() => {
+                            createTemplateRoadmap({
+                                title: '',
+                                description: '',
+                                milestones: customMilestones
+                            })
+                        }}
+                    >
+                        Create a Research Plan with selected Milestones
+                    </Button>
+                </div>
+                <div className="flex flex-row space-x-2">
+                    <Button 
+                        variant="secondary"
+                        onClick={() => createTemplateRoadmap(emptyMilestoneRoadmap)}
+                    >
+                        Create an empty Milestone
+                    </Button>
+                </div>
+                </span>
                 </div>
 
-                <div className="flex flex-col gap-4">
-                <p>Start from a roadmap template.</p>
+                <div className="flex flex-col gap-2">
+                <h2 className="text-xl text-bold">Start from a Research Plan Template</h2>
                 <Carousel
                     opts={{
                         align: "start"
@@ -191,7 +247,7 @@ export default function NewRoadmapForm() {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="flex flex-col gap-2">
-                                        <h5 className="text-lg">Roadmap Milestones</h5>
+                                        <h5 className="text-lg">Research Plan Milestones</h5>
                                         <ul className="flex flex-col gap-2">
                                             {roadmapData.milestones?.map((milestone, index) => (
                                                 <li key={index} className="flex flex-row gap-2 items-center">
@@ -209,12 +265,18 @@ export default function NewRoadmapForm() {
                     <CarouselPrevious />
                     <CarouselNext />
                 </Carousel>
-                </div>
-            </div>
 
-            <div className="flex flex-row space-x-2">
-                <Button onClick={createEmptyRoadmap}>Create an empty roadmap</Button>
-            </div>
+                <span className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-row space-x-2">
+                        <Button 
+                            variant="secondary"
+                            onClick={createEmptyRoadmap}
+                        >
+                            Create an empty Research Plan
+                        </Button>
+                    </div>
+                </span>
+                </div>
             </div>
         </ScrollArea>
     )
