@@ -1,4 +1,5 @@
 import React from "react"
+import prisma from "@/lib/prisma"
 import {Input} from "@/components/ui/input";
 import {typesense} from "@/lib/typesense";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -6,7 +7,7 @@ import { OrganizationMarketplaceCard } from "@/components/marketplace-pag-card";
 
 export default async function PatientGroupsPage() {
     console.log(typesense)
-    const PAGs = await prisma?.organization.findMany()
+    const PAGs = await prisma.organization.findMany()
 
     return (
         <main className="max-w-7xl flex flex-col w-full px-4 pb-20 items-center h-full mx-auto">
