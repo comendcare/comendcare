@@ -81,7 +81,6 @@ export default function AppLayout({children}: AppLayoutProps) {
             setIsLoading(false)
         }
     }
-    console.log(session.user.organizationId)
 
     useEffect(() => {
         fetchOrganizations()
