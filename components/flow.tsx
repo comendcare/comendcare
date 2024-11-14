@@ -25,6 +25,7 @@ import { useOnborda } from "./onborda/OnbordaContext"
 import { toast } from "sonner"
 import { isNewUser, setUserAsReturning } from "@/lib/utils"
 import { FaQuestion } from "react-icons/fa6"
+import { NewMilestoneDialogContent } from "./new-milestone-dialog-content"
 
 const proOptions = { hideAttribution: true }
 
@@ -65,6 +66,7 @@ export const FlowView = ({
     const nodeTypes = { MILESTONE: MilestoneNode }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
+    const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     const { startOnborda } = useOnborda()
 
     // Add a empty milestone node
@@ -197,9 +199,13 @@ export const FlowView = ({
         >
             <MiniMap />
             <Controls>
-                <Button className="research-plan-tour-step1" onClick={() => addMilestone()}>Add Milestone</Button>
+                {/* <Button className="research-plan-tour-step1" onClick={() => addMilestone()}>Add Milestone</Button> */}
+                <Button className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>Add Milestone</Button>
             </Controls>
         </ReactFlow>
+        <Dialog open={newMilestoneIsOpen} onOpenChange={setNewMilestoneIsOpen}>
+            <NewMilestoneDialogContent addMilestone={addMilestone} />
+        </Dialog>
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
         </Dialog>
