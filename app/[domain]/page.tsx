@@ -36,6 +36,9 @@ export async function generateStaticParams() {
         ])
         .filter(Boolean)
 
+    console.log("allPaths domain page")
+    console.log(allPaths)
+    console.log("allPaths domain page")
     return allPaths
 }
 
@@ -53,7 +56,7 @@ export default async function OrganizationHomePage({
     if (!data) {
         notFound()
     }
-    console.log(roadmaps)
+    console.log(data)
 
     return (
         <main className="flex flex-col items-center w-full max-w-7xl mx-auto mt-8">
