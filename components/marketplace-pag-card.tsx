@@ -1,9 +1,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 import { FaCalendar, FaCircleDollarToSlot, FaPeopleGroup } from "react-icons/fa6";
 
 export function OrganizationMarketplaceCard({ organization }: { organization: any }) {
+    console.log(organization)
     return (
-        <Card className="w-full max-w-[500px]">
+        <Link
+            href={
+                process.env.NEXT_PUBLIC_VERCEL_ENV
+                    ? `https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+                    : `http://${organization.subdomain}.localhost:3000`
+            }
+        >
+        <Card className="w-full max-w-[500px] text-left">
             <CardHeader>
                 <CardTitle>{organization.name}</CardTitle>
                 <CardDescription>{organization.description}</CardDescription>
@@ -36,5 +45,6 @@ export function OrganizationMarketplaceCard({ organization }: { organization: an
             </div>
             </CardContent>
         </Card>
+        </Link>
     )
 }
