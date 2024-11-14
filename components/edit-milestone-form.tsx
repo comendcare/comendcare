@@ -671,6 +671,7 @@ export function EditMilestoneForm({
                                     )}
                                 </ul>
                                 <Button
+                                    variant="secondary"
                                     onClick={(e: any) => {
                                         e.preventDefault()
                                         form.setValue("papers", [
@@ -732,7 +733,7 @@ export function EditMilestoneForm({
                                 </SortableContext>
                             </ol>
                             </DndContext>
-                            <Button onClick={(e: any) => {
+                            <Button variant="secondary" onClick={(e: any) => {
                                 e.preventDefault()
                                 form.setValue(
                                     'tasks',
@@ -749,7 +750,7 @@ export function EditMilestoneForm({
                 <span className="flex justify-end gap-4 flex-wrap">
                     <Dialog>
                         <DialogTrigger>
-                            <Button type="button" variant={"destructive"}>
+                            <Button type="button" variant="destructive">
                                 Delete Milestone
                             </Button>
                         </DialogTrigger>
@@ -790,7 +791,7 @@ const PaperField = ({
                 value={value}
                 onChange={valueChanged}
             />
-            <Button size="icon" onClick={deleteElement}>
+            <Button variant="secondary" size="icon" onClick={deleteElement}>
                 <FaTrash />
             </Button>
         </li>
@@ -871,7 +872,7 @@ const TaskField = ({
                     className="h-full"
                 />
             </div>
-            <Button size="icon" onClick={deleteTask}>
+            <Button variant="secondary" size="icon" onClick={deleteTask}>
                 <FaTrash />
             </Button>
         </li>
