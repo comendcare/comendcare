@@ -56,7 +56,6 @@ export default async function OrganizationHomePage({
     if (!data) {
         notFound()
     }
-    console.log(data)
 
     return (
         <main className="flex flex-col items-center w-full max-w-7xl mx-auto mt-8">

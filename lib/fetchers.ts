@@ -34,8 +34,6 @@ export async function getRoadmapsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : null
-    console.log(domain)
-    console.log(subdomain)
 
     return await unstable_cache(
         async () => {
