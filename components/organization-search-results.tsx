@@ -19,7 +19,9 @@ export function OrganizationSearchResults() {
             ))}
             {searchResults.length <= 0 && (
                 <div className="h-full w-full flex justify-center align-center">
-                    <p className="text-3xl">Sorry, we don't have any results for that search</p>
+                    <p className="text-3xl">
+                        {`Sorry, we don't have any results for that search`}
+                    </p>
                 </div>
             )}
         </div>
