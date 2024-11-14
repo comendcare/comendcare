@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {createOrganization, createOrGetOrganization, updateOrganization} from "@/lib/actions";
+import {updateOrganization} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -43,16 +43,6 @@ export default function FinancesOnboardingForm() {
     })
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
-        // console.log(values)
-        // const createOrg = await createOrGetSite({
-        //         siteName: form.getValues("orgName"),
-        //         siteSlug: form.getValues("slug")
-        //     },
-        //     session.data?.user.id,
-        //     form.getValues("description")
-        // )
-        //
-        // console.log(createOrg)
 
         const formData = new FormData()
 
