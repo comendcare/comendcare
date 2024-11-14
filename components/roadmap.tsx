@@ -272,7 +272,7 @@ const TaskDetailsPanel = ({
                         Edit Task
                     </Button>
                 )} */}
-                <Button onClick={handleClose}>
+                <Button variant="secondary" onClick={handleClose}>
                     <FaX />
                 </Button>
             </span>
@@ -319,7 +319,7 @@ const MilestoneDetailsPanel = ({
                         Edit Milestone
                     </Button>
                 )} */}
-                <Button onClick={handleClose}>
+                <Button variant="secondary" onClick={handleClose}>
                     <FaX />
                 </Button>
             </span>

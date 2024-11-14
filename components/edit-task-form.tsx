@@ -310,7 +310,7 @@ export function EditTaskForm({
                                 </SortableContext>
                             </ol>
                             </DndContext>
-                            <Button onClick={(e: any) => {
+                            <Button variant="secondary" onClick={(e: any) => {
                                 e.preventDefault()
                                 form.setValue(
                                     'checklist',
@@ -413,7 +413,7 @@ const ChecklistField = ({
                     className="h-full"
                 />
             </div>
-            <Button size="icon" onClick={deleteTask}>
+            <Button variant="secondary" size="icon" onClick={deleteTask}>
                 <FaTrash />
             </Button>
         </li>
