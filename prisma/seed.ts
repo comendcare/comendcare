@@ -277,7 +277,7 @@ async function main() {
         },
     })
 
-    await createConditions()
+    // await createConditions()
 
 }
 
