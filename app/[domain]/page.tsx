@@ -7,11 +7,12 @@ import BlogCard from "@/components/blog-card"
 import { getRoadmapsForOrganization, getOrganizationData } from "@/lib/fetchers"
 import Image from "next/image"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {PAGProfileDetailsCard} from "@/components/pag-profile-details-card";
 import {PAGProfileRoadmapCard} from "@/components/pag-profile-roadmap-card";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
+import {PAGPublicProfileDetailsCard} from "@/components/pag-public-profile-details-card";
+import {PAGPublicProfileRoadmapCard} from "@/components/pag-public-profile-roadmap-card";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -63,11 +64,11 @@ export default async function OrganizationHomePage({
 
             <div className="grid grid-cols-6 gap-4">
                 <div className="col-span-2 space-y-4">
-                    <PAGProfileDetailsCard organization={data}/>
+                    <PAGPublicProfileDetailsCard organization={data}/>
                 </div>
 
                 <div className="col-span-4 flex flex-col space-y-4">
-                    <PAGProfileRoadmapCard/>
+                    <PAGPublicProfileRoadmapCard roadmap={roadmaps[0]}/>
                     <Card>
                         <CardHeader>
                             <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>

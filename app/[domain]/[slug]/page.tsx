@@ -111,7 +111,7 @@ export default async function OrganizationRoadmapPage({
         <>
             {roadmaps.length > 0 ? (
                     <>
-                        <div className="flex flex-col items-center justify-center">
+                        <div className="flex flex-col items-center justify-center mt-8">
                             <div className="m-auto w-full text-center md:w-7/12">
                                 <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
                                     {toDateString(roadmaps[0].createdAt)}
