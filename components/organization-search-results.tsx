@@ -13,7 +13,7 @@ export function OrganizationSearchResults() {
     const { searchResults } = useOrganizationSearchStore(useShallow(selector))
 
     return (
-        <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2">
+        <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
             {searchResults.map((organization, index) => (
                 <OrganizationMarketplaceCard organization={organization.document} key={index} />
             ))}
