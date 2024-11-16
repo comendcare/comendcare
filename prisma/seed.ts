@@ -13,6 +13,24 @@ async function main() {
         },
     })
 
+    const albert = await prisma.user.upsert({
+        where: {email: 'albert@comendcare.com'},
+        update: {},
+        create: {
+            email: 'albert@comendcare.com',
+            name: 'Albert Wang',
+        },
+    })
+
+    const betty = await prisma.user.upsert({
+        where: {email: 'betty.trevino@comendcare.com'},
+        update: {},
+        create: {
+            email: 'betty.trevino@comendcare.com',
+            name: 'Betty Trevino',
+        },
+    })
+
     // const megan = await prisma.user.upsert({
     //     where: { email: 'megan@comendcare.com' },
     //     update: {},
@@ -378,6 +396,40 @@ async function main() {
             user: {
                 connect: {
                     email: "flawnsontong1@gmail.com",
+                },
+            },
+            organization: {
+                connect: {
+                    id: arcadion.id,
+                }
+            }
+        },
+    })
+
+    await prisma.member.create({
+        data: {
+            role: "admin",
+            email: "albert@comendcare.com",
+            user: {
+                connect: {
+                    email: "albert@comendcare.com",
+                },
+            },
+            organization: {
+                connect: {
+                    id: arcadion.id,
+                }
+            }
+        },
+    })
+
+    await prisma.member.create({
+        data: {
+            role: "admin",
+            email: "betty.trevino@comendcare.com",
+            user: {
+                connect: {
+                    email: "betty.trevino@comendcare.com",
                 },
             },
             organization: {
