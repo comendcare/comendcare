@@ -131,63 +131,65 @@ export default async function SitePostPage({
 
     return (
         <TooltipProvider>
-            <div className="flex flex-col items-center justify-center mt-24 space-y-8 max-w-7xl mx-auto">
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator/>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink href="/docs/components">
-                                Neurodegenerative disorders
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator/>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink href="/docs/components">
-                                Leukodystrophies
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator/>
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>Arcadion Disease</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-                <div className="flex flex-col mx-auto w-full text-center md:w-7/12 space-y-4">
-                    <div className="inline-flex items-baseline justify-center">
-                        <h1 className="font-title text-3xl font-bold text-stone-800 dark:text-white md:text-6xl">
-                            {data.name}
-                        </h1>
-                        <HoverCard
-                            openDelay={0}
-                            closeDelay={0}
-                        >
-                            <HoverCardTrigger
-                                asChild
+            <div className="flex flex-col items-center justify-center mt-24 space-y-16 max-w-7xl mx-auto">
+                <div className="flex flex-col items-center justify-center space-y-8">
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator/>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink href="/docs/components">
+                                    Neurodegenerative disorders
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator/>
+                            <BreadcrumbItem>
+                                <BreadcrumbLink href="/docs/components">
+                                    Leukodystrophies
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator/>
+                            <BreadcrumbItem>
+                                <BreadcrumbPage>Arcadion Disease</BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                    <div className="flex flex-col mx-auto w-full text-center md:w-7/12 space-y-4">
+                        <div className="inline-flex items-baseline justify-center">
+                            <h1 className="font-title text-3xl font-bold text-stone-800 dark:text-white md:text-6xl">
+                                {data.name}
+                            </h1>
+                            <HoverCard
+                                openDelay={0}
+                                closeDelay={0}
                             >
-                                <Button variant="link">a.k.a</Button>
-                            </HoverCardTrigger>
-                            <HoverCardContent className="w-fit">
-                                <ul className="inline-flex flex-col justify-start items-start max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
-                                    <li>
-                                        AD
-                                    </li>
-                                    <li>
-                                        Arcadion
-                                    </li>
-                                </ul>
-                            </HoverCardContent>
-                        </HoverCard>
-                    </div>
-                    <p className="mx-auto w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
-                        Last updated {toDateString(data.createdAt)}
-                    </p>
-                    <p className="text-md m-auto w-10/12 text-stone-600 dark:text-stone-400 md:text-lg">
-                        {data.summary}
-                    </p>
+                                <HoverCardTrigger
+                                    asChild
+                                >
+                                    <Button variant="link">a.k.a</Button>
+                                </HoverCardTrigger>
+                                <HoverCardContent className="w-fit">
+                                    <ul className="inline-flex flex-col justify-start items-start max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
+                                        <li>
+                                            AD
+                                        </li>
+                                        <li>
+                                            Arcadion
+                                        </li>
+                                    </ul>
+                                </HoverCardContent>
+                            </HoverCard>
+                        </div>
+                        <p className="mx-auto w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
+                            Last updated {toDateString(data.createdAt)}
+                        </p>
+                        <p className="text-md m-auto w-10/12 text-stone-600 dark:text-stone-400 md:text-lg">
+                            {data.summary}
+                        </p>
 
+                    </div>
                 </div>
                 <Tabs defaultValue="overview" className="w-full">
                     <TabsList className="mx-auto grid grid-cols-3 bg-white w-1/2">
@@ -333,8 +335,9 @@ export default async function SitePostPage({
 
                     </TabsContent>
                 </Tabs>
-                <div className="w-full">
-                    <h2 className="text-center text-3xl md:text-4xl font-bold mb-4">
+
+                <div className="w-full space-y-8">
+                    <h2 className="text-center text-3xl md:text-4xl font-bold">
                         Associated organizations and individuals
                     </h2>
                     <UserFormsDataTable data={forms} columns={userFormsTableColumns}/>
