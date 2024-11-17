@@ -1,11 +1,25 @@
-import { notFound } from "next/navigation"
+import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getRoadmapData, getOrganizationData, getDisorderData} from "@/lib/fetchers"
 import BlogCard from "@/components/blog-card"
 import BlurImage from "@/components/blur-image"
 import MDX from "@/components/mdx"
-import { placeholderBlurhash, toDateString } from "@/lib/utils"
+import {placeholderBlurhash, toDateString} from "@/lib/utils"
 import * as domain from "node:domain";
+import {
+    Breadcrumb, BreadcrumbEllipsis,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList, BreadcrumbPage,
+    BreadcrumbSeparator
+} from "@/components/ui/breadcrumb";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible";
+import {CalendarDays} from "lucide-react";
+import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import {Button} from "@/components/ui/button";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 
 export async function generateMetadata({
                                            params
@@ -63,7 +77,7 @@ export async function generateStaticParams() {
     })
 
     const allPaths = allRoadmaps
-        .flatMap(({ organization, slug }) => [
+        .flatMap(({organization, slug}) => [
             organization?.subdomain && {
                 domain: `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
                 slug
@@ -83,7 +97,6 @@ export default async function SitePostPage({
                                            }: {
     params: { domain: string; slug: string }
 }) {
-    const domain = decodeURIComponent(params.domain)
     const slug = decodeURIComponent(params.slug)
     const data = await getDisorderData(slug)
 
@@ -93,18 +106,105 @@ export default async function SitePostPage({
 
     return (
         <>
-            <div className="flex flex-col items-center justify-center">
-                <div className="m-auto w-full text-center md:w-7/12">
-                    <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
-                        {toDateString(data.createdAt)}
+            <div className="flex flex-col items-center justify-center mt-24 space-y-8 max-w-7xl mx-auto">
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator/>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/docs/components">
+                                Neurodegenerative disorders
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator/>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink href="/docs/components">
+                                Leukodystrophies
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator/>
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>Arcadion Disease</BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
+                <div className="flex flex-col mx-auto w-full text-center md:w-7/12 space-y-4">
+                    <div className="inline-flex items-baseline justify-center">
+                        <h1 className="font-title text-3xl font-bold text-stone-800 dark:text-white md:text-6xl">
+                            {data.name}
+                        </h1>
+                        <HoverCard
+                            openDelay={0}
+                            closeDelay={0}
+                        >
+                            <HoverCardTrigger
+                                asChild
+                            >
+                                <Button variant="link">a.k.a</Button>
+                            </HoverCardTrigger>
+                            <HoverCardContent className="w-fit">
+                                <ul className="inline-flex flex-col justify-start items-start max-w-md space-y-1 text-gray-500 list-disc list-inside dark:text-gray-400">
+                                    <li>
+                                        AD
+                                    </li>
+                                    <li>
+                                        Arcadion
+                                    </li>
+                                </ul>
+                            </HoverCardContent>
+                        </HoverCard>
+                    </div>
+                    <p className="mx-auto w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
+                        Last updated {toDateString(data.createdAt)}
                     </p>
-                    <h1 className="mb-10 font-title text-3xl font-bold text-stone-800 dark:text-white md:text-6xl">
-                        {data.name}
-                    </h1>
                     <p className="text-md m-auto w-10/12 text-stone-600 dark:text-stone-400 md:text-lg">
                         {data.description}
                     </p>
+
                 </div>
+                <Tabs defaultValue="overview" className="w-1/2">
+                    <TabsList className="grid w-full grid-cols-3 bg-white">
+                        <TabsTrigger
+                            variant="outline"
+                            value="overview"
+                        >
+                            <p className="w-full text-center">Overview</p>
+                        </TabsTrigger>
+                        <TabsTrigger
+                            variant="outline"
+                            value="scientific-details"
+                        >
+                            <p className="w-full text-center">Scientific Details</p>
+                        </TabsTrigger>
+                        <TabsTrigger
+                            variant="outline"
+                            value="faq"
+                        >
+                            <p className="w-full text-center">FAQ</p>
+                        </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent
+                        value="overview"
+                        className="w-full"
+                    >
+
+                    </TabsContent>
+                    <TabsContent
+                        value="scientific-details"
+                        className="w-full"
+                    >
+
+                    </TabsContent>
+                    <TabsContent
+                        value="faq"
+                        className="w-full"
+                    >
+
+                    </TabsContent>
+                </Tabs>
             </div>
         </>
     )
