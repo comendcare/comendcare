@@ -1,7 +1,7 @@
 import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getDisorderData} from "@/lib/fetchers"
-import {toDateString} from "@/lib/utils"
+import {cn, toDateString} from "@/lib/utils"
 import * as domain from "node:domain";
 import {
     Breadcrumb, BreadcrumbEllipsis,
@@ -20,6 +20,13 @@ import {z} from "zod";
 import {UserFormsDataTable} from "@/components/organizations-data-table/user-forms-data-table";
 import {userFormsTableColumns} from "@/components/organizations-data-table/user-forms-data-table-columns";
 import {formSchema} from "@/lib/schemas";
+import React from "react";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import Overview from "@/app/(admin)/admin/page";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {FaUserCheck, FaUserPlus, FaUsersViewfinder} from "react-icons/fa6";
+import HumanAnatomyMap from "@/components/human-anatomy-map";
+import {Badge} from "@/components/ui/badge";
 
 export async function generateMetadata({
                                            params
@@ -103,9 +110,9 @@ async function getForms() {
 }
 
 const stats = [
-    { name: 'Total forms', stat: '12', previousStat: '4', change: '200%', changeType: 'increase' },
-    { name: 'Avg. Completion rate', stat: '86%', previousStat: '56%', change: '30%', changeType: 'increase' },
-    { name: 'Next deadline', stat: 'Tomorrow', previousStat: '', change: '', changeType: '' },
+    {name: 'Total forms', stat: '12', previousStat: '4', change: '200%', changeType: 'increase'},
+    {name: 'Avg. Completion rate', stat: '86%', previousStat: '56%', change: '30%', changeType: 'increase'},
+    {name: 'Next deadline', stat: 'Tomorrow', previousStat: '', change: '', changeType: ''},
 ]
 
 
@@ -123,7 +130,7 @@ export default async function SitePostPage({
     }
 
     return (
-        <>
+        <TooltipProvider>
             <div className="flex flex-col items-center justify-center mt-24 space-y-8 max-w-7xl mx-auto">
                 <Breadcrumb>
                     <BreadcrumbList>
@@ -178,7 +185,7 @@ export default async function SitePostPage({
                         Last updated {toDateString(data.createdAt)}
                     </p>
                     <p className="text-md m-auto w-10/12 text-stone-600 dark:text-stone-400 md:text-lg">
-                        {data.description}
+                        {data.summary}
                     </p>
 
                 </div>
@@ -208,7 +215,110 @@ export default async function SitePostPage({
                         value="overview"
                         className="w-full"
                     >
+                        <div className="grid gap-8 grid-cols-2">
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                        Stats
+                                    </h3>
+                                    <div className="grid gap-4 grid-cols-1 md:grid-cols-3 h-fit">
+                                        <Card>
+                                            <CardHeader
+                                                className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                                <CardTitle className="text-sm font-medium">
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            Patient identified
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="max-w-80">
+                                                            <p>
+                                                                {`Straightforward count of known cases, e.g., "Fewer than 1,000 cases have been identified worldwide.`}
+                                                            </p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </CardTitle>
+                                                <FaUserCheck/>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="text-2xl font-bold">
+                                                    {data.numberOfIdentifiedPatients}
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    +20% from last month
+                                                </p>
+                                            </CardContent>
+                                        </Card>
+                                        <Card>
+                                            <CardHeader
+                                                className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                                <CardTitle className="text-sm font-medium">
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            Prevalence
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="max-w-80">
+                                                            <p>
+                                                                {`The estimated proportion of a population that has a characteristic at a specific time, regardless of when they first developed it.`}
+                                                            </p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </CardTitle>
+                                                <FaUsersViewfinder/>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="text-2xl font-bold">
+                                                    {data.prevalenceNumerator} in {data.prevalenceDenominator}
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                        <Card>
+                                            <CardHeader
+                                                className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                                <CardTitle className="text-sm font-medium">
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            Incidence
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="max-w-80">
+                                                            <p>
+                                                                {`The number of new cases of a characteristic that develop in a population over a specific time period.`}
+                                                            </p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </CardTitle>
+                                                <FaUserPlus/>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="text-2xl font-bold">
+                                                    +2 this year
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </div>
+                                </div>
+                                <HumanAnatomyMap/>
+                            </div>
 
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                        Disease Categories
+                                    </h3>
+                                    <Badge>
+                                        {data.diseaseCategories}
+                                    </Badge>
+                                </div>
+                                <div className="space-y-2">
+                                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                        Description
+                                    </h3>
+                                    <p>
+                                        {data.description}
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
                     </TabsContent>
                     <TabsContent
                         value="scientific-details"
@@ -223,8 +333,13 @@ export default async function SitePostPage({
 
                     </TabsContent>
                 </Tabs>
-                <UserFormsDataTable data={forms} columns={userFormsTableColumns}/>
+                <div className="w-full">
+                    <h2 className="text-center text-3xl md:text-4xl font-bold mb-4">
+                        Associated organizations and individuals
+                    </h2>
+                    <UserFormsDataTable data={forms} columns={userFormsTableColumns}/>
+                </div>
             </div>
-        </>
+        </TooltipProvider>
     )
 }

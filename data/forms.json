@@ -2,17 +2,17 @@
   {
     "id": "c426d895-0158-4fde-ba36-0512b479a368",
     "title": "Try to generate the IP microchip, maybe it will program the optical panel!",
-    "status": "submitted",
+    "type": "pag",
     "label": "documentation",
     "priority": "high",
-    "createdOn": "2024-04-03T01:17:47.587Z",
-    "submittedOn": "2024-04-01T06:13:30.941Z",
+    "createdOn": "2024-12-03T01:17:47.587Z",
+    "submittedOn": "2024-12-01T06:13:30.941Z",
     "deadline": "2024-03-27T05:39:07.095Z"
   },
   {
     "id": "db9ded4d-2054-40aa-85c9-b5d6adaa0b40",
     "title": "I'll calculate the mobile AI port, that should transmitter the DNS system!",
-    "status": "submitted",
+    "type": "pag",
     "label": "feature",
     "priority": "high",
     "createdOn": "2024-04-03T12:29:53.640Z",
@@ -22,7 +22,7 @@
   {
     "id": "159351ec-9631-482b-a690-caa66f9248b4",
     "title": "We need to generate the bluetooth JSON interface!",
-    "status": "in progress",
+    "type": "researcher",
     "label": "feature",
     "priority": "high",
     "createdOn": "2024-03-28T22:03:01.101Z",
@@ -32,7 +32,7 @@
   {
     "id": "220b2676-3ee8-41fd-bc7a-4d4d24157966",
     "title": "Use the bluetooth FTP matrix, then you can synthesize the bluetooth alarm!",
-    "status": "not started",
+    "type": "cro",
     "label": "documentation",
     "priority": "high",
     "createdOn": "2024-04-04T18:07:44.293Z",
@@ -42,7 +42,7 @@
   {
     "id": "a2aac7ea-8097-40ed-b8aa-c50ee2c09279",
     "title": "The SSD card is down, navigate the haptic bandwidth so we can synthesize the RSS transmitter!",
-    "status": "not started",
+    "type": "cro",
     "label": "documentation",
     "priority": "high",
     "createdOn": "2024-03-31T18:00:21.501Z",
@@ -52,7 +52,7 @@
   {
     "id": "468f2103-1bc5-4235-bd0f-62f7cf8137f8",
     "title": "Compressing the sensor won't do anything, we need to calculate the neural SMTP program!",
-    "status": "in progress",
+    "type": "researcher",
     "label": "bug",
     "priority": "high",
     "createdOn": "2024-03-27T00:51:45.460Z",
@@ -62,7 +62,7 @@
   {
     "id": "43bdfd25-aa6a-4ac0-9f5f-151b6587b470",
     "title": "Try to back up the JBOD protocol, maybe it will generate the 1080p driver!",
-    "status": "submitted",
+    "type": "pag",
     "label": "feature",
     "priority": "high",
     "createdOn": "2024-03-31T10:09:33.827Z",
@@ -72,7 +72,7 @@
   {
     "id": "a75d7165-787a-4659-be49-e710fd5f092e",
     "title": "The HTTP bandwidth is down, synthesize the online pixel so we can transmit the IP bandwidth!",
-    "status": "not started",
+    "type": "cro",
     "label": "feature",
     "priority": "medium",
     "createdOn": "2024-03-30T11:49:15.690Z",
@@ -82,7 +82,7 @@
   {
     "id": "cb386ca5-0c1a-44d2-bce5-c2788d61beee",
     "title": "Quantifying the panel won't do anything, we need to compress the haptic PCI circuit!",
-    "status": "submitted",
+    "type": "pag",
     "label": "documentation",
     "priority": "low",
     "createdOn": "2024-03-28T01:19:22.753Z",
@@ -92,7 +92,7 @@
   {
     "id": "dba1bf6f-a8cc-4930-9ab7-9d821fc4ac72",
     "title": "I'll copy the redundant SMS microchip, that should firewall the SAS feed!",
-    "status": "not started",
+    "type": "cro",
     "label": "bug",
     "priority": "high",
     "createdOn": "2024-04-02T11:39:14.100Z",
@@ -102,7 +102,7 @@
   {
     "id": "7730bf6f-805b-4107-88b7-b6c6be2c72a7",
     "title": "The HTTP circuit is down, reboot the virtual sensor so we can copy the SDD card!",
-    "status": "not started",
+    "type": "cro",
     "label": "documentation",
     "priority": "high",
     "createdOn": "2024-03-27T23:13:28.039Z",
@@ -112,7 +112,7 @@
   {
     "id": "0d1e64e7-b56d-4981-b01e-641128874ed0",
     "title": "You can't input the port without hacking the multi-byte SCSI matrix!",
-    "status": "not started",
+    "type": "cro",
     "label": "documentation",
     "priority": "medium",
     "createdOn": "2024-03-29T21:35:58.431Z",
@@ -122,7 +122,7 @@
   {
     "id": "f2dfb5b8-0e24-468e-ba0d-d179a4073ee4",
     "title": "The JSON bandwidth is down, hack the solid state hard drive so we can synthesize the JSON port!",
-    "status": "in progress",
+    "type": "researcher",
     "label": "bug",
     "priority": "low",
     "createdOn": "2024-04-01T10:22:21.351Z",
@@ -132,7 +132,7 @@
   {
     "id": "7aa66fcd-40a1-407e-884e-d20c973a86a7",
     "title": "I'll navigate the primary API transmitter, that should protocol the SDD matrix!",
-    "status": "submitted",
+    "type": "pag",
     "label": "bug",
     "priority": "low",
     "createdOn": "2024-04-01T10:17:39.234Z",
@@ -142,7 +142,7 @@
   {
     "id": "de1d8f14-f8eb-4b6f-9acd-739d0da0ba77",
     "title": "We need to quantify the auxiliary HTTP system!",
-    "status": "in progress",
+    "type": "researcher",
     "label": "bug",
     "priority": "low",
     "createdOn": "2024-03-31T19:12:06.540Z",
@@ -152,7 +152,7 @@
   {
     "id": "75abd480-9627-4d23-a6e6-f55953514fe1",
     "title": "Use the cross-platform SDD sensor, then you can bypass the online program!",
-    "status": "submitted",
+    "type": "pag",
     "label": "feature",
     "priority": "medium",
     "createdOn": "2024-03-31T05:20:08.021Z",
@@ -162,7 +162,7 @@
   {
     "id": "4ac5cfee-afc8-4eb7-a634-adf0c4487bad",
     "title": "The SMTP matrix is down, override the redundant sensor so we can calculate the CLI driver!",
-    "status": "in progress",
+    "type": "researcher",
     "label": "documentation",
     "priority": "high",
     "createdOn": "2024-04-04T11:17:15.801Z",
@@ -172,7 +172,7 @@
   {
     "id": "5c3cefd9-ab2d-43f8-9464-ae4f8c3f0039",
     "title": "I'll program the solid state TLS microchip, that should firewall the API monitor!",
-    "status": "not started",
+    "type": "cro",
     "label": "bug",
     "priority": "low",
     "createdOn": "2024-03-31T10:08:55.810Z",
@@ -182,7 +182,7 @@
   {
     "id": "2d6cda42-bc05-45ac-906e-c7416b69130b",
     "title": "You can't index the bus without backing up the neural API application!",
-    "status": "in progress",
+    "type": "researcher",
     "label": "bug",
     "priority": "medium",
     "createdOn": "2024-03-29T14:42:45.526Z",
@@ -192,7 +192,7 @@
   {
     "id": "98260fb6-ab32-4c95-a8fd-2917111e2ed6",
     "title": "Try to reboot the TCP protocol, maybe it will override the back-end driver!",
-    "status": "in progress",
+    "type": "researcher",
     "label": "bug",
     "priority": "medium",
     "createdOn": "2024-03-27T10:27:17.053Z",
@@ -202,7 +202,7 @@
   {
     "id": "ee1b85a2-1eec-4066-a081-8b82a0906369",
     "title": "The CSS card is down, override the bluetooth circuit so we can connect the PNG monitor!",
-    "status": "submitted",
+    "type": "pag",
     "label": "feature",
     "priority": "medium",
     "createdOn": "2024-03-29T01:41:17.984Z",
@@ -212,791 +212,11 @@
   {
     "id": "73c5b15b-5322-442b-a863-00cbcc4ceea6",
     "title": "We need to quantify the redundant CLI transmitter!",
-    "status": "in progress",
+    "type": "researcher",
     "label": "documentation",
     "priority": "high",
     "createdOn": "2024-03-30T14:30:15.411Z",
     "submittedOn": "2024-03-30T01:09:55.286Z",
     "deadline": "2024-04-04T08:37:02.416Z"
-  },
-  {
-    "id": "7f160898-dc59-43cf-92f6-2b17706db868",
-    "title": "If we program the port, we can get to the SSD bus through the haptic SSL application!",
-    "status": "in progress",
-    "label": "documentation",
-    "priority": "low",
-    "createdOn": "2024-04-02T10:03:24.922Z",
-    "submittedOn": "2024-03-31T21:38:14.254Z",
-    "deadline": "2024-04-05T20:29:11.487Z"
-  },
-  {
-    "id": "c752196c-07b1-4480-85f4-e5434abb8548",
-    "title": "We need to index the haptic JSON interface!",
-    "status": "submitted",
-    "label": "documentation",
-    "priority": "low",
-    "createdOn": "2024-03-31T11:11:21.509Z",
-    "submittedOn": "2024-03-31T04:35:29.695Z",
-    "deadline": "2024-04-01T06:23:41.254Z"
-  },
-  {
-    "id": "413fae0a-6afb-402b-9853-63620dc48071",
-    "title": "You can't parse the bandwidth without calculating the neural XML capacitor!",
-    "status": "in progress",
-    "label": "documentation",
-    "priority": "high",
-    "createdOn": "2024-04-02T05:00:46.291Z",
-    "submittedOn": "2024-04-04T07:08:34.145Z",
-    "deadline": "2024-03-27T22:16:30.865Z"
-  },
-  {
-    "id": "8ef340ec-f9d0-48ce-bc65-d79d403e5407",
-    "title": "We need to compress the primary THX microchip!",
-    "status": "submitted",
-    "label": "feature",
-    "priority": "high",
-    "createdOn": "2024-03-31T08:25:27.183Z",
-    "submittedOn": "2024-03-31T09:43:09.143Z",
-    "deadline": "2024-03-27T10:47:54.317Z"
-  },
-  {
-    "id": "28b394c2-f448-4e8f-8c88-3ccf06ac3d99",
-    "title": "You can't synthesize the port without calculating the multi-byte SMTP transmitter!",
-    "status": "submitted",
-    "label": "bug",
-    "priority": "medium",
-    "createdOn": "2024-04-03T04:22:46.720Z",
-    "submittedOn": "2024-04-02T19:40:44.911Z",
-    "deadline": "2024-04-04T03:11:48.231Z"
-  },
-  {
-    "id": "4fbe2cb3-aba6-4a23-ae9a-bd36b722bdd9",
-    "title": "If we bypass the firewall, we can get to the RAM program through the multi-byte CSS capacitor!",
-    "status": "submitted",
-    "label": "feature",
-    "priority": "medium",
-    "createdOn": "2024-03-30T04:58:32.288Z",
-    "submittedOn": "2024-03-31T15:07:07.325Z",
-    "deadline": "2024-04-04T14:38:40.814Z"
-  },
-  {
-    "id": "d89239a2-8f50-4ce1-8997-4aa01da200ff",
-    "title": "We need to reboot the back-end SAS feed!",
-    "status": "submitted",
-    "label": "documentation",
-    "priority": "medium",
-    "createdOn": "2024-03-31T07:09:13.112Z",
-    "submittedOn": "2024-03-28T08:40:51.012Z",
-    "deadline": "2024-03-30T05:03:27.456Z"
-  },
-  {
-    "id": "febf56b7-5d25-4262-a839-05e16024268b",
-    "title": "We need to quantify the primary SMS alarm!",
-    "status": "in progress",
-    "label": "bug",
-    "priority": "low",
-    "createdOn": "2024-03-30T09:02:56.567Z",
-    "submittedOn": "2024-03-30T11:11:02.757Z",
-    "deadline": "2024-04-02T11:22:47.347Z"
-  },
-  {
-    "id": "1acc6f33-0056-4962-92b3-06f0bcdf0939",
-    "title": "Try to reboot the IB protocol, maybe it will hack the haptic hard drive!",
-    "status": "not started",
-    "label": "feature",
-    "priority": "high",
-    "createdOn": "2024-03-31T06:31:56.954Z",
-    "submittedOn": "2024-03-31T01:26:35.964Z",
-    "deadline": "2024-03-27T21:36:28.521Z"
-  },
-  {
-    "id": "57d1cd86-79d8-4077-8028-50eeba199821",
-    "title": "You can't hack the bus without copying the neural API transmitter!",
-    "status": "not started",
-    "label": "feature",
-    "priority": "low",
-    "createdOn": "2024-04-04T23:50:13.939Z",
-    "submittedOn": "2024-03-27T08:09:46.793Z",
-    "deadline": "2024-04-03T22:53:25.975Z"
-  },
-  {
-    "id": "ff60c9c5-d221-477d-bf58-024a24185517",
-    "title": "Connecting the system won't do anything, we need to input the multi-byte SAS monitor!",
-    "status": "in progress",
-    "label": "bug",
-    "priority": "high",
-    "createdOn": "2024-03-27T18:10:40.440Z",
-    "submittedOn": "2024-04-04T22:03:02.193Z",
-    "deadline": "2024-04-01T08:07:38.040Z"
-  },
-  {
-    "id": "13a4267b-95c6-4ef3-855e-1ded8f0e6b98",
-    "title": "You can't copy the microchip without bypassing the haptic ADP card!",
-    "status": "not started",
-    "label": "feature",
-    "priority": "low",
-    "createdOn": "2024-04-04T10:59:47.485Z",
-    "submittedOn": "2024-03-31T03:41:34.317Z",
-    "deadline": "2024-04-03T03:23:43.996Z"
-  },
-  {
-    "id": "054fb889-e025-48cd-87d1-048ccb8c3841",
-    "title": "I'll quantify the primary UTF8 system, that should sensor the PNG circuit!",
-    "status": "submitted",
-    "label": "feature",
-    "priority": "high",
-    "createdOn": "2024-03-30T17:37:18.765Z",
-    "submittedOn": "2024-03-31T00:58:36.958Z",
-    "deadline": "2024-04-02T07:42:21.241Z"
-  },
-  {
-    "id": "f4f72d27-abc4-440c-bdff-0bc293f33b71",
-    "title": "I'll parse the multi-byte HTTP firewall, that should driver the TCP array!",
-    "status": "submitted",
-    "label": "feature",
-    "priority": "low",
-    "createdOn": "2024-04-05T20:07:32.627Z",
-    "submittedOn": "2024-03-31T19:57:35.006Z",
-    "deadline": "2024-04-04T10:29:33.319Z"
-  },
-  {
-    "id": "0828445c-d5e4-4cac-927c-134d27f61201",
-    "title": "We need to program the redundant UDP matrix!",
-    "status": "in progress",
-    "label": "feature",
-    "priority": "high",
-    "createdOn": "2024-03-27T06:31:01.700Z",
-    "submittedOn": "2024-03-27T11:24:10.482Z",
-    "deadline": "2024-04-02T00:15:33.496Z"
-  },
-  {
-    "id": "c96deb60-c48f-4cf2-b82d-3b2043cc16be",
-    "title": "The XSS firewall is down, input the online pixel so we can connect the EXE sensor!",
-    "status": "in progress",
-    "label": "feature",
-    "priority": "medium",
-    "createdOn": "2024-03-30T17:42:32.618Z",
-    "submittedOn": "2024-04-02T12:11:43.999Z",
-    "deadline": "2024-03-31T23:07:51.003Z"
-  },
-  {
-    "id": "f18202e5-1060-4a6f-952d-952ee62291b9",
-    "title": "Backing up the protocol won't do anything, we need to bypass the wireless API system!",
-    "status": "not started",
-    "label": "documentation",
-    "priority": "high",
-    "createdOn": "2024-04-04T21:27:54.739Z",
-    "submittedOn": "2024-04-02T04:30:40.032Z",
-    "deadline": "2024-03-30T23:44:31.426Z"
-  },
-  {
-    "id": "4f7ff70b-5139-4f77-9ed2-223fe65fa702",
-    "title": "We need to bypass the optical XSS monitor!",
-    "status": "not started",
-    "label": "feature",
-    "priority": "low",
-    "createdOn": "2024-04-02T05:18:59.300Z",
-    "submittedOn": "2024-04-04T15:55:33.925Z",
-    "deadline": "2024-04-04T09:10:24.482Z"
-  },
-  {
-    "id": "4badb9e3-6962-420c-a478-4e6db4bc106c",
-    "title": "The SSD firewall is down, copy the optical array so we can reboot the AGP matrix!",
-    "status": "submitted",
-    "label": "documentation",
-    "priority": "high",
-    "createdOn": "2024-04-04T06:18:37.537Z",
-    "submittedOn": "2024-04-03T22:34:11.120Z",
-    "deadline": "2024-03-28T17:49:24.494Z"
-  },
-  {
-    "id": "dfc4c9b4-a2b2-423f-b02b-dfb5678afc8b",
-    "title": "Use the haptic CSS interface, then you can bypass the 1080p application!",
-    "status": "submitted",
-    "label": "bug",
-    "priority": "medium",
-    "createdOn": "2024-03-28T23:12:31.844Z",
-    "submittedOn": "2024-04-04T15:04:40.221Z",
-    "deadline": "2024-04-05T06:54:39.243Z"
-  },
-  {
-    "id": "ef3d21a0-cf62-4d0f-a093-32cbcf258256",
-    "title": "If we navigate the application, we can get to the GB monitor through the primary AGP capacitor!",
-    "status": "in progress",
-    "label": "documentation",
-    "priority": "medium",
-    "createdOn": "2024-03-28T11:09:00.552Z",
-    "submittedOn": "2024-03-30T17:32:46.552Z",
-    "deadline": "2024-03-29T20:58:58.462Z"
-  },
-  {
-    "id": "7ac2d58c-7ee9-45ba-af1e-1a0877d3028f",
-    "title": "If we calculate the matrix, we can get to the IB circuit through the bluetooth JBOD protocol!",
-    "status": "submitted",
-    "label": "feature",
-    "priority": "low",
-    "createdOn": "2024-03-31T12:04:46.024Z",
-    "submittedOn": "2024-04-03T08:36:11.292Z",
-    "deadline": "2024-04-01T13:52:30.582Z"
-  },
-  {
-    "id": "564a1c40-853d-4ae9-b6d2-0cc091179b4b",
-    "title": "You can't transmit the pixel without synthesizing the primary API array!",
-    "status": "not started",
-    "label": "bug",
-    "priority": "low",
-    "createdOn": "2024-04-04T11:11:01.798Z",
-    "submittedOn": "2024-04-01T07:31:19.031Z",
-    "deadline": "2024-03-30T02:33:31.442Z"
-  },
-  {
-    "id": "a6ca7913-2192-4332-b016-438152e5491b",
-    "title": "Overriding the circuit won't do anything, we need to transmit the back-end EXE pixel!",
-    "status": "not started",
-    "label": "documentation",
-    "priority": "medium",
-    "createdOn": "2024-03-27T15:11:47.879Z",
-    "submittedOn": "2024-03-28T07:05:08.370Z",
-    "deadline": "2024-04-01T17:34:13.472Z"
-  },
-  {
-    "id": "6fff630b-dbe4-49e8-9a9c-ca6548700ac0",
-    "title": "I'll program the cross-platform PCI feed, that should capacitor the HTTP transmitter!",
-    "status": "in progress",
-    "label": "feature",
-    "priority": "medium",
-    "createdOn": "2024-03-28T00:08:50.651Z",
-    "submittedOn": "2024-03-29T00:24:40.438Z",
-    "deadline": "2024-04-02T17:59:40.892Z"
-  },
-  {
-    "id": "6984d1d0-902a-42a6-acad-534ac8514217",
-    "title": "Copying the card won't do anything, we need to reboot the back-end IB system!",
-    "status": "not started",
-    "label": "bug",
-    "priority": "low",
-    "createdOn": "2024-04-04T20:11:31.538Z",
-    "submittedOn": "2024-04-03T06:31:28.660Z",
-    "deadline": "2024-03-27T11:39:47.734Z"
-  },
-  {
-    "id": "8107645f-fb64-4a23-b2b7-653b47a92a4b",
-    "title": "You can't transmit the bus without copying the virtual GB monitor!",
-    "status": "in progress",
-    "label": "bug",
-    "priority": "low",
-    "createdOn": "2024-03-29T01:53:20.447Z",
-    "submittedOn": "2024-03-27T18:51:28.677Z",
-    "deadline": "2024-04-03T22:53:48.642Z"
-  },
-  {
-    "id": "7b78b578-4a8d-4161-b12d-6f695aa6a96c",
-    "title": "The JBOD firewall is down, parse the wireless system so we can index the HEX matrix!",
-    "status": "submitted",
-    "label": "documentation",
-    "priority": "medium",
-    "createdOn": "2024-04-01T11:00:02.822Z",
-    "submittedOn": "2024-03-29T10:55:21.510Z",
-    "deadline": "2024-04-03T08:22:57.248Z"
-  },
-  {
-    "id": "6dc4a692-9056-4d9d-ba28-6104e4d17b55",
-    "title": "Synthesizing the circuit won't do anything, we need to navigate the redundant COM pixel!",
-    "status": "submitted",
-    "label": "bug",
-    "priority": "high",
-    "createdOn": "2024-03-30T02:51:51.798Z",
-    "submittedOn": "2024-04-02T02:35:31.256Z",
-    "deadline": "2024-03-31T10:11:44.215Z"
-  },
-  {
-    "id": "c0545335-fde6-4939-a367-bd3b8b881237",
-    "title": "The IP port is down, override the open-source circuit so we can index the PNG microchip!",
-    "status": "submitted",
-    "label": "bug",
-    "priority": "low",
-    "createdOn": "2024-04-04T08:51:19.089Z",
-    "submittedOn": "2024-03-31T00:06:31.409Z",
-    "deadline": "2024-04-05T06:01:29.583Z"
-  },
-  {
-    "id": "1a2558e1-a955-4acd-a28e-ea5213155841",
-    "title": "Try to transmit the PCI feed, maybe it will back up the redundant program!",
-    "status": "not started",
-    "label": "bug",
-    "priority": "low",
-    "createdOn": "2024-03-29T02:09:08.140Z",
-    "submittedOn": "2024-04-04T03:42:56.065Z",
-    "deadline": "2024-04-01T11:06:23.849Z"
-  },
-  {
-    "id": "8fbe129e-18ea-4802-950b-8a9fb8de8d3a",
-    "title": "Use the redundant TLS capacitor, then you can input the auxiliary panel!",
-    "status": "submitted",
-    "label": "bug",
-    "priority": "medium",
-    "createdOn": "2024-03-27T13:00:42.876Z",
-    "submittedOn": "2024-03-30T21:12:30.630Z",
-    "deadline": "2024-03-30T04:19:48.612Z"
-  },
-  {
-    "id": "ab60d419-7ba5-429b-80e9-6505ac1ab0c6",
-    "title": "Try to program the FTP interface, maybe it will generate the haptic port!",
-    "status": "in progress",
-    "label": "bug",
-    "priority": "medium",
-    "createdOn": "2024-04-01T13:47:22.760Z",
-    "submittedOn": "2024-03-29T11:40:44.329Z",
-    "deadline": "2024-04-05T16:01:37.730Z"
-  },
-  {
-    "id": "0f4477ee-0fa7-442c-979b-0e255dcc4fe9",
-    "title": "Use the virtual TLS system, then you can override the haptic driver!",
-    "status": "not started",
-    "label": "bug",
-    "priority": "low",
-    "createdOn": "2024-04-03T05:13:35.374Z",
-    "submittedOn": "2024-03-28T02:08:49.511Z",
-    "deadline": "2024-03-27T19:35:21.639Z"
-  },
-  {
-    "id": "4e1708fd-0c7b-4fc8-abec-e34a3ab687d8",
-    "title": "Programming the alarm won't do anything, we need to index the optical SDD program!",
-    "status": "submitted",
-    "label": "feature",
-    "priority": "low",
-    "createdOn": "2024-04-02T04:35:30.394Z",
-    "submittedOn": "2024-03-31T00:14:24.229Z",
-    "deadline": "2024-04-04T05:31:34.665Z"
-  },
-  {
-    "id": "eee2176a-7666-4e86-8517-5ac7cb35d73b",
-    "title": "Try to hack the ADP feed, maybe it will reboot the neural interface!",
-    "status": "in progress",
-    "label": "feature",
-    "priority": "medium",
-    "createdOn": "2024-04-03T23:06:48.837Z",
-    "submittedOn": "2024-04-04T19:42:40.167Z",
-    "deadline": "2024-03-29T15:23:17.465Z"
-  },
-  {
-    "id": "0819779c-a284-434b-b58e-457708086fda",
-    "title": "Use the 1080p RSS application, then you can input the cross-platform application!",
-    "status": "submitted",
-    "label": "bug",
-    "priority": "medium",
-    "createdOn": "2024-03-28T23:00:28.268Z",
-    "submittedOn": "2024-04-05T11:17:24.674Z",
-    "deadline": "2024-04-03T02:31:08.777Z"
-  },
-  {
-    "id": "2b950dc2-ea12-4753-b248-205012482de2",
-    "title": "I'll navigate the neural GB circuit, that should feed the TLS pixel!",
-    "status": "not started",
-    "label": "bug",
-    "priority": "low",
-    "createdOn": "2024-04-02T19:38:45.630Z",
-    "submittedOn": "2024-03-30T01:53:11.699Z",
-    "deadline": "2024-04-02T13:16:53.281Z"
-  },
-  {
-    "id": "0948aa3a-93e7-430a-9103-2c0e26e273f1",
-    "title": "Try to navigate the GB circuit, maybe it will index the primary array!",
-    "status": "in progress",
-    "label": "feature",
-    "priority": "low",
-    "createdOn": "2024-04-03T14:01:05.514Z",
-    "submittedOn": "2024-04-05T07:40:31.214Z",
-    "deadline": "2024-04-04T15:48:09.683Z"
-  },
-  {
-    "id": "af80f2be-74fc-49d7-87d9-5f0a40e2b545",
-    "title": "The CSS port is down, compress the multi-byte feed so we can reboot the TCP port!",
-    "status": "in progress",
-    "label": "documentation",
-    "priority": "high",
-    "createdOn": "2024-04-02T02:28:31.011Z",
-    "submittedOn": "2024-04-05T23:55:29.539Z",
-    "deadline": "2024-04-02T04:24:08.897Z"
-  },
-  {
-    "id": "19556cb8-ef3b-4499-9ec3-874a475e81cc",
-    "title": "If we parse the bandwidth, we can get to the IP bandwidth through the online PCI microchip!",
-    "status": "submitted",
-    "label": "feature",
-    "priority": "medium",
-    "createdOn": "2024-03-30T09:15:34.404Z",
-    "submittedOn": "2024-04-04T02:08:44.989Z",
-    "deadline": "2024-03-29T04:11:17.840Z"
-  },
-  {
-    "id": "cedca23a-39be-4801-b7eb-85805acdb5cc",
-    "title": "You can't input the card without navigating the mobile HDD protocol!",
-    "status": "not started",
-    "label": "feature",
-    "priority": "high",
-    "createdOn": "2024-04-02T08:27:33.915Z",
-    "submittedOn": "2024-04-05T03:27:07.713Z",
-    "deadline": "2024-03-31T05:49:54.804Z"
-  },
-  {
-    "id": "935061ce-fd8c-41d1-a160-689ac59c45e4",
-    "title": "You can't input the card without transmitting the auxiliary HEX application!",
-    "status": "not started",
-    "label": "documentation",
-    "priority": "medium",
-    "createdOn": "2024-03-31T18:00:30.533Z",
-    "submittedOn": "2024-04-02T09:13:44.566Z",
-    "deadline": "2024-04-01T11:27:08.539Z"
-  },
-  {
-    "id": "c86cf118-c326-4254-8e7a-6eda63ebf8d8",
-    "title": "I'll hack the haptic CSS transmitter, that should alarm the XML card!",
-    "status": "not started",
-    "label": "documentation",
-    "priority": "high",
-    "createdOn": "2024-03-31T16:41:56.407Z",
-    "submittedOn": "2024-04-01T13:52:42.335Z",
-    "deadline": "2024-03-27T03:38:50.112Z"
-  },
-  {
-    "id": "d7102bb9-d812-4031-81bf-ee051baaadfc",
-    "title": "Use the open-source SDD feed, then you can connect the solid state port!",
-    "status": "submitted",
-    "label": "bug",
-    "priority": "medium",
-    "createdOn": "2024-04-05T15:10:44.297Z",
-    "submittedOn": "2024-04-05T19:40:44.216Z",
-    "deadline": "2024-04-03T04:41:26.517Z"
-  },
-  {
-    "id": "ae18f081-771c-450c-be53-50f2440a90f9",
-    "title": "Use the haptic VGA feed, then you can calculate the 1080p matrix!",
-    "status": "in progress",
-    "label": "documentation",
-    "priority": "high",
-    "createdOn": "2024-03-31T22:33:20.713Z",
-    "submittedOn": "2024-04-01T06:22:09.456Z",
-    "deadline": "2024-03-27T11:47:45.794Z"
-  },
-  {
-    "id": "37f7ec83-ea4e-4d57-bb69-4c846bd011fb",
-    "title": "We need to transmit the mobile UDP circuit!",
-    "status": "submitted",
-    "label": "feature",
-    "priority": "low",
-    "createdOn": "2024-04-03T06:55:19.854Z",
-    "submittedOn": "2024-03-27T00:14:20.588Z",
-    "deadline": "2024-04-02T04:30:51.867Z"
-  },
-  {
-    "id": "a97abe06-213a-4032-9443-295f4f4ec25e",
-    "title": "I'll override the open-source TCP monitor, that should array the TLS port!",
-    "status": "not started",
-    "label": "bug",
-    "priority": "high",
-    "createdOn": "2024-03-29T22:54:43.579Z",
-    "submittedOn": "2024-04-02T06:01:59.936Z",
-    "deadline": "2024-04-03T16:29:57.159Z"
-  },
-  {
-    "id": "6316b7fd-5151-4f81-abc3-599242d1884c",
-    "title": "Use the solid state SDD bus, then you can compress the cross-platform program!",
-    "status": "in progress",
-    "label": "bug",
-    "priority": "high",
-    "createdOn": "2024-03-31T13:18:40.340Z",
-    "submittedOn": "2024-04-05T23:05:48.720Z",
-    "deadline": "2024-03-28T11:55:26.881Z"
-  },
-  {
-    "id": "8e726d87-cbe4-4745-876a-b9039560118f",
-    "title": "I'll calculate the virtual USB system, that should array the JSON array!",
-    "status": "in progress",
-    "label": "documentation",
-    "priority": "medium",
-    "createdOn": "2024-03-31T06:07:01.249Z",
-    "submittedOn": "2024-04-03T11:58:06.943Z",
-    "deadline": "2024-04-02T14:37:49.662Z"
-  },
-  {
-    "id": "46fb198a-5316-4040-b342-c391fa2ecf2b",
-    "title": "Compressing the capacitor won't do anything, we need to quantify the virtual COM card!",
-    "status": "not started",
-    "label": "feature",
-    "priority": "low",
-    "createdOn": "2024-03-31T06:08:01.851Z",
-    "submittedOn": "2024-04-01T22:22:19.848Z",
-    "deadline": "2024-03-28T22:26:24.337Z"
-  },
-  {
-    "id": "803994d4-f05b-43c5-a334-b90a1299b9c1",
-    "title": "We need to reboot the 1080p XSS transmitter!",
-    "status": "submitted",
-    "label": "documentation",
-    "priority": "low",
-    "createdOn": "2024-03-28T09:46:30.843Z",
-    "submittedOn": "2024-04-03T00:55:30.586Z",
-    "deadline": "2024-04-01T06:00:34.574Z"
-  },
-  {
-    "id": "4caa32b8-2219-49de-a6b8-9243a91b0cec",
-    "title": "Synthesizing the panel won't do anything, we need to calculate the mobile COM transmitter!",
-    "status": "in progress",
-    "label": "feature",
-    "priority": "low",
-    "createdOn": "2024-04-05T05:25:01.444Z",
-    "submittedOn": "2024-03-27T08:59:05.068Z",
-    "deadline": "2024-04-02T13:47:04.381Z"
-  },
-  {
-    "id": "faf7856f-dadc-46e7-a1d9-6183c1fc5ee9",
-    "title": "We need to index the optical SSL array!",
-    "status": "submitted",
-    "label": "feature",
-    "priority": "medium",
-    "createdOn": "2024-04-03T17:06:59.089Z",
-    "submittedOn": "2024-04-05T03:16:32.910Z",
-    "deadline": "2024-04-05T05:44:30.954Z"
-  },
-  {
-    "id": "f4fecc61-99f3-4b82-8aa6-3cad88aa8b2e",
-    "title": "We need to compress the digital COM interface!",
-    "status": "not started",
-    "label": "documentation",
-    "priority": "high",
-    "createdOn": "2024-03-27T13:12:36.370Z",
-    "submittedOn": "2024-03-31T15:18:17.985Z",
-    "deadline": "2024-03-30T11:27:09.098Z"
-  },
-  {
-    "id": "0bc0d1e5-0b8e-4a54-98b2-062fe30838a1",
-    "title": "Synthesizing the driver won't do anything, we need to program the haptic TCP interface!",
-    "status": "submitted",
-    "label": "feature",
-    "priority": "low",
-    "createdOn": "2024-04-04T15:06:06.200Z",
-    "submittedOn": "2024-04-05T00:33:08.905Z",
-    "deadline": "2024-03-27T08:48:16.772Z"
-  },
-  {
-    "id": "e6c95a27-272e-494c-9fbd-9d274f46ef4c",
-    "title": "If we index the capacitor, we can get to the RAM program through the back-end UTF8 application!",
-    "status": "submitted",
-    "label": "bug",
-    "priority": "high",
-    "createdOn": "2024-04-05T00:15:38.331Z",
-    "submittedOn": "2024-03-27T13:06:44.648Z",
-    "deadline": "2024-03-28T03:19:40.919Z"
-  },
-  {
-    "id": "8c186ef0-3ad6-4a74-8a55-64d303de43af",
-    "title": "The SMS port is down, quantify the mobile matrix so we can input the PNG feed!",
-    "status": "not started",
-    "label": "feature",
-    "priority": "medium",
-    "createdOn": "2024-04-04T01:12:08.689Z",
-    "submittedOn": "2024-03-30T18:49:25.003Z",
-    "deadline": "2024-03-29T10:31:34.868Z"
-  },
-  {
-    "id": "8427d254-0f46-4feb-a433-c9ad004a70c1",
-    "title": "I'll quantify the optical HTTP transmitter, that should protocol the XML bandwidth!",
-    "status": "in progress",
-    "label": "documentation",
-    "priority": "medium",
-    "createdOn": "2024-03-27T14:45:05.040Z",
-    "submittedOn": "2024-03-31T09:17:32.436Z",
-    "deadline": "2024-03-28T04:42:01.991Z"
-  },
-  {
-    "id": "1e2fa48b-825f-4f89-a992-0ebef8ec4a9f",
-    "title": "We need to hack the bluetooth RSS card!",
-    "status": "in progress",
-    "label": "documentation",
-    "priority": "high",
-    "createdOn": "2024-04-03T07:43:58.204Z",
-    "submittedOn": "2024-03-27T13:49:36.220Z",
-    "deadline": "2024-04-02T10:18:54.714Z"
-  },
-  {
-    "id": "6a676441-fc66-4bfc-a675-899c2aafadb4",
-    "title": "Try to calculate the FTP application, maybe it will input the haptic port!",
-    "status": "not started",
-    "label": "documentation",
-    "priority": "high",
-    "createdOn": "2024-03-31T02:21:08.212Z",
-    "submittedOn": "2024-04-02T09:29:58.248Z",
-    "deadline": "2024-04-05T05:25:46.975Z"
-  },
-  {
-    "id": "1f1ecb76-23bc-4abc-ac27-9cea4aaf86eb",
-    "title": "Try to parse the SCSI sensor, maybe it will back up the open-source feed!",
-    "status": "in progress",
-    "label": "bug",
-    "priority": "high",
-    "createdOn": "2024-03-29T05:09:30.652Z",
-    "submittedOn": "2024-04-01T22:56:14.979Z",
-    "deadline": "2024-03-27T21:50:48.499Z"
-  },
-  {
-    "id": "7e1df78d-7fd6-41c6-8d83-0bbb312ffcfe",
-    "title": "If we quantify the port, we can get to the AGP panel through the multi-byte JSON driver!",
-    "status": "submitted",
-    "label": "documentation",
-    "priority": "high",
-    "createdOn": "2024-04-04T04:01:14.016Z",
-    "submittedOn": "2024-04-02T00:56:15.544Z",
-    "deadline": "2024-04-05T22:47:24.022Z"
-  },
-  {
-    "id": "c180fa8b-8010-4d23-bf86-e067a42fc022",
-    "title": "Parsing the alarm won't do anything, we need to navigate the solid state TCP card!",
-    "status": "submitted",
-    "label": "feature",
-    "priority": "medium",
-    "createdOn": "2024-03-28T16:28:14.853Z",
-    "submittedOn": "2024-03-27T21:17:21.515Z",
-    "deadline": "2024-04-02T15:25:01.980Z"
-  },
-  {
-    "id": "56966686-bceb-4c3f-ad86-8e4ca78b0a33",
-    "title": "Generating the interface won't do anything, we need to bypass the cross-platform TLS array!",
-    "status": "not started",
-    "label": "feature",
-    "priority": "high",
-    "createdOn": "2024-04-01T04:04:27.717Z",
-    "submittedOn": "2024-04-01T14:38:14.968Z",
-    "deadline": "2024-03-31T02:34:32.547Z"
-  },
-  {
-    "id": "92470ac6-18d8-432a-a0e3-bfc6481755f6",
-    "title": "Try to reboot the HEX bandwidth, maybe it will quantify the open-source microchip!",
-    "status": "not started",
-    "label": "bug",
-    "priority": "high",
-    "createdOn": "2024-03-28T16:32:59.160Z",
-    "submittedOn": "2024-04-03T12:31:40.721Z",
-    "deadline": "2024-03-29T00:54:28.136Z"
-  },
-  {
-    "id": "4433ee8d-db72-49f0-982a-89087f79b50c",
-    "title": "The USB port is down, generate the multi-byte card so we can transmit the DRAM bandwidth!",
-    "status": "in progress",
-    "label": "bug",
-    "priority": "high",
-    "createdOn": "2024-04-02T02:50:46.442Z",
-    "submittedOn": "2024-04-03T06:57:15.771Z",
-    "deadline": "2024-04-04T12:35:22.723Z"
-  },
-  {
-    "id": "fb7f6177-f769-432a-8c1a-82713fcde501",
-    "title": "We need to parse the solid state HEX alarm!",
-    "status": "in progress",
-    "label": "documentation",
-    "priority": "low",
-    "createdOn": "2024-03-29T03:11:17.141Z",
-    "submittedOn": "2024-03-30T12:14:34.168Z",
-    "deadline": "2024-03-31T11:36:24.330Z"
-  },
-  {
-    "id": "f0b1f886-c40b-4c67-a51b-0f863895233f",
-    "title": "Try to transmit the SMS port, maybe it will bypass the optical monitor!",
-    "status": "not started",
-    "label": "bug",
-    "priority": "medium",
-    "createdOn": "2024-03-31T01:12:04.341Z",
-    "submittedOn": "2024-03-27T13:40:32.864Z",
-    "deadline": "2024-04-05T06:11:50.472Z"
-  },
-  {
-    "id": "6afb1551-c2e4-4c6d-9e24-46a9152b5d28",
-    "title": "Try to program the TCP panel, maybe it will connect the neural alarm!",
-    "status": "in progress",
-    "label": "feature",
-    "priority": "medium",
-    "createdOn": "2024-03-29T06:50:10.545Z",
-    "submittedOn": "2024-04-02T02:40:15.428Z",
-    "deadline": "2024-03-31T03:57:49.232Z"
-  },
-  {
-    "id": "d1abac70-d8ab-469a-8a4f-05292ceb8840",
-    "title": "If we parse the monitor, we can get to the SDD matrix through the auxiliary EXE protocol!",
-    "status": "in progress",
-    "label": "documentation",
-    "priority": "low",
-    "createdOn": "2024-04-03T00:09:15.849Z",
-    "submittedOn": "2024-04-04T18:48:39.523Z",
-    "deadline": "2024-04-01T05:09:32.157Z"
-  },
-  {
-    "id": "103fa381-b433-440a-b528-8860030d9c9f",
-    "title": "The PNG bus is down, hack the cross-platform interface so we can parse the PNG feed!",
-    "status": "submitted",
-    "label": "bug",
-    "priority": "high",
-    "createdOn": "2024-03-29T16:18:42.223Z",
-    "submittedOn": "2024-04-03T03:39:57.141Z",
-    "deadline": "2024-04-05T05:14:28.734Z"
-  },
-  {
-    "id": "ca043f4b-5841-47f4-9656-72c8b5674500",
-    "title": "If we calculate the matrix, we can get to the ADP matrix through the optical PCI hard drive!",
-    "status": "not started",
-    "label": "bug",
-    "priority": "low",
-    "createdOn": "2024-03-29T02:51:47.234Z",
-    "submittedOn": "2024-03-31T03:28:16.026Z",
-    "deadline": "2024-04-03T08:55:01.519Z"
-  },
-  {
-    "id": "b55e1f67-b0e0-4033-b650-ebe20917a2ba",
-    "title": "Use the primary RSS circuit, then you can bypass the 1080p system!",
-    "status": "submitted",
-    "label": "documentation",
-    "priority": "low",
-    "createdOn": "2024-03-27T16:18:41.539Z",
-    "submittedOn": "2024-04-02T06:36:03.059Z",
-    "deadline": "2024-03-29T07:32:36.004Z"
-  },
-  {
-    "id": "847eed0a-0c7f-4670-8300-422e6872be00",
-    "title": "You can't input the bandwidth without copying the 1080p HEX sensor!",
-    "status": "submitted",
-    "label": "bug",
-    "priority": "high",
-    "createdOn": "2024-04-04T14:32:13.605Z",
-    "submittedOn": "2024-03-29T13:27:51.660Z",
-    "deadline": "2024-04-01T05:54:28.087Z"
-  },
-  {
-    "id": "8b09ce95-5041-4f06-88d9-2e8d2cdf1922",
-    "title": "We need to override the digital EXE panel!",
-    "status": "in progress",
-    "label": "bug",
-    "priority": "high",
-    "createdOn": "2024-03-30T16:35:34.309Z",
-    "submittedOn": "2024-04-03T00:51:46.293Z",
-    "deadline": "2024-04-02T01:38:39.286Z"
-  },
-  {
-    "id": "731769d2-1bea-45ac-91c9-dc0d0c55882e",
-    "title": "If we reboot the sensor, we can get to the SMTP driver through the cross-platform ADP hard drive!",
-    "status": "submitted",
-    "label": "documentation",
-    "priority": "high",
-    "createdOn": "2024-03-29T21:57:54.288Z",
-    "submittedOn": "2024-04-03T03:41:55.795Z",
-    "deadline": "2024-03-30T10:42:57.360Z"
-  },
-  {
-    "id": "bed1ec98-3ca0-42ad-83bd-01238bc3cf80",
-    "title": "Use the auxiliary SSD sensor, then you can back up the cross-platform program!",
-    "status": "submitted",
-    "label": "documentation",
-    "priority": "low",
-    "createdOn": "2024-03-28T08:54:20.692Z",
-    "submittedOn": "2024-03-28T02:32:22.794Z",
-    "deadline": "2024-03-31T18:26:57.941Z"
   }
 ]

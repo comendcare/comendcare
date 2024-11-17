@@ -7,7 +7,7 @@ import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
 import {UserFormsDataTableViewOptions} from "@/components/organizations-data-table/user-forms-data-table-view-options"
 
-import {statuses} from "@/lib/data";
+import {types} from "@/lib/data";
 import {UserFormsDataTableFacetedFilter} from "./user-forms-data-table-faceted-filter"
 
 interface DataTableToolbarProps<TData> {
@@ -30,11 +30,11 @@ export function UserFormsDataTableToolbar<TData>({
                     }
                     className="h-8 w-[150px] lg:w-[250px]"
                 />
-                {table.getColumn("status") && (
+                {table.getColumn("type") && (
                     <UserFormsDataTableFacetedFilter
-                        column={table.getColumn("status")}
-                        title="Status"
-                        options={statuses}
+                        column={table.getColumn("type")}
+                        title="Type"
+                        options={types}
                     />
                 )}
                 {isFiltered && (

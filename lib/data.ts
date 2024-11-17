@@ -1,4 +1,5 @@
 import {CheckCircledIcon, CrossCircledIcon, StopwatchIcon} from "@radix-ui/react-icons";
+import {FaSuitcase, FaFlaskVial, FaUsers} from "react-icons/fa6";
 
 export const labels = [
     {
@@ -15,21 +16,21 @@ export const labels = [
     },
 ]
 
-export const statuses = [
+export const types = [
     {
-        value: "not started",
-        label: "Not Started",
-        icon: CrossCircledIcon,
+        value: "pag",
+        label: "Patient group",
+        icon: FaUsers,
     },
     {
-        value: "in progress",
-        label: "In Progress",
-        icon: StopwatchIcon,
+        value: "researcher",
+        label: "Researcher",
+        icon: FaFlaskVial,
     },
     {
-        value: "submitted",
-        label: "Submitted",
-        icon: CheckCircledIcon,
+        value: "cro",
+        label: "Contractor",
+        icon: FaSuitcase,
     },
 ]
 
