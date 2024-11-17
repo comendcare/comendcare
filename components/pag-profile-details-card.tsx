@@ -6,6 +6,7 @@ import {faker} from "@faker-js/faker";
 import {Badge} from "@/components/ui/badge";
 import EditProfileAboutDialog from "@/components/edit-profile-about-dialog";
 import {Organization} from "@prisma/client";
+import Link from "next/link";
 
 const milestones = [
     {text: "Identified biomarkers ", highlight: "2 years ago"},
@@ -66,9 +67,17 @@ export const PAGProfileDetailsCard = ({organization}: {organization: Organizatio
                                 </p>
                             </div>
                             <div className="space-y-2">
-                                <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                    Relevant topics
-                                </h3>
+                                <div className="flex flex-row items-center justify-between w-full">
+                                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                        Relevant topics
+                                    </h3>
+                                    <Link
+                                        href="/condition"
+                                        className="hover:underline"
+                                    >
+                                        See more
+                                    </Link>
+                                </div>
                                 <div className="flex flex-col sm:flex-row sm:flex-wrap sm:space-x-2">
                                     {pag?.topics.map((item, index) =>
                                         <Badge key={index} className="flex text-sm">

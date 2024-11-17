@@ -1,6 +1,6 @@
-import { monthsList } from "@/lib/utils"
 import React from "react"
 import { FaCalendar } from "react-icons/fa6"
+import {monthsList} from "@/lib/data";
 
 export function DateView({startDate, endDate}: {startDate: Date | undefined, endDate: Date | undefined}) {
     if (startDate && endDate) {
