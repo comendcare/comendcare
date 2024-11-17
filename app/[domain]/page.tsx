@@ -93,12 +93,12 @@ export default async function OrganizationHomePage({
             <div className="mb-20 w-full">
                 {roadmaps.length > 0 ? (
                     <div className="mx-auto w-full max-w-screen-xl md:mb-28 lg:w-5/6">
-                        <Link href={`/${roadmaps[0].slug}`}>
+                        <Link href={`/${roadmaps[0]?.slug}`}>
                             <div className="group relative mx-auto h-80 w-full overflow-hidden sm:h-150 lg:rounded-xl">
                                 <BlurImage
-                                    alt={roadmaps[0].title ?? ""}
+                                    alt={roadmaps[0]?.title ?? ""}
                                     blurDataURL={
-                                        roadmaps[0].imageBlurhash ??
+                                        roadmaps[0]?.imageBlurhash ??
                                         placeholderBlurhash
                                     }
                                     className="h-full w-full object-cover group-hover:scale-105 group-hover:duration-300"
@@ -106,16 +106,16 @@ export default async function OrganizationHomePage({
                                     height={630}
                                     placeholder="blur"
                                     src={
-                                        roadmaps[0].image ?? "/placeholder.png"
+                                        roadmaps[0]?.image ?? "/placeholder.png"
                                     }
                                 />
                             </div>
                             <div className="mx-auto mt-10 w-5/6 lg:w-full">
                                 <h2 className="my-10 font-title text-4xl dark:text-white md:text-6xl">
-                                    {roadmaps[0].title}
+                                    {roadmaps[0]?.title}
                                 </h2>
                                 <p className="w-full text-base dark:text-white md:text-lg lg:w-2/3">
-                                    {roadmaps[0].description}
+                                    {roadmaps[0]?.description}
                                 </p>
                                 <div className="flex w-full items-center justify-start space-x-4">
                                     <div className="relative h-8 w-8 flex-none overflow-hidden rounded-full">
@@ -141,7 +141,7 @@ export default async function OrganizationHomePage({
                                     </p>
                                     <div className="h-6 border-l border-stone-600 dark:border-stone-400" />
                                     <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
-                                        {toDateString(roadmaps[0].createdAt)}
+                                        {toDateString(roadmaps[0]?.createdAt)}
                                     </p>
                                 </div>
                             </div>
@@ -170,7 +170,7 @@ export default async function OrganizationHomePage({
                 )}
             </div>
 
-            {roadmaps.length > 1 && (
+            {roadmaps?.length > 1 && (
                 <div className="mx-5 mb-20 max-w-screen-xl lg:mx-24 2xl:mx-auto">
                     <h2 className="mb-10 font-title text-4xl dark:text-white md:text-5xl">
                         More stories
