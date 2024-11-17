@@ -11,9 +11,10 @@ import {
 } from "./ui/card"
 import { FaArrowRight, FaCalendar, FaPlus } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
-import { truncate, monthsList, cn } from "@/lib/utils"
+import { truncate, cn } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
 import { PrivateBadge } from "./private-badge"
+import {monthsList} from "@/lib/data";
 
 export type MilestoneNode = Node<
     {

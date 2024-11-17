@@ -1,10 +1,7 @@
 import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
-import {getRoadmapData, getOrganizationData, getDisorderData} from "@/lib/fetchers"
-import BlogCard from "@/components/blog-card"
-import BlurImage from "@/components/blur-image"
-import MDX from "@/components/mdx"
-import {placeholderBlurhash, toDateString} from "@/lib/utils"
+import {getDisorderData} from "@/lib/fetchers"
+import {toDateString} from "@/lib/utils"
 import * as domain from "node:domain";
 import {
     Breadcrumb, BreadcrumbEllipsis,
@@ -13,13 +10,16 @@ import {
     BreadcrumbList, BreadcrumbPage,
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible";
-import {CalendarDays} from "lucide-react";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {Button} from "@/components/ui/button";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {ExternalDiseaseProfilesTable} from "@/components/external-disease-profiles-table";
+import {promises as fs} from "fs";
+import path from "path";
+import {z} from "zod";
+import {UserFormsDataTable} from "@/components/organizations-data-table/user-forms-data-table";
+import {userFormsTableColumns} from "@/components/organizations-data-table/user-forms-data-table-columns";
+import {formSchema} from "@/lib/schemas";
 
 export async function generateMetadata({
                                            params
@@ -92,11 +92,29 @@ export async function generateStaticParams() {
     return allPaths
 }
 
+async function getForms() {
+    const data = await fs.readFile(
+        path.join(process.cwd(), "data/forms.json")
+    )
+
+    const forms = JSON.parse(data.toString())
+
+    return z.array(formSchema).parse(forms)
+}
+
+const stats = [
+    { name: 'Total forms', stat: '12', previousStat: '4', change: '200%', changeType: 'increase' },
+    { name: 'Avg. Completion rate', stat: '86%', previousStat: '56%', change: '30%', changeType: 'increase' },
+    { name: 'Next deadline', stat: 'Tomorrow', previousStat: '', change: '', changeType: '' },
+]
+
+
 export default async function SitePostPage({
                                                params
                                            }: {
     params: { domain: string; slug: string }
 }) {
+    const forms = await getForms()
     const slug = decodeURIComponent(params.slug)
     const data = await getDisorderData(slug)
 
@@ -164,8 +182,8 @@ export default async function SitePostPage({
                     </p>
 
                 </div>
-                <Tabs defaultValue="overview" className="w-1/2">
-                    <TabsList className="grid w-full grid-cols-3 bg-white">
+                <Tabs defaultValue="overview" className="w-full">
+                    <TabsList className="mx-auto grid grid-cols-3 bg-white w-1/2">
                         <TabsTrigger
                             variant="outline"
                             value="overview"
@@ -196,7 +214,7 @@ export default async function SitePostPage({
                         value="scientific-details"
                         className="w-full"
                     >
-
+                        <ExternalDiseaseProfilesTable/>
                     </TabsContent>
                     <TabsContent
                         value="faq"
@@ -205,6 +223,7 @@ export default async function SitePostPage({
 
                     </TabsContent>
                 </Tabs>
+                <UserFormsDataTable data={forms} columns={userFormsTableColumns}/>
             </div>
         </>
     )

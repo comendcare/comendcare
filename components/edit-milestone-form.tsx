@@ -62,10 +62,11 @@ import { Popover, PopoverContent } from "./ui/popover"
 import { PopoverTrigger } from "./plate-ui/popover"
 import { Calendar } from "./ui/calendar"
 import { format } from "date-fns"
-import { cn, monthsList } from "@/lib/utils"
+import { cn } from "@/lib/utils"
 import { Switch } from "./ui/switch"
 import { PrivateBadge } from "./private-badge"
 import { debounce } from "lodash"
+import {monthsList} from "@/lib/data";
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"

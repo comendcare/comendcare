@@ -1,27 +1,22 @@
-import {clsx, type ClassValue} from "clsx"
+import {type ClassValue, clsx} from "clsx"
 import {twMerge} from "tailwind-merge"
 import {Active, DataRef, Over} from "@dnd-kit/core";
 import {ColumnDragData} from "@/components/board-column";
 import {TaskDragData} from "@/components/task-card";
-import {personas, identicon} from "@dicebear/collection";
+import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 
-export const mapsFetcher = (url: string) => fetch(url).then((r) => r.json());
+export function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
 
-export const monthsList = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December'
-]
+    return `${day} ${month}, ${year}`;
+}
+
+export const mapsFetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export const isNewUser = () => {
     const isNew = localStorage.getItem("isNewUser")
