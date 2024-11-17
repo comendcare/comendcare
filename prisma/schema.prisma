@@ -293,6 +293,7 @@ model Condition {
   nordURL                     String?
   gardURL                     String?
   description                 String?        @db.Text
+  summary                     String?        @db.Text
   interestedModalities        String[]
   diseaseCategories           String[]
   prevalenceNumerator         Int?

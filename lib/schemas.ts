@@ -3,7 +3,7 @@ import {z} from "zod";
 export const formSchema = z.object({
     id: z.string(),
     title: z.string(),
-    status: z.string(),
+    type: z.string(),
     label: z.string(),
     priority: z.string(),
     author: z.string().optional(),

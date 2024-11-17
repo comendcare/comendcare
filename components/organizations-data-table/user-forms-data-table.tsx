@@ -66,7 +66,7 @@ export function UserFormsDataTable<TData, TValue>({
     })
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 w-full">
             <UserFormsDataTableToolbar table={table}/>
             <div className="rounded-md border">
                 <Table>
