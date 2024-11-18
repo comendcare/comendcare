@@ -1,7 +1,7 @@
 import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getDisorderData} from "@/lib/fetchers"
-import {cn, toDateString} from "@/lib/utils"
+import {cn, formatDate, toDateString} from "@/lib/utils"
 import * as domain from "node:domain";
 import {
     Breadcrumb, BreadcrumbEllipsis,
@@ -27,6 +27,11 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import {FaUserCheck, FaUserPlus, FaUsersViewfinder} from "react-icons/fa6";
 import HumanAnatomyMap from "@/components/human-anatomy-map";
 import {Badge} from "@/components/ui/badge";
+import {CalendarDays} from "lucide-react";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {faker} from "@faker-js/faker";
+import {bioassets} from "@/lib/data";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 
 export async function generateMetadata({
                                            params
@@ -109,18 +114,12 @@ async function getForms() {
     return z.array(formSchema).parse(forms)
 }
 
-const stats = [
-    {name: 'Total forms', stat: '12', previousStat: '4', change: '200%', changeType: 'increase'},
-    {name: 'Avg. Completion rate', stat: '86%', previousStat: '56%', change: '30%', changeType: 'increase'},
-    {name: 'Next deadline', stat: 'Tomorrow', previousStat: '', change: '', changeType: ''},
-]
-
-
 export default async function SitePostPage({
                                                params
                                            }: {
     params: { domain: string; slug: string }
 }) {
+    faker.seed(14)
     const forms = await getForms()
     const slug = decodeURIComponent(params.slug)
     const data = await getDisorderData(slug)
@@ -131,7 +130,7 @@ export default async function SitePostPage({
 
     return (
         <TooltipProvider>
-            <div className="flex flex-col items-center justify-center mt-24 space-y-16 max-w-7xl mx-auto">
+            <div className="flex flex-col items-center justify-center my-24 space-y-24 max-w-7xl mx-auto">
                 <div className="flex flex-col items-center justify-center space-y-8">
                     <Breadcrumb>
                         <BreadcrumbList>
@@ -322,17 +321,97 @@ export default async function SitePostPage({
 
                         </div>
                     </TabsContent>
+
                     <TabsContent
                         value="scientific-details"
                         className="w-full"
                     >
-                        <ExternalDiseaseProfilesTable/>
+                        <div className="grid gap-8 grid-cols-2">
+                            <div className="space-y-4">
+                                <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                    Bioassets
+                                </h3>
+                                <div className="space-y-4">
+                                    {faker.helpers.arrayElements(bioassets, faker.number.int({
+                                        min: 1,
+                                        max: 5
+                                    })).map((asset, index) => (
+                                        <div key={index} className="flex justify-between space-x-4 w-fit">
+                                            <Avatar>
+                                                <AvatarImage src="https://github.com/vercel.png"/>
+                                                <AvatarFallback>VC</AvatarFallback>
+                                            </Avatar>
+                                            <div className="space-y-1">
+                                                <h4 className="text-sm font-semibold">
+                                                    {asset.name}
+                                                </h4>
+                                                <p className="text-sm">
+                                                    {asset.description}
+                                                </p>
+                                                <div className="flex items-center">
+                                                    <CalendarDays className="mr-2 h-4 w-4 opacity-70"/>{" "}
+                                                    <span className="text-xs text-muted-foreground">
+                                                        Created {formatDate(asset.dateCreated)}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                    Condition profiles
+                                </h3>
+                                <ExternalDiseaseProfilesTable/>
+                            </div>
+                        </div>
                     </TabsContent>
+
                     <TabsContent
                         value="faq"
                         className="w-full"
                     >
+                        <div className="grid gap-8 grid-cols-2">
+                            <div className="flex flex-col space-y-4">
+                                <blockquote
+                                    className="text-xl italic font-semibold text-left text-gray-900 dark:text-white">
+                                    <p>{`"Flowbite is just awesome. It contains tons of predesigned components and pages
+                                    starting from login screen to complex dashboard. Perfect choice for your next SaaS
+                                    application."`}</p>
+                                </blockquote>
 
+                                <blockquote
+                                    className="text-xl italic font-semibold text-right text-gray-900 dark:text-white">
+                                    <p>{`"Flowbite is just awesome. It contains tons of predesigned components and pages
+                                    starting from login screen to complex dashboard. Perfect choice for your next SaaS
+                                    application."`}</p>
+                                </blockquote>
+                            </div>
+
+                            <Accordion type="single" collapsible className="w-full">
+                                <AccordionItem value="item-1">
+                                    <AccordionTrigger>Is it accessible?</AccordionTrigger>
+                                    <AccordionContent>
+                                        Yes. It adheres to the WAI-ARIA design pattern.
+                                    </AccordionContent>
+                                </AccordionItem>
+                                <AccordionItem value="item-2">
+                                    <AccordionTrigger>Is it styled?</AccordionTrigger>
+                                    <AccordionContent>
+                                        Yes. It comes with default styles that matches the other
+                                        components&apos; aesthetic.
+                                    </AccordionContent>
+                                </AccordionItem>
+                                <AccordionItem value="item-3">
+                                    <AccordionTrigger>Is it animated?</AccordionTrigger>
+                                    <AccordionContent>
+                                        Yes. It&apos;s animated by default, but you can disable it if you
+                                        prefer.
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
+                        </div>
                     </TabsContent>
                 </Tabs>
 
