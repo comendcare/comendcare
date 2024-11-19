@@ -18,6 +18,8 @@ const sortByFilters: { [key: string]: string } = {
     "alphabetical": "name:asc",
     "patients-low-high": "numberOfIdentifiedPatients:asc",
     "patients-high-low": "numberOfIdentifiedPatients:desc",
+    "prevalence-low-high": "",
+    "prevalence-high-low": "",
     "money-raised-low-high": "moneyRaised:asc",
     "money-raised-high-low": "moneyRaised:desc"
 }
@@ -88,6 +90,8 @@ export default function MarketplaceSearchBar() {
             <SelectItem value="alphabetical">Alphabetical (A-Z)</SelectItem>
             <SelectItem value="patients-low-high">Patients (Low-High)</SelectItem>
             <SelectItem value="patients-high-low">Patients (High-Low)</SelectItem>
+            <SelectItem value="prevalence-low-high">Prevalence (Low-High)</SelectItem>
+            <SelectItem value="prevalence-high-low">Prevalence (High-Low)</SelectItem>
             <SelectItem value="money-raised-low-high">$ Raised (Low-High)</SelectItem>
             <SelectItem value="money-raised-high-low">$ Raised (High-Low)</SelectItem>
             </SelectGroup>
