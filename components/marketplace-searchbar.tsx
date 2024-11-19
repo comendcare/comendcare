@@ -3,11 +3,14 @@
 import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { typesense } from "@/lib/typesense";
-import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
+import { OrganizationSearchState, useOrganizationSearchStore, ViewType } from "@/state/search/organizationSearchStore";
 import { useShallow } from "zustand/react/shallow"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 const selector = (state: OrganizationSearchState) => ({
+    view: state.view,
+    setView: state.setView,
+    filters: state.filters,
     setSearchResults: state.setSearchResults
 })
 
@@ -19,22 +22,26 @@ const sortByFilters: { [key: string]: string } = {
     "money-raised-high-low": "moneyRaised:desc"
 }
 
+function generateFiltersString() {
+    return ""
+}
+
 export default function MarketplaceSearchBar() {
     const [query, setQuery] = useState("")
     const [sortBy, setSortBy] = useState<string | undefined>()
     const [searchTerm, setSearchTerm] = useState<string>("")
+    const { view, setView, filters, setSearchResults } = useOrganizationSearchStore(useShallow(selector))
 
     useEffect(() => {
         handleSearch()
-    }, [sortBy, searchTerm])
-
-    const { setSearchResults } = useOrganizationSearchStore(useShallow(selector))
+    }, [filters, sortBy, searchTerm])
 
     const handleSearch = async () => {
         try {
             const searchParameters = {
                 q: searchTerm,
                 query_by: "name",
+                ...(filters ? { filterBy: generateFiltersString() } : undefined),
                 ...(sortBy ? { sort_by: sortByFilters[sortBy] } : undefined),
             };
 
@@ -83,6 +90,23 @@ export default function MarketplaceSearchBar() {
             <SelectItem value="patients-high-low">Patients (High-Low)</SelectItem>
             <SelectItem value="money-raised-low-high">$ Raised (Low-High)</SelectItem>
             <SelectItem value="money-raised-high-low">$ Raised (High-Low)</SelectItem>
+            </SelectGroup>
+        </SelectContent>
+        </Select>
+
+        <Select
+            onValueChange={(view: string) => {
+                setView(view as ViewType)
+            }}
+            defaultValue={view}
+        >
+        <SelectTrigger className="w-[150px] h-full">
+            <SelectValue placeholder="View" />
+        </SelectTrigger>
+        <SelectContent>
+            <SelectGroup>
+            <SelectItem value="grid">Grid View</SelectItem>
+            <SelectItem value="list">List View</SelectItem>
             </SelectGroup>
         </SelectContent>
         </Select>
