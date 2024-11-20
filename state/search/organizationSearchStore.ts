@@ -23,7 +23,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>((set, 
     setSearchResults: (results: any[]) => set({ searchResults: results }),
     filters: {
         genes: [],
-        patientsRange: [0, 1000]
+        patientsRange: [0, 100]
     },
     setFilters: (updatedFilters: FiltersType) => {
         console.log(`update filters:`, updatedFilters)
