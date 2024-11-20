@@ -18,8 +18,8 @@ const sortByFilters: { [key: string]: string } = {
     "alphabetical": "name:asc",
     "patients-low-high": "numberOfIdentifiedPatients:asc",
     "patients-high-low": "numberOfIdentifiedPatients:desc",
-    "prevalence-low-high": "",
-    "prevalence-high-low": "",
+    "prevalence-low-high": "prevalenceRatio:asc",
+    "prevalence-high-low": "prevalenceRatio:desc",
     "money-raised-low-high": "moneyRaised:asc",
     "money-raised-high-low": "moneyRaised:desc"
 }
