@@ -33,6 +33,15 @@ const createTypeSenseCollection = async (
     return sendTypeSenseRequest(url, 'POST', apiKey, data);
 };
 
+const deleteTypeSenseCollection = async (
+    typesenseUrl: string,
+    apiKey: string,
+    data: any,
+) => {
+    const url = `${typesenseUrl}/collections`;
+    return sendTypeSenseRequest(url, 'POST', apiKey, data);
+}
+
 const addTypeSenseDocument = async (
     typesenseUrl: string,
     apiKey: string,

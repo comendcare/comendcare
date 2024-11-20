@@ -153,8 +153,6 @@ export default function ResearchOnboardingForm() {
 
         const formData = new FormData()
 
-        // TODO: Add prevalenceRatio calculation here...?
-
         if (session.data?.user.organizationId) {
             updateOrganization(formData, session.data.user.organizationId, "key").then((res: any) => {
                 if (res.error) {
