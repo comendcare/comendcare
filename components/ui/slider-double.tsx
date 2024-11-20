@@ -6,6 +6,8 @@ import * as SliderPrimitive from '@radix-ui/react-slider';
 
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip';
+import { ChartConfig, ChartContainer, ChartTooltip } from './chart';
+import { Bar, BarChart, CartesianGrid, Cell, XAxis } from 'recharts';
 
 const DoubleSlider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -22,9 +24,51 @@ const DoubleSlider = React.forwardRef<
 
     <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" />
     <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" />
-
   </SliderPrimitive.Root>
 ));
 DoubleSlider.displayName = SliderPrimitive.Root.displayName;
 
-export { DoubleSlider };
+const chartConfig = {
+  data: {
+      label: "value",
+  },
+} satisfies ChartConfig
+
+const DoubleSliderBarChart = (props: any) => {
+  return (
+    <div className="flex flex-col gap-0">
+      <ChartContainer config={chartConfig} className="h-[40px] w-full -mb-2">
+      <BarChart accessibilityLayer data={props.chartData}>
+          <Bar 
+            dataKey="data" 
+            radius={[4, 4, 0, 0]} 
+          >
+            {
+              props.chartData.map((value: any, index: number) => {
+                const color = (
+                  value.xAxis*props.step >= props.value[0] && (value.xAxis+1)*props.step <= props.value[1]
+                ) ? 
+                  "hsl(var(--primary))" : 
+                  "hsl(var(--secondary))"
+
+                return <Cell key={`cell-${index}`} fill={color} />
+              })
+            }
+          </Bar>
+      </BarChart>
+      </ChartContainer>
+      <DoubleSlider 
+          step={props.step || 1} 
+          minStepsBetweenThumbs={1}
+          defaultValue={props.range}
+          onValueChange={props.onChange}
+      />
+      <span className="flex flex-row justify-between mt-4">
+          <p>{props.value ? props.value[0] : props.range[0]}</p>
+          <p>{props.value ? props.value[1] : props.range[1]}</p>
+      </span>
+    </div>
+  )
+}
+
+export { DoubleSlider, DoubleSliderBarChart };
