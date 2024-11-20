@@ -24,6 +24,7 @@ import { OPTIONS } from "./research-onboarding-form"
 
 const selector = (state: OrganizationSearchState) => ({
     filters: state.filters,
+    allResults: state.allResults,
     searchResults: state.searchResults,
     setFilters: state.setFilters
 })
@@ -41,7 +42,7 @@ const filtersFormSchema = z.object({
 })
 
 export function PAGFilters() {
-    const { filters, searchResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
+    const { filters, allResults, searchResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
     const form = useForm<z.infer<typeof filtersFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(filtersFormSchema),
@@ -53,10 +54,10 @@ export function PAGFilters() {
     }
 
     const moneyDeployedRange = [0, 10000000]
-    const moneyDeployedStep = 250000
+    const moneyDeployedStep = moneyDeployedRange[1]/50
     const moneyDeployedChartData = (new Array((moneyDeployedRange[1] - moneyDeployedRange[0])/moneyDeployedStep).fill(0)).map((value, index) => ({
         xAxis: index,
-        data: searchResults.filter(
+        data: allResults.filter(
             result => result.document.moneyDeployed >= index*moneyDeployedStep && result.document.moneyDeployed < (index+1)*moneyDeployedStep
         ).length
     }))

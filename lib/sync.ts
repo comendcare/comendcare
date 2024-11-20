@@ -190,7 +190,43 @@ export const syncToTypesense = async (env: {
               "stem": false,
               "store": true,
               "type": "float"
-            }
+            },
+            {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "moneyDeployed",
+                "optional": false,
+                "sort": true,
+                "stem": false,
+                "store": true,
+                "type": "int64"
+              },
+              {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "interestedModalities",
+                "optional": true,
+                "sort": false,
+                "stem": false,
+                "store": true,
+                "type": "string[]"
+              },
+              {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "diseaseCategories",
+                "optional": true,
+                "sort": false,
+                "stem": false,
+                "store": true,
+                "type": "string[]"
+              }
             // add additional fields as needed
           ],
     });
