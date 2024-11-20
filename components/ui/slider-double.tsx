@@ -58,14 +58,16 @@ const DoubleSliderBarChart = (props: any) => {
       </BarChart>
       </ChartContainer>
       <DoubleSlider 
-          step={props.step || 1} 
+          step={props.step} 
           minStepsBetweenThumbs={1}
           defaultValue={props.range}
+          min={props.range[0]}
+          max={props.range[1]}
           onValueChange={props.onChange}
       />
       <span className="flex flex-row justify-between mt-4">
-          <p>{props.value ? props.value[0] : props.range[0]}</p>
-          <p>{props.value ? props.value[1] : props.range[1]}</p>
+          <p>{props.value ? props.value[0].toLocaleString() : props.range[0].toLocaleString()}</p>
+          <p>{props.value ? props.value[1].toLocaleString() : props.range[1].toLocaleString()}</p>
       </span>
     </div>
   )
