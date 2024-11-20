@@ -1,6 +1,7 @@
 "use client"
 // import {Metadata} from "next"
 import {MarketplaceNav} from "@/components/marketplace-nav"
+import { PAGFilters } from "@/components/pag-filters"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { useFiltersStore } from "@/state/nav/navStore"
 import { usePathname } from "next/navigation"
@@ -56,6 +57,6 @@ const FiltersPanel = () => {
     } else if (pathname.endsWith('/grants')) {
         return <p>Grants Filters</p>
     } else {
-        return <p>PAG Filters</p>
+        return <PAGFilters />
     }
 }
