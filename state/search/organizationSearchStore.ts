@@ -3,8 +3,17 @@ import { create } from 'zustand';
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    genes?: string[] | undefined
-    patientsRange?: number[] | undefined // [low, high]
+    modalities: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    categories: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    moneyDeployed: number[]
 }
 
 export interface OrganizationSearchState {
@@ -22,8 +31,9 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>((set, 
     searchResults: [],
     setSearchResults: (results: any[]) => set({ searchResults: results }),
     filters: {
-        genes: [],
-        patientsRange: [0, 100]
+        modalities: [],
+        categories: [],
+        moneyDeployed: [0, 10000000]
     },
     setFilters: (updatedFilters: FiltersType) => {
         console.log(`update filters:`, updatedFilters)

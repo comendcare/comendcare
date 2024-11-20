@@ -49,7 +49,7 @@ const invitationFormSchema = z.object({
     assets: z.array(optionSchema).min(0),
 })
 
-const OPTIONS: Option[] = [
+export const OPTIONS: Option[] = [
     {
         id: '1',
         label: 'nextjs',
