@@ -166,7 +166,25 @@ do locally).
 The `prisma migrate deploy` command will apply existing migrations without creating a new one (which you will likely
 want to do remotely).
 
-## Typesense search
+## Typesense Search - Development Setup
+These setup steps allow you to connect to the comend production database, and sync database changes with Typesense.
+
+**NOTE: Only complete these steps if you need to update the production database, or sync Typesense. These steps should not be needed if you're developing locally.**
+
+1. Update the `DATABASE_URL` (as defined in the .env locally) to point to the cloud SQL server.
+2. Ensure you are configured to the correct gcloud cli project
+   - use `gcloud projects list` to list all existing projects associated with your account and `use gcloud config set project PROJECT_ID` to switch to an existing project.
+   - the project name is `comend`
+3. Authenticate yourself with `gcloud auth application-default login`
+4. Turn on cloud sql auth proxy with `./cloud-sql-proxy projectId:serverLocation:instanceName`
+
+   > Note: at this point you're connected to the production database. Any prisma comands you run will apply to the production database.
+5. In a separate terminal/process, run `tsx lib/sync.ts`
+   - This step allows any changes to the database to sync automatically with Typesense
+   - You can test if the syncing is working by opening prisma studio and triggering a change (create, update, or delete)
+6. Run `npx prisma yourCommandHere` in your terminal it will run that command on the Cloud SQL database. Most likely you will want to `run npx prisma migrate deploy`, but follow the [prisma deployment guide](https://www.prisma.io/docs/orm/prisma-migrate/workflows/development-and-production#production-and-testing-environments) for more information.
+
+## Typesense Search - Project Initialization
 We use Typesense as our search as a service platform.
 It comes with a lot of features out of the box, but the only special things to note is the initial setup with our stack.
 1. Typesense Cloud
