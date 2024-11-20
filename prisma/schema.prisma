@@ -258,6 +258,7 @@ model Organization {
   diseaseCategories           String[]
   prevalenceNumerator         Int?
   prevalenceDenominator       Int?
+  prevalenceRatio Float?
   numberOfIdentifiedPatients  Int?
   relevantDiseaseMechanisms   String[]
   associatedGenes             String[]
@@ -298,6 +299,7 @@ model Condition {
   diseaseCategories           String[]
   prevalenceNumerator         Int?
   prevalenceDenominator       Int?
+  prevalenceRatio Float?
   numberOfIdentifiedPatients  Int?
   relevantDiseaseMechanisms   String[]
   associatedGenes             String[]

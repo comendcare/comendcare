@@ -6,7 +6,6 @@ import { createDicebearAvatar } from "@/lib/utils";
 import { Badge } from "./ui/badge";
 
 export function OrganizationMarketplaceCard({ organization }: { organization: any }) {
-    console.log(organization)
     return (
         <Link
             href={
