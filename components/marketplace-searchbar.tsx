@@ -11,6 +11,7 @@ const selector = (state: OrganizationSearchState) => ({
     view: state.view,
     setView: state.setView,
     filters: state.filters,
+    setAllResults: state.setAllResults,
     setSearchResults: state.setSearchResults
 })
 
@@ -24,26 +25,69 @@ const sortByFilters: { [key: string]: string } = {
     "money-raised-high-low": "moneyRaised:desc"
 }
 
-function generateFiltersString() {
-    return ""
-}
-
 export default function MarketplaceSearchBar() {
     const [query, setQuery] = useState("")
     const [sortBy, setSortBy] = useState<string | undefined>()
     const [searchTerm, setSearchTerm] = useState<string>("")
-    const { view, setView, filters, setSearchResults } = useOrganizationSearchStore(useShallow(selector))
+    const { view, setView, filters, setAllResults, setSearchResults } = useOrganizationSearchStore(useShallow(selector))
+
+    function generateFiltersString() {
+        let filtersList: string[] = []
+
+        if (filters.modalities.length > 0) {
+            filters.modalities.forEach(modality => {
+                filtersList.push(`interestedModalities:=[${modality.value}]`)
+            })
+        }
+
+        if (filters.categories.length > 0) {
+            filters.categories.forEach(category => {
+                filtersList.push(`interestedModalities:=[${category.value}]`)
+            })
+        }
+
+        if (filters.moneyDeployed) {
+            filtersList.push(`moneyDeployed:>=${filters.moneyDeployed[0]}`)
+            filtersList.push(`moneyDeployed:<${filters.moneyDeployed[1]}`)
+        }
+
+        return filtersList.join(" && ")
+    }
+
+    useEffect(() => {
+        init()
+    }, [])
 
     useEffect(() => {
         handleSearch()
     }, [filters, sortBy, searchTerm])
+
+    const init = async () => {
+        try {
+            const searchParameters = {
+                q: "",
+                query_by: "name"
+            };
+
+            const results = await typesense
+                .collections("organizations")
+                .documents()
+                .search(searchParameters);
+
+            setAllResults(results.hits || [])
+            console.log(`all results`, results.hits)
+
+        } catch (error) {
+            console.error("Search error (fetching all results):", error);
+        }
+    }
 
     const handleSearch = async () => {
         try {
             const searchParameters = {
                 q: searchTerm,
                 query_by: "name",
-                ...(filters ? { filterBy: generateFiltersString() } : undefined),
+                ...(generateFiltersString() ? { filter_by: generateFiltersString() } : undefined),
                 ...(sortBy ? { sort_by: sortByFilters[sortBy] } : undefined),
             };
 

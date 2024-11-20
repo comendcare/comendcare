@@ -19,6 +19,8 @@ export type FiltersType = {
 export interface OrganizationSearchState {
     view: ViewType,
     setView: (view: ViewType) => void,
+    allResults: any[],
+    setAllResults: (results: any[]) => void,
     searchResults: any[]
     setSearchResults: (results: any[]) => void
     filters: FiltersType,
@@ -28,6 +30,8 @@ export interface OrganizationSearchState {
 export const useOrganizationSearchStore = create<OrganizationSearchState>((set, get) => ({
     view: 'grid',
     setView: (view: ViewType) => set({ view }),
+    allResults: [],
+    setAllResults: (results: any[]) => set({ allResults: results }),
     searchResults: [],
     setSearchResults: (results: any[]) => set({ searchResults: results }),
     filters: {
@@ -36,7 +40,6 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>((set, 
         moneyDeployed: [0, 10000000]
     },
     setFilters: (updatedFilters: FiltersType) => {
-        console.log(`update filters:`, updatedFilters)
         set({ filters: {
             ...get().filters,
             ...updatedFilters
