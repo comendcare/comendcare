@@ -85,13 +85,105 @@ export const syncToTypesense = async (env: {
     // Ensure TypeSense collection exists
     await createTypeSenseCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
         name: 'organizations',
-        fields: [
-            { name: 'id', type: 'string', facet: false },
-            { name: 'name', type: 'string', facet: false },
-            { name: 'description', type: 'string', facet: false },
-            { name: 'dateFounded', type: 'string', facet: false },
-            // Add additional fields as needed
-        ],
+        "fields": [
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "description",
+              "optional": false,
+              "sort": false,
+              "stem": false,
+              "store": true,
+              "type": "string"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "dateFounded",
+              "optional": false,
+              "sort": false,
+              "stem": false,
+              "store": true,
+              "type": "string"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "name",
+              "optional": false,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "string"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "moneyRaised",
+              "optional": false,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "int64"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "numberOfIdentifiedPatients",
+              "optional": false,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "int64"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "prevalenceDenominator",
+              "optional": false,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "int64"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "prevalenceNumerator",
+              "optional": false,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "int64"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "prevalenceRatio",
+              "optional": true,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "float"
+            }
+            // add additional fields as needed
+          ],
     });
 
     // Stream organization changes
