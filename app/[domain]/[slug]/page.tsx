@@ -83,10 +83,6 @@ export async function generateStaticParams() {
             }
         ])
         .filter(Boolean)
-
-    console.log("allPaths slug page")
-    console.log(allPaths)
-    console.log("allPaths slug page")
     return allPaths
 }
 
