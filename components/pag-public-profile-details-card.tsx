@@ -77,7 +77,7 @@ export const PAGPublicProfileDetailsCard = ({organization}: { organization: Orga
                                         See more
                                     </Link>
                                 </div>
-                                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:space-x-2">
+                                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-1">
                                     {pag?.topics.map((item, index) =>
                                         <Badge key={index} className="flex text-sm">
                                             {item.charAt(0).toUpperCase() + item.slice(1)}
