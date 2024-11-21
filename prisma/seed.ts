@@ -498,7 +498,7 @@ async function main() {
         },
     })
 
-    await createConditions()
+    await createConditions([arcadion.id, celocyn.id])
 }
 
 const exampleASORoadmap = {
@@ -591,7 +591,7 @@ const exampleASORoadmap = {
     ]
 }
 
-async function createConditions() {
+async function createConditions(organizationIds: string[]) {
     const celocynSyndrome = await prisma.condition.create({
         data: {
             name: "Celocyn Syndrome",
@@ -610,7 +610,12 @@ async function createConditions() {
             associatedGenes: ["GEL3", "M4SF"],
             associatedSignsAndSymptoms: ["Severe migraines", "Early onset dementia"],
             existingDatabasesAndStudies: ["Celocyn Syndrome Registry"],
-            assetsUnderDevelopment: ["Mouse model", "Cell line"]
+            assetsUnderDevelopment: ["Mouse model", "Cell line"],
+            organizations: {
+                create: {
+                    organizationId: organizationIds[0]
+                }
+            }
         }
     });
 
@@ -632,7 +637,12 @@ async function createConditions() {
             associatedGenes: ["ARC1", "NEU4"],
             associatedSignsAndSymptoms: ["Muscle weakness", "Memory loss", "Difficulty swallowing"],
             existingDatabasesAndStudies: ["Arcadion Patient Registry", "Arcadion Disease Natural History Study"],
-            assetsUnderDevelopment: ["Gene therapy vector", "Patient-derived cell line"]
+            assetsUnderDevelopment: ["Gene therapy vector", "Patient-derived cell line"],
+            organizations: {
+                create: {
+                    organizationId: organizationIds[1]
+                }
+            }
         }
     });
 
