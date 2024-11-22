@@ -156,7 +156,7 @@ export default async function ProfilePage() {
                         <div className="col-span-2 space-y-4">
                             <PAGProfileDetailsCard organization={organization}/>
                             {/*<LineChartCard/>*/}
-                            <OpenRFPsCard/>
+                            {/*<OpenRFPsCard/>*/}
                             <DonutChartCard/>
                         </div>
 

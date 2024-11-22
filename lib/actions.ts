@@ -69,7 +69,8 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                                 ...(milestone.startDate ? { startDate: milestone.startDate } : undefined),
                                 ...(milestone.endDate ? { endDate: milestone.endDate } : undefined),
                                 ...(milestone.budget ? { budget: milestone.budget } : undefined),
-                                papers: milestone.papers || []
+                                papers: milestone.papers || [],
+                                private: milestone.private || false
                             }
                         }
                     }
@@ -311,15 +312,24 @@ export const updateOrganization = withOrganizationAuth(
                     }
                 })
             } else {
+                const prevalenceNumerator: number | undefined = parseInt(formData.get('prevalenceNumerator') as string) || undefined
+                const prevalenceDenominator: number | undefined = parseInt(formData.get('prevalenceDenominator') as string) || undefined
+                
                 response = await prisma.organization.update({
                     where: {
                         id: organization.id
                     },
                     data: {
-                        [key]: value
+                        [key]: value,
+                        // add prevalenceRatio (if applicable)
+                        ...(prevalenceNumerator && prevalenceDenominator ? 
+                                { prevalenceRatio: prevalenceNumerator/prevalenceDenominator } :
+                                undefined
+                            )
                     }
                 })
             }
+
             console.log(
                 "Updated organization data! Revalidating tags: ",
                 `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,

@@ -4,17 +4,22 @@ import * as React from "react"
 import { useNavStore, useSidebarStore } from "@/state/nav/navStore"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import { TooltipProvider } from "@/components/ui/tooltip"
 import {
     ResizablePanel,
     ResizablePanelGroup,
     ResizableHandle
 } from "@/components/ui/resizable"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+  } from "@/components/ui/tooltip"
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
 import { FlowView } from "@/components/flow"
 import { KanbanView } from "@/components/kanban"
 import { Button } from "./ui/button"
-import { FaX } from "react-icons/fa6"
+import { FaQuestion, FaX } from "react-icons/fa6"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useState } from "react"
 import { MilestoneDetails } from "./milestone-details"
@@ -22,6 +27,7 @@ import { EditTaskForm } from "./edit-task-form"
 import { TaskDetails } from "./task-details"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { GanttChartView } from "./gantt-chart"
+import { useOnborda } from "./onborda/OnbordaContext"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -58,6 +64,7 @@ export function Roadmap({
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
+    const { startOnborda } = useOnborda()
 
     const urlView = searchParams.get("view")
 
@@ -96,6 +103,8 @@ export function Roadmap({
     }
 
     const handleTabChange = (value: string) => {
+        setView(value) // for the onboarding tutorial
+
         // close all panels when switching tabs
         setSelectedNodeId(null)
         setSelectedTaskId(null)
@@ -117,6 +126,8 @@ export function Roadmap({
         initState(initNodes, initEdges, initMilestones, urlMilestone, urlTask, roadmapId)
     }, [])
 
+    const [view, setView] = useState(urlView ? urlView : "flow")
+
     return (
         <TooltipProvider delayDuration={0}>
             <ResizablePanelGroup
@@ -127,16 +138,35 @@ export function Roadmap({
                 className="h-full items-stretch"
             >
                 <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
-                    <Tabs defaultValue={urlView ? urlView : "roadmap"} onValueChange={handleTabChange}>
+                    <Tabs defaultValue={urlView ? urlView : "flow"} onValueChange={handleTabChange}>
                         <TabsList>
-                            <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
-                            <TabsTrigger value="gantt">Gantt Chart</TabsTrigger>
-                            <TabsTrigger value="kanban">Kanban</TabsTrigger>
+                            <TabsTrigger value="flow">Flow View</TabsTrigger>
+                            <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger>
+                            <TabsTrigger value="kanban">Kanban View</TabsTrigger>
+
+                            {view === 'flow' && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button 
+                                            size="icon" 
+                                            variant="ghost" 
+                                            onClick={() => {
+                                                startOnborda('research-plan-tour')
+                                            }}
+                                        >
+                                            <FaQuestion/>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Click to view the research plan onboarding tutorial</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
                         </TabsList>
 
-                        {/* Roadmap View */}
+                        {/* Flow View */}
                         <TabsContent
-                            value="roadmap"
+                            value="flow"
                             className="m-0 h-[calc(100vh-3.5rem)]"
                         >
                             <FlowView
@@ -169,7 +199,7 @@ export function Roadmap({
                         <ResizablePanel
                             defaultSize={defaultLayout[1]}
                             minSize={30}
-                            className="p-10 flex flex-col gap-4"
+                            className="p-10 h-full flex flex-col gap-4"
                         >
                             <MilestoneDetailsPanel
                                 milestone={milestones.find(
@@ -242,7 +272,7 @@ const TaskDetailsPanel = ({
                         Edit Task
                     </Button>
                 )} */}
-                <Button onClick={handleClose}>
+                <Button variant="secondary" onClick={handleClose}>
                     <FaX />
                 </Button>
             </span>
@@ -289,7 +319,7 @@ const MilestoneDetailsPanel = ({
                         Edit Milestone
                     </Button>
                 )} */}
-                <Button onClick={handleClose}>
+                <Button variant="secondary" onClick={handleClose}>
                     <FaX />
                 </Button>
             </span>

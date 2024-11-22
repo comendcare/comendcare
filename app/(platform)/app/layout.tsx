@@ -81,7 +81,6 @@ export default function AppLayout({children}: AppLayoutProps) {
             setIsLoading(false)
         }
     }
-    console.log(session.user.organizationId)
 
     useEffect(() => {
         fetchOrganizations()
@@ -141,7 +140,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                             links={[
                                 {title: "Profile", icon: User, variant: "ghost", href: "/app/profile"},
                                 {
-                                    title: "Roadmap",
+                                    title: "Research Plan",
                                     // label: "128",
                                     icon: Workflow,
                                     variant: "ghost",

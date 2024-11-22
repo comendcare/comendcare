@@ -6,7 +6,6 @@ import fs from "fs"
 function writeDecodedFile(filename: string, base64Content: string) {
     const filePath = `${tmpdir()}/${filename}`
     const contentBuffer = Buffer.from(base64Content, "base64")
-    console.log(filePath)
 
     fs.writeFile(filePath, contentBuffer, err => {
         if (err) {

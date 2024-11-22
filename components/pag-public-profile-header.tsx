@@ -7,7 +7,7 @@ import PublicProfileDropdown from "@/components/public-profile-dropdown";
 export default async function PAGPublicProfileHeader({organization}: { organization: Organization }) {
 
     return (
-        <div className="w-full flex flex-col space-y-8 my-8">
+        <div className="w-full flex flex-col space-y-8">
             <div>
                 <div>
                     <img

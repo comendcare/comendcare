@@ -11,8 +11,10 @@ import {
 } from "./ui/card"
 import { FaArrowRight, FaCalendar, FaPlus } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
-import { truncate, monthsList } from "@/lib/utils"
+import { truncate, cn } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
+import { PrivateBadge } from "./private-badge"
+import {monthsList} from "@/lib/data";
 
 export type MilestoneNode = Node<
     {
@@ -29,7 +31,9 @@ export type MilestoneNode = Node<
         dependencies?: string[]
         notes?: string
         status: StatusType
-        handleEditClick: (nodeId: string) => void
+        handleEditClick: (nodeId: string) => void,
+        onboardingMilestone: boolean,
+        private: boolean
     },
     "MILESTONE"
 >
@@ -50,8 +54,11 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
     }
 
     return (
-        <Card className="w-[350px]">
+        <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "")}>
             <CardHeader>
+                {props.data?.private && (
+                    <PrivateBadge className="-mt-2 justify-end" />
+                )}
                 <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
                 {/* Description length in node is truncated to 200 characters. */}
                 <CardDescription>
@@ -100,7 +107,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
             <Handle
                 type="source"
                 position={Position.Right}
-                className="z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2"
+                className={cn("z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2", props.data?.onboardingMilestone ? "research-plan-tour-step5": "")}
             >
                 <FaPlus className="pointer-events-none" />
             </Handle>
