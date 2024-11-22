@@ -37,7 +37,7 @@ Multi-tenancy features are based off the way [Openpanel](https://github.com/Open
 | GCP           | For hosting the database on cloud sql. You’ll need to install the CLI and the proxy service for local development and deployment. We use SSL certificates in production to allow the deployment on Vercel to access the production db.     | https://cloud.google.com/docs                                       | n/a            |                                                                            |
 | Mixpanel      | We also use Google Analytics and Vercel Analytics, but for more complex product analytics Mixpanel (and its open source sister Openpanel) are used.                                                                                        | https://developer.mixpanel.com/reference/overview                   | latest         |                                                                            |
 | Docker        | We recommend using Docker to set up and run a database. The rest of your environment can be set up locally.                                                                                                                                | https://docs.docker.com/                                            | n/a            |                                                                            |
-| React Flow    | Used for rendering editable research roadmaps                                                                                                                                                                                              | https://reactflow.dev/                                              | ^12            | @Untitled  (https://www.notion.so/d32bfe3e9c3b4144b81dd835413e3deb?pvs=21) |
+| React Flow    | Used for rendering editable research plans                                                                                                                                                                                              | https://reactflow.dev/                                              | ^12            | @Untitled  (https://www.notion.so/d32bfe3e9c3b4144b81dd835413e3deb?pvs=21) |
 | Zustand       | Used as a simpler, SSR friendlier, and less boilerplate, state management solution.                                                                                                                                                        | https://zustand-demo.pmnd.rs/                                       |                | @Untitled  (https://www.notion.so/d32bfe3e9c3b4144b81dd835413e3deb?pvs=21) |
 | Dnd kit       | For drag and drop interactions across our products.                                                                                                                                                                                        | https://dndkit.com/                                                 |                | @Untitled  (https://www.notion.so/d32bfe3e9c3b4144b81dd835413e3deb?pvs=21) |
 
@@ -165,3 +165,39 @@ Running `npx prisma migrate dev --name "your message here"` will create a new mi
 do locally).
 The `prisma migrate deploy` command will apply existing migrations without creating a new one (which you will likely
 want to do remotely).
+
+## Typesense Search - Development Setup
+These setup steps allow you to connect to the comend production database, and sync database changes with Typesense.
+
+**NOTE: Only complete these steps if you need to update the production database, or sync Typesense. These steps should not be needed if you're developing locally.**
+
+1. Update the `DATABASE_URL` (as defined in the .env locally) to point to the cloud SQL server.
+2. Ensure you are configured to the correct gcloud cli project
+   - use `gcloud projects list` to list all existing projects associated with your account and `use gcloud config set project PROJECT_ID` to switch to an existing project.
+   - the project name is `comend`
+3. Authenticate yourself with `gcloud auth application-default login`
+4. Turn on cloud sql auth proxy with `./cloud-sql-proxy projectId:serverLocation:instanceName`
+
+   > Note: at this point you're connected to the production database. Any prisma comands you run will apply to the production database.
+5. In a separate terminal/process, run `tsx lib/sync.ts`
+   - This step allows any changes to the database to sync automatically with Typesense
+   - You can test if the syncing is working by opening prisma studio and triggering a change (create, update, or delete)
+6. Run `npx prisma yourCommandHere` in your terminal it will run that command on the Cloud SQL database. Most likely you will want to `run npx prisma migrate deploy`, but follow the [prisma deployment guide](https://www.prisma.io/docs/orm/prisma-migrate/workflows/development-and-production#production-and-testing-environments) for more information.
+
+## Typesense Search - Project Initialization
+We use Typesense as our search as a service platform.
+It comes with a lot of features out of the box, but the only special things to note is the initial setup with our stack.
+1. Typesense Cloud
+   - You can choose between self-hosting or using their hosted solution.
+   - They have a free tier suitable for development.
+   - Their setup/onboarding will provide you with an API key.
+2. Typesense Client
+   - Typesense has packages for popular languages including [javascript](https://github.com/typesense/typesense-js).
+3. Prisma Pulse 
+   - Requires a publicly available hosted database 
+   - Requires you to enable `cloudsql.enable_pglogical` and `cloudsql.logical_decoding` in the Google Cloud SQL instance. Guides [here](https://cloud.google.com/sql/docs/postgres/replication/configure-logical-replication) and [here](https://cloud.google.com/sql/docs/postgres/flags).
+   - You will also need to run `ALTER USER postgres WITH REPLICATION` and `ALTER SYSTEM SET wal_level = logical` (details [here](https://www.prisma.io/docs/pulse/database-setup/general-database-instructions))
+4. In a separate terminal/process, run `tsx lib/sync.ts`
+   - You can test if the syncing is working by opening prisma studio and triggering a change (create, update, or delete)
+
+> Just for emphasis; Prisma Pulse DOES NOT WORK WITH LOCALLY HOSTED DATABASES. This means you cannot connect to a database hosted locally, and you cannot stream events triggered to your local database.

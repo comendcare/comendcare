@@ -17,15 +17,15 @@ export default function StatusButton({
     const StatusData = {
         TODO: {
             text: "To Do",
-            styling: "bg-red-100 border-red-600 text-red-800 hover-red-400 disabled:opacity-100"
+            styling: "bg-red-100 border-red-600 text-red-800 hover-red-400 disabled:opacity-100 hover:bg-red-200"
         },
         INPROGRESS: {
             text: "In Progress",
-            styling: "bg-yellow-100 border-yellow-600 text-yellow-800 disabled:opacity-100"
+            styling: "bg-yellow-100 border-yellow-600 text-yellow-800 disabled:opacity-100 hover:bg-yellow-200"
         },
         DONE: {
             text: "Done",
-            styling: "bg-green-100 border-green-600 text-green-800 disabled:opacity-100"
+            styling: "bg-green-100 border-green-600 text-green-800 disabled:opacity-100 hover:bg-green-200"
         }
     }
 

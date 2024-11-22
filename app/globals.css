@@ -36,6 +36,105 @@ h6 {
     }
 }
 
+/* generated theme from https://ui.jln.dev/ */
+/* green theme */
+  /* @layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 0 0% 3.9%;
+      --muted: 166 14% 92%;
+      --muted-foreground: 166 10% 26%;
+      --popover: 166 63% 99%;
+      --popover-foreground: 166 56% 0%;
+      --card: 0 0% 100%;
+      --card-foreground: 0 0% 3.9%;
+      --border: 166 3% 94%;
+      --input: 166 3% 94%;
+      --primary: 166 53% 40%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 166 15% 90%;
+      --secondary-foreground: 166 15% 30%;
+      --accent: 166 23% 83%;
+      --accent-foreground: 166 23% 23%;
+      --destructive: 12 81% 45%;
+      --destructive-foreground: 0 0% 100%;
+      --ring: 166 53% 40%;
+      --radius: 0.5rem;
+    }
+  
+    .dark {
+        --background: 0 0% 3.9%;
+        --foreground: 0 0% 98%;
+      --muted: 166 14% 8%;
+      --muted-foreground: 166 10% 74%;
+      --popover: 166 46% 4%;
+      --popover-foreground: 166 27% 100%;
+      --card: 0 0% 3.9%;
+      --card-foreground: 0 0% 98%;
+      --border: 166 3% 11%;
+      --input: 166 3% 11%;
+      --primary: 166 53% 40%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 166 18% 20%;
+      --secondary-foreground: 166 18% 80%;
+      --accent: 166 27% 27%;
+      --accent-foreground: 166 27% 87%;
+      --destructive: 12 81% 60%;
+      --destructive-foreground: 12 81% 0%;
+      --ring: 166 53% 40%;
+    }
+  } */
+  
+  /* blue theme */
+  /* @layer base {
+    :root {
+      --background: 200 45% 100%;
+      --foreground: 200 65% 0%;
+      --muted: 200 30% 89%;
+      --muted-foreground: 200 1% 28%;
+      --popover: 200 45% 100%;
+      --popover-foreground: 200 65% 0%;
+      --card: 0 0% 99%;
+      --card-foreground: 0 0% 0%;
+      --border: 200 6% 91%;
+      --input: 200 6% 91%;
+      --primary: 200 39% 47%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 200 3% 82%;
+      --secondary-foreground: 200 3% 22%;
+      --accent: 200 3% 82%;
+      --accent-foreground: 200 3% 22%;
+      --destructive: 3 98% 43%;
+      --destructive-foreground: 0 0% 100%;
+      --ring: 200 39% 47%;
+      --radius: 0.5rem;
+    }
+  
+    .dark {
+      --background: 200 48% 3%;
+      --foreground: 200 37% 99%;
+      --muted: 200 30% 11%;
+      --muted-foreground: 200 1% 72%;
+      --popover: 200 48% 3%;
+      --popover-foreground: 200 37% 99%;
+      --card: 200 48% 4%;
+      --card-foreground: 0 0% 100%;
+      --border: 200 6% 10%;
+      --input: 200 6% 10%;
+      --primary: 200 39% 47%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 200 1% 18%;
+      --secondary-foreground: 200 1% 78%;
+      --accent: 200 1% 18%;
+      --accent-foreground: 200 1% 78%;
+      --destructive: 3 98% 54%;
+      --destructive-foreground: 0 0% 100%;
+      --ring: 200 39% 47%;
+    }
+  } */
+  
+
+/* default shadcn theme */
 @layer base {
     :root {
         --background: 0 0% 100%;
@@ -70,6 +169,14 @@ h6 {
         --color-5: 90 100% 63%;
         --seagull: 197 71% 73%;
         --magic-mint: 139 68% 73%;
+        --sidebar-background: 0 0% 98%;
+        --sidebar-foreground: 240 5.3% 26.1%;
+        --sidebar-primary: 240 5.9% 10%;
+        --sidebar-primary-foreground: 0 0% 98%;
+        --sidebar-accent: 240 4.8% 95.9%;
+        --sidebar-accent-foreground: 240 5.9% 10%;
+        --sidebar-border: 220 13% 91%;
+        --sidebar-ring: 217.2 91.2% 59.8%;
     }
     .dark {
         --background: 0 0% 3.9%;
@@ -96,6 +203,14 @@ h6 {
         --chart-3: 30 80% 55%;
         --chart-4: 280 65% 60%;
         --chart-5: 340 75% 55%;
+        --sidebar-background: 240 5.9% 10%;
+        --sidebar-foreground: 240 4.8% 95.9%;
+        --sidebar-primary: 224.3 76.3% 48%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 240 3.7% 15.9%;
+        --sidebar-accent-foreground: 240 4.8% 95.9%;
+        --sidebar-border: 240 3.7% 15.9%;
+        --sidebar-ring: 217.2 91.2% 59.8%;
     }
 }
 

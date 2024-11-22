@@ -26,8 +26,6 @@ const invitationFormSchema = z.object({
 
 
 export default function EditProfileAboutDialog() {
-    const router = useRouter();
-
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(invitationFormSchema),

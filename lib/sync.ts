@@ -1,0 +1,288 @@
+import { PrismaClient } from '@prisma/client';
+import { withPulse } from '@prisma/extension-pulse/node';
+
+// Initialize Prisma Client with PostgreSQL adapter
+const initPrismaClient = () => {
+    return new PrismaClient()
+};
+
+// Helper function to send requests to TypeSense
+const sendTypeSenseRequest = async (
+    url: string,
+    method: string,
+    apiKey: string,
+    data?: any,
+) => {
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-TYPESENSE-API-KEY': apiKey,
+    };
+
+    const body = data ? JSON.stringify(data) : undefined;
+    const response = await fetch(url, { method, headers, body });
+    return response?.json() ?? null;
+};
+
+// TypeSense collection management
+const createTypeSenseCollection = async (
+    typesenseUrl: string,
+    apiKey: string,
+    data: any,
+) => {
+    const url = `${typesenseUrl}/collections`;
+    return sendTypeSenseRequest(url, 'POST', apiKey, data);
+};
+
+const deleteTypeSenseCollection = async (
+    typesenseUrl: string,
+    apiKey: string,
+    data: any,
+) => {
+    const url = `${typesenseUrl}/collections`;
+    return sendTypeSenseRequest(url, 'POST', apiKey, data);
+}
+
+const addTypeSenseDocument = async (
+    typesenseUrl: string,
+    apiKey: string,
+    data: any,
+) => {
+    const url = `${typesenseUrl}/collections/organizations/documents`;
+    return sendTypeSenseRequest(url, 'POST', apiKey, data);
+};
+
+const updateTypeSenseDocument = async (
+    typesenseUrl: string,
+    apiKey: string,
+    data: any,
+) => {
+    const url = `${typesenseUrl}/collections/organizations/documents/${data.id}`;
+    return sendTypeSenseRequest(url, 'PATCH', apiKey, data);
+};
+
+const deleteTypeSenseDocument = async (
+    typesenseUrl: string,
+    apiKey: string,
+    id: string,
+) => {
+    const url = `${typesenseUrl}/collections/organizations/documents/${id}`;
+    return sendTypeSenseRequest(url, 'DELETE', apiKey);
+};
+
+// Extend Prisma Client with Pulse extension
+const addPulseExtension = (
+    db: PrismaClient,
+    pulseAPIKey: string,
+) => {
+    return db.$extends(
+        withPulse({
+            apiKey: pulseAPIKey,
+        })
+    );
+};
+
+// Main sync function
+export const syncToTypesense = async (env: {
+    DATABASE_URL: string,
+    TYPESENSE_ADMIN_API_KEY: string,
+    TYPESENSE_URL: string,
+    PULSE_API_KEY: string
+}) => {
+    // Initialize Prisma and extend with Pulse
+    const prisma = addPulseExtension(initPrismaClient(), env.PULSE_API_KEY);
+
+    // Ensure TypeSense collection exists
+    await createTypeSenseCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
+        name: 'organizations',
+        "fields": [
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "description",
+              "optional": false,
+              "sort": false,
+              "stem": false,
+              "store": true,
+              "type": "string"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "dateFounded",
+              "optional": false,
+              "sort": false,
+              "stem": false,
+              "store": true,
+              "type": "string"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "name",
+              "optional": false,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "string"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "moneyRaised",
+              "optional": false,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "int64"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "numberOfIdentifiedPatients",
+              "optional": false,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "int64"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "prevalenceDenominator",
+              "optional": false,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "int64"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "prevalenceNumerator",
+              "optional": false,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "int64"
+            },
+            {
+              "facet": false,
+              "index": true,
+              "infix": false,
+              "locale": "",
+              "name": "prevalenceRatio",
+              "optional": true,
+              "sort": true,
+              "stem": false,
+              "store": true,
+              "type": "float"
+            },
+            {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "moneyDeployed",
+                "optional": false,
+                "sort": true,
+                "stem": false,
+                "store": true,
+                "type": "int64"
+              },
+              {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "interestedModalities",
+                "optional": true,
+                "sort": false,
+                "stem": false,
+                "store": true,
+                "type": "string[]"
+              },
+              {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "diseaseCategories",
+                "optional": true,
+                "sort": false,
+                "stem": false,
+                "store": true,
+                "type": "string[]"
+              }
+            // add additional fields as needed
+          ],
+    });
+
+    // Stream organization changes
+    const orgStream = await prisma.organization.stream({ name: 'organization-events' });
+
+    process.on('exit', () => {
+        orgStream.stop();
+    });
+
+    const FIVE_MINUTES = 5 * 60 * 1000;
+    let timeoutId: NodeJS.Timeout;
+
+    const resetTimeout = () => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+            console.log('No events for 5 minutes. Terminating stream.');
+            orgStream.stop();
+            throw Error('Stream terminated due to inactivity');
+        }, FIVE_MINUTES);
+    };
+
+    resetTimeout();
+
+    for await (const event of orgStream) {
+        resetTimeout();
+        try {
+            switch (event.action) {
+                case 'create':
+                    console.log("Syncing created organization to Typesense:", event.created);
+                    await addTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.created);
+                    break;
+                case 'update':
+                    console.log("Syncing updated organization to Typesense:", event.after);
+                    await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.after);
+                    break;
+                case 'delete':
+                    console.log("Deleting organization from Typesense:", event.deleted);
+                    await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id);
+                    break;
+            }
+        } catch (error) {
+            console.error("Error processing event for Typesense:", error);
+        }
+    }
+};
+
+// Run sync on start
+syncToTypesense({
+    DATABASE_URL: process.env.DATABASE_URL!,
+    TYPESENSE_ADMIN_API_KEY: process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!,
+    TYPESENSE_URL: "https://" + process.env.NEXT_PUBLIC_TYPESENSE_NODE!,
+    PULSE_API_KEY: process.env.PULSE_API_KEY!
+}).catch((error) => {
+    console.error("Failed to initialize Typesense sync:", error);
+});

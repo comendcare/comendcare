@@ -1,14 +1,17 @@
 import React from "react"
-import {Input} from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import MarketplaceSearchBar from "@/components/marketplace-searchbar";
+import { OrganizationSearchResults } from "@/components/organization-search-results";
 
-export default function PatientGroupsPage({
-    params
-}: {
-    params: { projectId: string }
-}) {
+export default async function PatientGroupsPage() {
     return (
-        <main className="max-w-7xl flex flex-col w-full p-4 items-center h-full mx-auto">
-            <Input />
+        <main className="max-w-7xl flex flex-col w-full px-4 pb-20 items-center h-full mx-auto">
+            <ScrollArea className="px-8 w-full">
+                <div className="flex flex-col gap-4 p-2 w-full">
+                    <MarketplaceSearchBar />
+                    <OrganizationSearchResults />
+                </div>
+            </ScrollArea>
         </main>
     )
 }
