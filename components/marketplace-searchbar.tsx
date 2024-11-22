@@ -33,25 +33,42 @@ export default function MarketplaceSearchBar() {
 
     function generateFiltersString() {
         let filtersList: string[] = []
+        let typesenseFilters = ""
 
+        // addative filters
         if (filters.modalities.length > 0) {
             filters.modalities.forEach(modality => {
                 filtersList.push(`interestedModalities:=[${modality.value}]`)
+                typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}interestedModalities:=[${modality.value}]`)
             })
         }
 
         if (filters.categories.length > 0) {
             filters.categories.forEach(category => {
                 filtersList.push(`interestedModalities:=[${category.value}]`)
+                typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}interestedModalities:=[${category.value}]`)
             })
         }
 
+        if (filters.genes.length > 0) {
+            filters.genes.forEach(gene => {
+                filtersList.push(`associatedGenes:=[${gene.value}]`)
+                typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}associatedGenes:=[${gene.value}]`)
+            })
+        }
+
+        if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
+
+        // subtractive filters
         if (filters.moneyDeployed) {
             filtersList.push(`moneyDeployed:>=${filters.moneyDeployed[0]}`)
             filtersList.push(`moneyDeployed:<${filters.moneyDeployed[1]}`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:>=${filters.moneyDeployed[0]}`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:<${filters.moneyDeployed[1]}`)
         }
 
-        return filtersList.join(" && ")
+        console.log(`typesense filters: `, typesenseFilters)
+        return typesenseFilters
     }
 
     useEffect(() => {
