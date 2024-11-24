@@ -13,7 +13,7 @@ import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {Label} from "@/components/ui/label";
 import {Switch} from "@/components/ui/switch";
 import {Separator} from "@/components/ui/separator";
@@ -23,6 +23,9 @@ import {AddressType} from "@/lib/types";
 import {useDebounce} from "use-debounce";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Bold, Italic} from "lucide-react";
+import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
+import {Avatar, AvatarFallback} from "@/components/ui/avatar";
+import {FileWithPath, useDropzone} from "react-dropzone";
 
 
 const optionSchema = z.object({
@@ -66,7 +69,12 @@ const newOrgFormSchema = z.object({
     country: z.string().optional(),
     lat: z.number().optional(),
     lng: z.number().optional(),
+    image: z.string().optional(),
 })
+
+const accept = {
+    "image/*": [],
+};
 
 const OPTIONS: Option[] = [
     {
@@ -110,6 +118,31 @@ export default function OrganizationOnboardingForm() {
     });
     const [searchInput, setSearchInput] = useState("");
     const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
+    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
+    const [isDialogOpen, setDialogOpen] = useState(false);
+
+    const onDrop = useCallback(
+        (acceptedFiles: FileWithPath[]) => {
+            const file = acceptedFiles[0];
+            if (!file) {
+                toast.error("Selected image is too large!");
+                return;
+            }
+
+            const fileWithPreview = Object.assign(file, {
+                preview: URL.createObjectURL(file),
+            });
+
+            setSelectedFile(fileWithPreview);
+            setDialogOpen(true);
+        },
+        []
+    );
+
+    const {getRootProps, getInputProps} = useDropzone({
+        onDrop,
+        accept,
+    });
 
     useEffect(() => {
 
@@ -456,6 +489,47 @@ export default function OrganizationOnboardingForm() {
                                     </FormControl>
                                     <FormDescription>
                                         {`Your organization's address.`}
+                                    </FormDescription>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={newOrgForm.control}
+                            name="image"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Organization Logo
+                                    </FormLabel>
+                                    <FormControl>
+                                        <div className="flex flex-col items-start space-y-4">
+                                            {selectedFile ? (
+                                                <ImageCropper
+                                                    dialogOpen={isDialogOpen}
+                                                    setDialogOpen={setDialogOpen}
+                                                    selectedFile={selectedFile}
+                                                    setSelectedFile={(file: any) => {
+                                                        setSelectedFile(file);
+                                                        field.onChange(file?.preview); // Update form field value
+                                                    }}
+                                                />
+                                            ) : (
+                                                <Avatar
+                                                    {...getRootProps()}
+                                                    className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
+                                                >
+                                                    <input {...getInputProps()} />
+                                                    <AvatarFallback className="text-center">
+                                                        Drag and drop or click!
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            )}
+                                        </div>
+                                    </FormControl>
+                                    <FormDescription>
+                                        This will be used as your organization profile's image.
                                     </FormDescription>
                                     <FormMessage/>
                                 </FormItem>

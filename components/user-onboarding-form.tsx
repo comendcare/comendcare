@@ -26,7 +26,7 @@ import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 
-const invitationFormSchema = z.object({
+const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
     title: z.string().min(2, {message: "Your role must be at least 2 characters."}),
     notificationSettings: z.boolean().default(false),
@@ -39,7 +39,7 @@ const invitationFormSchema = z.object({
     country: z.string().optional(),
     lat: z.number().optional(),
     lng: z.number().optional(),
-    image: z.string().optional(), // For the image cropper result
+    image: z.string().optional(),
 });
 
 const accept = {
@@ -88,11 +88,11 @@ export default function UserOnboardingForm() {
         lng: 0,
     });
 
-    const [defaultValues, setDefaultValues] = useState<z.infer<typeof invitationFormSchema> | undefined>(undefined);
+    const [defaultValues, setDefaultValues] = useState<z.infer<typeof userFormSchema> | undefined>(undefined);
 
-    const form = useForm<z.infer<typeof invitationFormSchema>>({
+    const form = useForm<z.infer<typeof userFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(invitationFormSchema),
+        resolver: zodResolver(userFormSchema),
         defaultValues,
     });
 
@@ -138,7 +138,7 @@ export default function UserOnboardingForm() {
         form.setValue("lng", address.lng);
     }, [address, form]);
 
-    async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
+    async function onSubmit(values: z.infer<typeof userFormSchema>) {
         try {
             for (const [key, value] of Object.entries(values)) {
                 const res: any = await editUser(session?.user?.id as string, {[key]: value});
@@ -227,27 +227,29 @@ export default function UserOnboardingForm() {
                         <FormItem>
                             <FormLabel>Profile Image</FormLabel>
                             <FormControl>
-                                {selectedFile ? (
-                                    <ImageCropper
-                                        dialogOpen={isDialogOpen}
-                                        setDialogOpen={setDialogOpen}
-                                        selectedFile={selectedFile}
-                                        setSelectedFile={(file: any) => {
-                                            setSelectedFile(file);
-                                            field.onChange(file?.preview); // Update form field value
-                                        }}
-                                    />
-                                ) : (
-                                    <Avatar
-                                        {...getRootProps()}
-                                        className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
-                                    >
-                                        <input {...getInputProps()} />
-                                        <AvatarFallback className="text-center">
-                                            Drag and drop or click!
-                                        </AvatarFallback>
-                                    </Avatar>
-                                )}
+                                <div className="flex flex-col items-start space-y-4">
+                                    {selectedFile ? (
+                                        <ImageCropper
+                                            dialogOpen={isDialogOpen}
+                                            setDialogOpen={setDialogOpen}
+                                            selectedFile={selectedFile}
+                                            setSelectedFile={(file: any) => {
+                                                setSelectedFile(file);
+                                                field.onChange(file?.preview); // Update form field value
+                                            }}
+                                        />
+                                    ) : (
+                                        <Avatar
+                                            {...getRootProps()}
+                                            className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
+                                        >
+                                            <input {...getInputProps()} />
+                                            <AvatarFallback className="text-center">
+                                                Drag and drop or click!
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    )}
+                                </div>
                             </FormControl>
                             <FormDescription>Your profile image.</FormDescription>
                             <FormMessage/>

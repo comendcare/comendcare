@@ -1,9 +1,9 @@
-import UserOnboardingForm from "@/components/user-onboarding-form";
 import {Separator} from "@/components/ui/separator";
+import {Skeleton} from "@/components/ui/skeleton";
 
-export default function OrganizationOnboardingPage() {
+export default function OnboardingWelcomePage() {
     return (
-        <main className="w-full max-w-7xl mx-auto">
+        <main className="flex flex-row space-x-8 w-full max-w-7xl mx-auto">
             <div className="space-y-4 w-1/2">
                 <div className="space-y-2">
                     <h1 className="text-xl font-semibold">Profile onboarding</h1>
@@ -17,7 +17,18 @@ export default function OrganizationOnboardingPage() {
                 </div>
 
                 <Separator/>
-                <UserOnboardingForm/>
+            </div>
+            <div className="space-y-4 w-1/2">
+                <h1 className="text-xl font-semibold">
+                    {`We'll show you what your information will be used to to.`}
+                </h1>
+                <div className="flex flex-col space-y-3">
+                    <Skeleton className="h-[125px] w-full rounded-xl"/>
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-full"/>
+                        <Skeleton className="h-4 w-[200px]"/>
+                    </div>
+                </div>
             </div>
         </main>
     )
