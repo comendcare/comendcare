@@ -27,7 +27,7 @@ export async function getMembersAndInvitees(organizationId: string | undefined) 
                 where: {organizationId},
             }),
             prisma?.invitation.findMany({
-                where: {organizationId},
+                where: {organizationId, accepted: false},
             }),
         ]);
 
@@ -665,7 +665,7 @@ export async function inviteUser(
         await sendInviteEmail(
             {
                 invitee: {
-                    name: "Test",
+                    name: "",
                     email: email,
                     image: ""
                 },
