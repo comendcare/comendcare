@@ -517,9 +517,12 @@ export default function ResearchOnboardingForm() {
                             )}
                         />
 
-                        <div className="flex flex-row space-x-2">
-                            <Button onClick={() => router.push("/onboarding/finances")}>Previous</Button>
-                            <Button type="submit">Next</Button>
+                        <div className="flex flex-row justify-between">
+                            <div className="flex flex-row space-x-2">
+                                <Button onClick={() => router.push("/onboarding/finances")}>Previous</Button>
+                                <Button type="submit">Next</Button>
+                            </div>
+                            <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
                         </div>
                     </form>
                 </Form>

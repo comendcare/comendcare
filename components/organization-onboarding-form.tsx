@@ -21,6 +21,8 @@ import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {AddressType} from "@/lib/types";
 import {useDebounce} from "use-debounce";
+import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
+import {Bold, Italic} from "lucide-react";
 
 
 const optionSchema = z.object({
@@ -107,7 +109,7 @@ export default function OrganizationOnboardingForm() {
         lng: 0,
     });
     const [searchInput, setSearchInput] = useState("");
-    const { isNewOrganization, toggleIsNewOrganization } = useOnboardingStore();
+    const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
 
     useEffect(() => {
 
@@ -237,20 +239,48 @@ export default function OrganizationOnboardingForm() {
 
             <Separator/>
 
-            {/* Toggle between joining or creating an organization */}
-            <div className="flex items-center space-x-2">
-                <Switch
-                    id="new-organization"
-                    checked={isNewOrganization}
-                    onCheckedChange={toggleIsNewOrganization}
-                />
-                <Label
-                    htmlFor="new-organization"
-                    className="text-base"
+            {/* Toggle between joining or creating an organization*/}
+            {/*<div className="flex items-center space-x-2">*/}
+            {/*    <Switch*/}
+            {/*        id="new-organization"*/}
+            {/*        checked={isNewOrganization}*/}
+            {/*        onCheckedChange={toggleIsNewOrganization}*/}
+            {/*    />*/}
+            {/*    <Label*/}
+            {/*        htmlFor="new-organization"*/}
+            {/*        className="text-base"*/}
+            {/*    >*/}
+            {/*        {isNewOrganization ? "Join an existing organization instead" : "Create a new organization instead"}*/}
+            {/*    </Label>*/}
+            {/*</div>*/}
+
+            <ToggleGroup
+                type="single"
+                value={isNewOrganization ? "new" : "existing"}
+                onValueChange={(value) => {
+                    if (value === "new") {
+                        toggleIsNewOrganization();
+                    } else {
+                        toggleIsNewOrganization();
+                    }
+                }}
+                className="flex justify-start space-x-2"
+            >
+                <ToggleGroupItem
+                    value="existing"
+                    aria-label="Join an existing organization"
+                    className={isNewOrganization ? "" : "bg-gray-200"}
                 >
-                    {isNewOrganization ? "Join an existing organization instead" : "Create a new organization instead"}
-                </Label>
-            </div>
+                    Join an existing organization
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                    value="new"
+                    aria-label="Create a new organization"
+                    className={isNewOrganization ? "bg-gray-200" : ""}
+                >
+                    Create a new organization
+                </ToggleGroupItem>
+            </ToggleGroup>
 
             {/* Conditionally render newOrgForm based on the toggle state */}
             {isNewOrganization ? (
@@ -456,9 +486,12 @@ export default function OrganizationOnboardingForm() {
                             )}
                         />
 
-                        <div className="flex flex-row space-x-2">
-                            <Button onClick={() => router.push("/onboarding/user")}>Previous</Button>
-                            <Button type="submit">Next</Button>
+                        <div className="flex flex-row justify-between">
+                            <div className="flex flex-row space-x-2">
+                                <Button onClick={() => router.push("/onboarding/user")}>Previous</Button>
+                                <Button type="submit">Next</Button>
+                            </div>
+                            <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
                         </div>
                     </form>
                 </Form>
@@ -501,7 +534,10 @@ export default function OrganizationOnboardingForm() {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="">Join Organization</Button>
+                            <div className="flex flex-row justify-between">
+                                <Button type="submit" className="">Join Organization</Button>
+                                <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
+                            </div>
                         </form>
                     </Form>
                 </div>
