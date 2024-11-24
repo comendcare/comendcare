@@ -69,7 +69,7 @@ export const InviteToOrganizationEmail = ({
                             Join <strong>{organizationName}</strong> on <strong>Comend</strong>
                         </Heading>
                         <Text className="text-black text-[14px] leading-[24px]">
-                            Hello {username},
+                            Hello,
                         </Text>
                         <Text className="text-black text-[14px] leading-[24px]">
                             <strong>{invitedByUsername}</strong> (
@@ -125,6 +125,9 @@ export const InviteToOrganizationEmail = ({
                             <Link href={inviteLink} className="text-blue-600 no-underline">
                                 {inviteLink}
                             </Link>
+                        </Text>
+                        <Text className="font-bold text-black text-[14px] leading-[24px]">
+                            Do not share your invitation link with anyone.
                         </Text>
                         <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
                         <Text className="text-[#666666] text-[12px] leading-[24px]">
