@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger } from './tooltip';
 import { ChartConfig, ChartContainer, ChartTooltip } from './chart';
 import { Bar, BarChart, CartesianGrid, Cell, XAxis } from 'recharts';
+import { useEffect } from 'react';
 
 const DoubleSlider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -35,6 +36,7 @@ const chartConfig = {
 } satisfies ChartConfig
 
 const DoubleSliderBarChart = (props: any) => {
+  
   return (
     <div className="flex flex-col gap-0">
       <ChartContainer config={chartConfig} className="h-[40px] w-full -mb-2">
@@ -63,6 +65,7 @@ const DoubleSliderBarChart = (props: any) => {
           defaultValue={props.range}
           min={props.range[0]}
           max={props.range[1]}
+          value={props.value}
           onValueChange={props.onChange}
       />
       <span className="flex flex-row justify-between mt-4">
