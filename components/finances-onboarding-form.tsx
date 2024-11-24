@@ -103,7 +103,8 @@ export default function FinancesOnboardingForm() {
                                         {`Are you currently raising money?`}
                                         <Tooltip delayDuration={0}>
                                             <TooltipTrigger>
-                                                <FaQuestionCircle className="text-black h-4 inline-block align-baseline mx-1"/>
+                                                <FaQuestionCircle
+                                                    className="text-black h-4 inline-block align-baseline mx-1"/>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>
@@ -179,7 +180,8 @@ export default function FinancesOnboardingForm() {
                                         {`The total amount of funding raised to date by your patient group.`}
                                         <Tooltip delayDuration={0}>
                                             <TooltipTrigger>
-                                                <FaQuestionCircle className="text-black h-4 inline-block align-baseline mx-1"/>
+                                                <FaQuestionCircle
+                                                    className="text-black h-4 inline-block align-baseline mx-1"/>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>
@@ -217,11 +219,13 @@ export default function FinancesOnboardingForm() {
                                         {`The total amount of money deployed to research to date.`}
                                         <Tooltip delayDuration={0}>
                                             <TooltipTrigger>
-                                                <FaQuestionCircle className="text-black h-4 inline-block align-baseline mx-1"/>
+                                                <FaQuestionCircle
+                                                    className="text-black h-4 inline-block align-baseline mx-1"/>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>
-                                                    Knowing how much you have deployed to research so far helps us understand how much experience you have with driving research.
+                                                    Knowing how much you have deployed to research so far helps us
+                                                    understand how much experience you have with driving research.
                                                 </p>
                                             </TooltipContent>
                                         </Tooltip>
@@ -249,11 +253,13 @@ export default function FinancesOnboardingForm() {
                                         {`The amount of money allocated to advancing research.`}
                                         <Tooltip delayDuration={0}>
                                             <TooltipTrigger>
-                                                <FaQuestionCircle className="text-black h-4 inline-block align-baseline mx-1"/>
+                                                <FaQuestionCircle
+                                                    className="text-black h-4 inline-block align-baseline mx-1"/>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>
-                                                    Knowing how much you have budgeted to research helps us prioritize based on what you prioritize.
+                                                    Knowing how much you have budgeted to research helps us prioritize
+                                                    based on what you prioritize.
                                                 </p>
                                             </TooltipContent>
                                         </Tooltip>
@@ -271,9 +277,12 @@ export default function FinancesOnboardingForm() {
                             )}
                         />
 
-                        <div className="flex flex-row space-x-2">
-                            <Button onClick={() => router.push("/onboarding/organization")}>Previous</Button>
-                            <Button type="submit">Next</Button>
+                        <div className="flex flex-row justify-between">
+                            <div className="flex flex-row space-x-2">
+                                <Button onClick={() => router.push("/onboarding/organization")}>Previous</Button>
+                                <Button type="submit">Next</Button>
+                            </div>
+                            <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
                         </div>
                     </form>
                 </Form>

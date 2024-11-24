@@ -21,6 +21,12 @@ function classNames(...classes: any[]) {
 
 const allSteps: Step[] = [
     {
+        name: 'Welcome to Comend',
+        description: "We're glad to have you",
+        href: '/onboarding/welcome',
+        status: 'complete'
+    },
+    {
         name: 'About you',
         description: 'Your profile information.',
         href: '/onboarding/user',
@@ -33,15 +39,15 @@ const allSteps: Step[] = [
         status: 'complete'
     },
     {
-        name: 'Finances',
-        description: 'Your budget and raising efforts.',
-        href: '/onboarding/finances',
-        status: 'upcoming'
-    },
-    {
         name: 'Research',
         description: 'The current research efforts in your disorder.',
         href: '/onboarding/research',
+        status: 'upcoming'
+    },
+    {
+        name: 'Finances',
+        description: 'Your budget and raising efforts.',
+        href: '/onboarding/finances',
         status: 'upcoming'
     },
 ];
