@@ -11,6 +11,7 @@ import {
   YAxis,
   Scatter,
   ScatterChart,
+  ResponsiveContainer,
 } from "recharts";
 import {
   Card,
@@ -157,10 +158,7 @@ export function GanttChart() {
     }
   
     return (
-      <ChartContainer
-          config={chartConfig}
-          className="h-full w-full"
-      >
+      <ResponsiveContainer height={chartData.length*80}>
           <ScatterChart
               data={chartData}
               margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
@@ -213,7 +211,7 @@ export function GanttChart() {
                   shape={<CustomBar/>}
               ></Scatter>
           </ScatterChart>
-      </ChartContainer>
+        </ResponsiveContainer>
     )
 }
 

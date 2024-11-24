@@ -1,4 +1,4 @@
-import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
+import { defaultFilters, OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
 import { useShallow } from "zustand/react/shallow"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -21,6 +21,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { FaQuestionCircle } from "react-icons/fa"
 import MultipleSelector from "./ui/multiple-selector"
 import { OPTIONS } from "./research-onboarding-form"
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 
 const selector = (state: OrganizationSearchState) => ({
     filters: state.filters,
@@ -39,7 +40,30 @@ const filtersFormSchema = z.object({
     modalities: z.array(optionSchema),
     categories: z.array(optionSchema),
     moneyDeployed: z.array(z.number()),
+    milestoneTypes: z.array(z.string()),
+    genes: z.array(optionSchema)
 })
+
+const milestoneTypesList = [
+    'Mouse Model',
+    'Natural History Study',
+    'Literature Review',
+]
+
+const genesList = [
+    'CRN1',
+    'MYOP1',
+    'MSU2',
+    'NEUA',
+    'NF4B',
+    'LYSO1',
+    'ARC1',
+    'NEU4',
+    'GEL3',
+    'M4SF',
+    'NEP1',
+    'REN1'
+]
 
 export function PAGFilters() {
     const { filters, allResults, searchResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
@@ -118,6 +142,61 @@ export function PAGFilters() {
 
                 <FormField
                     control={form.control}
+                    name="milestoneTypes"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Milestone Types</FormLabel>
+                            <FormDescription>{`Types of milestones an organization may have on their roadmap.`}</FormDescription>
+                            <FormControl>
+                                <ToggleGroup
+                                    type="multiple"
+                                    variant="outline"
+                                    value={field.value}
+                                    onValueChange={
+                                        field.onChange
+                                    }
+                                    className="w-fit flex flex-wrap gap-2 justify-start"
+                                >
+                                    {milestoneTypesList.map((type: string) => (
+                                        <ToggleGroupItem
+                                            key={type}
+                                            value={type}
+                                        >
+                                            {type}
+                                        </ToggleGroupItem>
+                                    ))}
+                                </ToggleGroup>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="genes"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Genes</FormLabel>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={genesList.map((name: string, index: number) => ({ id: index.toString(), label: name, value: name, description: '', strengths: '' }))}
+                                    placeholder="Select genes..."
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
                     name="moneyDeployed"
                     render={({ field }) => (
                         <FormItem className="flex flex-col grow">
@@ -137,6 +216,10 @@ export function PAGFilters() {
                 />
 
                 <span className="flex justify-end gap-4 flex-wrap">
+                    <Button type="submit" variant="destructive" onClick={() => {
+                        setFilters(defaultFilters)
+                        form.reset(defaultFilters)
+                    }}>Clear All Filters</Button>
                     <Button type="submit">Apply Filters</Button>
                 </span>
             </form>

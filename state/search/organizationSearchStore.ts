@@ -13,7 +13,21 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
-    moneyDeployed: number[]
+    moneyDeployed: number[],
+    milestoneTypes: string[],
+    genes: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[]
+}
+
+export const defaultFilters = {
+    modalities: [],
+    categories: [],
+    moneyDeployed: [0, 10000000],
+    milestoneTypes: [],
+    genes: []
 }
 
 export interface OrganizationSearchState {
@@ -34,11 +48,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>((set, 
     setAllResults: (results: any[]) => set({ allResults: results }),
     searchResults: [],
     setSearchResults: (results: any[]) => set({ searchResults: results }),
-    filters: {
-        modalities: [],
-        categories: [],
-        moneyDeployed: [0, 10000000]
-    },
+    filters: defaultFilters,
     setFilters: (updatedFilters: FiltersType) => {
         set({ filters: {
             ...get().filters,
