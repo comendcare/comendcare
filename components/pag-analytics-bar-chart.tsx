@@ -54,7 +54,7 @@ const data = [
 ]
 
 
-export default function AnalyticsBarChart() {
+export default function PAGAnalyticsBarChart() {
     return (
         <ResponsiveContainer width="100%" height={350}>
             <BarChart data={data}>

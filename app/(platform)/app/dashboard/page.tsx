@@ -7,6 +7,7 @@ import {
 import PAGDashboardAnalyticsTab from "@/components/pag-dashboard-analytics-tab";
 import PAGDashboardMembersTab from "@/components/pag-dashboard-members-tab";
 import PAGDashboardInvitationsTab from "@/components/pag-dashboard-invitations-tab";
+import PAGDashboardDetailsTab from "@/components/pag-dashboard-details-tab";
 
 export default function DashboardPage() {
     return (
@@ -37,7 +38,7 @@ export default function DashboardPage() {
                         <PAGDashboardAnalyticsTab/>
                     </TabsContent>
                     <TabsContent value="details">
-                        <PAGDashboardAnalyticsTab/>
+                        <PAGDashboardDetailsTab/>
                     </TabsContent>
                     <TabsContent value="members" className="space-y-4">
                         <PAGDashboardMembersTab/>

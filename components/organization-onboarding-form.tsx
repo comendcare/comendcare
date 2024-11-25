@@ -259,18 +259,6 @@ export default function OrganizationOnboardingForm() {
 
     return (
         <div className="space-y-4 w-1/2">
-            <div className="space-y-2">
-                <h1 className="text-xl font-semibold">
-                    Organization onboarding
-                </h1>
-                <p>
-                    {`Welcome ${"James"}, we have a few questions about your organization to help get your profile started.
-                    You can join an organization if it already exists on Comend, or create a new one.
-                    `}
-                </p>
-            </div>
-
-            <Separator/>
 
             {/* Toggle between joining or creating an organization*/}
             {/*<div className="flex items-center space-x-2">*/}
