@@ -1,7 +1,7 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
-import {FaPen} from "react-icons/fa6";
+import {FaArrowUpRightFromSquare, FaPen} from "react-icons/fa6";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 
@@ -71,8 +71,10 @@ export const PAGProfileRoadmapCard = () => {
                 <Button
                     variant="ghost"
                     onClick={() => router.push("/app/roadmap")}
+                    className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                 >
-                    <FaPen className="size-6"/>
+                    Edit roadmap
+                    <FaArrowUpRightFromSquare/>
                 </Button>
             </CardHeader>
 

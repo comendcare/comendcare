@@ -1,7 +1,7 @@
 import UserOnboardingForm from "@/components/user-onboarding-form";
 import {Separator} from "@/components/ui/separator";
 
-export default function OrganizationOnboardingPage() {
+export default function UserOnboardingPage() {
     return (
         <main className="w-full max-w-7xl mx-auto">
             <div className="space-y-4 w-1/2">

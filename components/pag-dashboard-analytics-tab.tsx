@@ -1,5 +1,6 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import AnalyticsBarChart from "@/components/analytics-bar-chart";
+import PAGAnalyticsBarChart from "@/components/pag-analytics-bar-chart";
+import PAGAnalyticsLineChart from "@/components/pag-analytics-line-chart";
 
 export default function PAGDashboardAnalyticsTab() {
     return (
@@ -121,17 +122,23 @@ export default function PAGDashboardAnalyticsTab() {
                         <CardTitle>Overview</CardTitle>
                     </CardHeader>
                     <CardContent className="pl-2">
-                        <AnalyticsBarChart/>
+                        <PAGAnalyticsBarChart/>
                     </CardContent>
                 </Card>
                 <Card className="col-span-3">
                     <CardHeader>
-                        <CardTitle>Recent Sales</CardTitle>
+                        <CardTitle>Profile views</CardTitle>
                         <CardDescription>
-                            You made 265 sales this month.
+                            <div className="text-2xl font-bold">
+                                27
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                +20% from last month
+                            </p>
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="h-80">
+                        <PAGAnalyticsLineChart/>
                     </CardContent>
                 </Card>
             </div>
