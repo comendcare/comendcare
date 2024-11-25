@@ -529,7 +529,7 @@ export default function OrganizationOnboardingForm() {
                                         </div>
                                     </FormControl>
                                     <FormDescription>
-                                        This will be used as your organization profile's image.
+                                        {`This will be used as your organization profile's image.`}
                                     </FormDescription>
                                     <FormMessage/>
                                 </FormItem>
