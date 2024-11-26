@@ -19,7 +19,7 @@ import {Separator} from "@/components/ui/separator";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {FaQuestionCircle} from "react-icons/fa";
 
-const optionSchema = z.object({
+export const optionSchema = z.object({
     label: z.string(),
     value: z.string(),
     disable: z.boolean().optional(),

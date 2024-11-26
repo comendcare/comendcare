@@ -67,6 +67,11 @@ import { Switch } from "./ui/switch"
 import { PrivateBadge } from "./private-badge"
 import { debounce } from "lodash"
 import {monthsList} from "@/lib/data";
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
+import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import type { Option } from "./ui/multiple-selector"
+import MultipleSelector from "./ui/multiple-selector"
+import { optionSchema } from "./research-onboarding-form"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -115,6 +120,7 @@ export function EditMilestoneForm({
             .string()
             .max(1000, "Description must be less than 1000 characters")
             .optional(),
+        milestoneType: z.string(),
         startDate: z.object({
             month: z.string().optional(),
             year: z.string().optional(),
@@ -154,6 +160,7 @@ export function EditMilestoneForm({
         defaultValues: {
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
+            milestoneType: milestoneData?.type || "NOTYPE",
             startDate: {
                 month: milestoneData?.startDate?.getMonth() ? monthsList[milestoneData?.startDate?.getMonth()] : undefined,
                 year: milestoneData?.startDate?.getFullYear()?.toString() || undefined
@@ -172,6 +179,7 @@ export function EditMilestoneForm({
 
     const title = form.watch("title")
     const description = form.watch("description")
+    const type = form.watch("milestoneType")
     const startDate = form.watch("startDate")
     const endDate = form.watch("endDate")
     const budget = form.watch("budget")
@@ -224,7 +232,7 @@ export function EditMilestoneForm({
                 }))}
                 : undefined
             ),
-            type: milestoneData?.type || 'NO TYPE',
+            type: type || 'NO TYPE',
             status,
             private: isPrivate || false
         })
@@ -381,6 +389,46 @@ export function EditMilestoneForm({
                 )}
                 />
 
+                <FormField
+                    control={form.control}
+                    name="milestoneType"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Milestone Type</FormLabel>
+                            <FormControl>
+                                <Select
+                                    onValueChange={(value: string) => {
+                                        field.onChange(value)
+                                        // handleMilestoneFormSubmit({
+                                        //     title,
+                                        //     description,
+                                        //     milestoneType: type,
+                                        //     startDate,
+                                        //     endDate,
+                                        //     budget,
+                                        //     papers,
+                                        //     tasks,
+                                        //     status,
+                                        //     private: isPrivate,
+                                        // })
+                                    }}
+                                    defaultValue={field.value}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a milestone type..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {MILESTONE_TYPE_OPTIONS.map((milestoneType, index) => (
+                                            <SelectItem value={milestoneType.value}>{milestoneType.label}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
                 <span className="flex flex-col gap-2">
                     <FormLabel className="text-xl">{`Timeline:`}</FormLabel>
                     <FormDescription>{`Enter this milestone's completion timeline (past or future)`}</FormDescription>
@@ -402,6 +450,7 @@ export function EditMilestoneForm({
                                         handleMilestoneFormSubmit({
                                             title,
                                             description,
+                                            milestoneType: type,
                                             startDate,
                                             endDate,
                                             budget,
@@ -453,6 +502,7 @@ export function EditMilestoneForm({
                                             handleMilestoneFormSubmit({
                                                 title,
                                                 description,
+                                                milestoneType: type,
                                                 startDate,
                                                 endDate,
                                                 budget,
@@ -510,6 +560,7 @@ export function EditMilestoneForm({
                                         handleMilestoneFormSubmit({
                                             title,
                                             description,
+                                            milestoneType: type,
                                             startDate,
                                             endDate,
                                             budget,
@@ -561,6 +612,7 @@ export function EditMilestoneForm({
                                             handleMilestoneFormSubmit({
                                                 title,
                                                 description,
+                                                milestoneType: type,
                                                 startDate,
                                                 endDate,
                                                 budget,
