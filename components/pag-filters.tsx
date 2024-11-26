@@ -20,8 +20,10 @@ import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { FaQuestionCircle } from "react-icons/fa"
 import MultipleSelector from "./ui/multiple-selector"
-import { CONDITION_MECHANISM_OPTIONS, MILESTONE_OUTCOME_OPTIONS, MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, MODALITIES_OF_INTEREST_OPTIONS, SYSTEMS_AFFECTED_OPTIONS } from "./research-onboarding-form"
+import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { CONDITION_MECHANISM_OPTIONS, MILESTONE_OUTCOME_OPTIONS, MILESTONE_STATUS_OPTIONS, MODALITIES_OF_INTEREST_OPTIONS, SYSTEMS_AFFECTED_OPTIONS } from "./research-onboarding-form"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
+import type { Option } from "./ui/multiple-selector"
 
 const selector = (state: OrganizationSearchState) => ({
     filters: state.filters,
@@ -182,12 +184,12 @@ export function PAGFilters() {
                                     }
                                     className="w-fit flex flex-wrap gap-2 justify-start"
                                 >
-                                    {MILESTONE_TYPE_OPTIONS.map((type: string) => (
+                                    {MILESTONE_TYPE_OPTIONS.map((type: Option) => (
                                         <ToggleGroupItem
-                                            key={type}
-                                            value={type}
+                                            key={type.value}
+                                            value={type.value}
                                         >
-                                            {type}
+                                            {type.label}
                                         </ToggleGroupItem>
                                     ))}
                                 </ToggleGroup>

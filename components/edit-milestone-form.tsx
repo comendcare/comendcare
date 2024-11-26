@@ -224,6 +224,7 @@ export function EditMilestoneForm({
                 }))}
                 : undefined
             ),
+            type: milestoneData?.type || 'NO TYPE',
             status,
             private: isPrivate || false
         })
