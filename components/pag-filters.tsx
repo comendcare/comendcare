@@ -88,7 +88,7 @@ export function PAGFilters() {
             <ScrollArea className="w-full h-full">
             <form
                 onSubmit={form.handleSubmit(handleSubmit)}
-                className="flex flex-col gap-8 pr-4"
+                className="flex flex-col gap-8 p-1 pr-4"
             >
                 <h1 className="text-2xl">{`Organization Filters`}</h1>
                 <FormField
