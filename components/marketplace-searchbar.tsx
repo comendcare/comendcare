@@ -8,10 +8,12 @@ import { useShallow } from "zustand/react/shallow"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 const selector = (state: OrganizationSearchState) => ({
+    lastFetchedPage: state.lastFetchedPage,
     view: state.view,
     setView: state.setView,
     filters: state.filters,
     setAllResults: state.setAllResults,
+    searchResults: state.searchResults,
     setSearchResults: state.setSearchResults
 })
 
@@ -29,7 +31,7 @@ export default function MarketplaceSearchBar() {
     const [query, setQuery] = useState("")
     const [sortBy, setSortBy] = useState<string | undefined>()
     const [searchTerm, setSearchTerm] = useState<string>("")
-    const { view, setView, filters, setAllResults, setSearchResults } = useOrganizationSearchStore(useShallow(selector))
+    const { lastFetchedPage, view, setView, filters, setAllResults, searchResults, setSearchResults } = useOrganizationSearchStore(useShallow(selector))
 
     function generateFiltersString() {
         let filtersList: string[] = []
@@ -76,14 +78,20 @@ export default function MarketplaceSearchBar() {
     }, [])
 
     useEffect(() => {
-        handleSearch()
+        console.log(`NEW SEARCH`, filters)
+        newSearch()
     }, [filters, sortBy, searchTerm])
+
+    useEffect(() => {
+        console.log(`UPDATE SEARCH`, lastFetchedPage)
+        updateSarch()
+    }, [lastFetchedPage])
 
     const init = async () => {
         try {
             const searchParameters = {
                 q: "",
-                query_by: "name"
+                query_by: "name",
             };
 
             const results = await typesense
@@ -99,11 +107,13 @@ export default function MarketplaceSearchBar() {
         }
     }
 
-    const handleSearch = async () => {
+    const newSearch = async () => {
         try {
             const searchParameters = {
                 q: searchTerm,
                 query_by: "name",
+                per_page: 10,
+                page: lastFetchedPage,
                 ...(generateFiltersString() ? { filter_by: generateFiltersString() } : undefined),
                 ...(sortBy ? { sort_by: sortByFilters[sortBy] } : undefined),
             };
@@ -114,6 +124,30 @@ export default function MarketplaceSearchBar() {
                 .search(searchParameters);
 
             setSearchResults(results.hits || [])
+            console.log(`search results`, results.hits)
+
+        } catch (error) {
+            console.error("Search error:", error);
+        }
+    }
+
+    const updateSarch = async () => {
+        try {
+            const searchParameters = {
+                q: searchTerm,
+                query_by: "name",
+                per_page: 10,
+                page: lastFetchedPage,
+                ...(generateFiltersString() ? { filter_by: generateFiltersString() } : undefined),
+                ...(sortBy ? { sort_by: sortByFilters[sortBy] } : undefined),
+            };
+
+            const results = await typesense
+                .collections("organizations")
+                .documents()
+                .search(searchParameters);
+
+            setSearchResults([...searchResults, ...(results.hits || [])])
             console.log(`search results`, results.hits)
 
         } catch (error) {
