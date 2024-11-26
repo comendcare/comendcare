@@ -113,7 +113,7 @@ export default function MarketplaceSearchBar() {
                 q: searchTerm,
                 query_by: "name",
                 per_page: 10,
-                page: lastFetchedPage,
+                page: 0,
                 ...(generateFiltersString() ? { filter_by: generateFiltersString() } : undefined),
                 ...(sortBy ? { sort_by: sortByFilters[sortBy] } : undefined),
             };

@@ -51,10 +51,10 @@ export function OrganizationSearchResults() {
     return searchResults.length > 0 ? (
         <>
             <ResultsView />
-            {/* <InfiniteScroll 
+            <InfiniteScroll 
                 lastFetchedPage={lastFetchedPage} 
                 setLastFetchedPage={setLastFetchedPage}
-            /> */}
+            />
         </>
     ):(
         <NoResultsView />
