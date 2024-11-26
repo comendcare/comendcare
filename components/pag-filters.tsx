@@ -12,22 +12,16 @@ import {
     FormMessage
 } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
-import { DoubleSlider, DoubleSliderBarChart } from "./ui/slider-double"
+import { DoubleSliderBarChart } from "./ui/slider-double"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
-import { ChartConfig, ChartContainer } from "./ui/chart"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
-import { FaQuestionCircle } from "react-icons/fa"
 import MultipleSelector from "./ui/multiple-selector"
 import { OPTIONS } from "./research-onboarding-form"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 
 const selector = (state: OrganizationSearchState) => ({
-    setLastFetchedPage: state.setLastFetchedPage,
     filters: state.filters,
     allResults: state.allResults,
-    searchResults: state.searchResults,
     setFilters: state.setFilters
 })
 
@@ -67,7 +61,7 @@ const genesList = [
 ]
 
 export function PAGFilters() {
-    const { setLastFetchedPage, filters, allResults, searchResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
+    const { filters, allResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
     const form = useForm<z.infer<typeof filtersFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(filtersFormSchema),

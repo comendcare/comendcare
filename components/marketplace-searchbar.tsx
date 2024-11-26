@@ -2,24 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { typesense } from "@/lib/typesense";
 import { OrganizationSearchState, useOrganizationSearchStore, ViewType } from "@/state/search/organizationSearchStore";
 import { useShallow } from "zustand/react/shallow"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 const selector = (state: OrganizationSearchState) => ({
-    searchTerm: state.searchTerm,
     setSearchTerm: state.setSearchTerm,
-    sortBy: state.sortBy,
     setSortBy: state.setSortBy,
-    lastFetchedPage: state.lastFetchedPage,
-    setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
     setView: state.setView,
-    filters: state.filters,
-    setAllResults: state.setAllResults,
-    searchResults: state.searchResults,
-    setSearchResults: state.setSearchResults
 })
 
 export default function MarketplaceSearchBar() {
@@ -32,7 +23,7 @@ export default function MarketplaceSearchBar() {
     } = useOrganizationSearchStore(useShallow(selector))
 
     useEffect(() => {
-        setSearchTerm("")
+        setSearchTerm("") // initial fetch on page load
     }, [])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
