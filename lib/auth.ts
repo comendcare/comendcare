@@ -6,8 +6,54 @@ import LinkedInProvider from "next-auth/providers/linkedin"
 import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@/lib/prisma"
+import {User} from "next-auth";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
+
+async function createMembershipsFromInvitations (user: User) {
+    try {
+        // Check if there are invitations for the user's email
+        const invitations = await prisma.invitation.findMany({
+            where: {
+                email: user.email || "",
+                accepted: false
+            }
+        });
+
+        if (invitations.length > 0) {
+            // Process invitations and create memberships
+            await Promise.all(
+                invitations.map(async (invitation) => {
+                    // Create a membership
+                    await prisma.member.create({
+                        data: {
+                            email: invitation.email,
+                            organizationId: invitation.organizationId,
+                            role: invitation.role || "admin",
+                            userId: user.id
+                        }
+                    });
+
+                    // Mark the invitation as accepted
+                    await prisma.invitation.update({
+                        where: {
+                            id: invitation.id
+                        },
+                        data: {
+                            accepted: true
+                        }
+                    });
+                })
+            );
+
+            console.log(`Memberships created and invitations accepted for user ${user.email}`);
+        } else {
+            console.log(`No invitations found for user ${user.email}`);
+        }
+    } catch (error) {
+        console.error("Error creating memberships:", error);
+    }
+}
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -90,7 +136,7 @@ export const authOptions: NextAuthOptions = {
         signIn: `/login`,
         verifyRequest: `/login/verify-request`,
         error: "/error", // Error code passed in query string as ?error=
-        newUser: "/onboarding/user"
+        newUser: "/onboarding/welcome"
     },
     adapter: PrismaAdapter(prisma),
     session: {strategy: "jwt"},
@@ -111,6 +157,17 @@ export const authOptions: NextAuthOptions = {
     },
 
     callbacks: {
+
+        async signIn({user, account, profile, email, credentials}) {
+            await createMembershipsFromInvitations(user)
+
+            const isAllowedToSignIn = true
+            if (isAllowedToSignIn) {
+                return true
+            } else {
+                return false
+            }
+        },
 
         jwt: async ({token, user, trigger, session}) => {
             if (trigger === 'update') {
@@ -168,6 +225,14 @@ export const authOptions: NextAuthOptions = {
             return session;
         }
     },
+
+    events: {
+        async createUser({user}) {
+            // This triggers after a user is created
+            await createMembershipsFromInvitations(user)
+        }
+    },
+
     debug: process.env.VERCEL_URL === "development",
 };
 

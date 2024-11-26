@@ -13,7 +13,7 @@ import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {Label} from "@/components/ui/label";
 import {Switch} from "@/components/ui/switch";
 import {Separator} from "@/components/ui/separator";
@@ -21,6 +21,11 @@ import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {AddressType} from "@/lib/types";
 import {useDebounce} from "use-debounce";
+import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
+import {Bold, Italic} from "lucide-react";
+import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
+import {Avatar, AvatarFallback} from "@/components/ui/avatar";
+import {FileWithPath, useDropzone} from "react-dropzone";
 
 
 const optionSchema = z.object({
@@ -64,7 +69,12 @@ const newOrgFormSchema = z.object({
     country: z.string().optional(),
     lat: z.number().optional(),
     lng: z.number().optional(),
+    image: z.string().optional(),
 })
+
+const accept = {
+    "image/*": [],
+};
 
 const OPTIONS: Option[] = [
     {
@@ -107,7 +117,32 @@ export default function OrganizationOnboardingForm() {
         lng: 0,
     });
     const [searchInput, setSearchInput] = useState("");
-    const { isNewOrganization, toggleIsNewOrganization } = useOnboardingStore();
+    const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
+    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
+    const [isDialogOpen, setDialogOpen] = useState(false);
+
+    const onDrop = useCallback(
+        (acceptedFiles: FileWithPath[]) => {
+            const file = acceptedFiles[0];
+            if (!file) {
+                toast.error("Selected image is too large!");
+                return;
+            }
+
+            const fileWithPreview = Object.assign(file, {
+                preview: URL.createObjectURL(file),
+            });
+
+            setSelectedFile(fileWithPreview);
+            setDialogOpen(true);
+        },
+        []
+    );
+
+    const {getRootProps, getInputProps} = useDropzone({
+        onDrop,
+        accept,
+    });
 
     useEffect(() => {
 
@@ -157,7 +192,6 @@ export default function OrganizationOnboardingForm() {
                 }
             });
         }
-        console.log(debouncedNickname)
     }, [debouncedNickname, checkSubdomainAvailability, newOrgForm])
 
     useEffect(() => {
@@ -223,34 +257,50 @@ export default function OrganizationOnboardingForm() {
     }
 
     return (
-        <div className="space-y-4 w-1/2">
-            <div className="space-y-2">
-                <h1 className="text-xl font-semibold">
-                    Organization onboarding
-                </h1>
-                <p>
-                    {`Welcome ${"James"}, we have a few questions about your organization to help get your profile started.
-                    You can join an organization if it already exists on Comend, or create a new one.
-                    `}
-                </p>
-            </div>
+        <div className="space-y-4">
 
-            <Separator/>
+            {/* Toggle between joining or creating an organization*/}
+            {/*<div className="flex items-center space-x-2">*/}
+            {/*    <Switch*/}
+            {/*        id="new-organization"*/}
+            {/*        checked={isNewOrganization}*/}
+            {/*        onCheckedChange={toggleIsNewOrganization}*/}
+            {/*    />*/}
+            {/*    <Label*/}
+            {/*        htmlFor="new-organization"*/}
+            {/*        className="text-base"*/}
+            {/*    >*/}
+            {/*        {isNewOrganization ? "Join an existing organization instead" : "Create a new organization instead"}*/}
+            {/*    </Label>*/}
+            {/*</div>*/}
 
-            {/* Toggle between joining or creating an organization */}
-            <div className="flex items-center space-x-2">
-                <Switch
-                    id="new-organization"
-                    checked={isNewOrganization}
-                    onCheckedChange={toggleIsNewOrganization}
-                />
-                <Label
-                    htmlFor="new-organization"
-                    className="text-base"
+            <ToggleGroup
+                type="single"
+                value={isNewOrganization ? "new" : "existing"}
+                onValueChange={(value) => {
+                    if (value === "new") {
+                        toggleIsNewOrganization();
+                    } else {
+                        toggleIsNewOrganization();
+                    }
+                }}
+                className="flex justify-start space-x-2"
+            >
+                <ToggleGroupItem
+                    value="existing"
+                    aria-label="Join an existing organization"
+                    className={isNewOrganization ? "" : "bg-gray-200"}
                 >
-                    {isNewOrganization ? "Join an existing organization instead" : "Create a new organization instead"}
-                </Label>
-            </div>
+                    Join an existing organization
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                    value="new"
+                    aria-label="Create a new organization"
+                    className={isNewOrganization ? "bg-gray-200" : ""}
+                >
+                    Create a new organization
+                </ToggleGroupItem>
+            </ToggleGroup>
 
             {/* Conditionally render newOrgForm based on the toggle state */}
             {isNewOrganization ? (
@@ -434,6 +484,47 @@ export default function OrganizationOnboardingForm() {
 
                         <FormField
                             control={newOrgForm.control}
+                            name="image"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Organization Logo
+                                    </FormLabel>
+                                    <FormControl>
+                                        <div className="flex flex-col items-start space-y-4">
+                                            {selectedFile ? (
+                                                <ImageCropper
+                                                    dialogOpen={isDialogOpen}
+                                                    setDialogOpen={setDialogOpen}
+                                                    selectedFile={selectedFile}
+                                                    setSelectedFile={(file: any) => {
+                                                        setSelectedFile(file);
+                                                        field.onChange(file?.preview); // Update form field value
+                                                    }}
+                                                />
+                                            ) : (
+                                                <Avatar
+                                                    {...getRootProps()}
+                                                    className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
+                                                >
+                                                    <input {...getInputProps()} />
+                                                    <AvatarFallback className="text-center">
+                                                        Drag and drop or click!
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            )}
+                                        </div>
+                                    </FormControl>
+                                    <FormDescription>
+                                        {`This will be used as your organization profile's image.`}
+                                    </FormDescription>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={newOrgForm.control}
                             name="looking"
                             render={({field}) => (
                                 <FormItem>
@@ -456,9 +547,12 @@ export default function OrganizationOnboardingForm() {
                             )}
                         />
 
-                        <div className="flex flex-row space-x-2">
-                            <Button onClick={() => router.push("/onboarding/user")}>Previous</Button>
-                            <Button type="submit">Next</Button>
+                        <div className="flex flex-row justify-between">
+                            <div className="flex flex-row space-x-2">
+                                <Button onClick={() => router.push("/onboarding/user")}>Previous</Button>
+                                <Button type="submit">Next</Button>
+                            </div>
+                            <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
                         </div>
                     </form>
                 </Form>
@@ -501,7 +595,10 @@ export default function OrganizationOnboardingForm() {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit" className="">Join Organization</Button>
+                            <div className="flex flex-row justify-between">
+                                <Button type="submit" className="">Join Organization</Button>
+                                <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
+                            </div>
                         </form>
                     </Form>
                 </div>

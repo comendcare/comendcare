@@ -27,7 +27,7 @@ export async function getMembersAndInvitees(organizationId: string | undefined) 
                 where: {organizationId},
             }),
             prisma?.invitation.findMany({
-                where: {organizationId},
+                where: {organizationId, accepted: false},
             }),
         ]);
 
@@ -42,7 +42,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
     const roadmap = await prisma.roadmap.create({
         data: {
             organization: {
-                connect: { id: organizationId }
+                connect: {id: organizationId}
             }
         }
     })
@@ -65,10 +65,10 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                                 roadmapId: roadmap.id,
                                 status: milestone.status || "TODO",
                                 title: milestone.title,
-                                ...(milestone.description ? { description: milestone.description } : undefined),
-                                ...(milestone.startDate ? { startDate: milestone.startDate } : undefined),
-                                ...(milestone.endDate ? { endDate: milestone.endDate } : undefined),
-                                ...(milestone.budget ? { budget: milestone.budget } : undefined),
+                                ...(milestone.description ? {description: milestone.description} : undefined),
+                                ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
+                                ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
+                                ...(milestone.budget ? {budget: milestone.budget} : undefined),
                                 papers: milestone.papers || [],
                                 private: milestone.private || false
                             }
@@ -79,8 +79,8 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 // grab milestone so we can add tasks
                 // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
                 const newMilestone = await prisma.milestone.findUnique({
-                    where: { nodeId: node.id },
-                    include: { tasks: true }
+                    where: {nodeId: node.id},
+                    include: {tasks: true}
                 })
 
                 // create tasks for relevant milestone
@@ -111,12 +111,12 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
             })
         )
 
-        for (let i = 0; i < nodes.length-1; i++) {
+        for (let i = 0; i < nodes.length - 1; i++) {
             await prisma.edge.create({
                 data: {
-                    roadmap: { connect: { id: roadmap.id } },
+                    roadmap: {connect: {id: roadmap.id}},
                     source: nodes[i]?.id,
-                    target: nodes[i+1]?.id
+                    target: nodes[i + 1]?.id
                 }
             })
         }
@@ -314,7 +314,7 @@ export const updateOrganization = withOrganizationAuth(
             } else {
                 const prevalenceNumerator: number | undefined = parseInt(formData.get('prevalenceNumerator') as string) || undefined
                 const prevalenceDenominator: number | undefined = parseInt(formData.get('prevalenceDenominator') as string) || undefined
-                
+
                 response = await prisma.organization.update({
                     where: {
                         id: organization.id
@@ -322,10 +322,10 @@ export const updateOrganization = withOrganizationAuth(
                     data: {
                         [key]: value,
                         // add prevalenceRatio (if applicable)
-                        ...(prevalenceNumerator && prevalenceDenominator ? 
-                                { prevalenceRatio: prevalenceNumerator/prevalenceDenominator } :
+                        ...(prevalenceNumerator && prevalenceDenominator ?
+                                {prevalenceRatio: prevalenceNumerator / prevalenceDenominator} :
                                 undefined
-                            )
+                        )
                     }
                 })
             }
@@ -647,53 +647,27 @@ export async function inviteUser(
         }
 
         const lowerCaseEmail = email.toLowerCase()
-        const userExists = await prisma.user.findFirst({
-            where: {
-                email: {
-                    equals: lowerCaseEmail,
-                    mode: 'insensitive',
-                },
-            },
-            select: {
-                image: true
-            }
-        });
 
         let invitationId: string | undefined
-        if (!userExists) {
-            const ticket = await prisma.invitation.create({
-                data: {
-                    email: lowerCaseEmail,
-                    role: role,
-                    organizationId: organization.organizationId
-                }
-            })
-            invitationId = ticket.id
-        }
+        const invitation = await prisma.invitation.create({
+            data: {
+                email: lowerCaseEmail,
+                role: role,
+                organizationId: organization.organizationId
+            }
+        }).then((res) => {
+            console.log(`Invitation created for ${email}`)
 
-        console.log({
-            invitee: {
-                name: "Test",
-                email: email,
-                image: userExists?.image
-            },
-            inviter: {
-                name: session?.user.name,
-                email: session?.user.email,
-                image: session?.user.image,
-                organizationName: organization.organizationName,
-                organizationImage: organization.organizationImage,
-                ip: ip,
-            },
-            inviteLink: invitationId
+            return res
         })
+        invitationId = invitation.id
 
         await sendInviteEmail(
             {
                 invitee: {
-                    name: "Test",
+                    name: "",
                     email: email,
-                    image: userExists?.image
+                    image: ""
                 },
                 inviter: {
                     name: session?.user.name,
@@ -703,37 +677,37 @@ export async function inviteUser(
                     organizationImage: organization.organizationImage,
                     ip: ip,
                 },
-                inviteLink: invitationId
+                inviteLink: `${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/login?invitationId=${invitationId}`
             }
         ).then(() => {
             console.log("email sent")
         })
 
+        return invitation
 
-        return await prisma.member.create({
-            // @ts-ignore
-            data: {
-                email: lowerCaseEmail,
-                organization: {
-                    connect: {
-                        id: organization.organizationId
-                    }
-                },
-                role: role,
-                invitedBy: {
-                    connect: {
-                        id: session?.user?.id
-                    }
-                },
-                meta: {
-                    invitationId,
-                },
-            },
-        }).then((res) => {
-            console.log(`Membership created for ${email}`)
-
-            return res
-        })
+        // return await prisma.member.create({
+        //     data: {
+        //         email: lowerCaseEmail,
+        //         organization: {
+        //             connect: {
+        //                 id: organization.organizationId
+        //             }
+        //         },
+        //         role: role,
+        //         invitedBy: {
+        //             connect: {
+        //                 id: session?.user?.id
+        //             }
+        //         },
+        //         meta: {
+        //             invitationId,
+        //         },
+        //     },
+        // }).then((res) => {
+        //     console.log(`Membership created for ${email}`)
+        //
+        //     return res
+        // })
     } catch (error) {
         console.error("Error inviting user:", error)
         throw new Error("Failed to invite user.")
@@ -829,13 +803,13 @@ export async function addMemberToOrganization(
 export async function checkSubdomainAvailability(nickname: string) {
     try {
         const existingOrg = await prisma.organization.findUnique({
-            where: { subdomain: nickname },
+            where: {subdomain: nickname},
         });
         console.log(`serverside: ${existingOrg}`)
 
         return !existingOrg
     } catch (error: any) {
         console.error("Database error checking subdomain availability:", error);
-        return { error: "Database error. Please try again later." };
+        return {error: "Database error. Please try again later."};
     }
 }

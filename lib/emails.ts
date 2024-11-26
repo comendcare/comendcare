@@ -124,7 +124,7 @@ export async function sendInviteEmail(params: {
             from: "corporate@comendcare.com",
             html: emailTemplate,
             text: "A user has sent a message via the contact page.",
-            subject: "Contact form message"
+            subject: `Join ${params.inviter.name} on Comend`
         }
         await sendEmail(msg)
     }
