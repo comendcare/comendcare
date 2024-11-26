@@ -310,7 +310,7 @@ export function EditMilestoneForm({
         <ScrollArea className="research-plan-tour-step3">
             <form
                 onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                className="flex flex-col gap-8 pr-4"
+                className="flex flex-col gap-8 p-2 pr-4"
             >
                 <FormField
                 control={form.control}
