@@ -45,7 +45,7 @@ export default async function ProfilePage() {
                             <img className="h-32 w-full object-cover lg:h-48" src={'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'} alt=""/>
                         </div>
 
-                        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div className="flex flex-row justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
 
                                 <div className="flex">
@@ -58,7 +58,7 @@ export default async function ProfilePage() {
                                     className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
                                 >
                                     <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
-                                        <h1 className="mt-6 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
+                                        <h1 className="mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">
                                             {organization?.name}
                                         </h1>
                                         <div
@@ -89,21 +89,22 @@ export default async function ProfilePage() {
                                     </div>
                                 </div>
 
-                                <div
-                                    className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
-                                    <div className="flex flex-row space-x-2">
-                                        <EditProfileHeaderDialog/>
-                                        <Button
-                                            className="gap-x-2"
-                                        >
-                                            <FaPlus/>
-                                            Add post
-                                        </Button>
-                                        <PrivateProfileDropdown subdomain={organization.subdomain}/>
-                                    </div>
-                                </div>
-
                             </div>
+
+                            <div
+                                className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
+                                <div className="flex flex-row space-x-2">
+                                    <EditProfileHeaderDialog/>
+                                    <Button
+                                        className="gap-x-2"
+                                    >
+                                        <FaPlus/>
+                                        Add post
+                                    </Button>
+                                    <PrivateProfileDropdown subdomain={organization.subdomain}/>
+                                </div>
+                            </div>
+
                             <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
                                 <h1 className="truncate text-2xl font-bold text-gray-900">{organization?.name}</h1>
                             </div>

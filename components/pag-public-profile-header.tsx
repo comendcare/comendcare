@@ -30,7 +30,7 @@ export default async function PAGPublicProfileHeader({organization}: { organizat
                             className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
                         >
                             <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
-                                <h1 className="mt-6 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
+                                <h1 className="mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">
                                     {organization?.name}
                                 </h1>
                                 <div
