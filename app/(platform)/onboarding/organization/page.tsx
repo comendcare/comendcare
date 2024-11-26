@@ -1,5 +1,7 @@
 import OrganizationOnboardingForm from "@/components/organization-onboarding-form";
 import {Separator} from "@/components/ui/separator";
+import ProfilePage from "@/app/(platform)/app/profile/page";
+import PAGProfilePagePreview from "@/components/pag-profile-page-preview";
 
 export default function OrganizationOnboardingPage() {
     return (
@@ -19,6 +21,9 @@ export default function OrganizationOnboardingPage() {
                 <Separator/>
                 <OrganizationOnboardingForm/>
             </div>
+            <div className="space-y-4 w-1/2">
+                <PAGProfilePagePreview/>
+            </div>
         </main>
-    )
+)
 }

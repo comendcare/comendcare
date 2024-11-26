@@ -1,4 +1,4 @@
-import {createDicebearAvatar} from "@/lib/utils";
+import {createDicebearAvatar, formatMoney} from "@/lib/utils";
 import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaPlus} from "react-icons/fa6";
 import {Button} from "@/components/ui/button";
 import {Organization} from "@prisma/client";
@@ -49,13 +49,13 @@ export default async function PAGPublicProfileHeader({organization}: { organizat
                                                 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                 aria-hidden="true"
                                             />
-                                            ${organization?.moneyRaised?.toLocaleString()} raised
+                                            {formatMoney(organization?.moneyRaised)} raised
                                         </div>
                                     }
                                     <div className="mt-2 flex items-center text-gray-500">
                                         <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                     aria-hidden="true"/>
-                                        Founded on {new Date(organization?.createdAt ?? "").toDateString()}
+                                        Founded in {new Date(organization?.createdAt ?? "").getFullYear()}
                                     </div>
                                 </div>
                             </div>

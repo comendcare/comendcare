@@ -6,6 +6,18 @@ import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 
+export const formatMoney = (moneyRaised: number | undefined) => {
+    if (moneyRaised === undefined) return "$0";
+
+    if (moneyRaised >= 1_000_000) {
+        return `$${(moneyRaised / 1_000_000).toFixed(1)}M`;
+    } else if (moneyRaised >= 1_000) {
+        return `$${(moneyRaised / 1_000).toFixed(1)}K`;
+    } else {
+        return `$${moneyRaised.toLocaleString()}`;
+    }
+}
+
 export function formatDate(dateString: string): string {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, '0');

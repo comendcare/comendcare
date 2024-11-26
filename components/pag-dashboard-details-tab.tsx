@@ -6,7 +6,12 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import {useCallback, useEffect, useState} from "react";
-import {checkSubdomainAvailability, createOrganization} from "@/lib/actions";
+import {
+    checkSubdomainAvailability,
+    createOrganization,
+    getOrganizationFromOrganizationId,
+    getUser
+} from "@/lib/actions";
 import {AddressType} from "@/lib/types";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
@@ -21,6 +26,7 @@ import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
+import {getOrganizationData} from "@/lib/fetchers";
 
 const OPTIONS: Option[] = [
     {
@@ -107,13 +113,12 @@ export default function PAGDashboardDetailsTab() {
         lat: 0,
         lng: 0,
     });
+    const [defaultValues, setDefaultValues] = useState<z.infer<typeof editOrgFormSchema> | undefined>(undefined);
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(editOrgFormSchema),
-        defaultValues: {
-            subdomain: ""
-        }
+        defaultValues: defaultValues
     })
 
     const [debouncedNickname] = useDebounce(editOrgForm.watch("subdomain"), 500); // Extract just the debounced value
@@ -141,7 +146,6 @@ export default function PAGDashboardDetailsTab() {
                 }
             });
         }
-        console.log(debouncedNickname)
     }, [debouncedNickname, checkSubdomainAvailability, editOrgForm])
 
     useEffect(() => {
@@ -213,6 +217,46 @@ export default function PAGDashboardDetailsTab() {
         })
     }
 
+    useEffect(() => {
+        async function fetchUserData() {
+            if (session?.user?.organizationId) {
+                const organizationData = await getOrganizationFromOrganizationId(session.user.organizationId);
+                if (organizationData) {
+                    const fetchedValues = {
+                        id: organizationData.id || "",
+                        description: organizationData.description || "",
+                        orgName: organizationData.name || "", // Map `name` to `orgName`
+                        founded: organizationData.dateFounded ? organizationData.dateFounded.toISOString() : "",
+                        subdomain: organizationData.subdomain || "",
+                        website: organizationData.website || "",
+                        address1: organizationData.address1 || "",
+                        address2: organizationData.address2 || "",
+                        formattedAddress: organizationData.formattedAddress || "",
+                        city: organizationData.city || "",
+                        region: organizationData.region || "",
+                        postalCode: organizationData.postalCode || "",
+                        country: organizationData.country || "",
+                        lat: parseFloat(organizationData.lat || "0"),
+                        lng: parseFloat(organizationData.lng || "0"),
+                        image: organizationData.image || "",
+                        name: organizationData.name || "",
+                        logo: organizationData.logo || "",
+                        font: organizationData.font || "",
+                        imageBlurhash: organizationData.imageBlurhash || "",
+                        statedGoal: organizationData.statedGoal || null,
+                        dateFounded: organizationData.dateFounded || null,
+                        incorporationStatus: organizationData.incorporationStatus || null,
+                    }
+                    setDefaultValues(fetchedValues);
+                    setAddress(fetchedValues); // Set address state as well
+                    editOrgForm.reset(fetchedValues); // Reset form with fetched data
+                }
+            }
+        }
+
+        fetchUserData();
+    }, [session, editOrgForm]);
+
     return (
         <div className="p-4 space-y-4">
             <div className="space-y-2 sm:flex-auto">
@@ -220,7 +264,7 @@ export default function PAGDashboardDetailsTab() {
                     Organization Details
                 </h2>
                 <p className="text-sm text-gray-700">
-                    {`Your organization's profile details.`}
+                    {`Your organization profile's details.`}
                 </p>
             </div>
 

@@ -1,6 +1,7 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import PAGAnalyticsBarChart from "@/components/pag-analytics-bar-chart";
 import PAGAnalyticsLineChart from "@/components/pag-analytics-line-chart";
+import {DonutChartCard} from "@/components/donut-chart-card";
 
 export default function PAGDashboardAnalyticsTab() {
     return (
@@ -141,6 +142,9 @@ export default function PAGDashboardAnalyticsTab() {
                         <PAGAnalyticsLineChart/>
                     </CardContent>
                 </Card>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                <DonutChartCard/>
             </div>
         </div>
     )
