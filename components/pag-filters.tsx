@@ -24,6 +24,7 @@ import { OPTIONS } from "./research-onboarding-form"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 
 const selector = (state: OrganizationSearchState) => ({
+    setLastFetchedPage: state.setLastFetchedPage,
     filters: state.filters,
     allResults: state.allResults,
     searchResults: state.searchResults,
@@ -66,7 +67,7 @@ const genesList = [
 ]
 
 export function PAGFilters() {
-    const { filters, allResults, searchResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
+    const { setLastFetchedPage, filters, allResults, searchResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
     const form = useForm<z.infer<typeof filtersFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(filtersFormSchema),
