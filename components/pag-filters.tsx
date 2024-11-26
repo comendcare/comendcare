@@ -20,7 +20,7 @@ import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { FaQuestionCircle } from "react-icons/fa"
 import MultipleSelector from "./ui/multiple-selector"
-import { OPTIONS } from "./research-onboarding-form"
+import { CONDITION_MECHANISM_OPTIONS, MILESTONE_OUTCOME_OPTIONS, MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, MODALITIES_OF_INTEREST_OPTIONS, SYSTEMS_AFFECTED_OPTIONS } from "./research-onboarding-form"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 
 const selector = (state: OrganizationSearchState) => ({
@@ -37,33 +37,30 @@ const optionSchema = z.object({
 });
 
 const filtersFormSchema = z.object({
+    mechanisms: z.array(optionSchema),
+    systemsAffected: z.array(optionSchema),
     modalities: z.array(optionSchema),
-    categories: z.array(optionSchema),
     moneyDeployed: z.array(z.number()),
     milestoneTypes: z.array(z.string()),
+    milestoneStatus: z.array(z.string()),
+    milestoneOutcomes: z.array(z.string()),
     genes: z.array(optionSchema)
 })
 
-const milestoneTypesList = [
-    'Mouse Model',
-    'Natural History Study',
-    'Literature Review',
-]
-
-const genesList = [
-    'CRN1',
-    'MYOP1',
-    'MSU2',
-    'NEUA',
-    'NF4B',
-    'LYSO1',
-    'ARC1',
-    'NEU4',
-    'GEL3',
-    'M4SF',
-    'NEP1',
-    'REN1'
-]
+// const genesList = [
+//     'CRN1',
+//     'MYOP1',
+//     'MSU2',
+//     'NEUA',
+//     'NF4B',
+//     'LYSO1',
+//     'ARC1',
+//     'NEU4',
+//     'GEL3',
+//     'M4SF',
+//     'NEP1',
+//     'REN1'
+// ]
 
 export function PAGFilters() {
     const { filters, allResults, searchResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
@@ -96,20 +93,46 @@ export function PAGFilters() {
                 <h1 className="text-2xl">{`Organization Filters`}</h1>
                 <FormField
                     control={form.control}
-                    name="categories"
+                    name="mechanisms"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Disease categories</FormLabel>
+                            <FormLabel>Disease Mechanisms</FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={OPTIONS}
-                                    placeholder="Select categories..."
+                                    defaultOptions={CONDITION_MECHANISM_OPTIONS}
+                                    placeholder="Select disease mechanisms..."
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                             no results found.
                                         </p>
                                     }
+                                    groupBy="group"
+                                    showHoverCard={false}
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="systemsAffected"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Systems Affected</FormLabel>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={SYSTEMS_AFFECTED_OPTIONS}
+                                    placeholder="Select affected systems..."
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                    showHoverCard={false}
                                 />
                             </FormControl>
                             <FormMessage/>
@@ -126,13 +149,15 @@ export function PAGFilters() {
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={OPTIONS}
+                                    defaultOptions={MODALITIES_OF_INTEREST_OPTIONS}
                                     placeholder="Select modalities..."
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                             no results found.
                                         </p>
                                     }
+                                    groupBy="group"
+                                    showHoverCard={false}
                                 />
                             </FormControl>
                             <FormMessage/>
@@ -146,7 +171,7 @@ export function PAGFilters() {
                     render={({field}) => (
                         <FormItem>
                             <FormLabel>Milestone Types</FormLabel>
-                            <FormDescription>{`Types of milestones an organization may have on their roadmap.`}</FormDescription>
+                            <FormDescription>{`Types of milestones an organization may have in their research plan`}</FormDescription>
                             <FormControl>
                                 <ToggleGroup
                                     type="multiple"
@@ -157,7 +182,7 @@ export function PAGFilters() {
                                     }
                                     className="w-fit flex flex-wrap gap-2 justify-start"
                                 >
-                                    {milestoneTypesList.map((type: string) => (
+                                    {MILESTONE_TYPE_OPTIONS.map((type: string) => (
                                         <ToggleGroupItem
                                             key={type}
                                             value={type}
@@ -173,6 +198,68 @@ export function PAGFilters() {
                 />
 
                 <FormField
+                    control={form.control}
+                    name="milestoneStatus"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Milestone Status</FormLabel>
+                            <FormControl>
+                                <ToggleGroup
+                                    type="multiple"
+                                    variant="outline"
+                                    value={field.value}
+                                    onValueChange={
+                                        field.onChange
+                                    }
+                                    className="w-fit flex flex-wrap gap-2 justify-start"
+                                >
+                                    {MILESTONE_STATUS_OPTIONS.map((type: string) => (
+                                        <ToggleGroupItem
+                                            key={type}
+                                            value={type}
+                                        >
+                                            {type}
+                                        </ToggleGroupItem>
+                                    ))}
+                                </ToggleGroup>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="milestoneOutcomes"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Milestone Outcomes</FormLabel>
+                            <FormControl>
+                                <ToggleGroup
+                                    type="multiple"
+                                    variant="outline"
+                                    value={field.value}
+                                    onValueChange={
+                                        field.onChange
+                                    }
+                                    className="w-fit flex flex-wrap gap-2 justify-start"
+                                >
+                                    {MILESTONE_OUTCOME_OPTIONS.map((type: string) => (
+                                        <ToggleGroupItem
+                                            key={type}
+                                            value={type}
+                                        >
+                                            {type}
+                                        </ToggleGroupItem>
+                                    ))}
+                                </ToggleGroup>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                {/* <FormField
                     control={form.control}
                     name="genes"
                     render={({field}) => (
@@ -193,7 +280,7 @@ export function PAGFilters() {
                             <FormMessage/>
                         </FormItem>
                     )}
-                />
+                /> */}
 
                 <FormField
                     control={form.control}
