@@ -424,7 +424,7 @@ export function EditMilestoneForm({
                                     </SelectTrigger>
                                     <SelectContent>
                                         {MILESTONE_TYPE_OPTIONS.map((milestoneType, index) => (
-                                            <SelectItem value={milestoneType.value}>{milestoneType.label}</SelectItem>
+                                            <SelectItem key={index} value={milestoneType.value}>{milestoneType.label}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
