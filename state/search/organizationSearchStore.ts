@@ -31,6 +31,8 @@ export const defaultFilters = {
 }
 
 export interface OrganizationSearchState {
+    lastFetchedPage: number,
+    setLastFetchedPage: (page: number) => void,
     view: ViewType,
     setView: (view: ViewType) => void,
     allResults: any[],
@@ -42,6 +44,8 @@ export interface OrganizationSearchState {
 }
 
 export const useOrganizationSearchStore = create<OrganizationSearchState>((set, get) => ({
+    lastFetchedPage: 0,
+    setLastFetchedPage: (page: number) => set({ lastFetchedPage: page }),
     view: 'grid',
     setView: (view: ViewType) => set({ view }),
     allResults: [],
