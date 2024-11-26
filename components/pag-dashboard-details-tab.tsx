@@ -27,6 +27,7 @@ import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {getOrganizationData} from "@/lib/fetchers";
+import {FaUpload} from "react-icons/fa6";
 
 const OPTIONS: Option[] = [
     {
@@ -344,7 +345,7 @@ export default function PAGDashboardDetailsTab() {
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel>{`Year founded (required)`}</FormLabel>
-                                <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
+                                <FormDescription>{`The year your organization was founded.`}</FormDescription>
                                 <FormControl>
                                     <Input
                                         type="text"
@@ -471,8 +472,10 @@ export default function PAGDashboardDetailsTab() {
                                                 className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
                                             >
                                                 <input {...getInputProps()} />
-                                                <AvatarFallback className="text-center">
-                                                    Drag and drop or click!
+                                                <AvatarFallback
+                                                    className="text-center flex flex-col justify-center gap-y-4">
+                                                    <FaUpload/>
+                                                    Click or drop!
                                                 </AvatarFallback>
                                             </Avatar>
                                         )}
