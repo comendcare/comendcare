@@ -261,7 +261,7 @@ export default function OrganizationOnboardingForm() {
     }
 
     return (
-        <div className="grid grid-cols-2">
+        <div className="grid grid-cols-2 gap-x-8">
             <div className="space-y-4 col-span-1">
 
                 {/* Toggle between joining or creating an organization*/}
@@ -292,18 +292,18 @@ export default function OrganizationOnboardingForm() {
                     className="flex justify-start space-x-2"
                 >
                     <ToggleGroupItem
-                        value="existing"
-                        aria-label="Join an existing organization"
-                        className={isNewOrganization ? "" : "bg-gray-200"}
-                    >
-                        Join an existing organization
-                    </ToggleGroupItem>
-                    <ToggleGroupItem
                         value="new"
                         aria-label="Create a new organization"
                         className={isNewOrganization ? "bg-gray-200" : ""}
                     >
                         Create a new organization
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
+                        value="existing"
+                        aria-label="Join an existing organization"
+                        className={isNewOrganization ? "" : "bg-gray-200"}
+                    >
+                        Join an existing organization
                     </ToggleGroupItem>
                 </ToggleGroup>
 
@@ -612,7 +612,16 @@ export default function OrganizationOnboardingForm() {
             {isNewOrganization &&
                 <div className="col-span-1 space-y-4">
                     <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
-                        <div className="flex flex-col space-y-8 my-8">
+                        <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
+                            Organization profile preview
+                        </h1>
+
+                        <div
+                            className="h-10 w-full bg-white text-gray-800 text-left px-4 flex items-center border border-gray-300 rounded-md shadow-sm">
+                            {newOrgForm.watch("subdomain")}
+                        </div>
+
+                        <div className="w-full flex flex-col space-y-8 my-8">
                             <div>
                                 <div>
                                     <img className="h-24 w-full object-cover lg:h-36"
@@ -634,7 +643,7 @@ export default function OrganizationOnboardingForm() {
                                         >
                                             <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
                                                 <h1 className="mt-6 min-w-0 flex-1 truncate text-xl font-bold text-gray-900">
-                                                    {newOrgForm.watch("orgName")}
+                                                    {newOrgForm.watch("orgName") || "Your organization's name"}
                                                 </h1>
                                                 <div
                                                     className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
@@ -692,7 +701,7 @@ export default function OrganizationOnboardingForm() {
                                                                 Description
                                                             </h3>
                                                             <p className="text-sm">
-                                                                {newOrgForm.watch("description")}
+                                                                {newOrgForm.watch("description") || "Your organization's description."}
                                                             </p>
                                                         </div>
                                                         <div className="space-y-2">
