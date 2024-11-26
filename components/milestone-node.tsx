@@ -15,12 +15,15 @@ import { truncate, cn } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
 import { PrivateBadge } from "./private-badge"
 import {monthsList} from "@/lib/data";
+import { Badge } from "./ui/badge"
+import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
 
 export type MilestoneNode = Node<
     {
         nodeId: string
         title: string
         description?: string
+        type?: string,
         startDate?: Date,
         endDate?: Date,
         budget?: number
@@ -66,6 +69,12 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
                 </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-8">
+                <span className="w-full flex">
+                    <Badge className="flex text-sm">
+                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
+                    </Badge>
+                </span>
+                
                 {(props.data?.startDate?.getMonth() || props.data?.endDate?.getFullYear()) && (
                     <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
                 )}
