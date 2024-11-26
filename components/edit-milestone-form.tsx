@@ -200,11 +200,11 @@ export function EditMilestoneForm({
         // callback in debounceUpdates holds onto the state of the time it was created
         // we can't use the form.watch values directly (since they'll be outdated)
         // we must pass in the most up to date values in the form
-        debounceUpdates({title, description, startDate, endDate, budget, papers, tasks, status, private: isPrivate })
+        debounceUpdates({title, description, milestoneType: type, startDate, endDate, budget, papers, tasks, status, private: isPrivate })
     }, [title, description, budget, papers, tasks, status, isPrivate])
 
     const handleMilestoneFormSubmit = (values: z.infer<typeof editMilestoneForm>) => {
-        const { title, description, startDate, endDate, budget, papers, tasks, status, private: isPrivate } = values;
+        const { title, description, milestoneType, startDate, endDate, budget, papers, tasks, status, private: isPrivate } = values;
         const now = new Date()
         
         setMilestone(milestoneData?.nodeId, {
@@ -232,7 +232,10 @@ export function EditMilestoneForm({
                 }))}
                 : undefined
             ),
-            type: type || 'NO TYPE',
+            ...(milestoneType
+                ? { type: milestoneType }
+                : { type: 'NOTYPE'}
+            ),
             status,
             private: isPrivate || false
         })
@@ -399,20 +402,22 @@ export function EditMilestoneForm({
                                 <Select
                                     onValueChange={(value: string) => {
                                         field.onChange(value)
-                                        // handleMilestoneFormSubmit({
-                                        //     title,
-                                        //     description,
-                                        //     milestoneType: type,
-                                        //     startDate,
-                                        //     endDate,
-                                        //     budget,
-                                        //     papers,
-                                        //     tasks,
-                                        //     status,
-                                        //     private: isPrivate,
-                                        // })
+                                        console.log(`value`, value)
+                                        handleMilestoneFormSubmit({
+                                            title,
+                                            description,
+                                            milestoneType: value,
+                                            startDate,
+                                            endDate,
+                                            budget,
+                                            papers,
+                                            tasks,
+                                            status,
+                                            private: isPrivate,
+                                        })
                                     }}
                                     defaultValue={field.value}
+                                    // onValueChange={field.onChange}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select a milestone type..." />
