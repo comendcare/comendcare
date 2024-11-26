@@ -72,12 +72,12 @@ function generateFiltersString(filters: FiltersType) {
         })
     }
 
-    if (filters.categories.length > 0) {
-        filters.categories.forEach(category => {
-            filtersList.push(`interestedModalities:=[${category.value}]`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}interestedModalities:=[${category.value}]`)
-        })
-    }
+    // if (filters.categories.length > 0) {
+    //     filters.categories.forEach(category => {
+    //         filtersList.push(`interestedModalities:=[${category.value}]`)
+    //         typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}interestedModalities:=[${category.value}]`)
+    //     })
+    // }
 
     if (filters.genes.length > 0) {
         filters.genes.forEach(gene => {
