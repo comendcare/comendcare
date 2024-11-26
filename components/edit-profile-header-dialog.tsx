@@ -61,7 +61,7 @@ export default function EditProfileHeaderDialog() {
                     className="gap-x-2"
                 >
                     <FaPen/>
-                    Edit profile
+                    Edit header
                 </Button>
             </DialogTrigger>
             <DialogContent>

@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import {FaGear, FaUserPlus} from "react-icons/fa6";
 import UserOnboardingForm from "@/components/user-onboarding-form";
+import UserEditForm from "@/components/user-edit-form";
 
-export default function UserSettingsDialog() {
+export default function UserEditSettingsDialog() {
 
     return (
         <Dialog>
@@ -31,7 +32,7 @@ export default function UserSettingsDialog() {
                     </DialogDescription>
                 </DialogHeader>
 
-                <UserOnboardingForm/>
+                <UserEditForm/>
             </DialogContent>
         </Dialog>
     )
