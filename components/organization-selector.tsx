@@ -1,85 +1,196 @@
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue
-} from "@/components/ui/select";
+"use client";
+
+import * as React from "react";
+import {Check, ChevronsUpDown, PlusCircle} from "lucide-react";
 import {useSession} from "next-auth/react";
+
+import {cn} from "@/lib/utils";
+import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/ui/avatar";
+import {Button} from "@/components/ui/button";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+    CommandSeparator,
+} from "@/components/ui/command";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import {MemberWithOrganization} from "@/app/(platform)/app/layout";
 import {FaCity} from "react-icons/fa6";
-import {Member, Organization} from "@prisma/client";
+import {useEffect} from "react";
 
-
-type MemberWithOrganization = Member & {
-    organization: Organization
-};
-
-export default function OrganizationSelector({isCollapsed, organizations}: {
+interface TeamSwitcherProps {
     isCollapsed: boolean,
-    organizations: MemberWithOrganization[]
-}) {
-    const {data: session, update} = useSession()
-    return isCollapsed ? (
-        <Select
-            defaultValue={session?.user.organizationId || ""}
-            onValueChange={async (value) => {
-                console.log(`org changed`, value)
-                await update({
-                    ...session,
-                    organizationId: value
-                })
-            }}
-        >
-            <SelectTrigger className="w-[48px]">
-                <div className="flex flex-row items-center justify-between">
-                    <FaCity/>
-                </div>
-            </SelectTrigger>
-            <SelectContent>
-                <SelectGroup>
-                    {organizations?.map(org => (
-                        <SelectItem
-                            key={org.organization.id}
-                            value={org.organization.id}>
-                            {org.organization.name}
-                        </SelectItem>
-                    ))}
-                </SelectGroup>
-            </SelectContent>
-        </Select>
-    ) : (
-        <Select
-            defaultValue={session?.user.organizationId || ""}
-            onValueChange={async (value) => {
-                console.log(`org changed`, value)
-                await update({
-                    ...session,
-                    organizationId: value
-                })
-            }}
-        >
-            <SelectTrigger className="w-full">
-                <SelectValue placeholder={
-                    <div className="flex flex-row items-center justify-between gap-x-2">
-                        <FaCity/>
-                        Organization
-                    </div>
-                }/>
-            </SelectTrigger>
-            <SelectContent>
-                <SelectGroup>
-                    {organizations?.map(org => (
-                        <SelectItem
-                            key={org.organization.id}
-                            value={org.organization.id}
+    organizations: MemberWithOrganization[];
+}
+
+export default function OrganizationSelector({
+                                                 isCollapsed,
+                                                 organizations,
+                                             }: TeamSwitcherProps) {
+    const {data: session, update} = useSession();
+    const [open, setOpen] = React.useState(false);
+    const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false);
+    const [selectedOrganization, setSelectedOrganization] = React.useState(organizations?.[0] || null);
+
+    useEffect(() => {
+        if (!organizations || organizations.length === 0) return;
+
+        const matchingOrganization = organizations.find(
+            (org) => org.organization.id === session?.user?.organizationId
+        );
+
+        setSelectedOrganization(matchingOrganization || organizations[0]);
+    }, [organizations, session?.user?.organizationId])
+
+    const handleOrganizationChange = async (org: MemberWithOrganization) => {
+        setSelectedOrganization(org);
+        setOpen(false);
+        await update({
+            ...session,
+            organizationId: org.organization.id,
+        });
+    };
+
+    return (
+        <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>
+            <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                    {isCollapsed ? (
+                        <Button variant="outline" className="w-[48px]">
+                            <div className="flex flex-row items-center justify-between">
+                                <Avatar className="h-5 w-5">
+                                    <AvatarImage
+                                        src={`https://avatar.vercel.sh/${selectedOrganization?.organization.id}.png`}
+                                        alt={selectedOrganization?.organization.name || ""}
+                                        className="grayscale"
+                                    />
+                                    <AvatarFallback>{selectedOrganization?.organization.name?.[0]}</AvatarFallback>
+                                </Avatar>
+                            </div>
+                        </Button>
+                    ) : (
+                        <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={open}
+                            aria-label="Select an organization"
+                            className={cn("w-[200px] justify-between")}
                         >
-                            {org.organization.name}
-                        </SelectItem>
-                    ))}
-                </SelectGroup>
-            </SelectContent>
-        </Select>
-    )
+                            <Avatar className="mr-2 h-5 w-5">
+                                <AvatarImage
+                                    src={`https://avatar.vercel.sh/${selectedOrganization?.organization.id}.png`}
+                                    alt={selectedOrganization?.organization.name || ""}
+                                    className="grayscale"
+                                />
+                                <AvatarFallback>{selectedOrganization?.organization.name?.[0]}</AvatarFallback>
+                            </Avatar>
+                            <p className="truncate">
+                                {selectedOrganization?.organization.name}
+                            </p>
+                            <ChevronsUpDown className="ml-auto opacity-50"/>
+                        </Button>
+                    )}
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                        {/*<CommandInput placeholder="Search organization..." />*/}
+                        <CommandList>
+                            <CommandEmpty>No organization found.</CommandEmpty>
+                            <CommandGroup heading="Organizations">
+                                {organizations.map((org) => (
+                                    <CommandItem
+                                        key={org.organization.id}
+                                        onSelect={() => handleOrganizationChange(org)}
+                                        className="text-sm"
+                                    >
+                                        <Avatar className="mr-2 h-5 w-5">
+                                            <AvatarImage
+                                                src={`https://avatar.vercel.sh/${org.organization.id}.png`}
+                                                alt={org.organization.name || ""}
+                                                className="grayscale"
+                                            />
+                                            <AvatarFallback>
+                                                {org.organization.name?.[0]}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        {org.organization.name}
+                                        <Check
+                                            className={cn(
+                                                "ml-auto",
+                                                selectedOrganization?.organization.id ===
+                                                org.organization.id
+                                                    ? "opacity-100"
+                                                    : "opacity-0"
+                                            )}
+                                        />
+                                    </CommandItem>
+                                ))}
+                            </CommandGroup>
+                        </CommandList>
+                        <CommandSeparator/>
+                        <CommandList>
+                            <CommandGroup>
+                                <DialogTrigger asChild>
+                                    <CommandItem
+                                        onSelect={() => {
+                                            setOpen(false);
+                                            setShowNewTeamDialog(true);
+                                        }}
+                                        className="flex flex-row gap-x-2"
+                                    >
+                                        <PlusCircle className="h-5 w-5"/>
+                                        Create Organization
+                                    </CommandItem>
+                                </DialogTrigger>
+                            </CommandGroup>
+                        </CommandList>
+                    </Command>
+                </PopoverContent>
+            </Popover>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Create Organization</DialogTitle>
+                    <DialogDescription>
+                        Add a new organization to manage projects and members.
+                    </DialogDescription>
+                </DialogHeader>
+                <div>
+                    <div className="space-y-4 py-2 pb-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="name">Organization name</Label>
+                            <Input id="name" placeholder="Acme Inc."/>
+                        </div>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => setShowNewTeamDialog(false)}>
+                        Cancel
+                    </Button>
+                    <Button type="submit">Create</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 }

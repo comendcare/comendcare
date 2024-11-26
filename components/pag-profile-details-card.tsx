@@ -8,17 +8,6 @@ import EditProfileAboutDialog from "@/components/edit-profile-about-dialog";
 import {Organization} from "@prisma/client";
 import Link from "next/link";
 
-const milestones = [
-    {text: "Identified biomarkers ", highlight: "2 years ago"},
-    {text: "Mouse model created "},
-    {text: "Contact registry available"},
-    {text: "Natural history study ", highlight: "ongoing"},
-    {text: "Gene therapy trial ", highlight: "1 month ago"},
-    {text: "Patient advocacy group ", highlight: "501c3 status designated"},
-    // {text: "Published in a peer-reviewed journal ", highlight: "last year"},
-    // {text: "FDA orphan drug status approved"}
-]
-
 const pag = {
     "groupName": "Myhre Syndrome Foundation",
     "description": "The Myhre Syndrome Foundation is dedicated to improving the lives of individuals affected by Myhre Syndrome, a rare genetic disorder characterized by distinctive facial features, skeletal anomalies, and developmental delays. The foundation provides support to families, promotes awareness, and funds critical research to uncover potential treatments.",
@@ -78,7 +67,7 @@ export const PAGProfileDetailsCard = ({organization}: {organization: Organizatio
                                         See more
                                     </Link>
                                 </div>
-                                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:space-x-2">
+                                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-1">
                                     {pag?.topics.map((item, index) =>
                                         <Badge key={index} className="flex text-sm">
                                             {item.charAt(0).toUpperCase() + item.slice(1)}
@@ -87,40 +76,6 @@ export const PAGProfileDetailsCard = ({organization}: {organization: Organizatio
                                 </div>
                             </div>
                         </div>
-                        <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                            Assets
-                        </h3>
-                        <ul className="space-y-4 text-left text-gray-500 dark:text-gray-400">
-                            {faker.helpers.arrayElements(milestones, faker.number.int({
-                                min: 3,
-                                max: 7
-                            })).map((item, index) => (
-                                <li key={index} className="flex items-center space-x-3 rtl:space-x-reverse">
-                                    <svg
-                                        className="flex-shrink-0 w-3.5 h-3.5 text-green-500 dark:text-green-400"
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 16 12"
-                                    >
-                                        <path
-                                            stroke="currentColor"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M1 5.917 5.724 10.5 15 1.5"
-                                        />
-                                    </svg>
-                                    <span>
-                                        {item.text}
-                                        {item.highlight && (
-                                            <span
-                                                className="font-semibold text-gray-900 dark:text-white">{item.highlight}</span>
-                                        )}
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
                     </div>
                 </div>
 

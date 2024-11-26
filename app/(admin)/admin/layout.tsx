@@ -2,11 +2,10 @@ import {ReactNode, Suspense} from "react";
 import Profile from "@/components/profile";
 import AdminNav from "@/components/admin-nav";
 import {redirect} from "next/navigation";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/lib/auth";
+import {getSession} from "@/lib/auth";
 
 export default async function DashboardLayout({children}: { children: ReactNode }) {
-    const session = await getServerSession(authOptions);
+    const session = await getSession()
 
     // Determine if the user is an admin
     const isAdmin = session?.user?.email?.endsWith("@comendcare.com") ||

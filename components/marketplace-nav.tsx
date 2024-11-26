@@ -14,20 +14,25 @@ const links = [
         comingSoon: false
     },
     {
+        name: "Milestones",
+        href: "/milestones",
+        comingSoon: false
+    },
+    {
         name: "Researchers",
         href: "/researchers",
         comingSoon: true
     },
-    {
-        name: "Contractors",
-        href: "/contractors",
-        comingSoon: true
-    },
-    {
-        name: "Grants",
-        href: "/grants",
-        comingSoon: true
-    },
+    // {
+    //     name: "Contractors",
+    //     href: "/contractors",
+    //     comingSoon: true
+    // },
+    // {
+    //     name: "Grants",
+    //     href: "/grants",
+    //     comingSoon: true
+    // },
 ]
 
 interface ExamplesNavProps extends React.HTMLAttributes<HTMLDivElement> {

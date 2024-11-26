@@ -6,9 +6,11 @@ import { editUser } from "@/lib/actions"
 
 export default async function SettingsPage() {
     const session = await getSession()
+
     if (!session) {
         redirect("/login")
     }
+
     return (
         <div className="flex max-w-screen-xl flex-col space-y-12 p-8">
             <div className="flex flex-col space-y-6">
