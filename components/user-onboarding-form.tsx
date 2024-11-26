@@ -49,7 +49,7 @@ const accept = {
 export default function UserOnboardingForm() {
     const router = useRouter();
     const {data: session} = useSession();
-    const [searchInput, setSearchInput] = useState("");
+    // const [searchInput, setSearchInput] = useState("");
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
 

@@ -1,60 +1,81 @@
-"use client"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {ResponsiveContainer, PieChart, Pie, Label} from "recharts";
-import {cn} from "@/lib/utils";
-import { PrivateBadge } from "./private-badge";
+"use client";
 
-const formsData = [
-    {
-        "name": "Submitted",
-        "value": 3,
-        "fill": "#9D82CA"
-    },
-    {
-        "name": "In progress",
-        "value": 7,
-        "fill": "#CA9D82"
-    },
-    {
-        "name": "Not started",
-        "value": 12,
-        "fill": "#82CA9D"
-    },
-]
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ResponsiveContainer, PieChart, Pie, Label } from "recharts";
+import { cn } from "@/lib/utils";
+import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore";
+import { useShallow } from "zustand/react/shallow";
+
+const statusLabels: Record<string, string> = {
+    TODO: "To Do",
+    INPROGRESS: "In Progress",
+    DONE: "Done",
+};
+
+const selector = (state: RoadmapState) => ({
+    milestones: state.milestones,
+});
 
 export const DonutChartCard = () => {
+    const { milestones } = useRoadmapStore(useShallow(selector));
+
+    // Group milestones by status and count them
+    const milestoneStatusData = milestones.reduce<Record<string, number>>(
+        (acc, milestone) => {
+            acc[milestone.status] = (acc[milestone.status] || 0) + 1;
+            return acc;
+        },
+        {}
+    );
+
+    // Define colors for known statuses
+    const colors: Record<"TODO" | "INPROGRESS" | "DONE", string> = {
+        TODO: "#9D82CA",
+        INPROGRESS: "#CA9D82",
+        DONE: "#82CA9D",
+    };
+
+    // Prepare data for the chart
+    const chartData = Object.entries(milestoneStatusData).map(
+        ([status, count]) => {
+            const color = colors[status as keyof typeof colors] || "#CCCCCC"; // Use fallback color
+            return {
+                name: status,
+                value: count,
+                fill: color,
+            };
+        }
+    )
 
     return (
-        <Card>
+        <Card className="col-span-3">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     Milestones
                 </CardTitle>
-                <PrivateBadge />
             </CardHeader>
 
             <CardContent>
                 <div className="flex flex-row">
-                    {formsData.map((formData, index) =>
+                    {chartData.map((data, index) => (
                         <span
                             key={index}
                             className="flex items-center text-sm font-medium text-gray-900 dark:text-white me-3"
                         >
                             <span
-                                style={{ backgroundColor: formData.fill }} // Can't use Tailwind for this
+                                style={{ backgroundColor: data.fill }}
                                 className="flex w-2.5 h-2.5 rounded-full me-1.5 flex-shrink-0"
                             />
-                                {formData.name}
+                            {statusLabels[data.name] || data.name}
                         </span>
-                    )}
+                    ))}
                 </div>
 
                 <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
-                        <PieChart width={730} height={250}>
-                            {/*<Pie data={data01} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={50} fill="#8884d8" />*/}
+                        <PieChart>
                             <Pie
-                                data={formsData}
+                                data={chartData}
                                 dataKey="value"
                                 nameKey="name"
                                 cx="50%"
@@ -65,7 +86,7 @@ export const DonutChartCard = () => {
                             >
                                 <Label
                                     className="font-semibold"
-                                    value={`${formsData.reduce((acc, item) => acc + item.value, 0)} forms`}
+                                    value={`${chartData.reduce((acc, item) => acc + item.value, 0)} milestones`}
                                     position="center"
                                 />
                             </Pie>
@@ -74,5 +95,5 @@ export const DonutChartCard = () => {
                 </div>
             </CardContent>
         </Card>
-    )
+    );
 };

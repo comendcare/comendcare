@@ -11,8 +11,8 @@ import PAGDashboardDetailsTab from "@/components/pag-dashboard-details-tab";
 
 export default function DashboardPage() {
     return (
-        <main className="flex flex-col items-center w-full max-w-7xl mx-auto">
-            <div className="w-full flex-1 space-y-4 p-8 pt-6">
+        <main className="flex flex-col items-center w-full max-w-7xl mx-auto max-h-80">
+            <div className="w-full space-y-4 p-8 pt-6 max-h-80">
                 <div className="flex items-center justify-between space-y-2">
                     <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
                 </div>
@@ -37,7 +37,7 @@ export default function DashboardPage() {
                     <TabsContent value="analytics">
                         <PAGDashboardAnalyticsTab/>
                     </TabsContent>
-                    <TabsContent value="details">
+                    <TabsContent value="details" className="space-y-4">
                         <PAGDashboardDetailsTab/>
                     </TabsContent>
                     <TabsContent value="members" className="space-y-4">

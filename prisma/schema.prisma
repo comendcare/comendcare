@@ -240,6 +240,8 @@ model Edge {
 
 model Organization {
   id                          String                    @id @default(cuid())
+  public                      Boolean                   @default(true)
+  verified                    Boolean                   @default(false)
   name                        String?
   description                 String?                   @db.Text
   logo                        String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text

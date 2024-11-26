@@ -192,7 +192,6 @@ export default function OrganizationOnboardingForm() {
                 }
             });
         }
-        console.log(debouncedNickname)
     }, [debouncedNickname, checkSubdomainAvailability, newOrgForm])
 
     useEffect(() => {
@@ -258,7 +257,7 @@ export default function OrganizationOnboardingForm() {
     }
 
     return (
-        <div className="space-y-4 w-1/2">
+        <div className="space-y-4">
 
             {/* Toggle between joining or creating an organization*/}
             {/*<div className="flex items-center space-x-2">*/}

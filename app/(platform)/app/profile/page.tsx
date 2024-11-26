@@ -18,52 +18,9 @@ import {getOrganizationFromOrganizationId} from "@/lib/actions";
 import {getSession} from "@/lib/auth";
 import Image from "next/image"
 import Link from "next/link";
-import {OpenRFPsCard} from "@/components/open-rfps-card";
-import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {AssetsCard} from "@/components/assets-card";
-
-const profile = {
-    name: 'Ricardo Cooper',
-    email: 'ricardo.cooper@example.com',
-    avatar:
-        'https://github.com/shadcn.png',
-    backgroundImage:
-        'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80',
-    fields: [
-        ['Phone', '(555) 123-4567'],
-        ['Email', 'ricardocooper@example.com'],
-        ['Title', 'Senior Front-End Developer'],
-        ['Team', 'Product Development'],
-        ['Location', 'San Francisco'],
-        ['Sits', 'Oasis, 4th floor'],
-        ['Salary', '$145,000'],
-        ['Birthday', 'June 8, 1990'],
-    ],
-}
-
-const pag = {
-    "groupName": "Myhre Syndrome Foundation",
-    "description": "The Myhre Syndrome Foundation is dedicated to improving the lives of individuals affected by Myhre Syndrome, a rare genetic disorder characterized by distinctive facial features, skeletal anomalies, and developmental delays. The foundation provides support to families, promotes awareness, and funds critical research to uncover potential treatments.",
-    "numberOfPatients": 150,
-    "amountRaised": 350000,
-    "dateJoined": "2023-01-15",
-    "dateFounded": "2015-03-12",
-    "topics": ["monogenic", "basic science", "gene replacement"],
-    "teamMembers": [
-        {
-            "name": "Dr. Sarah Johnson",
-            "title": "Chief Medical Officer",
-            "description": "Dr. Sarah Johnson has been a medical research wizard for over 20 years and has brought her magic to the Rare Disease Foundation for the past 8 years. She’s the heartbeat of our medical team, leading us with passion and a focus on innovation and patient care.",
-            "dateJoined": "2015-04-10"
-        },
-        {
-            "name": "Michael Brown",
-            "title": "Executive Director",
-            "description": "Michael Brown has been steering the ship at the Rare Disease Foundation for 5 years, after 15 years of leading non-profits to success. He’s our strategic mastermind, ensuring everything runs smoothly and we stay on course.",
-            "dateJoined": "2018-06-15"
-        }
-    ]
-}
+import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
+import {OpenRFPsCard} from "@/components/open-rfps-card";
 
 
 export default async function ProfilePage() {
@@ -81,11 +38,11 @@ export default async function ProfilePage() {
 
     if (organization) {
         return (
-            <main className="flex flex-col items-center w-full max-w-7xl mx-auto">
+            <main className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
                 <div className="flex flex-col space-y-8 my-8">
                     <div>
                         <div>
-                            <img className="h-32 w-full object-cover lg:h-48" src={profile.backgroundImage} alt=""/>
+                            <img className="h-32 w-full object-cover lg:h-48" src={'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'} alt=""/>
                         </div>
 
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -126,7 +83,7 @@ export default async function ProfilePage() {
                                             <div className="mt-2 flex items-center text-gray-500">
                                                 <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                             aria-hidden="true"/>
-                                                Founded on {new Date(organization?.createdAt ?? "").toDateString()}
+                                                Founded in {new Date(organization?.createdAt ?? "").getFullYear()}
                                             </div>
                                         </div>
                                     </div>
@@ -148,7 +105,7 @@ export default async function ProfilePage() {
 
                             </div>
                             <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
-                                <h1 className="truncate text-2xl font-bold text-gray-900">{profile.name}</h1>
+                                <h1 className="truncate text-2xl font-bold text-gray-900">{organization?.name}</h1>
                             </div>
                         </div>
                     </div>
@@ -157,9 +114,9 @@ export default async function ProfilePage() {
                         <div className="col-span-2 space-y-4">
                             <PAGProfileDetailsCard organization={organization}/>
                             {/*<LineChartCard/>*/}
-                            <OpenRFPsCard/>
                             <AssetsCard/>
-                            <DonutChartCard/>
+                            <OpenRFPsCard/>
+                            {/*<DonutChartCard/>*/}
                         </div>
 
                         <div className="col-span-4 flex flex-col space-y-4">
