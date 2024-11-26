@@ -25,11 +25,15 @@ import {useCallback, useEffect, useState} from "react";
 import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
+import {cn, createDicebearAvatar} from "@/lib/utils";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Skeleton} from "@/components/ui/skeleton";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
     title: z.string().min(2, {message: "Your role must be at least 2 characters."}),
     notificationSettings: z.boolean().default(false),
+    consentSettings: z.boolean().default(false),
     address1: z.string().optional(),
     address2: z.string().optional(),
     formattedAddress: z.string().optional(),
@@ -105,6 +109,7 @@ export default function UserOnboardingForm() {
                         name: userData.name || "",
                         title: userData.title || "",
                         notificationSettings: userData.notificationSettings ?? true,
+                        consentSettings: userData.consentSettings ?? true,
                         address1: userData.address1 || "",
                         address2: userData.address2 || "",
                         formattedAddress: userData.formattedAddress || "",
@@ -157,131 +162,198 @@ export default function UserOnboardingForm() {
     }
 
     return (
-        <Form {...form}>
-            <form
-                onSubmit={form.handleSubmit(
-                    onSubmit,
-                    (errors) => {
-                        console.log("Validation errors:", errors);
-                        if (Object.keys(errors).length > 0) {
-                            toast.error("Please correct the highlighted errors.");
-                        }
-                    }
-                )}
-                className="space-y-8"
-            >
-                <FormField
-                    control={form.control}
-                    name="name"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Your name (required)</FormLabel>
-                            <FormControl>
-                                <Input type="text" {...field} />
-                            </FormControl>
-                            <FormDescription>This is your public display name.</FormDescription>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+        <div className="grid grid-cols-2 gap-x-8">
+            <div className="col-span-1">
+                <Form {...form}>
+                    <form
+                        onSubmit={form.handleSubmit(
+                            onSubmit,
+                            (errors) => {
+                                console.log("Validation errors:", errors);
+                                if (Object.keys(errors).length > 0) {
+                                    toast.error("Please correct the highlighted errors.");
+                                }
+                            }
+                        )}
+                        className="space-y-8"
+                    >
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Your name (required)</FormLabel>
+                                    <FormControl>
+                                        <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>This is your public display name.</FormDescription>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
 
-                <FormField
-                    control={form.control}
-                    name="title"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Role</FormLabel>
-                            <FormControl>
-                                <Input type="text" {...field} />
-                            </FormControl>
-                            <FormDescription>Your role or title at your patient organization.</FormDescription>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+                        <FormField
+                            control={form.control}
+                            name="title"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Role</FormLabel>
+                                    <FormControl>
+                                        <Input type="text" {...field} />
+                                    </FormControl>
+                                    <FormDescription>Your role or title at your patient organization.</FormDescription>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
 
-                {/*<FormField*/}
-                {/*    control={form.control}*/}
-                {/*    name="formattedAddress"*/}
-                {/*    render={({field}) => (*/}
-                {/*        <FormItem>*/}
-                {/*            <FormLabel>Address</FormLabel>*/}
-                {/*            <FormControl>*/}
-                {/*                <AutocompleteComponent*/}
-                {/*                    address={address}*/}
-                {/*                    setAddress={setAddress}*/}
-                {/*                    searchInput={searchInput}*/}
-                {/*                    setSearchInput={setSearchInput}*/}
-                {/*                />*/}
-                {/*            </FormControl>*/}
-                {/*            <FormDescription>Your address.</FormDescription>*/}
-                {/*            <FormMessage/>*/}
-                {/*        </FormItem>*/}
-                {/*    )}*/}
-                {/*/>*/}
+                        {/*<FormField*/}
+                        {/*    control={form.control}*/}
+                        {/*    name="formattedAddress"*/}
+                        {/*    render={({field}) => (*/}
+                        {/*        <FormItem>*/}
+                        {/*            <FormLabel>Address</FormLabel>*/}
+                        {/*            <FormControl>*/}
+                        {/*                <AutocompleteComponent*/}
+                        {/*                    address={address}*/}
+                        {/*                    setAddress={setAddress}*/}
+                        {/*                    searchInput={searchInput}*/}
+                        {/*                    setSearchInput={setSearchInput}*/}
+                        {/*                />*/}
+                        {/*            </FormControl>*/}
+                        {/*            <FormDescription>Your address.</FormDescription>*/}
+                        {/*            <FormMessage/>*/}
+                        {/*        </FormItem>*/}
+                        {/*    )}*/}
+                        {/*/>*/}
 
-                <FormField
-                    control={form.control}
-                    name="image"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Profile Image</FormLabel>
-                            <FormControl>
-                                <div className="flex flex-col items-start space-y-4">
-                                    {selectedFile ? (
-                                        <ImageCropper
-                                            dialogOpen={isDialogOpen}
-                                            setDialogOpen={setDialogOpen}
-                                            selectedFile={selectedFile}
-                                            setSelectedFile={(file: any) => {
-                                                setSelectedFile(file);
-                                                field.onChange(file?.preview); // Update form field value
-                                            }}
-                                        />
-                                    ) : (
-                                        <Avatar
-                                            {...getRootProps()}
-                                            className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
-                                        >
-                                            <input {...getInputProps()} />
-                                            <AvatarFallback className="text-center">
-                                                Drag and drop or click!
-                                            </AvatarFallback>
-                                        </Avatar>
-                                    )}
+                        <FormField
+                            control={form.control}
+                            name="image"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Profile Image</FormLabel>
+                                    <FormControl>
+                                        <div className="flex flex-col items-start space-y-4">
+                                            {selectedFile ? (
+                                                <ImageCropper
+                                                    dialogOpen={isDialogOpen}
+                                                    setDialogOpen={setDialogOpen}
+                                                    selectedFile={selectedFile}
+                                                    setSelectedFile={(file: any) => {
+                                                        setSelectedFile(file);
+                                                        field.onChange(file?.preview); // Update form field value
+                                                    }}
+                                                />
+                                            ) : (
+                                                <Avatar
+                                                    {...getRootProps()}
+                                                    className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
+                                                >
+                                                    <input {...getInputProps()} />
+                                                    <AvatarFallback className="text-center">
+                                                        Drag and drop or click!
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                            )}
+                                        </div>
+                                    </FormControl>
+                                    <FormDescription>Your profile image.</FormDescription>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <div className="space-y-2">
+                            <FormField
+                                control={form.control}
+                                name="notificationSettings"
+                                render={({field}) => (
+                                    <FormItem
+                                        className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel>
+                                                {`Allow us to contact you regarding platform changes and notifications.`}
+                                            </FormLabel>
+                                            <FormDescription>
+                                                {`You can manage your mobile notifications in your user settings page.`}
+                                            </FormDescription>
+                                        </div>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="consentSettings"
+                                render={({field}) => (
+                                    <FormItem
+                                        className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel>
+                                                {`I consent for Comend to collect data to help improve the platform.`}
+                                            </FormLabel>
+                                            <FormDescription>
+                                                {`You can change these settings in your user settings page.`}
+                                            </FormDescription>
+                                        </div>
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <Button type="submit">Next</Button>
+                    </form>
+                </Form>
+            </div>
+            <div className="col-span-1 space-y-4">
+                <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
+                    <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
+                        User profile preview
+                    </h1>
+
+                    <div className="w-full flex flex-col space-y-8 my-8">
+                        <div>
+                            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                                <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
+
+                                    <div className="flex">
+                                        <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
+                                             src={createDicebearAvatar(form.watch("name")?.toLocaleString() ?? "", 50, 40, "identicon")}
+                                             alt=""/>
+                                    </div>
+
+                                    <div
+                                        className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
+                                    >
+                                        <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
+                                            <h1 className="mt-6 min-w-0 flex-1 truncate text-xl font-bold text-gray-900">
+                                                {form.watch("name") || "Your organization's name"}
+                                            </h1>
+                                        </div>
+                                    </div>
+
                                 </div>
-                            </FormControl>
-                            <FormDescription>Your profile image.</FormDescription>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="notificationSettings"
-                    render={({field}) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                            <FormControl>
-                                <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                                <FormLabel>
-                                    Allow us to contact you regarding platform changes and notifications.
-                                </FormLabel>
-                                <FormDescription>
-                                    You can manage your mobile notifications in your user settings page.
-                                </FormDescription>
+                                <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
+                                    <h1 className="truncate text-2xl font-bold text-gray-900">{form.watch("name")}</h1>
+                                </div>
                             </div>
-                        </FormItem>
-                    )}
-                />
-
-                <Button type="submit">Next</Button>
-            </form>
-        </Form>
-    );
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
