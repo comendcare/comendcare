@@ -28,6 +28,7 @@ import { TaskDetails } from "./task-details"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { GanttChartView } from "./gantt-chart"
 import { useOnborda } from "./onborda/OnbordaContext"
+import {FaQuestionCircle, FaRegQuestionCircle} from "react-icons/fa";
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -139,22 +140,23 @@ export function Roadmap({
             >
                 <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
                     <Tabs defaultValue={urlView ? urlView : "flow"} onValueChange={handleTabChange}>
-                        <TabsList>
-                            <TabsTrigger value="flow">Flow View</TabsTrigger>
-                            <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger>
-                            <TabsTrigger value="kanban">Kanban View</TabsTrigger>
-
+                        <div className="flex flex-row items-center p-1 gap-x-1">
+                            <TabsList>
+                                <TabsTrigger value="flow">Flow View</TabsTrigger>
+                                <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger>
+                                <TabsTrigger value="kanban">Kanban View</TabsTrigger>
+                            </TabsList>
                             {view === 'flow' && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Button 
-                                            size="icon" 
-                                            variant="ghost" 
+                                        <Button
+                                            size="icon"
+                                            variant="ghost"
                                             onClick={() => {
                                                 startOnborda('research-plan-tour')
                                             }}
                                         >
-                                            <FaQuestion/>
+                                            <FaRegQuestionCircle/>
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -162,7 +164,7 @@ export function Roadmap({
                                     </TooltipContent>
                                 </Tooltip>
                             )}
-                        </TabsList>
+                        </div>
 
                         {/* Flow View */}
                         <TabsContent

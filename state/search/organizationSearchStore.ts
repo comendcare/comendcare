@@ -3,18 +3,43 @@ import { create } from 'zustand';
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    modalities: {
+    // modalities: {
+    //     label: string,
+    //     value: string,
+    //     disable?: boolean,
+    // }[],
+    // categories: {
+    //     label: string,
+    //     value: string,
+    //     disable?: boolean,
+    // }[],
+    // moneyDeployed: number[],
+    // milestoneTypes: string[],
+    // genes: {
+    //     label: string,
+    //     value: string,
+    //     disable?: boolean,
+    // }[]
+
+    mechanisms: {
         label: string,
         value: string,
         disable?: boolean,
     }[],
-    categories: {
+    systemsAffected: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    modalities: {
         label: string,
         value: string,
         disable?: boolean,
     }[],
     moneyDeployed: number[],
     milestoneTypes: string[],
+    milestoneStatus: string[],
+    milestoneOutcomes: string[],
     genes: {
         label: string,
         value: string,
@@ -23,10 +48,13 @@ export type FiltersType = {
 }
 
 export const defaultFilters = {
+    mechanisms: [],
+    systemsAffected: [],
     modalities: [],
-    categories: [],
     moneyDeployed: [0, 10000000],
     milestoneTypes: [],
+    milestoneStatus: [],
+    milestoneOutcomes: [],
     genes: []
 }
 

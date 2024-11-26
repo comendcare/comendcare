@@ -6,7 +6,7 @@ import {TooltipProvider} from "@/components/ui/tooltip";
 import {ResizablePanel, ResizablePanelGroup, ResizableHandle} from "@/components/ui/resizable";
 import {Separator} from "@/components/ui/separator";
 import {AppNav} from "@/components/app-nav";
-import {Cog, Store, User, Workflow} from "lucide-react";
+import {Cog, LayoutDashboard, Newspaper, Store, User, Workflow} from "lucide-react";
 import {cn} from "@/lib/utils";
 import Image from "next/image";
 import logo from "@/public/logos/comend-logo.png";
@@ -20,15 +20,15 @@ import {
     getUser
 } from "@/lib/actions";
 import {useState} from "react";
-import LoadingSpinner from "@/components/form/loading-spinner";
 import {Member, Organization} from "@prisma/client";
 import OrganizationSelector from "@/components/organization-selector";
 import {redirect} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {FaPlus} from "react-icons/fa6";
+import Loading from "@/app/loading";
 
 
-type MemberWithOrganization = Member & {
+export type MemberWithOrganization = Member & {
     organization: Organization
 };
 
@@ -37,13 +37,23 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({children}: AppLayoutProps) {
-    const {data: session, update} = useSession()
+    const {data: session, status, update} = useSession()
     const [isLoading, setIsLoading] = useState(true)
     const [organizations, setOrganizations] = useState<MemberWithOrganization[]>([]);
 
-    if (!session) {
-        redirect("/login")
-    }
+    useEffect(() => {
+        // Handle loading state for the session
+        if (status === "loading") {
+            setIsLoading(true);
+        } else {
+            setIsLoading(false);
+
+            // Redirect if unauthenticated
+            if (status === "unauthenticated") {
+                redirect("/login");
+            }
+        }
+    }, [status])
 
     // Zustand state management
     const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} =
@@ -94,11 +104,13 @@ export default function AppLayout({children}: AppLayoutProps) {
         }
     };
 
-    return (
-        <div className="flex h-screen w-full">
-            {/*{isLoading ? (*/}
-            {/*    <LoadingSpinner/>*/}
-            {/*) : (*/}
+    if (isLoading) {
+        return <Loading/>
+    }
+
+    if (status === "authenticated" && session) {
+        return (
+            <div className="flex h-screen w-full">
                 <ResizablePanelGroup
                     direction="horizontal"
                     onLayout={(sizes: number[]) => {
@@ -140,6 +152,20 @@ export default function AppLayout({children}: AppLayoutProps) {
                             links={[
                                 {title: "Profile", icon: User, variant: "ghost", href: "/app/profile"},
                                 {
+                                    title: "Feed",
+                                    // label: "128",
+                                    icon: Newspaper,
+                                    variant: "ghost",
+                                    href: "/app/feed"
+                                },
+                                {
+                                    title: "Dashboard",
+                                    // label: "128",
+                                    icon: LayoutDashboard,
+                                    variant: "ghost",
+                                    href: "/app/dashboard"
+                                },
+                                {
                                     title: "Research Plan",
                                     // label: "128",
                                     icon: Workflow,
@@ -156,7 +182,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                                 {title: "Settings", icon: Cog, variant: "ghost", href: "/app/settings"},
                             ]}
                         >
-                            <Suspense fallback={<div>Loading...</div>}>
+                            <Suspense fallback={<Loading/>}>
                                 <Profile isCollapsed={isCollapsed}/>
                             </Suspense>
                         </AppNav>
@@ -170,7 +196,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                         {children}
                     </ResizablePanel>
                 </ResizablePanelGroup>
-            {/*)}*/}
-        </div>
-    )
+            </div>
+        )
+    }
 }

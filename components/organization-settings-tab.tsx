@@ -75,7 +75,7 @@ export default function OrganizationSettingsTab() {
     };
 
     return (
-        <div className="p-8 flex flex-col space-y-16">
+        <div className="flex flex-col space-y-16">
             <div>
                 <div className="sm:flex sm:items-center">
                     <div className="space-y-2 sm:flex-auto">

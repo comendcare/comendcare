@@ -5,7 +5,8 @@ import {FaPen} from "react-icons/fa6";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {Line, LineChart, ResponsiveContainer} from "recharts";
-import { PrivateBadge } from "./private-badge";
+import {PrivateBadge} from "./private-badge";
+import PAGAnalyticsLineChart from "@/components/pag-analytics-line-chart";
 
 const viewsData = [
     {
@@ -78,7 +79,6 @@ const searchData = [
 ]
 
 export const PAGProfileAnalyticsCard = () => {
-    const router = useRouter();
 
     return (
         <Card>
@@ -86,7 +86,7 @@ export const PAGProfileAnalyticsCard = () => {
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     Analytics
                 </CardTitle>
-                <PrivateBadge />
+                <PrivateBadge/>
             </CardHeader>
 
             <CardContent className="grid grid-cols-2 gap-4">
@@ -101,27 +101,7 @@ export const PAGProfileAnalyticsCard = () => {
                         +20% from last month
                     </p>
                     <div className="h-[80px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart
-                                data={viewsData}
-                                margin={{
-                                    top: 5,
-                                    right: 10,
-                                    left: 10,
-                                    bottom: 0,
-                                }}
-                            >
-                                <Line
-                                    type="monotone"
-                                    strokeWidth={2}
-                                    dataKey="revenue"
-                                    activeDot={{
-                                        r: 6,
-                                        style: {fill: "var(--theme-primary)", opacity: 0.25},
-                                    }}
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
+                        <PAGAnalyticsLineChart/>
                     </div>
                 </div>
                 <div>
@@ -135,27 +115,7 @@ export const PAGProfileAnalyticsCard = () => {
                         +10% from last month
                     </p>
                     <div className="h-[80px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart
-                                data={searchData}
-                                margin={{
-                                    top: 5,
-                                    right: 10,
-                                    left: 10,
-                                    bottom: 0,
-                                }}
-                            >
-                                <Line
-                                    type="monotone"
-                                    strokeWidth={2}
-                                    dataKey="revenue"
-                                    activeDot={{
-                                        r: 6,
-                                        style: {fill: "var(--theme-primary)", opacity: 0.25},
-                                    }}
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
+                        <PAGAnalyticsLineChart/>
                     </div>
                 </div>
             </CardContent>

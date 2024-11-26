@@ -8,7 +8,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Loading from "@/app/loading";
 import Link from "next/link";
 import {FaArrowLeft, FaArrowLeftLong} from "react-icons/fa6";
-import UserSettingsDialog from "@/components/user-settings-dialog";
+import UserEditSettingsDialog from "@/components/user-edit-settings-dialog";
 
 export default function UserProfilePage() {
     const {data: session} = useSession()
@@ -50,7 +50,7 @@ export default function UserProfilePage() {
                     <p>
                         Joined {new Date(user.createdAt).toDateString()}
                     </p>
-                    <UserSettingsDialog/>
+                    <UserEditSettingsDialog/>
                 </div>
                 <div>
                     <Tabs defaultValue="posts">

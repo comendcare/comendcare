@@ -84,6 +84,7 @@ interface MultipleSelectorProps {
     >;
     /** hide the clear all button. */
     hideClearAllButton?: boolean;
+    showHoverCard?: boolean;
 }
 
 export interface MultipleSelectorRef {
@@ -199,6 +200,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             commandProps,
             inputProps,
             hideClearAllButton = false,
+            showHoverCard = true,
         }: MultipleSelectorProps,
         ref: React.Ref<MultipleSelectorRef>,
     ) => {
@@ -435,7 +437,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
 
         return (
             <HoverCard openDelay={0} closeDelay={0}>
-                {open &&
+                {open && showHoverCard &&
                     <HoverCardContent
                         side="left"
                         align="start"
