@@ -48,7 +48,7 @@ export function OrganizationSearchResults() {
         )
     }
 
-    return searchResults.length > 0 ? (
+    return searchResults && (searchResults.length > 0) ? (
         <>
             <ResultsView />
             <InfiniteScroll 
