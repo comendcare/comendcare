@@ -26,7 +26,7 @@ import {Bold, Italic} from "lucide-react";
 import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup} from "react-icons/fa6";
+import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
 import {cn, createDicebearAvatar, formatMoney} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
@@ -386,7 +386,7 @@ export default function OrganizationOnboardingForm() {
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Year founded (required)`}</FormLabel>
-                                        <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
+                                        <FormDescription>{`The year your organization was founded.`}</FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -513,8 +513,10 @@ export default function OrganizationOnboardingForm() {
                                                         className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
                                                     >
                                                         <input {...getInputProps()} />
-                                                        <AvatarFallback className="text-center">
-                                                            Drag and drop or click!
+                                                        <AvatarFallback
+                                                            className="text-center flex flex-col justify-center gap-y-4">
+                                                            <FaUpload/>
+                                                            Click or drop!
                                                         </AvatarFallback>
                                                     </Avatar>
                                                 )}

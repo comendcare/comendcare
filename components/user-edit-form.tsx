@@ -25,6 +25,7 @@ import {useCallback, useEffect, useState} from "react";
 import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
+import {FaUpload} from "react-icons/fa6";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -246,8 +247,10 @@ export default function UserEditForm() {
                                             className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
                                         >
                                             <input {...getInputProps()} />
-                                            <AvatarFallback className="text-center">
-                                                Drag and drop or click!
+                                            <AvatarFallback
+                                                className="text-center flex flex-col justify-center gap-y-4">
+                                                <FaUpload/>
+                                                Click or drop!
                                             </AvatarFallback>
                                         </Avatar>
                                     )}
