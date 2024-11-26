@@ -49,6 +49,255 @@ const invitationFormSchema = z.object({
     assets: z.array(optionSchema).min(0),
 })
 
+export const CONDITION_MECHANISM_OPTIONS: Option[] = [
+    {
+        // id: 'autosomal-dominant',
+        label: 'Autosomal dominant',
+        value: 'autosomal-dominant',
+        group: 'Genetics',
+        subgroup: 'Inheritance'
+    },
+    {
+        // id: 'autosomal-recessive',
+        label: 'Autosomal recessive',
+        value: 'autosomal-recessive',
+        group: 'Genetics',
+        subgroup: 'Inheritance'
+    },
+    {
+        // id: 'x-linked',
+        label: 'X-linked',
+        value: 'x-linked',
+        group: 'Genetics',
+        subgroup: 'Inheritance'
+    },
+    {
+        // id: 'y-linked',
+        label: 'Y-linked',
+        value: 'y-linked',
+        group: 'Genetics',
+        subgroup: 'Inheritance'
+    },
+    {
+        // id: 'mitochondrial',
+        label: 'Mitochondrial',
+        value: 'mitochondrial',
+        group: 'Genetics',
+        subgroup: 'Inheritance'
+    },
+    {
+        // id: 'missense',
+        label: 'Missense',
+        value: 'missense',
+        group: 'Genetics',
+        subgroup: 'Molecular nature'
+    },
+    {
+        // id: 'nonsense',
+        label: 'Nonsense',
+        value: 'nonsense',
+        group: 'Genetics',
+        subgroup: 'Molecular nature'
+    },
+    {
+        // id: 'frameshift',
+        label: 'Frameshift',
+        value: 'frameshift',
+        group: 'Genetics',
+        subgroup: 'Molecular nature'
+    },
+    {
+        // id: 'insertion-or-deletion',
+        label: 'Insertion or deletion',
+        value: 'insertion-or-deletion',
+        group: 'Genetics',
+        subgroup: 'Molecular nature'
+    },
+    {
+        // id: 'copy-number-variations',
+        label: 'Copy number variations',
+        value: 'copy-number-variations',
+        group: 'Genetics',
+        subgroup: 'Molecular nature'
+    },
+    {
+        // id: 'splice-site-mutation',
+        label: 'Splice-site mutation',
+        value: 'splice-site-mutation',
+        group: 'Genetics',
+        subgroup: 'Molecular nature'
+    },
+    {
+        // id: 'chromosomal-anomaly',
+        label: 'Chromosomal anomaly',
+        value: 'chromosomal-anomaly',
+        group: 'Genetics',
+        subgroup: 'Chromosomal anomaly'
+    },
+    {
+        // id: 'epigenetic',
+        label: 'Epigenetic',
+        value: 'epigenetic',
+        group: 'Genetics',
+        subgroup: 'Epigenetic'
+    },
+    {
+        // id: 'loss-of-function',
+        label: 'Loss-of-function',
+        value: 'loss-of-function',
+        group: 'Genetics',
+        subgroup: 'Functional impact'
+    },
+    {
+        // id: 'gain-of-function',
+        label: 'Gain-of-function',
+        value: 'gain-of-function',
+        group: 'Genetics',
+        subgroup: 'Functional impact'
+    },
+]
+
+export const SYSTEMS_AFFECTED_OPTIONS: Option[] = [
+    {
+        label: 'Neurological',
+        value: 'neurological',
+    },
+    {
+        label: 'Musculoskeletal',
+        value: 'musculoskeletal',
+    },
+    {
+        label: 'Cardiovascular',
+        value: 'cardiovascular',
+    },
+    {
+        label: 'Respiratory',
+        value: 'respiratory',
+    },
+    {
+        label: 'Renal and urological',
+        value: 'renal-and-urological',
+    },
+    {
+        label: 'Dermatological',
+        value: 'dermatological',
+    },
+    {
+        label: 'Endocrine and metabolic',
+        value: 'endocrine-and-metabolic',
+    },
+    {
+        label: 'Hematological',
+        value: 'hematological',
+    },
+    {
+        label: 'Immune',
+        value: 'immune',
+    },
+]
+
+export const MODALITIES_OF_INTEREST_OPTIONS: Option[] = [
+    {
+        label: 'Gene replacement',
+        value: 'Gene replacement',
+        group: 'Genetic',
+    },
+    {
+        label: 'CRISPR',
+        value: 'CRISPR',
+        group: 'Genetic',
+    },
+    {
+        label: 'Base editing',
+        value: 'Base editing',
+        group: 'Genetic',
+    },
+    {
+        label: 'Prime editing',
+        value: 'Prime editing',
+        group: 'Genetic',
+    },
+    {
+        label: 'ASO',
+        value: 'ASO',
+        group: 'Genetic',
+    },
+    {
+        label: 'RNAi',
+        value: 'RNAi',
+        group: 'Genetic',
+    },
+    {
+        label: 'Enzyme replacement',
+        value: 'Enzyme replacement',
+        group: 'Protein-based',
+    },
+    {
+        label: 'Drug repurposing',
+        value: 'Drug repurposing',
+        group: 'Small-molecule',
+    },
+    {
+        label: 'Pathway modulators',
+        value: 'Pathway modulators',
+        group: 'Small-molecule',
+    },
+    {
+        label: 'Stem cells',
+        value: 'Stem cells',
+        group: 'Cell-based',
+    },
+    {
+        label: 'Nanoparticles',
+        value: 'Nanoparticles',
+        group: 'Delivery systems',
+    },
+    {
+        label: 'Viral vectors',
+        value: 'Viral vectors',
+        group: 'Delivery systems',
+    },
+]
+
+export const MILESTONE_TYPE_OPTIONS: string[] = [
+    'Basic science',
+    'Literature review',
+    'Cell line',
+    'Organoid',
+    'Animal model',
+    'Natural history study',
+    'Patient registry',
+    'Biobank',
+    'Biomarker analysis',
+    'Construct design',
+    'Plasmid production',
+    'AAV production',
+    'Target identification',
+    'Drug screening',
+    'In-vitro verification',
+    'In-vivo verification',
+    'Proof-of-concept study',
+    'Dosing study',
+    'Toxicology study',
+    'Pre-IND meeting',
+    'IND submission',
+]
+
+export const MILESTONE_STATUS_OPTIONS: string[] = [
+    'Planned',
+    'Fundraising',
+    'RFP',
+    'In-progress',
+    'Completed',
+]
+
+export const MILESTONE_OUTCOME_OPTIONS: string[] = [
+    'Publication',
+    'Asset',
+    'Data',
+    'Decision',
+]
+
 export const OPTIONS: Option[] = [
     {
         id: '1',
