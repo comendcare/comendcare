@@ -82,7 +82,7 @@ const sortByFilters: { [key: string]: string } = {
     "money-raised-high-low": "moneyRaised:desc"
 }
 
-const getNewSearchResults = async (state: any) => {
+const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
     try {
         const searchParameters = {
             q: state.searchTerm,
@@ -99,31 +99,8 @@ const getNewSearchResults = async (state: any) => {
             .search(searchParameters);
 
         console.log(`search results`, results.hits)
-        return [...(results.hits || [])]
-
-    } catch (error) {
-        console.error("Search error:", error);
-    }
-}
-
-const getUpdatedSearchResults = async (state: any) => {
-    try {
-        const searchParameters = {
-            q: state.searchTerm,
-            query_by: "name",
-            per_page: 10,
-            page: state.lastFetchedPage,
-            ...(generateFiltersString(state.filters) ? { filter_by: generateFiltersString(state.filters) } : undefined),
-            ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
-        };
-
-        const results = await typesense
-            .collections("organizations")
-            .documents()
-            .search(searchParameters);
-
-        console.log(`search results`, results.hits)
-        return [...state.searchResults, ...(results.hits || [])]
+        if (isNewSearch) return [...(results.hits || [])]           // new search - don't keep previous results
+        return [...state.searchResults, ...(results.hits || [])]    // update search - keep previous results
 
     } catch (error) {
         console.error("Search error:", error);
@@ -151,20 +128,20 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
     temporal((set, get) => ({
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
-                const newSearchResults = await getNewSearchResults({
+                const newSearchResults = await getUpdatedSearchResults({
                     ...get(),
                     searchTerm: newSearch,
                     lastFetchedPage: 1,
-                })
+                }, true)
                 set({ searchTerm: newSearch, searchResults: newSearchResults, lastFetchedPage: 1 })
             },
             sortBy: undefined,
             setSortBy: async (sortBy: string | undefined) => {
-                const newSearchResults = await getNewSearchResults({
+                const newSearchResults = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,
                     lastFetchedPage: 1,
-                })
+                }, true)
                 set({ sortBy, searchResults: newSearchResults, lastFetchedPage: 1 })
             },
             lastFetchedPage: 1, // page numbers in TypeSense start at 1
@@ -172,7 +149,7 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                 const updateSearchResults = await getUpdatedSearchResults({ 
                     ...get(),
                     lastFetchedPage: page
-                })
+                }, false)
                 set({ lastFetchedPage: page, searchResults: updateSearchResults })
             },
             view: 'grid',
@@ -187,11 +164,11 @@ export const useOrganizationSearchStore = create<OrganizationSearchState>()(
                     ...get().filters,
                     ...updatedFilters
                 }
-                const newSearchResults = await getNewSearchResults({
+                const newSearchResults = await getUpdatedSearchResults({
                     ...get(),
                     filters: newFilters,
                     lastFetchedPage: 1,
-                })
+                }, true)
                 set({ 
                     filters: newFilters, 
                     lastFetchedPage: 1,
