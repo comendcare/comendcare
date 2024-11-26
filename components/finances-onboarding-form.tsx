@@ -280,7 +280,7 @@ export default function FinancesOnboardingForm() {
                         <div className="flex flex-row justify-between">
                             <div className="flex flex-row space-x-2">
                                 <Button onClick={() => router.push("/onboarding/organization")}>Previous</Button>
-                                <Button type="submit">Next</Button>
+                                <Button type="submit">Finish</Button>
                             </div>
                             <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
                         </div>

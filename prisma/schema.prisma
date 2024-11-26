@@ -29,6 +29,7 @@ model User {
   sentInvitations      Member[]       @relation("invitedBy")
   deletedAt            DateTime?
   notificationSettings Boolean        @default(false)
+  consentSettings      Boolean        @default(false)
   address1             String?
   address2             String?
   formattedAddress     String?
