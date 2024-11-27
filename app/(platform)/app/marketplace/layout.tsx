@@ -1,6 +1,7 @@
 "use client"
 // import {Metadata} from "next"
 import {MarketplaceNav} from "@/components/marketplace-nav"
+import { MilestoneFilters } from "@/components/milestone-filters"
 import { PAGFilters } from "@/components/pag-filters"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable"
 import { useFiltersStore } from "@/state/nav/navStore"
@@ -50,12 +51,8 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 const FiltersPanel = () => {
     const pathname = usePathname()
 
-    if (pathname.endsWith('/researchers')) {
-        return <p>Researchers Filters</p>
-    } else if (pathname.endsWith('/contractors')) {
-        return <p>Contractors Filters</p>
-    } else if (pathname.endsWith('/grants')) {
-        return <p>Grants Filters</p>
+    if (pathname.endsWith('/milestones')) {
+        return <MilestoneFilters />
     } else {
         return <PAGFilters />
     }
