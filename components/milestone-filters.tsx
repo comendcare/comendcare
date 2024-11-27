@@ -1,29 +1,15 @@
-import { defaultFilters, OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
 import { useShallow } from "zustand/react/shallow"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage
+    Form
 } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
-import { DoubleSlider, DoubleSliderBarChart } from "./ui/slider-double"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
-import { ChartConfig, ChartContainer } from "./ui/chart"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
-import { FaQuestionCircle } from "react-icons/fa"
-import MultipleSelector from "./ui/multiple-selector"
-import { CONDITION_MECHANISM_OPTIONS, MILESTONE_OUTCOME_OPTIONS, MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, MODALITIES_OF_INTEREST_OPTIONS, SYSTEMS_AFFECTED_OPTIONS } from "./research-onboarding-form"
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
+import { defaultFilters, MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore"
 
-const selector = (state: OrganizationSearchState) => ({
+const selector = (state: MilestoneSearchState) => ({
     filters: state.filters,
     allResults: state.allResults,
     searchResults: state.searchResults,
@@ -48,7 +34,7 @@ const filtersFormSchema = z.object({
 })
 
 export function MilestoneFilters() {
-    const { filters, allResults, searchResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
+    const { filters, allResults, searchResults, setFilters } = useMilestoneSearchStore(useShallow(selector))
     const form = useForm<z.infer<typeof filtersFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(filtersFormSchema),
