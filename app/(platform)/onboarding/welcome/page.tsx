@@ -1,14 +1,17 @@
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import {Button} from "@/components/ui/button";
 
 export default function OnboardingWelcomePage() {
     return (
         <main className="flex flex-col space-y-8 w-full max-w-7xl mx-auto">
             <div className="w-full space-y-4">
                 <div className="space-y-2">
-                    <h1 className="text-xl font-semibold">Profile onboarding</h1>
+                    <h1 className="text-xl font-semibold">
+                        Welcome to Comend!
+                    </h1>
                     <p>
-                        {`Welcome to onboarding! We have a few questions to better understand how we can help you.
+                        {`We're happy to have you! We have a few questions to better understand how we can help you.
                         All questions in this form are optional unless marked as (required).`}
                     </p>
                     <p className="font-semibold">
@@ -36,6 +39,9 @@ export default function OnboardingWelcomePage() {
                         <Skeleton className="h-10 w-1/4 rounded-md" />
                     </div>
                 </div>
+                <Button variant="default">
+                    Next
+                </Button>
 
                 {/* Right side: Platform preview */}
                 <div className="col-span-1 space-y-6">

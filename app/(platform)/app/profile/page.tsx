@@ -12,7 +12,7 @@ import {PAGProfileDetailsCard} from "@/components/pag-profile-details-card";
 import {cn, createDicebearAvatar} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditProfileHeaderDialog from "@/components/edit-profile-header-dialog";
-import {PAGProfileRoadmapCard} from "@/components/pag-profile-roadmap-card";
+import {PAGProfileResearchPlanCard} from "@/components/pag-profile-research-plan-card";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {getOrganizationFromOrganizationId} from "@/lib/actions";
 import {getSession} from "@/lib/auth";
@@ -121,7 +121,7 @@ export default async function ProfilePage() {
                         </div>
 
                         <div className="col-span-4 flex flex-col space-y-4">
-                            <PAGProfileRoadmapCard/>
+                            <PAGProfileResearchPlanCard/>
                             <PAGProfileActivityCard/>
                         </div>
                     </div>

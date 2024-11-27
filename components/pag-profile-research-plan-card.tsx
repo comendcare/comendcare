@@ -59,21 +59,21 @@ const roadmapItems = [
     },
 ];
 
-export const PAGProfileRoadmapCard = () => {
+export const PAGProfileResearchPlanCard = () => {
     const router = useRouter();
 
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
-                    Roadmap
+                    Research Plan
                 </CardTitle>
                 <Button
                     variant="ghost"
                     onClick={() => router.push("/app/roadmap")}
                     className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                 >
-                    Edit roadmap
+                    Edit research plan
                     <FaArrowUpRightFromSquare/>
                 </Button>
             </CardHeader>

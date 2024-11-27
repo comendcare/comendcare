@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/realistic-seed.ts"
   },
   "dependencies": {
     "@ariakit/react": "^0.4.11",

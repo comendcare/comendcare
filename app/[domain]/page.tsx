@@ -7,7 +7,7 @@ import BlogCard from "@/components/blog-card"
 import {getRoadmapsForOrganization, getOrganizationData} from "@/lib/fetchers"
 import Image from "next/image"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {PAGProfileRoadmapCard} from "@/components/pag-profile-roadmap-card";
+import {PAGProfileResearchPlanCard} from "@/components/pag-profile-research-plan-card";
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
