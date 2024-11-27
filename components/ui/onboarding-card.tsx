@@ -85,6 +85,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
             },
             data: {
                 id: nanoid(),
+                type: 'NOTYPE',
                 nodeId: id,
                 title: `New Milestone`,
                 papers: [],
