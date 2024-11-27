@@ -38,10 +38,10 @@ export default function OnboardingWelcomePage() {
                         {/* Button */}
                         <Skeleton className="h-10 w-1/4 rounded-md" />
                     </div>
+                    <Button variant="default">
+                        Next
+                    </Button>
                 </div>
-                <Button variant="default">
-                    Next
-                </Button>
 
                 {/* Right side: Platform preview */}
                 <div className="col-span-1 space-y-6">
