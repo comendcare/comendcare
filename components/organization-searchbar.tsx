@@ -11,6 +11,9 @@ const selector = (state: OrganizationSearchState) => ({
     setSortBy: state.setSortBy,
     view: state.view,
     setView: state.setView,
+    filters: state.filters,
+    setAllResults: state.setAllResults,
+    setSearchResults: state.setSearchResults
 })
 
 export default function OrganizationSearchBar() {
@@ -20,6 +23,9 @@ export default function OrganizationSearchBar() {
         setSortBy,
         view, 
         setView, 
+        filters, 
+        setAllResults, 
+        setSearchResults
     } = useOrganizationSearchStore(useShallow(selector))
 
     useEffect(() => {
