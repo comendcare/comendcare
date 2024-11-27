@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma" // Adjust the path to your Prisma client
+import { nanoid } from "nanoid"
 
 export async function POST(request: Request) {
     try {
@@ -12,15 +13,20 @@ export async function POST(request: Request) {
                     where: { id: milestone.id },
                     include: { tasks: true }
                 })
+                  
+                if (!previousMilestone) {
+                    // milestone doesn't exist, throw error
+                    throw new Error(`Milestone with ID ${milestone.id} does not exist.`);
+                }
 
                 const previousTasks = previousMilestone?.tasks || []
                 const tasksToDelete = previousTasks.filter((task) => !milestone.tasks.map((t: any) => t.id).includes(task.id))
                 const tasksToUpdate = milestone.tasks?.filter((task: any) => previousMilestone?.tasks.map((t: any) => t.id).includes(task.id))
                 const tasksToCreate = milestone.tasks.filter((task: any) => !previousMilestone?.tasks.map((t: any) => t.id).includes(task.id))
 
-                // console.log(`tasks to delete`, tasksToDelete)
-                // console.log(`tasks to update`, tasksToUpdate)
-                // console.log(`tasks to create`, tasksToCreate)
+                console.log(`tasks to delete`, tasksToDelete)
+                console.log(`tasks to update`, tasksToUpdate)
+                console.log(`tasks to create`, tasksToCreate)
 
                 await prisma.milestone.update({
                     // where: { nodeId: milestone.nodeId },
@@ -35,15 +41,19 @@ export async function POST(request: Request) {
                         budget: milestone.budget,
                         papers: milestone.papers,
                         tasks: {
-                            deleteMany: tasksToDelete.map(task => ({ id: task.id })),
+                            deleteMany: tasksToDelete
+                                .filter((task: any) => task.id !== null && task.id !== undefined)
+                                .map(task => ({ id: task.id })),
                             createMany: {
-                                data: tasksToCreate.map((task: any) => ({
-                                    id: task?.id,
-                                    name: task?.name || "New Task",
-                                    status: task?.status || "TODO",
-                                    orderPosition: task.orderPosition || 0,
-                                    kanbanPosition: task.kanbanPosition || 0,
-                                }))
+                                data: tasksToCreate
+                                    .filter((task: any) => task.id !== undefined && task.id !== undefined)
+                                    .map((task: any) => ({
+                                        id: task?.id || nanoid(),
+                                        name: task?.name || "New Task",
+                                        status: task?.status || "TODO",
+                                        orderPosition: task.orderPosition || 0,
+                                        kanbanPosition: task.kanbanPosition || 0,
+                                    }))
                             }
                         },
                         status: milestone.status || "TODO",
