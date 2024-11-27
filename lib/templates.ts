@@ -2,12 +2,14 @@ export const templateMilestones = [
     {
         title: 'Natural History Study',
         description: 'Our observational research effort that follows individuals with a specific disease over time, collecting data on how the disease develops and progresses without intervention.',
+        type: 'NATURALHISTORYSTUDY',
         papers: [],
         tasks: []
     },
     {
         title: 'Review Literature',
         description: 'Examine existing research to better understand the disease, identify gaps in knowledge, and assess the latest findings on potential treatments.',
+        type: 'LITERATUREREVIEW',
         papers: [],
         tasks: []
     },
@@ -15,6 +17,7 @@ export const templateMilestones = [
         title: 'Identify Existing Disease Models',
         description: 'Research and evaluate lab models.',
         status: 'INPROGRESS',
+        // type: 'LITERATUREREVIEW',
         papers: [],
         tasks: []
     },
@@ -22,6 +25,7 @@ export const templateMilestones = [
         title: 'Construct Mouse Models',
         description: '',
         status: 'INPROGRESS',
+        type: 'ANIMALMODEL',
         papers: [],
         tasks: [
             { name: 'Secure Funding' },
@@ -32,6 +36,7 @@ export const templateMilestones = [
     {
         title: 'Construct Patient-Derived Cells',
         description: 'Work with researchers to create cell lines that replicate disease characteristics.',
+        type: 'CELLLINE',
         papers: [],
         tasks: [
             { name: 'Coordinate Patient Participation' },
@@ -42,24 +47,28 @@ export const templateMilestones = [
     {
         title: 'Design ASO Construct',
         description: 'Design an ASO (Antisense Oligonucleotide) construct that specifically targets the genetic mutations driving our disease.',
+        type: 'CONSTRUCTDESIGN',
         papers: [],
         tasks: []
     },
     {
         title: 'Produce Plasmid',
         description: 'Create a DNA template essential for developing and testing therapies.',
+        type: 'PLASMIDPRODUCTION',
         papers: [],
         tasks: []
     },
     {
         title: 'Proof-Of-Concept Study',
         description: 'Design and conduct initial experiments to demonstrate that a potential therapy or intervention can effectively target the disease.',
+        type: 'PROOFOFCONCEPTSTUDY',
         papers: [],
         tasks: []
     },
     {
         title: 'Animal Toxicology Study',
         description: 'Conduct preclinical trials to evaluate the safety and potential side effects of a therapy.',
+        type: 'TOXICOLOGYSTUDY',
         papers: [],
         tasks: []
     }
@@ -76,6 +85,7 @@ export const templateRoadmaps = [
 export const emptyMilestoneTemplate = {
     title: 'New Milestone',
     description: '',
+    type: 'NOTYPE',
     papers: [],
     tasks: []
 }

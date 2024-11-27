@@ -97,6 +97,7 @@ export const FlowView = ({
             data: {
                 id: nanoid(),
                 nodeId: id,
+                type: defaultData?.type || 'NOTYPE',
                 title: defaultData?.title || `New Milestone`,
                 ...(defaultData?.description ? { description: defaultData.description } : undefined),
                 papers: defaultData?.papers || [],

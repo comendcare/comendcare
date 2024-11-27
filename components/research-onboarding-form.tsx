@@ -19,7 +19,7 @@ import {Separator} from "@/components/ui/separator";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {FaQuestionCircle} from "react-icons/fa";
 
-const optionSchema = z.object({
+export const optionSchema = z.object({
     label: z.string(),
     value: z.string(),
     disable: z.boolean().optional(),
@@ -257,30 +257,6 @@ export const MODALITIES_OF_INTEREST_OPTIONS: Option[] = [
         value: 'Viral vectors',
         group: 'Delivery systems',
     },
-]
-
-export const MILESTONE_TYPE_OPTIONS: string[] = [
-    'Basic science',
-    'Literature review',
-    'Cell line',
-    'Organoid',
-    'Animal model',
-    'Natural history study',
-    'Patient registry',
-    'Biobank',
-    'Biomarker analysis',
-    'Construct design',
-    'Plasmid production',
-    'AAV production',
-    'Target identification',
-    'Drug screening',
-    'In-vitro verification',
-    'In-vivo verification',
-    'Proof-of-concept study',
-    'Dosing study',
-    'Toxicology study',
-    'Pre-IND meeting',
-    'IND submission',
 ]
 
 export const MILESTONE_STATUS_OPTIONS: string[] = [

@@ -191,9 +191,9 @@ model Node {
 }
 
 model Milestone {
-  id          String     @id @unique @default(uuid())
-  node        Node?      @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  nodeId      String?    @unique
+  id          String        @id @unique @default(uuid())
+  node        Node?         @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  nodeId      String?       @unique
   title       String
   description String?
   startDate   DateTime?
@@ -204,8 +204,34 @@ model Milestone {
   status      StatusType
   tasks       Task[]
   roadmapId   String
-  roadmap     Roadmap    @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  private     Boolean    @default(false)
+  roadmap     Roadmap       @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  private     Boolean       @default(false)
+  type        MilestoneType @default(NOTYPE)
+}
+
+enum MilestoneType {
+  BASICSCIENCE
+  LITERATUREREVIEW
+  CELLLINE
+  ORGANOID
+  ANIMALMODEL
+  NATURALHISTORYSTUDY
+  PATIENTREGISTRY
+  BIOBANK
+  BIOMARKERANALYSIS
+  CONSTRUCTDESIGN
+  PLASMIDPRODUCTION
+  AAVPRODUCTION
+  TARGETIDENTIFICATION
+  DRUGSCREENING
+  INVITROVERIFICATION
+  INVIVOVERIFICATION
+  PROOFOFCONCEPTSTUDY
+  DOSINGSTUDY
+  TOXICOLOGYSTUDY
+  PREINDMEETING
+  INDSUBMISSION
+  NOTYPE
 }
 
 model Task {

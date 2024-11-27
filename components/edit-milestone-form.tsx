@@ -67,6 +67,11 @@ import { Switch } from "./ui/switch"
 import { PrivateBadge } from "./private-badge"
 import { debounce } from "lodash"
 import {monthsList} from "@/lib/data";
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
+import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import type { Option } from "./ui/multiple-selector"
+import MultipleSelector from "./ui/multiple-selector"
+import { optionSchema } from "./research-onboarding-form"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -115,6 +120,7 @@ export function EditMilestoneForm({
             .string()
             .max(1000, "Description must be less than 1000 characters")
             .optional(),
+        milestoneType: z.string(),
         startDate: z.object({
             month: z.string().optional(),
             year: z.string().optional(),
@@ -154,6 +160,7 @@ export function EditMilestoneForm({
         defaultValues: {
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
+            milestoneType: milestoneData?.type || "NOTYPE",
             startDate: {
                 month: milestoneData?.startDate?.getMonth() ? monthsList[milestoneData?.startDate?.getMonth()] : undefined,
                 year: milestoneData?.startDate?.getFullYear()?.toString() || undefined
@@ -172,6 +179,7 @@ export function EditMilestoneForm({
 
     const title = form.watch("title")
     const description = form.watch("description")
+    const type = form.watch("milestoneType")
     const startDate = form.watch("startDate")
     const endDate = form.watch("endDate")
     const budget = form.watch("budget")
@@ -192,11 +200,11 @@ export function EditMilestoneForm({
         // callback in debounceUpdates holds onto the state of the time it was created
         // we can't use the form.watch values directly (since they'll be outdated)
         // we must pass in the most up to date values in the form
-        debounceUpdates({title, description, startDate, endDate, budget, papers, tasks, status, private: isPrivate })
+        debounceUpdates({title, description, milestoneType: type, startDate, endDate, budget, papers, tasks, status, private: isPrivate })
     }, [title, description, budget, papers, tasks, status, isPrivate])
 
     const handleMilestoneFormSubmit = (values: z.infer<typeof editMilestoneForm>) => {
-        const { title, description, startDate, endDate, budget, papers, tasks, status, private: isPrivate } = values;
+        const { title, description, milestoneType, startDate, endDate, budget, papers, tasks, status, private: isPrivate } = values;
         const now = new Date()
         
         setMilestone(milestoneData?.nodeId, {
@@ -223,6 +231,10 @@ export function EditMilestoneForm({
                     milestoneId: milestoneData?.id
                 }))}
                 : undefined
+            ),
+            ...(milestoneType
+                ? { type: milestoneType }
+                : { type: 'NOTYPE'}
             ),
             status,
             private: isPrivate || false
@@ -298,7 +310,7 @@ export function EditMilestoneForm({
         <ScrollArea className="research-plan-tour-step3">
             <form
                 onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                className="flex flex-col gap-8 pr-4"
+                className="flex flex-col gap-8 p-2 pr-4"
             >
                 <FormField
                 control={form.control}
@@ -380,6 +392,48 @@ export function EditMilestoneForm({
                 )}
                 />
 
+                <FormField
+                    control={form.control}
+                    name="milestoneType"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel>Milestone Type</FormLabel>
+                            <FormControl>
+                                <Select
+                                    onValueChange={(value: string) => {
+                                        field.onChange(value)
+                                        console.log(`value`, value)
+                                        handleMilestoneFormSubmit({
+                                            title,
+                                            description,
+                                            milestoneType: value,
+                                            startDate,
+                                            endDate,
+                                            budget,
+                                            papers,
+                                            tasks,
+                                            status,
+                                            private: isPrivate,
+                                        })
+                                    }}
+                                    defaultValue={field.value}
+                                    // onValueChange={field.onChange}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a milestone type..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {MILESTONE_TYPE_OPTIONS.map((milestoneType, index) => (
+                                            <SelectItem key={index} value={milestoneType.value}>{milestoneType.label}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
                 <span className="flex flex-col gap-2">
                     <FormLabel className="text-xl">{`Timeline:`}</FormLabel>
                     <FormDescription>{`Enter this milestone's completion timeline (past or future)`}</FormDescription>
@@ -401,6 +455,7 @@ export function EditMilestoneForm({
                                         handleMilestoneFormSubmit({
                                             title,
                                             description,
+                                            milestoneType: type,
                                             startDate,
                                             endDate,
                                             budget,
@@ -452,6 +507,7 @@ export function EditMilestoneForm({
                                             handleMilestoneFormSubmit({
                                                 title,
                                                 description,
+                                                milestoneType: type,
                                                 startDate,
                                                 endDate,
                                                 budget,
@@ -509,6 +565,7 @@ export function EditMilestoneForm({
                                         handleMilestoneFormSubmit({
                                             title,
                                             description,
+                                            milestoneType: type,
                                             startDate,
                                             endDate,
                                             budget,
@@ -560,6 +617,7 @@ export function EditMilestoneForm({
                                             handleMilestoneFormSubmit({
                                                 title,
                                                 description,
+                                                milestoneType: type,
                                                 startDate,
                                                 endDate,
                                                 budget,

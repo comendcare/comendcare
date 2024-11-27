@@ -202,7 +202,7 @@ export function EditTaskForm({
         <ScrollArea>
             <form
                 onSubmit={form.handleSubmit(handleFormSubmit)}
-                className="flex flex-col gap-8 pr-4"
+                className="flex flex-col gap-8 p-2 pr-4"
             >
                 <FormField
                 control={form.control}

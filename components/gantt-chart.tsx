@@ -158,7 +158,7 @@ export function GanttChart() {
     }
   
     return (
-      <ResponsiveContainer height={chartData.length*80}>
+      <ResponsiveContainer height={chartData.length*100}>
           <ScatterChart
               data={chartData}
               margin={{ top: 10, right: 10, left: 0, bottom: 0 }}

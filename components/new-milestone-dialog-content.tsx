@@ -12,6 +12,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { DialogClose } from "@radix-ui/react-dialog"
 import { templateMilestones } from "@/lib/templates";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { ScrollArea } from "./ui/scroll-area";
 
 export function NewMilestoneDialogContent({
     addMilestone
@@ -28,7 +29,7 @@ export function NewMilestoneDialogContent({
     }
 
     return (
-        <DialogContent className="w-[600px]">
+        <DialogContent>
             <DialogHeader>
                 <DialogTitle>
                     Select from a milestone template?
@@ -38,20 +39,13 @@ export function NewMilestoneDialogContent({
                 </DialogDescription>
             </DialogHeader>
 
-            <div className="h-full w-full px-8">
-            <Carousel
-                opts={{
-                    align: "start",
-                    loop: true
-                }}
-                className="w-[400px]"
-            >
-                <CarouselContent>
+            <ScrollArea className="w-full max-h-96">
+                <ol className="w-full pr-4 flex flex-col gap-4">
                     {templateMilestones.map((milestoneData, index) => (
-                        <CarouselItem key={index} className="basis-1/2">
-                            <DialogClose>
-                            <button onClick={() => handleAddMilestone(milestoneData)}>
-                                <Card className="text-left">
+                        <li key={index} className="w-full">
+                            <DialogClose className="w-full">
+                            <button className="w-full text-left" onClick={() => handleAddMilestone(milestoneData)}>
+                                <Card>
                                     <CardHeader>
                                         <CardTitle>{milestoneData.title}</CardTitle>
                                         <CardDescription>{milestoneData.description}</CardDescription>
@@ -59,14 +53,10 @@ export function NewMilestoneDialogContent({
                                 </Card>
                             </button>
                             </DialogClose>
-                        </CarouselItem>
+                        </li>
                     ))}
-                </CarouselContent>
-
-                <CarouselPrevious />
-                <CarouselNext />
-            </Carousel>
-            </div>
+                </ol>
+            </ScrollArea>
 
             <DialogFooter>
                 <DialogClose>
