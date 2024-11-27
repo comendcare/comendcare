@@ -25,7 +25,7 @@ const sortByFilters: { [key: string]: string } = {
     "money-raised-high-low": "moneyRaised:desc"
 }
 
-export default function MarketplaceSearchBar() {
+export default function OrganizationSearchBar() {
     const [query, setQuery] = useState("")
     const [sortBy, setSortBy] = useState<string | undefined>()
     const [searchTerm, setSearchTerm] = useState<string>("")
