@@ -1,7 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { Badge } from "./ui/badge";
+import { MILESTONE_TYPE_OPTIONS } from "@/lib/types";
+import { DateView } from "./miletone-date-view";
 
 export function MilestoneMarketplaceListElement({ milestone }: { milestone: any }) {
+    const startDate = milestone.startDate ? new Date(milestone.startDate) : undefined
+    const endDate = milestone.endDate ? new Date(milestone.endDate) : undefined
+    
     return (
         <Link
             href={'#'}
@@ -19,6 +25,13 @@ export function MilestoneMarketplaceListElement({ milestone }: { milestone: any 
                 <CardDescription>{milestone.description}</CardDescription>
             </CardHeader>
             <CardContent className="w-full flex flex-row gap-4 flex-wrap">
+                <Badge className="flex text-sm">
+                    {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestone.type))?.label || "No type"}
+                </Badge>
+                
+                {(startDate?.getMonth() || endDate?.getFullYear()) && (
+                    <DateView startDate={startDate} endDate={endDate}/>
+                )}
             </CardContent>
         </Card>
         </Link>
