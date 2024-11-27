@@ -306,6 +306,7 @@ const exampleASORoadmap = {
         {
             title: 'Natural History Study',
             description: 'Our observational research effort that follows individuals with a specific disease over time, collecting data on how the disease develops and progresses without intervention.',
+            type: 'NATURALHISTORYSTUDY',
             status: 'INPROGRESS',
             startDate: new Date(2019, 1, 1),
             papers: [],
@@ -314,6 +315,7 @@ const exampleASORoadmap = {
         {
             title: 'Review Literature',
             description: 'Examine existing research to better understand the disease, identify gaps in knowledge, and assess the latest findings on potential treatments.',
+            type: 'LITERATUREREVIEW',
             status: 'DONE',
             startDate: new Date(2020, 5, 12),
             endDate: new Date(2021, 1, 3),
@@ -332,6 +334,7 @@ const exampleASORoadmap = {
         {
             title: 'Construct Mouse Models',
             description: '',
+            type: 'ANIMALMODEL',
             status: 'INPROGRESS',
             startDate: new Date(2024, 5, 5),
             papers: [],
@@ -347,6 +350,7 @@ const exampleASORoadmap = {
         {
             title: 'Construct Patient-Derived Cells',
             description: 'Work with researchers to create cell lines that replicate disease characteristics.',
+            type: 'CELLLINE',
             papers: [],
             startDate: new Date(2026, 1, 1),
             tasks: [
@@ -361,6 +365,7 @@ const exampleASORoadmap = {
         {
             title: 'Design ASO Construct',
             description: 'Design an ASO (Antisense Oligonucleotide) construct that specifically targets the genetic mutations driving our disease.',
+            type: 'CONSTRUCTDESIGN',
             startDate: new Date(2027, 1, 1),
             papers: [],
             tasks: []
@@ -368,6 +373,7 @@ const exampleASORoadmap = {
         {
             title: 'Produce Plasmid',
             description: 'Create a DNA template essential for developing and testing therapies.',
+            type: 'PLASMIDPRODUCTION',
             startDate: new Date(2028, 1, 1),
             papers: [],
             tasks: []
@@ -376,6 +382,7 @@ const exampleASORoadmap = {
             title: 'Proof-Of-Concept Study',
             startDate: new Date(2029, 1, 1),
             description: 'Design and conduct initial experiments to demonstrate that a potential therapy or intervention can effectively target the disease.',
+            type: 'PROOFOFCONCEPTSTUDY',
             papers: [],
             tasks: []
         },
@@ -383,6 +390,7 @@ const exampleASORoadmap = {
             title: 'Animal Toxicology Study',
             startDate: new Date(2030, 1, 1),
             description: 'Conduct preclinical trials to evaluate the safety and potential side effects of a therapy.',
+            type: 'TOXICOLOGYSTUDY',
             papers: [],
             tasks: []
         }
@@ -448,6 +456,7 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                         data: {
                             create: {
                                 roadmapId: roadmap.id,
+                                type: milestone.type || "NOTYPE",
                                 status: milestone.status || "TODO",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),

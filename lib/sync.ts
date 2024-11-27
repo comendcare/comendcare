@@ -46,8 +46,9 @@ const addTypeSenseDocument = async (
     typesenseUrl: string,
     apiKey: string,
     data: any,
+    documentType: string
 ) => {
-    const url = `${typesenseUrl}/collections/organizations/documents`;
+    const url = `${typesenseUrl}/collections/${documentType}/documents`;
     return sendTypeSenseRequest(url, 'POST', apiKey, data);
 };
 
@@ -55,8 +56,9 @@ const updateTypeSenseDocument = async (
     typesenseUrl: string,
     apiKey: string,
     data: any,
+    documentType: string
 ) => {
-    const url = `${typesenseUrl}/collections/organizations/documents/${data.id}`;
+    const url = `${typesenseUrl}/collections/${documentType}/documents/${data.id}`;
     return sendTypeSenseRequest(url, 'PATCH', apiKey, data);
 };
 
@@ -64,8 +66,9 @@ const deleteTypeSenseDocument = async (
     typesenseUrl: string,
     apiKey: string,
     id: string,
+    documentType: string
 ) => {
-    const url = `${typesenseUrl}/collections/organizations/documents/${id}`;
+    const url = `${typesenseUrl}/collections/${documentType}/documents/${id}`;
     return sendTypeSenseRequest(url, 'DELETE', apiKey);
 };
 
@@ -91,7 +94,7 @@ export const syncToTypesense = async (env: {
     // Initialize Prisma and extend with Pulse
     const prisma = addPulseExtension(initPrismaClient(), env.PULSE_API_KEY);
 
-    // Ensure TypeSense collection exists
+    // Ensure TypeSense organization collection exists
     await createTypeSenseCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
         name: 'organizations',
         "fields": [
@@ -231,11 +234,44 @@ export const syncToTypesense = async (env: {
           ],
     });
 
+    await createTypeSenseCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
+        name: 'milestones',
+        "fields": [
+            {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "title",
+                "optional": false,
+                "sort": true,
+                "stem": false,
+                "store": true,
+                "type": "string"
+            },
+            {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "description",
+                "optional": false,
+                "sort": false,
+                "stem": false,
+                "store": true,
+                "type": "string"
+              },
+            // add additional fields as needed
+          ],
+    });
+
     // Stream organization changes
     const orgStream = await prisma.organization.stream({ name: 'organization-events' });
+    const milestoneStream = await prisma.milestone.stream({ name: 'milestone-events' });
 
     process.on('exit', () => {
         orgStream.stop();
+        milestoneStream.stop();
     });
 
     const FIVE_MINUTES = 5 * 60 * 1000;
@@ -248,6 +284,7 @@ export const syncToTypesense = async (env: {
         timeoutId = setTimeout(() => {
             console.log('No events for 5 minutes. Terminating stream.');
             orgStream.stop();
+            milestoneStream.stop();
             throw Error('Stream terminated due to inactivity');
         }, FIVE_MINUTES);
     };
@@ -260,15 +297,37 @@ export const syncToTypesense = async (env: {
             switch (event.action) {
                 case 'create':
                     console.log("Syncing created organization to Typesense:", event.created);
-                    await addTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.created);
+                    await addTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.created, 'organizations');
                     break;
                 case 'update':
                     console.log("Syncing updated organization to Typesense:", event.after);
-                    await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.after);
+                    await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.after, 'organizations');
                     break;
                 case 'delete':
                     console.log("Deleting organization from Typesense:", event.deleted);
-                    await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id);
+                    await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id, 'organizations');
+                    break;
+            }
+        } catch (error) {
+            console.error("Error processing event for Typesense:", error);
+        }
+    }
+
+    for await (const event of milestoneStream) {
+        resetTimeout();
+        try {
+            switch (event.action) {
+                case 'create':
+                    console.log("Syncing created milestone to Typesense:", event.created);
+                    await addTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.created, 'milestones');
+                    break;
+                case 'update':
+                    console.log("Syncing updated milestone to Typesense:", event.after);
+                    await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.after, 'milestones');
+                    break;
+                case 'delete':
+                    console.log("Deleting milestone from Typesense:", event.deleted);
+                    await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id, 'milestones');
                     break;
             }
         } catch (error) {
