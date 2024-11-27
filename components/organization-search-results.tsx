@@ -2,17 +2,20 @@
 
 import React from "react"
 import { OrganizationMarketplaceCard } from "@/components/marketplace-pag-card";
-import { OrganizationSearchState, useOrganizationSearchStore, ViewType } from "@/state/search/organizationSearchStore";
+import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import { OrganizationMarketplaceListElement } from "./marketplace-pag-list-element";
+import InfiniteScroll from "./ui/infinite-scroll";
 
 const selector = (state: OrganizationSearchState) => ({
+    lastFetchedPage: state.lastFetchedPage,
+    setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
     searchResults: state.searchResults
 })
 
 export function OrganizationSearchResults() {
-    const { view, searchResults } = useOrganizationSearchStore(useShallow(selector))
+    const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useOrganizationSearchStore(useShallow(selector))
 
     const ResultsView = () => {
         if (view === "list") {
@@ -45,8 +48,14 @@ export function OrganizationSearchResults() {
         )
     }
 
-    return searchResults.length > 0 ? (
-        <ResultsView />
+    return searchResults && (searchResults.length > 0) ? (
+        <>
+            <ResultsView />
+            <InfiniteScroll 
+                lastFetchedPage={lastFetchedPage} 
+                setLastFetchedPage={setLastFetchedPage}
+            />
+        </>
     ):(
         <NoResultsView />
     )
