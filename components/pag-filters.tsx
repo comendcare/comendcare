@@ -12,21 +12,18 @@ import {
     FormMessage
 } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
-import { DoubleSlider, DoubleSliderBarChart } from "./ui/slider-double"
+import { DoubleSliderBarChart } from "./ui/slider-double"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
-import { ChartConfig, ChartContainer } from "./ui/chart"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
-import { FaQuestionCircle } from "react-icons/fa"
 import MultipleSelector from "./ui/multiple-selector"
-import { CONDITION_MECHANISM_OPTIONS, MILESTONE_OUTCOME_OPTIONS, MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, MODALITIES_OF_INTEREST_OPTIONS, SYSTEMS_AFFECTED_OPTIONS } from "./research-onboarding-form"
+import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { CONDITION_MECHANISM_OPTIONS, MILESTONE_OUTCOME_OPTIONS, MILESTONE_STATUS_OPTIONS, MODALITIES_OF_INTEREST_OPTIONS, SYSTEMS_AFFECTED_OPTIONS } from "./research-onboarding-form"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
+import type { Option } from "./ui/multiple-selector"
 
 const selector = (state: OrganizationSearchState) => ({
     filters: state.filters,
     allResults: state.allResults,
-    searchResults: state.searchResults,
     setFilters: state.setFilters
 })
 
@@ -63,7 +60,7 @@ const filtersFormSchema = z.object({
 // ]
 
 export function PAGFilters() {
-    const { filters, allResults, searchResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
+    const { filters, allResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
     const form = useForm<z.infer<typeof filtersFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(filtersFormSchema),
@@ -88,7 +85,7 @@ export function PAGFilters() {
             <ScrollArea className="w-full h-full">
             <form
                 onSubmit={form.handleSubmit(handleSubmit)}
-                className="flex flex-col gap-8 pr-4"
+                className="flex flex-col gap-8 p-1 pr-4"
             >
                 <h1 className="text-2xl">{`Organization Filters`}</h1>
                 <FormField
@@ -182,12 +179,12 @@ export function PAGFilters() {
                                     }
                                     className="w-fit flex flex-wrap gap-2 justify-start"
                                 >
-                                    {MILESTONE_TYPE_OPTIONS.map((type: string) => (
+                                    {MILESTONE_TYPE_OPTIONS.map((type: Option) => (
                                         <ToggleGroupItem
-                                            key={type}
-                                            value={type}
+                                            key={type.value}
+                                            value={type.value}
                                         >
-                                            {type}
+                                            {type.label}
                                         </ToggleGroupItem>
                                     ))}
                                 </ToggleGroup>

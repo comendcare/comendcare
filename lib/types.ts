@@ -1,3 +1,118 @@
+import type { Option } from "@/components/ui/multiple-selector"
+
+// export type MilestoneTypes =
+//   BASICSCIENCE
+//   LITERATUREREVIEW
+//   CELLLINE
+//   ORGANOID
+//   ANIMALMODEL
+//   NATURALHISTORYSTUDY
+//   PATIENTREGISTRY
+//   BIOBANK
+//   BIOMARKERANALYSIS
+//   CONSTRUCTDESIGN
+//   PLASMIDPRODUCTION
+//   AAVPRODUCTION
+//   TARGETIDENTIFICATION
+//   DRUGSCREENING
+//   INVITROVERIFICATION
+//   INVIVOVERIFICATION
+//   PROOFOFCONCEPTSTUDY
+//   DOSINGSTUDY
+//   TOXICOLOGYSTUDY
+//   PREINDMEETING
+//   INDSUBMISSION
+
+export const MILESTONE_TYPE_OPTIONS: Option[] = [
+    {
+        label: 'Basic science',
+        value: 'BASICSCIENCE',
+    },
+    {
+        label: 'Literature review',
+        value: 'LITERATUREREVIEW',
+    },
+    {
+        label: 'Cell line',
+        value: 'CELLLINE',
+    },
+    {
+        label: 'Organoid',
+        value: 'ORGANOID',
+    },
+    {
+        label: 'Animal model',
+        value: 'ANIMALMODEL',
+    },
+    {
+        label: 'Natural history study',
+        value: 'NATURALHISTORYSTUDY',
+    },
+    {
+        label: 'Patient registry',
+        value: 'PATIENTREGISTRY',
+    },
+    {
+        label: 'Biobank',
+        value: 'BIOBANK',
+    },
+    {
+        label: 'Biomarker analysis',
+        value: 'BIOMARKERANALYSIS',
+    },
+    {
+        label: 'Construct design',
+        value: 'CONSTRUCTDESIGN',
+    },
+    {
+        label: 'Plasmid production',
+        value: 'PLASMIDPRODUCTION',
+    },
+    {
+        label: 'AAV production',
+        value: 'AAVPRODUCTION',
+    },
+    {
+        label: 'Target identification',
+        value: 'TARGETIDENTIFICATION',
+    },
+    {
+        label: 'Drug screening',
+        value: 'DRUGSCREENING',
+    },
+    {
+        label: 'In-vitro verification',
+        value: 'INVITROVERIFICATION',
+    },
+    {
+        label: 'In-vivo verification',
+        value: 'INVIVOVERIFICATION',
+    },
+    {
+        label: 'Proof-of-concept study',
+        value: 'PROOFOFCONCEPTSTUDY',
+    },
+    {
+        label: 'Dosing study',
+        value: 'DOSINGSTUDY',
+    },
+    {
+        label: 'Toxicology study',
+        value: 'TOXICOLOGYSTUDY',
+    },
+    {
+        label: 'Pre-IND meeting',
+        value: 'PREINDMEETING',
+    },
+    {
+        label: 'IND submission',
+        value: 'INDSUBMISSION',
+    },
+    {
+        label: 'No type',
+        value: 'NOTYPE',
+    }
+]
 
 export interface AddressType {
     address1: string;
