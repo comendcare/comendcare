@@ -61,7 +61,7 @@ export const newOrgFormSchema = z.object({
     website: z.string().min(2, {
         message: "Your organization's website.",
     }).optional(),
-    "501c3": z.enum(["yes", "no-but", "no"], {
+    incorporationStatus: z.enum(["yes", "no-but", "no"], {
         required_error: "You need to select a 501c3 status.",
     }).optional(),
     address1: z.string().optional(),
@@ -423,7 +423,7 @@ export default function OrganizationOnboardingForm() {
 
                             <FormField
                                 control={newOrgForm.control}
-                                name="501c3"
+                                name="incorporationStatus"
                                 render={({field}) => (
                                     <FormItem className="space-y-3">
                                         <FormLabel>{`What is your 501c3 status`}</FormLabel>

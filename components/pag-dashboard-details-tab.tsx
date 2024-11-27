@@ -82,7 +82,7 @@ const editOrgFormSchema = z.object({
     website: z.string().min(2, {
         message: "Your organization's website.",
     }).optional(),
-    "501c3": z.enum(["yes", "no-but", "no"], {
+    incorporationStatus: z.enum(["yes", "no-but", "no"], {
         required_error: "You need to select a 501c3 status.",
     }).optional(),
     address1: z.string().optional(),
@@ -223,6 +223,12 @@ export default function PAGDashboardDetailsTab() {
             if (session?.user?.organizationId) {
                 const organizationData = await getOrganizationFromOrganizationId(session.user.organizationId);
                 if (organizationData) {
+                    const incorporationStatusMap: Record<string, "yes" | "no" | "no-but" | undefined> = {
+                        YES: "yes",
+                        NO: "no",
+                        INPROGRESS: "no-but",
+                    };
+
                     const fetchedValues = {
                         id: organizationData.id || "",
                         description: organizationData.description || "",
@@ -246,8 +252,10 @@ export default function PAGDashboardDetailsTab() {
                         imageBlurhash: organizationData.imageBlurhash || "",
                         statedGoal: organizationData.statedGoal || null,
                         dateFounded: organizationData.dateFounded || null,
-                        incorporationStatus: organizationData.incorporationStatus || null,
-                    }
+                        incorporationStatus: organizationData.incorporationStatus
+                            ? incorporationStatusMap[organizationData.incorporationStatus.toUpperCase()] // Map the value if it exists
+                            : undefined
+                    };
                     setDefaultValues(fetchedValues);
                     setAddress(fetchedValues); // Set address state as well
                     editOrgForm.reset(fetchedValues); // Reset form with fetched data
@@ -382,7 +390,7 @@ export default function PAGDashboardDetailsTab() {
 
                     <FormField
                         control={editOrgForm.control}
-                        name="501c3"
+                        name="incorporationStatus"
                         render={({field}) => (
                             <FormItem className="space-y-3">
                                 <FormLabel>{`What is your 501c3 status`}</FormLabel>

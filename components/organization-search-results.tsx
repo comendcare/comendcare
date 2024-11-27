@@ -6,6 +6,7 @@ import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/sea
 import { useShallow } from "zustand/react/shallow";
 import { OrganizationMarketplaceListElement } from "./marketplace-pag-list-element";
 import InfiniteScroll from "./ui/infinite-scroll";
+import Image from "next/image";
 
 const selector = (state: OrganizationSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -40,7 +41,21 @@ export function OrganizationSearchResults() {
     
     const NoResultsView = () => {
         return (
-            <div className="h-full w-full flex justify-center align-center">
+            <div className="h-full w-full flex flex-col mx-auto justify-center items-center align-center">
+                <Image
+                    alt="No organization"
+                    src="https://illustrations.popsy.co/gray/question-mark.svg"
+                    width={400}
+                    height={400}
+                    className="dark:hidden"
+                />
+                <Image
+                    alt="No organization"
+                    src="https://illustrations.popsy.co/white/question-mark.svg"
+                    width={400}
+                    height={400}
+                    className="hidden dark:block"
+                />
                 <p className="text-3xl p-10">
                     {`Sorry, we don't have any results for that search`}
                 </p>
