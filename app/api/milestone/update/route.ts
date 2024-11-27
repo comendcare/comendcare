@@ -28,6 +28,7 @@ export async function POST(request: Request) {
                     include: { tasks: true },
                     data: {
                         title: milestone.title,
+                        type: milestone.type,
                         description: milestone.description,
                         startDate: milestone.startDate,
                         endDate: milestone.endDate,
