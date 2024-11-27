@@ -13,7 +13,7 @@ const selector = (state: OrganizationSearchState) => ({
     setView: state.setView,
 })
 
-export default function MarketplaceSearchBar() {
+export default function OrganizationSearchBar() {
     const [query, setQuery] = useState("")
     const { 
         setSearchTerm,
