@@ -5,14 +5,17 @@ import { useShallow } from "zustand/react/shallow";
 import { MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore";
 import { MilestoneMarketplaceListElement } from "./marketplace-milestone-list-element";
 import { MilestoneMarketplaceCard } from "./marketplace-milestone-card";
+import InfiniteScroll from "./ui/infinite-scroll";
 
 const selector = (state: MilestoneSearchState) => ({
+    lastFetchedPage: state.lastFetchedPage,
+    setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
     searchResults: state.searchResults
 })
 
 export function MilestoneSearchResults() {
-    const { view, searchResults } = useMilestoneSearchStore(useShallow(selector))
+    const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useMilestoneSearchStore(useShallow(selector))
 
     const ResultsView = () => {
         if (view === "list") {
@@ -45,8 +48,14 @@ export function MilestoneSearchResults() {
         )
     }
 
-    return searchResults.length > 0 ? (
-        <ResultsView />
+    return searchResults && (searchResults.length > 0) ? (
+        <>
+            <ResultsView />
+            <InfiniteScroll 
+                lastFetchedPage={lastFetchedPage} 
+                setLastFetchedPage={setLastFetchedPage}
+            />
+        </>
     ):(
         <NoResultsView />
     )
