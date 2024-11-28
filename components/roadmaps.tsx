@@ -36,7 +36,7 @@ export default async function Roadmaps({
             ))}
         </div>
     ) : (
-        <div className="flex flex-col items-center space-x-4">
+        <div className="flex flex-col items-center justify-center space-x-4">
             <h1 className="font-cal text-4xl">No Roadmaps Yet</h1>
             <Image
                 alt="missing roadmap"

@@ -203,6 +203,40 @@ export const createOrganization = async (formData: FormData) => {
     }
 }
 
+export const toggleOrganizationVerified = async (organizationId: string) => {
+    try {
+        const organization = await prisma.organization.findUnique({
+            where: {
+                id: organizationId,
+            }
+        })
+
+        if (organization) {
+            // Toggle the 'verified' attribute
+            const updatedOrganization = await prisma.organization.update({
+                where: {
+                    id: organization.id
+                },
+                data: {
+                    verified: !organization.verified
+                }
+            })
+
+            // Log or revalidate if necessary
+            console.log("Toggled verified status for organization", organization.id)
+            await revalidateTag(
+                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+            )
+
+            return updatedOrganization
+        }
+    } catch (error: any) {
+        return {
+            error: error.message
+        }
+    }
+}
+
 export const updateOrganization = withOrganizationAuth(
     async (formData: FormData, organization: Organization, key: string) => {
         const value = formData.get(key) as string

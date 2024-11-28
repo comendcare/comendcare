@@ -1,25 +1,62 @@
+"use client"
+
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {Button} from "@/components/ui/button";
+import {useRouter} from "next/navigation";
+import {useSession} from "next-auth/react";
+import Loading from "@/app/loading";
 
 export default function OnboardingWelcomePage() {
+    const {data: session, status} = useSession()
+    const router = useRouter()
+
+    if (status === "loading") {
+        return <Loading />
+    }
+
     return (
         <main className="flex flex-col space-y-8 w-full max-w-7xl mx-auto">
             <div className="w-full space-y-4">
                 <div className="space-y-2">
                     <h1 className="text-xl font-semibold">
-                        Welcome to Comend!
+                        Welcome to Comend, {session?.user.name?.split(" ")[0]}!
                     </h1>
                     <p>
                         {`We're happy to have you! We have a few questions to better understand how we can help you.
                         All questions in this form are optional unless marked as (required).`}
                     </p>
+                    <p>
+                        {`There are 4 sections`}
+                    </p>
+                    <ol className="space-y-1 list-decimal list-inside">
+                        <li>
+                            <span className="font-semibold text-gray-900 dark:text-white">
+                                About you:
+                            </span> Create your profile to get started. This will be connected to your Patient Advocacy Organization for a personalized experience.
+                        </li>
+                        <li>
+                            <span className="font-semibold text-gray-900 dark:text-white">
+                                Organization:
+                            </span> Share key details about your group and its mission.
+                        </li>
+                        <li>
+                            <span className="font-semibold text-gray-900 dark:text-white">
+                                Research:
+                            </span> Provide insights into your current research efforts to unlock tailored opportunities.
+                        </li>
+                        <li>
+                            <span className="font-semibold text-gray-900 dark:text-white">
+                                Finance:
+                            </span> Outline the financial landscape supporting your research initiatives.
+                        </li>
+                    </ol>
                     <p className="font-semibold">
                         {`Nothing that you share here will be shared with others, and you have complete control of what info is made public on your organization profile and research plan.`}
                     </p>
                 </div>
 
-                <Separator />
+                <Separator/>
             </div>
 
             <div className="grid grid-cols-2 gap-8">
@@ -30,15 +67,21 @@ export default function OnboardingWelcomePage() {
                     </h1>
                     <div className="flex flex-col space-y-4">
                         {/* Form header */}
-                        <Skeleton className="h-6 w-1/3" />
+                        <Skeleton className="h-6 w-1/3"/>
                         {/* Form inputs */}
-                        <Skeleton className="h-10 w-full rounded-md" />
+                        <Skeleton className="h-10 w-full rounded-md"/>
+                        <Skeleton className="h-10 w-full rounded-md"/>
+                        <Skeleton className="h-10 w-full rounded-md"/>
+                        <Skeleton className="h-10 w-full rounded-md"/>
                         <Skeleton className="h-10 w-full rounded-md" />
                         <Skeleton className="h-10 w-2/3 rounded-md" />
                         {/* Button */}
                         <Skeleton className="h-10 w-1/4 rounded-md" />
                     </div>
-                    <Button variant="default">
+                    <Button
+                        variant="default"
+                        onClick={() => router.push("/onboarding/user")}
+                    >
                         Next
                     </Button>
                 </div>

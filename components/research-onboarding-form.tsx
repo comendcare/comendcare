@@ -18,6 +18,7 @@ import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Separator} from "@/components/ui/separator";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {FaQuestionCircle} from "react-icons/fa";
+import {Timer} from "lucide-react";
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -399,9 +400,16 @@ export default function ResearchOnboardingForm() {
         <TooltipProvider>
             <div className="space-y-4 w-1/2">
                 <div className="space-y-2">
-                    <h1 className="text-xl font-semibold">
-                        Research onboarding
-                    </h1>
+                    <div className="flex flex-row justify-between">
+                        <h1 className="text-xl font-semibold">
+                            Research onboarding
+                        </h1>
+
+                        <p className="inline-flex flex-row justify-center items-center gap-x-2 text-xl">
+                            <Timer/>
+                            {`Estimated time: 6 min`}
+                        </p>
+                    </div>
                     <p>
                         {`
                         Lastly, we have some questions about the nature of your disorder, it's demographic, and the ongoing efforts towards treatments and cures.
