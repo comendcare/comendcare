@@ -68,12 +68,16 @@ import { PrivateBadge } from "./private-badge"
 import { debounce } from "lodash"
 import {monthsList} from "@/lib/data";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
-import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { MILESTONE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS } from "@/lib/types"
 import type { Option } from "./ui/multiple-selector"
 import MultipleSelector from "./ui/multiple-selector"
 import { optionSchema } from "./research-onboarding-form"
 import { Prisma } from "@prisma/client"
 import { Separator } from "./ui/separator"
+import { AssetEditForm } from "./asset-edit-form"
+import { ExternalContactField } from "./external-contact-field"
+import { ExternalAttachmentField } from "./external-attachment-field"
+import { RFPEditForm } from "./rfp-edit-form"
 
 type AssetType = Prisma.AssetGetPayload<{ 
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -86,7 +90,17 @@ type AssetType = Prisma.AssetGetPayload<{
         }
     } 
 }>
-type RFPType = Prisma.RFPGetPayload<{ include: { contacts: true, attachemnts: true } }>
+type RFPType = Prisma.RFPGetPayload<{
+    omit: { id: true, createdAt: true, updatedAt: true, researchFocus: true }
+    include: { 
+        contacts: { 
+            select: { name: true, role: true, email: true } 
+        }, 
+        attachments: {
+            select: { name: true, link: true }
+        }
+    }
+}>
 type ContactType = AssetType['contacts'][0]
 type AttachmentType = AssetType['attachments'][0]
 
@@ -152,7 +166,8 @@ export function EditMilestoneForm({
         ).optional(),
         status: z.string(),
         private: z.boolean(),
-        asset: z.custom<AssetType>().optional()
+        asset: z.custom<AssetType>().optional(),
+        RFP: z.custom<RFPType>().optional()
     })
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -174,7 +189,9 @@ export function EditMilestoneForm({
             papers: milestoneData?.papers || undefined,
             tasks: milestoneData?.tasks || [],
             status: milestoneData?.status || "TODO",
-            private: milestoneData?.private || false
+            private: milestoneData?.private || false,
+            asset: milestoneData?.asset || undefined,
+            RFP: milestoneData?.RFP || undefined
         }
     })
 
@@ -190,7 +207,7 @@ export function EditMilestoneForm({
         status: form.watch("status"),
         isPrivate: form.watch("private"),
         asset: form.watch("asset"),
-
+        RFP: form.watch("RFP")
     }
 
     // callback ensures we're not creating a new debounce every time this is called
@@ -198,57 +215,67 @@ export function EditMilestoneForm({
         debounce((updatedValues) => handleMilestoneFormSubmit(updatedValues), 500), []
     )
 
-    useEffect(() => {
-        console.log(`FORM DATA CHANGED...`)
-        // callback in debounceUpdates holds onto the state of the time it was created
-        // we can't use the form.watch values directly (since they'll be outdated)
-        // we must pass in the most up to date values in the form
-        debounceUpdates(formData)
-    }, [formData])
+    // useEffect(() => {
+    //     console.log(`FORM UPDATED...`)
+    //     console.log(`Form values have changed:`, form.formState.isDirty)
+    //     // callback in debounceUpdates holds onto the state of the time it was created
+    //     // we can't use the form.watch values directly (since they'll be outdated)
+    //     // we must pass in the most up to date values in the form
+    //     if (form.formState.isDirty) debounceUpdates(formData)
+    // }, [formData])
 
 
     const handleMilestoneFormSubmit = (values: z.infer<typeof editMilestoneForm>) => {
-        const { title, description, type, startDate, endDate, budget, papers, tasks, status, private: isPrivate, asset } = values;
+        const { title, description, type, startDate, endDate, budget, papers, tasks, status, private: isPrivate, asset, RFP } = values;
         const now = new Date()
 
         console.log(`save milestone data`, values)
+        console.log(`is dirty`, form.formState.isDirty)
         
-        // setMilestone(milestoneData?.nodeId, {
-        //     title,
-        //     ...(description !== undefined && description !== null
-        //         ? { description }
-        //         : undefined),
-        //     ...(startDate.month !== undefined || startDate.year !== undefined ? { startDate: new Date(
-        //         startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
-        //         startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
-        //         1
-        //     ) } : undefined),
-        //     ...(endDate.month !== undefined || endDate.year !== undefined ? { endDate: new Date(
-        //         endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
-        //         endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
-        //         1
-        //     ) } : undefined),
-        //     ...(budget ? { budget } : undefined),
-        //     papers,
-        //     ...(tasks 
-        //         ? { tasks: tasks.map((task: any, index: number) => ({
-        //             ...task, 
-        //             orderPosition: index,
-        //             milestoneId: milestoneData?.id
-        //         }))}
-        //         : undefined
-        //     ),
-        //     ...(type
-        //         ? { type }
-        //         : { type: 'NOTYPE'}
-        //     ),
-        //     status,
-        //     private: isPrivate || false
-        // })
-        // toast('Success!', {
-        //     position: "bottom-left",
-        //     description: 'The changes to your milestone have been successfully saved.'
-        // })
+        setMilestone(milestoneData?.nodeId, {
+            title,
+            ...(description !== undefined && description !== null
+                ? { description }
+                : undefined),
+            ...(startDate.month !== undefined || startDate.year !== undefined ? { startDate: new Date(
+                startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
+                startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
+                1
+            ) } : undefined),
+            ...(endDate.month !== undefined || endDate.year !== undefined ? { endDate: new Date(
+                endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
+                endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
+                1
+            ) } : undefined),
+            ...(budget ? { budget } : undefined),
+            papers,
+            ...(tasks 
+                ? { tasks: tasks.map((task: any, index: number) => ({
+                    ...task, 
+                    orderPosition: index,
+                    milestoneId: milestoneData?.id
+                }))}
+                : undefined
+            ),
+            ...(type
+                ? { type }
+                : { type: 'NOTYPE'}
+            ),
+            status,
+            private: isPrivate || false,
+            ...(asset
+                ? { asset}
+                : undefined
+            ),
+            ...(RFP
+                ? { RFP }
+                : undefined
+            )
+        })
+        toast('Success!', {
+            position: "bottom-left",
+            description: 'The changes to your milestone have been successfully saved.'
+        })
     }
 
     const sensors = useSensors(
@@ -673,7 +700,7 @@ export function EditMilestoneForm({
                 )}
                 /> */}
 
-                <Separator />
+                {/* <Separator />
 
                 <FormField
                 control={form.control}
@@ -684,7 +711,7 @@ export function EditMilestoneForm({
                             <>
                             {formData.papers && formData.papers.length > 0 && (
                                 <>
-                                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Associated Papers:`}</FormLabel>
+                                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Associated Papers`}</FormLabel>
                                 <ul className="flex flex-col gap-2">
                                     {field?.value?.map(
                                         (link, index) => (
@@ -738,152 +765,21 @@ export function EditMilestoneForm({
                         <FormMessage />
                     </FormItem>
                 )}
+                /> */}
+
+                <Separator />
+
+                <AssetEditForm 
+                    form={form}
+                    asset={formData.asset as AssetType}
                 />
 
                 <Separator />
 
-                <FormItem className="flex flex-col grow">
-                    <FormControl>
-                        {formData.asset ? (
-                            <>
-                                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Asset`}</FormLabel>
-
-                                <FormLabel>Name</FormLabel>
-                                <FormField 
-                                    control={form.control}
-                                    name="asset.name"
-                                    render={({field}) => (
-                                        <Input
-                                            id="assetName"
-                                            placeholder={`Enter a name for this asset`}
-                                            defaultValue={field.value}
-                                            {...field}
-                                        />
-                                    )}
-                                />
-
-                                <FormLabel>Description</FormLabel> 
-                                <FormField 
-                                    control={form.control}
-                                    name="asset.description"
-                                    render={({field}) => (
-                                        <Input
-                                            id="assetDescription"
-                                            placeholder={`Enter a description for this asset`}
-                                            defaultValue={field.value || ''}
-                                            value={field.value || ''}
-                                            onChange={field.onChange}
-                                        />
-                                    )}
-                                />
-
-                                <FormField 
-                                    control={form.control}
-                                    name="asset.contacts"
-                                    render={({field}) => (
-                                        <>
-                                        {field.value.length > 0 && <FormLabel>Contacts</FormLabel>}
-                                        <ol>
-                                            {field.value.map((contact, index) => (
-                                                <ExternalContactField 
-                                                    index={index}
-                                                    value={contact}
-                                                    onDelete={() => {
-                                                        form.setValue(
-                                                            "asset.contacts",
-                                                            field?.value?.filter((t, i) => i !== index)
-                                                        )
-                                                    }}
-                                                    onValueChange={newValue => {
-                                                        form.setValue(
-                                                            "asset.contacts",
-                                                            field?.value?.map((currentValue, i) => i === index ? newValue : currentValue)
-                                                        )
-                                                    }}
-                                                />
-                                            ))}
-                                        </ol>
-                                        <Button
-                                            variant="secondary"
-                                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                e.preventDefault()
-                                                form.setValue("asset.contacts", [
-                                                    ...(field.value),
-                                                    { name: "", email: "", role: null }
-                                                ])
-                                            }}
-                                        >{`Add a contact`}</Button>
-                                        </>
-                                    )}
-                                />
-                                
-                                <FormField 
-                                    control={form.control}
-                                    name="asset.attachments"
-                                    render={({field}) => (
-                                        <>
-                                        {field.value.length > 0 && <FormLabel>Attachments</FormLabel>}
-                                        <ol>
-                                            {field.value.map((attachment, index) => (
-                                                <ExternalAttachmentField 
-                                                    index={index}
-                                                    value={attachment}
-                                                    onDelete={() => {
-                                                        form.setValue(
-                                                            "asset.attachments",
-                                                            field?.value?.filter((t, i) => i !== index)
-                                                        )
-                                                    }}
-                                                    onValueChange={newValue => {
-                                                        form.setValue(
-                                                            "asset.attachments",
-                                                            field?.value?.map((currentValue, i) => i === index ? newValue : currentValue)
-                                                        )
-                                                    }}
-                                                />
-                                            ))}
-                                        </ol>
-                                        <Button
-                                            variant="secondary"
-                                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                                e.preventDefault()
-                                                form.setValue("asset.attachments", [
-                                                    ...(field.value),
-                                                    { name: "", link: "" }
-                                                ])
-                                            }}
-                                        >{`Add an attachment`}</Button>
-                                        </>
-                                    )}
-                                />
-
-                                <Button
-                                    variant="destructive"
-                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                        e.preventDefault()
-                                        form.setValue("asset", undefined)
-                                    }}
-                                >{`Remove Asset`}</Button>
-                            </>
-                        ) : (
-                            <Button
-                                variant="secondary"
-                                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                    e.preventDefault()
-                                    form.setValue("asset", {
-                                        name: '',
-                                        description: null,
-                                        contacts: [],
-                                        attachments: [],
-                                    })
-                                }}
-                            >{`Add Asset`}</Button>
-                        )}
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-
-                <Separator />
+                <RFPEditForm
+                    form={form}
+                    RFP={formData.RFP as RFPType} 
+                />
 
                 <span className="flex justify-end gap-4 flex-wrap">
                     <Dialog>
@@ -899,100 +795,6 @@ export function EditMilestoneForm({
             </form>
         </ScrollArea>
         </Form>
-    )
-}
-
-const ExternalContactField = ({
-    index,
-    value,
-    onDelete,
-    onValueChange
-}: {
-    index: number
-    value: ContactType
-    onDelete: () => void
-    onValueChange: (newValue: ContactType) => void
-}) => {
-    const deleteElement = (e: React.MouseEvent<HTMLElement>) => {
-        e.preventDefault()
-        onDelete()
-    }
-
-    return (
-        <li key={index} className="flex flex-row gap-2 items-center">
-            <Input
-                className="h-full"
-                placeholder={`Contact name`}
-                value={value.name}
-                onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                    onValueChange({
-                        ...value,
-                        name: e.currentTarget.value
-                    })
-                }}
-            />
-            <Input
-                className="h-full"
-                placeholder={`Contact email`}
-                value={value.email}
-                onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                    onValueChange({
-                        ...value,
-                        email: e.currentTarget.value
-                    })
-                }}
-            />
-            <Button variant="secondary" size="icon" onClick={deleteElement}>
-                <FaTrash />
-            </Button>
-        </li>
-    )
-}
-
-const ExternalAttachmentField = ({
-    index,
-    value,
-    onDelete,
-    onValueChange
-}: {
-    index: number
-    value: AttachmentType
-    onDelete: () => void
-    onValueChange: (newValue: AttachmentType) => void
-}) => {
-    const deleteElement = (e: React.MouseEvent<HTMLElement>) => {
-        e.preventDefault()
-        onDelete()
-    }
-
-    return (
-        <li key={index} className="flex flex-row gap-2 items-center">
-            <Input
-                className="h-full"
-                placeholder={`Attachment name`}
-                value={value.name || ""}
-                onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                    onValueChange({
-                        ...value,
-                        name: e.currentTarget.value
-                    })
-                }}
-            />
-            <Input
-                className="h-full"
-                placeholder={`Attachment link`}
-                value={value.link}
-                onChange={(e: React.FormEvent<HTMLInputElement>) => {
-                    onValueChange({
-                        ...value,
-                        link: e.currentTarget.value
-                    })
-                }}
-            />
-            <Button variant="secondary" size="icon" onClick={deleteElement}>
-                <FaTrash />
-            </Button>
-        </li>
     )
 }
 
@@ -1019,6 +821,7 @@ const PaperField = ({
     return (
         <li key={index} className="flex flex-row gap-2 items-center">
             <Input
+                className="h-full"
                 placeholder={`Enter a link to the associated paper`}
                 value={value}
                 onChange={valueChanged}
