@@ -30,6 +30,7 @@ import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-i
 import {cn, createDicebearAvatar, formatMoney} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 
 const optionSchema = z.object({
@@ -52,11 +53,11 @@ export const newOrgFormSchema = z.object({
         message: "Your organization's nickname must be at least 2 characters."
     }),
     looking: z.array(optionSchema).min(0).optional(),
-    founded: z.string().min(2, {
-        message: "The year that your organization was founded.",
-    }),
+    founded: z.string().optional(),
     description: z.string().min(2, {
-        message: "Your organization's description.",
+        message: "Your organization's description must be at least 2 characters long.",
+    }).max(500, {
+        message: "Your organization's description must less than 500 characters long.",
     }),
     website: z.string().min(2, {
         message: "Your organization's website.",
@@ -103,6 +104,8 @@ const OPTIONS: Option[] = [
         strengths: 'Provides full-stack capabilities with SSR, optimized for caching and streaming, and excellent support for nested routing.',
     },
 ];
+
+const years = Array.from({ length: new Date().getFullYear() - 1970 + 1 }, (_, i) => (1970 + i).toString());
 
 export default function OrganizationOnboardingForm() {
     const {data: session, update} = useSession()
@@ -380,22 +383,53 @@ export default function OrganizationOnboardingForm() {
                                 )}
                             />
 
+                            {/*<FormField*/}
+                            {/*    control={newOrgForm.control}*/}
+                            {/*    name="founded"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>{`Year founded (required)`}</FormLabel>*/}
+                            {/*            <FormDescription>{`The year your organization was founded.`}</FormDescription>*/}
+                            {/*            <FormControl>*/}
+                            {/*                <Input*/}
+                            {/*                    type="text"*/}
+                            {/*                    id="name"*/}
+                            {/*                    autoComplete="name"*/}
+                            {/*                    {...field}*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
+
                             <FormField
                                 control={newOrgForm.control}
                                 name="founded"
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>{`Year founded (required)`}</FormLabel>
-                                        <FormDescription>{`The year your organization was founded.`}</FormDescription>
-                                        <FormControl>
-                                            <Input
-                                                type="text"
-                                                id="name"
-                                                autoComplete="name"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
+                                        <FormLabel>Year</FormLabel>
+                                        <Select
+                                            onValueChange={(value) => field.onChange(`${value}-01-01`)} // Convert year to a date string
+                                            defaultValue={field.value?.split("-")[0]} // Extract the year from the date string for the default value
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a year" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {years.map((year) => (
+                                                    <SelectItem key={year} value={year.toString()}> {/* Use the year as a string for the SelectItem value */}
+                                                        {year}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormDescription>
+                                            Select the year your organization was founded.
+                                        </FormDescription>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />

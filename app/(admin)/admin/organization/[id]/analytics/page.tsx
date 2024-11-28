@@ -17,7 +17,8 @@ export default async function OrganizationAnalytics({
             id: decodeURIComponent(params.id)
         }
     })
-    if (!data || data.userId !== session.user.id) {
+
+    if (!data) {
         notFound()
     }
 
