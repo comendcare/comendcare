@@ -28,7 +28,7 @@ export const ExternalContactField = ({
             <div className="h-full w-full grow">
             <Input
                 className="h-full"
-                placeholder={`Contact name`}
+                placeholder={`Name`}
                 value={value.name}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                     onValueChange({
@@ -41,7 +41,7 @@ export const ExternalContactField = ({
             <div className="h-full w-full grow">
             <Input
                 className="h-full"
-                placeholder={`Contact email`}
+                placeholder={`Email`}
                 value={value.email}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                     onValueChange({

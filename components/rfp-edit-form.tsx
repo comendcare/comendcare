@@ -300,6 +300,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                     </Card>
                 ) : (
                     <Button
+                        className="w-full"
                         variant="secondary"
                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                             e.preventDefault()
@@ -314,7 +315,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                 endDate: null
                             })
                         }}
-                    >{`Add RFP`}</Button>
+                    >{`Add a RFP`}</Button>
                 )}
             </FormControl>
         </FormItem>

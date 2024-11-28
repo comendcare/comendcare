@@ -180,6 +180,7 @@ export function AssetEditForm({ form, asset }: { form: UseFormReturn<any>, asset
                     </Card>
                 ) : (
                     <Button
+                        className="w-full"
                         variant="secondary"
                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                             e.preventDefault()
@@ -190,7 +191,7 @@ export function AssetEditForm({ form, asset }: { form: UseFormReturn<any>, asset
                                 attachments: [],
                             })
                         }}
-                    >{`Add Asset`}</Button>
+                    >{`Add an Asset`}</Button>
                 )}
             </FormControl>
             <FormMessage />

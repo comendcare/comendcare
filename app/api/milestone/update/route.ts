@@ -39,7 +39,15 @@ export async function POST(request: Request) {
                         startDate: milestone.startDate,
                         endDate: milestone.endDate,
                         budget: milestone.budget,
-                        papers: milestone.papers,
+                        papers:{
+                            deleteMany: {}, // hmmm :(, what's the proper way to do this? upsertMany doesn't exist
+                            createMany: {
+                                data: milestone.papers.map((paper: any) => ({
+                                    link: paper.link,
+                                    ...(paper.name ? { name: paper.name } : undefined)
+                                }))
+                            }
+                        },
                         tasks: {
                             deleteMany: tasksToDelete
                                 .filter((task: any) => task.id !== null && task.id !== undefined)
