@@ -110,7 +110,7 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     if (status === "authenticated" && session) {
         return (
-            <div className="flex h-screen w-full">
+            <div className="flex h-screen max-h-screen w-full">
                 <ResizablePanelGroup
                     direction="horizontal"
                     onLayout={(sizes: number[]) => {

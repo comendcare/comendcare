@@ -40,7 +40,7 @@ export const PAGProfileDetailsCard = ({organization}: {organization: Organizatio
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     About
                 </CardTitle>
-                <EditProfileAboutDialog/>
+                {/*<EditProfileAboutDialog/>*/}
             </CardHeader>
 
             <CardContent>
