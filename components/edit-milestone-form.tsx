@@ -78,6 +78,7 @@ import { AssetEditForm } from "./asset-edit-form"
 import { ExternalContactField } from "./external-contact-field"
 import { ExternalAttachmentField } from "./external-attachment-field"
 import { RFPEditForm } from "./rfp-edit-form"
+import { PapersEditForm } from "./papers-edit-form"
 
 type AssetType = Prisma.AssetGetPayload<{ 
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -156,7 +157,7 @@ export function EditMilestoneForm({
             year: z.string().optional()
         }),
         budget: z.number().optional(),
-        papers: z.array(z.string()).optional(),
+        papers: z.array(z.custom<AttachmentType>()).optional(),
         tasks: z.array(
             z.object({
                 id: z.string(),
@@ -230,7 +231,6 @@ export function EditMilestoneForm({
         const now = new Date()
 
         console.log(`save milestone data`, values)
-        console.log(`is dirty`, form.formState.isDirty)
         
         setMilestone(milestoneData?.nodeId, {
             title,
@@ -248,7 +248,10 @@ export function EditMilestoneForm({
                 1
             ) } : undefined),
             ...(budget ? { budget } : undefined),
-            papers,
+            ...(papers
+                ? { papers }
+                : undefined
+            ),
             ...(tasks 
                 ? { tasks: tasks.map((task: any, index: number) => ({
                     ...task, 
@@ -263,14 +266,14 @@ export function EditMilestoneForm({
             ),
             status,
             private: isPrivate || false,
-            ...(asset
-                ? { asset}
-                : undefined
-            ),
-            ...(RFP
-                ? { RFP }
-                : undefined
-            )
+            // ...(asset
+            //     ? { asset}
+            //     : undefined
+            // ),
+            // ...(RFP
+            //     ? { RFP }
+            //     : undefined
+            // )
         })
         toast('Success!', {
             position: "bottom-left",
@@ -634,7 +637,7 @@ export function EditMilestoneForm({
                 )}
                 />
 
-                {/* <Separator />
+                <Separator />
 
                 <FormField
                 control={form.control}
@@ -698,74 +701,14 @@ export function EditMilestoneForm({
                         <FormMessage />
                     </FormItem>
                 )}
-                /> */}
+                />
 
-                {/* <Separator />
+                <Separator />
 
-                <FormField
-                control={form.control}
-                name="papers"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col grow">
-                        <FormControl>
-                            <>
-                            {formData.papers && formData.papers.length > 0 && (
-                                <>
-                                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Associated Papers`}</FormLabel>
-                                <ul className="flex flex-col gap-2">
-                                    {field?.value?.map(
-                                        (link, index) => (
-                                            <PaperField
-                                                key={index}
-                                                index={index}
-                                                value={link}
-                                                onDelete={() =>
-                                                    form.setValue(
-                                                        "papers",
-                                                        field?.value?.filter(
-                                                            (t, i) =>
-                                                                i !==
-                                                                index
-                                                        )
-                                                    )
-                                                }
-                                                onValueChange={newValue => {
-                                                    form.setValue(
-                                                        "papers",
-                                                        field?.value?.map(
-                                                            (
-                                                                currentValue,
-                                                                i
-                                                            ) =>
-                                                                i ===
-                                                                index
-                                                                    ? newValue
-                                                                    : currentValue
-                                                        )
-                                                    )
-                                                }}
-                                            />
-                                        )
-                                    )}
-                                </ul>
-                                </>
-                            )}
-                            <Button
-                                variant="secondary"
-                                onClick={(e: any) => {
-                                    e.preventDefault()
-                                    form.setValue("papers", [
-                                        ...(field?.value || []),
-                                        ""
-                                    ])
-                                }}
-                            >{`Add an Associated Paper`}</Button>
-                            </>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-                /> */}
+                <PapersEditForm
+                    form={form}
+                    papers={formData.papers as AttachmentType[]} 
+                />
 
                 <Separator />
 
@@ -795,41 +738,6 @@ export function EditMilestoneForm({
             </form>
         </ScrollArea>
         </Form>
-    )
-}
-
-const PaperField = ({
-    index,
-    value,
-    onDelete,
-    onValueChange
-}: {
-    index: number
-    value: string
-    onDelete: () => void
-    onValueChange: (newValue: string) => void
-}) => {
-    const deleteElement = (e: React.MouseEvent<HTMLElement>) => {
-        e.preventDefault()
-        onDelete()
-    }
-
-    const valueChanged = (e: React.FormEvent<HTMLInputElement>) => {
-        onValueChange(e.currentTarget.value)
-    }
-
-    return (
-        <li key={index} className="flex flex-row gap-2 items-center">
-            <Input
-                className="h-full"
-                placeholder={`Enter a link to the associated paper`}
-                value={value}
-                onChange={valueChanged}
-            />
-            <Button variant="secondary" size="icon" onClick={deleteElement}>
-                <FaTrash />
-            </Button>
-        </li>
     )
 }
 

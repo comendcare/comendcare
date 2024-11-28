@@ -28,7 +28,7 @@ export const ExternalAttachmentField = ({
             <div className="h-full w-full grow">
             <Input
                 className="h-full"
-                placeholder={`Attachment name`}
+                placeholder={`Name`}
                 value={value.name || ""}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                     onValueChange({
@@ -41,7 +41,7 @@ export const ExternalAttachmentField = ({
             <div className="h-full w-full grow">
             <Input
                 className="h-full"
-                placeholder={`Attachment link`}
+                placeholder={`Link`}
                 value={value.link}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                     onValueChange({
