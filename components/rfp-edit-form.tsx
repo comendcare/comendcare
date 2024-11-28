@@ -96,26 +96,29 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                 render={({field}) => (
                                     <>
                                     {field.value.length > 0 && <FormLabel className="text-md">{`Contacts`}</FormLabel>}
-                                    <ol className="flex flex-col gap-2">
-                                        {field.value.map((contact: ContactType, index: number) => (
-                                            <ExternalContactField 
-                                                index={index}
-                                                value={contact}
-                                                onDelete={() => {
-                                                    form.setValue(
-                                                        "RFP.contacts",
-                                                        field?.value?.filter((t: ContactType, i: number) => i !== index)
-                                                    )
-                                                }}
-                                                onValueChange={newValue => {
-                                                    form.setValue(
-                                                        "RFP.contacts",
-                                                        field?.value?.map((currentValue: ContactType, i: number) => i === index ? newValue : currentValue)
-                                                    )
-                                                }}
-                                            />
-                                        ))}
-                                    </ol>
+                                    {field.value.lenght > 0 && (
+                                        <ol className="flex flex-col gap-2">
+                                            {field.value.map((contact: ContactType, index: number) => (
+                                                <ExternalContactField 
+                                                    key={index}
+                                                    index={index}
+                                                    value={contact}
+                                                    onDelete={() => {
+                                                        form.setValue(
+                                                            "RFP.contacts",
+                                                            field?.value?.filter((t: ContactType, i: number) => i !== index)
+                                                        )
+                                                    }}
+                                                    onValueChange={newValue => {
+                                                        form.setValue(
+                                                            "RFP.contacts",
+                                                            field?.value?.map((currentValue: ContactType, i: number) => i === index ? newValue : currentValue)
+                                                        )
+                                                    }}
+                                                />
+                                            ))}
+                                        </ol>
+                                    )}
                                     <Button
                                         variant="secondary"
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
@@ -138,26 +141,29 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                 render={({field}) => (
                                     <>
                                     {field.value.length > 0 && <FormLabel className="text-md">{`Attachments`}</FormLabel>}
-                                    <ol className="flex flex-col gap-2">
-                                        {field.value.map((attachment: AttachmentType, index: number) => (
-                                            <ExternalAttachmentField 
-                                                index={index}
-                                                value={attachment}
-                                                onDelete={() => {
-                                                    form.setValue(
-                                                        "RFP.attachments",
-                                                        field?.value?.filter((t: AttachmentType, i: number) => i !== index)
-                                                    )
-                                                }}
-                                                onValueChange={newValue => {
-                                                    form.setValue(
-                                                        "RFP.attachments",
-                                                        field?.value?.map((currentValue: AttachmentType, i: number) => i === index ? newValue : currentValue)
-                                                    )
-                                                }}
-                                            />
-                                        ))}
-                                    </ol>
+                                    {field.value.length > 0 && (
+                                        <ol className="flex flex-col gap-2">
+                                            {field.value.map((attachment: AttachmentType, index: number) => (
+                                                <ExternalAttachmentField 
+                                                    key={index}
+                                                    index={index}
+                                                    value={attachment}
+                                                    onDelete={() => {
+                                                        form.setValue(
+                                                            "RFP.attachments",
+                                                            field?.value?.filter((t: AttachmentType, i: number) => i !== index)
+                                                        )
+                                                    }}
+                                                    onValueChange={newValue => {
+                                                        form.setValue(
+                                                            "RFP.attachments",
+                                                            field?.value?.map((currentValue: AttachmentType, i: number) => i === index ? newValue : currentValue)
+                                                        )
+                                                    }}
+                                                />
+                                            ))}
+                                        </ol>
+                                    )}
                                     <Button
                                         variant="secondary"
                                         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {

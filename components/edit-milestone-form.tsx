@@ -648,7 +648,7 @@ export function EditMilestoneForm({
                             <>
                             {formData.tasks && formData.tasks.length > 0 && (
                                 <>
-                                <FormLabel className="text-xl">{`Tasks:`}</FormLabel>
+                                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Tasks`}</FormLabel>
                                 <DndContext 
                                     accessibility={{
                                         announcements

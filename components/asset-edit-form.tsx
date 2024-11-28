@@ -87,6 +87,7 @@ export function AssetEditForm({ form, asset }: { form: UseFormReturn<any>, asset
                                         <ol className="flex flex-col gap-2">
                                             {field.value.map((contact: ContactType, index: number) => (
                                                 <ExternalContactField 
+                                                    key={index}
                                                     index={index}
                                                     value={contact}
                                                     onDelete={() => {
@@ -131,6 +132,7 @@ export function AssetEditForm({ form, asset }: { form: UseFormReturn<any>, asset
                                         <ol className="flex flex-col gap-2">
                                             {field.value.map((attachment: AttachmentType, index: number) => (
                                                 <ExternalAttachmentField 
+                                                    key={index}
                                                     index={index}
                                                     value={attachment}
                                                     onDelete={() => {

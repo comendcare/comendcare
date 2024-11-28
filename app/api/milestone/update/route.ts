@@ -11,7 +11,16 @@ export async function POST(request: Request) {
                 const previousMilestone = await prisma.milestone.findUnique({
                     // where: { nodeId: milestone.nodeId },
                     where: { id: milestone.id },
-                    include: { tasks: true }
+                    include: { 
+                        papers: true, 
+                        asset: {
+                            include: { contacts: true, attachments: true }
+                        },
+                        RFP: {
+                            include: { contacts: true, attachments: true }
+                        },
+                        tasks: true 
+                    }
                 })
                   
                 if (!previousMilestone) {
@@ -31,7 +40,16 @@ export async function POST(request: Request) {
                 await prisma.milestone.update({
                     // where: { nodeId: milestone.nodeId },
                     where: { id: milestone.id },
-                    include: { tasks: true },
+                    include: { 
+                        papers: true, 
+                        asset: {
+                            include: { contacts: true, attachments: true }
+                        },
+                        RFP: {
+                            include: { contacts: true, attachments: true }
+                        },
+                        tasks: true 
+                    },
                     data: {
                         title: milestone.title,
                         type: milestone.type,
