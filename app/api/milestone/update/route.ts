@@ -16,7 +16,7 @@ export async function POST(request: Request) {
                   
                 if (!previousMilestone) {
                     // milestone doesn't exist, throw error
-                    throw new Error(`Milestone with ID ${milestone.id} does not exist.`);
+                    throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`);
                 }
 
                 const previousTasks = previousMilestone?.tasks || []
