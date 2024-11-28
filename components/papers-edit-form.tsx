@@ -30,6 +30,7 @@ export function PapersEditForm({ form, papers }: { form: UseFormReturn<any>, pap
                                     <ol className="flex flex-col gap-2">
                                         {field.value.map((paper: AttachmentType, index: number) => (
                                             <ExternalAttachmentField 
+                                                key={index}
                                                 index={index}
                                                 value={paper}
                                                 onDelete={() => {
