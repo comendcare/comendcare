@@ -15,8 +15,8 @@ import {PAGPublicProfileDetailsCard} from "@/components/pag-public-profile-detai
 import {PAGPublicProfileRoadmapCard} from "@/components/pag-public-profile-roadmap-card";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {CalendarDays} from "lucide-react";
-import {AssetsCard} from "@/components/assets-card";
-import {OpenRFPsCard} from "@/components/open-rfps-card";
+import {PAGProfileAssetsCard} from "@/components/pag-profile-assets-card";
+import {PAGProfileOpenRFPsCard} from "@/components/pag-profile-open-rfps-card";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -66,8 +66,8 @@ export default async function OrganizationHomePage({
                 <div className="grid grid-cols-6 gap-4">
                     <div className="col-span-2 space-y-4">
                         <PAGPublicProfileDetailsCard organization={data}/>
-                        <AssetsCard/>
-                        <OpenRFPsCard/>
+                        <PAGProfileAssetsCard/>
+                        <PAGProfileOpenRFPsCard/>
                     </div>
 
                     <div className="col-span-4 flex flex-col space-y-4">

@@ -6,6 +6,7 @@ import rateLimit from "@/lib/rate-limit";
 import axios from "axios";
 import WaitlistEmail from "@/packages/transactional/emails/contact/waitlist-email";
 import InviteToOrganizationEmail from "@/packages/transactional/emails/invitations/invite-to-organization-email";
+import {NewMemberRequestEmail} from "@/packages/transactional/emails/invitations/new-member-request-email";
 
 const limiter = rateLimit({
     interval: 600 * 1000, // 10 minutes (600 seconds * 1000 ms)
@@ -125,6 +126,48 @@ export async function sendInviteEmail(params: {
             html: emailTemplate,
             text: "A user has sent a message via the contact page.",
             subject: `Join ${params.inviter.name} on Comend`
+        }
+        await sendEmail(msg)
+    }
+}
+
+
+export async function sendMemberRequestEmail(params: {
+    user: {
+        name: string | undefined
+        email: string | null | undefined
+        image: string | null | undefined
+    }
+    admin: {
+        name: string | null | undefined
+        email: string | null | undefined
+        organizationName: string | undefined
+        organizationImage: string | undefined
+    }
+}) {
+    const emailTemplate = await render(
+        NewMemberRequestEmail(
+            {
+                requestedByUserName: params.user.name,
+                requestedByUserImage: params.user.image,
+                requestedByUserEmail: params.user.email,
+                adminName: params.admin.name,
+                adminEmail: params.admin.email,
+                organizationName: params.admin.organizationName,
+                organizationImage: params.admin.organizationImage,
+            }
+        )
+    )
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
+    if (params.admin.email) {
+        const msg = {
+            // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
+            to: params.admin.email,
+            from: "corporate@comendcare.com",
+            html: emailTemplate,
+            text: "A user has sent a message via the contact page.",
+            subject: `${params.user.name} is requesting to join you on Comend`
         }
         await sendEmail(msg)
     }

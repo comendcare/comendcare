@@ -1,12 +1,12 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {ResponsiveContainer, PieChart, Pie, Label} from "recharts";
 import {cn} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
 import {Badge} from "@/components/ui/badge";
 import EditProfileAboutDialog from "@/components/edit-profile-about-dialog";
 import {Organization} from "@prisma/client";
 import Link from "next/link";
+import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 
 const pag = {
     "groupName": "Myhre Syndrome Foundation",
@@ -32,8 +32,9 @@ const pag = {
     ]
 }
 
-export const PAGProfileDetailsCard = ({organization}: {organization: Organization | null}) => {
+export const PagProfileAboutCard = ({organization}: { organization: Organization | null }) => {
     faker.seed(235)
+
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -45,38 +46,45 @@ export const PAGProfileDetailsCard = ({organization}: {organization: Organizatio
 
             <CardContent>
                 <div className="flex flex-col space-y-4">
-                    <div className="flex-shrink-0 space-y-4">
-                        <div className="flex-grow space-y-4">
-                            <div className="space-y-2">
-                                <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                    Description
-                                </h3>
-                                <p>
-                                    {organization?.description}
-                                </p>
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex flex-row items-center justify-between w-full">
-                                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                        Relevant topics
-                                    </h3>
-                                    <Link
-                                        href="/condition"
-                                        className="hover:underline"
-                                    >
-                                        See more
-                                    </Link>
-                                </div>
-                                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-1">
-                                    {pag?.topics.map((item, index) =>
-                                        <Badge key={index} className="flex text-sm">
-                                            {item.charAt(0).toUpperCase() + item.slice(1)}
-                                        </Badge>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
+                    <div className="space-y-2">
+                        <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                            Description
+                        </h3>
+                        <p>
+                            {organization?.description}
+                        </p>
                     </div>
+                    {/*<div className="space-y-2">*/}
+                    {/*    <div className="flex flex-row items-center justify-between w-full">*/}
+                    {/*        <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>*/}
+                    {/*            Relevant topics*/}
+                    {/*        </h3>*/}
+                    {/*        <Link*/}
+                    {/*            href="/condition"*/}
+                    {/*            className="hover:underline"*/}
+                    {/*        >*/}
+                    {/*            See more*/}
+                    {/*        </Link>*/}
+                    {/*    </div>*/}
+                    {/*    <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-1">*/}
+                    {/*        {pag?.topics.map((item, index) =>*/}
+                    {/*            <Badge key={index} className="flex text-sm">*/}
+                    {/*                {item.charAt(0).toUpperCase() + item.slice(1)}*/}
+                    {/*            </Badge>*/}
+                    {/*        )}*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
+                    {organization?.website &&
+                        <Link
+                            href={organization.website}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
+                        >
+                            {organization?.website}
+                            <FaArrowUpRightFromSquare/>
+                        </Link>
+                    }
                 </div>
 
             </CardContent>

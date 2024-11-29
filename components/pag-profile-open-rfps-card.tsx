@@ -79,7 +79,7 @@ const rfps: RFP[] = [
     },
 ];
 
-export const OpenRFPsCard = () => {
+export const PAGProfileOpenRFPsCard = () => {
 
     return (
         <Card>
