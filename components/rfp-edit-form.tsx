@@ -80,7 +80,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                         <Textarea
                                             id="RFPDescription"
                                             placeholder={`Enter a description for this RFP`}
-                                            defaultValue={field.value || ''}
+                                            // defaultValue={field.value || ''}
                                             value={field.value || ''}
                                             onChange={field.onChange}
                                         />
@@ -96,7 +96,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                 render={({field}) => (
                                     <>
                                     {field.value.length > 0 && <FormLabel className="text-md">{`Contacts`}</FormLabel>}
-                                    {field.value.lenght > 0 && (
+                                    {field.value.length > 0 && (
                                         <ol className="flex flex-col gap-2">
                                             {field.value.map((contact: ContactType, index: number) => (
                                                 <ExternalContactField 

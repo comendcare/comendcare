@@ -1,6 +1,20 @@
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma" // Adjust the path to your Prisma client
 import { nanoid } from "nanoid"
+import { Prisma } from "@prisma/client"
+
+type MilestoneType = Prisma.MilestoneGetPayload<{
+    include: { 
+        papers: true, 
+        asset: {
+            include: { contacts: true, attachments: true }
+        },
+        RFP: {
+            include: { contacts: true, attachments: true }
+        },
+        tasks: true 
+    }
+}>
 
 export async function POST(request: Request) {
     try {
@@ -57,7 +71,7 @@ export async function POST(request: Request) {
                         startDate: milestone.startDate,
                         endDate: milestone.endDate,
                         budget: milestone.budget,
-                        papers:{
+                        papers: {
                             deleteMany: {}, // hmmm :(, what's the proper way to do this? upsertMany doesn't exist
                             createMany: {
                                 data: milestone.papers.map((paper: any) => ({
@@ -83,9 +97,13 @@ export async function POST(request: Request) {
                             }
                         },
                         status: milestone.status || "TODO",
-                        private: milestone.private || false
+                        private: milestone.private || false,
                     }
                 })
+
+                updateAssets(previousMilestone, milestone)
+
+                updateRFP(previousMilestone, milestone)
 
                 for (let i = 0; i < tasksToUpdate.length; i++) {
                     const task = tasksToUpdate[i]
@@ -111,5 +129,123 @@ export async function POST(request: Request) {
             { error: "Failed to update milestones" },
             { status: 500 }
         )
+    }
+}
+
+async function updateAssets(previousMilestone: MilestoneType, milestone: MilestoneType) {
+    if (milestone.asset) {
+        await prisma.milestone.update({
+            where: { id: milestone.id },
+            include: { 
+                asset: { include: { contacts: true, attachments: true } }
+            },
+            data: {
+                asset: {
+                    upsert: {
+                        create: {
+                            name: milestone.asset.name
+                        },
+                        update: {
+                            name: milestone.asset.name,
+                            description: milestone.asset.description,
+                            contacts: {
+                                deleteMany: {}, // hmmm :(, what's the proper way to do this? upsertMany doesn't exist
+                                createMany: {
+                                    data: milestone.asset.contacts.map((contact: any) => ({
+                                        name: contact.name,
+                                        role: contact.role,
+                                        email: contact.email
+                                    }))
+                                }
+                            },
+                            attachments: {
+                                deleteMany: {}, // hmmm :(, what's the proper way to do this? upsertMany doesn't exist
+                                createMany: {
+                                    data: milestone.asset.attachments.map((attachment: any) => ({
+                                        link: attachment.link,
+                                        name: attachment.name
+                                    }))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    if (!milestone.asset && previousMilestone.asset) {
+        await prisma.milestone.update({
+            where: { id: milestone.id },
+            include: { 
+                asset: { include: { contacts: true, attachments: true } }
+            },
+            data: {
+                asset: { delete: true }
+            }
+        })
+    }
+}
+
+async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneType) {
+    if (milestone.RFP) {
+        await prisma.milestone.update({
+            where: { id: milestone.id },
+            include: { 
+                RFP: { include: { contacts: true, attachments: true } },
+            },
+            data: {
+                RFP: {
+                    upsert: {
+                        create: {
+                            name: milestone.RFP.name,
+                            funding: milestone.RFP.funding,
+                            researchFocus: milestone.type,
+                            openTo: milestone.RFP.openTo
+                        },
+                        update: {
+                            name: milestone.RFP.name,
+                            funding: milestone.RFP.funding,
+                            description: milestone.RFP.description,
+                            contacts: {
+                                deleteMany: {}, // hmmm :(, what's the proper way to do this? upsertMany doesn't exist
+                                createMany: {
+                                    data: milestone.RFP.contacts.map((contact: any) => ({
+                                        name: contact.name,
+                                        role: contact.role,
+                                        email: contact.email
+                                    }))
+                                }
+                            },
+                            attachments: {
+                                deleteMany: {}, // hmmm :(, what's the proper way to do this? upsertMany doesn't exist
+                                createMany: {
+                                    data: milestone.RFP.attachments.map((attachment: any) => ({
+                                        link: attachment.link,
+                                        name: attachment.name
+                                    }))
+                                }
+                            },
+                            researchFocus: milestone.type,
+                            openTo: milestone.RFP.openTo,
+                            startDate: milestone.RFP.startDate,
+                            endDate: milestone.RFP.endDate
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    if (!milestone.RFP && previousMilestone.RFP) {
+        await prisma.milestone.update({
+            where: { id: milestone.id },
+            include: { 
+                RFP: { include: { contacts: true, attachments: true } },
+            },
+            data: {
+                RFP: { delete: true }
+            }
+        })
     }
 }

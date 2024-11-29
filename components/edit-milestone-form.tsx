@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import React, { createRef, useCallback, useEffect, useImperativeHandle, useRef } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import {
@@ -11,7 +11,6 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
-    FormDescription
 } from "./ui/form"
 import { Input } from "./ui/input"
 import { Textarea } from "./ui/textarea"
@@ -22,7 +21,7 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import type { TaskType } from "./milestone-node"
 import type { StatusType } from "./milestone-status-button"
-import { FaDollarSign, FaTrash, FaX } from "react-icons/fa6"
+import { FaTrash, FaX } from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -39,44 +38,26 @@ import { nanoid } from "nanoid"
 import { toast } from "sonner"
 import {
     DndContext,
-    type DragEndEvent,
-    type DragOverEvent,
-    DragOverlay,
-    type DragStartEvent,
     useSensor,
     useSensors,
     KeyboardSensor,
     Announcements,
-    UniqueIdentifier,
     TouchSensor,
     MouseSensor,
     closestCorners
 } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
-import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { CalendarIcon, GripVertical } from "lucide-react"
+import { GripVertical } from "lucide-react"
 import { cva } from "class-variance-authority"
-import { DatePicker } from "@tremor/react"
-import { Popover, PopoverContent } from "./ui/popover"
-import { PopoverTrigger } from "./plate-ui/popover"
-import { Calendar } from "./ui/calendar"
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
 import { Switch } from "./ui/switch"
 import { PrivateBadge } from "./private-badge"
 import { debounce } from "lodash"
 import {monthsList} from "@/lib/data";
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
-import { MILESTONE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS } from "@/lib/types"
-import type { Option } from "./ui/multiple-selector"
-import MultipleSelector from "./ui/multiple-selector"
-import { optionSchema } from "./research-onboarding-form"
+import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
 import { Prisma } from "@prisma/client"
 import { Separator } from "./ui/separator"
 import { AssetEditForm } from "./asset-edit-form"
-import { ExternalContactField } from "./external-contact-field"
-import { ExternalAttachmentField } from "./external-attachment-field"
 import { RFPEditForm } from "./rfp-edit-form"
 import { PapersEditForm } from "./papers-edit-form"
 
@@ -102,7 +83,6 @@ type RFPType = Prisma.RFPGetPayload<{
         }
     }
 }>
-type ContactType = AssetType['contacts'][0]
 type AttachmentType = AssetType['attachments'][0]
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
@@ -135,6 +115,7 @@ export function EditMilestoneForm({
     const { setMilestone } = useRoadmapStore(
         useShallow(selector)
     )
+    const initializing = useRef(true)
 
     const editMilestoneForm = z.object({
         title: z
@@ -216,15 +197,16 @@ export function EditMilestoneForm({
         debounce((updatedValues) => handleMilestoneFormSubmit(updatedValues), 500), []
     )
 
-    // useEffect(() => {
-    //     console.log(`FORM UPDATED...`)
-    //     console.log(`Form values have changed:`, form.formState.isDirty)
-    //     // callback in debounceUpdates holds onto the state of the time it was created
-    //     // we can't use the form.watch values directly (since they'll be outdated)
-    //     // we must pass in the most up to date values in the form
-    //     if (form.formState.isDirty) debounceUpdates(formData)
-    // }, [formData])
+    // Allow update once form is initialized
+    useEffect(() => {
+        initializing.current = false;
+    }, []);
 
+    // Watch form changes, don't watch while initializing
+    useEffect(() => {
+        const subscription = form.watch((values) => debounceUpdates(values))
+        return () => subscription.unsubscribe();
+    }, [form.watch])
 
     const handleMilestoneFormSubmit = (values: z.infer<typeof editMilestoneForm>) => {
         const { title, description, type, startDate, endDate, budget, papers, tasks, status, private: isPrivate, asset, RFP } = values;
@@ -266,14 +248,8 @@ export function EditMilestoneForm({
             ),
             status,
             private: isPrivate || false,
-            // ...(asset
-            //     ? { asset}
-            //     : undefined
-            // ),
-            // ...(RFP
-            //     ? { RFP }
-            //     : undefined
-            // )
+            asset,
+            RFP
         })
         toast('Success!', {
             position: "bottom-left",
@@ -345,6 +321,7 @@ export function EditMilestoneForm({
         <ScrollArea className="research-plan-tour-step3">
             <form
                 onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
+                onChange={() => console.log(`CHANGE`)}
                 className="flex flex-col gap-8 p-2 pr-4"
             >
                 <span className="w-full flex flex-row gap-4">
@@ -449,10 +426,7 @@ export function EditMilestoneForm({
                                     status={
                                         field?.value as StatusType
                                     }
-                                    onStatusChange={status =>
-                                        form.setValue("status", status)
-                                    }
-                                    {...field}
+                                    onStatusChange={field.onChange}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -673,9 +647,9 @@ export function EditMilestoneForm({
                                             key={task.id} 
                                             index={index} 
                                             task={task} 
-                                            onDelete={() => (
+                                            onDelete={() => {
                                                 form.setValue('tasks', field?.value?.filter((t, i) => i !== index))
-                                            )}
+                                            }}
                                             onNameChange={(newName) => {
                                                 form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, name: newName} : t))
                                             }}
@@ -707,7 +681,7 @@ export function EditMilestoneForm({
 
                 <PapersEditForm
                     form={form}
-                    papers={formData.papers as AttachmentType[]} 
+                    papers={formData.papers as AttachmentType[]}
                 />
 
                 <Separator />
