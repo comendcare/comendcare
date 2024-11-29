@@ -149,7 +149,7 @@ async function updateAssets(previousMilestone: MilestoneType, milestone: Milesto
                             name: milestone.asset.name,
                             description: milestone.asset.description,
                             contacts: {
-                                deleteMany: {}, // hmmm :(, what's the proper way to do this? upsertMany doesn't exist
+                                deleteMany: {},  // clear all existing contacts
                                 createMany: {
                                     data: milestone.asset.contacts.map((contact: any) => ({
                                         name: contact.name,
@@ -159,7 +159,7 @@ async function updateAssets(previousMilestone: MilestoneType, milestone: Milesto
                                 }
                             },
                             attachments: {
-                                deleteMany: {}, // hmmm :(, what's the proper way to do this? upsertMany doesn't exist
+                                deleteMany: {}, // clear all existing attachments
                                 createMany: {
                                     data: milestone.asset.attachments.map((attachment: any) => ({
                                         link: attachment.link,
@@ -208,7 +208,7 @@ async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneT
                             funding: milestone.RFP.funding,
                             description: milestone.RFP.description,
                             contacts: {
-                                deleteMany: {}, // hmmm :(, what's the proper way to do this? upsertMany doesn't exist
+                                deleteMany: {}, // clear all existing contacts
                                 createMany: {
                                     data: milestone.RFP.contacts.map((contact: any) => ({
                                         name: contact.name,
@@ -218,7 +218,7 @@ async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneT
                                 }
                             },
                             attachments: {
-                                deleteMany: {}, // hmmm :(, what's the proper way to do this? upsertMany doesn't exist
+                                deleteMany: {}, // clear all existing attachments
                                 createMany: {
                                     data: milestone.RFP.attachments.map((attachment: any) => ({
                                         link: attachment.link,
