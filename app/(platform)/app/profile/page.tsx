@@ -8,7 +8,7 @@ import {LineChartCard} from "@/components/line-chart-card";
 import {DonutChartCard} from "@/components/donut-chart-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
-import {PAGProfileDetailsCard} from "@/components/pag-profile-details-card";
+import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {cn, createDicebearAvatar} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
@@ -18,10 +18,13 @@ import {getOrganizationFromOrganizationId} from "@/lib/actions";
 import {getSession} from "@/lib/auth";
 import Image from "next/image"
 import Link from "next/link";
-import {AssetsCard} from "@/components/assets-card";
+import {PAGProfileAssetsCard} from "@/components/pag-profile-assets-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
-import {OpenRFPsCard} from "@/components/open-rfps-card";
+import {PAGProfileOpenRFPsCard} from "@/components/pag-profile-open-rfps-card";
 import EditPAGProfileDialog from "@/components/edit-pag-profile-page";
+import {getConditionsDataFromOrgId} from "@/lib/fetchers";
+import {PAGProfileAssetsAndProjectsCard} from "@/components/pag-profile-assets-and-projects-card";
+import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 
 
 export default async function ProfilePage() {
@@ -36,6 +39,12 @@ export default async function ProfilePage() {
     if (session?.user.organizationId) {
         organization = await getOrganizationFromOrganizationId(session?.user.organizationId)
     }
+
+    let conditions = null
+    if (session?.user.organizationId) {
+        conditions = await getConditionsDataFromOrgId(session?.user.organizationId)
+    }
+
     if (organization) {
         if (!organization.verified) {
             // Render unverified organization state
@@ -138,11 +147,13 @@ export default async function ProfilePage() {
                     </div>
                     <div className="grid grid-cols-6 gap-4">
                         <div className="col-span-2 space-y-4">
-                            <PAGProfileDetailsCard organization={organization}/>
-                            <AssetsCard/>
-                            <OpenRFPsCard/>
+                            <PagProfileAboutCard organization={organization}/>
+                            <PAGProfileConditionsCard conditions={conditions}/>
+                            {/*<PAGProfileAssetsCard/>*/}
+                            {/*<PAGProfileOpenRFPsCard/>*/}
                         </div>
                         <div className="col-span-4 flex flex-col space-y-4">
+                            <PAGProfileAssetsAndProjectsCard/>
                             <PAGProfileResearchPlanCard/>
                             <PAGProfileActivityCard/>
                         </div>

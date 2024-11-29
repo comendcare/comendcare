@@ -16,7 +16,7 @@ import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
 import {getBlurDataURL, getIp} from "@/lib/utils";
 import {Session} from "next-auth";
-import {sendInviteEmail} from "@/lib/emails";
+import {sendInviteEmail, sendMemberRequestEmail} from "@/lib/emails";
 
 
 export async function getMembersAndInvitees(organizationId: string | undefined) {
@@ -193,6 +193,32 @@ export const createMemberRequest = async (organizationId: string) => {
                 }
             }
         })
+
+        const organization = await prisma.organization.findUnique({
+            where: {
+                id: organizationId
+            }
+        })
+
+        if (organization) {
+            await sendMemberRequestEmail(
+                {
+                    user: {
+                        name: session.user.name,
+                        email: session.user.email,
+                        image: ""
+                    },
+                    admin: {
+                        name: session?.user.name,
+                        email: session?.user.email,
+                        organizationName: organization.name || "",
+                        organizationImage: organization.image || "",
+                    },
+                }
+            ).then(() => {
+                console.log("email sent")
+            })
+        }
 
         return response
     } catch (error: any) {

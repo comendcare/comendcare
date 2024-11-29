@@ -3,9 +3,22 @@ import prisma from "@/lib/prisma"
 import {serialize} from "next-mdx-remote/serialize"
 import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
 
-export async function getDisorderData(slug: string) {
+export async function getConditionData(slug: string) {
     return prisma.condition.findUnique({
         where: slug ? {slug} : {slug: slug},
+        include: {organizations: true}
+    })
+}
+
+export async function getConditionsDataFromOrgId(organizationId: string) {
+    return prisma.condition.findMany({
+        where: {
+            organizations: {
+                some: {
+                    organizationId: organizationId
+                }
+            }
+        },
         include: {organizations: true}
     })
 }
