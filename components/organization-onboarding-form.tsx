@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {checkSubdomainAvailability, createOrganization, getAllOrganizations} from "@/lib/actions";
+import {checkSubdomainAvailability, createMemberRequest, createOrganization, getAllOrganizations} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -105,7 +105,7 @@ const OPTIONS: Option[] = [
     },
 ];
 
-const years = Array.from({ length: new Date().getFullYear() - 1970 + 1 }, (_, i) => (1970 + i).toString());
+const years = Array.from({length: new Date().getFullYear() - 1970 + 1}, (_, i) => (1970 + i).toString());
 
 export default function OrganizationOnboardingForm() {
     const {data: session, update} = useSession()
@@ -220,13 +220,17 @@ export default function OrganizationOnboardingForm() {
         })
     }
 
-    async function joinOrgOnSubmit(values: z.infer<typeof joinOrgFormSchema>) {
-        const formData = new FormData()
-        Object.entries(newOrgForm.getValues()).forEach(([key, value]) => {
-            if (value !== undefined) {
-                formData.append(key, typeof value === "string" ? value : JSON.stringify(value));
-            }
-        });
+    async function joinOrgOnSubmit() {
+        const orgValue = joinOrgForm.watch("org")?.[0]?.value;
+        if (typeof orgValue === "string") {
+            await createMemberRequest(orgValue);
+            toast.success(`A membership request has been sent to ${joinOrgForm.watch("org")?.[0]?.label}`)
+
+            router.push("/app/profile")
+        } else {
+            console.error("Organization value is undefined or invalid.");
+            toast.error("Organization value is undefined or invalid.")
+        }
     }
 
     async function newOrgOnSubmit(values: z.infer<typeof newOrgFormSchema>) {
@@ -406,7 +410,7 @@ export default function OrganizationOnboardingForm() {
                             <FormField
                                 control={newOrgForm.control}
                                 name="founded"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Year</FormLabel>
                                         <Select
@@ -415,12 +419,13 @@ export default function OrganizationOnboardingForm() {
                                         >
                                             <FormControl>
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Select a year" />
+                                                    <SelectValue placeholder="Select a year"/>
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
                                                 {years.map((year) => (
-                                                    <SelectItem key={year} value={year.toString()}> {/* Use the year as a string for the SelectItem value */}
+                                                    <SelectItem key={year}
+                                                                value={year.toString()}> {/* Use the year as a string for the SelectItem value */}
                                                         {year}
                                                     </SelectItem>
                                                 ))}
@@ -429,7 +434,7 @@ export default function OrganizationOnboardingForm() {
                                         <FormDescription>
                                             Select the year your organization was founded.
                                         </FormDescription>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -637,8 +642,15 @@ export default function OrganizationOnboardingForm() {
                                     )}
                                 />
                                 <div className="flex flex-row justify-between">
-                                    <Button type="submit" className="">Join Organization</Button>
-                                    <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={!joinOrgForm.formState.isDirty || !joinOrgForm.formState.isDirty}
+                                    >
+                                        Join Organization
+                                    </Button>
+                                    <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                        Skip
+                                    </Button>
                                 </div>
                             </form>
                         </Form>

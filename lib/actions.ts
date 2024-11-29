@@ -38,6 +38,20 @@ export async function getMembersAndInvitees(organizationId: string | undefined) 
     }
 }
 
+export async function getMemberRequests(organizationId: string | undefined) {
+    if (organizationId) {
+        const fetchedMemberRequests = await prisma?.memberRequest.findMany({
+                include: {user: true},
+                where: {organizationId},
+            })
+
+        return {fetchedMemberRequests}
+    } else {
+        console.log("No organizationId provided.")
+        return {}
+    }
+}
+
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
     const roadmap = await prisma.roadmap.create({
         data: {
@@ -153,6 +167,40 @@ const nanoid = customAlphabet(
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
     7
 ) // 7-character random string
+
+export const createMemberRequest = async (organizationId: string) => {
+    const session = await getSession()
+    if (!session?.user.id) {
+        return {
+            error: "Not authenticated"
+        }
+    }
+
+    try {
+        const response = await prisma.memberRequest.create({
+            data: {
+                email: session.user.email,
+                role: "admin",
+                user: {
+                    connect: {
+                        id: session.user.id
+                    }
+                },
+                organization: {
+                    connect: {
+                        id: organizationId
+                    }
+                }
+            }
+        })
+
+        return response
+    } catch (error: any) {
+        return {
+            error: error.message
+        }
+    }
+}
 
 export const createOrganization = async (formData: FormData) => {
     const session = await getSession()

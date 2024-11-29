@@ -1,5 +1,5 @@
 import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog";
-import { getMembersAndInvitees } from "@/lib/actions";
+import {getMemberRequests, getMembersAndInvitees} from "@/lib/actions";
 import { getSession } from "@/lib/auth";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { createDicebearAvatar } from "@/lib/utils";
@@ -36,7 +36,7 @@ export default async function PAGDashboardRequestsTab() {
         );
     }
 
-    const { fetchedMembers = [], fetchedInvitees = [] } = await getMembersAndInvitees(session.user.organizationId);
+    const {fetchedMemberRequests = []} = await getMemberRequests(session.user.organizationId);
 
     return (
         <div className="p-4">
@@ -49,10 +49,9 @@ export default async function PAGDashboardRequestsTab() {
                         Users who have requested access to your organization.
                     </p>
                 </div>
-                <InviteUserToOrgDialog />
             </div>
 
-            {fetchedInvitees.length === 0 ? (
+            {fetchedMemberRequests.length === 0 ? (
                 <div className="h-full w-full flex flex-col mx-auto justify-center items-center">
                     <Image
                         alt="No member requests"
@@ -103,7 +102,7 @@ export default async function PAGDashboardRequestsTab() {
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
-                                {fetchedInvitees.map((person) => (
+                                {fetchedMemberRequests.map((person) => (
                                     <tr key={person.email}>
                                         <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                             <div className="flex items-center">
@@ -114,7 +113,8 @@ export default async function PAGDashboardRequestsTab() {
                                                         alt=""
                                                     />
                                                 </div>
-                                                <div className="ml-4">
+                                                <div className="ml-4 flex flex-col space-y-1">
+                                                    <div className="font-bold text-gray-900">{person.user.name}</div>
                                                     <div className="font-medium text-gray-900">{person.email}</div>
                                                 </div>
                                             </div>
@@ -133,7 +133,7 @@ export default async function PAGDashboardRequestsTab() {
                                                 <DropdownMenuContent>
                                                     <DropdownMenuItem className="text-red-600">
                                                         <FaUserXmark />
-                                                        Revoke invite
+                                                        Deny request
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>

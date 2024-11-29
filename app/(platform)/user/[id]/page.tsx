@@ -1,8 +1,8 @@
 "use client"
 import {useSession} from "next-auth/react";
-import {getUser} from "@/lib/actions";
+import {getAllOrganizationsFromUserId, getUser} from "@/lib/actions";
 import {useEffect, useState} from "react";
-import {User} from "@prisma/client";
+import {Organization, User} from "@prisma/client";
 import {cn, createDicebearAvatar} from "@/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Loading from "@/app/loading";
@@ -12,10 +12,12 @@ import UserEditSettingsDialog from "@/components/user-edit-settings-dialog";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {toast} from "sonner";
 
 export default function UserProfilePage() {
     const {data: session} = useSession()
     const [user, setUser] = useState<User>();
+    const [orgs, setOrgs] = useState<Organization[]>();
 
     useEffect(() => {
         async function fetchUserData() {
@@ -23,11 +25,30 @@ export default function UserProfilePage() {
                 const userData = await getUser(session.user.id);
                 if (userData) {
                     setUser(userData);
+                } else {
+                    toast.error("Couldn't get user data")
                 }
             }
         }
 
-        fetchUserData();
+        async function fetchOrgData() {
+            if (session) {
+                try {
+                    const orgData = await getAllOrganizationsFromUserId(session.user.id);
+
+                    // Map the response to the correct structure if needed
+                    const organizations = orgData.map((item: { organization: Organization }) => item.organization);
+
+                    setOrgs(organizations);
+                } catch (error) {
+                    console.error("Error fetching organizations:", error);
+                    toast.error("Couldn't get organizations");
+                }
+            }
+        }
+
+        fetchUserData()
+        fetchOrgData()
     }, [session])
 
     if (user) {
@@ -56,7 +77,7 @@ export default function UserProfilePage() {
                                 {user.title}
                             </h2>
                             <p>
-                                Joined {new Date(user.createdAt).toDateString()}
+                                Joined {new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                             </p>
                             <UserEditSettingsDialog/>
                         </CardHeader>
@@ -65,16 +86,24 @@ export default function UserProfilePage() {
                                 Organizations
                             </h2>
                             <div className="flex items-center gap-4">
-                                <Avatar className="hidden h-9 w-9 sm:flex">
-                                    <AvatarImage src="/avatars/01.png" alt="Avatar"/>
-                                    <AvatarFallback>OM</AvatarFallback>
-                                </Avatar>
-                                <div className="grid gap-1">
-                                    <p className="text-sm font-medium leading-none">Olivia Martin</p>
-                                    <p className="text-sm text-muted-foreground">
-                                        olivia.martin@email.com
-                                    </p>
-                                </div>
+                                {orgs?.map((org) =>
+                                    <>
+                                        <Avatar className="hidden h-9 w-9 sm:flex">
+                                            <AvatarImage src="/avatars/01.png" alt="Avatar"/>
+                                            <AvatarFallback>OM</AvatarFallback>
+                                        </Avatar>
+                                        <div className="grid gap-1">
+                                            <>
+                                                <p className="text-sm font-medium leading-none">
+                                                    {org.name}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {`${org.subdomain}.comend.io`}
+                                                </p>
+                                            </>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
