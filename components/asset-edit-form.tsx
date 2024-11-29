@@ -67,7 +67,6 @@ export function AssetEditForm({ form, asset }: { form: UseFormReturn<any>, asset
                                     <Textarea
                                         id="assetDescription"
                                         placeholder={`Enter a description for this asset`}
-                                        defaultValue={field.value || ''}
                                         value={field.value || ''}
                                         onChange={field.onChange}
                                     />
