@@ -47,9 +47,9 @@ export async function POST(request: Request) {
                 const tasksToUpdate = milestone.tasks?.filter((task: any) => previousMilestone?.tasks.map((t: any) => t.id).includes(task.id))
                 const tasksToCreate = milestone.tasks.filter((task: any) => !previousMilestone?.tasks.map((t: any) => t.id).includes(task.id))
 
-                console.log(`tasks to delete`, tasksToDelete)
-                console.log(`tasks to update`, tasksToUpdate)
-                console.log(`tasks to create`, tasksToCreate)
+                // console.log(`tasks to delete`, tasksToDelete)
+                // console.log(`tasks to update`, tasksToUpdate)
+                // console.log(`tasks to create`, tasksToCreate)
 
                 await prisma.milestone.update({
                     // where: { nodeId: milestone.nodeId },
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
                         endDate: milestone.endDate,
                         budget: milestone.budget,
                         papers: {
-                            deleteMany: {}, // hmmm :(, what's the proper way to do this? upsertMany doesn't exist
+                            deleteMany: {}, // clear all existing papers
                             createMany: {
                                 data: milestone.papers.map((paper: any) => ({
                                     link: paper.link,
