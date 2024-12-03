@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import React, { useCallback, useEffect, useRef } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import {
@@ -60,6 +60,7 @@ import { Separator } from "./ui/separator"
 import { AssetEditForm } from "./asset-edit-form"
 import { RFPEditForm } from "./rfp-edit-form"
 import { PapersEditForm } from "./papers-edit-form"
+import { FaEdit } from "react-icons/fa"
 
 type AssetType = Prisma.AssetGetPayload<{ 
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -324,30 +325,13 @@ export function EditMilestoneForm({
                 onChange={() => console.log(`CHANGE`)}
                 className="flex flex-col gap-8 p-2 pr-4"
             >
-                <span className="w-full flex flex-row gap-4">
-                    <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                        <FormItem className="h-full grow">
-                            <FormControl className="h-full">
-                                <Input
-                                    className="h-full"
-                                    id="title"
-                                    placeholder={`Enter a title`}
-                                    defaultValue={field.value}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                    />
-
-                    <Button variant="secondary" onClick={onClose}>
-                        <FaX />
-                    </Button>
+                <span className="flex justify-end">
+                <Button variant="secondary" onClick={onClose}>
+                    <FaX />
+                </Button>
                 </span>
+
+                <EditTitle form={form}/>
 
                 <FormField
                 control={form.control}
@@ -712,6 +696,49 @@ export function EditMilestoneForm({
             </form>
         </ScrollArea>
         </Form>
+    )
+}
+
+const EditTitle = ({ form }: { form: any }) => {
+    const [isEditing, setIsEditing] = useState(false)
+    
+    return (
+        <FormField
+        control={form.control}
+        name="title"
+        render={({ field }) => (
+            <FormItem className="flex flex-col grow">
+                <FormControl>
+                    {isEditing ? (
+                        <span className="flex flex-row gap-2">
+                        <div className="h-full w-full">
+                            <Input
+                                id="title"
+                                className="h-full w-full"
+                                placeholder={`Enter a title`}
+                                defaultValue={field.value}
+                                {...field}
+                            />
+                        </div>
+                        <Button variant="ghost" className="p-2" onClick={(e) => {
+                            e.preventDefault()
+                            setIsEditing(false)
+                        }}><FaX /></Button>
+                        </span>
+                    ) : (
+                        <span className="flex flex-row gap-2 items-center">
+                        <h1 className="text-xl font-semibold w-full h-full">{field.value}</h1>
+                        <Button variant="ghost" className="p-2" onClick={(e) => {
+                            e.preventDefault()
+                            setIsEditing(true)
+                        }}><FaEdit /></Button>
+                        </span>
+                    )}
+                </FormControl>
+                <FormMessage />
+            </FormItem>
+        )}
+        />
     )
 }
 
