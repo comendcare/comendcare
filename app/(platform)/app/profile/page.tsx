@@ -25,6 +25,7 @@ import EditPAGProfileDialog from "@/components/edit-pag-profile-page";
 import {getConditionsDataFromOrgId} from "@/lib/fetchers";
 import {PAGProfileAssetsAndProjectsCard} from "@/components/pag-profile-assets-and-projects-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 
 
 export default async function ProfilePage() {
@@ -146,16 +147,28 @@ export default async function ProfilePage() {
                         </div>
                     </div>
                     <div className="grid grid-cols-6 gap-4">
-                        <div className="col-span-2 space-y-4">
-                            <PagProfileAboutCard organization={organization}/>
-                            <PAGProfileConditionsCard conditions={conditions}/>
+                        <div className="relative col-span-2 space-y-4">
+                            <div className="sticky top-4 space-y-4">
+                                <PagProfileAboutCard organization={organization}/>
+                                <PAGProfileConditionsCard conditions={conditions}/>
+                            </div>
                             {/*<PAGProfileAssetsCard/>*/}
                             {/*<PAGProfileOpenRFPsCard/>*/}
                         </div>
-                        <div className="col-span-4 flex flex-col space-y-4">
-                            <PAGProfileAssetsAndProjectsCard/>
-                            <PAGProfileResearchPlanCard/>
-                            <PAGProfileActivityCard/>
+                        <div className="col-span-4">
+                            <Tabs defaultValue="roadmap" className="w-full">
+                                <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
+                                    <TabsTrigger value="activity">Activity</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="roadmap" className="flex flex-col space-y-4">
+                                    <PAGProfileAssetsAndProjectsCard/>
+                                    <PAGProfileResearchPlanCard/>
+                                </TabsContent>
+                                <TabsContent value="activity" className="mt-0">
+                                    <PAGProfileActivityCard/>
+                                </TabsContent>
+                            </Tabs>
                         </div>
                     </div>
                 </div>
