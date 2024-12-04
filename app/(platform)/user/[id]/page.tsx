@@ -1,6 +1,5 @@
 "use client"
 import {useSession} from "next-auth/react";
-import {getAllOrganizationsFromUserId, getUser} from "@/lib/actions";
 import {useEffect, useState} from "react";
 import {Organization, User} from "@prisma/client";
 import {cn, createDicebearAvatar} from "@/lib/utils";
@@ -13,6 +12,7 @@ import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {toast} from "sonner";
+import {getAllOrganizationsFromUserId, getUser} from "@/lib/fetchers";
 
 export default function UserProfilePage() {
     const {data: session} = useSession()

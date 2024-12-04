@@ -14,7 +14,6 @@ import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {PAGProfileResearchPlanCard} from "@/components/pag-profile-research-plan-card";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {getOrganizationFromOrganizationId} from "@/lib/actions";
 import {getSession} from "@/lib/auth";
 import Image from "next/image"
 import Link from "next/link";
@@ -22,7 +21,7 @@ import {PAGProfileAssetsCard} from "@/components/pag-profile-assets-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {PAGProfileOpenRFPsCard} from "@/components/pag-profile-open-rfps-card";
 import EditPAGProfileDialog from "@/components/edit-pag-profile-page";
-import {getConditionsDataFromOrgId} from "@/lib/fetchers";
+import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {PAGProfileAssetsAndProjectsCard} from "@/components/pag-profile-assets-and-projects-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";

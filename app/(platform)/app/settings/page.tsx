@@ -14,12 +14,12 @@ import {getSession} from "@/lib/auth"
 import {faker} from "@faker-js/faker";
 import {cn, createDicebearAvatar} from "@/lib/utils";
 import {toast} from "sonner";
-import {getMembersAndInvitees} from "@/lib/actions";
 import Image from "next/image"
 import Link from "next/link";
 import {buttonVariants} from "@/components/ui/button";
 import PAGDashboardInvitationsTab from "@/components/pag-dashboard-invitations-tab";
 import PAGDashboardMembersTab from "@/components/pag-dashboard-members-tab";
+import {getMembersAndInvitees} from "@/lib/fetchers";
 
 
 export default async function ProfilePage() {

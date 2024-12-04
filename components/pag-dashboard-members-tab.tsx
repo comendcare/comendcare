@@ -1,8 +1,8 @@
-import {getMembersAndInvitees} from "@/lib/actions";
 import {getSession} from "@/lib/auth";
 import {createDicebearAvatar} from "@/lib/utils";
 import Image from "next/image";
 import {faker} from "@faker-js/faker";
+import {getMembersAndInvitees} from "@/lib/fetchers";
 
 export default async function PAGDashboardMembersTab() {
     const session = await getSession()

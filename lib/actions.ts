@@ -1,56 +1,17 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization} from "@prisma/client"
+import {Organization, Roadmap} from "@prisma/client"
 import {revalidateTag} from "next/cache"
-import {withRoadmapAuth, withOrganizationAuth} from "./auth"
+import {withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
-import {
-    addDomainToVercel,
-    // getApexDomain,
-    removeDomainFromVercelProject,
-    // removeDomainFromVercelTeam,
-    validDomainRegex,
-} from "@/lib/domains";
+import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
-import {getBlurDataURL, getIp} from "@/lib/utils";
+import {getBlurDataURL} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail, sendMemberRequestEmail} from "@/lib/emails";
 
-
-export async function getMembersAndInvitees(organizationId: string | undefined) {
-    if (organizationId) {
-        const [fetchedMembers, fetchedInvitees] = await Promise.all([
-            prisma?.member.findMany({
-                include: {user: true},
-                where: {organizationId},
-            }),
-            prisma?.invitation.findMany({
-                where: {organizationId, accepted: false},
-            }),
-        ]);
-
-        return {fetchedMembers, fetchedInvitees};
-    } else {
-        console.log("No organizationId provided.")
-        return {}
-    }
-}
-
-export async function getMemberRequests(organizationId: string | undefined) {
-    if (organizationId) {
-        const fetchedMemberRequests = await prisma?.memberRequest.findMany({
-                include: {user: true},
-                where: {organizationId},
-            })
-
-        return {fetchedMemberRequests}
-    } else {
-        console.log("No organizationId provided.")
-        return {}
-    }
-}
 
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
     const roadmap = await prisma.roadmap.create({
@@ -138,29 +99,6 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
     }
 
     return roadmap
-}
-
-export async function getUser(userId: string) {
-    const user = await prisma.user.findUnique({
-        include: {organizations: true},
-        where: {id: userId}
-    })
-
-    return user
-}
-
-export async function getRoadmapId(orgId: string | null | undefined) {
-    if (!orgId) return
-
-    const organization = await prisma.organization.findUnique({
-        include: {roadmaps: true},
-        where: {
-            id: decodeURIComponent(orgId)
-        }
-    })
-
-    // for now we're just getting the first roadmap, in the future we may enable multiple roadmaps per-organziation
-    return organization?.roadmaps && organization?.roadmaps?.length > 0 ? organization?.roadmaps[0].id : undefined
 }
 
 const nanoid = customAlphabet(
@@ -486,49 +424,6 @@ export const deleteOrganization = withOrganizationAuth(
         }
     }
 )
-
-export const getOrganizationFromOrganizationId = async (organizationId: string) => {
-    const organization = await prisma.organization.findUnique({
-        where: {
-            id: organizationId,
-        },
-    });
-    return organization
-};
-
-export const getAllOrganizations = async () => {
-    const organizations = await prisma.organization.findMany({
-        orderBy: {
-            createdAt: "asc"
-        },
-    })
-
-    return organizations
-};
-
-export const getAllOrganizationsFromUserId = async (userId: string) => {
-    const memberships = await prisma.member.findMany({
-        where: {
-            userId: userId
-        },
-        include: {
-            organization: true
-        }
-    });
-    return memberships
-};
-
-export const getOrganizationFromRoadmapId = async (roadmapId: string) => {
-    const roadmap = await prisma.roadmap.findUnique({
-        where: {
-            id: roadmapId
-        },
-        select: {
-            organizationId: true
-        }
-    })
-    return roadmap?.organizationId
-}
 
 // export const createRoadmap = withOrganizationAuth(
 //     async (_: FormData, organization: Organization) => {
@@ -909,16 +804,3 @@ export async function addMemberToOrganization(
     }
 }
 
-export async function checkSubdomainAvailability(nickname: string) {
-    try {
-        const existingOrg = await prisma.organization.findUnique({
-            where: {subdomain: nickname},
-        });
-        console.log(`serverside: ${existingOrg}`)
-
-        return !existingOrg
-    } catch (error: any) {
-        console.error("Database error checking subdomain availability:", error);
-        return {error: "Database error. Please try again later."};
-    }
-}

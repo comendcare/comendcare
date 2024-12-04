@@ -3,7 +3,7 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {getOrganizationFromOrganizationId, inviteUser, getMembersAndInvitees} from "@/lib/actions";
+import {inviteUser} from "@/lib/actions";
 import {getIp} from "@/lib/utils";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import {FaUserPlus} from "react-icons/fa6";
 import {toast} from "sonner";
+import {getMembersAndInvitees, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 
 const invitationFormSchema = z.object({
     email: z.string().min(3, {

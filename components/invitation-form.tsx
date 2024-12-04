@@ -6,11 +6,12 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {getOrganizationFromOrganizationId, getOrganizationFromRoadmapId, inviteUser} from "@/lib/actions";
+import {inviteUser} from "@/lib/actions";
 import {useParams} from "next/navigation";
 import {getIp} from "@/lib/utils";
 import {useEffect, useState} from "react";
 import {Organization} from "@prisma/client";
+import {getOrganizationFromOrganizationId, getOrganizationFromRoadmapId} from "@/lib/fetchers";
 
 const invitationFormSchema = z.object({
     email: z.string().min(2, {

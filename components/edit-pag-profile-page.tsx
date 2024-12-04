@@ -7,10 +7,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import {useCallback, useEffect, useState} from "react";
 import {
-    checkSubdomainAvailability,
-    createOrganization,
-    getOrganizationFromOrganizationId,
-    getUser
+    createOrganization
 } from "@/lib/actions";
 import {AddressType} from "@/lib/types";
 import {Input} from "@/components/ui/input";
@@ -26,7 +23,12 @@ import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
-import {getOrganizationData} from "@/lib/fetchers";
+import {
+    checkSubdomainAvailability,
+    getOrganizationData,
+    getOrganizationFromOrganizationId,
+    getUser
+} from "@/lib/fetchers";
 import {FaPen, FaUpload} from "react-icons/fa6";
 import {
     Dialog,
