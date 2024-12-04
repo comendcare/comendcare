@@ -96,7 +96,7 @@ export default function UserEditForm() {
             const fileWithPreview = Object.assign(file, {
                 preview: URL.createObjectURL(file),
             });
-            
+
             setSelectedFile(fileWithPreview);
             setDialogOpen(true);
         },
@@ -197,8 +197,6 @@ export default function UserEditForm() {
             }
 
             toast.success("Successfully updated user profile!");
-            // router.refresh();
-            // router.push("/onboarding/organization");
         } catch (error) {
             console.error('Error:', error)
             toast.error("An error occurred while updating your profile.");
@@ -283,8 +281,6 @@ export default function UserEditForm() {
                                             setDialogOpen={setDialogOpen}
                                             selectedFile={selectedFile}
                                             setSelectedFile={(file: any) => {
-                                                console.log(`preview`, file.preview)
-                                                setSelectedFile(file);
                                                 field.onChange(file?.preview); // Update form field value
                                             }}
                                         />

@@ -23,9 +23,11 @@ import {
 import "react-image-crop/dist/ReactCrop.css"
 import { CropIcon, Trash2Icon } from "lucide-react"
 
-export type FileWithPreview = FileWithPath & {
-    preview: string
-}
+// export type FileWithPreview = FileWithPath & {
+//     preview: string
+// }
+
+export type FileWithPreview = File & { preview: string }
 
 interface ImageCropperProps {
     dialogOpen: boolean
