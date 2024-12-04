@@ -311,6 +311,7 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
             where: {
                 id: organizationId,
             },
+            include: { roadmaps: true }
         });
 
         if (!organization) {
