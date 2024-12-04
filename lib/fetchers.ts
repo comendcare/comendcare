@@ -180,22 +180,53 @@ async function getMdxSource(roadmapContents: string) {
     return mdxSource
 }
 
-export async function getMembersAndInvitees(organizationId: string | undefined) {
-    if (organizationId) {
-        const [fetchedMembers, fetchedInvitees] = await Promise.all([
-            prisma?.member.findMany({
-                include: {user: true},
-                where: {organizationId},
-            }),
-            prisma?.invitation.findMany({
-                where: {organizationId, accepted: false},
-            }),
-        ]);
+export async function getMembers(organizationId: string | undefined) {
+    if (!organizationId) {
+        return {success: false, error: "No organization id provided."};
+    }
 
-        return {fetchedMembers, fetchedInvitees};
-    } else {
-        console.log("No organizationId provided.")
-        return {}
+    try {
+        const fetchedMembers = await prisma?.member.findMany({
+            include: {user: true},
+            where: {organizationId},
+        })
+
+
+        if (!fetchedMembers) {
+            return {success: false, error: "members not found"};
+        }
+
+        return {
+            success: true,
+            data: fetchedMembers
+        };
+    } catch (error: any) {
+        logError("Error fetching members", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getInvitees(organizationId: string | undefined) {
+    if (!organizationId) {
+        return {success: false, error: "No organization id provided."};
+    }
+
+    try {
+        const fetchedInvitees = await prisma?.invitation.findMany({
+            where: {organizationId, accepted: false},
+        })
+
+        if (!fetchedInvitees) {
+            return {success: false, error: "invitees not found"};
+        }
+
+        return {
+            success: true,
+            data: fetchedInvitees
+        };
+    } catch (error: any) {
+        logError("Error fetching invitees", error);
+        return {success: false, error: "Internal server error"};
     }
 }
 

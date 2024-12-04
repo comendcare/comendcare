@@ -4,7 +4,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { createDicebearAvatar } from "@/lib/utils";
 import { FaUserXmark } from "react-icons/fa6";
 import Image from "next/image";
-import {getMembersAndInvitees} from "@/lib/fetchers";
+import {getInvitees} from "@/lib/fetchers";
+import {toast} from "sonner";
 
 export default async function PAGDashboardInvitationsTab() {
     const session = await getSession();
@@ -36,7 +37,14 @@ export default async function PAGDashboardInvitationsTab() {
         );
     }
 
-    const { fetchedMembers = [], fetchedInvitees = [] } = await getMembersAndInvitees(session.user.organizationId);
+    let fetchedInvitees: any[] = []
+    const response = await getInvitees(session.user.organizationId)
+    if (response.success) {
+        fetchedInvitees = response.data ?? []
+    } else {
+        console.error(response.error)
+        toast.error(response.error)
+    }
 
     return (
         <div className="p-4">
