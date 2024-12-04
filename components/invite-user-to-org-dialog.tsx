@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import {FaUserPlus} from "react-icons/fa6";
 import {toast} from "sonner";
-import {getMembersAndInvitees, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 
 const invitationFormSchema = z.object({
     email: z.string().min(3, {

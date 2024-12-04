@@ -4,7 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { createDicebearAvatar } from "@/lib/utils";
 import { FaUserXmark } from "react-icons/fa6";
 import Image from "next/image";
-import {getMemberRequests, getMembersAndInvitees} from "@/lib/fetchers";
+import {getMemberRequests} from "@/lib/fetchers";
 import {toast} from "sonner";
 
 export default async function PAGDashboardRequestsTab() {

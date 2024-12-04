@@ -2,11 +2,18 @@ import {getSession} from "@/lib/auth";
 import {createDicebearAvatar} from "@/lib/utils";
 import Image from "next/image";
 import {faker} from "@faker-js/faker";
-import {getMembersAndInvitees} from "@/lib/fetchers";
+import {getMembers} from "@/lib/fetchers";
 
 export default async function PAGDashboardMembersTab() {
     const session = await getSession()
-    const {fetchedMembers, fetchedInvitees} = await getMembersAndInvitees(session?.user.organizationId);
+
+    let fetchedMembers: any[] | undefined = []
+    const response = await getMembers(session?.user.organizationId);
+    if (response.success) {
+        fetchedMembers = response.data
+    } else {
+        console.error(response.error)
+    }
 
     return (
         <div className="p-4">
