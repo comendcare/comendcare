@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import React, { createRef, useCallback, useEffect, useImperativeHandle, useRef } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import {
@@ -11,7 +11,6 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
-    FormDescription
 } from "./ui/form"
 import { Input } from "./ui/input"
 import { Textarea } from "./ui/textarea"
@@ -22,7 +21,7 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import type { TaskType } from "./milestone-node"
 import type { StatusType } from "./milestone-status-button"
-import { FaDollarSign, FaTrash } from "react-icons/fa6"
+import { FaTrash, FaX } from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -39,47 +38,56 @@ import { nanoid } from "nanoid"
 import { toast } from "sonner"
 import {
     DndContext,
-    type DragEndEvent,
-    type DragOverEvent,
-    DragOverlay,
-    type DragStartEvent,
     useSensor,
     useSensors,
     KeyboardSensor,
     Announcements,
-    UniqueIdentifier,
     TouchSensor,
     MouseSensor,
     closestCorners
 } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
-import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { CalendarIcon, GripVertical } from "lucide-react"
+import { GripVertical } from "lucide-react"
 import { cva } from "class-variance-authority"
-import { DatePicker } from "@tremor/react"
-import { Popover, PopoverContent } from "./ui/popover"
-import { PopoverTrigger } from "./plate-ui/popover"
-import { Calendar } from "./ui/calendar"
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
 import { Switch } from "./ui/switch"
 import { PrivateBadge } from "./private-badge"
 import { debounce } from "lodash"
 import {monthsList} from "@/lib/data";
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
-import type { Option } from "./ui/multiple-selector"
-import MultipleSelector from "./ui/multiple-selector"
-import { optionSchema } from "./research-onboarding-form"
+import { Prisma } from "@prisma/client"
+import { Separator } from "./ui/separator"
+import { AssetEditForm } from "./asset-edit-form"
+import { RFPEditForm } from "./rfp-edit-form"
+import { PapersEditForm } from "./papers-edit-form"
+import { FaEdit } from "react-icons/fa"
+
+type AssetType = Prisma.AssetGetPayload<{ 
+    omit: { id: true, createdAt: true, updatedAt: true }
+    include: { 
+        contacts: { 
+            select: { name: true, role: true, email: true } 
+        }, 
+        attachments: {
+            select: { name: true, link: true }
+        }
+    } 
+}>
+type RFPType = Prisma.RFPGetPayload<{
+    omit: { id: true, createdAt: true, updatedAt: true, researchFocus: true }
+    include: { 
+        contacts: { 
+            select: { name: true, role: true, email: true } 
+        }, 
+        attachments: {
+            select: { name: true, link: true }
+        }
+    }
+}>
+type AttachmentType = AssetType['attachments'][0]
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
-
-interface TimelineDateType {
-    month?: string | undefined,
-    year?: string | undefined
-}
 
 const today = new Date()
 
@@ -108,6 +116,7 @@ export function EditMilestoneForm({
     const { setMilestone } = useRoadmapStore(
         useShallow(selector)
     )
+    const initializing = useRef(true)
 
     const editMilestoneForm = z.object({
         title: z
@@ -120,29 +129,17 @@ export function EditMilestoneForm({
             .string()
             .max(1000, "Description must be less than 1000 characters")
             .optional(),
-        milestoneType: z.string(),
+        type: z.string(),
         startDate: z.object({
             month: z.string().optional(),
             year: z.string().optional(),
         }),
-        // startDate: z.object({
-        //     month: z.string().optional(),
-        //     year: z.string().optional(),
-        // }).refine(validateTimeline, { 
-        //     message: "Start date must occur before end date."
-        // }),
         endDate: z.object({
             month: z.string().optional(),
             year: z.string().optional()
         }),
-        // endDate: z.object({
-        //     month: z.string().optional(),
-        //     year: z.string().optional()
-        // }).refine(validateTimeline, { 
-        //     message: "End date must occur after start date."
-        // }),
         budget: z.number().optional(),
-        papers: z.array(z.string()).optional(),
+        papers: z.array(z.custom<AttachmentType>()).optional(),
         tasks: z.array(
             z.object({
                 id: z.string(),
@@ -151,7 +148,9 @@ export function EditMilestoneForm({
             })
         ).optional(),
         status: z.string(),
-        private: z.boolean()
+        private: z.boolean(),
+        asset: z.custom<AssetType>().optional(),
+        RFP: z.custom<RFPType>().optional()
     })
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -160,7 +159,7 @@ export function EditMilestoneForm({
         defaultValues: {
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            milestoneType: milestoneData?.type || "NOTYPE",
+            type: milestoneData?.type || "NOTYPE",
             startDate: {
                 month: milestoneData?.startDate?.getMonth() ? monthsList[milestoneData?.startDate?.getMonth()] : undefined,
                 year: milestoneData?.startDate?.getFullYear()?.toString() || undefined
@@ -173,39 +172,48 @@ export function EditMilestoneForm({
             papers: milestoneData?.papers || undefined,
             tasks: milestoneData?.tasks || [],
             status: milestoneData?.status || "TODO",
-            private: milestoneData?.private || false
+            private: milestoneData?.private || false,
+            asset: milestoneData?.asset || undefined,
+            RFP: milestoneData?.RFP || undefined
         }
     })
 
-    const title = form.watch("title")
-    const description = form.watch("description")
-    const type = form.watch("milestoneType")
-    const startDate = form.watch("startDate")
-    const endDate = form.watch("endDate")
-    const budget = form.watch("budget")
-    const papers = form.watch("papers")
-    const tasks = form.watch("tasks")
-    const status = form.watch("status")
-    const isPrivate = form.watch("private")
+    const formData = {
+        title: form.watch("title"),
+        description: form.watch("description"),
+        type: form.watch("type"),
+        startDate: form.watch("startDate"),
+        endDate: form.watch("endDate"),
+        budget: form.watch("budget"),
+        papers: form.watch("papers"),
+        tasks: form.watch("tasks"),
+        status: form.watch("status"),
+        isPrivate: form.watch("private"),
+        asset: form.watch("asset"),
+        RFP: form.watch("RFP")
+    }
 
     // callback ensures we're not creating a new debounce every time this is called
     const debounceUpdates = useCallback(
-        debounce(
-            (updatedValues) => handleMilestoneFormSubmit(updatedValues),
-            500
-        ), []
+        debounce((updatedValues) => handleMilestoneFormSubmit(updatedValues), 500), []
     )
 
+    // Allow update once form is initialized
     useEffect(() => {
-        // callback in debounceUpdates holds onto the state of the time it was created
-        // we can't use the form.watch values directly (since they'll be outdated)
-        // we must pass in the most up to date values in the form
-        debounceUpdates({title, description, milestoneType: type, startDate, endDate, budget, papers, tasks, status, private: isPrivate })
-    }, [title, description, budget, papers, tasks, status, isPrivate])
+        initializing.current = false;
+    }, []);
+
+    // Watch form changes, don't watch while initializing
+    useEffect(() => {
+        const subscription = form.watch((values) => debounceUpdates(values))
+        return () => subscription.unsubscribe();
+    }, [form.watch])
 
     const handleMilestoneFormSubmit = (values: z.infer<typeof editMilestoneForm>) => {
-        const { title, description, milestoneType, startDate, endDate, budget, papers, tasks, status, private: isPrivate } = values;
+        const { title, description, type, startDate, endDate, budget, papers, tasks, status, private: isPrivate, asset, RFP } = values;
         const now = new Date()
+
+        console.log(`save milestone data`, values)
         
         setMilestone(milestoneData?.nodeId, {
             title,
@@ -223,7 +231,10 @@ export function EditMilestoneForm({
                 1
             ) } : undefined),
             ...(budget ? { budget } : undefined),
-            papers,
+            ...(papers
+                ? { papers }
+                : undefined
+            ),
             ...(tasks 
                 ? { tasks: tasks.map((task: any, index: number) => ({
                     ...task, 
@@ -232,18 +243,19 @@ export function EditMilestoneForm({
                 }))}
                 : undefined
             ),
-            ...(milestoneType
-                ? { type: milestoneType }
+            ...(type
+                ? { type }
                 : { type: 'NOTYPE'}
             ),
             status,
-            private: isPrivate || false
+            private: isPrivate || false,
+            asset,
+            RFP
         })
         toast('Success!', {
             position: "bottom-left",
             description: 'The changes to your milestone have been successfully saved.'
         })
-        onClose()
     }
 
     const sensors = useSensors(
@@ -255,9 +267,9 @@ export function EditMilestoneForm({
     )
 
     function getDraggedData(id: string) {
-        const name = tasks?.find(task => task.id === id)?.name
-        const position = (tasks?.findIndex(task => task.id === id) || 0) + 1
-        const length = tasks?.length || 0
+        const name = formData.tasks?.find(task => task.id === id)?.name
+        const position = (formData.tasks?.findIndex(task => task.id === id) || 0) + 1
+        const length = formData.tasks?.length || 0
 
         return { name, position, length }
     }
@@ -310,75 +322,23 @@ export function EditMilestoneForm({
         <ScrollArea className="research-plan-tour-step3">
             <form
                 onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
+                onChange={() => console.log(`CHANGE`)}
                 className="flex flex-col gap-8 p-2 pr-4"
             >
-                <FormField
-                control={form.control}
-                name="private"
-                render={({ field }) => (
-                    <FormItem className="flex flex-row grow items-center justify-between">
-                        <FormLabel className="text-xl mt-2">{`Private`}</FormLabel>
-                        {isPrivate && (
-                            <PrivateBadge />
-                        )}
-                        <FormControl>
-                            <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-                />
+                <span className="flex justify-end">
+                <Button variant="secondary" onClick={onClose}>
+                    <FaX />
+                </Button>
+                </span>
 
-                <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col grow">
-                        <FormLabel className="text-xl">{`Milestone Status:`}</FormLabel>
-                        <FormControl>
-                            <StatusButton
-                                status={
-                                    field?.value as StatusType
-                                }
-                                onStatusChange={status =>
-                                    form.setValue("status", status)
-                                }
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-                />
-
-                <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col grow">
-                        <FormLabel className="text-xl">{`Title:`}</FormLabel>
-                        <FormControl>
-                            <Input
-                                id="title"
-                                placeholder={`Enter a title`}
-                                defaultValue={field.value}
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-                />
+                <EditTitle form={form}/>
 
                 <FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
                     <FormItem className="flex flex-col grow">
-                        <FormLabel className="text-xl">{`Description:`}</FormLabel>
+                        <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Description`}</FormLabel>
                         <FormControl>
                             <Textarea
                                 id="description"
@@ -392,80 +352,88 @@ export function EditMilestoneForm({
                 )}
                 />
 
-                <FormField
+                <FormItem className="w-full grid grid-cols-[150px_auto] gap-4 items-center">
+                    <FormLabel className="text-md">{`Milestone Type`}</FormLabel>
+                    <FormField
+                        control={form.control}
+                        name="type"
+                        render={({field}) => (
+                            <FormItem className="w-full">
+                                <FormControl>
+                                    <Select
+                                        defaultValue={field.value}
+                                        onValueChange={field.onChange}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a milestone type..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {MILESTONE_TYPE_OPTIONS.map((type, index) => (
+                                                <SelectItem key={index} value={type.value}>{type.label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormLabel className="text-md">{`Private`}</FormLabel>
+                    <FormField
                     control={form.control}
-                    name="milestoneType"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Milestone Type</FormLabel>
+                    name="private"
+                    render={({ field }) => (
+                        <FormItem className="h-full flex flex-row grow items-center justify-end gap-4">
+                            {formData.isPrivate && (
+                                <PrivateBadge />
+                            )}
                             <FormControl>
-                                <Select
-                                    onValueChange={(value: string) => {
-                                        field.onChange(value)
-                                        console.log(`value`, value)
-                                        handleMilestoneFormSubmit({
-                                            title,
-                                            description,
-                                            milestoneType: value,
-                                            startDate,
-                                            endDate,
-                                            budget,
-                                            papers,
-                                            tasks,
-                                            status,
-                                            private: isPrivate,
-                                        })
-                                    }}
-                                    defaultValue={field.value}
-                                    // onValueChange={field.onChange}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a milestone type..." />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {MILESTONE_TYPE_OPTIONS.map((milestoneType, index) => (
-                                            <SelectItem key={index} value={milestoneType.value}>{milestoneType.label}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                />
                             </FormControl>
-                            <FormMessage/>
+                            <FormMessage />
                         </FormItem>
                     )}
-                />
+                    />
+
+                    <FormLabel className="text-md">{`Milestone Status`}</FormLabel>
+                    <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                        <FormItem className="h-full flex items-center justify-end gap-4">
+                            <FormControl className="h-full">
+                                <StatusButton
+                                    status={
+                                        field?.value as StatusType
+                                    }
+                                    onStatusChange={field.onChange}
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                </FormItem>
+
+                <Separator />
 
                 <span className="flex flex-col gap-2">
-                    <FormLabel className="text-xl">{`Timeline:`}</FormLabel>
-                    <FormDescription>{`Enter this milestone's completion timeline (past or future)`}</FormDescription>
+                    <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Timeline`}</FormLabel>
 
-                    <FormItem>
-                        <FormLabel className="text-lg">{`Start:`}</FormLabel>
-                        <span className="w-full grid grid-cols-2 gap-4">
+                    <FormItem className="w-full grid grid-cols-[50px_auto_auto] gap-4 items-center">
+                        <FormLabel className="text-md">{`Start`}</FormLabel>
                         <FormField 
                             control={form.control}
                             name="startDate.month"
                             render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Month:</FormLabel>
+                                <FormItem className="h-full grow">
                                 <Select
-                                    onValueChange={(value: string) => {
-                                        field.onChange(value)
-                                        // we have to manually do this because changing startDate.month
-                                        // doesn't trigger a change on form.watch('startDate')
-                                        handleMilestoneFormSubmit({
-                                            title,
-                                            description,
-                                            milestoneType: type,
-                                            startDate,
-                                            endDate,
-                                            budget,
-                                            papers,
-                                            tasks,
-                                            status,
-                                            private: isPrivate,
-                                        })
-                                    }}
                                     defaultValue={field.value}
+                                    onValueChange={field.onChange}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
@@ -496,28 +464,10 @@ export function EditMilestoneForm({
                             control={form.control}
                             name="startDate.year"
                             render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Year:</FormLabel>
+                                <FormItem className="h-full grow">
                                     <Select
-                                        // onValueChange={field.onChange}
-                                        onValueChange={(value: string) => {
-                                            field.onChange(value)
-                                            // we have to manually do this because changing startDate.year
-                                            // doesn't trigger a change on form.watch('startDate')
-                                            handleMilestoneFormSubmit({
-                                                title,
-                                                description,
-                                                milestoneType: type,
-                                                startDate,
-                                                endDate,
-                                                budget,
-                                                papers,
-                                                tasks,
-                                                status,
-                                                private: isPrivate,
-                                            })
-                                        }}
                                         defaultValue={field.value}
+                                        onValueChange={field.onChange}
                                     >
                                         <FormControl>
                                             <SelectTrigger>
@@ -543,39 +493,16 @@ export function EditMilestoneForm({
                                 </FormItem>
                             )}
                         />
-                        </span>
-                        <FormMessage />
-                    </FormItem>
 
-                    <FormItem>
-                        <FormLabel className="text-lg">{`End:`}</FormLabel>
-                        <span className="w-full grid grid-cols-2 gap-4">
+                        <FormLabel className="text-md">{`End`}</FormLabel>
                         <FormField 
                             control={form.control}
                             name="endDate.month"
                             render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Month:</FormLabel>
+                                <FormItem className="h-full grow">
                                 <Select
-                                    // onValueChange={field.onChange}
-                                    onValueChange={(value: string) => {
-                                        field.onChange(value)
-                                        // we have to manually do this because changing endDate.month
-                                        // doesn't trigger a change on form.watch('endDate')
-                                        handleMilestoneFormSubmit({
-                                            title,
-                                            description,
-                                            milestoneType: type,
-                                            startDate,
-                                            endDate,
-                                            budget,
-                                            papers,
-                                            tasks,
-                                            status,
-                                            private: isPrivate,
-                                        })
-                                    }}
                                     defaultValue={field.value}
+                                    onValueChange={field.onChange}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
@@ -606,28 +533,10 @@ export function EditMilestoneForm({
                             control={form.control}
                             name="endDate.year"
                             render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Year:</FormLabel>
+                                <FormItem className="h-full grow">
                                     <Select
-                                        // onValueChange={field.onChange}
-                                        onValueChange={(value: string) => {
-                                            field.onChange(value)
-                                            // we have to manually do this because changing endDate.year
-                                            // doesn't trigger a change on form.watch('endDate')
-                                            handleMilestoneFormSubmit({
-                                                title,
-                                                description,
-                                                milestoneType: type,
-                                                startDate,
-                                                endDate,
-                                                budget,
-                                                papers,
-                                                tasks,
-                                                status,
-                                                private: isPrivate,
-                                            })
-                                        }}
                                         defaultValue={field.value}
+                                        onValueChange={field.onChange}
                                     >
                                         <FormControl>
                                             <SelectTrigger>
@@ -653,145 +562,91 @@ export function EditMilestoneForm({
                                 </FormItem>
                             )}
                         />
-                        </span>
+                        <FormMessage />
                     </FormItem>
                 </span>
+
+                <Separator />
 
                 <FormField
                 control={form.control}
                 name="budget"
                 render={({ field }) => (
-                    <FormItem className="flex flex-col grow">
-                        <FormLabel className="text-xl">{`Budget:`}</FormLabel>
-                        <FormControl>
-                            <span className="flex flex-row gap-2 items-center">
-                                <FaDollarSign size={24} />
-                                <Input
-                                    id="budget"
-                                    type="number"
-                                    placeholder={`Enter a number`}
-                                    defaultValue={field.value}
-                                    onChange={e =>
-                                        field.onChange(
-                                            Number(e.target.value)
-                                        )
-                                    }
-                                />
+                    <FormItem>
+                            <span className="w-full h-full flex flex-row items-center justify-between">
+                                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Budget`}</FormLabel>
+                                <FormControl className="grow w-full h-full">
+                                    <Input
+                                        className="h-full"
+                                        id="budget"
+                                        type="number"
+                                        placeholder={`Enter a number`}
+                                        defaultValue={field.value}
+                                        onChange={e =>
+                                            field.onChange(
+                                                Number(e.target.value)
+                                            )
+                                        }
+                                    />
+                                </FormControl>
                             </span>
-                        </FormControl>
                         <FormMessage />
                     </FormItem>
                 )}
                 />
 
-                <FormField
-                control={form.control}
-                name="papers"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col grow">
-                        <FormLabel className="text-xl">{`Associated Papers:`}</FormLabel>
-                        <FormDescription>{`Include links to any papers associated with this milestone`}</FormDescription>
-                        <FormControl>
-                            <>
-                                <ul className="flex flex-col gap-2">
-                                    {field?.value?.map(
-                                        (link, index) => (
-                                            <PaperField
-                                                key={index}
-                                                index={index}
-                                                value={link}
-                                                onDelete={() =>
-                                                    form.setValue(
-                                                        "papers",
-                                                        field?.value?.filter(
-                                                            (t, i) =>
-                                                                i !==
-                                                                index
-                                                        )
-                                                    )
-                                                }
-                                                onValueChange={newValue => {
-                                                    form.setValue(
-                                                        "papers",
-                                                        field?.value?.map(
-                                                            (
-                                                                currentValue,
-                                                                i
-                                                            ) =>
-                                                                i ===
-                                                                index
-                                                                    ? newValue
-                                                                    : currentValue
-                                                        )
-                                                    )
-                                                }}
-                                            />
-                                        )
-                                    )}
-                                </ul>
-                                <Button
-                                    variant="secondary"
-                                    onClick={(e: any) => {
-                                        e.preventDefault()
-                                        form.setValue("papers", [
-                                            ...(field?.value || []),
-                                            ""
-                                        ])
-                                    }}
-                                >{`Add an Associated Paper`}</Button>
-                            </>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-                />
+                <Separator />
 
                 <FormField
                 control={form.control}
                 name="tasks"
                 render={({ field }) => (
                     <FormItem className="flex flex-col grow">
-                        <FormLabel className="text-xl">{`Tasks:`}</FormLabel>
                         <FormControl>
                             <>
-                            <DndContext 
-                                accessibility={{
-                                    announcements
-                                }}
-                                collisionDetection={closestCorners} 
-                                sensors={sensors} 
-                                onDragEnd={(event) => {
-                                    const { active, over } = event
+                            {formData.tasks && formData.tasks.length > 0 && (
+                                <>
+                                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Tasks`}</FormLabel>
+                                <DndContext 
+                                    accessibility={{
+                                        announcements
+                                    }}
+                                    collisionDetection={closestCorners} 
+                                    sensors={sensors} 
+                                    onDragEnd={(event) => {
+                                        const { active, over } = event
 
-                                    if (active.id === over?.id) return
+                                        if (active.id === over?.id) return
 
-                                    const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
-                                    const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
+                                        const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
+                                        const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
 
-                                    form.setValue('tasks', arrayMove(field?.value || [], originalPosition, newPosition))
-                                }}
-                            >
-                            <ol className="flex flex-col gap-2">
-                                <SortableContext items={field?.value?.map(item => item.id) || []} strategy={verticalListSortingStrategy}>
-                                {field?.value?.map((task, index) => ( 
-                                    <TaskField
-                                        key={task.id} 
-                                        index={index} 
-                                        task={task} 
-                                        onDelete={() => (
-                                            form.setValue('tasks', field?.value?.filter((t, i) => i !== index))
-                                        )}
-                                        onNameChange={(newName) => {
-                                            form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, name: newName} : t))
-                                        }}
-                                        onStatusChange={(status) => {
-                                            form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, status} : t))
-                                        }}
-                                    />
-                                ))}
-                                </SortableContext>
-                            </ol>
-                            </DndContext>
+                                        form.setValue('tasks', arrayMove(field?.value || [], originalPosition, newPosition))
+                                    }}
+                                >
+                                <ol className="flex flex-col gap-2">
+                                    <SortableContext items={field?.value?.map(item => item.id) || []} strategy={verticalListSortingStrategy}>
+                                    {field?.value?.map((task, index) => ( 
+                                        <TaskField
+                                            key={task.id} 
+                                            index={index} 
+                                            task={task} 
+                                            onDelete={() => {
+                                                form.setValue('tasks', field?.value?.filter((t, i) => i !== index))
+                                            }}
+                                            onNameChange={(newName) => {
+                                                form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, name: newName} : t))
+                                            }}
+                                            onStatusChange={(status) => {
+                                                form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, status} : t))
+                                            }}
+                                        />
+                                    ))}
+                                    </SortableContext>
+                                </ol>
+                                </DndContext>
+                                </>
+                            )}
                             <Button variant="secondary" onClick={(e: any) => {
                                 e.preventDefault()
                                 form.setValue(
@@ -804,6 +659,27 @@ export function EditMilestoneForm({
                         <FormMessage />
                     </FormItem>
                 )}
+                />
+
+                <Separator />
+
+                <PapersEditForm
+                    form={form}
+                    papers={formData.papers as AttachmentType[]}
+                />
+
+                <Separator />
+
+                <AssetEditForm 
+                    form={form}
+                    asset={formData.asset as AssetType}
+                />
+
+                <Separator />
+
+                <RFPEditForm
+                    form={form}
+                    RFP={formData.RFP as RFPType} 
                 />
 
                 <span className="flex justify-end gap-4 flex-wrap">
@@ -823,37 +699,46 @@ export function EditMilestoneForm({
     )
 }
 
-const PaperField = ({
-    index,
-    value,
-    onDelete,
-    onValueChange
-}: {
-    index: number
-    value: string
-    onDelete: () => void
-    onValueChange: (newValue: string) => void
-}) => {
-    const deleteElement = (e: React.MouseEvent<HTMLElement>) => {
-        e.preventDefault()
-        onDelete()
-    }
-
-    const valueChanged = (e: React.FormEvent<HTMLInputElement>) => {
-        onValueChange(e.currentTarget.value)
-    }
-
+const EditTitle = ({ form }: { form: any }) => {
+    const [isEditing, setIsEditing] = useState(false)
+    
     return (
-        <li key={index} className="flex flex-row gap-2 items-center">
-            <Input
-                placeholder={`Enter a link to the associated paper`}
-                value={value}
-                onChange={valueChanged}
-            />
-            <Button variant="secondary" size="icon" onClick={deleteElement}>
-                <FaTrash />
-            </Button>
-        </li>
+        <FormField
+        control={form.control}
+        name="title"
+        render={({ field }) => (
+            <FormItem className="flex flex-col grow">
+                <FormControl>
+                    {isEditing ? (
+                        <span className="flex flex-row gap-2">
+                        <div className="h-full w-full">
+                            <Input
+                                id="title"
+                                className="h-full w-full"
+                                placeholder={`Enter a title`}
+                                defaultValue={field.value}
+                                {...field}
+                            />
+                        </div>
+                        <Button variant="ghost" className="p-2" onClick={(e) => {
+                            e.preventDefault()
+                            setIsEditing(false)
+                        }}><FaX /></Button>
+                        </span>
+                    ) : (
+                        <span className="flex flex-row gap-2 items-center">
+                        <h1 className="text-xl font-semibold w-full h-full">{field.value}</h1>
+                        <Button variant="ghost" className="p-2" onClick={(e) => {
+                            e.preventDefault()
+                            setIsEditing(true)
+                        }}><FaEdit /></Button>
+                        </span>
+                    )}
+                </FormControl>
+                <FormMessage />
+            </FormItem>
+        )}
+        />
     )
 }
 

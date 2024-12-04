@@ -72,6 +72,13 @@ export default async function RoadmapPage({
     const dbMilestones = await prisma.milestone.findMany({
         where: { roadmapId: params.id },
         include: { 
+            papers: true,
+            asset: {
+                include: { contacts: true, attachments: true }
+            },
+            RFP: {
+                include: { contacts: true, attachments: true }
+            },
             tasks: {
                 orderBy: { orderPosition: 'asc' },
                 include: {

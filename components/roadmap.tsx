@@ -309,9 +309,9 @@ const MilestoneDetailsPanel = ({
     return (
         <>
             <span className="flex flex-row justify-between items-center gap-4">
-                <h1 className="text-2xl font-bold grow">
+                {/* <h1 className="text-2xl font-bold grow">
                     {isEditing ? `Edit Milestone Details` : `Milestone Details`}
-                </h1>
+                </h1> */}
                 {/* {isEditing ? (
                     <Button onClick={() => setIsEditing(false)}>
                         Cancel Editing
@@ -321,15 +321,14 @@ const MilestoneDetailsPanel = ({
                         Edit Milestone
                     </Button>
                 )} */}
-                <Button variant="secondary" onClick={handleClose}>
+                {/* <Button variant="secondary" onClick={handleClose}>
                     <FaX />
-                </Button>
+                </Button> */}
             </span>
             {isEditing ? (
                 <EditMilestoneForm
                     milestoneData={milestone}
-                    // onClose={() => setIsEditing(false)}
-                    onClose={() => {}}
+                    onClose={handleClose}
                 />
             ) : (
                 <MilestoneDetails milestoneData={milestone} />
