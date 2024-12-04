@@ -12,7 +12,13 @@ export async function getConditionData(slug: string): Promise<ApiResponse<any>> 
     try {
         const condition = await prisma.condition.findUnique({
             where: {slug},
-            include: {organizations: true},
+            include: {
+                organizations: {
+                    select: {
+                        organization: true
+                    }
+                }
+            },
         });
 
         if (!condition) {
@@ -311,7 +317,7 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
             where: {
                 id: organizationId,
             },
-            include: { roadmaps: true }
+            include: {roadmaps: true}
         });
 
         if (!organization) {
