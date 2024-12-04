@@ -36,8 +36,14 @@ export default function InviteUserToOrgDialog() {
     const [organization, setOrganization] = useState<Organization | null>();
 
     useEffect(() => {
-        session.data?.user?.organizationId ? getOrganizationFromOrganizationId(session.data?.user?.organizationId).then((organization) => {
-            setOrganization(organization)
+        session.data?.user?.organizationId ? getOrganizationFromOrganizationId(session.data?.user?.organizationId).then((response) => {
+            if (response.success) {
+                const organization = response.data
+                setOrganization(organization)
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
+            }
         }) : toast.error("No organizationId provided")
     }, [setOrganization]);
 

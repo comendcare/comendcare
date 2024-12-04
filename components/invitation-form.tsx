@@ -12,6 +12,7 @@ import {getIp} from "@/lib/utils";
 import {useEffect, useState} from "react";
 import {Organization} from "@prisma/client";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {toast} from "sonner";
 
 const invitationFormSchema = z.object({
     email: z.string().min(2, {
@@ -26,8 +27,14 @@ export default function InvitationForm() {
     const [organization, setOrganization] = useState<Organization | null>();
 
     useEffect(() => {
-        const organization = getOrganizationFromOrganizationId(params?.id as string).then((organization) => {
-            setOrganization(organization)
+        getOrganizationFromOrganizationId(params?.id as string).then((response) => {
+            if (response.success) {
+                const organization = response.data
+                setOrganization(organization)
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
+            }
         })
     }, [setOrganization]);
 

@@ -20,7 +20,8 @@ import {redirect} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {FaPlus} from "react-icons/fa6";
 import Loading from "@/app/loading";
-import {getAllOrganizationsFromUserId, getOrganizationFromOrganizationId, getRoadmapId, getUser} from "@/lib/fetchers";
+import {getAllOrganizationsFromUserId, getRoadmapId} from "@/lib/fetchers";
+import {toast} from "sonner";
 
 
 export type MemberWithOrganization = Member & {
@@ -81,9 +82,15 @@ export default function AppLayout({children}: AppLayoutProps) {
                 // })
             }
 
-            const roadmapId = await getRoadmapId(orgId)
-            setRoadmapId(roadmapId)
-            setIsLoading(false)
+            const response = await getRoadmapId(orgId)
+            if (response.success) {
+                const organization = response.data
+                setRoadmapId(roadmapId)
+                setIsLoading(false)
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
+            }
         }
     }
 
@@ -94,8 +101,14 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     const fetchOrganizations = async () => {
         if (session) {
-            const orgs = await getAllOrganizationsFromUserId(session.user.id);
-            setOrganizations(orgs);
+            const response = await getAllOrganizationsFromUserId(session.user.id);
+            if (response.success) {
+                const orgs = response.data ?? []
+                setOrganizations(orgs)
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
+            }
         }
     };
 
