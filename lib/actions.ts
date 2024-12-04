@@ -393,6 +393,9 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
         where: {
             id: organizationId,
         },
+        include: {
+            roadmaps: true
+        }
     });
     return organization
 };
