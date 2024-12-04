@@ -27,6 +27,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
+import { handleImageUpload } from "@/lib/g-cloud";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -57,7 +58,7 @@ export default function UserEditForm() {
     const [isDialogOpen, setDialogOpen] = useState(false);
 
     const onDrop = useCallback(
-        (acceptedFiles: FileWithPath[]) => {
+        (acceptedFiles: File[]) => {
             const file = acceptedFiles[0];
             if (!file) {
                 toast.error("Selected image is too large!");
@@ -67,7 +68,7 @@ export default function UserEditForm() {
             const fileWithPreview = Object.assign(file, {
                 preview: URL.createObjectURL(file),
             });
-
+            
             setSelectedFile(fileWithPreview);
             setDialogOpen(true);
         },
@@ -126,7 +127,7 @@ export default function UserEditForm() {
                         country: userData.country || "",
                         lat: userData.lat || 0,
                         lng: userData.lng || 0,
-                        image: userData.image || "",
+                        // image: userData.image || "",
                     };
                     setDefaultValues(fetchedValues);
                     setAddress(fetchedValues); // Set address state as well
@@ -152,6 +153,10 @@ export default function UserEditForm() {
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
         try {
+            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+
+            values.image = imgUrl || undefined
+
             for (const [key, value] of Object.entries(values)) {
                 const res: any = await editUser(session?.user?.id as string, {[key]: value});
                 if (res?.error) {
@@ -161,8 +166,8 @@ export default function UserEditForm() {
             }
 
             toast.success("Successfully updated user profile!");
-            router.refresh();
-            router.push("/onboarding/organization");
+            // router.refresh();
+            // router.push("/onboarding/organization");
         } catch (error) {
             toast.error("An error occurred while updating your profile.");
         }
