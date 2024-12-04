@@ -5,60 +5,6 @@ import {FaArrowUpRightFromSquare, FaPen} from "react-icons/fa6";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 
-// const roadmapItems = [
-//     {
-//         title: "Data Analysis and Next Steps Planning",
-//         startDate: "2025-01-01T00:00:00Z",
-//         endDate: "2025-03-31T23:59:59Z",
-//         description: "Analyze results from Phase I trials to assess efficacy. Plan further clinical trials or expand research to focus on precision treatment approaches based on trial outcomes.",
-//         hasDownload: false,
-//     },
-//     {
-//         title: "Clinical Trial Phase I",
-//         startDate: "2024-07-01T00:00:00Z",
-//         endDate: "2024-09-30T23:59:59Z",
-//         description: "Launch Phase I clinical trials with a focus on safety and dosage. Monitor participants closely for initial response and adjust protocols as necessary.",
-//         hasDownload: true,
-//     },
-//     {
-//         title: "Patient Education and Community Outreach",
-//         startDate: "2024-01-01T00:00:00Z",
-//         endDate: "2024-12-31T23:59:59Z",
-//         description: "Develop educational materials and conduct workshops to support patients and families. Strengthen community engagement and advocacy efforts to raise awareness and gather support.",
-//         hasDownload: false,
-//     },
-//     {
-//         title: "Clinical Trial Preparation",
-//         startDate: "2024-04-01T00:00:00Z",
-//         endDate: "2024-06-30T23:59:59Z",
-//         description: "Work with regulatory bodies and research institutions to design early-stage clinical trials. Recruit patients and establish partnerships with medical centers for trial sites.",
-//         hasDownload: false,
-//     },
-//     {
-//         title: "Preclinical Research and Treatment Exploration",
-//         startDate: "2023-10-01T00:00:00Z",
-//         endDate: "2023-12-31T23:59:59Z",
-//         description: "Begin preclinical studies with research partners to explore existing compounds and potential treatments. This phase includes in vitro testing to identify promising therapeutic candidates.",
-//         hasDownload: false,
-//     },
-//     {
-//         title: "Genetic Analysis and Biomarker Identification",
-//         label: "Ongoing",
-//         startDate: "2023-03-15T00:00:00Z",
-//         endDate: "2024-03-15T23:59:59Z",
-//         description: "Collaborate with geneticists to analyze patient DNA samples and identify potential biomarkers associated with the disease. Early biomarkers will guide treatment and research priorities.",
-//         hasDownload: false,
-//     },
-//     {
-//         title: "Initial Patient Data Collection",
-//         label: "Phase 1",
-//         startDate: "2023-01-10T00:00:00Z",
-//         endDate: "2023-03-10T23:59:59Z",
-//         description: "Collect initial data from patients to understand the range of symptoms, genetic markers, and current treatments. Build a secure, anonymized database for research purposes.",
-//         hasDownload: false,
-//     },
-// ];
-
 const getDates = (milestone: any) => {
     if (milestone.startDate && milestone.endDate) {
         return (
