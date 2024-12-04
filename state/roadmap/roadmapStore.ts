@@ -11,6 +11,7 @@ import {
     EdgeChange
 } from "@xyflow/react"
 import { debounce } from "lodash"
+import { updateDBFlow, updateDBMilestones, updateDBTask } from "@/lib/actions"
 
 export type RoadmapState = {
     onboardingActive: boolean,
@@ -73,7 +74,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             })
             set({ milestones })
             const task = get().milestones.map(milestone => milestone?.tasks || []).flat(1).filter(task => task.id === taskId)
-            if (task) updateTasks(task)
+            if (task) updateDBTask({ tasks: task })
         },
         setTasks: (tasks: any[]) => {
             const milestones = get().milestones.map(milestone => {
@@ -83,7 +84,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 }
             })
             set({ milestones })
-            updateTasks(tasks)
+            updateDBTask({ tasks })
         },
         milestones: [],
         setMilestone: (nodeId: string, newProperties: any) => {
@@ -93,11 +94,11 @@ export const useRoadmapStore = create<RoadmapState>()(
                     : milestone
             )
             set({ milestones })
-            updateMilestones(milestones.filter(milestone => milestone.nodeId === nodeId))
+            updateDBMilestones({ milestones: milestones.filter(milestone => milestone.nodeId === nodeId) })
         },
         setMilestones: (milestones: any[]) => {
             set({ milestones })
-            updateMilestones(milestones)
+            updateDBMilestones({ milestones })
         },
         nodes: [],
         edges: [],
@@ -145,7 +146,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             const milestones = [...get().milestones, node.data]
             set({ nodes, milestones })
             debounceUpdateFlow(get().roadmapId, nodes, get().edges)
-            updateMilestones([node.data])
+            updateDBMilestones({ milestones: [node.data] })
         },
         deleteNode: (nodeId: string | undefined) => {
             const nodes = [...get().nodes].filter(({ id }) => id !== nodeId)
@@ -173,7 +174,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             const state = get()
             set(state)
             debounceUpdateFlow(state.roadmapId, state.nodes, state.edges)
-            updateMilestones(state.milestones)
+            updateDBMilestones({ milestones: state.milestones })
         }
     }),
     {
@@ -206,126 +207,7 @@ export const useRoadmapStore = create<RoadmapState>()(
 // debounce flow updates, because the flow spams X/Y Position change values when dragging a node
 export const debounceUpdateFlow = debounce(
     (roadmapId: string | null, nodes: Node[], edges: Edge[]) => {
-        updateFlow(roadmapId, nodes, edges)
+        updateDBFlow({ roadmapId, nodes, edges })
     }, 500
 )
-
-export const updateFlow = async (
-    roadmapId: string | null,
-    nodes: Node[],
-    edges: Edge[]
-) => {
-    try {
-        const response = await fetch("/api/flow/update", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ roadmapId, nodes, edges }) // Send the nodes and edges as JSON
-        })
-
-        if (!response.ok) {
-            throw new Error("Failed to save flow")
-        }
-
-        const data = await response.json()
-        console.log(data.message) // "Flow saved successfully"
-    } catch (error) {
-        console.error("Error saving flow:", error)
-    }
-}
-
-export const updateMilestones = async (
-    milestones: any[] // milestones to update
-) => {
-    try {
-        const response = await fetch("/api/milestone/update", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ milestones })
-        })
-
-        if (!response.ok) {
-            throw new Error("Failed to save milestones")
-        }
-
-        const data = await response.json()
-        console.log(data.message)
-    } catch (error) {
-        console.error("Error saving milestones:", error)
-    }
-}
-
-export const updateTasks = async (
-    tasks: any[] // tasks to update
-) => {
-    try {
-        const response = await fetch("/api/task/update", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ tasks })
-        })
-
-        if (!response.ok) {
-            throw new Error("Failed to save tasks")
-        }
-
-        const data = await response.json()
-        console.log(data.message)
-    } catch (error) {
-        console.error("Error saving tasks:", error)
-    }
-}
-
-// export const updateTasks = async (
-//     tasks: any[] // tasks to update
-// ) => {
-//     try {
-//         const response = await fetch("/api/milestone/update", {
-//             method: "POST",
-//             headers: {
-//                 "Content-Type": "application/json"
-//             },
-//             body: JSON.stringify({ tasks })
-//         })
-
-//         if (!response.ok) {
-//             throw new Error("Failed to save flow")
-//         }
-
-//         const data = await response.json()
-//         console.log(data.message)
-//     } catch (error) {
-//         console.error("Error saving flow:", error)
-//     }
-// }
-
-// export const saveToDatabase = async (
-//     nodes: Node[],
-//     edges: Edge[],
-//     milestones: any[]
-// ) => {
-//     try {
-//         const response = await fetch("/api/flow/update", {
-//             method: "POST",
-//             headers: {
-//                 "Content-Type": "application/json"
-//             },
-//             body: JSON.stringify({ nodes, edges, milestones }) // Send the nodes and edges as JSON
-//         })
-
-//         if (!response.ok) {
-//             throw new Error("Failed to save flow")
-//         }
-
-//         const data = await response.json()
-//         console.log(data.message) // "Flow saved successfully"
-//     } catch (error) {
-//         console.error("Error saving flow:", error)
-//     }
-// }
 
