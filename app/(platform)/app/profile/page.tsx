@@ -19,7 +19,6 @@ import Image from "next/image"
 import Link from "next/link";
 import {PAGProfileAssetsCard} from "@/components/pag-profile-assets-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
-import {OpenRFPsCard} from "@/components/open-rfps-card";
 import prisma from "@/lib/prisma"
 import {PAGProfileOpenRFPsCard} from "@/components/pag-profile-open-rfps-card";
 import EditPAGProfileDialog from "@/components/edit-pag-profile-page";
