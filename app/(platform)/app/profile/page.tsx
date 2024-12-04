@@ -21,7 +21,7 @@ import Link from "next/link";
 import {AssetsCard} from "@/components/assets-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {OpenRFPsCard} from "@/components/open-rfps-card";
-
+import prisma from "@/lib/prisma"
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -32,11 +32,31 @@ export default async function ProfilePage() {
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
     let organization = null
+    let dbMilestones = []
     if (session?.user.organizationId) {
         organization = await getOrganizationFromOrganizationId(session?.user.organizationId)
     }
 
     if (organization) {
+        dbMilestones = await prisma.milestone.findMany({
+            where: { roadmapId: organization.roadmaps[0].id },
+            include: { 
+                papers: true,
+                asset: {
+                    include: { contacts: true, attachments: true }
+                },
+                RFP: {
+                    include: { contacts: true, attachments: true }
+                },
+                tasks: {
+                    orderBy: { orderPosition: 'asc' },
+                    include: {
+                        checklist: { orderBy: { orderPosition: 'asc' } }
+                    }
+                } 
+            }
+        })
+
         return (
             <main className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
                 <div className="flex flex-col space-y-8 my-8">
@@ -121,7 +141,7 @@ export default async function ProfilePage() {
                         </div>
 
                         <div className="col-span-4 flex flex-col space-y-4">
-                            <PAGProfileResearchPlanCard/>
+                            <PAGProfileResearchPlanCard roadmapItems={dbMilestones}/>
                             <PAGProfileActivityCard/>
                         </div>
                     </div>
