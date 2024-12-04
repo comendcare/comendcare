@@ -434,52 +434,6 @@ export const deleteOrganization = withOrganizationAuth(
     }
 )
 
-export const getOrganizationFromOrganizationId = async (organizationId: string) => {
-    const organization = await prisma.organization.findUnique({
-        where: {
-            id: organizationId,
-        },
-        include: {
-            roadmaps: true
-        }
-    });
-    return organization
-};
-
-export const getAllOrganizations = async () => {
-    const organizations = await prisma.organization.findMany({
-        orderBy: {
-            createdAt: "asc"
-        },
-    })
-
-    return organizations
-};
-
-export const getAllOrganizationsFromUserId = async (userId: string) => {
-    const memberships = await prisma.member.findMany({
-        where: {
-            userId: userId
-        },
-        include: {
-            organization: true
-        }
-    });
-    return memberships
-};
-
-export const getOrganizationFromRoadmapId = async (roadmapId: string) => {
-    const roadmap = await prisma.roadmap.findUnique({
-        where: {
-            id: roadmapId
-        },
-        select: {
-            organizationId: true
-        }
-    })
-    return roadmap?.organizationId
-}
-
 // export const createRoadmap = withOrganizationAuth(
 //     async (_: FormData, organization: Organization) => {
 //         const session = await getSession()
@@ -856,20 +810,6 @@ export async function addMemberToOrganization(
     } catch (error) {
         console.error("Error adding member to organization:", error)
         throw new Error("Failed to add member to organization.")
-    }
-}
-
-export async function checkSubdomainAvailability(nickname: string) {
-    try {
-        const existingOrg = await prisma.organization.findUnique({
-            where: {subdomain: nickname},
-        });
-        console.log(`serverside: ${existingOrg}`)
-
-        return !existingOrg
-    } catch (error: any) {
-        console.error("Database error checking subdomain availability:", error);
-        return {error: "Database error. Please try again later."};
     }
 }
 
