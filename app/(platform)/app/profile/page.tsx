@@ -19,6 +19,7 @@ import Image from "next/image"
 import Link from "next/link";
 import {PAGProfileAssetsCard} from "@/components/pag-profile-assets-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
+import prisma from "@/lib/prisma"
 import {PAGProfileOpenRFPsCard} from "@/components/pag-profile-open-rfps-card";
 import EditPAGProfileDialog from "@/components/edit-pag-profile-page";
 import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
@@ -26,7 +27,6 @@ import {PAGProfileAssetsAndProjectsCard} from "@/components/pag-profile-assets-a
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "sonner";
-
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -37,6 +37,7 @@ export default async function ProfilePage() {
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
     let organization = null
+    let dbMilestones = []
     if (session?.user.organizationId) {
         const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
         if (response.success) {
@@ -86,6 +87,25 @@ export default async function ProfilePage() {
                 </div>
             );
         }
+      
+        dbMilestones = await prisma.milestone.findMany({
+            where: { roadmapId: organization.roadmaps[0].id },
+            include: { 
+                papers: true,
+                asset: {
+                    include: { contacts: true, attachments: true }
+                },
+                RFP: {
+                    include: { contacts: true, attachments: true }
+                },
+                tasks: {
+                    orderBy: { orderPosition: 'asc' },
+                    include: {
+                        checklist: { orderBy: { orderPosition: 'asc' } }
+                    }
+                } 
+            }
+        })
 
         // Existing verified organization rendering logic
         return (
@@ -175,7 +195,7 @@ export default async function ProfilePage() {
                                 </TabsList>
                                 <TabsContent value="roadmap" className="flex flex-col space-y-4">
                                     <PAGProfileAssetsAndProjectsCard/>
-                                    <PAGProfileResearchPlanCard/>
+                                    <PAGProfileResearchPlanCard roadmapItems={dbMilestones}/>
                                 </TabsContent>
                                 <TabsContent value="activity" className="mt-0">
                                     <PAGProfileActivityCard/>

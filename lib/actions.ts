@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Organization, Roadmap} from "@prisma/client"
+import {Roadmap, Organization, Prisma} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
@@ -813,3 +813,359 @@ export async function addMemberToOrganization(
     }
 }
 
+/* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
+
+export async function updateDBFlow({ roadmapId, nodes, edges }: { roadmapId: string | null, nodes: any[], edges: any[] }) {
+    try {
+        if (!roadmapId) throw new Error('No roadmapId provided.')
+        // console.log(`nodes:`, nodes)
+        // console.log(`milestones:`, milestones)
+        // console.log(`edges:`, edges)
+
+        // Delete any nodes that are not in the request
+        const nodeIds = nodes.map((node: any) => node.id)
+        const nodesInDB = await prisma.node.findMany({ select: { id: true } })
+        const nodeIdsInDB = (nodesInDB || []).map((node: any) => node.id)
+        const nodesToDelete = nodeIdsInDB.filter(
+            (id: string) => !nodeIds.includes(id)
+        )
+
+        await prisma.node.deleteMany({
+            where: {
+                id: { in: nodesToDelete }
+            }
+        })
+
+        await prisma.edge.deleteMany()
+
+        // Save or update nodes
+        await Promise.all(
+            nodes.map(async (node: any) => {
+                await prisma.node.upsert({
+                    where: { id: node.id },
+                    update: {
+                        positionX: node.position?.x,
+                        positionY: node.position?.y
+                    },
+                    create: {
+                        id: node.id,
+                        roadmap: {
+                            connect: { id: roadmapId }
+                        },
+                        type: node.type,
+                        positionX: node.position?.x,
+                        positionY: node.position?.y,
+                        data: {
+                            create: {
+                                id: node.data?.id,
+                                roadmap: {
+                                    connect: { id: roadmapId }
+                                },
+                                title: node.data?.title || "New Milestone",
+                                status: node.data?.status || "TODO",
+                            }
+                        }
+                    }
+                })
+            })
+        )
+
+        // Save or update edges
+        await Promise.all(
+            edges.map(async (edge: any) => {
+                await prisma.edge.upsert({
+                    where: { id: edge.id },
+                    update: {
+                        source: edge.source,
+                        target: edge.target
+                    },
+                    create: {
+                        id: edge.id,
+                        roadmap: {
+                            connect: { id: roadmapId }
+                        },
+                        source: edge.source,
+                        target: edge.target,
+                    }
+                })
+            })
+        )
+
+        console.log(`Successfully updated Flow`)
+    } catch (error) {
+        console.error(`Error updating Flow: `, error)
+    }
+}
+
+type MilestoneType = Prisma.MilestoneGetPayload<{
+    include: { 
+        papers: true, 
+        asset: {
+            include: { contacts: true, attachments: true }
+        },
+        RFP: {
+            include: { contacts: true, attachments: true }
+        },
+        tasks: true 
+    }
+}>
+
+export async function updateDBMilestones({ milestones }: { milestones: any[] }) {
+    try {
+        await Promise.all(
+            milestones.map(async (milestone: any) => {
+                const previousMilestone = await prisma.milestone.findUnique({
+                    // where: { nodeId: milestone.nodeId },
+                    where: { id: milestone.id },
+                    include: { 
+                        papers: true, 
+                        asset: {
+                            include: { contacts: true, attachments: true }
+                        },
+                        RFP: {
+                            include: { contacts: true, attachments: true }
+                        },
+                        tasks: true 
+                    }
+                })
+                  
+                if (!previousMilestone) {
+                    // milestone doesn't exist, throw error
+                    throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`);
+                }
+
+                const previousTasks = previousMilestone?.tasks || []
+                const tasksToDelete = previousTasks.filter((task) => !milestone.tasks.map((t: any) => t.id).includes(task.id))
+                const tasksToUpdate = milestone.tasks?.filter((task: any) => previousMilestone?.tasks.map((t: any) => t.id).includes(task.id))
+                const tasksToCreate = milestone.tasks.filter((task: any) => !previousMilestone?.tasks.map((t: any) => t.id).includes(task.id))
+
+                // console.log(`tasks to delete`, tasksToDelete)
+                // console.log(`tasks to update`, tasksToUpdate)
+                // console.log(`tasks to create`, tasksToCreate)
+
+                await prisma.milestone.update({
+                    // where: { nodeId: milestone.nodeId },
+                    where: { id: milestone.id },
+                    include: { 
+                        papers: true, 
+                        asset: {
+                            include: { contacts: true, attachments: true }
+                        },
+                        RFP: {
+                            include: { contacts: true, attachments: true }
+                        },
+                        tasks: true 
+                    },
+                    data: {
+                        title: milestone.title,
+                        type: milestone.type,
+                        description: milestone.description,
+                        startDate: milestone.startDate,
+                        endDate: milestone.endDate,
+                        budget: milestone.budget,
+                        papers: {
+                            deleteMany: {}, // clear all existing papers
+                            createMany: {
+                                data: milestone.papers.map((paper: any) => ({
+                                    link: paper.link,
+                                    ...(paper.name ? { name: paper.name } : undefined)
+                                }))
+                            }
+                        },
+                        tasks: {
+                            deleteMany: tasksToDelete
+                                .filter((task: any) => task.id !== null && task.id !== undefined)
+                                .map(task => ({ id: task.id })),
+                            createMany: {
+                                data: tasksToCreate
+                                    .filter((task: any) => task.id !== undefined && task.id !== undefined)
+                                    .map((task: any) => ({
+                                        id: task?.id || nanoid(),
+                                        name: task?.name || "New Task",
+                                        status: task?.status || "TODO",
+                                        orderPosition: task.orderPosition || 0,
+                                        kanbanPosition: task.kanbanPosition || 0,
+                                    }))
+                            }
+                        },
+                        status: milestone.status || "TODO",
+                        private: milestone.private || false,
+                    }
+                })
+
+                updateAssets(previousMilestone, milestone)
+
+                updateRFP(previousMilestone, milestone)
+
+                for (let i = 0; i < tasksToUpdate.length; i++) {
+                    const task = tasksToUpdate[i]
+                    await prisma.task.update({
+                        where: { id: task.id },
+                        data: {
+                            name: task.name,
+                            status: task.status,
+                            orderPosition: task.orderPosition || 0
+                        }
+                    })
+                }
+            })
+        )
+
+        console.log(`Successfully updated Milestone`)
+    } catch (error) {
+        console.error(`Error updating Milestone: `, error)
+    }
+}
+
+async function updateAssets(previousMilestone: MilestoneType, milestone: MilestoneType) {
+    if (milestone.asset) {
+        await prisma.milestone.update({
+            where: { id: milestone.id },
+            include: { 
+                asset: { include: { contacts: true, attachments: true } }
+            },
+            data: {
+                asset: {
+                    upsert: {
+                        create: {
+                            name: milestone.asset.name
+                        },
+                        update: {
+                            name: milestone.asset.name,
+                            description: milestone.asset.description,
+                            contacts: {
+                                deleteMany: {},  // clear all existing contacts
+                                createMany: {
+                                    data: milestone.asset.contacts.map((contact: any) => ({
+                                        name: contact.name,
+                                        role: contact.role,
+                                        email: contact.email
+                                    }))
+                                }
+                            },
+                            attachments: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: milestone.asset.attachments.map((attachment: any) => ({
+                                        link: attachment.link,
+                                        name: attachment.name
+                                    }))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    if (!milestone.asset && previousMilestone.asset) {
+        await prisma.milestone.update({
+            where: { id: milestone.id },
+            include: { 
+                asset: { include: { contacts: true, attachments: true } }
+            },
+            data: {
+                asset: { delete: true }
+            }
+        })
+    }
+}
+
+async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneType) {
+    if (milestone.RFP) {
+        await prisma.milestone.update({
+            where: { id: milestone.id },
+            include: { 
+                RFP: { include: { contacts: true, attachments: true } },
+            },
+            data: {
+                RFP: {
+                    upsert: {
+                        create: {
+                            name: milestone.RFP.name,
+                            funding: milestone.RFP.funding,
+                            researchFocus: milestone.type,
+                            openTo: milestone.RFP.openTo
+                        },
+                        update: {
+                            name: milestone.RFP.name,
+                            funding: milestone.RFP.funding,
+                            description: milestone.RFP.description,
+                            contacts: {
+                                deleteMany: {}, // clear all existing contacts
+                                createMany: {
+                                    data: milestone.RFP.contacts.map((contact: any) => ({
+                                        name: contact.name,
+                                        role: contact.role,
+                                        email: contact.email
+                                    }))
+                                }
+                            },
+                            attachments: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: milestone.RFP.attachments.map((attachment: any) => ({
+                                        link: attachment.link,
+                                        name: attachment.name
+                                    }))
+                                }
+                            },
+                            researchFocus: milestone.type,
+                            openTo: milestone.RFP.openTo,
+                            startDate: milestone.RFP.startDate,
+                            endDate: milestone.RFP.endDate
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    if (!milestone.RFP && previousMilestone.RFP) {
+        await prisma.milestone.update({
+            where: { id: milestone.id },
+            include: { 
+                RFP: { include: { contacts: true, attachments: true } },
+            },
+            data: {
+                RFP: { delete: true }
+            }
+        })
+    }
+}
+
+export async function updateDBTask({ tasks }: { tasks: any[] }) {
+    try {
+        // console.log(`tasks:`, tasks)
+
+        await Promise.all(
+            tasks.map(async (task: any) => {
+                await prisma.task.update({
+                    where: { id: task.id },
+                    data: {
+                        name: task.name,
+                        status: task.status,
+                        description: task.description,
+                        orderPosition: task.orderPosition,
+                        kanbanPosition: task.kanbanPosition,
+                        checklist: {
+                            deleteMany: {},
+                            createMany: {
+                                data: (task.checklist || []).map((item: any) => ({
+                                    name: item?.name || "New Item",
+                                    complete: item?.complete || false,
+                                    orderPosition: item?.orderPosition
+                                }))
+                            }
+                        }
+                    }
+                })
+            })
+        )
+
+        console.log(`Successfully updated Task`)
+    } catch (error) {
+        console.error(`Error updating Task: `, error)
+    }
+}
