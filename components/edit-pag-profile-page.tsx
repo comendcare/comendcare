@@ -25,9 +25,7 @@ import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {
     checkSubdomainAvailability,
-    getOrganizationData,
     getOrganizationFromOrganizationId,
-    getUser
 } from "@/lib/fetchers";
 import {FaPen, FaUpload} from "react-icons/fa6";
 import {
@@ -231,7 +229,15 @@ export default function EditPAGProfileDialog() {
     useEffect(() => {
         async function fetchUserData() {
             if (session?.user?.organizationId) {
-                const organizationData = await getOrganizationFromOrganizationId(session.user.organizationId);
+                let organizationData
+                const response = await getOrganizationFromOrganizationId(session.user.organizationId);
+                if (response.success) {
+                    organizationData = response.data
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+
                 if (organizationData) {
                     const incorporationStatusMap: Record<string, "yes" | "no" | "no-but" | undefined> = {
                         YES: "yes",

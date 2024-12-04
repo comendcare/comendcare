@@ -105,7 +105,15 @@ export default function UserOnboardingForm() {
     useEffect(() => {
         async function fetchUserData() {
             if (session?.user?.id) {
-                const userData = await getUser(session.user.id);
+                let userData
+                const response = await getUser(session.user.id);
+                if (response.success) {
+                    userData = response.data
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+
                 if (userData) {
                     const fetchedValues = {
                         name: userData.name || "",

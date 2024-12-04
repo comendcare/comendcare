@@ -155,15 +155,25 @@ export default function OrganizationOnboardingForm() {
     useEffect(() => {
 
         const fetchOrganizations = async () => {
-            await getAllOrganizations().then((res) => {
-                const options: Option[] = res.map((org, index) => ({
-                    value: org.id || index.toString(),
-                    label: org.name || "",
-                    description: org.description || "",
-                }))
+            try {
+                await getAllOrganizations().then((response) => {
+                    if (response.success && response.data) {
+                        const options: Option[] = response.data.map((org, index) => ({
+                            value: org.id || index.toString(),
+                            label: org.name || "",
+                            description: org.description || "",
+                        }))
 
-                setOrganizations(options)
-            })
+                        setOrganizations(options)
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+                })
+            } catch (error) {
+                console.error("Error fetching organizations:", error);
+                toast.error("Couldn't get organizations");
+            }
         };
 
         fetchOrganizations();

@@ -22,11 +22,13 @@ export default function UserProfilePage() {
     useEffect(() => {
         async function fetchUserData() {
             if (session?.user?.id) {
-                const userData = await getUser(session.user.id);
-                if (userData) {
+                const response = await getUser(session.user.id);
+                if (response.success) {
+                    const userData = response.data
                     setUser(userData);
                 } else {
-                    toast.error("Couldn't get user data")
+                    console.error(response.error)
+                    toast.error(response.error)
                 }
             }
         }
@@ -34,12 +36,17 @@ export default function UserProfilePage() {
         async function fetchOrgData() {
             if (session) {
                 try {
-                    const orgData = await getAllOrganizationsFromUserId(session.user.id);
+                    const response = await getAllOrganizationsFromUserId(session.user.id);
 
                     // Map the response to the correct structure if needed
-                    const organizations = orgData.map((item: { organization: Organization }) => item.organization);
+                    if (response.success) {
+                        const organizations = response.data?.map((item: { organization: Organization }) => item.organization)
+                        setOrgs(organizations);
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
 
-                    setOrgs(organizations);
                 } catch (error) {
                     console.error("Error fetching organizations:", error);
                     toast.error("Couldn't get organizations");

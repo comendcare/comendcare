@@ -38,7 +38,13 @@ export default async function ProfilePage() {
 
     let organization = null
     if (session?.user.organizationId) {
-        organization = await getOrganizationFromOrganizationId(session?.user.organizationId)
+        const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
+        if (response.success) {
+            organization = response.data
+        } else {
+            console.error(response.error)
+            toast.error(response.error)
+        }
     }
 
     let conditions = null
