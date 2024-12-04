@@ -21,8 +21,8 @@ import {
     useSelectedLayoutSegments
 } from "next/navigation"
 import { ReactNode, useEffect, useMemo, useState } from "react"
-import { getOrganizationFromRoadmapId } from "@/lib/actions"
 import Image from "next/image"
+import {getOrganizationFromRoadmapId} from "@/lib/fetchers";
 
 const externalLinks = [
     {

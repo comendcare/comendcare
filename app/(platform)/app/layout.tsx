@@ -13,12 +13,6 @@ import logo from "@/public/logos/comend-logo.png";
 import {useSession} from "next-auth/react";
 import {Suspense, useEffect} from "react";
 import Profile from "@/components/profile";
-import {
-    getAllOrganizationsFromUserId,
-    getOrganizationFromOrganizationId,
-    getRoadmapId,
-    getUser
-} from "@/lib/actions";
 import {useState} from "react";
 import {Member, Organization} from "@prisma/client";
 import OrganizationSelector from "@/components/organization-selector";
@@ -26,6 +20,7 @@ import {redirect} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {FaPlus} from "react-icons/fa6";
 import Loading from "@/app/loading";
+import {getAllOrganizationsFromUserId, getOrganizationFromOrganizationId, getRoadmapId, getUser} from "@/lib/fetchers";
 
 
 export type MemberWithOrganization = Member & {

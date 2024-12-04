@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {checkSubdomainAvailability, createMemberRequest, createOrganization, getAllOrganizations} from "@/lib/actions";
+import {createMemberRequest, createOrganization} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -31,6 +31,7 @@ import {cn, createDicebearAvatar, formatMoney} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
 
 
 const optionSchema = z.object({

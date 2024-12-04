@@ -1,10 +1,10 @@
 import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog";
-import {getMemberRequests, getMembersAndInvitees} from "@/lib/actions";
 import { getSession } from "@/lib/auth";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { createDicebearAvatar } from "@/lib/utils";
 import { FaUserXmark } from "react-icons/fa6";
 import Image from "next/image";
+import {getMemberRequests, getMembersAndInvitees} from "@/lib/fetchers";
 
 export default async function PAGDashboardRequestsTab() {
     const session = await getSession();
