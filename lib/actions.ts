@@ -56,7 +56,16 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
                 const newMilestone = await prisma.milestone.findUnique({
                     where: {nodeId: node.id},
-                    include: {tasks: true}
+                    include: {
+                        papers: true, 
+                        asset: {
+                            include: { contacts: true, attachments: true }
+                        },
+                        RFP: {
+                            include: { contacts: true, attachments: true }
+                        },
+                        tasks: true
+                    }
                 })
 
                 // create tasks for relevant milestone
