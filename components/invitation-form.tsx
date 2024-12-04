@@ -11,7 +11,7 @@ import {useParams} from "next/navigation";
 import {getIp} from "@/lib/utils";
 import {useEffect, useState} from "react";
 import {Organization} from "@prisma/client";
-import {getOrganizationFromOrganizationId, getOrganizationFromRoadmapId} from "@/lib/fetchers";
+import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 
 const invitationFormSchema = z.object({
     email: z.string().min(2, {

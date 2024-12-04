@@ -25,6 +25,7 @@ import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/l
 import {PAGProfileAssetsAndProjectsCard} from "@/components/pag-profile-assets-and-projects-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {toast} from "sonner";
 
 
 export default async function ProfilePage() {
@@ -42,7 +43,13 @@ export default async function ProfilePage() {
 
     let conditions = null
     if (session?.user.organizationId) {
-        conditions = await getConditionsDataFromOrgId(session?.user.organizationId)
+        const response = await getConditionsDataFromOrgId(session?.user.organizationId)
+        if (response.success) {
+            conditions = response.data
+        } else {
+            console.error(response.error)
+            toast.error(response.error)
+        }
     }
 
     if (organization) {
