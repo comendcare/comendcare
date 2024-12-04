@@ -31,7 +31,7 @@ interface ImageCropperProps {
     dialogOpen: boolean
     setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
     selectedFile: FileWithPreview | null
-    setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>
+    setSelectedFile: (file: any) => void
 }
 
 export function ImageCropper({
@@ -95,6 +95,11 @@ export function ImageCropper({
         try {
             setCroppedImage(croppedImageUrl)
             setDialogOpen(false)
+
+            setSelectedFile({
+                ...selectedFile,
+                preview: croppedImageUrl
+            })
         } catch (error) {
             alert("Something went wrong!")
         }

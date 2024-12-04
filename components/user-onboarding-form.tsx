@@ -30,6 +30,35 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
+import { uploadPublicImg } from "@/lib/g-cloud";
+
+export async function handleImageUpload(file: File, data: string | undefined): Promise<string | undefined> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+
+        reader.onloadend = async () => {
+            if (data == undefined) {
+                reject('No image data')
+                return
+            }
+
+            const base64data = data.replace(/^data:image\/\w+;base64,/, "")
+
+            const imageUrl = await uploadPublicImg({
+                name: file.name,
+                type: file.type,
+                data: base64data || ""
+            })
+
+            resolve(imageUrl)
+        }
+
+        reader.onerror = error => {
+            reject(error)
+        }
+    })
+}
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -155,6 +184,11 @@ export default function UserOnboardingForm() {
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
         try {
+            if (selectedFile && values.image) {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                values.image = imgUrl || undefined
+            }
+            
             for (const [key, value] of Object.entries(values)) {
                 const res: any = await editUser(session?.user?.id as string, {[key]: value});
                 if (res?.error) {

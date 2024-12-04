@@ -7,33 +7,6 @@ import { Storage } from '@google-cloud/storage'
     Google cloud, public only bucket.
     Use this bucket for files that will always be public (e.g. Organization Profile Photos)
 */
-export async function handleImageUpload(file: File, data: string | undefined): Promise<string | undefined> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-
-        reader.onloadend = async () => {
-            if (data == undefined) {
-                reject('No image data')
-                return
-            }
-
-            const base64data = data.replace(/^data:image\/\w+;base64,/, "")
-
-            const imageUrl = await uploadPublicImg({
-                name: file.name,
-                type: file.type,
-                data: base64data || ""
-            })
-
-            resolve(imageUrl)
-        }
-
-        reader.onerror = error => {
-            reject(error)
-        }
-    })
-}
 
 export async function uploadPublicImg(image: {
     name: string

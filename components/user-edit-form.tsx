@@ -27,7 +27,35 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
-import { handleImageUpload } from "@/lib/g-cloud";
+import { uploadPublicImg } from "@/lib/g-cloud";
+
+export async function handleImageUpload(file: File, data: string | undefined): Promise<string | undefined> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+
+        reader.onloadend = async () => {
+            if (data == undefined) {
+                reject('No image data')
+                return
+            }
+
+            const base64data = data.replace(/^data:image\/\w+;base64,/, "")
+
+            const imageUrl = await uploadPublicImg({
+                name: file.name,
+                type: file.type,
+                data: base64data || ""
+            })
+
+            resolve(imageUrl)
+        }
+
+        reader.onerror = error => {
+            reject(error)
+        }
+    })
+}
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -153,9 +181,12 @@ export default function UserEditForm() {
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
         try {
-            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+            if (selectedFile && values.image) {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                values.image = imgUrl || undefined
 
-            values.image = imgUrl || undefined
+                console.log(`imgUrl`, imgUrl)
+            }
 
             for (const [key, value] of Object.entries(values)) {
                 const res: any = await editUser(session?.user?.id as string, {[key]: value});
@@ -169,6 +200,7 @@ export default function UserEditForm() {
             // router.refresh();
             // router.push("/onboarding/organization");
         } catch (error) {
+            console.error('Error:', error)
             toast.error("An error occurred while updating your profile.");
         }
     }
@@ -251,6 +283,7 @@ export default function UserEditForm() {
                                             setDialogOpen={setDialogOpen}
                                             selectedFile={selectedFile}
                                             setSelectedFile={(file: any) => {
+                                                console.log(`preview`, file.preview)
                                                 setSelectedFile(file);
                                                 field.onChange(file?.preview); // Update form field value
                                             }}

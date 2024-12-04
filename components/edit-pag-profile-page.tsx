@@ -36,6 +36,35 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
+import { uploadPublicImg } from "@/lib/g-cloud";
+
+export async function handleImageUpload(file: File, data: string | undefined): Promise<string | undefined> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+
+        reader.onloadend = async () => {
+            if (data == undefined) {
+                reject('No image data')
+                return
+            }
+
+            const base64data = data.replace(/^data:image\/\w+;base64,/, "")
+
+            const imageUrl = await uploadPublicImg({
+                name: file.name,
+                type: file.type,
+                data: base64data || ""
+            })
+
+            resolve(imageUrl)
+        }
+
+        reader.onerror = error => {
+            reject(error)
+        }
+    })
+}
 
 const OPTIONS: Option[] = [
     {
@@ -211,6 +240,11 @@ export default function EditPAGProfileDialog() {
                 formData.append(key, value.toString());
             }
         });
+
+        if (selectedFile && values.image) {
+            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+            if (imgUrl) formData.set('image', imgUrl)
+        }
 
         createOrganization(formData).then((res: any) => {
             if (res.error) {
