@@ -4,7 +4,6 @@ import {ResponsiveContainer, PieChart, Pie, Label} from "recharts";
 import {cn} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
 import {Badge} from "@/components/ui/badge";
-import EditProfileAboutDialog from "@/components/edit-profile-about-dialog";
 import {Organization} from "@prisma/client";
 import Link from "next/link";
 

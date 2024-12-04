@@ -17,7 +17,7 @@ export default function UserEditSettingsDialog() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="gap-x-2">
+                <Button className="gap-x-2 w-min">
                     <FaGear/>
                     Settings
                 </Button>

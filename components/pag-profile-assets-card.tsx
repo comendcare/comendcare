@@ -39,7 +39,7 @@ const milestones = [
     // {text: "FDA orphan drug status approved"}
 ]
 
-export const AssetsCard = () => {
+export const PAGProfileAssetsCard = () => {
 
     return (
         <Card>

@@ -17,6 +17,7 @@ import {Slider} from "@/components/ui/slider";
 import {Separator} from "@/components/ui/separator";
 import {FaQuestionCircle} from "react-icons/fa";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {Timer} from "lucide-react";
 
 const invitationFormSchema = z.object({
     raising: z.enum(["yes", "no-but", "no"], {
@@ -66,9 +67,16 @@ export default function FinancesOnboardingForm() {
         <TooltipProvider>
             <div className="space-y-4 w-1/2">
                 <div className="space-y-2">
-                    <h1 className="text-xl font-semibold">
-                        Finances onboarding
-                    </h1>
+                    <div className="flex flex-row justify-between">
+                        <h1 className="text-xl font-semibold">
+                            Finances onboarding
+                        </h1>
+
+                        <p className="inline-flex flex-row justify-center items-center gap-x-2 text-xl">
+                            <Timer/>
+                            {`Estimated time: 5 min`}
+                        </p>
+                    </div>
                     <p>
                         {`With these questions we're seeking to understand your organization's capacity for advancing research in topics relevant to your group. Hover over the `}
                         <span className="inline-flex items-center">
