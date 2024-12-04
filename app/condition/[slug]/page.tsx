@@ -32,7 +32,6 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {faker} from "@faker-js/faker";
 import {bioassets} from "@/lib/data";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
-import {toast} from "sonner";
 
 export async function generateMetadata({
                                            params
@@ -47,7 +46,6 @@ export async function generateMetadata({
         data = response.data
     } else {
         console.error(response.error)
-        toast.error(response.error)
     }
 
     // Fallback to avoid passing null to title or description
@@ -137,7 +135,6 @@ export default async function SitePostPage({
         data = response.data
     } else {
         console.error(response.error)
-        toast.error(response.error)
     }
 
     if (!data) {
