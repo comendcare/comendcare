@@ -23,6 +23,7 @@ import {
 import { ReactNode, useEffect, useMemo, useState } from "react"
 import Image from "next/image"
 import {getOrganizationFromRoadmapId} from "@/lib/fetchers";
+import {toast} from "sonner";
 
 const externalLinks: any[] = [
     // {
@@ -70,8 +71,15 @@ export default function AdminNav({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         if (segments[0] === "roadmap" && id) {
-            getOrganizationFromRoadmapId(id).then(id => {
-                setOrganizationId(id)
+            let orgId = null
+            getOrganizationFromRoadmapId(id).then(response => {
+                if (response.success) {
+                    const orgId = response.data
+                    setOrganizationId(orgId)
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
             })
         }
     }, [segments, id])

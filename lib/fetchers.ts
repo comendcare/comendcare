@@ -4,25 +4,42 @@ import {unstable_cache} from "next/cache"
 import prisma from "@/lib/prisma"
 import {serialize} from "next-mdx-remote/serialize"
 import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
+import {ApiResponse} from "@/lib/types";
+import {logError} from "@/lib/utils";
 
-export async function getConditionData(slug: string) {
-    return prisma.condition.findUnique({
-        where: slug ? {slug} : {slug: slug},
-        include: {organizations: true}
-    })
+
+export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
+    try {
+        const condition = await prisma.condition.findUnique({
+            where: { slug },
+            include: { organizations: true },
+        });
+
+        if (!condition) {
+            return { success: false, error: "Condition not found" };
+        }
+
+        return { success: true, data: condition };
+    } catch (error: any) {
+        logError("Error fetching condition data", error);
+        return { success: false, error: "Internal server error" };
+    }
 }
 
-export async function getConditionsDataFromOrgId(organizationId: string) {
-    return prisma.condition.findMany({
-        where: {
-            organizations: {
-                some: {
-                    organizationId: organizationId
-                }
-            }
-        },
-        include: {organizations: true}
-    })
+export async function getConditionsDataFromOrgId(organizationId: string): Promise<ApiResponse<any[]>> {
+    try {
+        const conditions = await prisma.condition.findMany({
+            where: {
+                organizations: { some: { organizationId } },
+            },
+            include: { organizations: true },
+        });
+
+        return { success: true, data: conditions };
+    } catch (error: any) {
+        logError("Error fetching conditions data from organization ID", error);
+        return { success: false, error: "Internal server error" };
+    }
 }
 
 export async function getOrganizationData(domain: string) {
@@ -227,6 +244,7 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
     });
     return organization
 };
+
 export const getAllOrganizations = async () => {
     const organizations = await prisma.organization.findMany({
         orderBy: {
@@ -236,6 +254,7 @@ export const getAllOrganizations = async () => {
 
     return organizations
 };
+
 export const getAllOrganizationsFromUserId = async (userId: string) => {
     const memberships = await prisma.member.findMany({
         where: {
@@ -247,16 +266,27 @@ export const getAllOrganizationsFromUserId = async (userId: string) => {
     });
     return memberships
 };
-export const getOrganizationFromRoadmapId = async (roadmapId: string) => {
-    const roadmap = await prisma.roadmap.findUnique({
-        where: {
-            id: roadmapId
-        },
-        select: {
-            organizationId: true
+
+export const getOrganizationFromRoadmapId = async (roadmapId: string): Promise<ApiResponse<any>> => {
+    try {
+        const roadmap = await prisma.roadmap.findUnique({
+            where: {
+                id: roadmapId
+            },
+            select: {
+                organizationId: true
+            }
+        })
+
+        if (!roadmap) {
+            return { success: false, error: "roadmap not found" };
         }
-    })
-    return roadmap?.organizationId
+
+        return { success: true, data: roadmap?.organizationId };
+    } catch (error: any) {
+        logError("Error fetching roadmap data", error);
+        return { success: false, error: "Internal server error" };
+    }
 }
 
 export async function checkSubdomainAvailability(nickname: string) {

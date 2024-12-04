@@ -149,3 +149,8 @@ export function createDicebearAvatar(seed: string, radius: number, size: number,
 
     return createAvatar(selectedStyle, options).toDataUri();
 }
+
+// Helper function to standardize error logging
+export function logError(context: string, error: any) {
+    console.error(`${context}:`, error);
+}
