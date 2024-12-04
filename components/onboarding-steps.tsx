@@ -24,31 +24,26 @@ const allSteps: Step[] = [
         name: 'Welcome to Comend',
         description: "We're glad to have you",
         href: '/onboarding/welcome',
-        status: 'complete'
     },
     {
         name: 'About you',
         description: 'Your profile information.',
         href: '/onboarding/user',
-        status: 'complete'
     },
     {
         name: 'Organization',
         description: 'Basic information about your organization.',
         href: '/onboarding/organization',
-        status: 'complete'
     },
     {
         name: 'Research',
         description: 'The current research efforts in your disorder.',
         href: '/onboarding/research',
-        status: 'upcoming'
     },
     {
         name: 'Finances',
         description: 'Your budget and raising efforts.',
         href: '/onboarding/finances',
-        status: 'upcoming'
     },
 ];
 
@@ -185,7 +180,7 @@ export default function OnboardingSteps() {
                                         </>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>You must create or join an organization before accessing this pages.</p>
+                                        <p>You must create or join an organization before accessing this page.</p>
                                     </TooltipContent>
                                 </Tooltip>
                             )}

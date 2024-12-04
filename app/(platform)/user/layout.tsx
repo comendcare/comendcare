@@ -10,7 +10,7 @@ export default async function UserLayout({children}: { children: ReactNode }) {
     }
 
     return (
-        <div>
+        <div className="flex h-screen w-full">
             {children}
         </div>
     );

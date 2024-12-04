@@ -19,7 +19,6 @@ import Loading from "@/app/loading";
 export default function Profile({isCollapsed = false}: {isCollapsed?: boolean }) {
     const {data: session, status} = useSession()
     const router = useRouter()
-    console.log(session)
 
     // Redirect to login if the user is not authenticated
     useEffect(() => {

@@ -3,40 +3,15 @@
 import prisma from "@/lib/prisma"
 import {Roadmap, Organization, Prisma} from "@prisma/client"
 import {revalidateTag} from "next/cache"
-import {withRoadmapAuth, withOrganizationAuth} from "./auth"
+import {withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
-import {
-    addDomainToVercel,
-    // getApexDomain,
-    removeDomainFromVercelProject,
-    // removeDomainFromVercelTeam,
-    validDomainRegex,
-} from "@/lib/domains";
+import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
-import {getBlurDataURL, getIp} from "@/lib/utils";
+import {getBlurDataURL} from "@/lib/utils";
 import {Session} from "next-auth";
-import {sendInviteEmail} from "@/lib/emails";
+import {sendInviteEmail, sendMemberRequestEmail} from "@/lib/emails";
 
-
-export async function getMembersAndInvitees(organizationId: string | undefined) {
-    if (organizationId) {
-        const [fetchedMembers, fetchedInvitees] = await Promise.all([
-            prisma?.member.findMany({
-                include: {user: true},
-                where: {organizationId},
-            }),
-            prisma?.invitation.findMany({
-                where: {organizationId, accepted: false},
-            }),
-        ]);
-
-        return {fetchedMembers, fetchedInvitees};
-    } else {
-        console.log("No organizationId provided.")
-        return {}
-    }
-}
 
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
     const roadmap = await prisma.roadmap.create({
@@ -135,33 +110,70 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
     return roadmap
 }
 
-export async function getUser(userId: string) {
-    const user = await prisma.user.findUnique({
-        include: {organizations: true},
-        where: {id: userId}
-    })
-
-    return user
-}
-
-export async function getRoadmapId(orgId: string | null | undefined) {
-    if (!orgId) return
-
-    const organization = await prisma.organization.findUnique({
-        include: {roadmaps: true},
-        where: {
-            id: decodeURIComponent(orgId)
-        }
-    })
-
-    // for now we're just getting the first roadmap, in the future we may enable multiple roadmaps per-organziation
-    return organization?.roadmaps && organization?.roadmaps?.length > 0 ? organization?.roadmaps[0].id : undefined
-}
-
 const nanoid = customAlphabet(
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
     7
 ) // 7-character random string
+
+export const createMemberRequest = async (organizationId: string) => {
+    const session = await getSession()
+    if (!session?.user.id) {
+        return {
+            error: "Not authenticated"
+        }
+    }
+
+    try {
+        const response = await prisma.memberRequest.create({
+            data: {
+                email: session.user.email,
+                role: "admin",
+                user: {
+                    connect: {
+                        id: session.user.id
+                    }
+                },
+                organization: {
+                    connect: {
+                        id: organizationId
+                    }
+                }
+            }
+        })
+
+        const organization = await prisma.organization.findUnique({
+            where: {
+                id: organizationId
+            }
+        })
+
+        if (organization) {
+            await sendMemberRequestEmail(
+                {
+                    user: {
+                        name: session.user.name,
+                        email: session.user.email,
+                        image: ""
+                    },
+                    admin: {
+                        name: session?.user.name,
+                        email: session?.user.email,
+                        organizationName: organization.name || "",
+                        organizationImage: organization.image || "",
+                    },
+                }
+            ).then(() => {
+                console.log("email sent")
+            })
+        }
+
+        return response
+    } catch (error: any) {
+        return {
+            error: error.message
+        }
+    }
+}
 
 export const createOrganization = async (formData: FormData) => {
     const session = await getSession()
@@ -208,6 +220,40 @@ export const createOrganization = async (formData: FormData) => {
             return {
                 error: error.message
             }
+        }
+    }
+}
+
+export const toggleOrganizationVerified = async (organizationId: string) => {
+    try {
+        const organization = await prisma.organization.findUnique({
+            where: {
+                id: organizationId,
+            }
+        })
+
+        if (organization) {
+            // Toggle the 'verified' attribute
+            const updatedOrganization = await prisma.organization.update({
+                where: {
+                    id: organization.id
+                },
+                data: {
+                    verified: !organization.verified
+                }
+            })
+
+            // Log or revalidate if necessary
+            console.log("Toggled verified status for organization", organization.id)
+            await revalidateTag(
+                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+            )
+
+            return updatedOrganization
+        }
+    } catch (error: any) {
+        return {
+            error: error.message
         }
     }
 }

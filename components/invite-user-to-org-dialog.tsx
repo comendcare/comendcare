@@ -3,7 +3,7 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {getOrganizationFromOrganizationId, inviteUser, getMembersAndInvitees} from "@/lib/actions";
+import {inviteUser} from "@/lib/actions";
 import {getIp} from "@/lib/utils";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import {FaUserPlus} from "react-icons/fa6";
 import {toast} from "sonner";
+import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 
 const invitationFormSchema = z.object({
     email: z.string().min(3, {
@@ -35,8 +36,14 @@ export default function InviteUserToOrgDialog() {
     const [organization, setOrganization] = useState<Organization | null>();
 
     useEffect(() => {
-        session.data?.user?.organizationId ? getOrganizationFromOrganizationId(session.data?.user?.organizationId).then((organization) => {
-            setOrganization(organization)
+        session.data?.user?.organizationId ? getOrganizationFromOrganizationId(session.data?.user?.organizationId).then((response) => {
+            if (response.success) {
+                const organization = response.data
+                setOrganization(organization)
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
+            }
         }) : toast.error("No organizationId provided")
     }, [setOrganization]);
 

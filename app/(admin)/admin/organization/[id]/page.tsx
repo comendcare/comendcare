@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
 import Roadmaps from "@/components/roadmaps"
 import CreateRoadmapButton from "@/components/create-roadmap-button"
+import {VerifyOrganizationSwitch} from "@/components/verify-organization-switch";
 
 export default async function OrganizationRoadmaps({
     params
@@ -19,7 +20,7 @@ export default async function OrganizationRoadmaps({
         }
     })
 
-    if (!data || data.userId !== session.user.id) {
+    if (!data) {
         notFound()
     }
 
@@ -44,6 +45,7 @@ export default async function OrganizationRoadmaps({
                     >
                         {url} ↗
                     </a>
+                    <VerifyOrganizationSwitch organization={data}/>
                 </div>
                 <CreateRoadmapButton />
             </div>

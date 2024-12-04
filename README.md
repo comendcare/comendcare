@@ -120,6 +120,11 @@ This is also sensitive to `www.` and root domains, so make sure the domains are 
 Additionally, internal APIs might require the root/primary domain to be noted in configuration.
 For example, Librarey's API is called for the Librarey landing page section, and so the domain must be allowed by CORS.
 
+Additionally, you will need to configure Vercel Domains DNS such that:
+- The `www.example.com` version of the website redirects to the `example.com` version of the domain.
+- The `example.com` points to the production deployment (no redirects).
+- The wildcard `*.example.com` points to the production deployment (no redirects)
+
 ### Database
 There is a specific setup required because our backend and database are hosted on two different platforms.
 It's easy to access CloudSQL when deploying a backend on Cloud Run, but due to security concerns, accessing the deployed

@@ -1,12 +1,23 @@
 import UserOnboardingForm from "@/components/user-onboarding-form";
 import {Separator} from "@/components/ui/separator";
+import {Timer} from "lucide-react";
 
 export default function UserOnboardingPage() {
     return (
         <main className="w-full max-w-7xl mx-auto">
             <div className="space-y-4 w-full">
                 <div className="space-y-2">
-                    <h1 className="text-xl font-semibold">Profile onboarding</h1>
+                    <div className="flex flex-row justify-between">
+                        <h1 className="text-xl font-semibold">
+                            Profile onboarding
+                        </h1>
+
+                        <p className="inline-flex flex-row justify-center items-center gap-x-2 text-xl">
+                            <Timer/>
+                            {`Estimated time: 1 min`}
+                        </p>
+                    </div>
+
                     <p>
                         {`This section is all about you and your profile.`}
                     </p>

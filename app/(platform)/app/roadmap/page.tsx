@@ -2,10 +2,11 @@
 
 import NewRoadmapForm from "@/components/new-roadmap"
 import NoOrganization from "@/components/no-organization"
-import { getRoadmapId } from "@/lib/actions"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import {getRoadmapId} from "@/lib/fetchers";
+import {toast} from "sonner";
 
 export default async function RoadmapPage() {
     const router = useRouter()
@@ -13,8 +14,15 @@ export default async function RoadmapPage() {
     const [orgId, setOrgId] = useState<string | undefined>(undefined)
 
     const roadmapsCheck = async () => {
-        const roadmapId = await getRoadmapId(session?.user.organizationId)
-        if (roadmapId) router.push(`/app/roadmap/${roadmapId}`)
+        const response = await getRoadmapId(session?.user.organizationId)
+        if (response.success) {
+            const roadmapId = response.data
+
+            if (roadmapId) router.push(`/app/roadmap/${roadmapId}`)
+        } else {
+            console.error(response.error)
+            toast.error(response.error)
+        }
     }
 
     useEffect(() => {

@@ -1,6 +1,6 @@
 import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
-import {getDisorderData} from "@/lib/fetchers"
+import {getConditionData, getConditionsDataFromOrgId} from "@/lib/fetchers"
 import {cn, formatDate, toDateString} from "@/lib/utils"
 import * as domain from "node:domain";
 import {
@@ -40,7 +40,13 @@ export async function generateMetadata({
 }) {
     const slug = decodeURIComponent(params.slug)
 
-    const data = await getDisorderData(slug)
+    let data = null
+    const response = await getConditionData(slug)
+    if (response.success) {
+        data = response.data
+    } else {
+        console.error(response.error)
+    }
 
     // Fallback to avoid passing null to title or description
     const title = data?.name || "Default Title" // Use a fallback title
@@ -122,7 +128,14 @@ export default async function SitePostPage({
     faker.seed(14)
     const forms = await getForms()
     const slug = decodeURIComponent(params.slug)
-    const data = await getDisorderData(slug)
+
+    let data = null
+    const response = await getConditionData(slug)
+    if (response.success) {
+        data = response.data
+    } else {
+        console.error(response.error)
+    }
 
     if (!data) {
         notFound()

@@ -61,7 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
             title: "Comend - Tech for Rare Disease Patient Groups",
             description:
                 "Collaborate with researchers and patient advocacy groups.",
-            url: `https://www.joincomend.com/`,
+            url: `https://www.comend.io/`,
             siteName: "Comend",
             locale: "en_US"
         },

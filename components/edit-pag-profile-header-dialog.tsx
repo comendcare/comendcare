@@ -42,7 +42,6 @@ const invitationFormSchema = z.object({
 
 
 export default function EditProfileHeaderDialog() {
-    const router = useRouter();
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
@@ -67,10 +66,10 @@ export default function EditProfileHeaderDialog() {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
-                        Edit about
+                        Edit header
                     </DialogTitle>
                     <DialogDescription>
-                        {`Make changes to your profile here. Click save when you're done.`}
+                        {`Make changes to your header here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
 

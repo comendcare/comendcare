@@ -126,6 +126,7 @@ async function main() {
     const celocyn = await prisma.organization.create({
         data: {
             name: "Celocyn Syndrome Foundation",
+            verified: true,
             description: "The Celocyn Syndrome Foundation supports research and advocacy for Celocyn Syndrome, a progressive and degenerative disorder affecting the brain. Since founding in 2012 we're raised millions for the development of treatments, some of which are now in clinical trials.",
             subdomain: "celocyn",
             customDomain: "celocyn",
@@ -161,6 +162,7 @@ async function main() {
     const arcadion = await prisma.organization.create({
         data: {
             name: "Arcadion Disease Foundation",
+            verified: true,
             description: "The Arcadion Disease Foundation supports research and advocacy for Arcadion Disease, a progressive and degenerative disorder affecting the central nervous system.",
             subdomain: "arcadion",
             customDomain: "arcadion",
@@ -193,6 +195,7 @@ async function main() {
     const lysogeneFoundation = await prisma.organization.create({
         data: {
             name: "Lysogene Foundation",
+            verified: true,
             description: "The Lysogene Foundation is dedicated to finding a cure for Lysogene Syndrome, a severe genetic disorder that affects cellular lysosome function.",
             subdomain: "lysogene",
             customDomain: "lysogene",
@@ -225,6 +228,7 @@ async function main() {
     const neuroAidFoundation = await prisma.organization.create({
         data: {
             name: "NeuroAid Foundation",
+            verified: true,
             description: "NeuroAid Foundation promotes research in rare neurodegenerative disorders to identify potential therapeutic pathways.",
             subdomain: "neuroaid",
             customDomain: "neuroaid",
@@ -257,6 +261,7 @@ async function main() {
     const myoparFoundation = await prisma.organization.create({
         data: {
             name: "Myopar Foundation",
+            verified: true,
             description: "Myopar Foundation supports patients and families affected by Myopar Disease, an inherited muscular disorder.",
             subdomain: "myopar",
             customDomain: "myopar",
@@ -289,6 +294,7 @@ async function main() {
     const cranioFoundation = await prisma.organization.create({
         data: {
             name: "Cranio Foundation",
+            verified: true,
             description: "The Cranio Foundation supports research and advocacy for Cranio Syndrome, a craniofacial disorder with severe implications on bone structure.",
             subdomain: "cranio",
             customDomain: "cranio",
@@ -321,6 +327,7 @@ async function main() {
     const nephroFoundation = await prisma.organization.create({
         data: {
             name: "Nephro Foundation",
+            verified: true,
             description: "The Nephro Foundation advances research on Nephro Disease, a rare renal disorder affecting kidney function.",
             subdomain: "nephro",
             customDomain: "nephro",
