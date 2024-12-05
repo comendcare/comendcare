@@ -45,7 +45,6 @@ export default async function ProfilePage() {
             organization = response.data
         } else {
             console.error(response.error)
-            toast.error(response.error)
         }
     }
 
@@ -56,7 +55,6 @@ export default async function ProfilePage() {
             conditions = response.data
         } else {
             console.error(response.error)
-            toast.error(response.error)
         }
     }
 

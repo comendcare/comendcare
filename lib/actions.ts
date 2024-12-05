@@ -8,7 +8,7 @@ import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
-import {getBlurDataURL} from "@/lib/utils";
+import {getBlurDataURL, logError} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail, sendMemberRequestEmail} from "@/lib/emails";
 
@@ -57,12 +57,12 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 const newMilestone = await prisma.milestone.findUnique({
                     where: {nodeId: node.id},
                     include: {
-                        papers: true, 
+                        papers: true,
                         asset: {
-                            include: { contacts: true, attachments: true }
+                            include: {contacts: true, attachments: true}
                         },
                         RFP: {
-                            include: { contacts: true, attachments: true }
+                            include: {contacts: true, attachments: true}
                         },
                         tasks: true
                     }
@@ -815,7 +815,11 @@ export async function addMemberToOrganization(
 
 /* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
 
-export async function updateDBFlow({ roadmapId, nodes, edges }: { roadmapId: string | null, nodes: any[], edges: any[] }) {
+export async function updateDBFlow({roadmapId, nodes, edges}: {
+    roadmapId: string | null,
+    nodes: any[],
+    edges: any[]
+}) {
     try {
         if (!roadmapId) throw new Error('No roadmapId provided.')
         // console.log(`nodes:`, nodes)
@@ -824,7 +828,7 @@ export async function updateDBFlow({ roadmapId, nodes, edges }: { roadmapId: str
 
         // Delete any nodes that are not in the request
         const nodeIds = nodes.map((node: any) => node.id)
-        const nodesInDB = await prisma.node.findMany({ select: { id: true } })
+        const nodesInDB = await prisma.node.findMany({select: {id: true}})
         const nodeIdsInDB = (nodesInDB || []).map((node: any) => node.id)
         const nodesToDelete = nodeIdsInDB.filter(
             (id: string) => !nodeIds.includes(id)
@@ -832,7 +836,7 @@ export async function updateDBFlow({ roadmapId, nodes, edges }: { roadmapId: str
 
         await prisma.node.deleteMany({
             where: {
-                id: { in: nodesToDelete }
+                id: {in: nodesToDelete}
             }
         })
 
@@ -842,7 +846,7 @@ export async function updateDBFlow({ roadmapId, nodes, edges }: { roadmapId: str
         await Promise.all(
             nodes.map(async (node: any) => {
                 await prisma.node.upsert({
-                    where: { id: node.id },
+                    where: {id: node.id},
                     update: {
                         positionX: node.position?.x,
                         positionY: node.position?.y
@@ -850,7 +854,7 @@ export async function updateDBFlow({ roadmapId, nodes, edges }: { roadmapId: str
                     create: {
                         id: node.id,
                         roadmap: {
-                            connect: { id: roadmapId }
+                            connect: {id: roadmapId}
                         },
                         type: node.type,
                         positionX: node.position?.x,
@@ -859,7 +863,7 @@ export async function updateDBFlow({ roadmapId, nodes, edges }: { roadmapId: str
                             create: {
                                 id: node.data?.id,
                                 roadmap: {
-                                    connect: { id: roadmapId }
+                                    connect: {id: roadmapId}
                                 },
                                 title: node.data?.title || "New Milestone",
                                 status: node.data?.status || "TODO",
@@ -874,7 +878,7 @@ export async function updateDBFlow({ roadmapId, nodes, edges }: { roadmapId: str
         await Promise.all(
             edges.map(async (edge: any) => {
                 await prisma.edge.upsert({
-                    where: { id: edge.id },
+                    where: {id: edge.id},
                     update: {
                         source: edge.source,
                         target: edge.target
@@ -882,7 +886,7 @@ export async function updateDBFlow({ roadmapId, nodes, edges }: { roadmapId: str
                     create: {
                         id: edge.id,
                         roadmap: {
-                            connect: { id: roadmapId }
+                            connect: {id: roadmapId}
                         },
                         source: edge.source,
                         target: edge.target,
@@ -898,37 +902,37 @@ export async function updateDBFlow({ roadmapId, nodes, edges }: { roadmapId: str
 }
 
 type MilestoneType = Prisma.MilestoneGetPayload<{
-    include: { 
-        papers: true, 
+    include: {
+        papers: true,
         asset: {
             include: { contacts: true, attachments: true }
         },
         RFP: {
             include: { contacts: true, attachments: true }
         },
-        tasks: true 
+        tasks: true
     }
 }>
 
-export async function updateDBMilestones({ milestones }: { milestones: any[] }) {
+export async function updateDBMilestones({milestones}: { milestones: any[] }) {
     try {
         await Promise.all(
             milestones.map(async (milestone: any) => {
                 const previousMilestone = await prisma.milestone.findUnique({
                     // where: { nodeId: milestone.nodeId },
-                    where: { id: milestone.id },
-                    include: { 
-                        papers: true, 
+                    where: {id: milestone.id},
+                    include: {
+                        papers: true,
                         asset: {
-                            include: { contacts: true, attachments: true }
+                            include: {contacts: true, attachments: true}
                         },
                         RFP: {
-                            include: { contacts: true, attachments: true }
+                            include: {contacts: true, attachments: true}
                         },
-                        tasks: true 
+                        tasks: true
                     }
                 })
-                  
+
                 if (!previousMilestone) {
                     // milestone doesn't exist, throw error
                     throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`);
@@ -945,16 +949,16 @@ export async function updateDBMilestones({ milestones }: { milestones: any[] }) 
 
                 await prisma.milestone.update({
                     // where: { nodeId: milestone.nodeId },
-                    where: { id: milestone.id },
-                    include: { 
-                        papers: true, 
+                    where: {id: milestone.id},
+                    include: {
+                        papers: true,
                         asset: {
-                            include: { contacts: true, attachments: true }
+                            include: {contacts: true, attachments: true}
                         },
                         RFP: {
-                            include: { contacts: true, attachments: true }
+                            include: {contacts: true, attachments: true}
                         },
-                        tasks: true 
+                        tasks: true
                     },
                     data: {
                         title: milestone.title,
@@ -968,14 +972,14 @@ export async function updateDBMilestones({ milestones }: { milestones: any[] }) 
                             createMany: {
                                 data: milestone.papers.map((paper: any) => ({
                                     link: paper.link,
-                                    ...(paper.name ? { name: paper.name } : undefined)
+                                    ...(paper.name ? {name: paper.name} : undefined)
                                 }))
                             }
                         },
                         tasks: {
                             deleteMany: tasksToDelete
                                 .filter((task: any) => task.id !== null && task.id !== undefined)
-                                .map(task => ({ id: task.id })),
+                                .map(task => ({id: task.id})),
                             createMany: {
                                 data: tasksToCreate
                                     .filter((task: any) => task.id !== undefined && task.id !== undefined)
@@ -1000,7 +1004,7 @@ export async function updateDBMilestones({ milestones }: { milestones: any[] }) 
                 for (let i = 0; i < tasksToUpdate.length; i++) {
                     const task = tasksToUpdate[i]
                     await prisma.task.update({
-                        where: { id: task.id },
+                        where: {id: task.id},
                         data: {
                             name: task.name,
                             status: task.status,
@@ -1020,9 +1024,9 @@ export async function updateDBMilestones({ milestones }: { milestones: any[] }) 
 async function updateAssets(previousMilestone: MilestoneType, milestone: MilestoneType) {
     if (milestone.asset) {
         await prisma.milestone.update({
-            where: { id: milestone.id },
-            include: { 
-                asset: { include: { contacts: true, attachments: true } }
+            where: {id: milestone.id},
+            include: {
+                asset: {include: {contacts: true, attachments: true}}
             },
             data: {
                 asset: {
@@ -1061,12 +1065,12 @@ async function updateAssets(previousMilestone: MilestoneType, milestone: Milesto
 
     if (!milestone.asset && previousMilestone.asset) {
         await prisma.milestone.update({
-            where: { id: milestone.id },
-            include: { 
-                asset: { include: { contacts: true, attachments: true } }
+            where: {id: milestone.id},
+            include: {
+                asset: {include: {contacts: true, attachments: true}}
             },
             data: {
-                asset: { delete: true }
+                asset: {delete: true}
             }
         })
     }
@@ -1075,9 +1079,9 @@ async function updateAssets(previousMilestone: MilestoneType, milestone: Milesto
 async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneType) {
     if (milestone.RFP) {
         await prisma.milestone.update({
-            where: { id: milestone.id },
-            include: { 
-                RFP: { include: { contacts: true, attachments: true } },
+            where: {id: milestone.id},
+            include: {
+                RFP: {include: {contacts: true, attachments: true}},
             },
             data: {
                 RFP: {
@@ -1124,25 +1128,25 @@ async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneT
 
     if (!milestone.RFP && previousMilestone.RFP) {
         await prisma.milestone.update({
-            where: { id: milestone.id },
-            include: { 
-                RFP: { include: { contacts: true, attachments: true } },
+            where: {id: milestone.id},
+            include: {
+                RFP: {include: {contacts: true, attachments: true}},
             },
             data: {
-                RFP: { delete: true }
+                RFP: {delete: true}
             }
         })
     }
 }
 
-export async function updateDBTask({ tasks }: { tasks: any[] }) {
+export async function updateDBTask({tasks}: { tasks: any[] }) {
     try {
         // console.log(`tasks:`, tasks)
 
         await Promise.all(
             tasks.map(async (task: any) => {
                 await prisma.task.update({
-                    where: { id: task.id },
+                    where: {id: task.id},
                     data: {
                         name: task.name,
                         status: task.status,
@@ -1167,5 +1171,35 @@ export async function updateDBTask({ tasks }: { tasks: any[] }) {
         console.log(`Successfully updated Task`)
     } catch (error) {
         console.error(`Error updating Task: `, error)
+    }
+}
+
+// Invite user function with updated Organization model
+export async function leaveOrganization(
+    session: Session | null,
+    organizationId: string
+) {
+    try {
+        if (!session) {
+            return {success: false, error: "Internal server error"};
+        }
+
+        const member = await prisma.member.delete({
+            where: {
+                userId_organizationId: {
+                    userId: session.user.id,
+                    organizationId: organizationId,
+                }
+            }
+        })
+
+        if (!member) {
+            return {success: false, error: "membership not found"};
+        }
+
+        return {success: true, data: member};
+    } catch (error: any) {
+        logError("Error fetching membership data", error);
+        return {success: false, error: "Internal server error"};
     }
 }
