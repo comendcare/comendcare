@@ -27,7 +27,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import {FaUserCheck, FaUserPlus, FaUsersViewfinder} from "react-icons/fa6";
 import HumanAnatomyMap from "@/components/human-anatomy-map";
 import {Badge} from "@/components/ui/badge";
-import {CalendarDays} from "lucide-react";
+import {CalendarDays, FolderOpen} from "lucide-react";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {faker} from "@faker-js/faker";
 import {bioassets} from "@/lib/data";
@@ -195,7 +195,7 @@ export default async function ConditionPage({
     const slug = decodeURIComponent(params.slug)
 
     let data: Condition & {
-        organizations: {organization: Organization}[];
+        organizations: { organization: Organization }[];
     } | null = null
     const response = await getConditionData(slug)
     if (response.success) {
@@ -426,7 +426,8 @@ export default async function ConditionPage({
                                             Celocyn Synrdrome
                                         </h4>
                                         <p className="text-sm">
-                                            Celocyn Syndrome is a progressive and degenerative disorder affecting the brain, characterized by severe neurological symptoms.
+                                            Celocyn Syndrome is a progressive and degenerative disorder affecting the
+                                            brain, characterized by severe neurological symptoms.
                                         </p>
                                         <div className="flex items-center pt-2">
                                             <CalendarDays className="mr-2 h-4 w-4 opacity-70"/>{" "}
@@ -443,7 +444,8 @@ export default async function ConditionPage({
                                             Myhre Syndrome
                                         </h4>
                                         <p className="text-sm">
-                                            Myhre syndrome is a rare genetic disorder that affects connective tissue and causes a variety of symptoms in many parts of the body.
+                                            Myhre syndrome is a rare genetic disorder that affects connective tissue and
+                                            causes a variety of symptoms in many parts of the body.
                                         </p>
                                         <div className="flex items-center pt-2">
                                             <CalendarDays className="mr-2 h-4 w-4 opacity-70"/>{" "}
@@ -486,14 +488,25 @@ export default async function ConditionPage({
                     </h2>
                     <Carousel>
                         <CarouselContent className="p-4">
-                            {Array.from({length: 10}).map((_, index) => (
-                                <CarouselItem
-                                    key={index}
-                                    className="md:basis-1/2 lg:basis-1/3"
-                                >
-                                    {/*<ConditionProfilePatientGroupCard/>*/}
-                                </CarouselItem>
-                            ))}
+                            {true ?
+                                <Card className="w-full mx-auto">
+                                    <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+                                        <FolderOpen className="w-12 h-12 text-gray-400 mb-4"/>
+                                        <h3 className="text-lg font-semibold mb-2">No assets</h3>
+                                        <p className="text-sm text-gray-500">
+                                            {`We don't have any assets yet.`}
+                                        </p>
+                                    </CardContent>
+                                </Card> :
+                                Array.from({length: 10}).map((_, index) => (
+                                    <CarouselItem
+                                        key={index}
+                                        className="md:basis-1/2 lg:basis-1/3"
+                                    >
+                                        {/*<ConditionProfilePatientGroupCard/>*/}
+                                    </CarouselItem>
+                                ))
+                            }
                         </CarouselContent>
                         <CarouselPrevious/>
                         <CarouselNext/>
@@ -506,14 +519,25 @@ export default async function ConditionPage({
                     </h2>
                     <Carousel>
                         <CarouselContent className="p-4">
-                            {Array.from({length: 10}).map((_, index) => (
-                                <CarouselItem
-                                    key={index}
-                                    className="md:basis-1/2 lg:basis-1/3"
-                                >
-                                    {/*<ConditionProfilePatientGroupCard/>*/}
-                                </CarouselItem>
-                            ))}
+                            {true ?
+                                <Card className="w-full mx-auto">
+                                    <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+                                        <FolderOpen className="w-12 h-12 text-gray-400 mb-4"/>
+                                        <h3 className="text-lg font-semibold mb-2">No RFPs</h3>
+                                        <p className="text-sm text-gray-500">
+                                            {`We don't have any requests for proposals yet.`}
+                                        </p>
+                                    </CardContent>
+                                </Card> :
+                                Array.from({length: 10}).map((_, index) => (
+                                    <CarouselItem
+                                        key={index}
+                                        className="md:basis-1/2 lg:basis-1/3"
+                                    >
+                                        {/*<ConditionProfilePatientGroupCard/>*/}
+                                    </CarouselItem>
+                                ))
+                            }
                         </CarouselContent>
                         <CarouselPrevious/>
                         <CarouselNext/>

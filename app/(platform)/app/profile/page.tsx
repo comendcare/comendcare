@@ -27,6 +27,7 @@ import {PAGProfileAssetsAndProjectsCard} from "@/components/pag-profile-assets-a
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "sonner";
+import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -194,7 +195,8 @@ export default async function ProfilePage() {
                                     <TabsTrigger value="activity">Activity</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="roadmap" className="flex flex-col space-y-4">
-                                    <PAGProfileAssetsAndProjectsCard/>
+                                    {/*<PAGProfileAssetsAndProjectsCard/>*/}
+                                    <PAGProfileAssetsAndProjectsHoverableCard/>
                                     <PAGProfileResearchPlanCard roadmapItems={dbMilestones}/>
                                 </TabsContent>
                                 <TabsContent value="activity" className="mt-0">
