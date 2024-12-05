@@ -18,7 +18,14 @@ import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Separator} from "@/components/ui/separator";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {FaQuestionCircle} from "react-icons/fa";
-import {Timer} from "lucide-react";
+import {CalendarDays, Timer} from "lucide-react";
+import {Skeleton} from "@/components/ui/skeleton";
+import {cn} from "@/lib/utils";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {FaUserPlus, FaUsersViewfinder} from "react-icons/fa6";
+import {Badge} from "@/components/ui/badge";
+import React from "react";
+import {faker} from "@faker-js/faker";
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -398,367 +405,497 @@ export default function ResearchOnboardingForm() {
 
     return (
         <TooltipProvider>
-            <div className="space-y-4 w-1/2">
-                <div className="space-y-2">
-                    <div className="flex flex-row justify-between">
-                        <h1 className="text-xl font-semibold">
-                            Research onboarding
-                        </h1>
+            <div className="grid grid-cols-2 gap-x-8">
+                <div className="space-y-4 col-span-1">
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
-                        <p className="inline-flex flex-row justify-center items-center gap-x-2 text-xl">
-                            <Timer/>
-                            {`Estimated time: 6 min`}
-                        </p>
-                    </div>
-                    <p>
-                        {`
-                        Lastly, we have some questions about the nature of your disorder, it's demographic, and the ongoing efforts towards treatments and cures.
-                        `}
-                    </p>
-                </div>
+                            <FormField
+                                control={form.control}
+                                name="disorder"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>{`Name of disorder`}</FormLabel>
+                                        <FormDescription>{`The name of your rare disease/disorder.`}</FormDescription>
+                                        <FormControl>
+                                            <Input
+                                                type="text"
+                                                id="disorder"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                <Separator/>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                            <FormField
+                                control={form.control}
+                                name="categories"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Disease categories</FormLabel>
+                                        <FormDescription className="flex items-center">
+                                            {`What type of disorder is ${'disoder name'}`}
+                                            <Tooltip delayDuration={0}>
+                                                <TooltipTrigger>
+                                                    <FaQuestionCircle
+                                                        className="text-black h-4 inline-block align-baseline mx-1"/>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>
+                                                        {`This will help us match you with the experts of your particular modality.`}
+                                                    </p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={OPTIONS}
+                                                placeholder="Select categories that apply to you..."
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormField
-                            control={form.control}
-                            name="disorder"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>{`Name of disorder`}</FormLabel>
-                                    <FormDescription>{`The name of your rare disease/disorder.`}</FormDescription>
-                                    <FormControl>
-                                        <Input
-                                            type="text"
-                                            id="disorder"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                            <FormField
+                                control={form.control}
+                                name="modalities"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Modalities</FormLabel>
+                                        <FormDescription className="flex items-center">
+                                            {`The treatment modalities of interest by your organization.`}
+                                            <Tooltip delayDuration={0}>
+                                                <TooltipTrigger>
+                                                    <FaQuestionCircle
+                                                        className="text-black h-4 inline-block align-baseline mx-1"/>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>
+                                                        {`This will help us match you with the experts of your particular modality.`}
+                                                    </p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={OPTIONS}
+                                                placeholder="Select modalities you like..."
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormField
-                            control={form.control}
-                            name="categories"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Disease categories</FormLabel>
-                                    <FormDescription className="flex items-center">
-                                        {`What type of disorder is ${'disoder name'}`}
-                                        <Tooltip delayDuration={0}>
-                                            <TooltipTrigger>
-                                                <FaQuestionCircle
-                                                    className="text-black h-4 inline-block align-baseline mx-1"/>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>
-                                                    {`This will help us match you with the experts of your particular modality.`}
-                                                </p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={OPTIONS}
-                                            placeholder="Select categories that apply to you..."
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                            <FormField
+                                control={form.control}
+                                name="prevalenceNumerator"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>{`Estimated total prevalence`}</FormLabel>
+                                        <FormDescription>{`The estimated total number of patients in the world.`}</FormDescription>
+                                        <FormControl>
+                                            <div className="flex flex-row items-end justify-start">
+                                                <Input
+                                                    type="number"
+                                                    id="population"
+                                                    {...field}
+                                                    className="w-16"
+                                                />
+                                                &nbsp;in&nbsp;
+                                                <FormField
+                                                    control={form.control}
+                                                    name="prevalenceDenominator"
+                                                    render={({field}) => (
+                                                        <FormItem>
+                                                            <FormControl>
+                                                                <Input
+                                                                    type="number"
+                                                                    id="population"
+                                                                    {...field}
+                                                                    className="w-32"
+                                                                />
+                                                            </FormControl>
+                                                            <FormMessage/>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormField
-                            control={form.control}
-                            name="modalities"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Modalities</FormLabel>
-                                    <FormDescription className="flex items-center">
-                                        {`The treatment modalities of interest by your organization.`}
-                                        <Tooltip delayDuration={0}>
-                                            <TooltipTrigger>
-                                                <FaQuestionCircle
-                                                    className="text-black h-4 inline-block align-baseline mx-1"/>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>
-                                                    {`This will help us match you with the experts of your particular modality.`}
-                                                </p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={OPTIONS}
-                                            placeholder="Select modalities you like..."
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="prevalenceNumerator"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>{`Estimated total prevalence`}</FormLabel>
-                                    <FormDescription>{`The estimated total number of patients in the world.`}</FormDescription>
-                                    <FormControl>
-                                        <div className="flex flex-row items-end justify-start">
+                            <FormField
+                                control={form.control}
+                                name="population"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>{`Number of patients identified`}</FormLabel>
+                                        <FormDescription>{`The number of known patients (not the estimated total). The people in this count should be reachable by your organization.`}</FormDescription>
+                                        <FormControl>
                                             <Input
                                                 type="number"
                                                 id="population"
                                                 {...field}
-                                                className="w-16"
                                             />
-                                            &nbsp;in&nbsp;
-                                            <FormField
-                                                control={form.control}
-                                                name="prevalenceDenominator"
-                                                render={({field}) => (
-                                                    <FormItem>
-                                                        <FormControl>
-                                                            <Input
-                                                                type="number"
-                                                                id="population"
-                                                                {...field}
-                                                                className="w-32"
-                                                            />
-                                                        </FormControl>
-                                                        <FormMessage/>
-                                                    </FormItem>
-                                                )}
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            {/*<FormField*/}
+                            {/*    control={form.control}*/}
+                            {/*    name="mechanisms"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>Relevant disease mechanisms</FormLabel>*/}
+                            {/*            <FormDescription>{`The relevant mechanisms of your disorder`}</FormDescription>*/}
+                            {/*            <FormControl>*/}
+                            {/*                <MultipleSelector*/}
+                            {/*                    {...field}*/}
+                            {/*                    defaultOptions={OPTIONS}*/}
+                            {/*                    placeholder="Select the mechanisms that apply to your disorder..."*/}
+                            {/*                    emptyIndicator={*/}
+                            {/*                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
+                            {/*                            no results found.*/}
+                            {/*                        </p>*/}
+                            {/*                    }*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
+
+                            <FormField
+                                control={form.control}
+                                name="mechanisms"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Relevant disease mechanisms</FormLabel>
+                                        <FormDescription>{`The relevant mechanisms of your disorder.`}</FormDescription>
+                                        <FormControl>
+                                            <ToggleGroup
+                                                type="multiple"
+                                                variant="outline"
+                                                value={field.value}
+                                                onValueChange={
+                                                    field.onChange
+                                                }
+                                                className="w-fit flex flex-wrap gap-2 justify-start"
+                                            >
+                                                {mechanisms.map(type => (
+                                                    <ToggleGroupItem
+                                                        key={type.id}
+                                                        value={type.id}
+                                                    >
+                                                        {type.name}
+                                                    </ToggleGroupItem>
+                                                ))}
+                                            </ToggleGroup>
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="genes"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Associated genes</FormLabel>
+                                        <FormDescription>{`The genes associated with your disorder.`}</FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={OPTIONS}
+                                                placeholder="Select the associated genes of your disorder..."
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
                                             />
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormField
-                            control={form.control}
-                            name="population"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>{`Number of patients identified`}</FormLabel>
-                                    <FormDescription>{`The number of known patients (not the estimated total). The people in this count should be reachable by your organization.`}</FormDescription>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            id="population"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                            <FormField
+                                control={form.control}
+                                name="biomarkers"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Associated biomarkers</FormLabel>
+                                        <FormDescription>{`The biomarkers that have been identified for your disorder.`}</FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={OPTIONS}
+                                                placeholder="Select the associated biomarkers of your disorder..."
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        {/*<FormField*/}
-                        {/*    control={form.control}*/}
-                        {/*    name="mechanisms"*/}
-                        {/*    render={({field}) => (*/}
-                        {/*        <FormItem>*/}
-                        {/*            <FormLabel>Relevant disease mechanisms</FormLabel>*/}
-                        {/*            <FormDescription>{`The relevant mechanisms of your disorder`}</FormDescription>*/}
-                        {/*            <FormControl>*/}
-                        {/*                <MultipleSelector*/}
-                        {/*                    {...field}*/}
-                        {/*                    defaultOptions={OPTIONS}*/}
-                        {/*                    placeholder="Select the mechanisms that apply to your disorder..."*/}
-                        {/*                    emptyIndicator={*/}
-                        {/*                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
-                        {/*                            no results found.*/}
-                        {/*                        </p>*/}
-                        {/*                    }*/}
-                        {/*                />*/}
-                        {/*            </FormControl>*/}
-                        {/*            <FormMessage/>*/}
-                        {/*        </FormItem>*/}
-                        {/*    )}*/}
-                        {/*/>*/}
+                            <FormField
+                                control={form.control}
+                                name="symptoms"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Associated signs and symptoms</FormLabel>
+                                        <FormDescription>{`The hallmark signs and symptoms of your disorder.`}</FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={OPTIONS}
+                                                placeholder="Select the associated signs and symptoms of your disorder..."
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormField
-                            control={form.control}
-                            name="mechanisms"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Relevant disease mechanisms</FormLabel>
-                                    <FormDescription>{`The relevant mechanisms of your disorder.`}</FormDescription>
-                                    <FormControl>
-                                        <ToggleGroup
-                                            type="multiple"
-                                            variant="outline"
-                                            value={field.value}
-                                            onValueChange={
-                                                field.onChange
-                                            }
-                                            className="w-fit flex flex-wrap gap-2 justify-start"
-                                        >
-                                            {mechanisms.map(type => (
-                                                <ToggleGroupItem
-                                                    key={type.id}
-                                                    value={type.id}
-                                                >
-                                                    {type.name}
-                                                </ToggleGroupItem>
-                                            ))}
-                                        </ToggleGroup>
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                            <FormField
+                                control={form.control}
+                                name="studies"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Existing patient databases or clinical studies</FormLabel>
+                                        <FormDescription>{`Does your organization have any patient databases or clinical studies?`}</FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={OPTIONS}
+                                                placeholder="Select the associated signs and symptoms of your disorder..."
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormField
-                            control={form.control}
-                            name="genes"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Associated genes</FormLabel>
-                                    <FormDescription>{`The genes associated with your disorder.`}</FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={OPTIONS}
-                                            placeholder="Select the associated genes of your disorder..."
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                            <FormField
+                                control={form.control}
+                                name="assets"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Assets under development</FormLabel>
+                                        <FormDescription>{`Does your disorder have any existing or assets under development?`}</FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={OPTIONS}
+                                                placeholder="Select the assets that apply to you..."
+                                                creatable
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormField
-                            control={form.control}
-                            name="biomarkers"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Associated biomarkers</FormLabel>
-                                    <FormDescription>{`The biomarkers that have been identified for your disorder.`}</FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={OPTIONS}
-                                            placeholder="Select the associated biomarkers of your disorder..."
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="symptoms"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Associated signs and symptoms</FormLabel>
-                                    <FormDescription>{`The hallmark signs and symptoms of your disorder.`}</FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={OPTIONS}
-                                            placeholder="Select the associated signs and symptoms of your disorder..."
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="studies"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Existing patient databases or clinical studies</FormLabel>
-                                    <FormDescription>{`Does your organization have any patient databases or clinical studies?`}</FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={OPTIONS}
-                                            placeholder="Select the associated signs and symptoms of your disorder..."
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="assets"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Assets under development</FormLabel>
-                                    <FormDescription>{`Does your disorder have any existing or assets under development?`}</FormDescription>
-                                    <FormControl>
-                                        <MultipleSelector
-                                            {...field}
-                                            defaultOptions={OPTIONS}
-                                            placeholder="Select the assets that apply to you..."
-                                            creatable
-                                            emptyIndicator={
-                                                <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                    no results found.
-                                                </p>
-                                            }
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <div className="flex flex-row justify-between">
-                            <div className="flex flex-row space-x-2">
-                                <Button onClick={() => router.push("/onboarding/finances")}>Previous</Button>
-                                <Button type="submit">Next</Button>
+                            <div className="flex flex-row justify-between">
+                                <div className="flex flex-row space-x-2">
+                                    <Button onClick={() => router.push("/onboarding/finances")}>Previous</Button>
+                                    <Button type="submit">Next</Button>
+                                </div>
+                                <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
                             </div>
-                            <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
+                        </form>
+                    </Form>
+                </div>
+                <div className="space-y-4 col-span-1 w-full">
+                    <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
+                        <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
+                            Condition profile preview
+                        </h1>
+
+                        <div className="w-full flex flex-col items-center justify-center space-y-8">
+
+                            <div className="flex flex-col mx-auto w-full text-center md:w-7/12 space-y-4">
+                                <div className="inline-flex items-baseline justify-center">
+                                    {form.watch("disorder") ?
+                                        <h1 className="font-title text-lg font-bold text-stone-800 dark:text-white md:text-xl">
+                                            {form.watch("disorder")}
+                                        </h1>
+                                        : <Skeleton className="w-96 h-12"/>
+                                    }
+                                </div>
+                            </div>
+
+                            <div className="grid gap-8 grid-cols-2 w-full">
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
+                                            Stats
+                                        </h3>
+                                        <Card className="w-min">
+                                            <CardHeader
+                                                className="flex flex-row items-center justify-between space-y-0 space-x-4 p-4">
+                                                <CardTitle className="text-sm font-medium">
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            Prevalence
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="max-w-80">
+                                                            <p>
+                                                                {`The estimated proportion of a population that has a characteristic at a specific time, regardless of when they first developed it.`}
+                                                            </p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </CardTitle>
+                                                <FaUsersViewfinder/>
+                                            </CardHeader>
+                                            <CardContent className="p-4 pt-0">
+                                                <div className="inline-flex items-center text-base font-bold">
+                                                    {form.watch("prevalenceNumerator") ? form.watch("prevalenceNumerator") :
+                                                        <Skeleton
+                                                            className="w-8 h-8"/>}&nbsp; in&nbsp; {form.watch("prevalenceDenominator") ? form.watch("prevalenceDenominator") :
+                                                    <Skeleton className="w-8 h-8"/>}
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
+                                            Disease Categories
+                                        </h3>
+                                        <div className="flex space-x-1">
+                                            {form.watch("categories") ? form.watch("categories")?.map((category, index) =>
+                                                <Badge key={index}>
+                                                    {category.label}
+                                                </Badge>
+                                            ) : Array.from({
+                                                length: faker.number.int({
+                                                    min: 1,
+                                                    max: 3
+                                                })
+                                            }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
+                                            Signs and Symptoms
+                                        </h3>
+                                        <div className="flex space-x-1">
+                                            {form.watch("symptoms") ? form.watch("symptoms")?.map((sign, index) =>
+                                                <Badge key={index}>
+                                                    {sign.label}
+                                                </Badge>
+                                            ) : Array.from({
+                                                length: faker.number.int({
+                                                    min: 1,
+                                                    max: 3
+                                                })
+                                            }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
+                                            Associated Genes
+                                        </h3>
+                                        <div className="flex space-x-1">
+                                            {form.watch("genes") ? form.watch("genes")?.map((gene, index) =>
+                                                <Badge key={index}>
+                                                    {gene.label}
+                                                </Badge>
+                                            ) : Array.from({
+                                                length: faker.number.int({
+                                                    min: 1,
+                                                    max: 3
+                                                })
+                                            }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
+                                            Disease Mechanisms
+                                        </h3>
+                                        <div className="flex space-x-1">
+                                            {form.watch("mechanisms") ? form.watch("mechanisms")?.map((mechanism, index) =>
+                                                <Badge key={index}>
+                                                    {mechanism}
+                                                </Badge>
+                                            ) : Array.from({
+                                                length: faker.number.int({
+                                                    min: 1,
+                                                    max: 3
+                                                })
+                                            }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
+                                            Description
+                                        </h3>
+                                        <p className="flex flex-col space-y-2">
+                                            <Skeleton className="h-4 w-1/3"/>
+                                            <Skeleton className="h-4 w-full rounded-md"/>
+                                            <Skeleton className="h-4 w-full rounded-md"/>
+                                            <Skeleton className="h-4 w-full rounded-md"/>
+                                            <Skeleton className="h-4 w-full rounded-md"/>
+                                            <Skeleton className="h-4 w-full rounded-md"/>
+                                            <Skeleton className="h-4 w-2/3 rounded-md"/>
+                                            <Skeleton className="h-4 w-1/4 rounded-md"/>
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
                         </div>
-                    </form>
-                </Form>
+                    </div>
+                </div>
             </div>
         </TooltipProvider>
     );
