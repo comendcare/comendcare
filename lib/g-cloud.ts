@@ -1,21 +1,19 @@
 /* eslint-disable camelcase */
 "use server"
 import { Storage } from '@google-cloud/storage'
-import { nanoid } from 'nanoid';
 
 /* 
     Google cloud, public only bucket.
     Use this bucket for files that will always be public (e.g. Organization Profile Photos)
 */
-
 export async function uploadOrUpdatePublicImg(image: {
     name: string
     type: string
     data: string
-} | undefined) {
-    if (!image) return
-
+}) {
     try {
+        if (!image) return
+
         // Parse credentials from environment variable
         const keyFileJson = JSON.parse(process.env.G_CLOUD_KEY || '')
 
@@ -46,7 +44,7 @@ export async function uploadOrUpdatePublicImg(image: {
 
             // create new unique file (name <uniqueId>-<filename>)
             // unique id avoids files having the same name
-            filename = `${nanoid()}-${image.name}`
+            filename = `${Date.now()}-${image.name}`
             file = bucket.file(filename)
         }
 

@@ -32,7 +32,7 @@ export async function fetchPublicFile(fileUrl: string) {
             type: blob.type,
             data: base64Data
         }
-        } catch (error) {
+    } catch (error) {
         console.error('Error fetching file:', error)
         throw Error('Error fetching file')
     }
