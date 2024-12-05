@@ -6,6 +6,7 @@ import {serialize} from "next-mdx-remote/serialize"
 import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
 import {ApiResponse} from "@/lib/types";
 import {logError} from "@/lib/utils";
+import { Session } from "next-auth"
 
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {

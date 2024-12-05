@@ -1,7 +1,7 @@
 "use client"
 
 import {signOut, useSession} from "next-auth/react"
-import {useEffect} from "react"
+import {useEffect, useState} from "react"
 import {useRouter} from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -15,17 +15,40 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {FaArrowRightFromBracket} from "react-icons/fa6";
 import Loading from "@/app/loading";
+import { getUser } from "@/lib/fetchers"
 
 export default function Profile({isCollapsed = false}: {isCollapsed?: boolean }) {
     const {data: session, status} = useSession()
     const router = useRouter()
+    const [userData, setUserData] = useState<any>()
 
-    // Redirect to login if the user is not authenticated
+    // Redirect to login if the user is not authenticated, and fetch user data
     useEffect(() => {
-        if (status === "unauthenticated") {
-            router.push("/login")
-        }
-    }, [status, router])
+        const fetchUserData = async () => {
+            if (status === "unauthenticated") {
+                router.push("/login");
+                return;
+            }
+
+            if (status === "authenticated" && session?.user?.id) {
+                try {
+                    const userData = await getUser(session.user.id);
+                    console.log(`user data`, userData)
+                    setUserData(userData);
+                } catch (error) {
+                    console.error("Failed to fetch user data:", error);
+                }
+            }
+        };
+
+        fetchUserData();
+    }, [status, session, router])
+
+    function getUserPhoto(): string {
+        if (userData?.data?.image) return userData?.data?.image
+        if (session?.user?.image) return session?.user?.image
+        return `https://avatar.vercel.sh/${session?.user?.email}`
+    }
 
     // Handle loading state while session is being fetched
     if (status === "loading") {
@@ -37,10 +60,7 @@ export default function Profile({isCollapsed = false}: {isCollapsed?: boolean })
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Image
-                        src={
-                            session?.user?.image ??
-                            `https://avatar.vercel.sh/${session?.user?.email}`
-                        }
+                        src={getUserPhoto()}
                         width={40}
                         height={40}
                         alt={session?.user?.name ?? "User avatar"}
@@ -70,10 +90,7 @@ export default function Profile({isCollapsed = false}: {isCollapsed?: boolean })
                 className="flex w-full flex-1 items-center space-x-3 rounded-lg px-2 py-1.5 transition-all duration-150 ease-in-out hover:bg-stone-200 active:bg-stone-300 dark:text-white dark:hover:bg-stone-700 dark:active:bg-stone-800"
             >
                 <Image
-                    src={
-                        session?.user?.image ??
-                        `https://avatar.vercel.sh/${session?.user?.email}`
-                    }
+                    src={getUserPhoto()}
                     width={40}
                     height={40}
                     alt={session?.user?.name ?? "User avatar"}

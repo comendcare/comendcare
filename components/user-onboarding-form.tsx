@@ -285,7 +285,7 @@ export default function UserOnboardingForm() {
                                                     setDialogOpen={setDialogOpen}
                                                     selectedFile={selectedFile}
                                                     setSelectedFile={(file: any) => {
-                                                        setSelectedFile(file);
+                                                        // setSelectedFile(file);
                                                         field.onChange(file?.preview); // Update form field value
                                                     }}
                                                 />
