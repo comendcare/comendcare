@@ -4,8 +4,10 @@ import {Button} from "@/components/ui/button";
 import {FaArrowUpRightFromSquare, FaPen} from "react-icons/fa6";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
+import { FlowView } from "./flow";
+import { ReactFlow } from "@xyflow/react";
 
-const getDates = (milestone: any) => {
+export const getDates = (milestone: any) => {
     if (milestone.startDate && milestone.endDate) {
         return (
             `${new Date(milestone.startDate).toLocaleString('en-US', {
@@ -39,6 +41,8 @@ const getDates = (milestone: any) => {
 
 export const PAGProfileResearchPlanCard = ({ roadmapItems }: { roadmapItems: any[] }) => {
     const router = useRouter();
+
+    console.log(`PROPS`, roadmapItems)
 
     return (
         <Card className="organization-profile-tour-step5">

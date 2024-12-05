@@ -83,23 +83,32 @@ export async function getRoadmapsForOrganization(domain: string) {
 
     return await unstable_cache(
         async () => {
-            return prisma.roadmap.findMany({
+            const roadmaps = prisma.roadmap.findMany({
                 where: {
                     // organization: subdomain
                     //     ? {subdomain}
                     //     : {customDomain: domain},
                     organization: {
-                        subdomain: subdomain
+                        subdomain: subdomain,
                     },
                     // published: true
                 },
-                select: {
-                    title: true,
-                    description: true,
-                    slug: true,
-                    image: true,
-                    imageBlurhash: true,
-                    createdAt: true
+                // select: {
+                //     title: true,
+                //     description: true,
+                //     slug: true,
+                //     image: true,
+                //     imageBlurhash: true,
+                //     createdAt: true,
+                // },
+                include: {
+                    nodes: {
+                        include: {
+                            data: true
+                        }
+                    },
+                    edges: true,
+                    milestones: true,
                 },
                 orderBy: [
                     {
@@ -107,6 +116,8 @@ export async function getRoadmapsForOrganization(domain: string) {
                     }
                 ]
             })
+            console.log(`roadmaps`, roadmaps)
+            return roadmaps
         },
         [`${domain}-roadmaps`],
         {
