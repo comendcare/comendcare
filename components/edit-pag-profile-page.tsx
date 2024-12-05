@@ -36,7 +36,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import { handleImageUpload } from "@/lib/utils";
+import { getPublicFile, handleImageUpload } from "@/lib/utils";
 
 const OPTIONS: Option[] = [
     {
@@ -278,6 +278,21 @@ export default function EditPAGProfileDialog() {
                             ? incorporationStatusMap[organizationData.incorporationStatus.toUpperCase()] // Map the value if it exists
                             : undefined
                     };
+
+                    if (organizationData.image) {
+                        try {
+                            const orgPhoto: File = await getPublicFile(organizationData.image)
+                            if (orgPhoto) {
+                                const fileWithPreview = Object.assign(orgPhoto, {
+                                    preview: URL.createObjectURL(orgPhoto),
+                                })
+                                setSelectedFile(fileWithPreview)
+                            }
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    }
+                    
                     setDefaultValues(fetchedValues);
                     setAddress(fetchedValues); // Set address state as well
                     editOrgForm.reset(fetchedValues); // Reset form with fetched data

@@ -172,8 +172,6 @@ export default function UserEditForm() {
             if (selectedFile && values.image) {
                 const imgUrl = await handleImageUpload(selectedFile as File, values.image, session?.user.id)
                 values.image = imgUrl || undefined
-
-                console.log(`imgUrl`, imgUrl)
             }
 
             for (const [key, value] of Object.entries(values)) {

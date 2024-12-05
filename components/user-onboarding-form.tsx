@@ -25,7 +25,7 @@ import {useCallback, useEffect, useState} from "react";
 import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {cn, createDicebearAvatar, handleImageUpload} from "@/lib/utils";
+import {cn, createDicebearAvatar, getPublicFile, handleImageUpload} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {FaUpload} from "react-icons/fa6";
@@ -131,6 +131,21 @@ export default function UserOnboardingForm() {
                         lng: userData.lng || 0,
                         image: userData.image || "",
                     };
+
+                    if (userData.image) {
+                        try {
+                            const userPhoto: File = await getPublicFile(userData.image)
+                            if (userPhoto) {
+                                const fileWithPreview = Object.assign(userPhoto, {
+                                    preview: URL.createObjectURL(userPhoto),
+                                })
+                                setSelectedFile(fileWithPreview)
+                            }
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    }
+                    
                     setDefaultValues(fetchedValues);
                     setAddress(fetchedValues); // Set address state as well
                     form.reset(fetchedValues); // Reset form with fetched data
