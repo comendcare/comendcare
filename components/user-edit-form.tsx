@@ -170,7 +170,7 @@ export default function UserEditForm() {
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
         try {
             if (selectedFile && values.image) {
-                const imgUrl = await handleImageUpload(selectedFile as File, values.image, session?.user.id)
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
                 values.image = imgUrl || undefined
             }
 

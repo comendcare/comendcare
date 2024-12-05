@@ -264,7 +264,7 @@ export default function OrganizationOnboardingForm() {
         });
 
         if (selectedFile && values.image) {
-            const imgUrl = await handleImageUpload(selectedFile as File, values.image, session?.user?.organizationId)
+            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
             if (imgUrl) formData.set('image', imgUrl)
         }
 

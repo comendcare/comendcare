@@ -214,7 +214,7 @@ export default function EditPAGProfileDialog() {
         });
 
         if (selectedFile && values.image) {
-            const imgUrl = await handleImageUpload(selectedFile as File, values.image, session?.user?.organizationId)
+            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
             if (imgUrl) formData.set('image', imgUrl)
         }
 
@@ -292,7 +292,7 @@ export default function EditPAGProfileDialog() {
                             console.error(e)
                         }
                     }
-                    
+
                     setDefaultValues(fetchedValues);
                     setAddress(fetchedValues); // Set address state as well
                     editOrgForm.reset(fetchedValues); // Reset form with fetched data

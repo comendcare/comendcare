@@ -42,9 +42,7 @@ export async function getPublicFile(fileUrl: string): Promise<File> {
 }
 
 // this function must be in a client env
-export async function handleImageUpload(file: File, data: string | undefined, uniqueId: string | undefined | null): Promise<string | undefined> {
-    if (!uniqueId) return 
-
+export async function handleImageUpload(file: File, data: string | undefined): Promise<string | undefined> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.readAsDataURL(file)
@@ -61,7 +59,6 @@ export async function handleImageUpload(file: File, data: string | undefined, un
                 name: file.name,
                 type: file.type,
                 data: base64data || "",
-                uniqueId
             })
 
             console.log(`image url`, imageUrl)
