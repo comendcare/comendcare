@@ -30,7 +30,6 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
-import { uploadOrUpdatePublicImg } from "@/lib/g-cloud";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -157,7 +156,7 @@ export default function UserOnboardingForm() {
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
         try {
             if (selectedFile && values.image) {
-                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image, session?.user?.id)
                 values.image = imgUrl || undefined
             }
             
@@ -257,7 +256,7 @@ export default function UserOnboardingForm() {
                                                     setDialogOpen={setDialogOpen}
                                                     selectedFile={selectedFile}
                                                     setSelectedFile={(file: any) => {
-                                                        // setSelectedFile(file);
+                                                        if (file == null) setSelectedFile(null)
                                                         field.onChange(file?.preview); // Update form field value
                                                     }}
                                                 />

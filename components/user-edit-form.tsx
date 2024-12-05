@@ -27,8 +27,8 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
-import { uploadOrUpdatePublicImg } from "@/lib/g-cloud";
 import { handleImageUpload } from "@/lib/utils";
+import { getPublicFile } from "@/lib/utils";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -128,8 +128,23 @@ export default function UserEditForm() {
                         country: userData.country || "",
                         lat: userData.lat || 0,
                         lng: userData.lng || 0,
-                        // image: userData.image || "",
+                        image: userData.image || "",
                     };
+                    
+                    if (userData.image) {
+                        try {
+                            const userPhoto: File = await getPublicFile(userData.image)
+                            if (userPhoto) {
+                                const fileWithPreview = Object.assign(userPhoto, {
+                                    preview: URL.createObjectURL(userPhoto),
+                                })
+                                setSelectedFile(fileWithPreview)
+                            }
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    }
+
                     setDefaultValues(fetchedValues);
                     setAddress(fetchedValues); // Set address state as well
                     form.reset(fetchedValues); // Reset form with fetched data
@@ -155,7 +170,7 @@ export default function UserEditForm() {
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
         try {
             if (selectedFile && values.image) {
-                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image, session?.user.id)
                 values.image = imgUrl || undefined
 
                 console.log(`imgUrl`, imgUrl)
@@ -254,6 +269,7 @@ export default function UserEditForm() {
                                             setDialogOpen={setDialogOpen}
                                             selectedFile={selectedFile}
                                             setSelectedFile={(file: any) => {
+                                                if (file == null) setSelectedFile(null)
                                                 field.onChange(file?.preview); // Update form field value
                                             }}
                                         />

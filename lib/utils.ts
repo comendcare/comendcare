@@ -6,7 +6,7 @@ import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import { Session } from "next-auth";
-import { uploadOrUpdatePublicImg } from "./g-cloud";
+import { fetchPublicFile, uploadOrUpdatePublicImg } from "./g-cloud";
 
 export function getUserPhoto(user: any, session: Session | null): string {
     if (user?.image) return user.image
@@ -20,8 +20,31 @@ export function getOrgPhoto(org: any | undefined): string {
     return `https://avatar.vercel.sh/${org?.id}.png`
 }
 
+export async function getPublicFile(fileUrl: string): Promise<File> {
+    try {
+        const { name, type, data } = await fetchPublicFile(fileUrl)
+
+        // Decode the base64 data into a Blob
+        const byteCharacters = atob(data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type });
+    
+        // Create the File object
+        return new File([blob], name, { type });
+    } catch (error) {
+        console.error('Error fetching file:', error);
+        throw error;
+    }
+}
+
 // this function must be in a client env
-export async function handleImageUpload(file: File, data: string | undefined): Promise<string | undefined> {
+export async function handleImageUpload(file: File, data: string | undefined, uniqueId: string | undefined | null): Promise<string | undefined> {
+    if (!uniqueId) return 
+
     return new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.readAsDataURL(file)
@@ -37,9 +60,11 @@ export async function handleImageUpload(file: File, data: string | undefined): P
             const imageUrl = await uploadOrUpdatePublicImg({
                 name: file.name,
                 type: file.type,
-                data: base64data || ""
+                data: base64data || "",
+                uniqueId
             })
 
+            console.log(`image url`, imageUrl)
             resolve(imageUrl)
         }
 

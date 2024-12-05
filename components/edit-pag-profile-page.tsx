@@ -36,7 +36,6 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import { uploadOrUpdatePublicImg } from "@/lib/g-cloud";
 import { handleImageUpload } from "@/lib/utils";
 
 const OPTIONS: Option[] = [
@@ -215,7 +214,7 @@ export default function EditPAGProfileDialog() {
         });
 
         if (selectedFile && values.image) {
-            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+            const imgUrl = await handleImageUpload(selectedFile as File, values.image, session?.user?.organizationId)
             if (imgUrl) formData.set('image', imgUrl)
         }
 
@@ -504,7 +503,7 @@ export default function EditPAGProfileDialog() {
                                                     setDialogOpen={setDialogOpen}
                                                     selectedFile={selectedFile}
                                                     setSelectedFile={(file: any) => {
-                                                        // setSelectedFile(file);
+                                                        if (file == null) setSelectedFile(null)
                                                         field.onChange(file?.preview); // Update form field value
                                                     }}
                                                 />
