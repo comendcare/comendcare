@@ -140,6 +140,71 @@ const steps: Tour[] = [
                 pointerRadius: 10
             },
         ]
+    },
+    {
+        tour: "organization-profile-tour",
+        steps: [
+            {
+                icon: <>👋</>,
+                title: "About your organization",
+                content: <>{`Your organization's information and members can be found here.`}</>,
+                selector: ".organization-profile-tour-step1",
+                side: "top" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+            {
+                icon: <>👋</>,
+                title: "Updating your organization",
+                content: <>{`If you'd like to update your organization's information, visit the settings page.`}</>,
+                selector: ".organization-profile-tour-step2",
+                side: "right" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
+            },
+            {
+                icon: <>⭐</>,
+                title: "About your condition",
+                content: <>{`Information about your condition will appear here. To edit it, visit the condition page.`}</>,
+                selector: ".organization-profile-tour-step3",
+                side: "top" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+            {
+                icon: <>⭐</>,
+                title: "Your miletones",
+                content: <>{`Your milestones include assets (the results of completed milestones) and projects (ongoing or proposal-stage milestones. To update them, visit the research planner.`}</>,
+                selector: ".organization-profile-tour-step4",
+                side: "left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+            {
+                icon: <>⭐</>,
+                title: "Your roadmap",
+                content: <>{`A timeline view of your roadmap will be found here. To see the entire roadmap and to edit details, visit the research planner.`}</>,
+                selector: ".organization-profile-tour-step5",
+                side: "top-right" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+            {
+                icon: <>⭐</>,
+                title: "Your organization's activity",
+                content: <>{`All posts related to your organization will appear in this tab.`}</>,
+                selector: ".organization-profile-tour-step6",
+                side: "left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10
+            },
+        ]
     }
 ]
 
