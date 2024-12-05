@@ -6,7 +6,8 @@ import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import { Session } from "next-auth";
-import { fetchPublicFile, uploadOrUpdatePublicImg } from "./g-cloud";
+import { uploadOrUpdatePublicImg } from "./g-cloud";
+import { fetchPublicFile } from "./actions";
 
 export function getUserPhoto(user: any, session: Session | null): string {
     if (user?.image) return user.image

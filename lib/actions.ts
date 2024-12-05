@@ -12,6 +12,32 @@ import {getBlurDataURL, logError} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail, sendMemberRequestEmail} from "@/lib/emails";
 
+export async function fetchPublicFile(fileUrl: string) {
+    try {
+        const response = await fetch(fileUrl);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch file: ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        const arrayBuffer = await blob.arrayBuffer();
+
+        // Serialize the data into base64
+        const base64Data = Buffer.from(arrayBuffer).toString('base64');
+        const fileName = fileUrl.split('/').pop() || 'unknown';
+
+        return {
+            name: fileName,
+            type: blob.type,
+            data: base64Data
+        }
+        } catch (error) {
+        console.error('Error fetching file:', error)
+        throw Error('Error fetching file')
+    }
+}
+
 
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
     const roadmap = await prisma.roadmap.create({
