@@ -56,11 +56,12 @@ export async function handleImageUpload(file: File, data: string | undefined): P
 
             const base64data = data.replace(/^data:image\/\w+;base64,/, "")
 
-            const imageUrl = await uploadOrUpdatePublicImg({
-                name: file.name,
-                type: file.type,
-                data: base64data || "",
-            })
+            // const imageUrl = await uploadOrUpdatePublicImg({
+            //     name: file.name,
+            //     type: file.type,
+            //     data: base64data || "",
+            // })
+            const imageUrl = ''
 
             console.log(`image url`, imageUrl)
             resolve(imageUrl)
