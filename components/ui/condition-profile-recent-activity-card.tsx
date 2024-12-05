@@ -21,7 +21,7 @@ export function ConditionProfileRecentActivityCard({ post }: { post: Post }) {
     }
 
     return (
-        <Card className="w-full max-w-md mx-auto">
+        <Card className="flex flex-col justify-between w-full max-w-md mx-auto">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <div className="flex items-center space-x-2">
                     <Avatar>
@@ -37,7 +37,7 @@ export function ConditionProfileRecentActivityCard({ post }: { post: Post }) {
                     <MoreHorizontal className="h-4 w-4" />
                 </Button>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="h-full flex flex-col justify-between space-y-2">
                 <p className="text-sm">{post.content}</p>
                 <img src={post.image} alt="Post image" className="rounded-md w-full h-auto" />
             </CardContent>

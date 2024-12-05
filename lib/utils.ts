@@ -154,3 +154,11 @@ export function createDicebearAvatar(seed: string, radius: number, size: number,
 export function logError(context: string, error: any) {
     console.error(`${context}:`, error);
 }
+
+export function nameToInitials(name: string | null | undefined): string | undefined{
+    if (!name) return
+    return name
+        .split(' ') // Split the name into parts by spaces
+        .map(part => part.charAt(0).toUpperCase()) // Take the first letter of each part and capitalize it
+        .join(''); // Join the initials together
+}
