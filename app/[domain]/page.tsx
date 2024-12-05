@@ -95,6 +95,8 @@ export default async function OrganizationHomePage({
         }
     }
 
+    console.log(`ROADMAPS`, roadmaps)
+
     return (
         <>
             <main className="grid grid-cols-8 w-full max-w-7xl mx-auto mt-16 gap-4">

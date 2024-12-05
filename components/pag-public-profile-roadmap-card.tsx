@@ -1,93 +1,41 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button, buttonVariants} from "@/components/ui/button";
-import {FaPen} from "react-icons/fa6";
+import {FaArrowUpRightFromSquare, FaPen} from "react-icons/fa6";
 import {Workflow} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {Roadmap} from "@prisma/client";
 import Link from "next/link";
+import { getDates } from "./pag-profile-research-plan-card";
+import { Controls, MiniMap, ReactFlow } from "@xyflow/react";
+import "@xyflow/react/dist/base.css"
+import MilestoneNode from "@/components/milestone-node"
 
-type RoadmapPreview = Pick<
-    Roadmap,
-    "slug" | "description" | "createdAt" | "image" | "imageBlurhash" | "title"
->
-
-const roadmapItems = [
-    {
-        title: "Data Analysis and Next Steps Planning",
-        startDate: "2025-01-01T00:00:00Z",
-        endDate: "2025-03-31T23:59:59Z",
-        description: "Analyze results from Phase I trials to assess efficacy. Plan further clinical trials or expand research to focus on precision treatment approaches based on trial outcomes.",
-        hasDownload: false,
-    },
-    {
-        title: "Clinical Trial Phase I",
-        startDate: "2024-07-01T00:00:00Z",
-        endDate: "2024-09-30T23:59:59Z",
-        description: "Launch Phase I clinical trials with a focus on safety and dosage. Monitor participants closely for initial response and adjust protocols as necessary.",
-        hasDownload: true,
-    },
-    {
-        title: "Patient Education and Community Outreach",
-        startDate: "2024-01-01T00:00:00Z",
-        endDate: "2024-12-31T23:59:59Z",
-        description: "Develop educational materials and conduct workshops to support patients and families. Strengthen community engagement and advocacy efforts to raise awareness and gather support.",
-        hasDownload: false,
-    },
-    {
-        title: "Clinical Trial Preparation",
-        startDate: "2024-04-01T00:00:00Z",
-        endDate: "2024-06-30T23:59:59Z",
-        description: "Work with regulatory bodies and research institutions to design early-stage clinical trials. Recruit patients and establish partnerships with medical centers for trial sites.",
-        hasDownload: false,
-    },
-    {
-        title: "Preclinical Research and Treatment Exploration",
-        startDate: "2023-10-01T00:00:00Z",
-        endDate: "2023-12-31T23:59:59Z",
-        description: "Begin preclinical studies with research partners to explore existing compounds and potential treatments. This phase includes in vitro testing to identify promising therapeutic candidates.",
-        hasDownload: false,
-    },
-    {
-        title: "Genetic Analysis and Biomarker Identification",
-        label: "Ongoing",
-        startDate: "2023-03-15T00:00:00Z",
-        endDate: "2024-03-15T23:59:59Z",
-        description: "Collaborate with geneticists to analyze patient DNA samples and identify potential biomarkers associated with the disease. Early biomarkers will guide treatment and research priorities.",
-        hasDownload: false,
-    },
-    {
-        title: "Initial Patient Data Collection",
-        label: "Phase 1",
-        startDate: "2023-01-10T00:00:00Z",
-        endDate: "2023-03-10T23:59:59Z",
-        description: "Collect initial data from patients to understand the range of symptoms, genetic markers, and current treatments. Build a secure, anonymized database for research purposes.",
-        hasDownload: false,
-    },
-];
-
-export const PAGPublicProfileRoadmapCard = ({roadmap}: {roadmap: RoadmapPreview}) => {
-    const router = useRouter();
+export const PAGPublicProfileRoadmapCard = ({roadmap}: {roadmap: any}) => {
+    const router = useRouter()
+    const nodeTypes = { MILESTONE: MilestoneNode }
 
     return (
+        <>
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
-                    Roadmap
+                    Research Plan
                 </CardTitle>
-                <Link
-                    href={`/${roadmap.slug}`}
-                    className={cn(buttonVariants({variant: "secondary"}), "inline-flex items-center text-base")}
+                <Button
+                    variant="ghost"
+                    onClick={() => router.push("/app/roadmap")}
+                    className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                 >
-                    <Workflow className="size-6"/>
-                    View roadmap
-                </Link>
+                    Edit research plan
+                    <FaArrowUpRightFromSquare/>
+                </Button>
             </CardHeader>
 
             <CardContent className="px-8">
                 <ol className="relative border-s border-gray-200 dark:border-gray-700 space-y-8">
-                    {roadmapItems.map((item, index) => (
+                    {roadmap?.milestones?.map((item: any, index: number) => (
                         <li key={index} className="ms-6">
                             <span
                                 className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
@@ -109,19 +57,13 @@ export const PAGPublicProfileRoadmapCard = ({roadmap}: {roadmap: RoadmapPreview}
                                 </h3>
                                 <time
                                     className="block mb-2 font-semibold leading-none dark:text-gray-500">
-                                    {`${new Date(item.startDate).toLocaleString('en-US', {
-                                        month: 'short',
-                                        year: 'numeric'
-                                    })} - ${new Date(item.endDate).toLocaleString('en-US', {
-                                        month: 'short',
-                                        year: 'numeric'
-                                    })}`}
+                                    {getDates(item)}
                                 </time>
                             </div>
                             <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
                                 {item.description}
                             </p>
-                            {item.hasDownload && (
+                            {/* {item.hasDownload && (
                                 <a href="#"
                                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:outline-none focus:ring-gray-100 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">
                                     <svg className="w-3.5 h-3.5 me-2.5" aria-hidden="true"
@@ -134,11 +76,37 @@ export const PAGPublicProfileRoadmapCard = ({roadmap}: {roadmap: RoadmapPreview}
                                     </svg>
                                     Download ZIP
                                 </a>
-                            )}
+                            )} */}
                         </li>
                     ))}
                 </ol>
+                
+                <div className="h-[600px]">
+                    <ReactFlow
+                        width={32}
+                        nodes={roadmap?.nodes.map((node: any) => ({...node, position: {x: node.positionX, y: node.positionY}})) || []}
+                        edges={roadmap?.edges || []}
+                        nodeTypes={nodeTypes}
+                        proOptions={{ hideAttribution: true }}
+                        fitView
+                    >
+                        <MiniMap />
+                    </ReactFlow>
+                </div>
             </CardContent>
         </Card>
+
+        {/* <div>
+            <ReactFlow
+                width={32}
+                nodes={roadmap?.nodes.map((node: any) => ({...node, position: {x: node.positionX, y: node.positionY}})) || []}
+                edges={roadmap?.edges || []}
+                nodeTypes={nodeTypes}
+                >
+                <MiniMap />
+                <Controls></Controls>
+            </ReactFlow>
+        </div> */}
+        </>
     );
 };
