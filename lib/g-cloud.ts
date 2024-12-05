@@ -6,7 +6,7 @@ import { Storage } from '@google-cloud/storage'
     Google cloud, public only bucket.
     Use this bucket for files that will always be public (e.g. Organization Profile Photos)
 */
-export async function uploadPublicImg(image: {
+export async function uploadOrUpdatePublicImg(image: {
     name: string
     type: string
     data: string
