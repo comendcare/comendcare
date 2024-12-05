@@ -202,7 +202,7 @@ export const PAGProfileAssetsAndProjectsHoverableCard = () => {
     const router = useRouter();
 
     return (
-        <Card>
+        <Card className="organization-profile-tour-step4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     Milestones

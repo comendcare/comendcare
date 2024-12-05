@@ -189,8 +189,15 @@ export default async function ProfilePage() {
                         <div className="col-span-4">
                             <Tabs defaultValue="roadmap" className="w-full">
                                 <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
-                                    <TabsTrigger value="activity">Activity</TabsTrigger>
+                                    <TabsTrigger value="roadmap">
+                                        Roadmap
+                                    </TabsTrigger>
+                                    <TabsTrigger
+                                        value="activity"
+                                        className="organization-profile-tour-step6"
+                                    >
+                                        Activity
+                                    </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="roadmap" className="flex flex-col space-y-4">
                                     {/*<PAGProfileAssetsAndProjectsCard/>*/}

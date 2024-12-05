@@ -690,7 +690,7 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
                                 ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
                                 ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                papers: milestone.papers || [],
+                                ...(milestone.papers && milestone.papers.length > 0 ? { papers: milestone.papers } : undefined),
                                 private: milestone.private || false
                             }
                         }

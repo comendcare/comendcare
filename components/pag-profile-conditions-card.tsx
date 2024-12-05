@@ -14,7 +14,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
 
     if (conditions) {
         return (
-            <Card>
+            <Card className="organization-profile-tour-step3">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                         Conditions

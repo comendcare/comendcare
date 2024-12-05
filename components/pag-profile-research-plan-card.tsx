@@ -41,7 +41,7 @@ export const PAGProfileResearchPlanCard = ({ roadmapItems }: { roadmapItems: any
     const router = useRouter();
 
     return (
-        <Card>
+        <Card className="organization-profile-tour-step5">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     Research Plan
