@@ -25,40 +25,12 @@ import {useCallback, useEffect, useState} from "react";
 import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {cn, createDicebearAvatar} from "@/lib/utils";
+import {cn, createDicebearAvatar, handleImageUpload} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
-import { uploadPublicImg } from "@/lib/g-cloud";
-
-export async function handleImageUpload(file: File, data: string | undefined): Promise<string | undefined> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-
-        reader.onloadend = async () => {
-            if (data == undefined) {
-                reject('No image data')
-                return
-            }
-
-            const base64data = data.replace(/^data:image\/\w+;base64,/, "")
-
-            const imageUrl = await uploadPublicImg({
-                name: file.name,
-                type: file.type,
-                data: base64data || ""
-            })
-
-            resolve(imageUrl)
-        }
-
-        reader.onerror = error => {
-            reject(error)
-        }
-    })
-}
+import { uploadOrUpdatePublicImg } from "@/lib/g-cloud";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),

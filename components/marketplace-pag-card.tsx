@@ -2,8 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 import { FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaGlobe, FaPeopleGroup } from "react-icons/fa6";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { createDicebearAvatar } from "@/lib/utils";
 import { Badge } from "./ui/badge";
+import { getOrgPhoto } from "@/lib/utils";
 
 export function OrganizationMarketplaceCard({ organization }: { organization: any }) {
     return (
@@ -23,7 +23,7 @@ export function OrganizationMarketplaceCard({ organization }: { organization: an
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar> */}
                     <Avatar className="h-10 w-10">
-                        <AvatarImage src={createDicebearAvatar("", 50, 40, "identicon")}/>
+                        <AvatarImage src={getOrgPhoto(organization)}/>
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     {organization.name}

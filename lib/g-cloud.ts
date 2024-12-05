@@ -8,42 +8,125 @@ import { Storage } from '@google-cloud/storage'
     Use this bucket for files that will always be public (e.g. Organization Profile Photos)
 */
 
-export async function uploadPublicImg(image: {
+export async function uploadOrUpdatePublicImg(image: {
     name: string
     type: string
     data: string
-} | undefined) {
+  } | undefined) {
     if (!image) return
-
+  
     try {
-        const keyFileJson = JSON.parse(
-            process.env.G_CLOUD_KEY || ""
-        )
-        const storage = new Storage({
-            projectId: keyFileJson.project_id,
-            credentials: {
-                client_email: keyFileJson.client_email,
-                private_key: keyFileJson.private_key
-            }
-        })
-        const bucket = storage.bucket('comend-app-public')
-
-        const filename = `${Date.now()}-${image.name}`
-        const file = bucket.file(filename)
-        const buffer = Buffer.from(image.data, "base64")
-
-        await file.save(buffer, {
-            contentType: image.type
-        })
-
-        // public url
-        const imageUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`
-
-        return imageUrl
+      // Parse credentials from environment variable
+      const keyFileJson = JSON.parse(process.env.G_CLOUD_KEY || '')
+  
+      // Initialize Google Cloud Storage
+      const storage = new Storage({
+        projectId: keyFileJson.project_id,
+        credentials: {
+          client_email: keyFileJson.client_email,
+          private_key: keyFileJson.private_key,
+        },
+      })
+  
+      // Reference the target bucket
+      const bucket = storage.bucket('comend-app-public')
+  
+      // Use the original image name for the file in the bucket
+      const filename = image.name
+      const file = bucket.file(filename)
+  
+      // Check if the file already exists
+      const [exists] = await file.exists()
+  
+      if (exists) {
+        console.log(`File ${filename} already exists. Updating...`)
+      } else {
+        console.log(`File ${filename} does not exist. Creating...`)
+      }
+  
+      // Convert the base64 image data to a Buffer
+      const buffer = Buffer.from(image.data, 'base64')
+  
+      // Save or overwrite the file
+      await file.save(buffer, {
+        contentType: image.type,
+        metadata: {
+          cacheControl: 'public, max-age=31536000', // Set cache control for public files
+        },
+      })
+  
+      // Public URL for the file
+      const imageUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`
+  
+      return imageUrl
     } catch (e) {
-        console.error("Failed to upload image:", e)
+      console.error('Failed to upload or update image:', e)
     }
+  }
+
+// export async function uploadPublicImg(image: {
+//     name: string
+//     type: string
+//     data: string
+// } | undefined) {
+//     if (!image) return
+
+//     try {
+//         const keyFileJson = JSON.parse(
+//             process.env.G_CLOUD_KEY || ""
+//         )
+//         const storage = new Storage({
+//             projectId: keyFileJson.project_id,
+//             credentials: {
+//                 client_email: keyFileJson.client_email,
+//                 private_key: keyFileJson.private_key
+//             }
+//         })
+//         const bucket = storage.bucket('comend-app-public')
+
+//         const filename = `${Date.now()}-${image.name}`
+//         const file = bucket.file(filename)
+//         const buffer = Buffer.from(image.data, "base64")
+
+//         await file.save(buffer, { 
+//             contentType: image.type
+//         })
+
+//         // public url
+//         const imageUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`
+
+//         return imageUrl
+//     } catch (e) {
+//         console.error("Failed to upload image:", e)
+//     }
+// }
+
+function extractFileNameFromUrl(url: string): string {
+    const parsedUrl = new URL(url);
+    return parsedUrl.pathname.split('/').pop() || ''; // Get the last segment of the path
 }
+
+export async function fetchPublicFileFromGCS(fileUrl: string): Promise<File> {
+    try {
+      // Fetch the file from the bucket
+      const response = await fetch(fileUrl);
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch file: ${response.statusText}`);
+      }
+  
+      // Get the file content as a Blob
+      const blob = await response.blob();
+  
+      // Create a File object from the Blob
+      const file = new File([blob], extractFileNameFromUrl(fileUrl), { type: blob.type });
+  
+      return file;
+    } catch (error) {
+      console.error("Error fetching file from GCS:", error);
+      throw error;
+    }
+  }
 
 // export async function fetchImageAsBase64(url: string | null): Promise<string | undefined> {
 //     try {

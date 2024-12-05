@@ -5,6 +5,49 @@ import {ColumnDragData} from "@/components/board-column";
 import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
+import { Session } from "next-auth";
+import { uploadOrUpdatePublicImg } from "./g-cloud";
+
+export function getUserPhoto(user: any, session: Session | null): string {
+    if (user?.image) return user.image
+    if (session?.user?.image) return session?.user?.image
+    return `https://avatar.vercel.sh/${session?.user?.email}`
+}
+
+export function getOrgPhoto(org: any | undefined): string {
+    if (!org) return createDicebearAvatar('', 50, 40, "identicon")
+    if (org?.image) return org?.image
+    return `https://avatar.vercel.sh/${org?.id}.png`
+}
+
+// this function must be in a client env
+export async function handleImageUpload(file: File, data: string | undefined): Promise<string | undefined> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+
+        reader.onloadend = async () => {
+            if (data == undefined) {
+                reject('No image data')
+                return
+            }
+
+            const base64data = data.replace(/^data:image\/\w+;base64,/, "")
+
+            const imageUrl = await uploadOrUpdatePublicImg({
+                name: file.name,
+                type: file.type,
+                data: base64data || ""
+            })
+
+            resolve(imageUrl)
+        }
+
+        reader.onerror = error => {
+            reject(error)
+        }
+    })
+}
 
 export const formatMoney = (moneyRaised: number | undefined) => {
     if (moneyRaised === undefined) return "$0";

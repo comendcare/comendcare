@@ -27,40 +27,12 @@ import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
-import {cn, createDicebearAvatar, formatMoney} from "@/lib/utils";
+import {cn, createDicebearAvatar, formatMoney, handleImageUpload} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
-import { uploadPublicImg } from "@/lib/g-cloud";
-
-export async function handleImageUpload(file: File, data: string | undefined): Promise<string | undefined> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-
-        reader.onloadend = async () => {
-            if (data == undefined) {
-                reject('No image data')
-                return
-            }
-
-            const base64data = data.replace(/^data:image\/\w+;base64,/, "")
-
-            const imageUrl = await uploadPublicImg({
-                name: file.name,
-                type: file.type,
-                data: base64data || ""
-            })
-
-            resolve(imageUrl)
-        }
-
-        reader.onerror = error => {
-            reject(error)
-        }
-    })
-}
+import { uploadOrUpdatePublicImg } from "@/lib/g-cloud";
 
 const optionSchema = z.object({
     label: z.string(),
