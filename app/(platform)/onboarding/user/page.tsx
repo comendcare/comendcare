@@ -9,12 +9,14 @@ export default function UserOnboardingPage() {
                 <div className="space-y-2">
                     <div className="flex flex-row justify-between">
                         <h1 className="text-xl font-semibold">
-                            Profile onboarding
+                            Profile Onboarding: About You
                         </h1>
 
-                        <p className="inline-flex flex-row justify-center items-center gap-x-2 text-xl">
+                        <p
+                            className="inline-flex flex-row justify-center items-center gap-x-2 w-min text-base truncate rounded-md bg-stone-100 px-4 py-2 font-medium text-stone-600 transition-colors dark:bg-stone-800 dark:text-stone-400"
+                        >
                             <Timer/>
-                            {`Estimated time: 1 min`}
+                            {`< 1 min`}
                         </p>
                     </div>
 

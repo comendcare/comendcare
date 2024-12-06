@@ -40,7 +40,7 @@ interface RFP {
 interface Asset {
     id: number
     href: string
-    projectName: string
+    assetName: string
     teamName: string
     description: string
     recency?: Recency
@@ -108,7 +108,7 @@ const assets: Asset[] = [
     {
         id: 1,
         href: '#',
-        projectName: 'Biomarker Identification',
+        assetName: 'Biomarker Identification',
         teamName: 'Arcadia Research',
         description: 'Identified key biomarkers for Arcadion Syndrome.',
         recency: 'New',
@@ -120,7 +120,7 @@ const assets: Asset[] = [
     {
         id: 2,
         href: '#',
-        projectName: 'Mouse Model Development',
+        assetName: 'Mouse Model Development',
         teamName: 'Arcadia Research',
         description: 'Developed a mouse model for preclinical studies.',
         recency: 'New',
@@ -132,7 +132,7 @@ const assets: Asset[] = [
     {
         id: 3,
         href: '#',
-        projectName: 'Contact Registry Establishment',
+        assetName: 'Contact Registry Establishment',
         teamName: 'Rare Disease Lab',
         description: 'Built a comprehensive contact registry for patients.',
         principal: 'Dr. Emily Carter',
@@ -143,7 +143,7 @@ const assets: Asset[] = [
     {
         id: 4,
         href: '#',
-        projectName: 'Natural History Study',
+        assetName: 'Natural History Study',
         teamName: 'Arcadia Foundation',
         description: 'Ongoing study to document disease progression.',
         principal: 'Dr. Alan Brown',
@@ -154,7 +154,7 @@ const assets: Asset[] = [
     {
         id: 5,
         href: '#',
-        projectName: 'Gene Therapy Trial',
+        assetName: 'Gene Therapy Trial',
         teamName: 'Pharma Innovations',
         description: 'Launched gene therapy trials for Arcadion Syndrome.',
         principal: 'Dr. Sarah White',
@@ -165,7 +165,7 @@ const assets: Asset[] = [
     {
         id: 6,
         href: '#',
-        projectName: 'Patient Advocacy Group Formation',
+        assetName: 'Patient Advocacy Group Formation',
         teamName: 'Arcadia Advocacy',
         description: 'Formed a patient advocacy group with 501(c)(3) status.',
         principal: 'Dr. Megan Lee',
@@ -176,7 +176,7 @@ const assets: Asset[] = [
     {
         id: 7,
         href: '#',
-        projectName: 'Publication in Peer-Reviewed Journal',
+        assetName: 'Publication in Peer-Reviewed Journal',
         teamName: 'Rare Disease Lab',
         description: 'Published key findings in a leading scientific journal.',
         principal: 'Dr. Emily Carter',
@@ -187,7 +187,7 @@ const assets: Asset[] = [
     {
         id: 8,
         href: '#',
-        projectName: 'FDA Orphan Drug Status Approval',
+        assetName: 'FDA Orphan Drug Status Approval',
         teamName: 'Pharma Innovations',
         description: 'Secured FDA orphan drug status for Arcadion treatment.',
         principal: 'Dr. Alan Brown',
@@ -241,7 +241,7 @@ export const PAGProfileAssetsAndProjectsHoverableCard = () => {
                                             <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
                                                 <div className="flex items-center gap-x-3">
                                                     <h2 className="min-w-0 text-sm font-semibold">
-                                                        <span className="truncate">{asset.projectName}</span>
+                                                        <span className="truncate">{asset.assetName}</span>
                                                     </h2>
                                                 </div>
                                                 <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
@@ -269,13 +269,13 @@ export const PAGProfileAssetsAndProjectsHoverableCard = () => {
                                 >
                                     <div className="flex justify-between space-x-4">
                                         <div className="space-y-1">
-                                            <h4 className="text-sm font-semibold">@nextjs</h4>
+                                            <h4 className="text-sm font-semibold">{asset.assetName}</h4>
                                             <p className="text-sm">
-                                                The React Framework – created and maintained by @vercel.
+                                                {asset.assetSummary}
                                             </p>
                                             <div className="flex items-center pt-2">
                                                 <span className="text-xs text-muted-foreground">
-                                                    Joined December 2021
+                                                    Created {faker.date.past().toISOString().split('T')[0]}
                                                 </span>
                                             </div>
                                         </div>
@@ -334,13 +334,13 @@ export const PAGProfileAssetsAndProjectsHoverableCard = () => {
                                 >
                                     <div className="flex justify-between space-x-4">
                                         <div className="space-y-1">
-                                            <h4 className="text-sm font-semibold">@nextjs</h4>
+                                            <h4 className="text-sm font-semibold">{rfp.projectName}</h4>
                                             <p className="text-sm">
-                                                The React Framework – created and maintained by @vercel.
+                                                {rfp.proposalSummary}
                                             </p>
                                             <div className="flex items-center pt-2">
                                                 <span className="text-xs text-muted-foreground">
-                                                    Joined December 2021
+                                                    Created {faker.date.past().toISOString().split('T')[0]}
                                                 </span>
                                             </div>
                                         </div>
