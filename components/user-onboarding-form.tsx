@@ -17,7 +17,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {editUser, getUser} from "@/lib/actions";
+import {editUser} from "@/lib/actions";
 import {Checkbox} from "@/components/ui/checkbox";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {AddressType} from "@/lib/types";
@@ -29,6 +29,7 @@ import {cn, createDicebearAvatar} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {FaUpload} from "react-icons/fa6";
+import {getUser} from "@/lib/fetchers";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -104,7 +105,15 @@ export default function UserOnboardingForm() {
     useEffect(() => {
         async function fetchUserData() {
             if (session?.user?.id) {
-                const userData = await getUser(session.user.id);
+                let userData
+                const response = await getUser(session.user.id);
+                if (response.success) {
+                    userData = response.data
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+
                 if (userData) {
                     const fetchedValues = {
                         name: userData.name || "",
@@ -183,11 +192,11 @@ export default function UserOnboardingForm() {
                             name="name"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>Your name (required)</FormLabel>
+                                    <FormLabel>Your Name (required)</FormLabel>
+                                    <FormDescription>This is your public display name.</FormDescription>
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
-                                    <FormDescription>This is your public display name.</FormDescription>
                                     <FormMessage/>
                                 </FormItem>
                             )}
@@ -199,10 +208,10 @@ export default function UserOnboardingForm() {
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Role</FormLabel>
+                                    <FormDescription>Your role or title at your patient organization.</FormDescription>
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
-                                    <FormDescription>Your role or title at your patient organization.</FormDescription>
                                     <FormMessage/>
                                 </FormItem>
                             )}
@@ -234,6 +243,7 @@ export default function UserOnboardingForm() {
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Profile Image</FormLabel>
+                                    <FormDescription>Your profile image.</FormDescription>
                                     <FormControl>
                                         <div className="flex flex-col items-start space-y-4">
                                             {selectedFile ? (
@@ -260,7 +270,6 @@ export default function UserOnboardingForm() {
                                             )}
                                         </div>
                                     </FormControl>
-                                    <FormDescription>Your profile image.</FormDescription>
                                     <FormMessage/>
                                 </FormItem>
                             )}
@@ -320,7 +329,7 @@ export default function UserOnboardingForm() {
                     </form>
                 </Form>
             </div>
-            <div className="col-span-1 space-y-4">
+            <div className="col-span-1 space-y-4 border-1 rounded-lg">
                 <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
                     <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
                         User profile preview

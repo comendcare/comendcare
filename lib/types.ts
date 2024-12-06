@@ -23,6 +23,25 @@ import type { Option } from "@/components/ui/multiple-selector"
 //   PREINDMEETING
 //   INDSUBMISSION
 
+export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
+    {
+        label: 'All',
+        value: 'ALL',
+    },
+    {
+        label: 'CROs',
+        value: 'CRO',
+    },
+    {
+        label: 'Academics',
+        value: 'ACADEMIC',
+    },
+    {
+        label: 'None',
+        value: 'NONE',
+    },
+]
+
 export const MILESTONE_TYPE_OPTIONS: Option[] = [
     {
         label: 'Basic science',
@@ -184,3 +203,8 @@ export interface DomainVerificationResponse {
         reason: string
     }[]
 }
+
+export type ApiResponse<T> =
+    | { success: true; data: T }
+    | { success: false; error: string; code?: string };
+

@@ -17,7 +17,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {editUser, getUser} from "@/lib/actions";
+import {editUser} from "@/lib/actions";
 import {Checkbox} from "@/components/ui/checkbox";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {AddressType} from "@/lib/types";
@@ -26,6 +26,7 @@ import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaUpload} from "react-icons/fa6";
+import {getUser} from "@/lib/fetchers";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -101,7 +102,15 @@ export default function UserEditForm() {
     useEffect(() => {
         async function fetchUserData() {
             if (session?.user?.id) {
-                const userData = await getUser(session.user.id);
+                let userData
+                const response = await getUser(session.user.id);
+                if (response.success) {
+                    userData = response.data
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+
                 if (userData) {
                     const fetchedValues = {
                         name: userData.name || "",

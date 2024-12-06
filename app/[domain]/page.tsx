@@ -60,14 +60,16 @@ export default async function OrganizationHomePage({
 
     return (
         <main className="grid grid-cols-8 w-full max-w-7xl mx-auto mt-16 gap-4">
-            <div className="col-span-6 flex flex-col items-center space-y-8">
+            <div className="col-span-8 flex flex-col items-center space-y-8">
                 <PAGPublicProfileHeader organization={data}/>
 
                 <div className="grid grid-cols-6 gap-4">
-                    <div className="col-span-2 space-y-4">
-                        <PAGPublicProfileDetailsCard organization={data}/>
-                        <PAGProfileAssetsCard/>
-                        <PAGProfileOpenRFPsCard/>
+                    <div className="relative col-span-2 space-y-4">
+                        <div className="sticky top-24 space-y-4">
+                            <PAGPublicProfileDetailsCard organization={data}/>
+                            <PAGProfileAssetsCard/>
+                            <PAGProfileOpenRFPsCard/>
+                        </div>
                     </div>
 
                     <div className="col-span-4 flex flex-col space-y-4">
@@ -193,37 +195,37 @@ export default async function OrganizationHomePage({
                 )}
             </div>
 
-            <div className="col-span-2">
-                <Card className="">
-                    <CardHeader>
-                        <CardTitle>
-                            More patient groups for you
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex justify-between space-x-4">
-                            <Avatar>
-                                <AvatarImage src="https://github.com/vercel.png"/>
-                                <AvatarFallback>VC</AvatarFallback>
-                            </Avatar>
-                            <div className="space-y-1">
-                                <h4 className="text-sm font-semibold">@nextjs</h4>
-                                <p className="text-sm">
-                                    The React Framework – created and maintained by @vercel.
-                                </p>
-                                <div className="flex items-center pt-2">
-                                    <CalendarDays className="mr-2 h-4 w-4 opacity-70"/>{" "}
-                                    <span className="text-xs text-muted-foreground">
-                                        Joined December 2021
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                    </CardFooter>
-                </Card>
-            </div>
+            {/*<div className="col-span-2">*/}
+            {/*    <Card className="">*/}
+            {/*        <CardHeader>*/}
+            {/*            <CardTitle>*/}
+            {/*                More patient groups for you*/}
+            {/*            </CardTitle>*/}
+            {/*        </CardHeader>*/}
+            {/*        <CardContent>*/}
+            {/*            <div className="flex justify-between space-x-4">*/}
+            {/*                <Avatar>*/}
+            {/*                    <AvatarImage src="https://github.com/vercel.png"/>*/}
+            {/*                    <AvatarFallback>VC</AvatarFallback>*/}
+            {/*                </Avatar>*/}
+            {/*                <div className="space-y-1">*/}
+            {/*                    <h4 className="text-sm font-semibold">@nextjs</h4>*/}
+            {/*                    <p className="text-sm">*/}
+            {/*                        The React Framework – created and maintained by @vercel.*/}
+            {/*                    </p>*/}
+            {/*                    <div className="flex items-center pt-2">*/}
+            {/*                        <CalendarDays className="mr-2 h-4 w-4 opacity-70"/>{" "}*/}
+            {/*                        <span className="text-xs text-muted-foreground">*/}
+            {/*                            Joined December 2021*/}
+            {/*                        </span>*/}
+            {/*                    </div>*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*        </CardContent>*/}
+            {/*        <CardFooter className="flex justify-between">*/}
+            {/*        </CardFooter>*/}
+            {/*    </Card>*/}
+            {/*</div>*/}
         </main>
     )
 }

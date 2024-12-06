@@ -27,6 +27,8 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {leaveOrganization} from "@/lib/actions";
+import {useSession} from "next-auth/react";
 
 const FormSchema = z.object({
     organizationName: z.string().min(2, {
@@ -35,6 +37,7 @@ const FormSchema = z.object({
 });
 
 export default function OrganizationSettingsTab() {
+    const {data: session} = useSession()
     const [isDeleting, setIsDeleting] = useState(false); // Track API call state
 
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -53,6 +56,24 @@ export default function OrganizationSettingsTab() {
             },
         });
     }
+
+    const handleLeaveOrganization = async () => {
+        setIsDeleting(true); // Disable the button
+
+        try {
+            const response = await leaveOrganization(session, session?.user.organizationId || "")
+
+            if (response.success) {
+                toast.success("Removed from Organization successfully");
+            } else {
+                toast.error("Failed to delete account. Please try again.");
+            }
+        } catch (error) {
+            toast.error("An error occurred. Please try again later.");
+        } finally {
+            setIsDeleting(false); // Re-enable the button
+        }
+    };
 
     const handleDeleteAccount = async () => {
         setIsDeleting(true); // Disable the button
@@ -119,6 +140,48 @@ export default function OrganizationSettingsTab() {
                 <p className="mt-1 text-sm leading-6 text-gray-500">
                     Anything you change here cannot be undone.
                 </p>
+
+                <div className="mt-10 border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between">
+                    <span className="flex flex-grow flex-col">
+                        <span className="text-sm font-medium leading-6 text-gray-900">
+                            Leave Organization
+                        </span>
+                        <span className="text-sm text-gray-500">
+                            You will be removed from this organization. Your account will remain.
+                        </span>
+                    </span>
+
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive">
+                                Leave organization
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete
+                                    your account and remove your data from our servers.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction asChild>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={handleDeleteAccount}
+                                        disabled={isDeleting}
+                                    >
+                                        {isDeleting ? "Deleting..." : "Continue"}
+                                    </Button>
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
 
                 <div className="mt-10 border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between">
                     <span className="flex flex-grow flex-col">
