@@ -1,5 +1,5 @@
 "use client"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 import {useRouter} from "next/navigation";
@@ -17,16 +17,11 @@ export const PublicRoadmap = ({roadmap}: {roadmap: any}) => {
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
-                    Research Plan
+                    {roadmap.title}
                 </CardTitle>
-                <Button
-                    variant="ghost"
-                    onClick={() => router.push("/app/roadmap")}
-                    className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
-                >
-                    Edit research plan
-                    <FaArrowUpRightFromSquare/>
-                </Button>
+                <CardDescription>
+                    {roadmap.description}
+                </CardDescription>
             </CardHeader>
 
             <CardContent className="px-8">
