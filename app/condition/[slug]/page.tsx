@@ -271,194 +271,136 @@ export default async function ConditionPage({
                         </p>
 
                     </div>
-                </div>
 
-                <div className="grid gap-8 grid-cols-2">
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                Stats
-                            </h3>
-                            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 h-fit">
-                                {/*<Card>*/}
-                                {/*    <CardHeader*/}
-                                {/*        className="flex flex-row items-center justify-between space-y-0 pb-2">*/}
-                                {/*        <CardTitle className="text-sm font-medium">*/}
-                                {/*            <Tooltip>*/}
-                                {/*                <TooltipTrigger>*/}
-                                {/*                    Patients identified*/}
-                                {/*                </TooltipTrigger>*/}
-                                {/*                <TooltipContent className="max-w-80">*/}
-                                {/*                    <p>*/}
-                                {/*                        {`Straightforward count of known cases, e.g., "Fewer than 1,000 cases have been identified worldwide.`}*/}
-                                {/*                    </p>*/}
-                                {/*                </TooltipContent>*/}
-                                {/*            </Tooltip>*/}
-                                {/*        </CardTitle>*/}
-                                {/*        <FaUserCheck/>*/}
-                                {/*    </CardHeader>*/}
-                                {/*    <CardContent>*/}
-                                {/*        <div className="text-2xl font-bold">*/}
-                                {/*            {data.numberOfIdentifiedPatients}*/}
-                                {/*        </div>*/}
-                                {/*        <p className="text-xs text-muted-foreground">*/}
-                                {/*            +20% from last month*/}
-                                {/*        </p>*/}
-                                {/*    </CardContent>*/}
-                                {/*</Card>*/}
-                                <Card>
-                                    <CardHeader
-                                        className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium">
-                                            <Tooltip>
-                                                <TooltipTrigger>
-                                                    Prevalence
-                                                </TooltipTrigger>
-                                                <TooltipContent className="max-w-80">
-                                                    <p>
-                                                        {`The estimated proportion of a population that has a characteristic at a specific time, regardless of when they first developed it.`}
-                                                    </p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </CardTitle>
-                                        <FaUsersViewfinder/>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold">
-                                            {data.prevalenceNumerator} in {data.prevalenceDenominator}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                                <Card>
-                                    <CardHeader
-                                        className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-sm font-medium">
-                                            <Tooltip>
-                                                <TooltipTrigger>
-                                                    Incidence
-                                                </TooltipTrigger>
-                                                <TooltipContent className="max-w-80">
-                                                    <p>
-                                                        {`The number of new cases of a characteristic that develop in a population over a specific time period.`}
-                                                    </p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </CardTitle>
-                                        <FaUserPlus/>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="text-2xl font-bold">
-                                            +2 this year
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                    <div className="flex flex-col items-center justify-center space-y-8">
+                        <div className="grid grid-cols-4">
+                            <div className="space-y-2 flex flex-col items-center">
+                                <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                    Disease Categories
+                                </h3>
+                                <div className="space-y-1 space-x-1 text-center">
+                                    {data.diseaseCategories.map((category, index) =>
+                                        <Badge size="large" key={index}>
+                                            {category}
+                                        </Badge>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        {/*<HumanAnatomyMap/>*/}
-                        <div className="space-y-2">
-                            <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                Disease Categories
-                            </h3>
-                            <div className="space-x-1">
-                                {data.diseaseCategories.map((category, index) =>
-                                    <Badge key={index}>
-                                        {category}
-                                    </Badge>
-                                )}
+                            <div className="space-y-2 flex flex-col items-center">
+                                <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                    Signs and Symptoms
+                                </h3>
+                                <div className="space-y-1 space-x-1 text-center">
+                                    {data.associatedSignsAndSymptoms.map((sign, index) =>
+                                        <Badge size="large" key={index}>
+                                            {sign}
+                                        </Badge>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        <div className="space-y-2">
-                            <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                Signs and Symptoms
-                            </h3>
-                            <div className="space-x-1">
-                                {data.associatedSignsAndSymptoms.map((sign, index) =>
-                                    <Badge key={index}>
-                                        {sign}
-                                    </Badge>
-                                )}
+                            <div className="space-y-2 flex flex-col items-center">
+                                <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                    Associated Genes
+                                </h3>
+                                <div className="space-y-1 space-x-1 text-center">
+                                    {data.associatedGenes.map((gene, index) =>
+                                        <Badge size="large" key={index}>
+                                            {gene}
+                                        </Badge>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        <div className="space-y-2">
-                            <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                Associated Genes
-                            </h3>
-                            <div className="space-x-1">
-                                {data.associatedGenes.map((gene, index) =>
-                                    <Badge key={index}>
-                                        {gene}
-                                    </Badge>
-                                )}
+                            <div className="space-y-2 flex flex-col items-center">
+                                <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                    Disease Mechanisms
+                                </h3>
+                                <div className="space-y-1 space-x-1 text-center">
+                                    {data.relevantDiseaseMechanisms.map((mechanism, index) =>
+                                        <Badge size="large" key={index}>
+                                            {mechanism}
+                                        </Badge>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        <div className="space-y-2">
-                            <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                Disease Mechanisms
-                            </h3>
-                            <div className="space-x-1">
-                                {data.relevantDiseaseMechanisms.map((mechanism, index) =>
-                                    <Badge key={index}>
-                                        {mechanism}
-                                    </Badge>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="space-y-2">
-                            <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                Description
-                            </h3>
-                            <p>
-                                {data.description}
-                            </p>
                         </div>
 
-                        <div className="space-y-2">
-                            <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                Similar conditions
-                            </h3>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="flex justify-between space-x-4">
-                                    <div className="space-y-1">
-                                        <h4 className="text-sm font-semibold">
-                                            Celocyn Synrdrome
-                                        </h4>
-                                        <p className="text-sm">
-                                            Celocyn Syndrome is a progressive and degenerative disorder affecting the
-                                            brain, characterized by severe neurological symptoms.
-                                        </p>
-                                        <div className="flex items-center pt-2">
-                                            <CalendarDays className="mr-2 h-4 w-4 opacity-70"/>{" "}
-                                            <span className="text-xs text-muted-foreground">
-                                                Joined December 2021
-                                            </span>
-                                        </div>
-                                    </div>
+                        <div className="grid grid-cols-2 gap-8">
+                            <div className="col-span-1 space-y-2">
+                                <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                    Description
+                                </h3>
+                                <p>
+                                    {data.description}
+                                </p>
+                            </div>
+
+                            <div className="col-span-1 flex flex-col space-y-8">
+                                <div className="space-y-2">
+                                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                        Stats
+                                    </h3>
+                                    <Card>
+                                        <CardHeader
+                                            className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                            <CardTitle className="text-sm font-medium">
+                                                <Tooltip>
+                                                    <TooltipTrigger>
+                                                        Prevalence
+                                                    </TooltipTrigger>
+                                                    <TooltipContent className="max-w-80">
+                                                        <p>
+                                                            {`The estimated proportion of a population that has a characteristic at a specific time, regardless of when they first developed it.`}
+                                                        </p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </CardTitle>
+                                            <FaUsersViewfinder/>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <div className="text-2xl font-bold">
+                                                {data.prevalenceNumerator} in {data.prevalenceDenominator}
+                                            </div>
+                                        </CardContent>
+                                    </Card>
                                 </div>
 
-                                <div className="flex justify-between space-x-4">
-                                    <div className="space-y-1">
-                                        <h4 className="text-sm font-semibold">
-                                            Myhre Syndrome
-                                        </h4>
-                                        <p className="text-sm">
-                                            Myhre syndrome is a rare genetic disorder that affects connective tissue and
-                                            causes a variety of symptoms in many parts of the body.
-                                        </p>
-                                        <div className="flex items-center pt-2">
-                                            <CalendarDays className="mr-2 h-4 w-4 opacity-70"/>{" "}
-                                            <span className="text-xs text-muted-foreground">
-                                                Joined December 2021
-                                            </span>
+                                <div className="space-y-2">
+                                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                        Similar conditions
+                                    </h3>
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex justify-between space-x-4">
+                                            <div className="space-y-1">
+                                                <h4 className="text-sm font-semibold">
+                                                    Celocyn Synrdrome
+                                                </h4>
+                                                <p>
+                                                    Celocyn Syndrome is a progressive and degenerative disorder
+                                                    affecting
+                                                    the
+                                                    brain, characterized by severe neurological symptoms.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-between space-x-4">
+                                            <div className="space-y-1">
+                                                <h4 className="text-sm font-semibold">
+                                                    Myhre Syndrome
+                                                </h4>
+                                                <p>
+                                                    Myhre syndrome is a rare genetic disorder that affects connective
+                                                    tissue
+                                                    and
+                                                    causes a variety of symptoms in many parts of the body.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <div className="w-full space-y-8">
@@ -490,7 +432,8 @@ export default async function ConditionPage({
                         <CarouselContent className="p-4">
                             {true ?
                                 <Card className="w-full mx-auto">
-                                    <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+                                    <CardContent
+                                        className="flex flex-col items-center justify-center p-6 text-center">
                                         <FolderOpen className="w-12 h-12 text-gray-400 mb-4"/>
                                         <h3 className="text-lg font-semibold mb-2">No assets</h3>
                                         <p className="text-sm text-gray-500">
@@ -521,7 +464,8 @@ export default async function ConditionPage({
                         <CarouselContent className="p-4">
                             {true ?
                                 <Card className="w-full mx-auto">
-                                    <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+                                    <CardContent
+                                        className="flex flex-col items-center justify-center p-6 text-center">
                                         <FolderOpen className="w-12 h-12 text-gray-400 mb-4"/>
                                         <h3 className="text-lg font-semibold mb-2">No RFPs</h3>
                                         <p className="text-sm text-gray-500">
