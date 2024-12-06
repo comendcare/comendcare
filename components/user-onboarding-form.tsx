@@ -192,11 +192,11 @@ export default function UserOnboardingForm() {
                             name="name"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>Your name (required)</FormLabel>
+                                    <FormLabel>Your Name (required)</FormLabel>
+                                    <FormDescription>This is your public display name.</FormDescription>
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
-                                    <FormDescription>This is your public display name.</FormDescription>
                                     <FormMessage/>
                                 </FormItem>
                             )}
@@ -208,10 +208,10 @@ export default function UserOnboardingForm() {
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Role</FormLabel>
+                                    <FormDescription>Your role or title at your patient organization.</FormDescription>
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
-                                    <FormDescription>Your role or title at your patient organization.</FormDescription>
                                     <FormMessage/>
                                 </FormItem>
                             )}
@@ -243,6 +243,7 @@ export default function UserOnboardingForm() {
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Profile Image</FormLabel>
+                                    <FormDescription>Your profile image.</FormDescription>
                                     <FormControl>
                                         <div className="flex flex-col items-start space-y-4">
                                             {selectedFile ? (
@@ -269,7 +270,6 @@ export default function UserOnboardingForm() {
                                             )}
                                         </div>
                                     </FormControl>
-                                    <FormDescription>Your profile image.</FormDescription>
                                     <FormMessage/>
                                 </FormItem>
                             )}
@@ -329,7 +329,7 @@ export default function UserOnboardingForm() {
                     </form>
                 </Form>
             </div>
-            <div className="col-span-1 space-y-4">
+            <div className="col-span-1 space-y-4 border-1 rounded-lg">
                 <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
                     <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
                         User profile preview
