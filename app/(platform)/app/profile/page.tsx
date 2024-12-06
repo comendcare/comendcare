@@ -114,9 +114,16 @@ export default async function ProfilePage() {
                     include: { data: true }
                 },
                 edges: true,
-                milestones: true
+                milestones: {
+                    include: {
+                        asset: true,
+                        RFP: true
+                    }
+                }
             }
         })
+
+        console.log(roadmaps)
 
         // Existing verified organization rendering logic
         return (
