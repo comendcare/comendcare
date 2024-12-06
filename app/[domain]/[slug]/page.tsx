@@ -4,13 +4,14 @@ import {getRoadmapData, getOrganizationData, getRoadmapsForOrganization} from "@
 import BlogCard from "@/components/blog-card"
 import BlurImage from "@/components/blur-image"
 import MDX from "@/components/mdx"
-import {cn, placeholderBlurhash, toDateString} from "@/lib/utils"
+import {cn, createDicebearAvatar, placeholderBlurhash, toDateString} from "@/lib/utils"
 import Image from "next/image"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PublicFlowView } from "@/components/public-flow"
 import { PublicTimelineView } from "@/components/public-timeline"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { PublicRoadmap } from "@/components/public-roadmap"
 
 export async function generateMetadata({
                                            params
@@ -111,48 +112,25 @@ export default async function OrganizationRoadmapPage({
     return (
         <>
             {roadmaps.length > 0 ? (
-                    <div className="flex flex-col items-center justify-center my-12 gap-8">
+                    <div className="flex flex-col items-center justify-center my-16 gap-8">
                         <div className="m-auto w-full text-center md:w-7/12">
                             <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
                                 {toDateString(roadmaps[0].createdAt)}
                             </p>
-                            <h1 className="mb-10 font-title text-3xl font-bold text-stone-800 dark:text-white md:text-6xl">
-                                {roadmaps[0].title}
-                            </h1>
-                            <p className="text-md m-auto w-10/12 text-stone-600 dark:text-stone-400 md:text-lg">
-                                {roadmaps[0].description}
-                            </p>
                         </div>
 
-                        <Card className="m-auto w-full text-left md:w-7/12">
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                                <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
-                                    Research Plan
-                                </CardTitle>
-                            </CardHeader>
+                        <div className="flex gap-4 items-center">
+                            <img 
+                                className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                src={createDicebearAvatar(organization?.createdAt.toLocaleString() ?? "", 50, 40, "identicon")}
+                                alt=""
+                            />
+                            <h1 className="truncate text-4xl font-bold text-gray-900">{organization.name}</h1>
+                        </div>
 
-                            <CardContent className="px-8">
-
-                                <Tabs defaultValue="timeline" className="space-y-4 w-full">
-                                    <TabsList>
-                                        <TabsTrigger value="timeline">
-                                            Timeline View
-                                        </TabsTrigger>
-                                        <TabsTrigger value="flow">
-                                            Flow View
-                                        </TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="timeline" className="space-y-4 w-full">
-                                        <PublicTimelineView roadmap={roadmaps[0]} />
-                                    </TabsContent>
-                                    <TabsContent value="flow" className="space-y-4 w-full">
-                                        <div className="h-[600px]">
-                                            <PublicFlowView roadmap={roadmaps[0]} />
-                                        </div>
-                                    </TabsContent>
-                                </Tabs>
-                            </CardContent>
-                        </Card>
+                        <div className="m-auto w-full text-left md:w-7/12">
+                            <PublicRoadmap roadmap={roadmaps[0]} />
+                        </div>
                     </div>
                 ) :
                 (
