@@ -4,8 +4,9 @@ import {Button} from "@/components/ui/button";
 import {FaArrowUpRightFromSquare, FaPen} from "react-icons/fa6";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
-import { FlowView } from "./flow";
+import { PrivateFlowView } from "./private-flow";
 import { ReactFlow } from "@xyflow/react";
+import { PublicTimelineView } from "./public-timeline";
 
 export const getDates = (milestone: any) => {
     if (milestone.startDate && milestone.endDate) {

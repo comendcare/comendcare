@@ -4,8 +4,13 @@ import {getRoadmapData, getOrganizationData, getRoadmapsForOrganization} from "@
 import BlogCard from "@/components/blog-card"
 import BlurImage from "@/components/blur-image"
 import MDX from "@/components/mdx"
-import {placeholderBlurhash, toDateString} from "@/lib/utils"
+import {cn, placeholderBlurhash, toDateString} from "@/lib/utils"
 import Image from "next/image"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { PublicFlowView } from "@/components/public-flow"
+import { PublicTimelineView } from "@/components/public-timeline"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 export async function generateMetadata({
                                            params
@@ -106,71 +111,49 @@ export default async function OrganizationRoadmapPage({
     return (
         <>
             {roadmaps.length > 0 ? (
-                    <>
-                        <div className="flex flex-col items-center justify-center mt-8">
-                            <div className="m-auto w-full text-center md:w-7/12">
-                                <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
-                                    {toDateString(roadmaps[0].createdAt)}
-                                </p>
-                                <h1 className="mb-10 font-title text-3xl font-bold text-stone-800 dark:text-white md:text-6xl">
-                                    {roadmaps[0].title}
-                                </h1>
-                                <p className="text-md m-auto w-10/12 text-stone-600 dark:text-stone-400 md:text-lg">
-                                    {roadmaps[0].description}
-                                </p>
-                            </div>
-                            <a
-                                // if you are using Github OAuth, you can get rid of the Twitter option
-                                href={
-                                    organization?.user?.username
-                                        ? `https://twitter.com/${organization.user.username}`
-                                        : `https://github.com/${organization?.user?.gh_username}`
-                                }
-                                rel="noreferrer"
-                                target="_blank"
-                            >
-                                <div className="my-8">
-                                    <div
-                                        className="relative inline-block h-8 w-8 overflow-hidden rounded-full align-middle md:h-12 md:w-12">
-                                        {organization?.user?.image ? (
-                                            <BlurImage
-                                                alt={
-                                                    organization?.user?.name ??
-                                                    "User Avatar"
-                                                }
-                                                height={80}
-                                                src={organization.user.image}
-                                                width={80}
-                                            />
-                                        ) : (
-                                            <div
-                                                className="absolute flex h-full w-full select-none items-center justify-center bg-stone-100 text-4xl text-stone-500">
-                                                ?
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="text-md ml-3 inline-block align-middle dark:text-white md:text-lg">
-                                        by{" "}
-                                        <span className="font-semibold">
-                                            {organization?.user?.name}
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
+                    <div className="flex flex-col items-center justify-center my-12 gap-8">
+                        <div className="m-auto w-full text-center md:w-7/12">
+                            <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
+                                {toDateString(roadmaps[0].createdAt)}
+                            </p>
+                            <h1 className="mb-10 font-title text-3xl font-bold text-stone-800 dark:text-white md:text-6xl">
+                                {roadmaps[0].title}
+                            </h1>
+                            <p className="text-md m-auto w-10/12 text-stone-600 dark:text-stone-400 md:text-lg">
+                                {roadmaps[0].description}
+                            </p>
                         </div>
-                        <div
-                            className="relative m-auto mb-10 h-80 w-full max-w-screen-lg overflow-hidden md:mb-20 md:h-150 md:w-5/6 md:rounded-2xl lg:w-2/3">
-                            <BlurImage
-                                alt={roadmaps[0].title ?? "Post image"}
-                                width={1200}
-                                height={630}
-                                className="h-full w-full object-cover"
-                                placeholder="blur"
-                                blurDataURL={roadmaps[0].imageBlurhash ?? placeholderBlurhash}
-                                src={roadmaps[0].image ?? "/placeholder.png"}
-                            />
-                        </div>
-                    </>
+
+                        <Card className="m-auto w-full text-left md:w-7/12">
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                                    Research Plan
+                                </CardTitle>
+                            </CardHeader>
+
+                            <CardContent className="px-8">
+
+                                <Tabs defaultValue="timeline" className="space-y-4 w-full">
+                                    <TabsList>
+                                        <TabsTrigger value="timeline">
+                                            Timeline View
+                                        </TabsTrigger>
+                                        <TabsTrigger value="flow">
+                                            Flow View
+                                        </TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="timeline" className="space-y-4 w-full">
+                                        <PublicTimelineView roadmap={roadmaps[0]} />
+                                    </TabsContent>
+                                    <TabsContent value="flow" className="space-y-4 w-full">
+                                        <div className="h-[600px]">
+                                            <PublicFlowView roadmap={roadmaps[0]} />
+                                        </div>
+                                    </TabsContent>
+                                </Tabs>
+                            </CardContent>
+                        </Card>
+                    </div>
                 ) :
                 (
                     <div className="flex flex-col items-center justify-center py-20">

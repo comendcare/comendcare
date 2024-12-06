@@ -81,50 +81,94 @@ export async function getRoadmapsForOrganization(domain: string) {
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : null
 
-    return await unstable_cache(
-        async () => {
-            const roadmaps = prisma.roadmap.findMany({
-                where: {
-                    // organization: subdomain
-                    //     ? {subdomain}
-                    //     : {customDomain: domain},
-                    organization: {
-                        subdomain: subdomain,
-                    },
-                    // published: true
-                },
-                // select: {
-                //     title: true,
-                //     description: true,
-                //     slug: true,
-                //     image: true,
-                //     imageBlurhash: true,
-                //     createdAt: true,
-                // },
-                include: {
-                    nodes: {
-                        include: {
-                            data: true
-                        }
-                    },
-                    edges: true,
-                    milestones: true,
-                },
-                orderBy: [
-                    {
-                        createdAt: "desc"
-                    }
-                ]
-            })
-            console.log(`roadmaps`, roadmaps)
-            return roadmaps
+    const roadmaps = prisma.roadmap.findMany({
+        where: {
+            // organization: subdomain
+            //     ? {subdomain}
+            //     : {customDomain: domain},
+            organization: {
+                subdomain: subdomain,
+            },
+            // published: true
         },
-        [`${domain}-roadmaps`],
-        {
-            revalidate: 900,
-            tags: [`${domain}-roadmaps`]
-        }
-    )()
+        // select: {
+        //     title: true,
+        //     description: true,
+        //     slug: true,
+        //     image: true,
+        //     imageBlurhash: true,
+        //     createdAt: true,
+        // },
+        include: {
+            nodes: {
+                include: {
+                    data: true
+                }
+            },
+            edges: true,
+            milestones: {
+                where: {
+                    private: false
+                }
+            },
+        },
+        orderBy: [
+            {
+                createdAt: "desc"
+            }
+        ]
+    })
+    console.log(`roadmaps`, roadmaps)
+    return roadmaps
+
+    // return await unstable_cache(
+    //     async () => {
+    //         const roadmaps = prisma.roadmap.findMany({
+    //             where: {
+    //                 // organization: subdomain
+    //                 //     ? {subdomain}
+    //                 //     : {customDomain: domain},
+    //                 organization: {
+    //                     subdomain: subdomain,
+    //                 },
+    //                 // published: true
+    //             },
+    //             // select: {
+    //             //     title: true,
+    //             //     description: true,
+    //             //     slug: true,
+    //             //     image: true,
+    //             //     imageBlurhash: true,
+    //             //     createdAt: true,
+    //             // },
+    //             include: {
+    //                 nodes: {
+    //                     include: {
+    //                         data: true
+    //                     }
+    //                 },
+    //                 edges: true,
+    //                 milestones: {
+    //                     where: {
+    //                         private: false
+    //                     }
+    //                 },
+    //             },
+    //             orderBy: [
+    //                 {
+    //                     createdAt: "desc"
+    //                 }
+    //             ]
+    //         })
+    //         console.log(`roadmaps`, roadmaps)
+    //         return roadmaps
+    //     },
+    //     [`${domain}-roadmaps`],
+    //     {
+    //         revalidate: 900,
+    //         tags: [`${domain}-roadmaps`]
+    //     }
+    // )()
 }
 
 export async function getRoadmapData(domain: string, slug: string) {
