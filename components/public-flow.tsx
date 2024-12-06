@@ -14,11 +14,7 @@ export const PublicFlowView = ({ roadmap }: { roadmap: any}) => {
     return (
     <ReactFlow
         width={32}
-        nodes={
-            roadmap?.nodes
-                .filter((node: any) => node.data.private == false)
-                .map((node: any) => ({...node, position: {x: node.positionX, y: node.positionY}})) || []
-        }
+        nodes={roadmap?.nodes.map((node: any) => ({...node, position: {x: node.positionX, y: node.positionY}})) || []}
         edges={roadmap?.edges || []}
         nodeTypes={nodeTypes}
         proOptions={{ hideAttribution: true }}
