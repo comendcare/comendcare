@@ -336,8 +336,8 @@ export default function OrganizationOnboardingForm() {
                                 name="orgName"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Organization name (required)`}</FormLabel>
-                                        <FormDescription>{`The name of your organization`}</FormDescription>
+                                        <FormLabel>{`Organization Name (required)`}</FormLabel>
+                                        <FormDescription>{`The name of your organization.`}</FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -356,8 +356,17 @@ export default function OrganizationOnboardingForm() {
                                 name="subdomain"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Nickname (required)`}</FormLabel>
-                                        <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
+                                        <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
+                                        <FormDescription>
+                                            {`Enter your organization's abbreviated name, short form, or nickname.`}
+                                            <br/>
+                                            {
+                                                newOrgForm.watch("subdomain") && !newOrgForm.formState.errors.subdomain &&
+                                                <>
+                                                    {`Your organization's domain will be ${newOrgForm.watch("subdomain")}.comend.io`}
+                                                </>
+                                            }
+                                        </FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -367,14 +376,6 @@ export default function OrganizationOnboardingForm() {
                                             />
                                         </FormControl>
                                         <FormMessage/>
-                                        {
-                                            newOrgForm.watch("subdomain") && !newOrgForm.formState.errors.subdomain &&
-                                            <FormDescription>
-                                                <p>
-                                                    {`Your organization's domain will be ${newOrgForm.watch("subdomain")}.comend.io`}
-                                                </p>
-                                            </FormDescription>
-                                        }
                                     </FormItem>
                                 )}
                             />
@@ -423,7 +424,10 @@ export default function OrganizationOnboardingForm() {
                                 name="founded"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Year</FormLabel>
+                                        <FormLabel>Year Founded</FormLabel>
+                                        <FormDescription>
+                                            Select the year your organization was founded.
+                                        </FormDescription>
                                         <Select
                                             onValueChange={(value) => field.onChange(`${value}-01-01`)} // Convert year to a date string
                                             defaultValue={field.value?.split("-")[0]} // Extract the year from the date string for the default value
@@ -442,9 +446,6 @@ export default function OrganizationOnboardingForm() {
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                        <FormDescription>
-                                            Select the year your organization was founded.
-                                        </FormDescription>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
@@ -476,7 +477,7 @@ export default function OrganizationOnboardingForm() {
                                 name="incorporationStatus"
                                 render={({field}) => (
                                     <FormItem className="space-y-3">
-                                        <FormLabel>{`What is your 501c3 status`}</FormLabel>
+                                        <FormLabel>{`What is your 501c3 status?`}</FormLabel>
                                         <FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>
                                         <FormControl>
                                             <RadioGroup
@@ -520,7 +521,10 @@ export default function OrganizationOnboardingForm() {
                                 name="formattedAddress"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Address</FormLabel>
+                                        <FormLabel>Patient Group Address</FormLabel>
+                                        <FormDescription>
+                                            {`Your organization's address.`}
+                                        </FormDescription>
                                         <FormControl>
                                             <AutocompleteComponent
                                                 address={address}
@@ -529,9 +533,6 @@ export default function OrganizationOnboardingForm() {
                                                 setSearchInput={setSearchInput}
                                             />
                                         </FormControl>
-                                        <FormDescription>
-                                            {`Your organization's address.`}
-                                        </FormDescription>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
@@ -545,6 +546,9 @@ export default function OrganizationOnboardingForm() {
                                         <FormLabel>
                                             Organization Logo
                                         </FormLabel>
+                                        <FormDescription>
+                                            {`This will be used as your organization profile's image.`}
+                                        </FormDescription>
                                         <FormControl>
                                             <div className="flex flex-col items-start space-y-4">
                                                 {selectedFile ? (
@@ -572,9 +576,6 @@ export default function OrganizationOnboardingForm() {
                                                 )}
                                             </div>
                                         </FormControl>
-                                        <FormDescription>
-                                            {`This will be used as your organization profile's image.`}
-                                        </FormDescription>
                                         <FormMessage/>
                                     </FormItem>
                                 )}
@@ -624,7 +625,7 @@ export default function OrganizationOnboardingForm() {
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel>
-                                                Organization name
+                                                Organization Name
                                             </FormLabel>
                                             <FormControl>
                                                 <>
@@ -669,7 +670,7 @@ export default function OrganizationOnboardingForm() {
                 )}
             </div>
             {isNewOrganization &&
-                <div className="col-span-1 space-y-4">
+                <div className="col-span-1 space-y-4 border-1 rounded-lg">
                     <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
                         <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
                             Organization profile preview
