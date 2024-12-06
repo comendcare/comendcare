@@ -2,7 +2,7 @@
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
 import {Organization, User} from "@prisma/client";
-import {cn, createDicebearAvatar} from "@/lib/utils";
+import {cn, getUserPhoto} from "@/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Loading from "@/app/loading";
 import Link from "next/link";
@@ -73,7 +73,7 @@ export default function UserProfilePage() {
                     <Card>
                         <CardHeader>
                             <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                 src={createDicebearAvatar(user.createdAt.toLocaleString() ?? "", 50, 40, "identicon")}
+                                 src={getUserPhoto(user, session)}
                                  alt=""/>
                             <CardTitle>
                                 <h1 className="min-w-0 truncate text-4xl font-bold text-gray-900">

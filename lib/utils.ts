@@ -5,6 +5,86 @@ import {ColumnDragData} from "@/components/board-column";
 import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
+import { Session } from "next-auth";
+// import { uploadImg } from "./g-cloud";
+// import { uploadOrUpdatePublicImg } from "./g-cloud";
+
+export function getUserPhoto(user: any, session: Session | null): string {
+    if (user?.image) return user.image
+    if (session?.user?.image) return session?.user?.image
+    return `https://avatar.vercel.sh/${session?.user?.email}`
+}
+
+export function getOrgPhoto(org: any | undefined): string {
+    if (!org) return createDicebearAvatar('', 50, 40, "identicon")
+    if (org?.image) return org?.image
+    return `https://avatar.vercel.sh/${org?.id}.png`
+}
+
+export async function getPublicFile(fileUrl: string): Promise<File> {
+    try {
+        // Make a GET request to your API endpoint
+        const response = await fetch(`/api/gcs?fileUrl=${encodeURIComponent(fileUrl)}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+
+        console.log(`response`, response)
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch file: ${response.statusText}`);
+        }
+
+        // Parse the response as JSON
+        const { name, type, data } = await response.json();
+
+        // Decode the base64 data into a Blob
+        const byteCharacters = atob(data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type });
+
+        // Create the File object
+        return new File([blob], name, { type });
+    } catch (error) {
+        console.error('Error fetching file:', error);
+        throw error;
+    }
+}
+
+// export async function handleImageUpload(file: File, data: string | undefined): Promise<string | undefined> {
+//     return new Promise((resolve, reject) => {
+//         const reader = new FileReader()
+//         reader.readAsDataURL(file)
+
+//         reader.onloadend = async () => {
+//             if (data == undefined) {
+//                 reject('No image data')
+//                 return
+//             }
+
+//             const base64data = data.replace(/^data:image\/\w+;base64,/, "")
+
+//             const imageUrl = await uploadImg({
+//                 name: file.name,
+//                 type: file.type,
+//                 data: base64data || "",
+//             })
+
+//             console.log(`image url`, imageUrl)
+//             resolve(imageUrl)
+//         }
+
+//         reader.onerror = error => {
+//             reject(error)
+//         }
+//     })
+// }
 
 export function abbreviateNumber(num: number | null | undefined) {
     if (num === null || num === undefined) return '';

@@ -23,15 +23,17 @@ import {
 import "react-image-crop/dist/ReactCrop.css"
 import { CropIcon, Trash2Icon } from "lucide-react"
 
-export type FileWithPreview = FileWithPath & {
-    preview: string
-}
+// export type FileWithPreview = FileWithPath & {
+//     preview: string
+// }
+
+export type FileWithPreview = File & { preview: string }
 
 interface ImageCropperProps {
     dialogOpen: boolean
     setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
     selectedFile: FileWithPreview | null
-    setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>
+    setSelectedFile: (file: any) => void
 }
 
 export function ImageCropper({
@@ -95,6 +97,11 @@ export function ImageCropper({
         try {
             setCroppedImage(croppedImageUrl)
             setDialogOpen(false)
+
+            setSelectedFile({
+                ...selectedFile,
+                preview: croppedImageUrl
+            })
         } catch (error) {
             alert("Something went wrong!")
         }

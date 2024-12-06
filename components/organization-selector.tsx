@@ -4,7 +4,7 @@ import * as React from "react";
 import {Check, ChevronsUpDown, PlusCircle} from "lucide-react";
 import {useSession} from "next-auth/react";
 
-import {cn} from "@/lib/utils";
+import {cn, getOrgPhoto} from "@/lib/utils";
 import {
     Avatar,
     AvatarFallback,
@@ -82,7 +82,7 @@ export default function OrganizationSelector({
                             <div className="flex flex-row items-center justify-between">
                                 <Avatar className="h-5 w-5">
                                     <AvatarImage
-                                        src={`https://avatar.vercel.sh/${selectedOrganization?.organization.id}.png`}
+                                        src={getOrgPhoto(selectedOrganization?.organization)}
                                         alt={selectedOrganization?.organization.name || ""}
                                         className="grayscale"
                                     />
@@ -100,7 +100,7 @@ export default function OrganizationSelector({
                         >
                             <Avatar className="mr-2 h-5 w-5">
                                 <AvatarImage
-                                    src={`https://avatar.vercel.sh/${selectedOrganization?.organization.id}.png`}
+                                    src={getOrgPhoto(selectedOrganization?.organization)}
                                     alt={selectedOrganization?.organization.name || ""}
                                     className="grayscale"
                                 />
@@ -127,7 +127,7 @@ export default function OrganizationSelector({
                                     >
                                         <Avatar className="mr-2 h-5 w-5">
                                             <AvatarImage
-                                                src={`https://avatar.vercel.sh/${org.organization.id}.png`}
+                                                src={getOrgPhoto(org?.organization)}
                                                 alt={org.organization.name || ""}
                                                 className="grayscale"
                                             />
