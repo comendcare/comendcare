@@ -5,7 +5,7 @@ import { ScrollArea } from "./ui/scroll-area"
 import StatusButton, { StatusType } from "./milestone-status-button"
 import { FaDollarSign } from "react-icons/fa6"
 import { Label } from "./ui/label"
-import { TaskType } from "./milestone-node"
+import { TaskType } from "./private-milestone-node"
 
 export function MilestoneDetails({ milestoneData }: { milestoneData: any }) {
     return (

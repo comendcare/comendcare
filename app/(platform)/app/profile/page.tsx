@@ -29,6 +29,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "sonner";
 import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import { ProfilePhoto } from "@/components/profile-photo";
+import { PublicRoadmap } from "@/components/public-roadmap";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -210,6 +211,7 @@ export default async function ProfilePage() {
                                     {/*<PAGProfileAssetsAndProjectsCard/>*/}
                                     <PAGProfileAssetsAndProjectsHoverableCard/>
                                     <PAGProfileResearchPlanCard roadmapItems={dbMilestones}/>
+                                    {/* <PublicRoadmap roadmap={organization?.roadmaps[1] || []} /> */}
                                 </TabsContent>
                                 <TabsContent value="activity" className="mt-0">
                                     <PAGProfileActivityCard/>

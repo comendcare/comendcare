@@ -18,7 +18,7 @@ import {monthsList} from "@/lib/data";
 import { Badge } from "./ui/badge"
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
 
-export type MilestoneNode = Node<
+export type PrivateMilestoneNode = Node<
     {
         nodeId: string
         title: string
@@ -49,7 +49,7 @@ export interface TaskType {
 
 type StatusType = "TODO" | "INPROGRESS" | "DONE"
 
-function MilestoneNode(props: NodeProps<MilestoneNode>) {
+function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     const handleEditClick = () => {
         if (props.data?.handleEditClick) {
             props.data.handleEditClick(props?.id)
@@ -75,7 +75,7 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
                     </Badge>
                 </span>
                 
-                {(props.data?.startDate?.getMonth() || props.data?.endDate?.getFullYear()) && (
+                {(props.data?.startDate && props.data?.endDate && props.data.startDate?.getMonth() || props.data?.endDate?.getFullYear()) && (
                     <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
                 )}
 
@@ -124,4 +124,4 @@ function MilestoneNode(props: NodeProps<MilestoneNode>) {
     )
 }
 
-export default memo(MilestoneNode)
+export default memo(PrivateMilestoneNode)
