@@ -6,7 +6,7 @@ import {TooltipProvider} from "@/components/ui/tooltip";
 import {ResizablePanel, ResizablePanelGroup, ResizableHandle} from "@/components/ui/resizable";
 import {Separator} from "@/components/ui/separator";
 import {AppNav} from "@/components/app-nav";
-import {Cog, LayoutDashboard, Newspaper, Store, User, Workflow} from "lucide-react";
+import {Cog, LayoutDashboard, Newspaper, Store, User, Workflow, Pin} from "lucide-react";
 import {cn} from "@/lib/utils";
 import Image from "next/image";
 import logo from "@/public/logos/comend-logo.png";
@@ -159,6 +159,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                             isCollapsed={isCollapsed}
                             links={[
                                 {title: "Profile", icon: User, variant: "ghost", href: "/app/profile"},
+                                {title: "Kanban", icon: Pin, variant: "ghost", href: "/app/kanban"},
                                 {
                                     title: "Feed",
                                     // label: "128",

@@ -50,14 +50,14 @@ export default function ConditionProfilePatientGroupCard({organization}: {organi
         >
             <div className="flex flex-col">
                 <CardHeader className="flex flex-row items-center justify-between gap-4">
-                    <CardTitle className="text-lg text-wrap line-clamp-2">
-                        {organization?.name}
-                    </CardTitle>
                     <img
                         alt=""
                         src={createDicebearAvatar(pag.groupName, 50, 40, "identicon")}
                         className="h-16 w-16 rounded-full"
                     />
+                    <CardTitle className="text-lg text-wrap line-clamp-2">
+                        {organization?.name}
+                    </CardTitle>
                 </CardHeader>
 
                 <CardContent>
