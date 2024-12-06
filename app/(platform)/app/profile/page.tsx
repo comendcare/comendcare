@@ -40,7 +40,7 @@ export default async function ProfilePage() {
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
     let organization = null
-    let dbMilestones = []
+    // let dbMilestones = []
     if (session?.user.organizationId) {
         const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
         if (response.success) {
@@ -89,22 +89,32 @@ export default async function ProfilePage() {
             );
         }
       
-        dbMilestones = await prisma.milestone.findMany({
-            where: { roadmapId: organization?.roadmaps?.[0]?.id },
-            include: { 
-                papers: true,
-                asset: {
-                    include: { contacts: true, attachments: true }
+        // dbMilestones = await prisma.milestone.findMany({
+        //     where: { roadmapId: organization.roadmaps[0].id },
+        //     include: { 
+        //         papers: true,
+        //         asset: {
+        //             include: { contacts: true, attachments: true }
+        //         },
+        //         RFP: {
+        //             include: { contacts: true, attachments: true }
+        //         },
+        //         tasks: {
+        //             orderBy: { orderPosition: 'asc' },
+        //             include: {
+        //                 checklist: { orderBy: { orderPosition: 'asc' } }
+        //             }
+        //         } 
+        //     }
+        // })
+        let roadmaps = await prisma.roadmap.findMany({
+            where: { organizationId: organization.id },
+            include: {
+                nodes: {
+                    include: { data: true }
                 },
-                RFP: {
-                    include: { contacts: true, attachments: true }
-                },
-                tasks: {
-                    orderBy: { orderPosition: 'asc' },
-                    include: {
-                        checklist: { orderBy: { orderPosition: 'asc' } }
-                    }
-                } 
+                edges: true,
+                milestones: true
             }
         })
 
@@ -208,10 +218,9 @@ export default async function ProfilePage() {
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="roadmap" className="flex flex-col space-y-4">
-                                    {/*<PAGProfileAssetsAndProjectsCard/>*/}
-                                    <PAGProfileAssetsAndProjectsHoverableCard/>
-                                    <PAGProfileResearchPlanCard roadmapItems={dbMilestones}/>
-                                    {/* <PublicRoadmap roadmap={organization?.roadmaps[1] || []} /> */}
+                                    <PAGProfileAssetsAndProjectsCard/>
+                                    {/* <PAGProfileResearchPlanCard roadmapItems={dbMilestones}/> */}
+                                    <PublicRoadmap roadmap={roadmaps[0]} />
                                 </TabsContent>
                                 <TabsContent value="activity" className="mt-0">
                                     <PAGProfileActivityCard/>

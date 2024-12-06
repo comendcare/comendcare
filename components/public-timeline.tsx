@@ -8,7 +8,7 @@ export const PublicTimelineView = ({ roadmap }: { roadmap: any}) => {
     console.log(`milestones`, roadmap.milestones)
     return (
         <ol className="relative border-s border-gray-200 dark:border-gray-700 space-y-8">
-            {roadmap?.milestones?.filter((milestone: any) => milestone.private == false).map((item: any, index: number) => (
+            {roadmap?.milestones?.map((item: any, index: number) => (
                 <li key={index} className="ms-6">
                     <span
                         className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
@@ -18,7 +18,7 @@ export const PublicTimelineView = ({ roadmap }: { roadmap: any}) => {
                                 d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
                         </svg>
                     </span>
-                    <div className="flex flex-row items-center justify-between">
+                    <div className="flex flex-row items-center justify-between gap-8 ">
                         <h3 className="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white">
                             {item.title}
                             {item.label && (
@@ -28,6 +28,11 @@ export const PublicTimelineView = ({ roadmap }: { roadmap: any}) => {
                                 </span>
                             )}
                         </h3>
+                        {item.private && (
+                            <div className="grow flex items-start">
+                                <PrivateBadge />
+                            </div>
+                        )}
                         <time
                             className="block mb-2 font-semibold leading-none dark:text-gray-500">
                             {getDates(item)}
