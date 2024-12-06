@@ -9,18 +9,18 @@ export default function OrganizationOnboardingPage() {
                 <div className="space-y-2">
                     <div className="flex flex-row justify-between">
                         <h1 className="text-xl font-semibold">
-                            Organization onboarding
+                            Organization Onboarding
                         </h1>
 
-                        <p className="inline-flex flex-row justify-center items-center gap-x-2 text-xl">
+                        <p
+                            className="inline-flex flex-row justify-center items-center gap-x-2 w-min text-base truncate rounded-md bg-stone-100 px-4 py-2 font-medium text-stone-600 transition-colors dark:bg-stone-800 dark:text-stone-400"
+                        >
                             <Timer/>
-                            {`Estimated time: 5 min`}
+                            {`< 5 min`}
                         </p>
                     </div>
                     <p>
-                        {`We have a few questions about your organization to help get your profile started.
-                    You can join an organization if it already exists on Comend, or create a new one.
-                    `}
+                        {`To help set up your profile, please answer a few questions about your organization. You can either join an existing organization on Comend or create a new one.`}
                     </p>
                 </div>
 

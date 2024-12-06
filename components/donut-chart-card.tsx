@@ -100,30 +100,32 @@ export const DonutChartCard = () => {
                         </div>
                     </>
                     : <div className="h-full flex flex-col items-center justify-center">
-                    <Image
-                        alt="Organization not verified"
-                        src="https://illustrations.popsy.co/gray/surreal-flying-bulbs.svg"
-                        width={400}
-                        height={400}
-                        className="dark:hidden"
-                    />
-                    <Image
-                        alt="Organization not verified"
-                        src="https://illustrations.popsy.co/white/surreal-flying-bulbs.svg"
-                        width={400}
-                        height={400}
-                        className="hidden dark:block"
-                    />
-                    <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                        {`You don't have any roadmaps yet.`}
-                    </p>
-                    <Link
-                        className={cn(buttonVariants({variant: "default"}))}
-                        href={`/app/roadmap`}
-                    >
-                        Create roadmap
-                    </Link>
-                </div>
+                        <Image
+                            alt="Organization not verified"
+                            src="https://illustrations.popsy.co/gray/surreal-flying-bulbs.svg"
+                            width={300}
+                            height={300}
+                            className="dark:hidden"
+                        />
+                        <Image
+                            alt="Organization not verified"
+                            src="https://illustrations.popsy.co/white/surreal-flying-bulbs.svg"
+                            width={300}
+                            height={300}
+                            className="hidden dark:block"
+                        />
+                        <div className="flex flex-col space-y-4">
+                            <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                                {`You don't have any roadmaps yet.`}
+                            </p>
+                            <Link
+                                className={cn(buttonVariants({variant: "default"}))}
+                                href={`/app/roadmap`}
+                            >
+                                Create roadmap
+                            </Link>
+                        </div>
+                    </div>
                 }
             </CardContent>
         </Card>

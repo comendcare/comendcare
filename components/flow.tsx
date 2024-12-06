@@ -100,8 +100,8 @@ export const FlowView = ({
                 type: defaultData?.type || 'NOTYPE',
                 title: defaultData?.title || `New Milestone`,
                 ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                papers: defaultData?.papers || [],
-                tasks: defaultData?.tasks || [],
+                // papers: defaultData?.papers || [],
+                // tasks: defaultData?.tasks || [],
                 status: defaultData?.status || "TODO"
             }
         }
