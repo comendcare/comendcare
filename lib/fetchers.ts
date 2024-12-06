@@ -103,6 +103,9 @@ export async function getRoadmapsForOrganization(domain: string) {
             nodes: {
                 include: {
                     data: true
+                },
+                where: {
+                    data: { private: false }
                 }
             },
             edges: true,
