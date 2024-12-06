@@ -2,8 +2,36 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import PAGAnalyticsBarChart from "@/components/pag-analytics-bar-chart";
 import PAGAnalyticsLineChart from "@/components/pag-analytics-line-chart";
 import {DonutChartCard} from "@/components/donut-chart-card";
+import {Eye, Users, Workflow} from "lucide-react";
+import {MagnifyingGlassIcon} from "@radix-ui/react-icons";
+import prisma from "@/lib/prisma"
+import {getSession} from "@/lib/auth";
 
-export default function PAGDashboardAnalyticsTab() {
+export default async function PAGDashboardAnalyticsTab() {
+    const session = await getSession()
+
+    if (!session?.user.organizationId) {
+        return <div>No session or organization ID found.</div>;
+    }
+
+    const organization = await prisma.organization.findUnique({
+        where: { id: session.user.organizationId },
+        include: {
+            roadmaps: true,
+            members: true
+        },
+    });
+
+    if (!organization) {
+        return <div>No organization data available.</div>;
+    }
+
+    const milestones = organization.roadmaps[0]
+        ? await prisma.milestone.findMany({
+            where: { roadmapId: organization.roadmaps[0].id },
+        })
+        : []
+
     return (
         <div className="p-4 space-y-4">
             <div className="space-y-2 sm:flex-auto">
@@ -18,74 +46,12 @@ export default function PAGDashboardAnalyticsTab() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Total Revenue
+                            Search Appearances
                         </CardTitle>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            className="h-4 w-4 text-muted-foreground"
-                        >
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                        </svg>
+                        <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground"/>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">$45,231.89</div>
-                        <p className="text-xs text-muted-foreground">
-                            +20.1% from last month
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Subscriptions
-                        </CardTitle>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            className="h-4 w-4 text-muted-foreground"
-                        >
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-                        </svg>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">+2350</div>
-                        <p className="text-xs text-muted-foreground">
-                            +180.1% from last month
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Sales</CardTitle>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            className="h-4 w-4 text-muted-foreground"
-                        >
-                            <rect width="20" height="14" x="2" y="5" rx="2"/>
-                            <path d="M2 10h20"/>
-                        </svg>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">+12,234</div>
+                        <div className="text-2xl font-bold">+1223</div>
                         <p className="text-xs text-muted-foreground">
                             +19% from last month
                         </p>
@@ -94,26 +60,43 @@ export default function PAGDashboardAnalyticsTab() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Active Now
+                            Profile views
                         </CardTitle>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            className="h-4 w-4 text-muted-foreground"
-                        >
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                        </svg>
+                        <Eye className="h-4 w-4 text-muted-foreground"/>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">+573</div>
                         <p className="text-xs text-muted-foreground">
                             +201 since last hour
                         </p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Milestones
+                        </CardTitle>
+                        <Workflow className="h-4 w-4 text-muted-foreground"/>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{milestones.length}</div>
+                        {/*<p className="text-xs text-muted-foreground">*/}
+                        {/*    +20.1% from last month*/}
+                        {/*</p>*/}
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Members
+                        </CardTitle>
+                        <Users className="h-4 w-4 text-muted-foreground"/>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{organization.members.length}</div>
+                        {/*<p className="text-xs text-muted-foreground">*/}
+                        {/*    +180.1% from last month*/}
+                        {/*</p>*/}
                     </CardContent>
                 </Card>
             </div>

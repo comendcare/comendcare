@@ -58,6 +58,8 @@ model Member {
   updatedAt      DateTime     @default(now()) @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
+
+  @@unique([userId, organizationId])
 }
 
 model Invitation {
@@ -207,22 +209,26 @@ model Node {
 }
 
 model Milestone {
-  id          String        @id @unique @default(uuid())
-  node        Node?         @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  nodeId      String?       @unique
+  id          String               @id @unique @default(uuid())
+  node        Node?                @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  nodeId      String?              @unique
   title       String
   description String?
   startDate   DateTime?
   endDate     DateTime?
   budget      Int?
-  papers      String[]
+  papers      ExternalAttachment[]
   notes       String?
   status      StatusType
   tasks       Task[]
   roadmapId   String
-  roadmap     Roadmap       @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  private     Boolean       @default(false)
-  type        MilestoneType @default(NOTYPE)
+  roadmap     Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  private     Boolean              @default(false)
+  type        MilestoneType        @default(NOTYPE)
+  RFP         RFP?                 @relation(fields: [RFPId], references: [id])
+  RFPId       String?
+  asset       Asset?               @relation(fields: [assetId], references: [id])
+  assetId     String?
 }
 
 enum MilestoneType {
@@ -269,6 +275,63 @@ model ChecklistItem {
   taskId        String
   task          Task    @relation(fields: [taskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   orderPosition Int? // order position in the task checklist
+}
+
+model RFP {
+  id            String               @id @unique @default(uuid())
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  name          String
+  funding       Int
+  description   String?
+  contacts      ExternalContact[]
+  attachments   ExternalAttachment[]
+  researchFocus MilestoneType        @default(NOTYPE)
+  openTo        RFPOpenToType        @default(ALL)
+  startDate     DateTime?
+  endDate       DateTime?
+  Milestone     Milestone[]
+}
+
+model Asset {
+  id          String               @id @unique @default(uuid())
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  name        String
+  description String?
+  contacts    ExternalContact[]
+  attachments ExternalAttachment[]
+  Milestone   Milestone[]
+}
+
+model ExternalAttachment {
+  id          String     @id @unique @default(uuid())
+  name        String?
+  link        String
+  RFP         RFP?       @relation(fields: [rFPId], references: [id])
+  rFPId       String?
+  Asset       Asset?     @relation(fields: [assetId], references: [id])
+  assetId     String?
+  Milestone   Milestone? @relation(fields: [milestoneId], references: [id])
+  milestoneId String?
+}
+
+model ExternalContact {
+  id      String  @id @unique @default(uuid())
+  name    String
+  role    String?
+  email   String
+  RFP     RFP?    @relation(fields: [rFPId], references: [id])
+  rFPId   String?
+  Asset   Asset?  @relation(fields: [assetId], references: [id])
+  assetId String?
+}
+
+enum RFPOpenToType {
+  CRO
+  ACADEMIC
+  ALL
+  NONE
 }
 
 model Edge {

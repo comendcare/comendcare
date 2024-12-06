@@ -1,10 +1,11 @@
 import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog";
-import {getMemberRequests, getMembersAndInvitees} from "@/lib/actions";
 import { getSession } from "@/lib/auth";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { createDicebearAvatar } from "@/lib/utils";
 import { FaUserXmark } from "react-icons/fa6";
 import Image from "next/image";
+import {getMemberRequests} from "@/lib/fetchers";
+import {toast} from "sonner";
 
 export default async function PAGDashboardRequestsTab() {
     const session = await getSession();
@@ -36,7 +37,16 @@ export default async function PAGDashboardRequestsTab() {
         );
     }
 
-    const {fetchedMemberRequests = []} = await getMemberRequests(session.user.organizationId);
+    let fetchedMemberRequests: any[] = []; // Initialize the variable with an empty array
+
+    const response = await getMemberRequests(session.user.organizationId);
+
+    if (response.success) {
+        fetchedMemberRequests = response.data?.fetchedMemberRequests ?? []; // Access the nested data properly and default to an empty array if undefined
+    } else {
+        console.error(response.error);
+        toast.error(response.error);
+    }
 
     return (
         <div className="p-4">

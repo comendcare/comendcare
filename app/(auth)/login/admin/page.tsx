@@ -7,7 +7,7 @@ import logo from "@/public/logos/comend-logo.png"
 import {useSearchParams} from "next/navigation";
 import {toast} from "sonner";
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
     const searchParams = useSearchParams();
     const error = searchParams.get("error");
 

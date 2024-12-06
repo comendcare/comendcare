@@ -14,18 +14,20 @@ import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {PAGProfileResearchPlanCard} from "@/components/pag-profile-research-plan-card";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {getOrganizationFromOrganizationId} from "@/lib/actions";
 import {getSession} from "@/lib/auth";
 import Image from "next/image"
 import Link from "next/link";
 import {PAGProfileAssetsCard} from "@/components/pag-profile-assets-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
+import prisma from "@/lib/prisma"
 import {PAGProfileOpenRFPsCard} from "@/components/pag-profile-open-rfps-card";
 import EditPAGProfileDialog from "@/components/edit-pag-profile-page";
-import {getConditionsDataFromOrgId} from "@/lib/fetchers";
+import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {PAGProfileAssetsAndProjectsCard} from "@/components/pag-profile-assets-and-projects-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
-
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {toast} from "sonner";
+import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -36,13 +38,24 @@ export default async function ProfilePage() {
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
     let organization = null
+    let dbMilestones = []
     if (session?.user.organizationId) {
-        organization = await getOrganizationFromOrganizationId(session?.user.organizationId)
+        const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
+        if (response.success) {
+            organization = response.data
+        } else {
+            console.error(response.error)
+        }
     }
 
     let conditions = null
     if (session?.user.organizationId) {
-        conditions = await getConditionsDataFromOrgId(session?.user.organizationId)
+        const response = await getConditionsDataFromOrgId(session?.user.organizationId)
+        if (response.success) {
+            conditions = response.data
+        } else {
+            console.error(response.error)
+        }
     }
 
     if (organization) {
@@ -73,6 +86,25 @@ export default async function ProfilePage() {
                 </div>
             );
         }
+      
+        dbMilestones = await prisma.milestone.findMany({
+            where: { roadmapId: organization.roadmaps?.[0].id },
+            include: { 
+                papers: true,
+                asset: {
+                    include: { contacts: true, attachments: true }
+                },
+                RFP: {
+                    include: { contacts: true, attachments: true }
+                },
+                tasks: {
+                    orderBy: { orderPosition: 'asc' },
+                    include: {
+                        checklist: { orderBy: { orderPosition: 'asc' } }
+                    }
+                } 
+            }
+        })
 
         // Existing verified organization rendering logic
         return (
@@ -146,16 +178,36 @@ export default async function ProfilePage() {
                         </div>
                     </div>
                     <div className="grid grid-cols-6 gap-4">
-                        <div className="col-span-2 space-y-4">
-                            <PagProfileAboutCard organization={organization}/>
-                            <PAGProfileConditionsCard conditions={conditions}/>
+                        <div className="relative col-span-2 space-y-4">
+                            <div className="sticky top-4 space-y-4">
+                                <PagProfileAboutCard organization={organization}/>
+                                <PAGProfileConditionsCard conditions={conditions}/>
+                            </div>
                             {/*<PAGProfileAssetsCard/>*/}
                             {/*<PAGProfileOpenRFPsCard/>*/}
                         </div>
-                        <div className="col-span-4 flex flex-col space-y-4">
-                            <PAGProfileAssetsAndProjectsCard/>
-                            <PAGProfileResearchPlanCard/>
-                            <PAGProfileActivityCard/>
+                        <div className="col-span-4">
+                            <Tabs defaultValue="roadmap" className="w-full">
+                                <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger value="roadmap">
+                                        Roadmap
+                                    </TabsTrigger>
+                                    <TabsTrigger
+                                        value="activity"
+                                        className="organization-profile-tour-step6"
+                                    >
+                                        Activity
+                                    </TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="roadmap" className="flex flex-col space-y-4">
+                                    {/*<PAGProfileAssetsAndProjectsCard/>*/}
+                                    <PAGProfileAssetsAndProjectsHoverableCard/>
+                                    <PAGProfileResearchPlanCard roadmapItems={dbMilestones}/>
+                                </TabsContent>
+                                <TabsContent value="activity" className="mt-0">
+                                    <PAGProfileActivityCard/>
+                                </TabsContent>
+                            </Tabs>
                         </div>
                     </div>
                 </div>

@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
 import SiteSettingsNav from "./nav"
 
-export default async function SiteAnalyticsLayout({
+export default async function OrganizationAnalyticsLayout({
     params,
     children
 }: {

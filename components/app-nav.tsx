@@ -94,7 +94,8 @@ export function AppNav({ links, isCollapsed, children }: NavProps) {
                                     link.variant === "default" &&
                                     "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
                                     "justify-start",
-                                    isActive && "bg-muted text-primary font-medium"
+                                    isActive && "bg-muted text-primary font-medium",
+                                    link.title === "Settings" && "organization-profile-tour-step2"
                                 )}
                             >
                                 <link.icon className="mr-2 h-4 w-4" />

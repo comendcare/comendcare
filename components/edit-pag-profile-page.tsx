@@ -7,10 +7,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import {useCallback, useEffect, useState} from "react";
 import {
-    checkSubdomainAvailability,
-    createOrganization,
-    getOrganizationFromOrganizationId,
-    getUser
+    createOrganization
 } from "@/lib/actions";
 import {AddressType} from "@/lib/types";
 import {Input} from "@/components/ui/input";
@@ -26,7 +23,10 @@ import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
-import {getOrganizationData} from "@/lib/fetchers";
+import {
+    checkSubdomainAvailability,
+    getOrganizationFromOrganizationId,
+} from "@/lib/fetchers";
 import {FaPen, FaUpload} from "react-icons/fa6";
 import {
     Dialog,
@@ -229,7 +229,15 @@ export default function EditPAGProfileDialog() {
     useEffect(() => {
         async function fetchUserData() {
             if (session?.user?.organizationId) {
-                const organizationData = await getOrganizationFromOrganizationId(session.user.organizationId);
+                let organizationData
+                const response = await getOrganizationFromOrganizationId(session.user.organizationId);
+                if (response.success) {
+                    organizationData = response.data
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+
                 if (organizationData) {
                     const incorporationStatusMap: Record<string, "yes" | "no" | "no-but" | undefined> = {
                         YES: "yes",
