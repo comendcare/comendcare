@@ -9,6 +9,8 @@ import { Button } from "./ui/button"
 import { GripVertical } from "lucide-react"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 import { cn } from "@/lib/utils"
+import {Badge} from "@/components/ui/badge";
+import NewColumnDialog from "@/components/new-column-dialog";
 
 export interface Column {
     id: UniqueIdentifier
@@ -58,7 +60,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     }
 
     const variants = cva(
-        "h-full max-h-[800px] w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+        "h-full w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
         {
             variants: {
                 dragging: {
@@ -83,10 +85,24 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
             })}
         >
             <CardHeader className={cn(
-                "p-4 font-semibold border-b-2 text-left flex flex-row space-between items-center",
-                column.styling
+                "p-4 font-semibold border-b-2 text-left flex flex-row space-between items-center"
             )}>
-                <CardTitle>{column.title}</CardTitle>
+                <CardTitle className="flex flex-row space-between items-center">
+                    <Button
+                        variant="ghost"
+                        {...attributes}
+                        {...listeners}
+                        className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
+                    >
+                        <span className="sr-only">{`Move column: ${column.title}`}</span>
+                        <GripVertical />
+                    </Button>
+                    <Badge
+                        size="large"
+                    >
+                        {column.title}
+                    </Badge>
+                </CardTitle>
             </CardHeader>
             <ScrollArea className="h-full">
                 <CardContent className="flex flex-grow flex-col gap-2 p-2">
@@ -121,7 +137,8 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
             type="auto"
         >
             {/* calculate the same height as the parent TabsContent - because scroll areas don't like h-full >:( */}
-            <div className="h-[calc(100vh-3.5rem)] p-4 flex gap-4 items-center flex-row justify-center">
+            <div className="h-[calc(100vh-10rem)] flex gap-4 items-center flex-row justify-start">
+                <NewColumnDialog/>
                 {children}
             </div>
             <ScrollBar orientation="horizontal" />

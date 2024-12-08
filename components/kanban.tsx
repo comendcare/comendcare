@@ -74,7 +74,7 @@ function Kanban({ initTasks }: { initTasks: Task[] }) {
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
     const columnsId = useMemo(() => columns.map(col => col.id), [columns])
 
-    // kanban requires it's own state outside of the zustand state, so we can move things around properly
+    // kanban requires its own state outside of the zustand state, so we can move things around properly
     const [tasks, setTasks] = useState(sortKanbanTasks(initTasks))
 
     const [activeColumn, setActiveColumn] = useState<Column | null>(null)
