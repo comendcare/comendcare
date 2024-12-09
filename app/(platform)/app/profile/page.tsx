@@ -30,6 +30,7 @@ import {toast} from "sonner";
 import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import { ProfilePhoto } from "@/components/profile-photo";
 import { PublicRoadmap } from "@/components/public-roadmap";
+import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -88,25 +89,7 @@ export default async function ProfilePage() {
                 </div>
             );
         }
-      
-        // dbMilestones = await prisma.milestone.findMany({
-        //     where: { roadmapId: organization.roadmaps[0].id },
-        //     include: { 
-        //         papers: true,
-        //         asset: {
-        //             include: { contacts: true, attachments: true }
-        //         },
-        //         RFP: {
-        //             include: { contacts: true, attachments: true }
-        //         },
-        //         tasks: {
-        //             orderBy: { orderPosition: 'asc' },
-        //             include: {
-        //                 checklist: { orderBy: { orderPosition: 'asc' } }
-        //             }
-        //         } 
-        //     }
-        // })
+
         let roadmaps = await prisma.roadmap.findMany({
             where: { organizationId: organization.id },
             include: {
@@ -116,8 +99,18 @@ export default async function ProfilePage() {
                 edges: true,
                 milestones: {
                     include: {
-                        asset: true,
-                        RFP: true
+                        asset: {
+                            include: {
+                                contacts: true,
+                                attachments: true
+                            }
+                        },
+                        RFP: {
+                            include: {
+                                contacts: true,
+                                attachments: true
+                            }
+                        }
                     }
                 }
             }
@@ -225,8 +218,10 @@ export default async function ProfilePage() {
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="roadmap" className="flex flex-col space-y-4">
-                                    <PAGProfileAssetsAndProjectsCard/>
-                                    {/* <PAGProfileResearchPlanCard roadmapItems={dbMilestones}/> */}
+                                    <PAGProfileAssetsAndProjectsHoverableCard 
+                                        assets={roadmaps[0].milestones.filter(milestone => milestone.asset).map(milestone => milestone.asset)}
+                                        rfps={roadmaps[0].milestones.filter(milestone => milestone.RFP).map(milestone => milestone.RFP)}
+                                    />
                                     <PublicRoadmap roadmap={roadmaps[0]} />
                                 </TabsContent>
                                 <TabsContent value="activity" className="mt-0">

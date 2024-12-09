@@ -9,8 +9,6 @@ import { Button } from "./ui/button"
 import { GripVertical } from "lucide-react"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 import { cn } from "@/lib/utils"
-import {Badge} from "@/components/ui/badge";
-import NewColumnDialog from "@/components/new-column-dialog";
 import {FaPlus} from "react-icons/fa6";
 import {Column} from "@prisma/client";
 
@@ -57,7 +55,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     }
 
     const variants = cva(
-        "h-min w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+        "h-full w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
         {
             variants: {
                 dragging: {
@@ -91,14 +89,14 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
                         {...listeners}
                         className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
                     >
-                        <span className="sr-only">{`Move column: ${column.name}`}</span>
+                        {/* <span className="sr-only">{`Move column: ${column.title}`}</span> */}
                         <GripVertical />
                     </Button>
-                    <Badge
+                    {/* <Badge
                         size="large"
                     >
-                        {column.name}
-                    </Badge>
+                        {column.title}
+                    </Badge> */}
                 </CardTitle>
             </CardHeader>
             <ScrollArea className="h-full">
@@ -140,8 +138,8 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
             type="auto"
         >
             {/* calculate the same height as the parent TabsContent - because scroll areas don't like h-full >:( */}
-            <div className="h-[calc(100vh-10rem)] flex gap-4 items-start flex-row justify-start">
-                <NewColumnDialog/>
+            <div className="h-[calc(100vh-10rem)] flex gap-4 items-center flex-row justify-start">
+                {/* <NewColumnDialog/> */}
                 {children}
             </div>
             <ScrollBar orientation="horizontal" />
