@@ -28,7 +28,7 @@ import StatusButton from "./milestone-status-button"
 import {nanoid} from "nanoid"
 import {FaTrash} from "react-icons/fa6"
 import {Checkbox} from "./ui/checkbox"
-import {toast} from "sonner"
+import {toast, Toaster} from "sonner"
 import {
     arrayMove,
     SortableContext,
@@ -56,6 +56,8 @@ import {CSS} from "@dnd-kit/utilities"
 import {coordinateGetter} from "@/lib/multiple-containers-keyboard-preset"
 import {cva} from "class-variance-authority"
 import {debounce} from "lodash"
+import {SettingsProvider} from "@/components/editor/settings";
+import {PlateEditor} from "@/components/editor/plate-editor";
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -269,6 +271,12 @@ export function EditTaskForm({
                             </FormItem>
                         )}
                     />
+
+                    <div className="w-full" data-registry="plate">
+                        <SettingsProvider>
+                            <PlateEditor/>
+                        </SettingsProvider>
+                    </div>
 
                     <FormField
                         control={form.control}
