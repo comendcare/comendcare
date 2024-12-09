@@ -4,7 +4,7 @@ import * as React from "react";
 import {Check, ChevronsUpDown, PlusCircle} from "lucide-react";
 import {useSession} from "next-auth/react";
 
-import {cn, getOrgPhoto} from "@/lib/utils";
+import {cn} from "@/lib/utils";
 import {
     Avatar,
     AvatarFallback,
@@ -39,6 +39,7 @@ import {
 import {MemberWithOrganization} from "@/app/(platform)/app/layout";
 import {FaCity} from "react-icons/fa6";
 import {useEffect} from "react";
+import { ProfilePhoto } from "./profile-photo";
 
 interface TeamSwitcherProps {
     isCollapsed: boolean,
@@ -80,14 +81,19 @@ export default function OrganizationSelector({
                     {isCollapsed ? (
                         <Button variant="outline" className="w-[48px]">
                             <div className="flex flex-row items-center justify-between">
-                                <Avatar className="h-5 w-5">
+                                {/* <Avatar className="h-5 w-5">
                                     <AvatarImage
                                         src={getOrgPhoto(selectedOrganization?.organization)}
                                         alt={selectedOrganization?.organization.name || ""}
                                         className="grayscale"
                                     />
                                     <AvatarFallback>{selectedOrganization?.organization.name?.[0]}</AvatarFallback>
-                                </Avatar>
+                                </Avatar> */}
+                                <ProfilePhoto 
+                                    img={selectedOrganization?.organization?.image}
+                                    name={selectedOrganization?.organization?.name}
+                                    className="h-5 w-5"
+                                />
                             </div>
                         </Button>
                     ) : (
@@ -98,14 +104,19 @@ export default function OrganizationSelector({
                             aria-label="Select an organization"
                             className={cn("w-full justify-between truncate")}
                         >
-                            <Avatar className="mr-2 h-5 w-5">
+                            {/* <Avatar className="mr-2 h-5 w-5">
                                 <AvatarImage
                                     src={getOrgPhoto(selectedOrganization?.organization)}
                                     alt={selectedOrganization?.organization.name || ""}
                                     className="grayscale"
                                 />
                                 <AvatarFallback>{selectedOrganization?.organization.name?.[0]}</AvatarFallback>
-                            </Avatar>
+                            </Avatar> */}
+                            <ProfilePhoto 
+                                img={selectedOrganization?.organization?.image}
+                                name={selectedOrganization?.organization?.name}
+                                className="mr-2 h-5 w-5"
+                            />
                             <p className="truncate">
                                 {selectedOrganization?.organization.name}
                             </p>
@@ -125,7 +136,7 @@ export default function OrganizationSelector({
                                         onSelect={() => handleOrganizationChange(org)}
                                         className="text-sm"
                                     >
-                                        <Avatar className="mr-2 h-5 w-5">
+                                        {/* <Avatar className="mr-2 h-5 w-5">
                                             <AvatarImage
                                                 src={getOrgPhoto(org?.organization)}
                                                 alt={org.organization.name || ""}
@@ -134,7 +145,12 @@ export default function OrganizationSelector({
                                             <AvatarFallback>
                                                 {org.organization.name?.[0]}
                                             </AvatarFallback>
-                                        </Avatar>
+                                        </Avatar> */}
+                                        <ProfilePhoto 
+                                            img={org?.organization?.image}
+                                            name={org?.organization?.name}
+                                            className="mr-2 h-5 w-5"
+                                        />
                                         {org.organization.name}
                                         <Check
                                             className={cn(
