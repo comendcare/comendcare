@@ -1,19 +1,29 @@
-import type { UniqueIdentifier } from "@dnd-kit/core"
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { cva } from "class-variance-authority"
-import { GripVertical } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { StatusType } from "./milestone-status-button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog"
-import { EditTaskForm } from "./edit-task-form"
-import { useState } from "react"
-import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
-import { useShallow } from "zustand/react/shallow"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { Checkbox } from "./ui/checkbox"
+import type {UniqueIdentifier} from "@dnd-kit/core"
+import {useSortable} from "@dnd-kit/sortable"
+import {CSS} from "@dnd-kit/utilities"
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
+import {Button} from "@/components/ui/button"
+import {cva} from "class-variance-authority"
+import {GripVertical} from "lucide-react"
+import {Badge} from "@/components/ui/badge"
+import {StatusType} from "./milestone-status-button"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+    DialogDescription
+} from "./ui/dialog"
+import {EditTaskForm} from "./edit-task-form"
+import {useState} from "react"
+import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
+import {useShallow} from "zustand/react/shallow"
+import {usePathname, useRouter, useSearchParams} from "next/navigation"
+import {Checkbox} from "./ui/checkbox"
+import {Label} from "@/components/ui/label";
+import {Input} from "@/components/ui/input";
 
 export interface Task {
     id: string
@@ -41,8 +51,8 @@ const selector = (state: RoadmapState) => ({
     setSelectedTaskId: state.setSelectedTaskId
 })
 
-export function TaskCard({ task, isOverlay }: TaskCardProps) {
-    const { setSelectedTaskId } = useRoadmapStore(useShallow(selector))
+export function TaskCard({task, isOverlay}: TaskCardProps) {
+    const {setSelectedTaskId} = useRoadmapStore(useShallow(selector))
     const {
         setNodeRef,
         attributes,
@@ -69,7 +79,7 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
         transform: CSS.Translate.toString(transform)
     }
 
-    const variants = cva("", {
+    const variants = cva("hover:cursor-pointer hover:bg-slate-100", {
         variants: {
             dragging: {
                 over: "ring-2 opacity-30",
@@ -79,55 +89,75 @@ export function TaskCard({ task, isOverlay }: TaskCardProps) {
     })
 
     return (
-        <Card
-            ref={setNodeRef}
-            style={style}
-            className={variants({
-                dragging: isOverlay
-                    ? "overlay"
-                    : isDragging
-                    ? "over"
-                    : undefined
-            })}
-        >
-            <CardHeader className="px-3 py-3 space-between flex flex-row border-b-2 border-secondary relative">
-                <Button
-                    variant={"ghost"}
-                    {...attributes}
-                    {...listeners}
-                    className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
-                >
-                    <span className="sr-only">Move task</span>
-                    <GripVertical />
-                </Button>
-                <div className="flex flex-col">
-                    <CardTitle className="text-lg">{task?.name}</CardTitle>
-                    <CardDescription>{task?.description}</CardDescription>
-                </div>
-            </CardHeader>
-            <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">
-                <ol id="checklist" className="flex flex-col gap-2">
-                    {task?.checklist?.map(
-                        (item: any, index: number) => (
-                            <li key={index} className="flex gap-2 items-center">
-                                <Checkbox checked={item.complete} disabled={true}/>
-                                <p>{item.name}</p>
-                            </li>
-                        )
-                    )}
-                </ol>
-            </CardContent>
-            <CardFooter>
-                <Button onClick={() => {
-                    setSelectedTaskId(task?.id)
+        <Dialog>
+            <DialogTrigger asChild>
+                <Card
+                    onClick={() => {
+                        // setSelectedTaskId(task?.id)
 
-                    const params = new URLSearchParams(searchParams.toString())
-                    params.delete("task")
-                    params.set("task", task?.id)
-            
-                    router.push(`${pathname}?${params.toString()}`, { scroll: false })
-                }}>Edit Task</Button>
-            </CardFooter>
-        </Card>
+                        const params = new URLSearchParams(searchParams.toString())
+                        params.delete("task")
+                        params.set("task", task?.id)
+
+                        router.push(`${pathname}?${params.toString()}`, {scroll: false})
+                    }}
+                    ref={setNodeRef}
+                    style={style}
+                    className={variants({
+                        dragging: isOverlay
+                            ? "overlay"
+                            : isDragging
+                                ? "over"
+                                : undefined
+                    })}
+                >
+                    <CardHeader className="px-3 py-3 space-between flex flex-row border-b-2 border-secondary relative">
+                        <Button
+                            variant={"ghost"}
+                            {...attributes}
+                            {...listeners}
+                            className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
+                        >
+                            <span className="sr-only">Move task</span>
+                            <GripVertical/>
+                        </Button>
+                        <div className="flex flex-col">
+                            <CardTitle className="text-lg">{task?.name}</CardTitle>
+                            <CardDescription>{task?.description}</CardDescription>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">
+                        <ol id="checklist" className="flex flex-col gap-2">
+                            {task?.checklist?.map(
+                                (item: any, index: number) => (
+                                    <li key={index} className="flex gap-2 items-center">
+                                        <Checkbox checked={item.complete} disabled={true}/>
+                                        <p>{item.name}</p>
+                                    </li>
+                                )
+                            )}
+                        </ol>
+                    </CardContent>
+                </Card>
+            </DialogTrigger>
+            <DialogContent className="">
+                <DialogHeader>
+                    <DialogTitle>Edit Task Details</DialogTitle>
+                    <DialogDescription>
+                        {`Make changes to your profile here. Click save when you're done.`}
+                    </DialogDescription>
+                </DialogHeader>
+                <EditTaskForm
+                    taskData={task}
+                    // onClose={() => setIsEditing(false)}
+                    onClose={() => {
+                    }}
+                />
+                {/*<DialogFooter>*/}
+                {/*    <Button type="submit">Save changes</Button>*/}
+                {/*</DialogFooter>*/}
+            </DialogContent>
+        </Dialog>
+
     )
 }

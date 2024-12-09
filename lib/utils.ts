@@ -6,6 +6,21 @@ import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 
+export function abbreviateNumber(num: number | null | undefined) {
+    if (num === null || num === undefined) return '';
+    if (num < 1000) return num.toString(); // No abbreviation needed
+
+    const units = ['K', 'M', 'B', 'T', 'Q']; // Thousand, Million, Billion, Trillion, Quadrillion
+    let unitIndex = -1;
+
+    while (Math.abs(num) >= 1000 && unitIndex < units.length - 1) {
+        num /= 1000;
+        unitIndex++;
+    }
+
+    return `${parseFloat(num.toFixed(1))}${units[unitIndex]}`;
+}
+
 export const formatMoney = (moneyRaised: number | undefined) => {
     if (moneyRaised === undefined) return "$0";
 

@@ -1,9 +1,9 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import React, { useCallback, useEffect } from "react"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import {zodResolver} from "@hookform/resolvers/zod"
+import React, {useCallback, useEffect} from "react"
+import {useForm} from "react-hook-form"
+import {z} from "zod"
 import {
     Form,
     FormControl,
@@ -12,25 +12,31 @@ import {
     FormItem,
     FormMessage,
 } from "./ui/form"
-import { Input } from "./ui/input"
-import { Textarea } from "./ui/textarea"
-import { Button } from "./ui/button"
-import { ScrollArea } from "./ui/scroll-area"
-import type { StatusType } from "./milestone-status-button"
+import {Input} from "./ui/input"
+import {Textarea} from "./ui/textarea"
+import {Button} from "./ui/button"
+import {ScrollArea} from "./ui/scroll-area"
+import type {StatusType} from "./milestone-status-button"
 import {
     Dialog,
     DialogTrigger
 } from "./ui/dialog"
-import { DeleteTaskDialogContent } from "./delete-task-dialog-content"
-import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
-import { useShallow } from "zustand/react/shallow"
+import {DeleteTaskDialogContent} from "./delete-task-dialog-content"
+import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
+import {useShallow} from "zustand/react/shallow"
 import StatusButton from "./milestone-status-button"
-import { nanoid } from "nanoid"
-import { FaTrash } from "react-icons/fa6"
-import { Checkbox } from "./ui/checkbox"
-import { toast } from "sonner"
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { GripVertical } from "lucide-react"
+import {nanoid} from "nanoid"
+import {FaTrash} from "react-icons/fa6"
+import {Checkbox} from "./ui/checkbox"
+import {toast} from "sonner"
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy
+} from "@dnd-kit/sortable"
+import {GripVertical} from "lucide-react"
 import {
     DndContext,
     type DragEndEvent,
@@ -46,10 +52,10 @@ import {
     MouseSensor,
     closestCorners
 } from "@dnd-kit/core"
-import { CSS } from "@dnd-kit/utilities"
-import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
-import { cva } from "class-variance-authority"
-import { debounce } from "lodash"
+import {CSS} from "@dnd-kit/utilities"
+import {coordinateGetter} from "@/lib/multiple-containers-keyboard-preset"
+import {cva} from "class-variance-authority"
+import {debounce} from "lodash"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -77,15 +83,15 @@ const selector = (state: RoadmapState) => ({
 })
 
 export function EditTaskForm({
-    // milestoneId,
-    taskData,
-    onClose
-}: {
+                                 // milestoneId,
+                                 taskData,
+                                 onClose
+                             }: {
     // milestoneId: string
     taskData: any
     onClose: () => void
 }) {
-    const { setTask } = useRoadmapStore(useShallow(selector))
+    const {setTask} = useRoadmapStore(useShallow(selector))
     const form = useForm<z.infer<typeof editTaskForm>>({
         mode: "onChange",
         resolver: zodResolver(editTaskForm),
@@ -118,16 +124,16 @@ export function EditTaskForm({
     }, [name, status, description, checklist])
 
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
-        const { name, status, description, checklist } = values
+        const {name, status, description, checklist} = values
 
         setTask(
             taskData?.id,
             {
                 name,
                 status,
-                ...(description ? { description } : undefined),
-                ...(checklist 
-                    ? { checklist: checklist.map((item, index) => ({...item, orderPosition: index})) } 
+                ...(description ? {description} : undefined),
+                ...(checklist
+                    ? {checklist: checklist.map((item, index) => ({...item, orderPosition: index}))}
                     : undefined)
             }
         )
@@ -151,17 +157,17 @@ export function EditTaskForm({
         const position = (checklist?.findIndex(item => item.id === id) || 0) + 1
         const length = checklist?.length || 0
 
-        return { name, position, length }
+        return {name, position, length}
     }
 
     const announcements: Announcements = {
-        onDragStart({ active }) {
+        onDragStart({active}) {
             const data = getDraggedData(active?.id.toString())
             const message = `Picked up checklist item ${data.name} at position ${data.position} of ${data.length}`
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
             return message
         },
-        onDragOver({ active, over }) {
+        onDragOver({active, over}) {
             const activeData = getDraggedData(active?.id.toString())
 
             if (over) {
@@ -170,12 +176,12 @@ export function EditTaskForm({
                 if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
                 return message
             }
-        
+
             const message = `Checklist item ${activeData.name} is no longer over a droppable position.`
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
             return message
         },
-        onDragEnd({ active, over }) {
+        onDragEnd({active, over}) {
             const activeData = getDraggedData(active?.id.toString())
 
             if (over) {
@@ -184,12 +190,12 @@ export function EditTaskForm({
                 if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
                 return message
             }
-        
+
             const message = `Checklist item ${activeData} was dropped.`
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
             return message
         },
-        onDragCancel({ active }) {
+        onDragCancel({active}) {
             const activeData = getDraggedData(active?.id.toString())
             const message = `Dragging was cancelled. Checklist item ${activeData.name} was dropped.`
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
@@ -199,155 +205,166 @@ export function EditTaskForm({
 
     return (
         <Form {...form}>
-        <ScrollArea>
-            <form
-                onSubmit={form.handleSubmit(handleFormSubmit)}
-                className="flex flex-col gap-8 p-2 pr-4"
-            >
-                <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col grow">
-                        <FormLabel className="text-xl">{`Task Status:`}</FormLabel>
-                        <FormControl>
-                            <StatusButton
-                                status={
-                                    field?.value as StatusType
-                                }
-                                onStatusChange={status =>
-                                    form.setValue("status", status)
-                                }
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-                />
-
-                <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col grow">
-                        <FormLabel className="text-xl">{`Name:`}</FormLabel>
-                        <FormControl>
-                            <Input
-                                id="name"
-                                placeholder={`Enter a name`}
-                                defaultValue={field.value}
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-                />
-
-                <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col grow">
-                        <FormLabel className="text-xl">{`Description:`}</FormLabel>
-                        <FormControl>
-                            <Textarea
-                                id="description"
-                                placeholder={`Enter a description`}
-                                defaultValue={field.value}
-                                {...field}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-                />
-
-                <FormField
-                control={form.control}
-                name="checklist"
-                render={({ field }) => (
-                    <FormItem className="flex flex-col grow">
-                        <FormLabel className="text-xl">{`Checklist:`}</FormLabel>
-                        <FormControl>
-                            <>
-                            <DndContext 
-                                accessibility={{
-                                    announcements
-                                }}
-                                collisionDetection={closestCorners} 
-                                sensors={sensors} 
-                                onDragEnd={(event) => {
-                                    const { active, over } = event
-
-                                    if (active.id === over?.id) return
-
-                                    const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
-                                    const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
-
-                                    form.setValue('checklist', arrayMove(field?.value || [], originalPosition, newPosition))
-                                }}
-                            >
-                            <ol className="flex flex-col gap-2">
-                                <SortableContext items={field?.value?.map(item => item.id) || []} strategy={verticalListSortingStrategy}>
-                                {field?.value?.map((checklistItem, index) => (
-                                    <ChecklistField 
-                                        key={checklistItem.id}
-                                        index={index}
-                                        item={checklistItem}
-                                        onDelete={() => (
-                                            form.setValue('checklist', field?.value?.filter((t, i) => i !== index))
-                                        )}
-                                        onNameChange={(name) => {
-                                            form.setValue('checklist', field?.value?.map((t, i) => i === index ? {...t, name} : t))
-                                        }}
-                                        onCompleteChange={(complete) => {
-                                            form.setValue('checklist', field?.value?.map((t, i) => i === index ? {...t, complete} : t))
-                                        }}
+            <ScrollArea>
+                <form
+                    onSubmit={form.handleSubmit(handleFormSubmit)}
+                    className="flex flex-col gap-8"
+                >
+                    <FormField
+                        control={form.control}
+                        name="status"
+                        render={({field}) => (
+                            <FormItem className="flex flex-col grow">
+                                <FormLabel className="text-xl">{`Task Status:`}</FormLabel>
+                                <FormControl>
+                                    <StatusButton
+                                        status={
+                                            field?.value as StatusType
+                                        }
+                                        onStatusChange={status =>
+                                            form.setValue("status", status)
+                                        }
+                                        {...field}
                                     />
-                                ))}
-                                </SortableContext>
-                            </ol>
-                            </DndContext>
-                            <Button variant="secondary" onClick={(e: any) => {
-                                e.preventDefault()
-                                form.setValue(
-                                    'checklist',
-                                    [...field?.value || [], { name: 'New Item', complete: false, id: nanoid() }]
-                                )
-                            }}>Add a checklist item</Button>
-                            </>
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-                />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                <span className="flex justify-end gap-4 flex-wrap">
-                    <Dialog>
-                        <DialogTrigger>
-                            <Button type="button" variant={"destructive"}>
-                                Delete Task
-                            </Button>
-                        </DialogTrigger>
-                        <DeleteTaskDialogContent taskData={taskData}/>
-                    </Dialog>
-                    <Button type="submit">Save Changes</Button>
-                </span>
-            </form>
-        </ScrollArea>
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({field}) => (
+                            <FormItem className="flex flex-col grow">
+                                <FormLabel className="text-xl">{`Name:`}</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        id="name"
+                                        placeholder={`Enter a name`}
+                                        defaultValue={field.value}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem className="flex flex-col grow">
+                                <FormLabel className="text-xl">{`Description:`}</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="description"
+                                        placeholder={`Enter a description`}
+                                        defaultValue={field.value}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="checklist"
+                        render={({field}) => (
+                            <FormItem className="flex flex-col grow">
+                                <FormLabel className="text-xl">{`Checklist:`}</FormLabel>
+                                <FormControl>
+                                    <>
+                                        <DndContext
+                                            accessibility={{
+                                                announcements
+                                            }}
+                                            collisionDetection={closestCorners}
+                                            sensors={sensors}
+                                            onDragEnd={(event) => {
+                                                const {active, over} = event
+
+                                                if (active.id === over?.id) return
+
+                                                const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
+                                                const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
+
+                                                form.setValue('checklist', arrayMove(field?.value || [], originalPosition, newPosition))
+                                            }}
+                                        >
+                                            <ol className="flex flex-col gap-2">
+                                                <SortableContext items={field?.value?.map(item => item.id) || []}
+                                                                 strategy={verticalListSortingStrategy}>
+                                                    {field?.value?.map((checklistItem, index) => (
+                                                        <ChecklistField
+                                                            key={checklistItem.id}
+                                                            index={index}
+                                                            item={checklistItem}
+                                                            onDelete={() => (
+                                                                form.setValue('checklist', field?.value?.filter((t, i) => i !== index))
+                                                            )}
+                                                            onNameChange={(name) => {
+                                                                form.setValue('checklist', field?.value?.map((t, i) => i === index ? {
+                                                                    ...t,
+                                                                    name
+                                                                } : t))
+                                                            }}
+                                                            onCompleteChange={(complete) => {
+                                                                form.setValue('checklist', field?.value?.map((t, i) => i === index ? {
+                                                                    ...t,
+                                                                    complete
+                                                                } : t))
+                                                            }}
+                                                        />
+                                                    ))}
+                                                </SortableContext>
+                                            </ol>
+                                        </DndContext>
+                                        <Button variant="secondary" onClick={(e: any) => {
+                                            e.preventDefault()
+                                            form.setValue(
+                                                'checklist',
+                                                [...field?.value || [], {
+                                                    name: 'New Item',
+                                                    complete: false,
+                                                    id: nanoid()
+                                                }]
+                                            )
+                                        }}>Add a checklist item</Button>
+                                    </>
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <span className="flex justify-end gap-4 flex-wrap">
+                        <Dialog>
+                            <DialogTrigger>
+                                <Button type="button" variant={"destructive"}>
+                                    Delete Task
+                                </Button>
+                            </DialogTrigger>
+                            <DeleteTaskDialogContent taskData={taskData}/>
+                        </Dialog>
+                        <Button type="submit">Save Changes</Button>
+                    </span>
+                </form>
+            </ScrollArea>
         </Form>
     )
 }
 
 const ChecklistField = ({
-    index,
-    item,
-    onDelete,
-    onNameChange,
-    onCompleteChange
-}: {
+                            index,
+                            item,
+                            onDelete,
+                            onNameChange,
+                            onCompleteChange
+                        }: {
     index: number
     item: any
     onDelete: () => void
@@ -361,7 +378,7 @@ const ChecklistField = ({
         transform,
         transition,
         isDragging
-    } = useSortable({ id: item.id })
+    } = useSortable({id: item.id})
 
     const style = {
         transition,
@@ -386,9 +403,9 @@ const ChecklistField = ({
     })
 
     return (
-        <li 
-            key={index}  
-            ref={setNodeRef} 
+        <li
+            key={index}
+            ref={setNodeRef}
             style={style}
             className={variants({
                 dragging: isDragging ? "overlay" : undefined
@@ -402,7 +419,7 @@ const ChecklistField = ({
                 className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
             >
                 <span className="sr-only">Move checklist item</span>
-                <GripVertical />
+                <GripVertical/>
             </Button>
             <Checkbox checked={item.complete} onCheckedChange={onCompleteChange}/>
             <div className="grow">
@@ -414,7 +431,7 @@ const ChecklistField = ({
                 />
             </div>
             <Button variant="secondary" size="icon" onClick={deleteTask}>
-                <FaTrash />
+                <FaTrash/>
             </Button>
         </li>
     )
