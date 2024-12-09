@@ -32,36 +32,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
-import { uploadImg } from "@/lib/g-cloud";
-
-export async function handleImageUpload(file: File, data: string | undefined): Promise<string | undefined> {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(file)
-
-        reader.onloadend = async () => {
-            if (data == undefined) {
-                reject('No image data')
-                return
-            }
-
-            const base64data = data.replace(/^data:image\/\w+;base64,/, "")
-
-            const imageUrl = await uploadImg({
-                name: file.name,
-                type: file.type,
-                data: base64data || "",
-            })
-
-            console.log(`image url`, imageUrl)
-            resolve(imageUrl)
-        }
-
-        reader.onerror = error => {
-            reject(error)
-        }
-    })
-}
+import { handleImageUpload } from "@/lib/upload";
 
 const optionSchema = z.object({
     label: z.string(),
