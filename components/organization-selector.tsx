@@ -96,7 +96,7 @@ export default function OrganizationSelector({
                             role="combobox"
                             aria-expanded={open}
                             aria-label="Select an organization"
-                            className={cn("w-[200px] justify-between")}
+                            className={cn("w-full justify-between truncate")}
                         >
                             <Avatar className="mr-2 h-5 w-5">
                                 <AvatarImage
@@ -113,7 +113,7 @@ export default function OrganizationSelector({
                         </Button>
                     )}
                 </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
+                <PopoverContent className="w-full p-0">
                     <Command>
                         {/*<CommandInput placeholder="Search organization..." />*/}
                         <CommandList>
