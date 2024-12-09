@@ -33,7 +33,7 @@ import {faker} from "@faker-js/faker";
 import {bioassets} from "@/lib/data";
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {Condition, Organization} from "@prisma/client";
-import PublicPageFooter from "@/components/public-page-footer";
+import ConditionProfileFooter from "@/components/condition-profile-footer";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
 import ConditionProfilePatientGroupCard from "@/components/condition-profile-patient-group-card";
 import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
@@ -503,7 +503,7 @@ export default async function ConditionPage({
                     </Carousel>
                 </div>
             </div>
-            <PublicPageFooter/>
+            <ConditionProfileFooter/>
         </TooltipProvider>
     )
 }
