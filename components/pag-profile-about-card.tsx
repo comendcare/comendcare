@@ -9,6 +9,7 @@ import Link from "next/link";
 import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {CalendarDays} from "lucide-react";
+import { ProfilePhoto } from "./profile-photo";
 
 const pag = {
     "groupName": "Myhre Syndrome Foundation",
@@ -66,12 +67,16 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
                                     key={index}
                                     className="flex space-x-4"
                                 >
-                                    <Avatar>
+                                    {/* <Avatar>
                                         <AvatarImage src={member.user.image || ""}/>
                                         <AvatarFallback>
                                             {nameToInitials(member.user.name)}
                                         </AvatarFallback>
-                                    </Avatar>
+                                    </Avatar> */}
+                                    <ProfilePhoto 
+                                        img={member?.user?.image}
+                                        name={member?.user?.name}
+                                    />
                                     <div className="space-y-2">
                                         <h4 className="text-sm font-semibold">
                                             {member.user.name}

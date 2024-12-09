@@ -5,7 +5,7 @@ import {
 } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
-export function ProfilePhoto({ img, name, className }: { img: string | null | undefined, name: string | null | undefined, className: string | undefined }) {
+export function ProfilePhoto({ img, name, textSize, className }: { img: string | null | undefined, name: string | null | undefined, textSize?: "small" | "large", className?: string | null | undefined }) {
     return (
         <Avatar className={cn(
             className,
@@ -16,7 +16,11 @@ export function ProfilePhoto({ img, name, className }: { img: string | null | un
                 alt={name || ""}
                 className="grayscale"
             />
-            <AvatarFallback className="h-full w-full">
+            <AvatarFallback 
+                className={
+                    cn("h-full w-full", textSize === "large" ? "text-6xl" : "")
+                }
+            >
                 {name?.[0]}
             </AvatarFallback>
         </Avatar>
