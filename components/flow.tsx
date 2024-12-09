@@ -201,7 +201,7 @@ export const FlowView = ({
         >
             <MiniMap
                 nodeColor='#757575'
-                maskColor='rgb(240, 240, 240, 0.8)' 
+                maskColor='rgb(200, 200, 200, 0.8)' 
             />
             <Controls>
                 {/* <Button className="research-plan-tour-step1" onClick={() => addMilestone()}>Add Milestone</Button> */}
