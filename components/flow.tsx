@@ -199,7 +199,10 @@ export const FlowView = ({
             fitView
             proOptions={proOptions}
         >
-            <MiniMap />
+            <MiniMap
+                nodeColor='#757575'
+                maskColor='rgb(240, 240, 240, 0.8)' 
+            />
             <Controls>
                 {/* <Button className="research-plan-tour-step1" onClick={() => addMilestone()}>Add Milestone</Button> */}
                 <Button className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>Add Milestone</Button>
