@@ -2,7 +2,7 @@
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
 import {Organization, User} from "@prisma/client";
-import {cn, getUserPhoto} from "@/lib/utils";
+import {cn} from "@/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Loading from "@/app/loading";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {toast} from "sonner";
 import {getAllOrganizationsFromUserId, getUser} from "@/lib/fetchers";
+import { ProfilePhoto } from "@/components/profile-photo";
 
 export default function UserProfilePage() {
     const {data: session} = useSession()
@@ -72,9 +73,14 @@ export default function UserProfilePage() {
 
                     <Card>
                         <CardHeader>
-                            <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                            {/* <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
                                  src={getUserPhoto(user, session)}
-                                 alt=""/>
+                                 alt=""/> */}
+                            <ProfilePhoto 
+                                img={user?.image}
+                                name={user?.name}
+                                className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                            />
                             <CardTitle>
                                 <h1 className="min-w-0 truncate text-4xl font-bold text-gray-900">
                                     {user.name}

@@ -5,21 +5,6 @@ import {ColumnDragData} from "@/components/board-column";
 import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
-import { Session } from "next-auth";
-// import { uploadImg } from "./g-cloud";
-// import { uploadOrUpdatePublicImg } from "./g-cloud";
-
-export function getUserPhoto(user: any, session: Session | null): string {
-    if (user?.image) return user.image
-    if (session?.user?.image) return session?.user?.image
-    return `https://avatar.vercel.sh/${session?.user?.email}`
-}
-
-export function getOrgPhoto(org: any | undefined): string {
-    if (!org) return createDicebearAvatar('', 50, 40, "identicon")
-    if (org?.image) return org?.image
-    return `https://avatar.vercel.sh/${org?.id}.png`
-}
 
 export async function getPublicFile(fileUrl: string): Promise<File> {
     try {
