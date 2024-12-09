@@ -14,7 +14,6 @@ export function ProfilePhoto({ img, name, textSize, className }: { img: string |
             <AvatarImage
                 src={(img ? img : name) || undefined}
                 alt={name || ""}
-                className="grayscale"
             />
             <AvatarFallback 
                 className={
