@@ -48,123 +48,131 @@ export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { ass
                     <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
                         Assets
                     </h3>
-                    <ul role="list" className="divide-y">
-                        {faker.helpers.arrayElements(assets, faker.number.int({
-                            min: 2,
-                            max: 5
-                        })).map((asset) =>
-                            <HoverCard
-                                key={asset?.id}
-                                openDelay={0}
-                                closeDelay={0}
-                            >
-                                <HoverCardTrigger asChild>
-                                    <a href={"#"}>
-                                        <li
-                                            key={asset?.id}
-                                            className="w-full flex items-center justify-between space-x-4 py-2"
-                                        >
-                                            <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
-                                                <div className="flex items-center gap-x-3">
-                                                    <h2 className="min-w-0 text-sm font-semibold">
-                                                        <span className="truncate">{asset?.name}</span>
-                                                    </h2>
-                                                </div>
-                                                <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
-                                                    <p className="whitespace-nowrap">
-                                                        {asset?.createdAt?.getFullYear()} &bull; {asset?.contacts.map((contact: any) => contact.name).join(', ')}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </a>
-                                </HoverCardTrigger>
-                                <HoverCardContent
-                                    side="top"
-                                    className="w-80"
+                    {assets.length > 0 ? (
+                        <ul role="list" className="divide-y">
+                            {faker.helpers.arrayElements(assets, faker.number.int({
+                                min: 2,
+                                max: 5
+                            })).map((asset) =>
+                                <HoverCard
+                                    key={asset?.id}
+                                    openDelay={0}
+                                    closeDelay={0}
                                 >
-                                    <div className="flex justify-between space-x-4">
-                                        <div className="space-y-1">
-                                            <h4 className="text-sm font-semibold">{asset?.name}</h4>
-                                            <p className="text-sm">
-                                                {asset?.description}
-                                            </p>
-                                            <div className="flex items-center pt-2">
-                                                <span className="text-xs text-muted-foreground">
-                                                    Created {faker.date.past().toISOString().split('T')[0]}
-                                                </span>
+                                    <HoverCardTrigger asChild>
+                                        <a href={"#"}>
+                                            <li
+                                                key={asset?.id}
+                                                className="w-full flex items-center justify-between space-x-4 py-2"
+                                            >
+                                                <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
+                                                    <div className="flex items-center gap-x-3">
+                                                        <h2 className="min-w-0 text-sm font-semibold">
+                                                            <span className="truncate">{asset?.name}</span>
+                                                        </h2>
+                                                    </div>
+                                                    <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
+                                                        <p className="whitespace-nowrap">
+                                                            {asset?.createdAt?.getFullYear()} &bull; {asset?.contacts.map((contact: any) => contact.name).join(', ')}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </a>
+                                    </HoverCardTrigger>
+                                    <HoverCardContent
+                                        side="top"
+                                        className="w-80"
+                                    >
+                                        <div className="flex justify-between space-x-4">
+                                            <div className="space-y-1">
+                                                <h4 className="text-sm font-semibold">{asset?.name}</h4>
+                                                <p className="text-sm">
+                                                    {asset?.description}
+                                                </p>
+                                                <div className="flex items-center pt-2">
+                                                    <span className="text-xs text-muted-foreground">
+                                                        Created {faker.date.past().toISOString().split('T')[0]}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </HoverCardContent>
-                            </HoverCard>
-                        )}
-                    </ul>
+                                    </HoverCardContent>
+                                </HoverCard>
+                            )}
+                        </ul>
+                    ): (
+                        <p className="text-gray-400">No assets to show.</p>
+                    )}
                 </div>
 
                 <div className="flex flex-col space-y-4">
                     <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
                         Projects
                     </h3>
-                    <ul role="list" className="divide-y">
-                        {rfps.map((rfp) =>
-                            <HoverCard
-                                key={rfp?.id}
-                                openDelay={0}
-                                closeDelay={0}
-                            >
-                                <HoverCardTrigger asChild>
-                                    <a href={"#"}>
-                                        <li
-                                            key={rfp?.id}
-                                            className="w-full flex items-center justify-between space-x-4 py-2"
-                                        >
-                                            <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
-                                                <div className="flex items-center gap-x-3">
-                                                    <h2 className="min-w-0 text-sm font-semibold">
-                                                        <span className="truncate">{rfp?.name}</span>
-                                                    </h2>
-                                                </div>
-                                                <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
-                                                    <p className="whitespace-nowrap">
-                                                        {`$${rfp?.funding.toLocaleString()}`} &bull; {rfp?.contacts.map((contact: any) => contact.name).join(', ')}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            {/* {rfp?.recency &&
-                                                <div
-                                                    className={cn(
-                                                        // environments[rfp.recency],
-                                                        'flex-none rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset',
-                                                    )}
-                                                >
-                                                    {rfp?.recency}
-                                                </div>
-                                            } */}
-                                        </li>
-                                    </a>
-                                </HoverCardTrigger>
-                                <HoverCardContent
-                                    side="top"
-                                    className="w-80"
+                    {rfps.length > 0 ? (
+                        <ul role="list" className="divide-y">
+                            {rfps.map((rfp) =>
+                                <HoverCard
+                                    key={rfp?.id}
+                                    openDelay={0}
+                                    closeDelay={0}
                                 >
-                                    <div className="flex justify-between space-x-4">
-                                        <div className="space-y-1">
-                                            <h4 className="text-sm font-semibold">{rfp?.name}</h4>
-                                            <p className="text-sm">
-                                                {rfp?.description}
-                                            </p>
-                                            <div className="flex items-center pt-2">
-                                                <span className="text-xs text-muted-foreground">
-                                                    Created {faker.date.past().toISOString().split('T')[0]}
-                                                </span>
+                                    <HoverCardTrigger asChild>
+                                        <a href={"#"}>
+                                            <li
+                                                key={rfp?.id}
+                                                className="w-full flex items-center justify-between space-x-4 py-2"
+                                            >
+                                                <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
+                                                    <div className="flex items-center gap-x-3">
+                                                        <h2 className="min-w-0 text-sm font-semibold">
+                                                            <span className="truncate">{rfp?.name}</span>
+                                                        </h2>
+                                                    </div>
+                                                    <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
+                                                        <p className="whitespace-nowrap">
+                                                            {`$${rfp?.funding.toLocaleString()}`} &bull; {rfp?.contacts.map((contact: any) => contact.name).join(', ')}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                {/* {rfp?.recency &&
+                                                    <div
+                                                        className={cn(
+                                                            // environments[rfp.recency],
+                                                            'flex-none rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset',
+                                                        )}
+                                                    >
+                                                        {rfp?.recency}
+                                                    </div>
+                                                } */}
+                                            </li>
+                                        </a>
+                                    </HoverCardTrigger>
+                                    <HoverCardContent
+                                        side="top"
+                                        className="w-80"
+                                    >
+                                        <div className="flex justify-between space-x-4">
+                                            <div className="space-y-1">
+                                                <h4 className="text-sm font-semibold">{rfp?.name}</h4>
+                                                <p className="text-sm">
+                                                    {rfp?.description}
+                                                </p>
+                                                <div className="flex items-center pt-2">
+                                                    <span className="text-xs text-muted-foreground">
+                                                        Created {faker.date.past().toISOString().split('T')[0]}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </HoverCardContent>
-                            </HoverCard>
-                        )}
-                    </ul>
+                                    </HoverCardContent>
+                                </HoverCard>
+                            )}
+                        </ul>
+                    ): (
+                        <p className="text-gray-400">No projects to show.</p>
+                    )}
                 </div>
             </CardContent>
         </Card>
