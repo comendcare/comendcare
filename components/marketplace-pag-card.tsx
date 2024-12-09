@@ -4,6 +4,7 @@ import {FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaGlobe, FaPeopleGroup}
 import {Avatar, AvatarFallback, AvatarImage} from "./ui/avatar";
 import {abbreviateNumber, createDicebearAvatar, formatMoney} from "@/lib/utils";
 import {Badge} from "./ui/badge";
+import { ProfilePhoto } from "./profile-photo";
 
 export function OrganizationMarketplaceCard({organization}: { organization: any }) {
     return (
@@ -17,15 +18,11 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
             <Card className="h-full w-full text-left flex flex-col justify-between">
                 <CardHeader>
                     <CardTitle className="text-xl flex flex-row gap-2 items-center">
-                        {/* Use the actual org images once we have them */}
-                        {/* <Avatar>
-                        <AvatarImage src={organization?.image} alt="@shadcn" />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar> */}
-                        <Avatar className="h-10 w-10">
-                            <AvatarImage src={createDicebearAvatar("", 50, 40, "identicon")}/>
-                            <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
+                        <ProfilePhoto 
+                            img={organization?.image}
+                            name={organization?.name}
+                            className="h-10 w-10"
+                        />
                         {organization.name}
                     </CardTitle>
                     <CardDescription>{organization.description}</CardDescription>

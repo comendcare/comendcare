@@ -4,8 +4,8 @@ import React, { forwardRef, ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { faker } from "@faker-js/faker";
 import { motion } from "framer-motion";
-import { createDicebearAvatar } from "@/lib/utils";
 import {Organization} from "@prisma/client";
+import { ProfilePhoto } from "./profile-photo";
 
 interface CardProps {
     children: ReactNode;
@@ -15,6 +15,7 @@ interface CardProps {
 interface PatientGroup {
     groupName: string;
     description: string;
+    image: string;
 }
 
 export default function ConditionProfilePatientGroupCard({organization}: {organization: Organization}) {
@@ -24,6 +25,7 @@ export default function ConditionProfilePatientGroupCard({organization}: {organi
     const pag: PatientGroup = {
         groupName: faker.company.name(),
         description: faker.lorem.paragraph(),
+        image: faker.image.url()
     };
 
     // Define the Card component with `forwardRef`
@@ -50,9 +52,17 @@ export default function ConditionProfilePatientGroupCard({organization}: {organi
         >
             <div className="flex flex-col">
                 <CardHeader className="flex flex-row items-center justify-between gap-4">
-                    <img
+                    <CardTitle className="text-lg text-wrap line-clamp-2">
+                        {organization?.name}
+                    </CardTitle>
+                    {/* <img
                         alt=""
                         src={createDicebearAvatar(pag.groupName, 50, 40, "identicon")}
+                        className="h-16 w-16 rounded-full"
+                    /> */}
+                    <ProfilePhoto 
+                        img={pag?.image}
+                        name={pag?.groupName}
                         className="h-16 w-16 rounded-full"
                     />
                     <CardTitle className="text-lg text-wrap line-clamp-2">

@@ -1,8 +1,8 @@
 import {getSession} from "@/lib/auth";
-import {createDicebearAvatar} from "@/lib/utils";
 import Image from "next/image";
 import {faker} from "@faker-js/faker";
 import {getMembers} from "@/lib/fetchers";
+import { ProfilePhoto } from "./profile-photo";
 
 export default async function PAGDashboardMembersTab() {
     const session = await getSession()
@@ -61,9 +61,14 @@ export default async function PAGDashboardMembersTab() {
                                         <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                             <div className="flex items-center">
                                                 <div className="h-11 w-11 flex-shrink-0">
-                                                    <img className="h-11 w-11 rounded-full"
+                                                    {/* <img className="h-11 w-11 rounded-full"
                                                          src={person.user?.image || createDicebearAvatar(person.user?.name || faker.string.uuid(), 50, 40, "identicon")}
                                                          alt={`${person.user?.name}'s profile picture`}
+                                                    /> */}
+                                                    <ProfilePhoto 
+                                                        img={person?.user?.image}
+                                                        name={person?.user?.name}
+                                                        className="h-11 w-11 rounded-full"
                                                     />
                                                 </div>
                                                 <div className="ml-4">

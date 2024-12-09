@@ -9,7 +9,7 @@ import {DonutChartCard} from "@/components/donut-chart-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
-import {cn, createDicebearAvatar} from "@/lib/utils";
+import {cn} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {PAGProfileResearchPlanCard} from "@/components/pag-profile-research-plan-card";
@@ -128,6 +128,7 @@ export default async function ProfilePage() {
                                         img={organization.image}
                                         name={organization.name}
                                         className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                        textSize="large"
                                     />
                                 </div>
                                 <div
