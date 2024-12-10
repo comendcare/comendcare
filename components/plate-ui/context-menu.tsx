@@ -5,6 +5,7 @@ import * as React from 'react';
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 import { cn } from '@udecode/cn';
 import { Check, ChevronRight, Circle } from 'lucide-react';
+import {AIChatEditor} from "@/components/plate-ui/ai-chat-editor";
 
 const ContextMenu = ContextMenuPrimitive.Root;
 
@@ -40,6 +41,8 @@ const ContextMenuGroup = React.forwardRef<
     </>
   );
 });
+
+ContextMenuGroup.displayName = 'AIChatEditor';
 
 const ContextMenuPortal = ContextMenuPrimitive.Portal;
 
