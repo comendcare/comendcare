@@ -56,11 +56,11 @@ import { ExitBreakPlugin, SoftBreakPlugin } from "@udecode/plate-break/react"
 import { NodeIdPlugin } from "@udecode/plate-node-id"
 import { ResetNodePlugin } from "@udecode/plate-reset-node/react"
 import { DeletePlugin } from "@udecode/plate-select"
-import { TabbablePlugin } from "@udecode/plate-tabbable/react"
+// import { TabbablePlugin } from "@udecode/plate-tabbable/react"
 import { TrailingBlockPlugin } from "@udecode/plate-trailing-block"
 import { CommentsPlugin } from "@udecode/plate-comments/react"
 import { DocxPlugin } from "@udecode/plate-docx"
-import { CsvPlugin } from "@udecode/plate-csv"
+// import { CsvPlugin } from "@udecode/plate-csv"
 import { MarkdownPlugin } from "@udecode/plate-markdown"
 import { JuicePlugin } from "@udecode/plate-juice"
 import { HEADING_KEYS } from "@udecode/plate-heading"
@@ -217,13 +217,13 @@ const plateEditor = createPlateEditor({
                 ]
             }
         }),
-        TabbablePlugin,
+        // TabbablePlugin,
         TrailingBlockPlugin.configure({
             options: { type: "p" }
         }),
         CommentsPlugin,
         DocxPlugin,
-        CsvPlugin,
+        // CsvPlugin,
         MarkdownPlugin,
         JuicePlugin
     ],
