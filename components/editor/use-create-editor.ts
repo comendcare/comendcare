@@ -147,8 +147,8 @@ export const useCreateEditor = () => {
       ),
     },
     plugins: [
-      ...copilotPlugins,
-      // ...editorPlugins,
+      // ...copilotPlugins,
+      ...editorPlugins,
       FixedToolbarPlugin,
       FloatingToolbarPlugin,
     ],
