@@ -14,7 +14,7 @@ export const PublicRoadmap = ({roadmap, subdomain}: {roadmap: any, subdomain: st
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardHeader>
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     {roadmap.title}
                 </CardTitle>

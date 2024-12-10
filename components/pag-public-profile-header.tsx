@@ -5,7 +5,7 @@ import {Organization} from "@prisma/client";
 import PublicProfileDropdown from "@/components/public-profile-dropdown";
 import { ProfilePhoto } from "./profile-photo";
 
-export default async function PAGPublicProfileHeader({organization}: { organization: Organization }) {
+export default function PAGPublicProfileHeader({organization}: { organization: Organization }) {
 
     return (
         <div className="w-full flex flex-col space-y-8">
