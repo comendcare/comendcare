@@ -32,7 +32,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
-
+import { handleImageUpload } from "@/lib/upload";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -263,6 +263,11 @@ export default function OrganizationOnboardingForm() {
                 formData.append(key, value.toString());
             }
         });
+
+        if (selectedFile && values.image) {
+            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+            if (imgUrl) formData.set('image', imgUrl)
+        }
 
         createOrganization(formData).then((res: any) => {
             if (res.error) {
@@ -557,7 +562,7 @@ export default function OrganizationOnboardingForm() {
                                                         setDialogOpen={setDialogOpen}
                                                         selectedFile={selectedFile}
                                                         setSelectedFile={(file: any) => {
-                                                            setSelectedFile(file);
+                                                            if (file == null) setSelectedFile(null)
                                                             field.onChange(file?.preview); // Update form field value
                                                         }}
                                                     />

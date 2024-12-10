@@ -1,8 +1,9 @@
-import {createDicebearAvatar, formatMoney} from "@/lib/utils";
+import {formatMoney} from "@/lib/utils";
 import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaPlus} from "react-icons/fa6";
 import {Button} from "@/components/ui/button";
 import {Organization} from "@prisma/client";
 import PublicProfileDropdown from "@/components/public-profile-dropdown";
+import { ProfilePhoto } from "./profile-photo";
 
 export default async function PAGPublicProfileHeader({organization}: { organization: Organization }) {
 
@@ -21,9 +22,12 @@ export default async function PAGPublicProfileHeader({organization}: { organizat
                     <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
 
                         <div className="flex">
-                            <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                 src={createDicebearAvatar(organization?.createdAt.toLocaleString() ?? "", 50, 40, "identicon")}
-                                 alt=""/>
+                            <ProfilePhoto 
+                                img={organization?.image}
+                                name={organization?.name}
+                                className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                textSize="large"
+                            />
                         </div>
 
                         <div

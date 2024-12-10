@@ -9,7 +9,7 @@ import {DonutChartCard} from "@/components/donut-chart-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
-import {cn, createDicebearAvatar} from "@/lib/utils";
+import {cn} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {PAGProfileResearchPlanCard} from "@/components/pag-profile-research-plan-card";
@@ -28,6 +28,7 @@ import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "sonner";
 import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
+import { ProfilePhoto } from "@/components/profile-photo";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -119,10 +120,16 @@ export default async function ProfilePage() {
 
                         <div className="flex flex-row justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
-                                <div className="flex">
-                                    <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                         src={createDicebearAvatar(organization?.createdAt.toLocaleString() ?? "", 50, 40, "identicon")}
-                                         alt=""/>
+                                <div className="flex bg-white rounded-full">
+                                    {/* <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                        src={getOrgPhoto(organization)}
+                                        alt=""/> */}
+                                    <ProfilePhoto 
+                                        img={organization.image}
+                                        name={organization.name}
+                                        className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                        textSize="large"
+                                    />
                                 </div>
                                 <div
                                     className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">

@@ -2,8 +2,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 import { FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaGlobe, FaPeopleGroup } from "react-icons/fa6";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { createDicebearAvatar } from "@/lib/utils";
 import { Badge } from "./ui/badge";
+import { ProfilePhoto } from "./profile-photo";
 
 export function OrganizationMarketplaceListElement({ organization }: { organization: any }) {
     return (
@@ -17,15 +17,11 @@ export function OrganizationMarketplaceListElement({ organization }: { organizat
         <Card className="h-full w-full text-left">
             <CardHeader className="w-full">
                 <CardTitle className="flex flex-row gap-2 items-center">
-                    {/* Use the actual org images once we have them */}
-                    {/* <Avatar>
-                        <AvatarImage src={organization?.image} alt="@shadcn" />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar> */}
-                    <Avatar className="h-10 w-10">
-                        <AvatarImage src={createDicebearAvatar("", 50, 40, "identicon")}/>
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
+                    <ProfilePhoto 
+                        img={organization?.image}
+                        name={organization?.name}
+                        className="h-10 w-10"
+                    />
                     {organization.name}
                 </CardTitle>
                 <CardDescription>{organization.description}</CardDescription>

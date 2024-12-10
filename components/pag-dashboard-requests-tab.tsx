@@ -1,11 +1,11 @@
 import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog";
 import { getSession } from "@/lib/auth";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { createDicebearAvatar } from "@/lib/utils";
 import { FaUserXmark } from "react-icons/fa6";
 import Image from "next/image";
 import {getMemberRequests} from "@/lib/fetchers";
 import {toast} from "sonner";
+import { ProfilePhoto } from "./profile-photo";
 
 export default async function PAGDashboardRequestsTab() {
     const session = await getSession();
@@ -117,10 +117,15 @@ export default async function PAGDashboardRequestsTab() {
                                         <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                             <div className="flex items-center">
                                                 <div className="h-11 w-11 flex-shrink-0">
-                                                    <img
+                                                    {/* <img
                                                         className="h-11 w-11 rounded-full"
                                                         src={createDicebearAvatar(person.email, 50, 40, "identicon")}
                                                         alt=""
+                                                    /> */}
+                                                    <ProfilePhoto 
+                                                        img={person?.image}
+                                                        name={person?.name}
+                                                        className="h-11 w-11 rounded-full"
                                                     />
                                                 </div>
                                                 <div className="ml-4 flex flex-col space-y-1">

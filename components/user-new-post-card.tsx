@@ -10,7 +10,7 @@ import {Button} from "@/components/ui/button";
 import {FaPaperPlane} from "react-icons/fa6";
 import * as z from "zod";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {createDicebearAvatar} from "@/lib/utils";
+import { ProfilePhoto } from "./profile-photo";
 
 const newPostSchema = z.object({
     text: z
@@ -47,10 +47,15 @@ export const UserNewPostCard = () => {
         <Card>
             <CardHeader>
                 <CardTitle className="flex flex-row space-x-2 justify-between items-center">
-                    <Avatar>
+                    {/* <Avatar>
                         <AvatarImage src={createDicebearAvatar("", 50, 40, "identicon")}/>
                         <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
+                    </Avatar> */}
+                    <ProfilePhoto 
+                        img={undefined}
+                        name={undefined}
+                        className="h-11 w-11 rounded-full"
+                    />
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
                             <FormField
