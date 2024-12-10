@@ -36,6 +36,7 @@ import {Condition, Organization} from "@prisma/client";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
 import ConditionProfilePatientGroupCard from "@/components/condition-profile-patient-group-card";
 import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
+import PublicPageFooter from "@/components/public-page-footer";
 
 export type Post = {
     id: string
@@ -502,6 +503,7 @@ export default async function ConditionPage({
                     </Carousel>
                 </div>
             </div>
+            <PublicPageFooter/>
         </TooltipProvider>
     )
 }
