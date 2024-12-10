@@ -466,3 +466,13 @@ model ConditionToOrganization {
   // Composite Primary Key
   @@id([conditionId, organizationId])
 }
+
+model Example {
+  id            Int     @id @default(autoincrement())
+  name          String?
+  description   String? @db.Text
+  domainCount   Int?
+  url           String?
+  image         String? @db.Text
+  imageBlurhash String? @db.Text
+}
