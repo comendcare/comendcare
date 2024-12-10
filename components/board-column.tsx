@@ -11,6 +11,8 @@ import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 import { cn } from "@/lib/utils"
 import {FaPlus} from "react-icons/fa6";
 import {Column} from "@prisma/client";
+import NewColumnDialog from "./new-column-dialog"
+import { Badge } from "./ui/badge"
 
 
 export type ColumnType = "Column"
@@ -89,14 +91,14 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
                         {...listeners}
                         className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
                     >
-                        {/* <span className="sr-only">{`Move column: ${column.title}`}</span> */}
+                        <span className="sr-only">{`Move column: ${column.name}`}</span>
                         <GripVertical />
                     </Button>
-                    {/* <Badge
+                    <Badge
                         size="large"
                     >
-                        {column.title}
-                    </Badge> */}
+                        {column.name}
+                    </Badge>
                 </CardTitle>
             </CardHeader>
             <ScrollArea className="h-full">
@@ -139,7 +141,7 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
         >
             {/* calculate the same height as the parent TabsContent - because scroll areas don't like h-full >:( */}
             <div className="h-[calc(100vh-10rem)] flex gap-4 items-center flex-row justify-start">
-                {/* <NewColumnDialog/> */}
+                <NewColumnDialog/>
                 {children}
             </div>
             <ScrollBar orientation="horizontal" />
