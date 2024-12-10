@@ -90,7 +90,7 @@ export default async function ProfilePage() {
         }
 
         let roadmaps = await prisma.roadmap.findMany({
-            where: { organizationId: organization.id },
+            where: { organizationId: organization?.id },
             include: {
                 nodes: {
                     include: { data: true }
@@ -114,8 +114,6 @@ export default async function ProfilePage() {
                 }
             }
         })
-
-        console.log(roadmaps)
 
         // Existing verified organization rendering logic
         return (

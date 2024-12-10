@@ -140,7 +140,7 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
             type="auto"
         >
             {/* calculate the same height as the parent TabsContent - because scroll areas don't like h-full >:( */}
-            <div className="h-[calc(100vh-10rem)] flex gap-4 items-center flex-row justify-start">
+            <div className="h-[calc(100vh-10rem)] flex gap-4 items-start flex-row justify-start">
                 <NewColumnDialog/>
                 {children}
             </div>
