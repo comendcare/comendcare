@@ -1,8 +1,7 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
 import {FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaGlobe, FaPeopleGroup} from "react-icons/fa6";
-import {Avatar, AvatarFallback, AvatarImage} from "./ui/avatar";
-import {abbreviateNumber, createDicebearAvatar, formatMoney} from "@/lib/utils";
+import {abbreviateNumber, formatMoney} from "@/lib/utils";
 import {Badge} from "./ui/badge";
 import { ProfilePhoto } from "./profile-photo";
 

@@ -14,7 +14,7 @@ import { useShallow } from "zustand/react/shallow"
 
 import "@xyflow/react/dist/base.css"
 
-import MilestoneNode from "@/components/milestone-node"
+import PrivateMilestoneNode from "@/components/private-milestone-node"
 import { Button } from "./ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
@@ -41,7 +41,7 @@ const selector = (state: RoadmapState) => ({
     addNode: state.addNode,
 })
 
-export const FlowView = ({
+export const PrivateFlowView = ({
     width,
 }: {
     width: number
@@ -63,7 +63,7 @@ export const FlowView = ({
     const pathname = usePathname()
     const searchParams = useSearchParams()
     // const { undo, redo, clear } = useRoadmapStore.temporal.getState()
-    const nodeTypes = { MILESTONE: MilestoneNode }
+    const nodeTypes = { MILESTONE: PrivateMilestoneNode }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)

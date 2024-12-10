@@ -16,7 +16,7 @@ import {
     TooltipTrigger,
   } from "@/components/ui/tooltip"
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
-import { FlowView } from "@/components/flow"
+import { PrivateFlowView } from "@/components/private-flow"
 import { KanbanView } from "@/components/kanban"
 import { Button } from "./ui/button"
 import { FaQuestion, FaX } from "react-icons/fa6"
@@ -170,7 +170,7 @@ export function Roadmap({
                             value="flow"
                             className="m-0 h-[calc(100vh-3.5rem)]"
                         >
-                            <FlowView
+                            <PrivateFlowView
                                 width={defaultLayout[0]}
                             />
                         </TabsContent>
@@ -322,7 +322,7 @@ const MilestoneDetailsPanel = ({
                     onClose={handleClose}
                 />
             ) : (
-                <MilestoneDetails milestoneData={milestone} />
+                <MilestoneDetails milestone={milestone} />
             )}
         </>
     )
