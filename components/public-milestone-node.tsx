@@ -1,6 +1,5 @@
 import React, { memo } from "react"
 import { Handle, Position, Node, NodeProps } from "@xyflow/react"
-import { Button } from "./ui/button"
 import {
     Card,
     CardContent,
@@ -9,15 +8,12 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import { FaArrowRight, FaCalendar, FaPlus } from "react-icons/fa6"
+import { FaArrowUpRightFromSquare } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
 import { truncate, cn } from "@/lib/utils"
-import { DateView } from "./miletone-date-view"
 import { PrivateBadge } from "./private-badge"
-import {monthsList} from "@/lib/data";
 import { Badge } from "./ui/badge"
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export type PublicMilestoneNode = Node<
     {
@@ -65,7 +61,10 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
                 {props.data?.private && (
                     <PrivateBadge className="-mt-2 justify-end" />
                 )}
-                <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
+                <CardTitle className="flex flex-row gap-4 justify-between w-full">
+                    {props.data?.title || "New Milestone"}
+                    <FaArrowUpRightFromSquare className="h-[20px] w-[20px]"/>
+                </CardTitle>
                 {/* Description length in node is truncated to 200 characters. */}
                 <CardDescription>
                     {truncate(props.data?.description || "", 200)}
