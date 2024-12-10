@@ -1,11 +1,13 @@
 import prisma from "@/lib/prisma";
 import KanbanBoard from "@/components/kanban-board";
+import {getSession} from "@/lib/auth";
 
 export default async function KanbanPage({
                                              params
                                          }: {
     params: { id: string }
 }) {
+    const session = await getSession()
 
     const dbNodes = await Promise.all(
         (
@@ -60,6 +62,16 @@ export default async function KanbanPage({
         }
     })
 
+    const dbColumns = await prisma.column.findMany({
+        where: {
+            kanban: {
+                organization: {
+                    id: session?.user.organizationId
+                }
+            }
+        },
+    })
+
     return (
         <main className="flex flex-col space-y-4 p-8">
             <h1 className="text-3xl font-bold tracking-tight">
@@ -67,6 +79,7 @@ export default async function KanbanPage({
             </h1>
             <KanbanBoard
                 roadmapId={params.id}
+                initColumns={dbColumns || []}
                 initNodes={dbNodes || []}
                 initEdges={dbEdges || []}
                 initMilestones={dbMilestones || []}
