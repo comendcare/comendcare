@@ -405,7 +405,7 @@ export default function ResearchOnboardingForm() {
 
     return (
         <TooltipProvider>
-            <div className="grid grid-cols-2 gap-x-8">
+            <div className="relative grid grid-cols-2 gap-x-8">
                 <div className="space-y-4 col-span-1">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -749,9 +749,9 @@ export default function ResearchOnboardingForm() {
                         </form>
                     </Form>
                 </div>
-                <div className="space-y-4 col-span-1 w-full">
-                    <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
-                        <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
+                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-280px)]">
+                    <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
+                        <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
                             Condition profile preview
                         </h1>
 
