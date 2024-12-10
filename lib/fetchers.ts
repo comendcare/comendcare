@@ -480,3 +480,16 @@ export async function checkSubdomainAvailability(nickname: string) {
         return {error: "Database error. Please try again later."};
     }
 }
+
+export async function getMilestoneDetails(id: string) {
+    try {
+        const milestone = await prisma.milestone.findUnique({
+            where: { id }
+        })
+
+        return {success: true, milestone}
+    } catch (error: any) {
+        console.error("Database error finding milestone details:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}

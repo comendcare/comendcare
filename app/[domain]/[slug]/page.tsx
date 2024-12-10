@@ -1,6 +1,6 @@
-import {notFound} from "next/navigation"
+import {notFound, useSearchParams} from "next/navigation"
 import prisma from "@/lib/prisma"
-import {getRoadmapData, getOrganizationData, getRoadmapsForOrganization} from "@/lib/fetchers"
+import {getRoadmapData, getOrganizationData, getRoadmapsForOrganization, getMilestoneDetails} from "@/lib/fetchers"
 import BlogCard from "@/components/blog-card"
 import BlurImage from "@/components/blur-image"
 import MDX from "@/components/mdx"
@@ -12,6 +12,7 @@ import { PublicTimelineView } from "@/components/public-timeline"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PublicRoadmap } from "@/components/public-roadmap"
+import { PublicMilestoneDetails } from "@/components/public-milestone-details"
 
 export async function generateMetadata({
                                            params
@@ -99,10 +100,11 @@ export default async function OrganizationRoadmapPage({
 }) {
     const domain = decodeURIComponent(params.domain)
     const slug = decodeURIComponent(params.slug)
+    
     // const data = await getRoadmapData(domain, slug)
     const [organization, roadmaps] = await Promise.all([
         getOrganizationData(domain),
-        getRoadmapsForOrganization(domain)
+        getRoadmapsForOrganization(domain),
     ])
 
     if (!organization) {
@@ -128,8 +130,9 @@ export default async function OrganizationRoadmapPage({
                             <h1 className="truncate text-4xl font-bold text-gray-900">{organization.name}</h1>
                         </div>
 
-                        <div className="m-auto w-full text-left md:w-7/12">
-                            <PublicRoadmap roadmap={roadmaps[0]} />
+                        <div className="m-auto w-full text-left md:w-7/12 flex flex-col gap-8">
+                            <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined} />
+                            <PublicMilestoneDetails />
                         </div>
                     </div>
                 ) :

@@ -8,13 +8,20 @@ import {
 import "@xyflow/react/dist/base.css"
 import PublicMilestoneNode from "./public-milestone-node"
 
-export const PublicFlowView = ({ roadmap }: { roadmap: any}) => {
+export const PublicFlowView = ({ roadmap, subdomain }: { roadmap: any, subdomain: string | undefined }) => {
     const nodeTypes = { MILESTONE: PublicMilestoneNode }
 
     return (
     <ReactFlow
         width={32}
-        nodes={roadmap?.nodes.map((node: any) => ({...node, position: {x: node.positionX, y: node.positionY}})) || []}
+        nodes={roadmap?.nodes.map((node: any) => ({
+            ...node, 
+            position: {x: node.positionX, y: node.positionY}, 
+            data: {
+                ...node.data,
+                subdomain: subdomain
+            }
+        })) || []}
         edges={roadmap?.edges || []}
         nodeTypes={nodeTypes}
         proOptions={{ hideAttribution: true }}
@@ -22,12 +29,13 @@ export const PublicFlowView = ({ roadmap }: { roadmap: any}) => {
         edgesFocusable={false}
         nodesDraggable={false}
         nodesConnectable={false}
-        nodesFocusable={false}
         draggable={false}
-        elementsSelectable={false}
         fitView
     >
-        <MiniMap />
+        <MiniMap
+            nodeColor='#757575'
+            maskColor='rgb(200, 200, 200, 0.8)' 
+        />
     </ReactFlow>
     )
 }

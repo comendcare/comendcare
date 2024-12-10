@@ -1,17 +1,16 @@
 "use client"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
-import {FaArrowUpRightFromSquare} from "react-icons/fa6";
-import {useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 import {cn} from "@/lib/utils";
 import "@xyflow/react/dist/base.css"
-import PublicMilestoneNode from "@/components/public-milestone-node"
 import { PublicFlowView } from "./public-flow";
 import { PublicTimelineView } from "./public-timeline";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
-export const PublicRoadmap = ({roadmap}: {roadmap: any}) => {
+export const PublicRoadmap = ({roadmap, subdomain}: {roadmap: any, subdomain: string | undefined}) => {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const urlView = searchParams.get("view")
 
     return (
         <Card>
@@ -26,7 +25,7 @@ export const PublicRoadmap = ({roadmap}: {roadmap: any}) => {
 
             <CardContent className="px-8">
 
-            <Tabs defaultValue="timeline" className="space-y-4 w-full">
+            <Tabs defaultValue={urlView === 'flow' ? 'flow' : 'timeline'} className="space-y-4 w-full">
                 <TabsList>
                     <TabsTrigger value="timeline">
                         Timeline View
@@ -40,7 +39,7 @@ export const PublicRoadmap = ({roadmap}: {roadmap: any}) => {
                 </TabsContent>
                 <TabsContent value="flow" className="space-y-4 w-full">
                     <div className="h-[600px]">
-                        <PublicFlowView roadmap={roadmap} />
+                        <PublicFlowView roadmap={roadmap} subdomain={subdomain} />
                     </div>
                 </TabsContent>
             </Tabs>
