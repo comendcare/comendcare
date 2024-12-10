@@ -31,8 +31,6 @@ import {getNewColumnFormSchema} from "@/lib/schemas";
 import {cn} from "@/lib/utils";
 
 export default function NewColumnDialog() {
-    const router = useRouter()
-    const {data: session, status} = useSession()
     const [open, setOpen] = useState(false)
     const newMonitorFormSchema = getNewColumnFormSchema([])
 
