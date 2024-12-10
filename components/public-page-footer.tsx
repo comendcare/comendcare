@@ -5,7 +5,7 @@ import LandingFooter from "@/components/layout/sections/landing-footer";
 import React, {useEffect, useState} from "react";
 
 
-export default function ConditionProfileFooter() {
+export default function PublicPageFooter() {
     const [isSubscribed, setIsSubscribed] = useState<boolean>(false)
 
     useEffect(() => {

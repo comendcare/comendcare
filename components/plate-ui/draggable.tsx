@@ -32,6 +32,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './tooltip';
+import {AIChatEditor} from "@/components/plate-ui/ai-chat-editor";
 
 export interface DraggableProps extends PlateElementProps {
   /**
@@ -123,6 +124,8 @@ const Gutter = React.forwardRef<
   );
 });
 
+Gutter.displayName = 'Gutter';
+
 const DragHandle = React.memo(() => {
   const editor = useEditorRef();
 
@@ -150,6 +153,8 @@ const DragHandle = React.memo(() => {
     </TooltipProvider>
   );
 });
+
+DragHandle.displayName = 'DragHandle';
 
 const DropLine = React.memo(
   React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(

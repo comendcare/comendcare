@@ -57,7 +57,15 @@ export async function getOrganizationData(domain: string) {
         async () => {
             return prisma.organization.findUnique({
                 where: subdomain ? {subdomain} : {customDomain: domain},
-                include: {user: true}
+                include: {
+                    user: true,
+                    roadmaps: true,
+                    members: {
+                        include: {
+                            user: true
+                        }
+                    }
+                }
             })
         },
         [`${domain}-metadata`],

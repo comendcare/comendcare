@@ -52,3 +52,5 @@ export const AIChatEditor = memo(
     );
   }
 );
+
+AIChatEditor.displayName = 'AIChatEditor';

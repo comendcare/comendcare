@@ -24,3 +24,5 @@ export const PlateElement = React.forwardRef<HTMLDivElement, PlateElementProps>(
     );
   }
 );
+
+PlateElement.displayName = 'PlateElement';

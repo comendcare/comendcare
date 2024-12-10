@@ -81,6 +81,7 @@ const dropdownArrowVariants = cva(
 );
 
 const ToolbarButton = withTooltip(
+    // eslint-disable-next-line react/display-name
   React.forwardRef<
     React.ElementRef<typeof ToolbarToggleItem>,
     {
@@ -193,6 +194,8 @@ export const ToolbarSplitButtonPrimary = React.forwardRef<
   );
 });
 
+ToolbarSplitButtonPrimary.displayName = 'ToolbarSplitButtonPrimary';
+
 export const ToolbarSplitButtonSecondary = React.forwardRef<
   HTMLButtonElement,
   React.ComponentPropsWithoutRef<'span'> &
@@ -217,6 +220,8 @@ export const ToolbarSplitButtonSecondary = React.forwardRef<
     </span>
   );
 });
+
+ToolbarSplitButtonSecondary.displayName = 'ToolbarSplitButtonSecondary';
 
 ToolbarSplitButton.displayName = 'ToolbarButton';
 
