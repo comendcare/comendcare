@@ -151,10 +151,9 @@ export default async function OrganizationHomePage({
                         </div>
                     </div>
                 )}
-                
+
                 </div>
             </main>
-            <PublicPageFooter/>
         </>
     )
 }

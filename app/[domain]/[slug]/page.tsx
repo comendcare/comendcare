@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PublicRoadmap } from "@/components/public-roadmap"
 import { PublicMilestoneDetails } from "@/components/public-milestone-details"
+import PAGPublicProfileHeader from "@/components/pag-public-profile-header"
 
 export async function generateMetadata({
                                            params
@@ -115,24 +116,17 @@ export default async function OrganizationRoadmapPage({
         <>
             {roadmaps.length > 0 ? (
                     <div className="flex flex-col items-center justify-center my-16 gap-8">
-                        <div className="m-auto w-full text-center md:w-7/12">
-                            <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
+                        <div className="m-auto w-full text-left md:w-7/12">
+                            {/* <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
                                 {toDateString(roadmaps[0].createdAt)}
-                            </p>
-                        </div>
-
-                        <div className="flex gap-4 items-center">
-                            <img 
-                                className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                src={createDicebearAvatar(organization?.createdAt.toLocaleString() ?? "", 50, 40, "identicon")}
-                                alt=""
-                            />
-                            <h1 className="truncate text-4xl font-bold text-gray-900">{organization.name}</h1>
+                            </p> */}
+                            <PAGPublicProfileHeader organization={organization}/>
                         </div>
 
                         <div className="m-auto w-full text-left md:w-7/12 flex flex-col gap-8">
-                            <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined} />
                             <PublicMilestoneDetails />
+                            <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined} />
+                            {/* <PublicMilestoneDetails /> */}
                         </div>
                     </div>
                 ) :

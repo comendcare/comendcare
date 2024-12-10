@@ -8,6 +8,7 @@ import { getOrganizationData } from "@/lib/fetchers"
 import { fontMapper } from "@/styles/fonts"
 import { Metadata } from "next"
 import {LandingNavbar} from "@/components/layout/sections/landing-navbar";
+import PublicPageFooter from "@/components/public-page-footer"
 
 export async function generateMetadata({
     params
@@ -92,6 +93,7 @@ export default async function SiteLayout({
             ) : (
                 <ReportAbuse />
             )}
+            <PublicPageFooter/>
         </div>
     )
 }

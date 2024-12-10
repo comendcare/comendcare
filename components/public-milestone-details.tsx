@@ -41,7 +41,7 @@ export function PublicMilestoneDetails() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>No milestone selected!</CardTitle>
+                <CardTitle>Select a Milestone!</CardTitle>
                 <CardDescription>Select a milestone from the timeline or flow to see more details about it.</CardDescription>
             </CardHeader>
         </Card>
