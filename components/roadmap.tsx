@@ -322,7 +322,7 @@ const MilestoneDetailsPanel = ({
                     onClose={handleClose}
                 />
             ) : (
-                <MilestoneDetails milestoneData={milestone} />
+                <MilestoneDetails milestone={milestone} />
             )}
         </>
     )
