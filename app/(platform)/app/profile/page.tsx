@@ -222,7 +222,7 @@ export default async function ProfilePage() {
                                         assets={roadmaps[0].milestones.filter(milestone => milestone.asset).map(milestone => milestone.asset)}
                                         rfps={roadmaps[0].milestones.filter(milestone => milestone.RFP).map(milestone => milestone.RFP)}
                                     />
-                                    <PublicRoadmap roadmap={roadmaps[0]} />
+                                    <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined}/>
                                 </TabsContent>
                                 <TabsContent value="activity" className="mt-0">
                                     <PAGProfileActivityCard/>

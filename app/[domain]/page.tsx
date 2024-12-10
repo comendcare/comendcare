@@ -113,7 +113,7 @@ export default async function OrganizationHomePage({
 
                     <div className="col-span-4 flex flex-col space-y-4">
                         {roadmaps.length > 0 &&
-                            <PublicRoadmap roadmap={roadmaps[0]}/>
+                            <PublicRoadmap roadmap={roadmaps[0]} subdomain={data?.subdomain || undefined}/>
                         }
                         <Card>
                             <CardHeader>

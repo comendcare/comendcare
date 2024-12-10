@@ -17,9 +17,11 @@ import { PrivateBadge } from "./private-badge"
 import {monthsList} from "@/lib/data";
 import { Badge } from "./ui/badge"
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export type PublicMilestoneNode = Node<
     {
+        id: string
         nodeId: string
         title: string
         description?: string
@@ -34,9 +36,10 @@ export type PublicMilestoneNode = Node<
         dependencies?: string[]
         notes?: string
         status: StatusType
-        handleEditClick: (nodeId: string) => void,
-        onboardingMilestone: boolean,
+        // handleEditClick: (nodeId: string) => void,
+        onboardingMilestone: boolean
         private: boolean
+        subdomain: string | undefined
     },
     "MILESTONE"
 >
@@ -51,6 +54,12 @@ type StatusType = "TODO" | "INPROGRESS" | "DONE"
 
 function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
     return (
+        <a href={
+            props?.data?.subdomain ? 
+                `http://${props.data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${props?.data?.id}&view=flow` :
+                ''
+            }
+        >
         <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "")}>
             <CardHeader>
                 {props.data?.private && (
@@ -88,6 +97,7 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
                 className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
             />
         </Card>
+        </a>
     )
 }
 
