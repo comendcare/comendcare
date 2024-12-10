@@ -57,7 +57,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     }
 
     const variants = cva(
-        "h-full w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+        "h-min w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
         {
             variants: {
                 dragging: {
