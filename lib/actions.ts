@@ -69,28 +69,28 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 })
 
                 // create tasks for relevant milestone
-                if (newMilestone) {
-                    await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
-                        await prisma.task.create({
-                            data: {
-                                milestoneId: newMilestone?.id,
-                                status: task.status || "TODO",
-                                name: task.name,
-                                orderPosition: index,
-                                kanbanPosition: index,
-                                checklist: {
-                                    createMany: {
-                                        data: (task.checklist || []).map((item: any, index: number) => ({
-                                            name: item.name,
-                                            complete: item.complete || false,
-                                            orderPosition: index
-                                        }))
-                                    }
-                                }
-                            }
-                        })
-                    )))
-                }
+                // if (newMilestone) {
+                //     await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
+                //         await prisma.task.create({
+                //             data: {
+                //                 milestoneId: newMilestone?.id,
+                //                 status: task.status || "TODO",
+                //                 name: task.name,
+                //                 orderPosition: index,
+                //                 kanbanPosition: index,
+                //                 checklist: {
+                //                     createMany: {
+                //                         data: (task.checklist || []).map((item: any, index: number) => ({
+                //                             name: item.name,
+                //                             complete: item.complete || false,
+                //                             orderPosition: index
+                //                         }))
+                //                     }
+                //                 }
+                //             }
+                //         })
+                //     )))
+                // }
 
                 return node
             })
