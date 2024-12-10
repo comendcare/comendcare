@@ -67,16 +67,12 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
                                     key={index}
                                     className="flex space-x-4"
                                 >
-                                    {/* <Avatar>
+                                    <Avatar>
                                         <AvatarImage src={member.user.image || ""}/>
                                         <AvatarFallback>
                                             {nameToInitials(member.user.name)}
                                         </AvatarFallback>
-                                    </Avatar> */}
-                                    <ProfilePhoto 
-                                        img={member?.user?.image}
-                                        name={member?.user?.name}
-                                    />
+                                    </Avatar>
                                     <div className="space-y-2">
                                         <h4 className="text-sm font-semibold">
                                             {member.user.name}

@@ -28,7 +28,7 @@ import StatusButton from "./milestone-status-button"
 import {nanoid} from "nanoid"
 import {FaTrash} from "react-icons/fa6"
 import {Checkbox} from "./ui/checkbox"
-import {toast, Toaster} from "sonner"
+import {toast} from "sonner"
 import {
     arrayMove,
     SortableContext,

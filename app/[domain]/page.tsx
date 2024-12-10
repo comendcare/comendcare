@@ -12,7 +12,7 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {PAGPublicProfileDetailsCard} from "@/components/pag-public-profile-details-card";
-import {PAGPublicProfileRoadmapCard} from "@/components/pag-public-profile-roadmap-card";
+import { PublicRoadmap } from "@/components/public-roadmap";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {CalendarDays} from "lucide-react";
 import {PAGProfileAssetsCard} from "@/components/pag-profile-assets-card";
@@ -111,164 +111,52 @@ export default async function OrganizationHomePage({
                             {/*<PAGProfileOpenRFPsCard/>*/}
                         </div>
 
-                        <div className="col-span-4 flex flex-col space-y-4">
-                            <Tabs defaultValue="roadmap" className="w-full">
-                                <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="roadmap">
-                                        Roadmap
-                                    </TabsTrigger>
-                                    <TabsTrigger
-                                        value="activity"
-                                        className="organization-profile-tour-step6"
-                                    >
-                                        Activity
-                                    </TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="roadmap" className="flex flex-col space-y-4">
-                                    {/*<PAGProfileAssetsAndProjectsCard/>*/}
-                                    <PAGProfileAssetsAndProjectsHoverableCard/>
-                                    {roadmaps.length > 0 &&
-                                        <PAGProfileResearchPlanCard roadmapItems={dbMilestones}/>
-                                    }
-                                </TabsContent>
-                                <TabsContent value="activity" className="mt-0">
-                                    <PAGProfileActivityCard/>
-                                </TabsContent>
-                            </Tabs>
-                        </div>
+                    <div className="col-span-4 flex flex-col space-y-4">
+                        <Tabs defaultValue="roadmap" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="roadmap">
+                                    Roadmap
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="activity"
+                                    className="organization-profile-tour-step6"
+                                >
+                                    Activity
+                                </TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="roadmap" className="flex flex-col space-y-4">
+                                <PAGProfileAssetsAndProjectsHoverableCard 
+                                    assets={(roadmaps?.[0]?.milestones.filter(milestone => milestone.asset) || []).map(milestone => milestone.asset)}
+                                    rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
+                                />
+                                {roadmaps.length > 0 &&
+                                    <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined}/>
+                                }
+                            </TabsContent>
+                            <TabsContent value="activity" className="mt-0">
+                                <PAGProfileActivityCard/>
+                            </TabsContent>
+                        </Tabs>
                     </div>
-
-                    {/*<div className="w-full">*/}
-                    {/*    {roadmaps.length > 0 ? (*/}
-                    {/*        <div className="mx-auto w-full max-w-screen-xl md:mb-28 lg:w-5/6">*/}
-                    {/*            <Link href={`/${roadmaps[0]?.slug}`}>*/}
-                    {/*                <div*/}
-                    {/*                    className="group relative mx-auto h-80 w-full overflow-hidden sm:h-150 lg:rounded-xl">*/}
-                    {/*                    <BlurImage*/}
-                    {/*                        alt={roadmaps[0]?.title ?? ""}*/}
-                    {/*                        blurDataURL={*/}
-                    {/*                            roadmaps[0]?.imageBlurhash ??*/}
-                    {/*                            placeholderBlurhash*/}
-                    {/*                        }*/}
-                    {/*                        className="h-full w-full object-cover group-hover:scale-105 group-hover:duration-300"*/}
-                    {/*                        width={1300}*/}
-                    {/*                        height={630}*/}
-                    {/*                        placeholder="blur"*/}
-                    {/*                        src={*/}
-                    {/*                            roadmaps[0]?.image ?? "/placeholder.png"*/}
-                    {/*                        }*/}
-                    {/*                    />*/}
-                    {/*                </div>*/}
-                    {/*                <div className="mx-auto mt-10 w-5/6 lg:w-full">*/}
-                    {/*                    <h2 className="my-10 font-title text-4xl dark:text-white md:text-6xl">*/}
-                    {/*                        {roadmaps[0]?.title}*/}
-                    {/*                    </h2>*/}
-                    {/*                    <p className="w-full text-base dark:text-white md:text-lg lg:w-2/3">*/}
-                    {/*                        {roadmaps[0]?.description}*/}
-                    {/*                    </p>*/}
-                    {/*                    <div className="flex w-full items-center justify-start space-x-4">*/}
-                    {/*                        <div className="relative h-8 w-8 flex-none overflow-hidden rounded-full">*/}
-                    {/*                            {organization.user?.image ? (*/}
-                    {/*                                <BlurImage*/}
-                    {/*                                    alt={*/}
-                    {/*                                        organization.user?.name ??*/}
-                    {/*                                        "User Avatar"*/}
-                    {/*                                    }*/}
-                    {/*                                    width={100}*/}
-                    {/*                                    height={100}*/}
-                    {/*                                    className="h-full w-full object-cover"*/}
-                    {/*                                    src={organization.user?.image}*/}
-                    {/*                                />*/}
-                    {/*                            ) : (*/}
-                    {/*                                <div*/}
-                    {/*                                    className="absolute flex h-full w-full select-none items-center justify-center bg-stone-100 text-4xl text-stone-500">*/}
-                    {/*                                    ?*/}
-                    {/*                                </div>*/}
-                    {/*                            )}*/}
-                    {/*                        </div>*/}
-                    {/*                        <p className="ml-3 inline-block whitespace-nowrap align-middle text-sm font-semibold dark:text-white md:text-base">*/}
-                    {/*                            {organization.user?.name}*/}
-                    {/*                        </p>*/}
-                    {/*                        <div className="h-6 border-l border-stone-600 dark:border-stone-400"/>*/}
-                    {/*                        <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">*/}
-                    {/*                            {toDateString(roadmaps[0]?.createdAt)}*/}
-                    {/*                        </p>*/}
-                    {/*                    </div>*/}
-                    {/*                </div>*/}
-                    {/*            </Link>*/}
-                    {/*        </div>*/}
-                    {/*    ) : (*/}
-                    {/*        <div className="flex flex-col items-center justify-center py-20">*/}
-                    {/*            <Image*/}
-                    {/*                alt="missing roadmap"*/}
-                    {/*                src="https://illustrations.popsy.co/gray/success.svg"*/}
-                    {/*                width={400}*/}
-                    {/*                height={400}*/}
-                    {/*                className="dark:hidden"*/}
-                    {/*            />*/}
-                    {/*            <Image*/}
-                    {/*                alt="missing roadmap"*/}
-                    {/*                src="https://illustrations.popsy.co/white/success.svg"*/}
-                    {/*                width={400}*/}
-                    {/*                height={400}*/}
-                    {/*                className="hidden dark:block"*/}
-                    {/*            />*/}
-                    {/*            <p className="font-title text-2xl text-stone-600 dark:text-stone-400">*/}
-                    {/*                No roadmaps yet.*/}
-                    {/*            </p>*/}
-                    {/*        </div>*/}
-                    {/*    )}*/}
-                    {/*</div>*/}
-
-                    {/*{roadmaps?.length > 1 && (*/}
-                    {/*    <div className="mx-5 mb-20 max-w-screen-xl lg:mx-24 2xl:mx-auto">*/}
-                    {/*        <h2 className="mb-10 font-title text-4xl dark:text-white md:text-5xl">*/}
-                    {/*            More stories*/}
-                    {/*        </h2>*/}
-                    {/*        <div className="grid w-full grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">*/}
-                    {/*            {roadmaps*/}
-                    {/*                .slice(1)*/}
-                    {/*                .map((metadata: any, index: number) => (*/}
-                    {/*                    <BlogCard key={index} data={metadata}/>*/}
-                    {/*                ))}*/}
-                    {/*        </div>*/}
-                    {/*    </div>*/}
-                    {/*)}*/}
                 </div>
 
-                {/*<div className="col-span-2">*/}
-                {/*    <Card className="">*/}
-                {/*        <CardHeader>*/}
-                {/*            <CardTitle>*/}
-                {/*                More patient groups for you*/}
-                {/*            </CardTitle>*/}
-                {/*        </CardHeader>*/}
-                {/*        <CardContent>*/}
-                {/*            <div className="flex justify-between space-x-4">*/}
-                {/*                <Avatar>*/}
-                {/*                    <AvatarImage src="https://github.com/vercel.png"/>*/}
-                {/*                    <AvatarFallback>VC</AvatarFallback>*/}
-                {/*                </Avatar>*/}
-                {/*                <div className="space-y-1">*/}
-                {/*                    <h4 className="text-sm font-semibold">@nextjs</h4>*/}
-                {/*                    <p className="text-sm">*/}
-                {/*                        The React Framework – created and maintained by @vercel.*/}
-                {/*                    </p>*/}
-                {/*                    <div className="flex items-center pt-2">*/}
-                {/*                        <CalendarDays className="mr-2 h-4 w-4 opacity-70"/>{" "}*/}
-                {/*                        <span className="text-xs text-muted-foreground">*/}
-                {/*                            Joined December 2021*/}
-                {/*                        </span>*/}
-                {/*                    </div>*/}
-                {/*                </div>*/}
-                {/*            </div>*/}
-                {/*        </CardContent>*/}
-                {/*        <CardFooter className="flex justify-between">*/}
-                {/*        </CardFooter>*/}
-                {/*    </Card>*/}
-                {/*</div>*/}
+                {roadmaps?.length > 1 && (
+                    <div className="mx-5 mb-20 max-w-screen-xl lg:mx-24 2xl:mx-auto">
+                        <h2 className="mb-10 font-title text-4xl dark:text-white md:text-5xl">
+                            More stories
+                        </h2>
+                        <div className="grid w-full grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
+                            {roadmaps
+                                .slice(1)
+                                .map((metadata: any, index: number) => (
+                                    <BlogCard key={index} data={metadata}/>
+                                ))}
+                        </div>
+                    </div>
+                )}
+
+                </div>
             </main>
-            <PublicPageFooter/>
         </>
     )
 }

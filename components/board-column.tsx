@@ -9,10 +9,10 @@ import { Button } from "./ui/button"
 import { GripVertical } from "lucide-react"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 import { cn } from "@/lib/utils"
-import {Badge} from "@/components/ui/badge";
-import NewColumnDialog from "@/components/new-column-dialog";
 import {FaPlus} from "react-icons/fa6";
 import {Column} from "@prisma/client";
+import NewColumnDialog from "./new-column-dialog"
+import { Badge } from "./ui/badge"
 
 
 export type ColumnType = "Column"
