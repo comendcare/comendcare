@@ -197,7 +197,7 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
   }
 );
 
-const TableElement = withHOC(
+export const TableElement = withHOC(
     TableProvider,
     withRef<typeof PlateElement>(({ children, className, ...props }, ref) => {
         const { colSizes, isSelectingCell, marginLeft, minColumnWidth } =
