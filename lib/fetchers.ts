@@ -112,6 +112,20 @@ export async function getRoadmapsForOrganization(domain: string) {
             milestones: {
                 where: {
                     private: false
+                },
+                include: {
+                    asset: {
+                        include: {
+                            contacts: true,
+                            attachments: true
+                        }
+                    },
+                    RFP: {
+                        include: {
+                            contacts: true,
+                            attachments: true
+                        }
+                    }
                 }
             },
         },

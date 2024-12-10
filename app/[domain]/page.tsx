@@ -112,28 +112,31 @@ export default async function OrganizationHomePage({
                         </div>
 
                     <div className="col-span-4 flex flex-col space-y-4">
-                        {roadmaps.length > 0 &&
-                            <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined}/>
-                        }
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                        <Tabs defaultValue="roadmap" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="roadmap">
+                                    Roadmap
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    value="activity"
+                                    className="organization-profile-tour-step6"
+                                >
                                     Activity
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <UserNewPostCard/>
-                                <UserFeedTextCard
-                                    content={"Some patients with LGMD2I or MDC1C have trouble with their breathing. To support their breathing, they get a ventilation device that they either use full-time, i.e. 24 hours a day, or only for several hours a day or at night. “Non-invasive” means that they use this device without having had an operation. Usually this means they wear a mask that can be removed at any time."}
+                                </TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="roadmap" className="flex flex-col space-y-4">
+                                <PAGProfileAssetsAndProjectsHoverableCard 
+                                    assets={(roadmaps?.[0]?.milestones.filter(milestone => milestone.asset) || []).map(milestone => milestone.asset)}
+                                    rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
                                 />
-                                <UserFeedTextCard
-                                    content={"I'm wondering if this applies to me? I can move unassisted but not without a lot of stiffness."}
-                                    blockquote={"Motor function describes a person’s ability to move his or her body. Sitting independently means that you can stay in the sitting position for several minutes, without being supported by either another position or stabilizing device (chair back, corset or brace)." +
-                                        "- I am able to run " +
-                                        "- I am currently able to climb stairs without assistance"}
-                                />
-                            </CardContent>
-                        </Card>
+                                {roadmaps.length > 0 &&
+                                    <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined}/>
+                                }
+                            </TabsContent>
+                            <TabsContent value="activity" className="mt-0">
+                                <PAGProfileActivityCard/>
+                            </TabsContent>
+                        </Tabs>
                     </div>
                 </div>
 
