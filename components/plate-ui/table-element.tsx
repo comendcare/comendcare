@@ -197,46 +197,46 @@ export const TableFloatingToolbar = withRef<typeof PopoverContent>(
   }
 );
 
-export const TableElement = withHOC(
-  TableProvider,
-  withRef<typeof PlateElement>(({ children, className, ...props }, ref) => {
-    const { colSizes, isSelectingCell, marginLeft, minColumnWidth } =
-      useTableElementState();
-    const { colGroupProps, props: tableProps } = useTableElement();
+const TableElement = withHOC(
+    TableProvider,
+    withRef<typeof PlateElement>(({ children, className, ...props }, ref) => {
+        const { colSizes, isSelectingCell, marginLeft, minColumnWidth } =
+            useTableElementState();
+        const { colGroupProps, props: tableProps } = useTableElement();
 
-    return (
-      <TableFloatingToolbar>
-        <PlateElement
-          className={cn('overflow-x-auto', className)}
-          style={{ paddingLeft: marginLeft }}
-          {...props}
-        >
-          <table
-            ref={ref}
-            className={cn(
-              'my-4 ml-px mr-0 table h-px w-[calc(100%-6px)] table-fixed border-collapse',
-              isSelectingCell && '[&_*::selection]:bg-none'
-            )}
-            {...tableProps}
-          >
-            <colgroup {...colGroupProps}>
-              {colSizes.map((width, index) => (
-                <col
-                  key={index}
-                  style={{
-                    minWidth: minColumnWidth,
-                    width: width || undefined,
-                  }}
-                />
-              ))}
-            </colgroup>
+        return (
+            <TableFloatingToolbar>
+                <PlateElement
+                    className={cn('overflow-x-auto', className)}
+                    style={{ paddingLeft: marginLeft }}
+                    {...props}
+                >
+                    <table
+                        ref={ref as React.Ref<HTMLTableElement>} // Cast the ref
+                        className={cn(
+                            'my-4 ml-px mr-0 table h-px w-[calc(100%-6px)] table-fixed border-collapse',
+                            isSelectingCell && '[&_*::selection]:bg-none'
+                        )}
+                        {...tableProps}
+                    >
+                        <colgroup {...colGroupProps}>
+                            {colSizes.map((width, index) => (
+                                <col
+                                    key={index}
+                                    style={{
+                                        minWidth: minColumnWidth,
+                                        width: width || undefined,
+                                    }}
+                                />
+                            ))}
+                        </colgroup>
 
-            <tbody className="min-w-full">{children}</tbody>
-          </table>
-        </PlateElement>
-      </TableFloatingToolbar>
-    );
-  })
+                        <tbody className="min-w-full">{children}</tbody>
+                    </table>
+                </PlateElement>
+            </TableFloatingToolbar>
+        );
+    })
 );
 
 const BorderAll = (props: LucideProps) => (
