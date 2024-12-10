@@ -144,7 +144,6 @@ export function Roadmap({
                             <TabsList>
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
                                 <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger>
-                                <TabsTrigger value="kanban">Kanban View</TabsTrigger>
                             </TabsList>
                             {view === 'flow' && (
                                 <Tooltip>
@@ -182,14 +181,6 @@ export function Roadmap({
                             className="m-0 h-[calc(100vh-3.5rem)]"
                         >
                             <GanttChartView />
-                        </TabsContent>
-
-                        {/* Kanban View */}
-                        <TabsContent 
-                            value="kanban"
-                            className="m-0 h-[calc(100vh-3.5rem)]"
-                        >
-                            <KanbanView />
                         </TabsContent>
                     </Tabs>
                 </ResizablePanel>

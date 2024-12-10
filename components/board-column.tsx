@@ -11,12 +11,9 @@ import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 import { cn } from "@/lib/utils"
 import {Badge} from "@/components/ui/badge";
 import NewColumnDialog from "@/components/new-column-dialog";
+import {FaPlus} from "react-icons/fa6";
+import {Column} from "@prisma/client";
 
-export interface Column {
-    id: UniqueIdentifier
-    title: string
-    styling: string
-}
 
 export type ColumnType = "Column"
 
@@ -50,7 +47,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
             column
         } satisfies ColumnDragData,
         attributes: {
-            roleDescription: `Column: ${column.title}`
+            roleDescription: `Column: ${column.name}`
         }
     })
 
@@ -60,7 +57,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     }
 
     const variants = cva(
-        "h-full w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+        "h-min w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
         {
             variants: {
                 dragging: {
@@ -94,13 +91,13 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
                         {...listeners}
                         className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
                     >
-                        <span className="sr-only">{`Move column: ${column.title}`}</span>
+                        <span className="sr-only">{`Move column: ${column.name}`}</span>
                         <GripVertical />
                     </Button>
                     <Badge
                         size="large"
                     >
-                        {column.title}
+                        {column.name}
                     </Badge>
                 </CardTitle>
             </CardHeader>
@@ -111,6 +108,12 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
                             <TaskCard key={task.id} task={task} />
                         ))}
                     </SortableContext>
+                    <Button
+                        variant="outline"
+                    >
+                        <FaPlus/>
+                        New task
+                    </Button>
                 </CardContent>
             </ScrollArea>
         </Card>
@@ -137,7 +140,7 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
             type="auto"
         >
             {/* calculate the same height as the parent TabsContent - because scroll areas don't like h-full >:( */}
-            <div className="h-[calc(100vh-10rem)] flex gap-4 items-center flex-row justify-start">
+            <div className="h-[calc(100vh-10rem)] flex gap-4 items-start flex-row justify-start">
                 <NewColumnDialog/>
                 {children}
             </div>

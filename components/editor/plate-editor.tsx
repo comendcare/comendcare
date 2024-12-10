@@ -19,8 +19,6 @@ export function PlateEditor() {
         <EditorContainer>
           <Editor variant="demo" />
         </EditorContainer>
-
-        <SettingsDialog />
       </Plate>
     </DndProvider>
   );
