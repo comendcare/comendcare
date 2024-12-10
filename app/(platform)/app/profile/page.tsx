@@ -30,7 +30,6 @@ import {toast} from "sonner";
 import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import { ProfilePhoto } from "@/components/profile-photo";
 import { PublicRoadmap } from "@/components/public-roadmap";
-import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 
 export default async function ProfilePage() {
     const session = await getSession()
