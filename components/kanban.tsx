@@ -42,7 +42,7 @@ const defaultCols = [
         name: "Done",
         styling: "bg-green-100 border-green-600 text-green-800"
     }
-] satisfies Column[]
+] satisfies any[]
 
 export type ColumnId = (typeof defaultCols)[number]["id"]
 
