@@ -47,8 +47,8 @@ const joinOrgFormSchema = z.object({
 export const newOrgFormSchema = z.object({
     orgName: z.string().min(2, {
         message: "Your organization's name must be at least 2 characters."
-    }).max(32, {
-        message: "Your organization's name must be a maximum of 32 characters."
+    }).max(50, {
+        message: "Your organization's name must be a maximum of 50 characters."
     }),
     subdomain: z.string().min(2, {
         message: "Your organization's nickname must be at least 2 characters."
@@ -68,7 +68,7 @@ export const newOrgFormSchema = z.object({
     }).optional(),
     address1: z.string().optional(),
     address2: z.string().optional(),
-    formattedAddress: z.string(),
+    formattedAddress: z.string().optional(),
     city: z.string().optional(),
     region: z.string().optional(),
     postalCode: z.string().optional(),
@@ -284,7 +284,7 @@ export default function OrganizationOnboardingForm() {
     }
 
     return (
-        <div className="grid grid-cols-2 gap-x-8">
+        <div className="relative grid grid-cols-2 gap-x-8">
             <div className="space-y-4 col-span-1">
 
                 {/* Toggle between joining or creating an organization*/}
@@ -461,7 +461,7 @@ export default function OrganizationOnboardingForm() {
                                 name="description"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Description</FormLabel>
+                                        <FormLabel>Description (required)</FormLabel>
                                         <FormDescription>
                                             This will be the public description of your organization.
                                         </FormDescription>
@@ -675,9 +675,9 @@ export default function OrganizationOnboardingForm() {
                 )}
             </div>
             {isNewOrganization &&
-                <div className="col-span-1 space-y-4 border-1 rounded-lg">
-                    <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
-                        <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
+                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-280px)]">
+                    <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
+                        <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
                             Organization profile preview
                         </h1>
 
@@ -765,9 +765,11 @@ export default function OrganizationOnboardingForm() {
                                                             <h3 className={cn("scroll-m-20 text-md tracking-tight font-semibold")}>
                                                                 Description
                                                             </h3>
-                                                            <p className="text-sm">
-                                                                {newOrgForm.watch("description") || "Your organization's description."}
-                                                            </p>
+                                                            {newOrgForm.watch("description") ?
+                                                                <p className="text-sm line-clamp-6">
+                                                                    {newOrgForm.watch("description")}
+                                                                </p> : <Skeleton className="h-4 w-full"/>
+                                                            }
                                                         </div>
                                                         <div className="space-y-2">
                                                             <div
