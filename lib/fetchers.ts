@@ -484,7 +484,12 @@ export async function checkSubdomainAvailability(nickname: string) {
 export async function getMilestoneDetails(id: string) {
     try {
         const milestone = await prisma.milestone.findUnique({
-            where: { id }
+            where: { id },
+            include: {
+                asset: true,
+                RFP: true,
+                tasks: true
+            }
         })
 
         return {success: true, milestone}

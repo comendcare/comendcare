@@ -14,8 +14,9 @@ import {
 import { useSearchParams } from "next/navigation"
 import { getMilestoneDetails } from "@/lib/fetchers"
 import { toast } from "sonner"
+import { MilestoneDetails } from "./milestone-details"
 
-export async function PublicMilestoneDetails() {
+export function PublicMilestoneDetails() {
     const searchParams = useSearchParams()
     const urlMilestone = searchParams.get("milestone")
     const [milestone, setMilestone] = useState<any>()
@@ -34,14 +35,7 @@ export async function PublicMilestoneDetails() {
     }, [urlMilestone])
 
     if (milestone) {
-        return (
-            <Card>
-                <CardHeader>
-                    <CardTitle>{milestone.title}</CardTitle>
-                    <CardDescription>{milestone.description}</CardDescription>
-                </CardHeader>
-            </Card>
-        )
+        return <MilestoneDetails milestone={milestone} />
     }
 
     return (

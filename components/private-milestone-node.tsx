@@ -85,7 +85,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                     <FaTag size={24}/>
                     <p>{props.data.labels.join(', ')}</p>
                 </span>
-            } */}
+                } */}
 
                 {/* Related Ticket: https://www.notion.so/comend/Milestone-Labels-122801a6fddc80e69136e4e7ca9445b9?pvs=4 */}
                 {/* <ul className="flex flex-col gap-2"> 
