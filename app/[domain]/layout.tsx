@@ -9,6 +9,7 @@ import { fontMapper } from "@/styles/fonts"
 import { Metadata } from "next"
 import {LandingNavbar} from "@/components/layout/sections/landing-navbar";
 import PublicPageFooter from "@/components/public-page-footer"
+import { Button } from "@/components/ui/button"
 
 export async function generateMetadata({
     params

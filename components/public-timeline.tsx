@@ -3,12 +3,22 @@
 import React from "react"
 import { getDates } from "./pag-profile-research-plan-card"
 import { PrivateBadge } from "./private-badge"
+import { FaArrowUpRightFromSquare } from "react-icons/fa6"
 
-export const PublicTimelineView = ({ roadmap }: { roadmap: any}) => {
+export const PublicTimelineView = ({ roadmap, subdomain, urlMilestone }: { roadmap: any, subdomain: string | undefined, urlMilestone: string | undefined}) => {
     console.log(`milestones`, roadmap.milestones)
     return (
         <ol className="relative border-s border-gray-200 dark:border-gray-700 space-y-8">
             {roadmap?.milestones?.map((item: any, index: number) => (
+                <a 
+                href={
+                    subdomain ? 
+                        `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${item?.id}&view=timeline` :
+                        ''
+                    }
+                key={index}
+                // target="_blank"
+                >
                 <li key={index} className="ms-6">
                     <span
                         className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
@@ -19,8 +29,9 @@ export const PublicTimelineView = ({ roadmap }: { roadmap: any}) => {
                         </svg>
                     </span>
                     <div className="flex flex-row items-center justify-between gap-8 ">
-                        <h3 className="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white">
+                        <h3 className="flex items-center mb-1 text-lg font-semibold text-gray-900 dark:text-white gap-4">
                             {item.title}
+                            <FaArrowUpRightFromSquare size={15}/>
                             {item.label && (
                                 <span
                                     className="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300 ms-3">
@@ -56,6 +67,7 @@ export const PublicTimelineView = ({ roadmap }: { roadmap: any}) => {
                         </a>
                     )} */}
                 </li>
+                </a>
             ))}
         </ol>
     )
