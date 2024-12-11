@@ -1,6 +1,6 @@
 "use client"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {useRouter, useSearchParams} from "next/navigation";
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {cn} from "@/lib/utils";
 import "@xyflow/react/dist/base.css"
 import { PublicFlowView } from "./public-flow";
@@ -9,8 +9,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 export const PublicRoadmap = ({roadmap, subdomain}: {roadmap: any, subdomain: string | undefined}) => {
     const router = useRouter()
+    const pathname = usePathname()
     const searchParams = useSearchParams()
     const urlView = searchParams.get("view")
+
+    const handleTabChange = (value: string) => {
+        const params = new URLSearchParams(searchParams.toString())
+
+        params.delete("view")
+        params.set("view", value)
+
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    }
 
     return (
         <Card>
@@ -25,7 +35,11 @@ export const PublicRoadmap = ({roadmap, subdomain}: {roadmap: any, subdomain: st
 
             <CardContent className="px-8">
 
-            <Tabs defaultValue={urlView === 'flow' ? 'flow' : 'timeline'} className="space-y-4 w-full">
+            <Tabs 
+                defaultValue={urlView === 'flow' ? 'flow' : 'timeline'} 
+                className="space-y-4 w-full"
+                onValueChange={handleTabChange}
+            >
                 <TabsList>
                     <TabsTrigger value="timeline">
                         Timeline View
