@@ -98,42 +98,6 @@ export default function OrganizationSettingsTab() {
     return (
         <div className="flex flex-col space-y-16">
             <div>
-                <div className="sm:flex sm:items-center">
-                    <div className="space-y-2 sm:flex-auto">
-                        <h1 className="text-xl font-semibold leading-6 text-gray-900">
-                            Account
-                        </h1>
-                        <p className="text-sm text-gray-700">
-                            {`Make changes to your account here. Click save when you're done.`}
-                        </p>
-                    </div>
-                </div>
-                <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="w-2/3 space-y-6"
-                    >
-                        <FormField
-                            control={form.control}
-                            name="organizationName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Organization name</FormLabel>
-                                    <FormControl>
-                                        <Input id="name" defaultValue="Pedro Duarte" {...field} />
-                                    </FormControl>
-                                    <FormDescription>
-                                        This is your public display name.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button type="submit">Submit</Button>
-                    </form>
-                </Form>
-            </div>
-            <div>
                 <h1 className="text-xl font-semibold leading-6 text-gray-900">
                     Permanent Settings
                 </h1>
