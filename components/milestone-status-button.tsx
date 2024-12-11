@@ -44,10 +44,10 @@ export default function StatusButton({
     return (
         <Button
             disabled={disabled}
-            className={`${StatusData[status].styling}`}
+            className={`${StatusData[status]?.styling}`}
             onClick={handleStateChange}
         >
-            {StatusData[status].text}
+            {StatusData[status]?.text}
         </Button>
     )
 }
