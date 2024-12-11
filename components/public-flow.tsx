@@ -1,15 +1,32 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import {
     ReactFlow,
     MiniMap,
+    useReactFlow,
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
 import PublicMilestoneNode from "./public-milestone-node"
 
-export const PublicFlowView = ({ roadmap, subdomain }: { roadmap: any, subdomain: string | undefined }) => {
+export const PublicFlowView = ({ roadmap, subdomain, urlMilestone }: { roadmap: any, subdomain: string | undefined, urlMilestone: string | undefined }) => {
     const nodeTypes = { MILESTONE: PublicMilestoneNode }
+    const { fitView } = useReactFlow()
+
+    console.log(roadmap)
+
+    useEffect(() => {
+        if (urlMilestone && roadmap?.nodes) {
+            const timer = setTimeout(() => {
+                fitView({
+                    nodes: roadmap?.nodes?.filter((node: any) => node?.data?.id == urlMilestone).map((node: any) => ({ id: node.id })),
+                    padding: 2
+                })
+            }, 1) // Delay by a short time to allow layout adjustment
+    
+            return () => clearTimeout(timer)
+        }
+    }, [urlMilestone])
 
     return (
     <ReactFlow
@@ -19,7 +36,8 @@ export const PublicFlowView = ({ roadmap, subdomain }: { roadmap: any, subdomain
             position: {x: node.positionX, y: node.positionY}, 
             data: {
                 ...node.data,
-                subdomain: subdomain
+                subdomain: subdomain,
+                focused: urlMilestone === node?.data?.id
             }
         })) || []}
         edges={roadmap?.edges || []}
