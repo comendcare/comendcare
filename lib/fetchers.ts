@@ -500,9 +500,20 @@ export async function getMilestoneDetails(id: string) {
         const milestone = await prisma.milestone.findUnique({
             where: { id },
             include: {
-                asset: true,
-                RFP: true,
-                tasks: true
+                asset: {
+                    include: {
+                        contacts: true,
+                        attachments: true,
+                    }
+                },
+                RFP: {
+                    include: {
+                        contacts: true,
+                        attachments: true
+                    }
+                },
+                tasks: true,
+                papers: true
             }
         })
 
