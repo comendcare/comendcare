@@ -17,14 +17,11 @@ export const PublicFlowView = ({ roadmap, subdomain, urlMilestone }: { roadmap: 
 
     useEffect(() => {
         if (urlMilestone && roadmap?.nodes) {
-            const options = {
-                nodes: roadmap?.nodes?.filter((node: any) => node?.data?.id == urlMilestone).map((node: any) => ({ id: node.id })),
-                padding: 2
-            }
-            console.log(`options`, options)
-
             const timer = setTimeout(() => {
-                fitView(options)
+                fitView({
+                    nodes: roadmap?.nodes?.filter((node: any) => node?.data?.id == urlMilestone).map((node: any) => ({ id: node.id })),
+                    padding: 2
+                })
             }, 1) // Delay by a short time to allow layout adjustment
     
             return () => clearTimeout(timer)
