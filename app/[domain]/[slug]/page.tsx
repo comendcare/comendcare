@@ -119,12 +119,11 @@ export default async function OrganizationRoadmapPage({
         <>
             {roadmaps.length > 0 ? (
                     <div className="flex flex-col items-center justify-center my-16 gap-8">
-                        <div className="m-auto w-full text-left md:w-7/12">
-                            <BackButton />
-                            <PAGPublicProfileHeader organization={organization}/>
+                        <div className="m-auto w-full text-left max-w-7xl ">
+                            <PAGPublicProfileHeader organization={organization} showBackButton={true} />
                         </div>
 
-                        <div className="m-auto w-full text-left md:w-7/12 flex flex-col gap-8">
+                        <div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">
                             <PublicMilestoneDetails />
                             <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined} />
                         </div>

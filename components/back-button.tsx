@@ -9,7 +9,7 @@ export function BackButton() {
 
     return (
         <Button
-            className="absolute m-4"
+            className="absolute m-4 top-0 left-0"
             onClick={() => {
                 router.back()
             }}
