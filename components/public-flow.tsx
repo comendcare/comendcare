@@ -8,7 +8,7 @@ import {
 import "@xyflow/react/dist/base.css"
 import PublicMilestoneNode from "./public-milestone-node"
 
-export const PublicFlowView = ({ roadmap, subdomain }: { roadmap: any, subdomain: string | undefined }) => {
+export const PublicFlowView = ({ roadmap, subdomain, urlMilestone }: { roadmap: any, subdomain: string | undefined, urlMilestone: string | undefined }) => {
     const nodeTypes = { MILESTONE: PublicMilestoneNode }
 
     return (
@@ -19,7 +19,8 @@ export const PublicFlowView = ({ roadmap, subdomain }: { roadmap: any, subdomain
             position: {x: node.positionX, y: node.positionY}, 
             data: {
                 ...node.data,
-                subdomain: subdomain
+                subdomain: subdomain,
+                focused: urlMilestone === node?.data?.id
             }
         })) || []}
         edges={roadmap?.edges || []}

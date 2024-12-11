@@ -5,7 +5,7 @@ import { getDates } from "./pag-profile-research-plan-card"
 import { PrivateBadge } from "./private-badge"
 import { FaArrowUpRightFromSquare } from "react-icons/fa6"
 
-export const PublicTimelineView = ({ roadmap, subdomain }: { roadmap: any, subdomain: string | undefined}) => {
+export const PublicTimelineView = ({ roadmap, subdomain, urlMilestone }: { roadmap: any, subdomain: string | undefined, urlMilestone: string | undefined}) => {
     console.log(`milestones`, roadmap.milestones)
     return (
         <ol className="relative border-s border-gray-200 dark:border-gray-700 space-y-8">

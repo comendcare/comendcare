@@ -36,6 +36,7 @@ export type PublicMilestoneNode = Node<
         onboardingMilestone: boolean
         private: boolean
         subdomain: string | undefined
+        focused: boolean
     },
     "MILESTONE"
 >
@@ -57,7 +58,13 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
             }
             target="_blank"
         >
-        <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "")}>
+        <Card 
+            className={cn(
+                "w-[350px]", 
+                props.data?.onboardingMilestone ? "research-plan-tour-step2" : "",
+                props.data?.focused ? "border-2 border-black" : ""
+            )}
+        >
             <CardHeader>
                 {props.data?.private && (
                     <PrivateBadge className="-mt-2 justify-end" />
