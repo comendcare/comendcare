@@ -12,6 +12,7 @@ export const PublicRoadmap = ({roadmap, subdomain}: {roadmap: any, subdomain: st
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const urlView = searchParams.get("view")
+    const urlMilestone = searchParams.get("milestone")
 
     const handleTabChange = (value: string) => {
         const params = new URLSearchParams(searchParams.toString())
@@ -49,11 +50,11 @@ export const PublicRoadmap = ({roadmap, subdomain}: {roadmap: any, subdomain: st
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="timeline" className="space-y-4 w-full">
-                    <PublicTimelineView roadmap={roadmap} subdomain={subdomain}/>
+                    <PublicTimelineView roadmap={roadmap} subdomain={subdomain} urlMilestone={urlMilestone || undefined}/>
                 </TabsContent>
                 <TabsContent value="flow" className="space-y-4 w-full">
                     <div className="h-[600px]">
-                        <PublicFlowView roadmap={roadmap} subdomain={subdomain} />
+                        <PublicFlowView roadmap={roadmap} subdomain={subdomain} urlMilestone={urlMilestone || undefined}/>
                     </div>
                 </TabsContent>
             </Tabs>
