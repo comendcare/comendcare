@@ -56,7 +56,7 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
                 `http://${props.data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${props?.data?.id}&view=flow` :
                 ''
             }
-            target="_blank"
+            // target="_blank"
         >
         <Card 
             className={cn(

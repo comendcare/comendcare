@@ -41,7 +41,7 @@ export function RFPDetails({ asset }: { asset: AssetType }) {
                 <a href={"#"}>
                     <li
                         key={asset?.id}
-                        className="w-full flex items-center justify-between space-x-4 py-2"
+                        className="w-full flex items-center justify-between space-x-4 py-2 text-wrap"
                     >
                         <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
                             <div className="flex items-center gap-x-3">

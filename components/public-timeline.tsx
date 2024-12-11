@@ -15,7 +15,7 @@ export const PublicTimelineView = ({ roadmap, subdomain, urlMilestone }: { roadm
                         `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${item?.id}&view=timeline` :
                         ''
                     }
-                    target="_blank"
+                    // target="_blank"
                 >
                 <li key={index} className="ms-6">
                     <span
