@@ -21,7 +21,7 @@ import {PAGProfileAssetsCard} from "@/components/pag-profile-assets-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import prisma from "@/lib/prisma"
 import {PAGProfileOpenRFPsCard} from "@/components/pag-profile-open-rfps-card";
-import EditPAGProfileDialog from "@/components/edit-pag-profile-page";
+import EditPAGProfileDialog from "@/components/edit-pag-profile-page-dialog";
 import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {PAGProfileAssetsAndProjectsCard} from "@/components/pag-profile-assets-and-projects-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";

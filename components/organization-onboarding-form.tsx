@@ -53,7 +53,7 @@ export const newOrgFormSchema = z.object({
     subdomain: z.string().min(2, {
         message: "Your organization's nickname must be at least 2 characters."
     }),
-    looking: z.array(optionSchema).min(0).optional(),
+    looking: z.string().min(0).optional(),
     founded: z.string().optional(),
     description: z.string().min(2, {
         message: "Your organization's description must be at least 2 characters long.",
@@ -106,7 +106,9 @@ const OPTIONS: Option[] = [
     },
 ];
 
-const years = Array.from({length: new Date().getFullYear() - 1970 + 1}, (_, i) => (1970 + i).toString());
+const years = Array.from({ length: new Date().getFullYear() - 1970 + 1 }, (_, i) =>
+    (new Date().getFullYear() - i).toString()
+)
 
 export default function OrganizationOnboardingForm() {
     const {data: session, update} = useSession()
@@ -591,19 +593,24 @@ export default function OrganizationOnboardingForm() {
                                 name="looking"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Looking for`}</FormLabel>
-                                        <FormDescription>{`What your organization is looking for and hoping to get from joining Comend.`}</FormDescription>
+                                        <FormLabel>{`What your organization is looking for and hoping to get from joining Comend.`}</FormLabel>
+                                        <FormDescription>{`Provide as much detail as possible; we want to help you!`}</FormDescription>
                                         <FormControl>
-                                            <MultipleSelector
+                                            <Input
+                                                type="text"
+                                                id="looking"
                                                 {...field}
-                                                defaultOptions={OPTIONS}
-                                                placeholder="Select options that appeal to you..."
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
                                             />
+                                            {/*<MultipleSelector*/}
+                                            {/*    {...field}*/}
+                                            {/*    defaultOptions={OPTIONS}*/}
+                                            {/*    placeholder="Select options that appeal to you..."*/}
+                                            {/*    emptyIndicator={*/}
+                                            {/*        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
+                                            {/*            no results found.*/}
+                                            {/*        </p>*/}
+                                            {/*    }*/}
+                                            {/*/>*/}
                                         </FormControl>
                                         <FormMessage/>
                                     </FormItem>

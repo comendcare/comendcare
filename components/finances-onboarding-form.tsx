@@ -19,7 +19,7 @@ import {FaQuestionCircle} from "react-icons/fa";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {Timer} from "lucide-react";
 
-const invitationFormSchema = z.object({
+export const financesFormSchema = z.object({
     raising: z.enum(["yes", "no-but", "no"], {
         required_error: "You need to select a 501c3 status.",
     }).optional(),
@@ -38,12 +38,12 @@ export default function FinancesOnboardingForm() {
     const session = useSession()
     const router = useRouter()
 
-    const form = useForm<z.infer<typeof invitationFormSchema>>({
+    const form = useForm<z.infer<typeof financesFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(invitationFormSchema)
+        resolver: zodResolver(financesFormSchema)
     })
 
-    async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
+    async function onSubmit(values: z.infer<typeof financesFormSchema>) {
 
         const formData = new FormData()
 

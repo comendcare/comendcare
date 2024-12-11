@@ -40,6 +40,8 @@ model User {
   country              String?
   lat                  Float?
   lng                  Float?
+  Post                 Post[]
+  Like                 Like[]
 }
 
 model Member {
@@ -475,4 +477,32 @@ model Example {
   url           String?
   image         String? @db.Text
   imageBlurhash String? @db.Text
+}
+
+model Post {
+  id        String     @id
+  title     String
+  content   Json?
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  like      Reaction[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+enum ReactionType {
+  LIKE
+  LOVE
+  SUPPORT
+}
+
+model Reaction {
+  id        String       @id
+  type      ReactionType
+  author    User         @relation(fields: [authorId], references: [id])
+  authorId  String       @db.ObjectId
+  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String       @db.ObjectId
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }
