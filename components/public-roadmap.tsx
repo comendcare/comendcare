@@ -49,7 +49,7 @@ export const PublicRoadmap = ({roadmap, subdomain}: {roadmap: any, subdomain: st
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="timeline" className="space-y-4 w-full">
-                    <PublicTimelineView roadmap={roadmap} />
+                    <PublicTimelineView roadmap={roadmap} subdomain={subdomain}/>
                 </TabsContent>
                 <TabsContent value="flow" className="space-y-4 w-full">
                     <div className="h-[600px]">
