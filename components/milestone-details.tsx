@@ -80,7 +80,7 @@ export function MilestoneDetails({ milestone }: { milestone: any }) {
                         <h2 className="font-semibold text-xl">{`Attached Papers`}</h2>
                         <ol className="flex flex-row gap-4 flex-wrap">
                             {milestone?.papers?.map((paper: any, index: number) => (
-                                <Link href={paper.link}>
+                                <Link href={paper.link} key={index}>
                                     <Button variant="secondary">
                                         {paper.name || paper.link}
                                         <FaPaperclip />
