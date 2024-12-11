@@ -26,6 +26,7 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 
 export interface Task {
+    columnId: string;
     id: string
     status: StatusType
     name: string

@@ -70,6 +70,9 @@ export default async function KanbanPage({
                 }
             }
         },
+        include: {
+            tasks: true
+        }
     })
 
     return (

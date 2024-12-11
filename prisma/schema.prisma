@@ -40,8 +40,8 @@ model User {
   country              String?
   lat                  Float?
   lng                  Float?
-  Post                 Post[]
-  Like                 Like[]
+  posts                Post[]
+  reactions            Reaction[]
 }
 
 model Member {
@@ -500,9 +500,9 @@ model Reaction {
   id        String       @id
   type      ReactionType
   author    User         @relation(fields: [authorId], references: [id])
-  authorId  String       @db.ObjectId
+  authorId  String
   post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String       @db.ObjectId
+  postId    String
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
 }

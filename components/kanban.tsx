@@ -59,11 +59,13 @@ const kanbanSelector = (state: KanbanState) => ({
 export function KanbanView() {
     const { milestones } = useRoadmapStore(useShallow(roadmapSelector))
     const { columns } = useKanbanStore(useShallow(kanbanSelector))
+    console.log(columns)
 
     return (
         <Kanban
             initColumns={columns}
-            initTasks={milestones.map(milestone => milestone?.tasks || []).flat(1)}
+            // initTasks={milestones.map(milestone => milestone?.tasks || []).flat(1)}
+            initTasks={columns.flatMap(column => column.tasks)}
         />
     )
 }
@@ -85,6 +87,7 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
 
     // kanban requires its own state outside of the zustand state, so we can move things around properly
     const [tasks, setTasks] = useState(sortKanbanTasks(initTasks))
+    console.log(tasks)
 
     const [activeColumn, setActiveColumn] = useState<Column | null>(null)
 
@@ -366,7 +369,7 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
                             key={col.id}
                             column={col}
                             tasks={tasks.filter(
-                                task => task.status === col.id
+                                task => task.columnId === col.id
                             )}
                         />
                     )) : <div>{`You don't have any columns`}</div>}
@@ -381,7 +384,7 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
                                 isOverlay
                                 column={activeColumn}
                                 tasks={tasks.filter(
-                                    task => task.status === activeColumn.id
+                                    task => task.columnId === activeColumn.id
                                 )}
                             />
                         )}
