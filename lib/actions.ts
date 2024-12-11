@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma} from "@prisma/client"
+import {Roadmap, Organization, Prisma, Column} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
@@ -1198,6 +1198,31 @@ export async function leaveOrganization(
         }
 
         return {success: true, data: member};
+    } catch (error: any) {
+        logError("Error fetching membership data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function createNewKanbanTask(column: Column) {
+    try {
+        const task = prisma.task.create({
+            data: {
+                column: {
+                    connect: {
+                        id: column.id
+                    },
+                },
+                orderPosition: 0,
+                kanbanPosition: 0
+            }
+        })
+
+        if (!task) {
+            return {success: false, error: "membership not found"};
+        }
+
+        return {success: true, data: task};
     } catch (error: any) {
         logError("Error fetching membership data", error);
         return {success: false, error: "Internal server error"};

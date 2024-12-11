@@ -9,10 +9,10 @@ import { Button } from "./ui/button"
 import { GripVertical } from "lucide-react"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 import { cn } from "@/lib/utils"
-import {FaPlus} from "react-icons/fa6";
 import {Column} from "@prisma/client";
 import NewColumnDialog from "./new-column-dialog"
 import { Badge } from "./ui/badge"
+import NewKanbanTaskButton from "@/components/new-kanban-task-button";
 
 
 export type ColumnType = "Column"
@@ -108,12 +108,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
                             <TaskCard key={task.id} task={task} />
                         ))}
                     </SortableContext>
-                    <Button
-                        variant="outline"
-                    >
-                        <FaPlus/>
-                        New task
-                    </Button>
+                    <NewKanbanTaskButton column={column}/>
                 </CardContent>
             </ScrollArea>
         </Card>
