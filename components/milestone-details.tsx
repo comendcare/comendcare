@@ -30,21 +30,21 @@ export function MilestoneDetails({ milestone }: { milestone: any }) {
         <Card>
             <CardHeader className="flex flex-row gap-4">
                 <span className="flex flex-col gap-4 grow">
-                    <CardTitle className="flex flex-row gap-4">
+                    <CardTitle className="flex flex-row gap-4 items-center scroll-m-20 text-3xl font-bold tracking-tight">
                         {milestone.title}
                         {milestone.type && milestone.type !== 'NOTYPE' && (
-                            <Badge className="flex text-sm">
+                            <Badge className="flex text-sm h-[30px]">
                                 {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestone.type))?.label || "No type"}
                             </Badge>
                         )}
+                        <StatusButton
+                            disabled={true}
+                            status={milestone.status}
+                            onStatusChange={() => {}}
+                        />
                     </CardTitle>
                     <CardDescription>{milestone.description}</CardDescription>
                 </span>
-                <StatusButton
-                    disabled={true}
-                    status={milestone.status}
-                    onStatusChange={() => {}}
-                />
             </CardHeader>
             <CardContent className="flex flex-col gap-8">
                 <div className="flex flex-row gap-4 text-gray-500">
