@@ -1,15 +1,35 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import {
     ReactFlow,
     MiniMap,
+    useReactFlow,
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
 import PublicMilestoneNode from "./public-milestone-node"
 
 export const PublicFlowView = ({ roadmap, subdomain, urlMilestone }: { roadmap: any, subdomain: string | undefined, urlMilestone: string | undefined }) => {
     const nodeTypes = { MILESTONE: PublicMilestoneNode }
+    const { fitView } = useReactFlow()
+
+    console.log(roadmap)
+
+    useEffect(() => {
+        if (urlMilestone && roadmap?.nodes) {
+            const options = {
+                nodes: roadmap?.nodes?.filter((node: any) => node?.data?.id == urlMilestone).map((node: any) => ({ id: node.id })),
+                padding: 2
+            }
+            console.log(`options`, options)
+
+            const timer = setTimeout(() => {
+                fitView(options)
+            }, 1) // Delay by a short time to allow layout adjustment
+    
+            return () => clearTimeout(timer)
+        }
+    }, [urlMilestone])
 
     return (
     <ReactFlow
