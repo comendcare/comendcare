@@ -31,7 +31,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                             <div className="space-y-2">
                                 <div className="inline-flex flex-row justify-between items-center">
                                     <Link
-                                        href={"/app/roadmap"}
+                                        href={`/condition/${condition.slug}`}
                                         className="hover:underline inline-flex flex-row justify-center items-center gap-x-2 text-base"
                                     >
                                         <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>

@@ -37,6 +37,7 @@ import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious}
 import ConditionProfilePatientGroupCard from "@/components/condition-profile-patient-group-card";
 import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
 import PublicPageFooter from "@/components/public-page-footer";
+import Link from "next/link";
 
 export type Post = {
     id: string
@@ -411,12 +412,15 @@ export default async function ConditionPage({
                     <Carousel>
                         <CarouselContent className="p-4">
                             {data.organizations.map((organization, index) => (
-                                <CarouselItem
+                                <Link
                                     key={index}
+                                    href={`${organization.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                     className="md:basis-1/2 lg:basis-1/3"
                                 >
-                                    <ConditionProfilePatientGroupCard organization={organization.organization}/>
-                                </CarouselItem>
+                                    <CarouselItem >
+                                        <ConditionProfilePatientGroupCard organization={organization.organization}/>
+                                    </CarouselItem>
+                                </Link>
                             ))}
                         </CarouselContent>
                         <CarouselPrevious/>
