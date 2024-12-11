@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button"
 import { PublicRoadmap } from "@/components/public-roadmap"
 import { PublicMilestoneDetails } from "@/components/public-milestone-details"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header"
+import { FaArrowLeft } from "react-icons/fa6"
+import { BackButton } from "@/components/back-button"
 
 export async function generateMetadata({
                                            params
@@ -102,6 +104,7 @@ export default async function OrganizationRoadmapPage({
     const domain = decodeURIComponent(params.domain)
     const slug = decodeURIComponent(params.slug)
     
+    
     // const data = await getRoadmapData(domain, slug)
     const [organization, roadmaps] = await Promise.all([
         getOrganizationData(domain),
@@ -117,16 +120,13 @@ export default async function OrganizationRoadmapPage({
             {roadmaps.length > 0 ? (
                     <div className="flex flex-col items-center justify-center my-16 gap-8">
                         <div className="m-auto w-full text-left md:w-7/12">
-                            {/* <p className="m-auto my-5 w-10/12 text-sm font-light text-stone-500 dark:text-stone-400 md:text-base">
-                                {toDateString(roadmaps[0].createdAt)}
-                            </p> */}
+                            <BackButton />
                             <PAGPublicProfileHeader organization={organization}/>
                         </div>
 
                         <div className="m-auto w-full text-left md:w-7/12 flex flex-col gap-8">
                             <PublicMilestoneDetails />
                             <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined} />
-                            {/* <PublicMilestoneDetails /> */}
                         </div>
                     </div>
                 ) :
