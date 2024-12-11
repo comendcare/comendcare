@@ -3,7 +3,7 @@
 import React from "react"
 import { ScrollArea } from "./ui/scroll-area"
 import StatusButton, { StatusType } from "./milestone-status-button"
-import { FaDollarSign } from "react-icons/fa6"
+import { FaArrowUpRightFromSquare, FaDollarSign, FaPaperclip } from "react-icons/fa6"
 import { Label } from "./ui/label"
 import { TaskType } from "./private-milestone-node"
 import {
@@ -20,13 +20,24 @@ import { DateView } from "./miletone-date-view"
 import { BudgetView } from "./milestone-budget-view"
 import { AssetEditForm } from "./asset-edit-form"
 import { AssetDetails } from "./asset-details"
+import { Separator } from "./ui/separator"
+import Link from "next/link"
+import { RFPDetails } from "./rfp-details.tsx"
+import { Button } from "./ui/button"
 
 export function MilestoneDetails({ milestone }: { milestone: any }) {
     return (
         <Card>
             <CardHeader className="flex flex-row gap-4">
                 <span className="flex flex-col gap-4 grow">
-                    <CardTitle>{milestone.title}</CardTitle>
+                    <CardTitle className="flex flex-row gap-4">
+                        {milestone.title}
+                        {milestone.type && milestone.type !== 'NOTYPE' && (
+                            <Badge className="flex text-sm">
+                                {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestone.type))?.label || "No type"}
+                            </Badge>
+                        )}
+                    </CardTitle>
                     <CardDescription>{milestone.description}</CardDescription>
                 </span>
                 <StatusButton
@@ -35,19 +46,49 @@ export function MilestoneDetails({ milestone }: { milestone: any }) {
                     onStatusChange={() => {}}
                 />
             </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-                <span className="w-full flex">
-                    <Badge className="flex text-sm">
-                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestone.type))?.label || "No type"}
-                    </Badge>
-                </span>
+            <CardContent className="flex flex-col gap-8">
+                <div className="flex flex-row gap-4 text-gray-500">
+                    <DateView startDate={milestone.startDate} endDate={milestone.endDate}/>
 
-                <DateView startDate={milestone.startDate} endDate={milestone.endDate}/>
+                    <BudgetView budget={milestone.budget} />
+                </div>
 
-                <BudgetView budget={milestone.budget} />
+                {(milestone?.asset || milestone?.rfp) && (
+                    <>
+                    <Separator />
+                    <div className="grid grid-cols-2 gap-4">
+                        {milestone.asset && (
+                            <div className="flex flex-col gap-4">
+                                <h2 className="font-semibold text-xl">{`Assets`}</h2>
+                                <AssetDetails asset={milestone.asset} />
+                            </div>
+                        )}
+    
+                        {milestone.RFP && (
+                            <div className="flex flex-col gap-4">
+                                <h2 className="font-semibold text-xl">{`Projects`}</h2>
+                                <RFPDetails asset={milestone.RFP} />
+                            </div>
+                        )}
+                    </div>
+                    </>
+                )}
 
-                {milestone.asset && (
-                    <AssetDetails asset={milestone.asset} />
+                {milestone.papers && milestone.papers.length > 0 && (
+                    <div className="flex flex-col gap-4">
+                        <Separator />
+                        <h2 className="font-semibold text-xl">{`Attached Papers`}</h2>
+                        <ol className="flex flex-row gap-4 flex-wrap">
+                            {milestone?.papers?.map((paper: any, index: number) => (
+                                <Link href={paper.link}>
+                                    <Button variant="secondary">
+                                        {paper.name || paper.link}
+                                        <FaPaperclip />
+                                    </Button>
+                                </Link>
+                            ))}
+                        </ol>
+                    </div>
                 )}
             </CardContent>
         </Card>
