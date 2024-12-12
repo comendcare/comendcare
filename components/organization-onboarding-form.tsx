@@ -47,8 +47,8 @@ const joinOrgFormSchema = z.object({
 export const newOrgFormSchema = z.object({
     orgName: z.string().min(2, {
         message: "Your organization's name must be at least 2 characters."
-    }).max(50, {
-        message: "Your organization's name must be a maximum of 50 characters."
+    }).max(60, {
+        message: "Your organization's name must be a maximum of 60 characters."
     }),
     subdomain: z.string().min(2, {
         message: "Your organization's nickname must be at least 2 characters."

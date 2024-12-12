@@ -20,8 +20,8 @@ export const getNewColumnFormSchema = (existingKeywords: string[]) =>
             .string()
             .min(2, "Keyword must be at least 2 characters long.")
             .max(
-                50,
-                "Please shorten your keyword or phrase to fewer than 50 characters."
+                20,
+                "Please shorten your keyword or phrase to fewer than 20 characters."
             )
             .superRefine((keyword, ctx) => {
                 if (existingKeywords.includes(keyword.toLowerCase())) {
