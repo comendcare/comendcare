@@ -361,18 +361,21 @@ export default function OrganizationOnboardingForm() {
                             <FormField
                                 control={newOrgForm.control}
                                 name="subdomain"
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                         <FormDescription>
                                             {`Enter your organization's abbreviated name, short form, or nickname.`}
-                                            <br/>
-                                            {
-                                                newOrgForm.watch("subdomain") && !newOrgForm.formState.errors.subdomain &&
-                                                <>
-                                                    {`Your organization's domain will be ${newOrgForm.watch("subdomain")}.comend.io`}
-                                                </>
-                                            }
+                                            <br />
+                                            {newOrgForm.watch("subdomain") &&
+                                                !newOrgForm.formState.errors.subdomain && (
+                                                    <>
+                                                        {`Your organization's domain will be ${newOrgForm
+                                                            .watch("subdomain")
+                                                            .toLowerCase()
+                                                            .replace(/\s+/g, "-")}.comend.io`}
+                                                    </>
+                                                )}
                                         </FormDescription>
                                         <FormControl>
                                             <Input
@@ -380,9 +383,13 @@ export default function OrganizationOnboardingForm() {
                                                 id="name"
                                                 autoComplete="name"
                                                 {...field}
+                                                onChange={(e) => {
+                                                    const value = e.target.value.toLowerCase().replace(/\s+/g, "-");
+                                                    field.onChange(value); // Update the form state with processed value
+                                                }}
                                             />
                                         </FormControl>
-                                        <FormMessage/>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
