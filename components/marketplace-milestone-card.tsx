@@ -23,13 +23,27 @@ export function MilestoneMarketplaceCard({ milestone }: { milestone: any }) {
         if (!organization) initOrg()
     }, [])
 
+    const getLink = () => {
+        if (organization?.subdomain) {
+            if (organization.roadmaps?.filter((roadmap: any) => roadmap.id === milestone?.roadmapId).length > 0) {
+                return `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${milestone?.roadmapId}&view=flow`
+            }
+
+            return `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap`
+        }
+
+        return '#'
+    }
+
     return (
         <Link
-            href={
-                organization?.subdomain ? 
-                `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${milestone?.roadmapId}&view=flow` :
-                '#'
-            }
+            // href={
+            //     organization?.subdomain ? 
+            //     // `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${milestone?.roadmapId}&view=flow` :
+            //     `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap` :
+            //     '#'
+            // }
+            href={getLink()}
         >
         <Card className="h-full w-full text-left flex flex-col justify-between">
             <CardHeader>
