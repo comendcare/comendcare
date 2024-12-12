@@ -12,7 +12,7 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {PAGPublicProfileDetailsCard} from "@/components/pag-public-profile-details-card";
-import { PublicRoadmap } from "@/components/public-roadmap";
+import { PublicRoadmapCard } from "@/components/public-roadmap-card";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {CalendarDays} from "lucide-react";
 import {PAGProfileAssetsCard} from "@/components/pag-profile-assets-card";
@@ -130,7 +130,7 @@ export default async function OrganizationHomePage({
                                     rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
                                 />
                                 {roadmaps.length > 0 &&
-                                    <PublicRoadmap roadmap={roadmaps?.[0]} subdomain={organization?.subdomain || undefined}/>
+                                    <PublicRoadmapCard roadmap={roadmaps?.[0]} subdomain={organization?.subdomain || undefined}/>
                                 }
                             </TabsContent>
                             <TabsContent value="activity" className="mt-0">
