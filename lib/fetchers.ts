@@ -6,6 +6,7 @@ import {serialize} from "next-mdx-remote/serialize"
 import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
 import {ApiResponse} from "@/lib/types";
 import {logError} from "@/lib/utils";
+import {getSession} from "@/lib/auth";
 
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
@@ -517,9 +518,25 @@ export async function getMilestoneDetails(id: string) {
             }
         })
 
-        return {success: true, milestone}
+        return {success: true, data: milestone}
     } catch (error: any) {
         console.error("Database error finding milestone details:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function getKanbanFromOrganizationId() {
+    const session = await getSession()
+    try {
+        const kanban = await prisma.kanban.findUnique({
+            where: {
+                organizationId: session?.user.organizationId
+            }
+        })
+
+        return {success: true, data: kanban}
+    } catch (error: any) {
+        console.error("Database error finding kanban details:", error)
         return {success: false, error: "Database error. please try again later."}
     }
 }

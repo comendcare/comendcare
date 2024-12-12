@@ -13,6 +13,18 @@ import {Column} from "@prisma/client";
 import NewColumnDialog from "./new-column-dialog"
 import { Badge } from "./ui/badge"
 import NewKanbanTaskButton from "@/components/new-kanban-task-button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {FaEllipsis, FaTrash} from "react-icons/fa6";
+import {toast} from "sonner";
+import {getKanbanFromOrganizationId} from "@/lib/fetchers";
+import {deleteKanbanColumn} from "@/lib/actions";
 
 
 export type ColumnType = "Column"
@@ -69,6 +81,22 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
         }
     )
 
+    async function deleteColumn () {
+        try {
+            await deleteKanbanColumn(column).then((response) => {
+                if (response.success && response.data) {
+                    toast.success("column deleted successfully!");
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+            })
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to delete task.");
+        }
+    }
+
     return (
         <Card
             ref={setNodeRef}
@@ -84,21 +112,40 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
             <CardHeader className={cn(
                 "p-4 font-semibold border-b-2 text-left flex flex-row space-between items-center"
             )}>
-                <CardTitle className="flex flex-row space-between items-center">
-                    <Button
-                        variant="ghost"
-                        {...attributes}
-                        {...listeners}
-                        className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
-                    >
-                        <span className="sr-only">{`Move column: ${column.name}`}</span>
-                        <GripVertical />
-                    </Button>
-                    <Badge
-                        size="large"
-                    >
-                        {column.name}
-                    </Badge>
+                <CardTitle className="w-full flex flex-row justify-between space-between items-center">
+                    <div>
+                        <Button
+                            variant="ghost"
+                            {...attributes}
+                            {...listeners}
+                            className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
+                        >
+                            <span className="sr-only">{`Move column: ${column.name}`}</span>
+                            <GripVertical />
+                        </Button>
+                        <Badge
+                            size="large"
+                        >
+                            {column.name}
+                        </Badge>
+                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="ghost"
+                            >
+                                <FaEllipsis/>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem
+                                onClick={deleteColumn}
+                            >
+                                <FaTrash/>
+                                Delete column
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </CardTitle>
             </CardHeader>
             <ScrollArea className="h-full">

@@ -25,7 +25,7 @@ export function PublicMilestoneDetails() {
         if (urlMilestone) {
             getMilestoneDetails(urlMilestone).then(response => {
                 if (response.success) {
-                    setMilestone(response.milestone)
+                    setMilestone(response.data)
                 } else {
                     console.error(response.error)
                     toast.error(response.error)
