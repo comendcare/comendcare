@@ -20,9 +20,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import {Timer} from "lucide-react";
 
 export const financesFormSchema = z.object({
-    raising: z.enum(["yes", "no-but", "no"], {
-        required_error: "You need to select a 501c3 status.",
-    }).optional(),
+    raising: z.enum(["yes", "no-but", "no"]).optional(),
     raised: z.number().min(2, {
         message: "Your organization's description.",
     }).optional(),
@@ -131,7 +129,7 @@ export default function FinancesOnboardingForm() {
                                         >
                                             <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl>
-                                                    <RadioGroupItem value="Yes"/>
+                                                    <RadioGroupItem value="yes"/>
                                                 </FormControl>
                                                 <FormLabel className="font-normal">
                                                     {`Yes I'm currently raising`}
@@ -243,7 +241,8 @@ export default function FinancesOnboardingForm() {
                                     <FormControl>
                                         <Input
                                             variant="currency"
-                                            type="url"
+                                            type="number"
+                                            min={0}
                                             id="website"
                                             {...field}
                                         />
@@ -277,7 +276,8 @@ export default function FinancesOnboardingForm() {
                                     <FormControl>
                                         <Input
                                             variant="currency"
-                                            type="url"
+                                            type="number"
+                                            min={0}
                                             id="website"
                                             {...field}
                                         />

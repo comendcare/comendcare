@@ -82,8 +82,8 @@ const optionSchema = z.object({
 const editOrgFormSchema = z.object({
     orgName: z.string().min(2, {
         message: "Your organization's name must be at least 2 characters."
-    }).max(32, {
-        message: "Your organization's name must be a maximum of 32 characters."
+    }).max(60, {
+        message: "Your organization's name must be a maximum of 60 characters."
     }),
     subdomain: z.string().min(2, {
         message: "Your organization's nickname must be at least 2 characters."
@@ -207,7 +207,7 @@ export default function EditPAGProfileDialog() {
         accept,
     });
 
-    async function editOrgOnSubmit(values: z.infer<typeof editOrgFormSchema>) {
+    async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
         // console.log(values)
         // const createOrg = await createOrGetSite({
         //         siteName: newOrgForm.getValues("orgName"),
@@ -232,18 +232,19 @@ export default function EditPAGProfileDialog() {
             if (imgUrl) formData.set('image', imgUrl)
         }
 
-        createOrganization(formData).then((res: any) => {
-            if (res.error) {
-                toast.error(res.error)
-            } else {
-                va.track("Created Organization")
-                // Update the session object with the newly created organizationId
-                updateSession(res.id)
-                router.refresh()
-                router.push("/onboarding/finances")
-                toast.success(`Successfully created organization!`)
-            }
-        })
+        if (session?.user?.organizationId) {
+            updateOrganization(formData, session?.user.organizationId || "", "key").then((res: any) => {
+                if (res.error) {
+                    toast.error(res.error)
+                } else {
+                    router.refresh()
+                    toast.success(`Successfully saved changes.`)
+                }
+            })
+        } else {
+            toast.error("You're not signed into an organization right now.")
+        }
+
     }
 
     useEffect(() => {
@@ -322,7 +323,7 @@ export default function EditPAGProfileDialog() {
         resolver: zodResolver(financesFormSchema)
     })
 
-    async function onSubmit(values: z.infer<typeof financesFormSchema>) {
+    async function onFinancesFormSubmit(values: z.infer<typeof financesFormSchema>) {
 
         const formData = new FormData()
 
@@ -331,9 +332,7 @@ export default function EditPAGProfileDialog() {
                 if (res.error) {
                     toast.error(res.error)
                 } else {
-                    const {id} = res
                     router.refresh()
-                    router.push("/onboarding/research")
                     toast.success(`Successfully saved changes.`)
                 }
             })
@@ -375,7 +374,7 @@ export default function EditPAGProfileDialog() {
                         </TabsList>
                         <TabsContent value="organization">
                             <Form {...editOrgForm}>
-                                <form onSubmit={editOrgForm.handleSubmit(editOrgOnSubmit)} className="space-y-8">
+                                <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
 
                                     <FormField
                                         control={editOrgForm.control}
@@ -625,7 +624,7 @@ export default function EditPAGProfileDialog() {
                         <TabsContent value="finances">
 
                             <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                                <form onSubmit={form.handleSubmit(onFinancesFormSubmit)} className="space-y-8">
 
                                     <FormField
                                         control={form.control}
@@ -654,7 +653,7 @@ export default function EditPAGProfileDialog() {
                                                     >
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                                             <FormControl>
-                                                                <RadioGroupItem value="Yes"/>
+                                                                <RadioGroupItem value="yes"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
                                                                 {`Yes I'm currently raising`}
@@ -769,8 +768,9 @@ export default function EditPAGProfileDialog() {
                                                 <FormControl>
                                                     <Input
                                                         variant="currency"
-                                                        type="url"
-                                                        id="website"
+                                                        type="number"
+                                                        min={0}
+                                                        id="deployed"
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -804,8 +804,9 @@ export default function EditPAGProfileDialog() {
                                                 <FormControl>
                                                     <Input
                                                         variant="currency"
-                                                        type="url"
-                                                        id="website"
+                                                        type="number"
+                                                        min={0}
+                                                        id="budget"
                                                         {...field}
                                                     />
                                                 </FormControl>
