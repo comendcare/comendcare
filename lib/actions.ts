@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma, Column} from "@prisma/client"
+import {Roadmap, Organization, Prisma, Column, Kanban} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
@@ -1225,6 +1225,49 @@ export async function createNewKanbanTask(column: Column) {
         return {success: true, data: task};
     } catch (error: any) {
         logError("Error fetching membership data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function createKanbanColumn(kanban: Kanban) {
+    try {
+        const column = prisma.column.create({
+            data: {
+                kanban: {
+                    connect: {
+                        id: kanban.id
+                    },
+                },
+                kanbanPosition: 0
+            }
+        })
+
+        if (!column) {
+            return {success: false, error: "failed to create kanban column"};
+        }
+
+        return {success: true, data: column};
+    } catch (error: any) {
+        logError("Error creating kanban column", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function deleteKanbanColumn(column: Column) {
+    try {
+        const deletedColumn = prisma.column.delete({
+            where: {
+                id: column.id
+            }
+        })
+
+        if (!column) {
+            return {success: false, error: "failed to delete kanban column"};
+        }
+
+        return {success: true, data: deletedColumn};
+    } catch (error: any) {
+        logError("Error deleting kanban column", error);
         return {success: false, error: "Internal server error"};
     }
 }

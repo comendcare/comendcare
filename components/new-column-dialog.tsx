@@ -29,6 +29,8 @@ import {useRouter} from "next/navigation"
 import {useSession} from "next-auth/react"
 import {getNewColumnFormSchema} from "@/lib/schemas";
 import {cn} from "@/lib/utils";
+import {createKanbanColumn, createNewKanbanTask} from "@/lib/actions";
+import {getKanbanFromOrganizationId} from "@/lib/fetchers";
 
 export default function NewColumnDialog() {
     const [open, setOpen] = useState(false)
@@ -46,14 +48,22 @@ export default function NewColumnDialog() {
     async function onSubmit() {
 
         setOpen(false)
-
-        toast(`A new monitor for ${form.getValues("keyword")} is being created!`, {
-            description: (
-                <p>
-                    {`Your feeds will automatically be updated when we successfully create the column.`}
-                </p>
-            )
-        })
+        try {
+            const response = await getKanbanFromOrganizationId()
+            if (response.success && response.data) {
+                await createKanbanColumn(response.data).then((response) => {
+                    if (response.success && response.data) {
+                        toast.success("column created successfully!");
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+                })
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to create task.");
+        }
     }
 
     return (
