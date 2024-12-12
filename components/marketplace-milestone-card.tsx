@@ -3,11 +3,10 @@ import Link from "next/link";
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import { DateView } from "./miletone-date-view";
-import prisma from "@/lib/prisma"
-import { getOrganizationData, getOrganizationFromOrganizationId, getOrganizationFromRoadmapId } from "@/lib/fetchers";
+import { getOrganizationFromOrganizationId, getOrganizationFromRoadmapId } from "@/lib/fetchers";
 import { useEffect, useState } from "react";
 
-export async function MilestoneMarketplaceCard({ milestone }: { milestone: any }) {
+export function MilestoneMarketplaceCard({ milestone }: { milestone: any }) {
     const startDate = milestone.startDate ? new Date(milestone.startDate) : undefined
     const endDate = milestone.endDate ? new Date(milestone.endDate) : undefined
     const [organization, setOrganization] = useState<any>()
