@@ -11,6 +11,7 @@ import { Tour } from "@/components/onborda/types"
 import gif1 from "@/public/onboarding-gif-1.gif"
 import Image from "next/image"
 import { FeedbackForm } from "@/components/feedback"
+import { Suspense } from "react"
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -228,8 +229,10 @@ export default function RootLayout({
                         disableTransitionOnChange
                     >
                         <Onborda steps={steps} cardComponent={OnboardingCard}>
+                            <Suspense>
                             {children}
                             {/* <FeedbackForm /> */}
+                            </Suspense>
                         </Onborda>
                     </ThemeProvider>
                 </Providers>
