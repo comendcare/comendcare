@@ -11,7 +11,7 @@ import { PublicFlowView } from "@/components/public-flow"
 import { PublicTimelineView } from "@/components/public-timeline"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PublicRoadmap } from "@/components/public-roadmap"
+import { PublicRoadmapCard } from "@/components/public-roadmap-card"
 import { PublicMilestoneDetails } from "@/components/public-milestone-details"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header"
 import { FaArrowLeft } from "react-icons/fa6"
@@ -125,7 +125,7 @@ export default async function OrganizationRoadmapPage({
 
                         <div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">
                             <PublicMilestoneDetails />
-                            <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined} />
+                            <PublicRoadmapCard roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined} />
                         </div>
                     </div>
                 ) :

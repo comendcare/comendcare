@@ -40,6 +40,7 @@ import {MemberWithOrganization} from "@/app/(platform)/app/layout";
 import {FaCity} from "react-icons/fa6";
 import {useEffect} from "react";
 import { ProfilePhoto } from "./profile-photo";
+import {useRouter} from "next/navigation";
 
 interface TeamSwitcherProps {
     isCollapsed: boolean,
@@ -50,6 +51,7 @@ export default function OrganizationSelector({
                                                  isCollapsed,
                                                  organizations,
                                              }: TeamSwitcherProps) {
+    const router = useRouter();
     const {data: session, update} = useSession();
     const [open, setOpen] = React.useState(false);
     const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false);
@@ -72,6 +74,7 @@ export default function OrganizationSelector({
             ...session,
             organizationId: org.organization.id,
         });
+        router.refresh()
     };
 
     return (
