@@ -6,7 +6,7 @@ import { PrivateBadge } from "./private-badge"
 import { FaArrowUpRightFromSquare } from "react-icons/fa6"
 
 export const PublicTimelineView = ({ roadmap, subdomain, urlMilestone }: { roadmap: any, subdomain: string | undefined, urlMilestone: string | undefined}) => {
-    console.log(`milestones`, roadmap.milestones)
+    console.log(`milestones`, roadmap?.milestones)
     return (
         <ol className="relative border-s border-gray-200 dark:border-gray-700 space-y-8">
             {roadmap?.milestones?.map((item: any, index: number) => (

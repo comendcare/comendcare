@@ -216,8 +216,8 @@ export default async function ProfilePage() {
                                 </TabsList>
                                 <TabsContent value="roadmap" className="flex flex-col space-y-4">
                                     <PAGProfileAssetsAndProjectsHoverableCard 
-                                        assets={roadmaps[0].milestones.filter(milestone => milestone.asset).map(milestone => milestone.asset)}
-                                        rfps={roadmaps[0].milestones.filter(milestone => milestone.RFP).map(milestone => milestone.RFP)}
+                                        assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
+                                        rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                                     />
                                     <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined}/>
                                 </TabsContent>

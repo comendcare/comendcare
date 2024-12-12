@@ -67,7 +67,7 @@ export default async function OrganizationHomePage({
 
     let dbMilestones = []
     dbMilestones = await prisma.milestone.findMany({
-        where: {roadmapId: organization.roadmaps?.[0].id},
+        where: {roadmapId: organization.roadmaps?.[0]?.id},
         include: {
             papers: true,
             asset: {
@@ -87,7 +87,7 @@ export default async function OrganizationHomePage({
 
     let conditions = null
     if (organization) {
-        const response = await getConditionsDataFromOrgId(organization.id)
+        const response = await getConditionsDataFromOrgId(organization?.id)
         if (response.success) {
             conditions = response.data
         } else {
@@ -130,7 +130,7 @@ export default async function OrganizationHomePage({
                                     rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
                                 />
                                 {roadmaps.length > 0 &&
-                                    <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined}/>
+                                    <PublicRoadmap roadmap={roadmaps?.[0]} subdomain={organization?.subdomain || undefined}/>
                                 }
                             </TabsContent>
                             <TabsContent value="activity" className="mt-0">
