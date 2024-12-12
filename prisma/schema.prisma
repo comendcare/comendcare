@@ -211,26 +211,28 @@ model Node {
 }
 
 model Milestone {
-  id          String               @id @unique @default(uuid())
-  node        Node?                @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  nodeId      String?              @unique
-  title       String
-  description String?
-  startDate   DateTime?
-  endDate     DateTime?
-  budget      Int?
-  papers      ExternalAttachment[]
-  notes       String?
-  status      StatusType
-  tasks       Task[]
-  roadmapId   String
-  roadmap     Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  private     Boolean              @default(false)
-  type        MilestoneType        @default(NOTYPE)
-  RFP         RFP?                 @relation(fields: [RFPId], references: [id])
-  RFPId       String?
-  asset       Asset?               @relation(fields: [assetId], references: [id])
-  assetId     String?
+  id             String               @id @unique @default(uuid())
+  node           Node?                @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  nodeId         String?              @unique
+  title          String
+  description    String?
+  startDate      DateTime?
+  endDate        DateTime?
+  budget         Int?
+  papers         ExternalAttachment[]
+  notes          String?
+  status         StatusType
+  tasks          Task[]
+  organizationId String
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  roadmapId      String
+  roadmap        Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  private        Boolean              @default(false)
+  type           MilestoneType        @default(NOTYPE)
+  RFP            RFP?                 @relation(fields: [RFPId], references: [id])
+  RFPId          String?
+  asset          Asset?               @relation(fields: [assetId], references: [id])
+  assetId        String?
 }
 
 enum MilestoneType {
@@ -424,6 +426,7 @@ model Organization {
   membershipRequest           MemberRequest[]
   condition                   ConditionToOrganization[]
   Kanban                      Kanban?
+  Milestone                   Milestone[]
 
   @@index([userId])
 }
