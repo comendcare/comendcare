@@ -38,6 +38,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                         data: {
                             create: {
                                 roadmapId: roadmap.id,
+                                organizationId,
                                 type: milestone.type || 'NOTYPE',
                                 status: milestone.status || "TODO",
                                 title: milestone.title,
