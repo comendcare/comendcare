@@ -3,19 +3,34 @@ import Link from "next/link";
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types";
 import { Badge } from "./ui/badge";
 import { DateView } from "./miletone-date-view";
+import prisma from "@/lib/prisma"
+import { getOrganizationData, getOrganizationFromOrganizationId, getOrganizationFromRoadmapId } from "@/lib/fetchers";
+import { useEffect, useState } from "react";
 
-export function MilestoneMarketplaceCard({ milestone }: { milestone: any }) {
+export async function MilestoneMarketplaceCard({ milestone }: { milestone: any }) {
     const startDate = milestone.startDate ? new Date(milestone.startDate) : undefined
     const endDate = milestone.endDate ? new Date(milestone.endDate) : undefined
+    const [organization, setOrganization] = useState<any>()
+
+    useEffect(() => {
+        const initOrg = async () => {
+            const organizationId = await getOrganizationFromRoadmapId(milestone.roadmapId)
+            if (organizationId.success) {
+                const response = await getOrganizationFromOrganizationId(organizationId?.data)
+                if (response.success) setOrganization(response.data)
+            }
+        }
+
+        if (!organization) initOrg()
+    }, [])
 
     return (
         <Link
-        href={"#"}
-            // href={
-            //     process.env.NEXT_PUBLIC_VERCEL_ENV
-            //         ? `https://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-            //         : `http://${organization.subdomain}.localhost:3000`
-            // }
+            href={
+                organization?.subdomain ? 
+                `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${milestone?.roadmapId}&view=flow` :
+                '#'
+            }
         >
         <Card className="h-full w-full text-left flex flex-col justify-between">
             <CardHeader>
