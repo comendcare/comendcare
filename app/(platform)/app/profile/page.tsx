@@ -30,6 +30,7 @@ import {toast} from "sonner";
 import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import { ProfilePhoto } from "@/components/profile-photo";
 import { PublicRoadmapCard } from "@/components/public-roadmap-card";
+import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -142,9 +143,25 @@ export default async function ProfilePage() {
                                 <div
                                     className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                                     <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
-                                        <h1 className="mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">
-                                            {organization?.name}
-                                        </h1>
+                                        <div className="mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900 max-w-xl">
+                                            <HoverCard>
+                                                <HoverCardTrigger asChild>
+                                                    <h1 className="truncate cursor-pointer">
+                                                        {organization?.name}
+                                                    </h1>
+                                                </HoverCardTrigger>
+                                                <HoverCardContent
+                                                    side="top"
+                                                    className="w-fit"
+                                                >
+                                                    <div className="space-y-2">
+                                                        <h4 className="text-lg font-semibold">
+                                                            {organization?.name}
+                                                        </h4>
+                                                    </div>
+                                                </HoverCardContent>
+                                            </HoverCard>
+                                        </div>
                                         <div
                                             className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                                             {organization?.numberOfIdentifiedPatients &&
