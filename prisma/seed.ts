@@ -794,6 +794,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                         data: {
                             create: {
                                 roadmapId: roadmap.id,
+                                organizationId,
                                 status: milestone.status || "TODO",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
