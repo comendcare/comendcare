@@ -6,8 +6,9 @@ import "@xyflow/react/dist/base.css"
 import { PublicFlowView } from "./public-flow";
 import { PublicTimelineView } from "./public-timeline";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import Image from "next/image"
 
-export const PublicRoadmap = ({roadmap, subdomain}: {roadmap: any, subdomain: string | undefined}) => {
+export const PublicRoadmapCard = ({roadmap, subdomain}: {roadmap: any, subdomain: string | undefined}) => {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -21,6 +22,21 @@ export const PublicRoadmap = ({roadmap, subdomain}: {roadmap: any, subdomain: st
         params.set("view", value)
 
         router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    }
+
+    if (!roadmap) {
+        return <div className="flex flex-col items-center justify-center space-x-4">
+            <h1 className="font-cal text-4xl">No Roadmaps Yet</h1>
+            <Image
+                alt="missing roadmap"
+                src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                width={400}
+                height={400}
+            />
+            <p className="text-lg text-stone-500">
+                You do not have any roadmaps yet. Create one to get started.
+            </p>
+        </div>
     }
 
     return (

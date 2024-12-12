@@ -1,18 +1,21 @@
 import {formatMoney} from "@/lib/utils";
-import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaPlus} from "react-icons/fa6";
+import {FaCity, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaPlus} from "react-icons/fa6";
 import {Button} from "@/components/ui/button";
 import {Organization} from "@prisma/client";
 import PublicProfileDropdown from "@/components/public-profile-dropdown";
-import { ProfilePhoto } from "./profile-photo";
-import { BackButton } from "./back-button";
+import {ProfilePhoto} from "./profile-photo";
+import {BackButton} from "./back-button";
 
-export default function PAGPublicProfileHeader({organization, showBackButton}: { organization: Organization, showBackButton?: boolean }) {
+export default function PAGPublicProfileHeader({organization, showBackButton}: {
+    organization: Organization,
+    showBackButton?: boolean
+}) {
 
     return (
         <div className="w-full flex flex-col space-y-8">
             <div>
                 <div className="relative">
-                    {showBackButton && <BackButton />}
+                    {showBackButton && <BackButton/>}
                     <img
                         className="h-32 w-full object-cover lg:h-48"
                         src={'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'}
@@ -24,7 +27,7 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                     <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
 
                         <div className="flex">
-                            <ProfilePhoto 
+                            <ProfilePhoto
                                 img={organization?.image}
                                 name={organization?.name}
                                 className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
@@ -63,6 +66,13 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                                                     aria-hidden="true"/>
                                         Founded in {new Date(organization?.createdAt ?? "").getFullYear()}
                                     </div>
+                                    {organization?.incorporationStatus === "YES" &&
+                                        <div className="mt-2 flex items-center text-gray-500">
+                                            <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                    aria-hidden="true"/>
+                                            {`501c3`}
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -76,7 +86,7 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                                     <FaPlus/>
                                     Follow
                                 </Button>
-                                <PublicProfileDropdown website={organization?.website} />
+                                <PublicProfileDropdown website={organization?.website}/>
                             </div>
                         </div>
 

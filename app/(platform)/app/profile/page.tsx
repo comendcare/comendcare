@@ -1,6 +1,6 @@
 import {cookies} from "next/headers"
 import {
-    FaCalendar, FaCircleDollarToSlot, FaEllipsis, FaPen,
+    FaCalendar, FaCircleDollarToSlot, FaCity, FaEllipsis, FaPen,
     FaPencil, FaPeopleGroup, FaPhone, FaPlus,
 } from "react-icons/fa6";
 import {Button, buttonVariants} from "@/components/ui/button";
@@ -9,7 +9,7 @@ import {DonutChartCard} from "@/components/donut-chart-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
-import {cn} from "@/lib/utils";
+import {cn, formatMoney} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {PAGProfileResearchPlanCard} from "@/components/pag-profile-research-plan-card";
@@ -29,7 +29,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "sonner";
 import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import { ProfilePhoto } from "@/components/profile-photo";
-import { PublicRoadmap } from "@/components/public-roadmap";
+import { PublicRoadmapCard } from "@/components/public-roadmap-card";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -161,7 +161,7 @@ export default async function ProfilePage() {
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"
                                                     />
-                                                    ${organization?.moneyRaised?.toLocaleString()} raised
+                                                    ${formatMoney(organization?.moneyRaised)} raised
                                                 </div>
                                             }
                                             <div className="mt-2 flex items-center text-gray-500">
@@ -169,6 +169,13 @@ export default async function ProfilePage() {
                                                             aria-hidden="true"/>
                                                 Founded in {new Date(organization?.createdAt ?? "").getFullYear()}
                                             </div>
+                                            {organization?.incorporationStatus === "YES" &&
+                                                <div className="mt-2 flex items-center text-gray-500">
+                                                    <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                            aria-hidden="true"/>
+                                                    {`501c3`}
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -219,7 +226,7 @@ export default async function ProfilePage() {
                                         assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
                                         rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                                     />
-                                    <PublicRoadmap roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined}/>
+                                    <PublicRoadmapCard roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined}/>
                                 </TabsContent>
                                 <TabsContent value="activity" className="mt-0">
                                     <PAGProfileActivityCard/>
