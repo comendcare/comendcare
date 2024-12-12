@@ -27,10 +27,10 @@ export const PublicRoadmap = ({roadmap, subdomain}: {roadmap: any, subdomain: st
         <Card>
             <CardHeader>
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
-                    {roadmap.title}
+                    {roadmap?.title}
                 </CardTitle>
                 <CardDescription>
-                    {roadmap.description}
+                    {roadmap?.description}
                 </CardDescription>
             </CardHeader>
 
