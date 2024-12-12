@@ -67,7 +67,7 @@ export function MilestoneDetails({ milestone }: { milestone: any }) {
                         {milestone.RFP && (
                             <div className="flex flex-col gap-4">
                                 <h2 className="font-semibold text-xl">{`Projects`}</h2>
-                                <RFPDetails asset={milestone.RFP} />
+                                <RFPDetails rfp={milestone.RFP} />
                             </div>
                         )}
                     </div>

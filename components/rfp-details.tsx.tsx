@@ -30,28 +30,28 @@ type AssetType = Prisma.AssetGetPayload<{
 type ContactType = AssetType['contacts'][0]
 type AttachmentType = AssetType['attachments'][0]
 
-export function RFPDetails({ asset }: { asset: AssetType }) {
+export function RFPDetails({ rfp }: { rfp: AssetType }) {
     return (
         <HoverCard
-            key={asset?.id}
+            key={rfp?.id}
             openDelay={0}
             closeDelay={0}
         >
             <HoverCardTrigger asChild>
                 <a href={"#"}>
                     <li
-                        key={asset?.id}
+                        key={rfp?.id}
                         className="w-full flex items-center justify-between space-x-4 py-2 text-wrap"
                     >
                         <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
                             <div className="flex items-center gap-x-3">
                                 <h2 className="min-w-0 text-sm font-semibold">
-                                    <span className="truncate">{asset?.name}</span>
+                                    <span className="truncate">{rfp?.name}</span>
                                 </h2>
                             </div>
                             <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
                                 <p className="whitespace-nowrap">
-                                    {asset?.createdAt?.getFullYear()} &bull; {asset?.contacts?.map((contact: any) => contact.name).join(', ')}
+                                    {rfp?.createdAt?.getFullYear()} &bull; {rfp?.contacts?.map((contact: any) => contact.name).join(', ')}
                                 </p>
                             </div>
                         </div>
@@ -64,9 +64,9 @@ export function RFPDetails({ asset }: { asset: AssetType }) {
             >
                 <div className="flex justify-between space-x-4">
                     <div className="space-y-1">
-                        <h4 className="text-sm font-semibold">{asset?.name}</h4>
+                        <h4 className="text-sm font-semibold">{rfp?.name}</h4>
                         <p className="text-sm">
-                            {asset?.description}
+                            {rfp?.description}
                         </p>
                     </div>
                 </div>
