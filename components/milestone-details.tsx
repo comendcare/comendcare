@@ -53,7 +53,7 @@ export function MilestoneDetails({ milestone }: { milestone: any }) {
                     <BudgetView budget={milestone.budget} />
                 </div>
 
-                {(milestone?.asset || milestone?.rfp) && (
+                {(milestone?.asset || milestone?.RFP) && (
                     <>
                     <Separator />
                     <div className="grid grid-cols-2 gap-4">
