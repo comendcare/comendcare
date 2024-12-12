@@ -396,7 +396,6 @@ export default function OrganizationOnboardingForm() {
                                         <FormDescription>{`Your patient group's website URL.`}</FormDescription>
                                         <FormControl>
                                             <Input
-                                                type="url"
                                                 id="website"
                                                 {...field}
                                             />
