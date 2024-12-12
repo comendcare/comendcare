@@ -8,7 +8,7 @@ import { useEffect, useState } from "react"
 import {getRoadmapId} from "@/lib/fetchers";
 import {toast} from "sonner";
 
-export default async function RoadmapPage() {
+export default function RoadmapPage() {
     const router = useRouter()
     const {data: session} = useSession()
     const [orgId, setOrgId] = useState<string | undefined>(undefined)
