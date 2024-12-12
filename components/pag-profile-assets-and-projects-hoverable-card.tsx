@@ -14,6 +14,8 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import { AssetDetails } from "./asset-details";
+import { RFPDetails } from "./rfp-details.tsx";
 
 // Define types for statuses and environments
 type Recency = 'Due' | 'New';
@@ -54,51 +56,7 @@ export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { ass
                                 min: 2,
                                 max: 5
                             })).map((asset) =>
-                                <HoverCard
-                                    key={asset?.id}
-                                    openDelay={0}
-                                    closeDelay={0}
-                                >
-                                    <HoverCardTrigger asChild>
-                                        <a href={"#"}>
-                                            <li
-                                                key={asset?.id}
-                                                className="w-full flex items-center justify-between space-x-4 py-2"
-                                            >
-                                                <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
-                                                    <div className="flex items-center gap-x-3">
-                                                        <h2 className="min-w-0 text-sm font-semibold">
-                                                            <span className="truncate">{asset?.name}</span>
-                                                        </h2>
-                                                    </div>
-                                                    <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
-                                                        <p className="whitespace-nowrap">
-                                                            {asset?.createdAt?.getFullYear()} &bull; {asset?.contacts.map((contact: any) => contact.name).join(', ')}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </li>
-                                        </a>
-                                    </HoverCardTrigger>
-                                    <HoverCardContent
-                                        side="top"
-                                        className="w-80"
-                                    >
-                                        <div className="flex justify-between space-x-4">
-                                            <div className="space-y-1">
-                                                <h4 className="text-sm font-semibold">{asset?.name}</h4>
-                                                <p className="text-sm">
-                                                    {asset?.description}
-                                                </p>
-                                                <div className="flex items-center pt-2">
-                                                    <span className="text-xs text-muted-foreground">
-                                                        Created {faker.date.past().toISOString().split('T')[0]}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </HoverCardContent>
-                                </HoverCard>
+                                <AssetDetails asset={asset}/>
                             )}
                         </ul>
                     ): (
@@ -113,61 +71,7 @@ export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { ass
                     {rfps.length > 0 ? (
                         <ul role="list" className="divide-y">
                             {rfps.map((rfp) =>
-                                <HoverCard
-                                    key={rfp?.id}
-                                    openDelay={0}
-                                    closeDelay={0}
-                                >
-                                    <HoverCardTrigger asChild>
-                                        <a href={"#"}>
-                                            <li
-                                                key={rfp?.id}
-                                                className="w-full flex items-center justify-between space-x-4 py-2"
-                                            >
-                                                <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
-                                                    <div className="flex items-center gap-x-3">
-                                                        <h2 className="min-w-0 text-sm font-semibold">
-                                                            <span className="truncate">{rfp?.name}</span>
-                                                        </h2>
-                                                    </div>
-                                                    <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
-                                                        <p className="whitespace-nowrap">
-                                                            {`$${rfp?.funding.toLocaleString()}`} &bull; {rfp?.contacts.map((contact: any) => contact.name).join(', ')}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                {/* {rfp?.recency &&
-                                                    <div
-                                                        className={cn(
-                                                            // environments[rfp.recency],
-                                                            'flex-none rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset',
-                                                        )}
-                                                    >
-                                                        {rfp?.recency}
-                                                    </div>
-                                                } */}
-                                            </li>
-                                        </a>
-                                    </HoverCardTrigger>
-                                    <HoverCardContent
-                                        side="top"
-                                        className="w-80"
-                                    >
-                                        <div className="flex justify-between space-x-4">
-                                            <div className="space-y-1">
-                                                <h4 className="text-sm font-semibold">{rfp?.name}</h4>
-                                                <p className="text-sm">
-                                                    {rfp?.description}
-                                                </p>
-                                                <div className="flex items-center pt-2">
-                                                    <span className="text-xs text-muted-foreground">
-                                                        Created {faker.date.past().toISOString().split('T')[0]}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </HoverCardContent>
-                                </HoverCard>
+                                <RFPDetails rfp={rfp}/>
                             )}
                         </ul>
                     ): (
