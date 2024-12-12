@@ -8,7 +8,6 @@ import {ApiResponse} from "@/lib/types";
 import {logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
 
-
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
         const condition = await prisma.condition.findUnique({
