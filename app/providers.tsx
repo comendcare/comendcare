@@ -10,8 +10,15 @@ import {MixpanelProvider} from "./mixpanel"
 export function Providers({children}: { children: React.ReactNode }) {
     return (
         <SessionProvider>
-            <Toaster className="dark:hidden" closeButton/>
-            <Toaster theme="dark" className="hidden dark:block" closeButton/>
+            <Toaster
+                className="dark:hidden"
+                closeButton
+            />
+            <Toaster
+                theme="dark"
+                className="hidden dark:block"
+                closeButton
+            />
             <ModalProvider>
                 <ReactFlowProvider>
                     <MixpanelProvider>

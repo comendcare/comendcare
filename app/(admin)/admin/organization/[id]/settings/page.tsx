@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma"
 import Form from "@/components/form"
-import { updateOrganization } from "@/lib/actions"
+import { updateOrganizationAttribute } from "@/lib/actions"
 import DeleteOrganizationForm from "@/components/form/delete-organization-form"
 
 export default async function SiteSettingsIndex({
@@ -27,7 +27,7 @@ export default async function SiteSettingsIndex({
                     placeholder: "My Awesome Site",
                     maxLength: 32
                 }}
-                handleSubmit={updateOrganization}
+                handleSubmit={updateOrganizationAttribute}
             />
 
             <Form
@@ -40,7 +40,7 @@ export default async function SiteSettingsIndex({
                     defaultValue: data?.description!,
                     placeholder: "A blog about really interesting things."
                 }}
-                handleSubmit={updateOrganization}
+                handleSubmit={updateOrganizationAttribute}
             />
 
             <DeleteOrganizationForm organizationName={data?.name!} />
