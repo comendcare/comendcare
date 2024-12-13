@@ -7,7 +7,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import {useCallback, useEffect, useState} from "react";
 import {
-    createOrganization, updateOrganization
+    createOrganization, updateOrganizationAttribute
 } from "@/lib/actions";
 import {AddressType} from "@/lib/types";
 import {Input} from "@/components/ui/input";
@@ -233,7 +233,7 @@ export default function EditPAGProfileDialog() {
         }
 
         if (session?.user?.organizationId) {
-            updateOrganization(formData, session?.user.organizationId || "", "key").then((res: any) => {
+            updateOrganizationAttribute(formData, session?.user.organizationId || "", "key").then((res: any) => {
                 if (res.error) {
                     toast.error(res.error)
                 } else {
@@ -328,7 +328,7 @@ export default function EditPAGProfileDialog() {
         const formData = new FormData()
 
         if (session?.user?.organizationId) {
-            updateOrganization(formData, session?.user.organizationId || "", "key").then((res: any) => {
+            updateOrganizationAttribute(formData, session?.user.organizationId || "", "key").then((res: any) => {
                 if (res.error) {
                     toast.error(res.error)
                 } else {

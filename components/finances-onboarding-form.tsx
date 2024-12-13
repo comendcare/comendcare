@@ -21,15 +21,9 @@ import {Timer} from "lucide-react";
 
 export const financesFormSchema = z.object({
     raising: z.enum(["yes", "no-but", "no"]).optional(),
-    raised: z.number().min(2, {
-        message: "Your organization's description.",
-    }).optional(),
-    budget: z.string().min(2, {
-        message: "Your organization's description.",
-    }).optional(),
-    deployed: z.string().min(2, {
-        message: "Your organization's description.",
-    }).optional(),
+    raised: z.number().optional(),
+    budget: z.number().optional(),
+    deployed: z.number().optional(),
 })
 
 export default function FinancesOnboardingForm() {
@@ -42,22 +36,33 @@ export default function FinancesOnboardingForm() {
     })
 
     async function onSubmit(values: z.infer<typeof financesFormSchema>) {
+        if (!session.data?.user.organizationId) {
+            toast.error("You're not signed into an organization right now.");
+            return;
+        }
 
-        const formData = new FormData()
+        const formData = new FormData();
 
-        if (session.data?.user.organizationId) {
-            updateOrganization(formData, session.data.user.organizationId, "key").then((res: any) => {
-                if (res.error) {
-                    toast.error(res.error)
-                } else {
-                    const {id} = res
-                    router.refresh()
-                    router.push("/onboarding/research")
-                    toast.success(`Successfully saved changes.`)
-                }
-            })
-        } else {
-            toast.error("You're not signed into an organization right now.")
+        const databaseMap: Partial<Record<keyof typeof values, string>> = {
+            raised: "moneyRaised",
+            budget: "researchBudget",
+            deployed: "moneyDeployed",
+            // raising: "raising",
+        };
+
+        Object.entries(values).forEach(([key, value]) => {
+            const mappedKey = databaseMap[key as keyof typeof databaseMap]; // Explicitly cast key
+            if (mappedKey && value !== undefined) {
+                formData.append(mappedKey, value.toString());
+            }
+        });
+
+        try {
+            const response = await updateOrganization(formData, session.data.user.organizationId);
+            toast.success("Organization updated successfully!");
+            router.push("/app/profile");
+        } catch (error) {
+            toast.error("Failed to update organization.");
         }
     }
 
@@ -243,8 +248,12 @@ export default function FinancesOnboardingForm() {
                                             variant="currency"
                                             type="number"
                                             min={0}
-                                            id="website"
+                                            id="deployed"
                                             {...field}
+                                            onChange={(e) => {
+                                                const parsedValue = parseFloat(e.target.value);
+                                                field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
+                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage/>
@@ -278,8 +287,12 @@ export default function FinancesOnboardingForm() {
                                             variant="currency"
                                             type="number"
                                             min={0}
-                                            id="website"
+                                            id="budget"
                                             {...field}
+                                            onChange={(e) => {
+                                                const parsedValue = parseFloat(e.target.value);
+                                                field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
+                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage/>
@@ -289,7 +302,7 @@ export default function FinancesOnboardingForm() {
 
                         <div className="flex flex-row justify-between">
                             <div className="flex flex-row space-x-2">
-                                <Button onClick={() => router.push("/onboarding/organization")}>Previous</Button>
+                                <Button onClick={() => router.push("/onboarding/research")}>Previous</Button>
                                 <Button type="submit">Finish</Button>
                             </div>
                             <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>

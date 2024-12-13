@@ -253,6 +253,32 @@ export function withOrganizationAuth(action: any) {
     return async (
         formData: FormData | null,
         organizationId: string,
+    ) => {
+        const session = await getSession()
+        if (!session) {
+            return {
+                error: "Not authenticated"
+            }
+        }
+        const organization = await prisma.organization.findUnique({
+            where: {
+                id: organizationId
+            }
+        })
+        if (!organization || organization.userId !== session.user.id) {
+            return {
+                error: "Not authorized"
+            }
+        }
+
+        return action(formData, organization)
+    }
+}
+
+export function withOrganizationAttributeAuth(action: any) {
+    return async (
+        formData: FormData | null,
+        organizationId: string,
         key: string | null
     ) => {
         const session = await getSession()
