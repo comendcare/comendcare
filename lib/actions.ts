@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma"
 import {Roadmap, Organization, Prisma, Column, Kanban} from "@prisma/client"
 import {revalidateTag} from "next/cache"
-import {withOrganizationAuth, withRoadmapAuth} from "./auth"
+import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
@@ -260,6 +260,37 @@ export const toggleOrganizationVerified = async (organizationId: string) => {
 }
 
 export const updateOrganization = withOrganizationAuth(
+    async (formData: FormData, organization: Organization) => {
+        // Convert FormData to a plain object
+        const data: Record<string, any> = {};
+
+        formData.forEach((value, key) => {
+            // Attempt to parse numbers
+            if (!isNaN(Number(value)) && value !== "") {
+                data[key] = Number(value);
+            } else {
+                data[key] = value;
+            }
+        });
+
+        try {
+            const response = await prisma.organization.update({
+                where: {
+                    id: organization.id,
+                },
+                data,
+            });
+
+            return response;
+        } catch (error: any) {
+            console.error("Error updating organization:", error.message);
+            throw new Error(error.message || "Failed to update organization.");
+        }
+    }
+);
+
+
+export const updateOrganizationAttribute = withOrganizationAttributeAuth(
     async (formData: FormData, organization: Organization, key: string) => {
         const value = formData.get(key) as string
 
@@ -413,7 +444,7 @@ export const updateOrganization = withOrganizationAuth(
     }
 )
 
-export const deleteOrganization = withOrganizationAuth(
+export const deleteOrganization = withOrganizationAttributeAuth(
     async (_: FormData, organization: Organization) => {
         try {
             const response = await prisma.organization.delete({
@@ -831,7 +862,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
             select: {
                 id: true,
                 roadmaps: {
-                    where: { id: roadmapId }
+                    where: {id: roadmapId}
                 }
             }
         })

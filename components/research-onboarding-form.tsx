@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {updateOrganization} from "@/lib/actions";
+import {updateOrganizationAttribute} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -387,7 +387,7 @@ export default function ResearchOnboardingForm() {
         const formData = new FormData()
 
         if (session.data?.user.organizationId) {
-            updateOrganization(formData, session.data.user.organizationId, "key").then((res: any) => {
+            updateOrganizationAttribute(formData, session.data.user.organizationId, "key").then((res: any) => {
                 if (res.error) {
                     toast.error(res.error)
                     router.push("/app/profile")
