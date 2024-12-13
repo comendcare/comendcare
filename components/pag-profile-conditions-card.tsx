@@ -1,7 +1,5 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
-import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {Condition} from "@prisma/client";
 import {FaArrowUpRightFromSquare} from "react-icons/fa6";
@@ -10,7 +8,6 @@ import {Badge} from "@/components/ui/badge";
 import {concat} from "lodash";
 
 export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[] | null }) => {
-    const router = useRouter();
 
     if (conditions) {
         return (
@@ -19,11 +16,10 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                     <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                         Conditions
                     </CardTitle>
-
                 </CardHeader>
 
                 <CardContent>
-                    {conditions.map((condition: Condition) =>
+                    {conditions.length > 0 ? conditions.map((condition: Condition) =>
                         <div
                             key={condition.id}
                             className="flex flex-col space-y-4"
@@ -73,7 +69,13 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                                 </div>
                             </div>
                         </div>
-                    )}
+                    ) : <div className="flex flex-col items-center justify-center space-x-4">
+                        <h1 className="font-cal text-4xl">No Conditions Yet</h1>
+                        <p className="text-lg text-stone-500">
+                            This organization is not associated with any conditions yet.
+                        </p>
+                    </div>
+                    }
                 </CardContent>
             </Card>
         )
