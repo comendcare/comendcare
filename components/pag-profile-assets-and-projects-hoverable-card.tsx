@@ -55,8 +55,8 @@ export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { ass
                             {faker.helpers.arrayElements(assets, faker.number.int({
                                 min: 2,
                                 max: 5
-                            })).map((asset) =>
-                                <AssetDetails asset={asset}/>
+                            })).map((asset, index) =>
+                                <AssetDetails key={index} asset={asset}/>
                             )}
                         </ul>
                     ): (
@@ -70,8 +70,8 @@ export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { ass
                     </h3>
                     {rfps.length > 0 ? (
                         <ul role="list" className="divide-y">
-                            {rfps.map((rfp) =>
-                                <RFPDetails rfp={rfp}/>
+                            {rfps.map((rfp, index) =>
+                                <RFPDetails key={index} rfp={rfp}/>
                             )}
                         </ul>
                     ): (
