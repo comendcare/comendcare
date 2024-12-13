@@ -82,7 +82,7 @@ export interface MilestoneSearchState {
     setView: (view: ViewType) => void,
     allResults: any[],
     setAllResults: (results: any[]) => void,
-    searchResults: any[]
+    searchResults: any[] | undefined
     setSearchResults: (results: any[]) => void
     filters: FiltersType,
     setFilters: (updatedFilters: FiltersType) => void
@@ -120,7 +120,7 @@ export const useMilestoneSearchStore = create<MilestoneSearchState>()(
         setView: (view: ViewType) => set({ view }),
         allResults: [],
         setAllResults: (results: any[]) => set({ allResults: results }),
-        searchResults: [],
+        searchResults: undefined,
         setSearchResults: (results: any[]) => set({ searchResults: results }),
         filters: defaultFilters,
         setFilters: async (updatedFilters: FiltersType) => {

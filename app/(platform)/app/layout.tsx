@@ -186,7 +186,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                                     // label: "9",
                                     icon: Store,
                                     variant: "ghost",
-                                    href: "/app/marketplace"
+                                    href: "/app/marketplace/patient-groups"
                                 },
                                 {title: "Settings", icon: Cog, variant: "ghost", href: "/app/settings"},
                             ]}
