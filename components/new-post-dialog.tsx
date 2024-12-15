@@ -62,9 +62,9 @@ export default async function NewPostDialog() {
                     New post
                 </Button>
             </DialogTrigger>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                    <DialogContent className="min-w-40 sm:w-1/3">
+            <DialogContent className="min-w-40 sm:w-1/3">
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                         <DialogHeader>
                             <DialogTitle>
                                 Create a new post
@@ -117,9 +117,9 @@ export default async function NewPostDialog() {
                                 Post
                             </Button>
                         </DialogFooter>
-                    </DialogContent>
-                </form>
-            </Form>
+                    </form>
+                </Form>
+            </DialogContent>
         </Dialog>
     )
 }

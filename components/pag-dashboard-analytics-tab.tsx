@@ -2,7 +2,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import PAGAnalyticsBarChart from "@/components/pag-analytics-bar-chart";
 import PAGAnalyticsLineChart from "@/components/pag-analytics-line-chart";
 import {DonutChartCard} from "@/components/donut-chart-card";
-import {Eye, Users, Workflow} from "lucide-react";
+import {Eye, UserPlus, Users, Workflow} from "lucide-react";
 import {MagnifyingGlassIcon} from "@radix-ui/react-icons";
 import prisma from "@/lib/prisma"
 import {getSession} from "@/lib/auth";
@@ -46,12 +46,12 @@ export default async function PAGDashboardAnalyticsTab() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Search Appearances
+                            Number of followers
                         </CardTitle>
-                        <MagnifyingGlassIcon className="h-4 w-4 text-muted-foreground"/>
+                        <UserPlus className="h-4 w-4 text-muted-foreground"/>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">+1223</div>
+                        <div className="text-2xl font-bold">123</div>
                         <p className="text-xs text-muted-foreground">
                             +19% from last month
                         </p>
