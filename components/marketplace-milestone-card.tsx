@@ -26,7 +26,7 @@ export function MilestoneMarketplaceCard({ milestone }: { milestone: any }) {
     const getLink = () => {
         if (organization?.subdomain) {
             if (organization.roadmaps?.filter((roadmap: any) => roadmap.id === milestone?.roadmapId).length > 0) {
-                return `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${milestone?.roadmapId}&view=flow`
+                return `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${milestone?.id}&view=flow`
             }
 
             return `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap`
