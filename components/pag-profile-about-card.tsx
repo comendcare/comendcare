@@ -50,7 +50,7 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
             <CardContent>
                 <div className="flex flex-col space-y-4">
                     <div className="space-y-2">
-                        <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
                             Description
                         </h3>
                         <p>
@@ -59,7 +59,7 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
                     </div>
 
                     <div className="space-y-2">
-                        <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
                             Members
                         </h3>
                         {organization?.members ? organization?.members.map((member, index) =>
@@ -92,7 +92,7 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
                     </div>
 
                     <div className="space-y-2">
-                        <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
                             Website
                         </h3>
                         {organization?.website &&

@@ -69,9 +69,11 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                                 </div>
                             </div>
                         </div>
-                    ) : <div className="flex flex-col items-center justify-center space-x-4">
-                        <h1 className="font-cal text-4xl">No Conditions Yet</h1>
-                        <p className="text-lg text-stone-500">
+                    ) : <div className="flex flex-col space-x-4">
+                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
+                            No Conditions Yet
+                        </h3>
+                        <p>
                             This organization is not associated with any conditions yet.
                         </p>
                     </div>

@@ -3,12 +3,12 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {cn} from "@/lib/utils";
 import "@xyflow/react/dist/base.css"
-import { PublicFlowView } from "./public-flow";
-import { PublicTimelineView } from "./public-timeline";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import {PublicFlowView} from "./public-flow";
+import {PublicTimelineView} from "./public-timeline";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "./ui/tabs";
 import Image from "next/image"
 
-export const PublicRoadmapCard = ({roadmap, subdomain}: {roadmap: any, subdomain: string | undefined}) => {
+export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomain: string | undefined }) => {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -21,7 +21,7 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: {roadmap: any, subdomain
         params.delete("view")
         params.set("view", value)
 
-        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        router.push(`${pathname}?${params.toString()}`, {scroll: false})
     }
 
     if (!roadmap) {
@@ -40,41 +40,37 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: {roadmap: any, subdomain
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
-                    {roadmap?.title}
-                </CardTitle>
-                <CardDescription>
-                    {roadmap?.description}
-                </CardDescription>
-            </CardHeader>
 
-            <CardContent className="px-8">
+        <Tabs
+            defaultValue={urlView === 'flow' ? 'flow' : 'timeline'}
+            className="w-full"
+            onValueChange={handleTabChange}
+        >
+            <Card>
+                <CardHeader className="w-min pt-6 pb-2">
+                    <TabsList>
+                        <TabsTrigger value="timeline">
+                            Timeline View
+                        </TabsTrigger>
+                        <TabsTrigger value="flow">
+                            Flow View
+                        </TabsTrigger>
+                    </TabsList>
+                </CardHeader>
 
-            <Tabs 
-                defaultValue={urlView === 'flow' ? 'flow' : 'timeline'} 
-                className="space-y-4 w-full"
-                onValueChange={handleTabChange}
-            >
-                <TabsList>
-                    <TabsTrigger value="timeline">
-                        Timeline View
-                    </TabsTrigger>
-                    <TabsTrigger value="flow">
-                        Flow View
-                    </TabsTrigger>
-                </TabsList>
-                <TabsContent value="timeline" className="space-y-4 w-full">
-                    <PublicTimelineView roadmap={roadmap} subdomain={subdomain} urlMilestone={urlMilestone || undefined}/>
-                </TabsContent>
-                <TabsContent value="flow" className="space-y-4 w-full">
-                    <div className="h-[600px]">
-                        <PublicFlowView roadmap={roadmap} subdomain={subdomain} urlMilestone={urlMilestone || undefined}/>
-                    </div>
-                </TabsContent>
-            </Tabs>
-            </CardContent>
-        </Card>
+                <CardContent className="px-8">
+                    <TabsContent value="timeline" className="space-y-4 w-full">
+                        <PublicTimelineView roadmap={roadmap} subdomain={subdomain}
+                                            urlMilestone={urlMilestone || undefined}/>
+                    </TabsContent>
+                    <TabsContent value="flow" className="space-y-4 w-full">
+                        <div className="h-[800px]">
+                            <PublicFlowView roadmap={roadmap} subdomain={subdomain}
+                                            urlMilestone={urlMilestone || undefined}/>
+                        </div>
+                    </TabsContent>
+                </CardContent>
+            </Card>
+        </Tabs>
     );
 };
