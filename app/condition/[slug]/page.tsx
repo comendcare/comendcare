@@ -199,6 +199,20 @@ const posts: Post[] = [
     }
 ]
 
+const similarConditions = [
+    {
+        name: "Celocyn Syndrome",
+        description:
+            "Celocyn Syndrome is a progressive and degenerative disorder affecting the brain, characterized by severe neurological symptoms.",
+    },
+    {
+        name: "Myhre Syndrome",
+        description:
+            "Myhre syndrome is a rare genetic disorder that affects connective tissue and causes a variety of symptoms in many parts of the body.",
+    },
+    // Add more conditions here as needed
+]
+
 export default async function ConditionPage({
                                                 params
                                             }: {
@@ -378,37 +392,18 @@ export default async function ConditionPage({
                                 </div>
 
                                 <div className="space-y-2">
-                                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                    <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
                                         Similar conditions
                                     </h3>
                                     <div className="flex flex-col gap-2">
-                                        <div className="flex justify-between space-x-4">
-                                            <div className="space-y-1">
-                                                <h4 className="text-sm font-semibold">
-                                                    Celocyn Synrdrome
-                                                </h4>
-                                                <p>
-                                                    Celocyn Syndrome is a progressive and degenerative disorder
-                                                    affecting
-                                                    the
-                                                    brain, characterized by severe neurological symptoms.
-                                                </p>
+                                        {similarConditions.map((condition, index) => (
+                                            <div key={index} className="flex justify-between space-x-4">
+                                                <div className="space-y-1">
+                                                    <h4 className="text-sm font-semibold">{condition.name}</h4>
+                                                    <p>{condition.description}</p>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        <div className="flex justify-between space-x-4">
-                                            <div className="space-y-1">
-                                                <h4 className="text-sm font-semibold">
-                                                    Myhre Syndrome
-                                                </h4>
-                                                <p>
-                                                    Myhre syndrome is a rare genetic disorder that affects connective
-                                                    tissue
-                                                    and
-                                                    causes a variety of symptoms in many parts of the body.
-                                                </p>
-                                            </div>
-                                        </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>

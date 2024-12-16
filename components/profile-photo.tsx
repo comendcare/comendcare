@@ -5,23 +5,38 @@ import {
 } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
-export function ProfilePhoto({ img, name, textSize, className }: { img: string | null | undefined, name: string | null | undefined, textSize?: "small" | "large", className?: string | null | undefined }) {
+export function ProfilePhoto({
+                                 img,
+                                 name,
+                                 textSize = "medium",
+                                 className
+                             }: {
+    img: string | null | undefined;
+    name: string | null | undefined;
+    textSize?: "small" | "medium" | "large";
+    className?: string | null | undefined;
+}) {
     return (
-        <Avatar className={cn(
-            className,
-            "relative rounded-full ring-4 ring-white"
-        )}>
+        <Avatar
+            className={cn(
+                className,
+                "relative rounded-full ring-4 ring-white"
+            )}
+        >
             <AvatarImage
-                src={(img ? img : name) || undefined}
+                src={img || undefined}
                 alt={name || ""}
             />
-            <AvatarFallback 
-                className={
-                    cn("h-full w-full", textSize === "large" ? "text-6xl" : "")
-                }
+            <AvatarFallback
+                className={cn(
+                    "h-full w-full",
+                    textSize === "small" && "text-2xl",
+                    textSize === "medium" && "text-4xl",
+                    textSize === "large" && "text-6xl"
+                )}
             >
                 {name?.[0]}
             </AvatarFallback>
         </Avatar>
-    )
+    );
 }
