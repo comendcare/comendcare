@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export function ProfilePhoto({
                                  img,
                                  name,
-                                 textSize = "medium",
+                                 textSize,
                                  className
                              }: {
     img: string | null | undefined;

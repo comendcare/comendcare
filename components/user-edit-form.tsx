@@ -342,7 +342,7 @@ export default function UserEditForm() {
                     />
                 </div>
 
-                <Button type="submit">Next</Button>
+                <Button type="submit">Save</Button>
             </form>
         </Form>
     );

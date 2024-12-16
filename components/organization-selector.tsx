@@ -180,7 +180,7 @@ export default function OrganizationSelector({
                                         className="flex flex-row gap-x-2"
                                     >
                                         <PlusCircle className="h-5 w-5"/>
-                                        Create Organization
+                                        Create or join organization
                                     </CommandItem>
                                 </DialogTrigger>
                             </CommandGroup>
@@ -190,7 +190,7 @@ export default function OrganizationSelector({
             </Popover>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Create Organization</DialogTitle>
+                    <DialogTitle>Create or join organization</DialogTitle>
                     <DialogDescription>
                         Add a new organization to manage projects and members.
                     </DialogDescription>

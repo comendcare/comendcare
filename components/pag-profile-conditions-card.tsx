@@ -1,6 +1,5 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {cn} from "@/lib/utils";
 import {Condition} from "@prisma/client";
 import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 import Link from "next/link";
@@ -13,7 +12,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
         return (
             <Card className="organization-profile-tour-step3">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                    <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
                         Conditions
                     </CardTitle>
                 </CardHeader>
@@ -27,10 +26,10 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                             <div className="space-y-2">
                                 <div className="inline-flex flex-row justify-between items-center">
                                     <Link
-                                        href={`/condition/${condition.slug}`}
+                                        href={`http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${condition.slug}`}
                                         className="hover:underline inline-flex flex-row justify-center items-center gap-x-2 text-base"
                                     >
-                                        <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
                                             {condition.name}
                                         </h3>
                                         <FaArrowUpRightFromSquare/>
@@ -42,7 +41,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                             </div>
                             <div className="space-y-2">
                                 <div className="flex flex-row items-center justify-between w-full">
-                                    <h4 className={cn("scroll-m-20 text-base font-semibold")}>
+                                    <h4 className="scroll-m-20 text-base font-semibold">
                                         Relevant signs and symptoms
                                     </h4>
                                 </div>
@@ -56,7 +55,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                             </div>
                             <div className="space-y-2">
                                 <div className="flex flex-row items-center justify-between w-full">
-                                    <h4 className={cn("scroll-m-20 text-base font-semibold")}>
+                                    <h4 className="scroll-m-20 text-base font-semibold">
                                         Relevant topics
                                     </h4>
                                 </div>
@@ -69,8 +68,8 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                                 </div>
                             </div>
                         </div>
-                    ) : <div className="flex flex-col space-x-4">
-                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
+                    ) : <div className="flex flex-col space-y-2 text-left">
+                        <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
                             No Conditions Yet
                         </h3>
                         <p>
@@ -85,7 +84,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
         return (
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                    <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
                         Conditions
                     </CardTitle>
                 </CardHeader>
