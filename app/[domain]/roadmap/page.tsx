@@ -21,6 +21,9 @@ import {Organization} from "@prisma/client";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import PublicProfileDropdown from "@/components/public-profile-dropdown";
+import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
+import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
+import {Post} from "@/app/condition/[slug]/page";
 
 export async function generateMetadata({
                                            params
@@ -100,6 +103,51 @@ export async function generateStaticParams() {
         .filter(Boolean)
     return allPaths
 }
+
+const posts: Post[] = [
+    {
+        id: '1',
+        user: {
+            name: 'John Doe',
+            username: '@johndoe',
+            avatar: '/placeholder.svg?height=40&width=40'
+        },
+        content: 'Just finished a great hike! The view was breathtaking. 🏞️ #NatureLover',
+        image: '/placeholder.png',
+        likes: 120,
+        comments: 18,
+        shares: 5,
+        timestamp: '2 hours ago'
+    },
+    {
+        id: '2',
+        user: {
+            name: 'Jane Smith',
+            username: '@janesmith',
+            avatar: '/placeholder.svg?height=40&width=40'
+        },
+        content: 'Excited to announce my new project! Stay tuned for more details. 🚀 #NewBeginnings',
+        image: '/placeholder.png',
+        likes: 89,
+        comments: 32,
+        shares: 12,
+        timestamp: '5 hours ago'
+    },
+    {
+        id: '3',
+        user: {
+            name: 'Bob Jackson',
+            username: '@bobby',
+            avatar: '/placeholder.svg?height=40&width=40'
+        },
+        content: 'Hello!. 🚀 #NewBeginnings',
+        image: '/placeholder.png',
+        likes: 29,
+        comments: 32,
+        shares: 1,
+        timestamp: '5 hours ago'
+    }
+]
 
 export default async function OrganizationRoadmapPage({
                                                           params
@@ -234,6 +282,21 @@ export default async function OrganizationRoadmapPage({
                             <div className="col-span-1">
                                 <PublicMilestoneDetails/>
                             </div>
+                        </div>
+
+                        <div className="mt-8 w-full space-y-8">
+                            <h2 className="text-center text-3xl md:text-4xl font-bold">
+                                Recent activity
+                            </h2>
+                            <Carousel>
+                                <CarouselContent className="p-4 gap-4">
+                                    {posts.map((post, index) => (
+                                        <ConditionProfileRecentActivityCard post={post} key={index}/>
+                                    ))}
+                                </CarouselContent>
+                                <CarouselPrevious/>
+                                <CarouselNext/>
+                            </Carousel>
                         </div>
                     </div>
                 ) :

@@ -356,7 +356,7 @@ export default function EditPAGProfileDialog() {
                 <DialogContent className="max-h-[800px] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
-                            Edit profile
+                            Edit organization profile
                         </DialogTitle>
                         <DialogDescription>
                             {`Make changes to your profile here. Click save when you're done.`}

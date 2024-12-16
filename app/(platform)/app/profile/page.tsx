@@ -31,6 +31,8 @@ import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile
 import { ProfilePhoto } from "@/components/profile-photo";
 import { PublicRoadmapCard } from "@/components/public-roadmap-card";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
+import NoOrganizationPage from "@/components/no-organization-page";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -65,28 +67,7 @@ export default async function ProfilePage() {
         if (!organization.verified) {
             // Render unverified organization state
             return (
-                <div className="h-full flex flex-col items-center justify-center py-20">
-                    <Image
-                        alt="Organization not verified"
-                        src="https://illustrations.popsy.co/gray/abstract-art-6.svg"
-                        width={400}
-                        height={400}
-                        className="dark:hidden"
-                    />
-                    <Image
-                        alt="Organization not verified"
-                        src="https://illustrations.popsy.co/white/abstract-art-6.svg"
-                        width={400}
-                        height={400}
-                        className="hidden dark:block"
-                    />
-                    <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                        {`Your organization is not verified yet.`}
-                    </p>
-                    <p className="mt-4 text-stone-500 dark:text-stone-300">
-                        {`We're currently verifying your organization. If this is taking too long, please contact support.`}
-                    </p>
-                </div>
+                <UnverifiedOrganizationPage/>
             );
         }
 
@@ -256,32 +237,7 @@ export default async function ProfilePage() {
         );
     } else {
         return (
-            <div className="h-full flex flex-col items-center justify-center py-20">
-                <Image
-                    alt="No organization"
-                    src="https://illustrations.popsy.co/gray/success.svg"
-                    width={400}
-                    height={400}
-                    className="dark:hidden"
-                />
-                <Image
-                    alt="No organization"
-                    src="https://illustrations.popsy.co/white/success.svg"
-                    width={400}
-                    height={400}
-                    className="hidden dark:block"
-                />
-                <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                    {`You're not part of an organization yet.`}
-                </p>
-                <Link
-                    href="/onboarding/organization"
-                    className={cn(buttonVariants({variant: "default"}), "gap-x-2 mt-8")}
-                >
-                    <FaPlus/>
-                    Join an organization
-                </Link>
-            </div>
+            <NoOrganizationPage/>
         );
     }
 }

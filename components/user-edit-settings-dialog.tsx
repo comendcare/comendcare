@@ -8,9 +8,9 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {FaGear, FaUserPlus} from "react-icons/fa6";
-import UserOnboardingForm from "@/components/user-onboarding-form";
+import {FaGear} from "react-icons/fa6";
 import UserEditForm from "@/components/user-edit-form";
+import UserSettings from "@/components/user-settings";
 
 export default function UserEditSettingsDialog() {
 
@@ -22,7 +22,7 @@ export default function UserEditSettingsDialog() {
                     Settings
                 </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="h-3/4 max-h-screen overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
                         Edit your settings
@@ -32,7 +32,10 @@ export default function UserEditSettingsDialog() {
                     </DialogDescription>
                 </DialogHeader>
 
-                <UserEditForm/>
+                <div className="flex flex-col gap-8">
+                    <UserEditForm/>
+                    <UserSettings/>
+                </div>
             </DialogContent>
         </Dialog>
     )

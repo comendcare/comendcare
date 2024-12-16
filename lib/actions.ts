@@ -1229,7 +1229,7 @@ export async function leaveOrganization(
 ) {
     try {
         if (!session) {
-            return {success: false, error: "Internal server error"};
+            return {success: false, error: "Session not found."};
         }
 
         const member = await prisma.member.delete({
@@ -1248,6 +1248,32 @@ export async function leaveOrganization(
         return {success: true, data: member};
     } catch (error: any) {
         logError("Error fetching membership data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+// Invite user function with updated Organization model
+export async function deleteUser(
+    session: Session | null,
+) {
+    try {
+        if (!session) {
+            return {success: false, error: "Internal server error"};
+        }
+
+        const user = await prisma.user.delete({
+            where: {
+                id: session.user.id,
+            }
+        })
+
+        if (!user) {
+            return {success: false, error: "user not found"};
+        }
+
+        return {success: true, data: user};
+    } catch (error: any) {
+        logError("Error fetching user data", error);
         return {success: false, error: "Internal server error"};
     }
 }
