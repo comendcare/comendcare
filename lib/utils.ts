@@ -6,6 +6,10 @@ import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 
+export const years = Array.from({ length: new Date().getFullYear() - 1970 + 1 }, (_, i) =>
+    (new Date().getFullYear() - i).toString()
+)
+
 export async function getPublicFile(fileUrl: string): Promise<File> {
     try {
         // Make a GET request to your API endpoint

@@ -108,9 +108,6 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                         </div>
 
                     </div>
-                    <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
-                        <h1 className="truncate text-2xl font-bold text-gray-900">{"Hi"}</h1>
-                    </div>
                 </div>
             </div>
         </div>

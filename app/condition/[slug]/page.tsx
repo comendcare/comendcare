@@ -11,6 +11,15 @@ import {
     BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {Button} from "@/components/ui/button";
 import {ExternalDiseaseProfilesTable} from "@/components/external-disease-profiles-table";
@@ -38,6 +47,10 @@ import ConditionProfilePatientGroupCard from "@/components/condition-profile-pat
 import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
 import PublicPageFooter from "@/components/public-page-footer";
 import Link from "next/link";
+import { FloatingDock } from "@/components/floating-dock";
+import {IconBrandGithub, IconEdit, IconFlag, IconHome, IconShare, IconShare2, IconShare3} from "@tabler/icons-react";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
 
 export type Post = {
     id: string
@@ -186,6 +199,20 @@ const posts: Post[] = [
     }
 ]
 
+const similarConditions = [
+    {
+        name: "Celocyn Syndrome",
+        description:
+            "Celocyn Syndrome is a progressive and degenerative disorder affecting the brain, characterized by severe neurological symptoms.",
+    },
+    {
+        name: "Myhre Syndrome",
+        description:
+            "Myhre syndrome is a rare genetic disorder that affects connective tissue and causes a variety of symptoms in many parts of the body.",
+    },
+    // Add more conditions here as needed
+]
+
 export default async function ConditionPage({
                                                 params
                                             }: {
@@ -208,7 +235,6 @@ export default async function ConditionPage({
     if (!data) {
         notFound()
     }
-    console.log(data.organizations)
 
     return (
         <TooltipProvider>
@@ -366,37 +392,18 @@ export default async function ConditionPage({
                                 </div>
 
                                 <div className="space-y-2">
-                                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                    <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
                                         Similar conditions
                                     </h3>
                                     <div className="flex flex-col gap-2">
-                                        <div className="flex justify-between space-x-4">
-                                            <div className="space-y-1">
-                                                <h4 className="text-sm font-semibold">
-                                                    Celocyn Synrdrome
-                                                </h4>
-                                                <p>
-                                                    Celocyn Syndrome is a progressive and degenerative disorder
-                                                    affecting
-                                                    the
-                                                    brain, characterized by severe neurological symptoms.
-                                                </p>
+                                        {similarConditions.map((condition, index) => (
+                                            <div key={index} className="flex justify-between space-x-4">
+                                                <div className="space-y-1">
+                                                    <h4 className="text-sm font-semibold">{condition.name}</h4>
+                                                    <p>{condition.description}</p>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        <div className="flex justify-between space-x-4">
-                                            <div className="space-y-1">
-                                                <h4 className="text-sm font-semibold">
-                                                    Myhre Syndrome
-                                                </h4>
-                                                <p>
-                                                    Myhre syndrome is a rare genetic disorder that affects connective
-                                                    tissue
-                                                    and
-                                                    causes a variety of symptoms in many parts of the body.
-                                                </p>
-                                            </div>
-                                        </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
@@ -508,6 +515,65 @@ export default async function ConditionPage({
                 </div>
             </div>
             <PublicPageFooter/>
+
+            <FloatingDock
+                items={[
+                    {
+                        title: "Edit condition page",
+                        icon: <IconEdit />,
+                        dialog: (
+                            <>
+                                <DialogHeader>
+                                    <DialogTitle>Edit profile</DialogTitle>
+                                    <DialogDescription>
+                                        {`Make changes to your profile here. Click save when you're done.`}
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                    <Label htmlFor="name">Name</Label>
+                                    <Input id="name" defaultValue="John Doe" />
+                                </div>
+                                <DialogFooter>
+                                    <Button type="submit">Save changes</Button>
+                                </DialogFooter>
+                            </>
+                        ),
+                    },
+                    {
+                        title: "Post on feed",
+                        icon: <IconShare2 />,
+                        href: "/app/feed",
+                    },
+                    {
+                        title: "Share on social media",
+                        icon: <IconShare />,
+                        href: "/dashboard",
+                    },
+                    {
+                        title: "Report an issue",
+                        icon: <IconFlag />,
+                        dialog: (
+                            <>
+                                <DialogHeader>
+                                    <DialogTitle>Edit profile</DialogTitle>
+                                    <DialogDescription>
+                                        {`Make changes to your profile here. Click save when you're done.`}
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                    <Label htmlFor="name">Name</Label>
+                                    <Input id="name" defaultValue="John Doe" />
+                                </div>
+                                <DialogFooter>
+                                    <Button type="submit">Save changes</Button>
+                                </DialogFooter>
+                            </>
+                        ),
+                    }
+                ]}
+                desktopClassName="fixed bottom-4 left-1/2 transform -translate-x-1/2"
+            />
+
         </TooltipProvider>
     )
 }

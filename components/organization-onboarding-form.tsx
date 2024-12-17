@@ -27,7 +27,7 @@ import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
-import {cn, createDicebearAvatar, formatMoney} from "@/lib/utils";
+import {cn, createDicebearAvatar, formatMoney, years} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
@@ -105,10 +105,6 @@ const OPTIONS: Option[] = [
         strengths: 'Provides full-stack capabilities with SSR, optimized for caching and streaming, and excellent support for nested routing.',
     },
 ];
-
-const years = Array.from({ length: new Date().getFullYear() - 1970 + 1 }, (_, i) =>
-    (new Date().getFullYear() - i).toString()
-)
 
 export default function OrganizationOnboardingForm() {
     const {data: session, update} = useSession()

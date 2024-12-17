@@ -1,0 +1,29 @@
+import Image from "next/image"
+
+
+export default function UnverifiedOrganizationPage() {
+    return (
+        <div className="h-full flex flex-col items-center justify-center py-20">
+            <Image
+                alt="Organization not verified"
+                src="https://illustrations.popsy.co/gray/abstract-art-6.svg"
+                width={400}
+                height={400}
+                className="dark:hidden"
+            />
+            <Image
+                alt="Organization not verified"
+                src="https://illustrations.popsy.co/white/abstract-art-6.svg"
+                width={400}
+                height={400}
+                className="hidden dark:block"
+            />
+            <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                {`Your organization is not verified yet.`}
+            </p>
+            <p className="mt-4 text-stone-500 dark:text-stone-300">
+                {`We're currently verifying your organization. If this is taking too long, please contact support.`}
+            </p>
+        </div>
+    )
+}

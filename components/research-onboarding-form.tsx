@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {updateOrganizationAttribute} from "@/lib/actions";
+import {updateOrganization, updateOrganizationAttribute} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -35,10 +35,15 @@ export const optionSchema = z.object({
 
 const invitationFormSchema = z.object({
     modalities: z.array(optionSchema).min(0).optional(),
-    disorder: z.string().min(2, {
-        message: "Your organization's description.",
-    }).optional(),
-    categories: z.array(optionSchema).min(0).optional(),
+    disorder: z.string()
+        .min(2, {
+            message: "The name of your disorder needs to be longer than 2 characters",
+        })
+        .max(60, {
+            message: "The name of your disorder needs to be shorter than 60 characters",
+        })
+        .optional(),
+    categories: z.array(optionSchema).optional(),
     prevalenceNumerator: z.string().min(1, {
         message: "Your organization's prevalence.",
     }).optional(),
@@ -49,12 +54,12 @@ const invitationFormSchema = z.object({
         message: "Your organization's description.",
     }).optional(),
     // mechanisms: z.array(optionSchema).min(0),
-    mechanisms: z.array(z.string()).min(0).optional(),
-    genes: z.array(optionSchema).min(0).optional(),
-    biomarkers: z.array(optionSchema).min(0).optional(),
-    symptoms: z.array(optionSchema).min(0).optional(),
-    studies: z.array(optionSchema).min(0).optional(),
-    assets: z.array(optionSchema).min(0).optional(),
+    mechanisms: z.array(z.string()).optional(),
+    genes: z.array(optionSchema).optional(),
+    biomarkers: z.array(optionSchema).optional(),
+    symptoms: z.array(optionSchema).optional(),
+    studies: z.array(optionSchema).optional(),
+    assets: z.array(optionSchema).optional(),
 })
 
 export const CONDITION_MECHANISM_OPTIONS: Option[] = [
@@ -383,23 +388,47 @@ export default function ResearchOnboardingForm() {
     })
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
+        const sessionData = session.data;
 
-        const formData = new FormData()
+        if (!sessionData?.user.organizationId) {
+            toast.error("You're not signed into an organization right now.");
+            return;
+        }
 
-        if (session.data?.user.organizationId) {
-            updateOrganizationAttribute(formData, session.data.user.organizationId, "key").then((res: any) => {
-                if (res.error) {
-                    toast.error(res.error)
-                    router.push("/app/profile")
-                } else {
-                    const {id} = res
-                    router.refresh()
-                    router.push("/app/profile")
-                    toast.success(`Successfully saved changes.`)
-                }
-            })
-        } else {
-            toast.error("You're not signed into an organization right now.")
+        // Create FormData object
+        const formData = new FormData();
+
+        // Map form values into FormData
+        const data = {
+            interestedModalities: values.modalities?.map((modality) => modality.value).join(",") || "",
+            diseaseName: values.disorder || "",
+            diseaseCategories: values.categories?.map((category) => category.value).join(",") || "",
+            prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
+            prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",
+            numberOfIdentifiedPatients: values.population ? values.population.toString() : "",
+            relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
+            associatedGenes: values.genes?.map((gene) => gene.value).join(",") || "",
+            associatedSignsAndSymptoms: values.symptoms?.map((symptom) => symptom.value).join(",") || "",
+            existingDatabasesAndStudies: values.studies?.map((study) => study.value).join(",") || "",
+            assetsUnderDevelopment: values.assets?.map((asset) => asset.value).join(",") || "",
+        };
+
+        // Append data to FormData
+        Object.entries(data).forEach(([key, value]) => {
+            if (value) {
+                formData.append(key, value);
+            }
+        });
+
+        try {
+            // Call the updateOrganization function with FormData
+            await updateOrganization(formData, sessionData.user.organizationId);
+
+            toast.success("Successfully updated organization.");
+            router.push("/app/finances"); // Redirect to the profile page
+        } catch (error) {
+            console.error("Failed to update organization:", error);
+            toast.error("An error occurred while updating the organization.");
         }
     }
 
@@ -743,10 +772,10 @@ export default function ResearchOnboardingForm() {
 
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
-                                    <Button onClick={() => router.push("/onboarding/finances")}>Previous</Button>
+                                    <Button onClick={() => router.push("/onboarding/organization")}>Previous</Button>
                                     <Button type="submit">Next</Button>
                                 </div>
-                                <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
+                                <Button variant="ghost" onClick={() => router.push("/app/finances")}>Skip</Button>
                             </div>
                         </form>
                     </Form>
@@ -775,7 +804,7 @@ export default function ResearchOnboardingForm() {
                                     <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
                                         Disease Categories
                                     </h3>
-                                    <div className="flex justify-center space-x-1">
+                                    <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
                                         {form.watch("categories") ? form.watch("categories")?.map((category, index) =>
                                             <Badge key={index}>
                                                 {category.label}
@@ -792,7 +821,7 @@ export default function ResearchOnboardingForm() {
                                     <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
                                         Signs and Symptoms
                                     </h3>
-                                    <div className="flex justify-center space-x-1">
+                                    <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
                                         {form.watch("symptoms") ? form.watch("symptoms")?.map((sign, index) =>
                                             <Badge key={index}>
                                                 {sign.label}
@@ -809,7 +838,7 @@ export default function ResearchOnboardingForm() {
                                     <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
                                         Associated Genes
                                     </h3>
-                                    <div className="flex justify-center space-x-1">
+                                    <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
                                         {form.watch("genes") ? form.watch("genes")?.map((gene, index) =>
                                             <Badge key={index}>
                                                 {gene.label}
@@ -826,18 +855,21 @@ export default function ResearchOnboardingForm() {
                                     <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
                                         Disease Mechanisms
                                     </h3>
-                                    <div className="flex justify-center space-x-1">
-                                        {form.watch("mechanisms") ? form.watch("mechanisms")?.map((mechanism, index) =>
-                                            <Badge key={index}>
-                                                {mechanism}
-                                            </Badge>
-                                        ) : Array.from({
+                                    <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
+                                        {form.watch("mechanisms") ? form.watch("mechanisms")?.map((mechanismId, index) => {
+                                            // Find the mechanism by its id
+                                            const mechanism = mechanisms.find(m => m.id === mechanismId);
+                                            return (
+                                                <Badge key={index}>
+                                                    {mechanism?.name || mechanismId} {/* Fallback to id if name not found */}
+                                                </Badge>
+                                            );
+                                        }) : Array.from({
                                             length: faker.number.int({
                                                 min: 1,
                                                 max: 3
                                             })
-                                        }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
-                                    </div>
+                                        }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}                                    </div>
                                 </div>
                             </div>
 
