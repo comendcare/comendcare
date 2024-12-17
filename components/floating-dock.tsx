@@ -25,6 +25,7 @@ import {
 
 export const FloatingDock = ({
                                  items,
+                                 orientation = "horizontal",
                                  desktopClassName,
                                  mobileClassName,
                              }: {
@@ -34,19 +35,21 @@ export const FloatingDock = ({
         href?: string;
         dialog?: React.ReactNode;
     }[];
+    orientation?: "horizontal" | "vertical";
     desktopClassName?: string;
     mobileClassName?: string;
 }) => {
     return (
         <>
-            <FloatingDockDesktop items={items} className={desktopClassName}/>
-            <FloatingDockMobile items={items} className={mobileClassName}/>
+            <FloatingDockDesktop items={items} orientation={orientation} className={desktopClassName}/>
+            <FloatingDockMobile items={items} orientation={orientation} className={mobileClassName}/>
         </>
     );
 };
 
 const FloatingDockMobile = ({
                                 items,
+                                orientation,
                                 className,
                             }: {
     items: {
@@ -55,6 +58,7 @@ const FloatingDockMobile = ({
         href?: string;
         dialog?: React.ReactNode;
     }[];
+    orientation: "horizontal" | "vertical";
     className?: string;
 }) => {
     const [open, setOpen] = useState(false);
@@ -64,7 +68,10 @@ const FloatingDockMobile = ({
                 {open && (
                     <motion.div
                         layoutId="nav"
-                        className="absolute bottom-full mb-2 inset-x-0 flex flex-col gap-2"
+                        className={cn(
+                            "absolute bottom-full mb-2 inset-x-0 flex gap-2",
+                            orientation === "vertical" ? "flex-col" : "flex-row"
+                        )}
                     >
                         {items.map((item, idx) => (
                             <motion.div
@@ -107,6 +114,7 @@ const FloatingDockMobile = ({
 
 const FloatingDockDesktop = ({
                                  items,
+                                 orientation,
                                  className,
                              }: {
     items: {
@@ -115,20 +123,38 @@ const FloatingDockDesktop = ({
         href?: string;
         dialog?: React.ReactNode;
     }[];
+    orientation: "horizontal" | "vertical";
     className?: string;
 }) => {
     let mouseX = useMotionValue(Infinity);
+    let mouseY = useMotionValue(Infinity);
+
     return (
         <motion.div
-            onMouseMove={(e) => mouseX.set(e.pageX)}
-            onMouseLeave={() => mouseX.set(Infinity)}
+            onMouseMove={(e) => {
+                mouseX.set(e.pageX);
+                mouseY.set(e.pageY);
+            }}
+            onMouseLeave={() => {
+                mouseX.set(Infinity);
+                mouseY.set(Infinity);
+            }}
             className={cn(
-                "mx-auto hidden md:flex h-16 gap-4 items-end  rounded-2xl bg-gray-50 dark:bg-neutral-900 px-4 pb-3",
+                "hidden md:flex gap-4 items-end rounded-2xl bg-gray-50 dark:bg-neutral-900 p-4",
+                orientation === "vertical"
+                    ? "flex-col h-auto fixed top-1/2 right-4 transform -translate-y-1/2"
+                    : "flex-row h-16 mx-auto",
                 className
             )}
         >
             {items.map((item) => (
-                <IconContainer mouseX={mouseX} key={item.title} {...item} />
+                <IconContainer
+                    mouseX={mouseX}
+                    mouseY={mouseY}
+                    orientation={orientation}
+                    key={item.title}
+                    {...item}
+                />
             ))}
         </motion.div>
     );
@@ -136,12 +162,16 @@ const FloatingDockDesktop = ({
 
 function IconContainer({
                            mouseX,
+                           mouseY,
+                           orientation,
                            title,
                            icon,
                            href,
                            dialog,
                        }: {
     mouseX: MotionValue;
+    mouseY: MotionValue;
+    orientation: "horizontal" | "vertical";
     title: string;
     icon: React.ReactNode;
     href?: string | undefined;
@@ -149,32 +179,31 @@ function IconContainer({
 }) {
     let ref = useRef<HTMLDivElement>(null);
 
-    let distance = useTransform(mouseX, (val) => {
-        let bounds = ref.current?.getBoundingClientRect() ?? {x: 0, width: 0};
+    // Calculate distance based on orientation
+    let distance = useTransform(
+        orientation === "horizontal" ? mouseX : mouseY,
+        (val) => {
+            let bounds = ref.current?.getBoundingClientRect() ?? {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+            };
+            return orientation === "horizontal"
+                ? val - bounds.x - bounds.width / 2
+                : val - bounds.y - bounds.height / 2;
+        }
+    );
 
-        return val - bounds.x - bounds.width / 2;
-    });
-
+    // Animate icon sizes
     let widthTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
     let heightTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);
 
     let widthTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
-    let heightTransformIcon = useTransform(
-        distance,
-        [-150, 0, 150],
-        [20, 40, 20]
-    );
+    let heightTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
 
-    let width = useSpring(widthTransform, {
-        mass: 0.1,
-        stiffness: 150,
-        damping: 12,
-    });
-    let height = useSpring(heightTransform, {
-        mass: 0.1,
-        stiffness: 150,
-        damping: 12,
-    });
+    let width = useSpring(widthTransform, { mass: 0.1, stiffness: 150, damping: 12 });
+    let height = useSpring(heightTransform, { mass: 0.1, stiffness: 150, damping: 12 });
 
     let widthIcon = useSpring(widthTransformIcon, {
         mass: 0.1,
@@ -195,13 +224,13 @@ function IconContainer({
                 <DialogTrigger asChild>
                     <motion.div
                         ref={ref}
-                        style={{width, height}}
+                        style={{ width, height }}
                         onMouseEnter={() => setHovered(true)}
                         onMouseLeave={() => setHovered(false)}
                         className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative cursor-pointer"
                     >
                         <motion.div
-                            style={{width: widthIcon, height: heightIcon}}
+                            style={{ width: widthIcon, height: heightIcon }}
                             className="flex items-center justify-center"
                         >
                             {icon}
@@ -209,9 +238,9 @@ function IconContainer({
                         <AnimatePresence>
                             {hovered && (
                                 <motion.div
-                                    initial={{opacity: 0, y: 10, x: "-50%"}}
-                                    animate={{opacity: 1, y: 0, x: "-50%"}}
-                                    exit={{opacity: 0, y: 2, x: "-50%"}}
+                                    initial={{ opacity: 0, y: 10, x: "-50%" }}
+                                    animate={{ opacity: 1, y: 0, x: "-50%" }}
+                                    exit={{ opacity: 0, y: 2, x: "-50%" }}
                                     className="px-2 py-0.5 whitespace-pre rounded-md bg-gray-100 border dark:bg-neutral-800 dark:border-neutral-900 dark:text-white border-gray-200 text-neutral-700 absolute left-1/2 -translate-x-1/2 -top-8 w-fit text-xs"
                                 >
                                     {title}
@@ -220,9 +249,7 @@ function IconContainer({
                         </AnimatePresence>
                     </motion.div>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                    {dialog}
-                </DialogContent>
+                <DialogContent className="sm:max-w-[425px]">{dialog}</DialogContent>
             </Dialog>
         );
     }
@@ -231,7 +258,7 @@ function IconContainer({
         <Link href={href || ""}>
             <motion.div
                 ref={ref}
-                style={{width, height}}
+                style={{ width, height }}
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative"
@@ -239,9 +266,9 @@ function IconContainer({
                 <AnimatePresence>
                     {hovered && (
                         <motion.div
-                            initial={{opacity: 0, y: 10, x: "-50%"}}
-                            animate={{opacity: 1, y: 0, x: "-50%"}}
-                            exit={{opacity: 0, y: 2, x: "-50%"}}
+                            initial={{ opacity: 0, y: 10, x: "-50%" }}
+                            animate={{ opacity: 1, y: 0, x: "-50%" }}
+                            exit={{ opacity: 0, y: 2, x: "-50%" }}
                             className="px-2 py-0.5 whitespace-pre rounded-md bg-gray-100 border dark:bg-neutral-800 dark:border-neutral-900 dark:text-white border-gray-200 text-neutral-700 absolute left-1/2 -translate-x-1/2 -top-8 w-fit text-xs"
                         >
                             {title}
@@ -249,7 +276,7 @@ function IconContainer({
                     )}
                 </AnimatePresence>
                 <motion.div
-                    style={{width: widthIcon, height: heightIcon}}
+                    style={{ width: widthIcon, height: heightIcon }}
                     className="flex items-center justify-center"
                 >
                     {icon}

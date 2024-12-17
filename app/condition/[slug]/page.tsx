@@ -571,7 +571,8 @@ export default async function ConditionPage({
                         ),
                     }
                 ]}
-                desktopClassName="fixed bottom-4 left-1/2 transform -translate-x-1/2"
+                orientation="vertical"
+                desktopClassName="right-4"
             />
 
         </TooltipProvider>
