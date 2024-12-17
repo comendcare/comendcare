@@ -5,7 +5,7 @@ import {FaPaperPlane} from "react-icons/fa6";
 import {CardContent, CardFooter} from "@/components/ui/card";
 import {Separator} from "@/components/ui/separator";
 import {faker} from "@faker-js/faker";
-import {createDicebearAvatar} from "@/lib/utils";
+import { ProfilePhoto } from "./profile-photo";
 
 interface FeedCardSocialSectionProps {
     text?: string
@@ -28,10 +28,15 @@ export const UserFeedCardSocialSection = ({text}: FeedCardSocialSectionProps) =>
             </CardContent>
 
             <CardFooter className="flex flex-row space-x-2 justify-between items-center">
-                <Avatar>
+                {/* <Avatar>
                     <AvatarImage src={createDicebearAvatar("", 50, 40, "identicon")} />
                     <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
+                </Avatar> */}
+                <ProfilePhoto 
+                    img={undefined}
+                    name={undefined}
+                    className="h-11 w-11 rounded-full"
+                />
                 <div className="flex-1">
                     <Input placeholder={"What's on your mind?"} />
                 </div>

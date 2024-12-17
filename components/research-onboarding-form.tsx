@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {updateOrganization} from "@/lib/actions";
+import {updateOrganization, updateOrganizationAttribute} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -34,27 +34,32 @@ export const optionSchema = z.object({
 });
 
 const invitationFormSchema = z.object({
-    modalities: z.array(optionSchema).min(0),
-    disorder: z.string().min(2, {
-        message: "Your organization's description.",
-    }),
-    categories: z.array(optionSchema).min(0),
+    modalities: z.array(optionSchema).min(0).optional(),
+    disorder: z.string()
+        .min(2, {
+            message: "The name of your disorder needs to be longer than 2 characters",
+        })
+        .max(60, {
+            message: "The name of your disorder needs to be shorter than 60 characters",
+        })
+        .optional(),
+    categories: z.array(optionSchema).optional(),
     prevalenceNumerator: z.string().min(1, {
-        message: "Your organization's description.",
-    }),
+        message: "Your organization's prevalence.",
+    }).optional(),
     prevalenceDenominator: z.string().min(1, {
-        message: "Your organization's description.",
-    }),
+        message: "Your organization's prevalence.",
+    }).optional(),
     population: z.string().min(1, {
         message: "Your organization's description.",
-    }),
+    }).optional(),
     // mechanisms: z.array(optionSchema).min(0),
-    mechanisms: z.array(z.string()).min(0),
-    genes: z.array(optionSchema).min(0),
-    biomarkers: z.array(optionSchema).min(0),
-    symptoms: z.array(optionSchema).min(0),
-    studies: z.array(optionSchema).min(0),
-    assets: z.array(optionSchema).min(0),
+    mechanisms: z.array(z.string()).optional(),
+    genes: z.array(optionSchema).optional(),
+    biomarkers: z.array(optionSchema).optional(),
+    symptoms: z.array(optionSchema).optional(),
+    studies: z.array(optionSchema).optional(),
+    assets: z.array(optionSchema).optional(),
 })
 
 export const CONDITION_MECHANISM_OPTIONS: Option[] = [
@@ -383,29 +388,53 @@ export default function ResearchOnboardingForm() {
     })
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
+        const sessionData = session.data;
 
-        const formData = new FormData()
+        if (!sessionData?.user.organizationId) {
+            toast.error("You're not signed into an organization right now.");
+            return;
+        }
 
-        if (session.data?.user.organizationId) {
-            updateOrganization(formData, session.data.user.organizationId, "key").then((res: any) => {
-                if (res.error) {
-                    toast.error(res.error)
-                    router.push("/app/profile")
-                } else {
-                    const {id} = res
-                    router.refresh()
-                    router.push("/app/profile")
-                    toast.success(`Successfully saved changes.`)
-                }
-            })
-        } else {
-            toast.error("You're not signed into an organization right now.")
+        // Create FormData object
+        const formData = new FormData();
+
+        // Map form values into FormData
+        const data = {
+            interestedModalities: values.modalities?.map((modality) => modality.value).join(",") || "",
+            diseaseName: values.disorder || "",
+            diseaseCategories: values.categories?.map((category) => category.value).join(",") || "",
+            prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
+            prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",
+            numberOfIdentifiedPatients: values.population ? values.population.toString() : "",
+            relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
+            associatedGenes: values.genes?.map((gene) => gene.value).join(",") || "",
+            associatedSignsAndSymptoms: values.symptoms?.map((symptom) => symptom.value).join(",") || "",
+            existingDatabasesAndStudies: values.studies?.map((study) => study.value).join(",") || "",
+            assetsUnderDevelopment: values.assets?.map((asset) => asset.value).join(",") || "",
+        };
+
+        // Append data to FormData
+        Object.entries(data).forEach(([key, value]) => {
+            if (value) {
+                formData.append(key, value);
+            }
+        });
+
+        try {
+            // Call the updateOrganization function with FormData
+            await updateOrganization(formData, sessionData.user.organizationId);
+
+            toast.success("Successfully updated organization.");
+            router.push("/app/finances"); // Redirect to the profile page
+        } catch (error) {
+            console.error("Failed to update organization:", error);
+            toast.error("An error occurred while updating the organization.");
         }
     }
 
     return (
         <TooltipProvider>
-            <div className="grid grid-cols-2 gap-x-8">
+            <div className="relative grid grid-cols-2 gap-x-8">
                 <div className="space-y-4 col-span-1">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -503,46 +532,48 @@ export default function ResearchOnboardingForm() {
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="prevalenceNumerator"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`Estimated total prevalence`}</FormLabel>
-                                        <FormDescription>{`The estimated total number of patients in the world.`}</FormDescription>
-                                        <FormControl>
-                                            <div className="flex flex-row items-end justify-start">
-                                                <Input
-                                                    type="number"
-                                                    id="population"
-                                                    {...field}
-                                                    className="w-16"
-                                                />
-                                                &nbsp;in&nbsp;
-                                                <FormField
-                                                    control={form.control}
-                                                    name="prevalenceDenominator"
-                                                    render={({field}) => (
-                                                        <FormItem>
+                            <div className="flex flex-col">
+                                <FormField
+                                    control={form.control}
+                                    name="prevalenceNumerator"
+                                    render={({field: numeratorField}) => (
+                                        <FormItem>
+                                            <FormLabel>{`Estimated total prevalence`}</FormLabel>
+                                            <FormDescription>
+                                                {`The estimated total number of patients in the world.`}
+                                            </FormDescription>
+                                            <FormControl>
+                                                <div className="flex flex-row items-end justify-start space-x-2">
+                                                    <Input
+                                                        type="number"
+                                                        id="prevalenceNumerator"
+                                                        {...numeratorField}
+                                                        className="w-16"
+                                                        min={0}
+                                                    />
+                                                    <span>in</span>
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="prevalenceDenominator"
+                                                        render={({field: denominatorField}) => (
                                                             <FormControl>
                                                                 <Input
                                                                     type="number"
-                                                                    id="population"
-                                                                    {...field}
+                                                                    id="prevalenceDenominator"
+                                                                    {...denominatorField}
                                                                     className="w-32"
+                                                                    min={0}
                                                                 />
                                                             </FormControl>
-                                                            <FormMessage/>
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
+                                                        )}
+                                                    />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                             <FormField
                                 control={form.control}
                                 name="population"
@@ -741,17 +772,17 @@ export default function ResearchOnboardingForm() {
 
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
-                                    <Button onClick={() => router.push("/onboarding/finances")}>Previous</Button>
+                                    <Button onClick={() => router.push("/onboarding/organization")}>Previous</Button>
                                     <Button type="submit">Next</Button>
                                 </div>
-                                <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
+                                <Button variant="ghost" onClick={() => router.push("/app/finances")}>Skip</Button>
                             </div>
                         </form>
                     </Form>
                 </div>
-                <div className="space-y-4 col-span-1 w-full">
-                    <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
-                        <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
+                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-280px)]">
+                    <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
+                        <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
                             Condition profile preview
                         </h1>
 
@@ -768,7 +799,100 @@ export default function ResearchOnboardingForm() {
                                 </div>
                             </div>
 
+                            <div className="grid grid-cols-4">
+                                <div className="space-y-2">
+                                    <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
+                                        Disease Categories
+                                    </h3>
+                                    <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
+                                        {form.watch("categories") ? form.watch("categories")?.map((category, index) =>
+                                            <Badge key={index}>
+                                                {category.label}
+                                            </Badge>
+                                        ) : Array.from({
+                                            length: faker.number.int({
+                                                min: 1,
+                                                max: 3
+                                            })
+                                        }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
+                                        Signs and Symptoms
+                                    </h3>
+                                    <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
+                                        {form.watch("symptoms") ? form.watch("symptoms")?.map((sign, index) =>
+                                            <Badge key={index}>
+                                                {sign.label}
+                                            </Badge>
+                                        ) : Array.from({
+                                            length: faker.number.int({
+                                                min: 1,
+                                                max: 3
+                                            })
+                                        }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
+                                        Associated Genes
+                                    </h3>
+                                    <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
+                                        {form.watch("genes") ? form.watch("genes")?.map((gene, index) =>
+                                            <Badge key={index}>
+                                                {gene.label}
+                                            </Badge>
+                                        ) : Array.from({
+                                            length: faker.number.int({
+                                                min: 1,
+                                                max: 3
+                                            })
+                                        }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
+                                        Disease Mechanisms
+                                    </h3>
+                                    <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
+                                        {form.watch("mechanisms") ? form.watch("mechanisms")?.map((mechanismId, index) => {
+                                            // Find the mechanism by its id
+                                            const mechanism = mechanisms.find(m => m.id === mechanismId);
+                                            return (
+                                                <Badge key={index}>
+                                                    {mechanism?.name || mechanismId} {/* Fallback to id if name not found */}
+                                                </Badge>
+                                            );
+                                        }) : Array.from({
+                                            length: faker.number.int({
+                                                min: 1,
+                                                max: 3
+                                            })
+                                        }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}                                    </div>
+                                </div>
+                            </div>
+
                             <div className="grid gap-8 grid-cols-2 w-full">
+
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
+                                            Description
+                                        </h3>
+                                        <p className="flex flex-col space-y-2">
+                                            <Skeleton className="h-4 w-1/3"/>
+                                            <Skeleton className="h-4 w-full rounded-md"/>
+                                            <Skeleton className="h-4 w-full rounded-md"/>
+                                            <Skeleton className="h-4 w-full rounded-md"/>
+                                            <Skeleton className="h-4 w-full rounded-md"/>
+                                            <Skeleton className="h-4 w-full rounded-md"/>
+                                            <Skeleton className="h-4 w-2/3 rounded-md"/>
+                                            <Skeleton className="h-4 w-1/4 rounded-md"/>
+                                        </p>
+                                    </div>
+                                </div>
+
                                 <div className="space-y-4">
                                     <div className="space-y-2">
                                         <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
@@ -801,96 +925,15 @@ export default function ResearchOnboardingForm() {
                                             </CardContent>
                                         </Card>
                                     </div>
-
                                     <div className="space-y-2">
                                         <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
-                                            Disease Categories
+                                            Similar conditions
                                         </h3>
-                                        <div className="flex space-x-1">
-                                            {form.watch("categories") ? form.watch("categories")?.map((category, index) =>
-                                                <Badge key={index}>
-                                                    {category.label}
-                                                </Badge>
-                                            ) : Array.from({
-                                                length: faker.number.int({
-                                                    min: 1,
-                                                    max: 3
-                                                })
-                                            }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
-                                            Signs and Symptoms
-                                        </h3>
-                                        <div className="flex space-x-1">
-                                            {form.watch("symptoms") ? form.watch("symptoms")?.map((sign, index) =>
-                                                <Badge key={index}>
-                                                    {sign.label}
-                                                </Badge>
-                                            ) : Array.from({
-                                                length: faker.number.int({
-                                                    min: 1,
-                                                    max: 3
-                                                })
-                                            }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
-                                            Associated Genes
-                                        </h3>
-                                        <div className="flex space-x-1">
-                                            {form.watch("genes") ? form.watch("genes")?.map((gene, index) =>
-                                                <Badge key={index}>
-                                                    {gene.label}
-                                                </Badge>
-                                            ) : Array.from({
-                                                length: faker.number.int({
-                                                    min: 1,
-                                                    max: 3
-                                                })
-                                            }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
-                                            Disease Mechanisms
-                                        </h3>
-                                        <div className="flex space-x-1">
-                                            {form.watch("mechanisms") ? form.watch("mechanisms")?.map((mechanism, index) =>
-                                                <Badge key={index}>
-                                                    {mechanism}
-                                                </Badge>
-                                            ) : Array.from({
-                                                length: faker.number.int({
-                                                    min: 1,
-                                                    max: 3
-                                                })
-                                            }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
-                                            Description
-                                        </h3>
-                                        <p className="flex flex-col space-y-2">
-                                            <Skeleton className="h-4 w-1/3"/>
-                                            <Skeleton className="h-4 w-full rounded-md"/>
-                                            <Skeleton className="h-4 w-full rounded-md"/>
-                                            <Skeleton className="h-4 w-full rounded-md"/>
-                                            <Skeleton className="h-4 w-full rounded-md"/>
-                                            <Skeleton className="h-4 w-full rounded-md"/>
-                                            <Skeleton className="h-4 w-2/3 rounded-md"/>
-                                            <Skeleton className="h-4 w-1/4 rounded-md"/>
-                                        </p>
+                                        <Skeleton className="h-4 w-2/3 rounded-md"/>
+                                        <Skeleton className="h-4 w-1/4 rounded-md"/>
                                     </div>
 
                                 </div>
-
                             </div>
 
                         </div>

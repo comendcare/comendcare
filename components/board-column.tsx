@@ -9,12 +9,23 @@ import { Button } from "./ui/button"
 import { GripVertical } from "lucide-react"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 import { cn } from "@/lib/utils"
+import {Column} from "@prisma/client";
+import NewColumnDialog from "./new-column-dialog"
+import { Badge } from "./ui/badge"
+import NewKanbanTaskButton from "@/components/new-kanban-task-button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {FaEllipsis, FaTrash} from "react-icons/fa6";
+import {toast} from "sonner";
+import {getKanbanFromOrganizationId} from "@/lib/fetchers";
+import {deleteKanbanColumn} from "@/lib/actions";
 
-export interface Column {
-    id: UniqueIdentifier
-    title: string
-    styling: string
-}
 
 export type ColumnType = "Column"
 
@@ -48,7 +59,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
             column
         } satisfies ColumnDragData,
         attributes: {
-            roleDescription: `Column: ${column.title}`
+            roleDescription: `Column: ${column.name}`
         }
     })
 
@@ -58,7 +69,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     }
 
     const variants = cva(
-        "h-full max-h-[800px] w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+        "h-min w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
         {
             variants: {
                 dragging: {
@@ -69,6 +80,22 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
             }
         }
     )
+
+    async function deleteColumn () {
+        try {
+            await deleteKanbanColumn(column).then((response) => {
+                if (response.success && response.data) {
+                    toast.success("column deleted successfully!");
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+            })
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to delete task.");
+        }
+    }
 
     return (
         <Card
@@ -83,10 +110,43 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
             })}
         >
             <CardHeader className={cn(
-                "p-4 font-semibold border-b-2 text-left flex flex-row space-between items-center",
-                column.styling
+                "p-4 font-semibold border-b-2 text-left flex flex-row space-between items-center"
             )}>
-                <CardTitle>{column.title}</CardTitle>
+                <CardTitle className="w-full flex flex-row justify-between space-between items-center">
+                    <div>
+                        <Button
+                            variant="ghost"
+                            {...attributes}
+                            {...listeners}
+                            className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
+                        >
+                            <span className="sr-only">{`Move column: ${column.name}`}</span>
+                            <GripVertical />
+                        </Button>
+                        <Badge
+                            size="large"
+                        >
+                            {column.name}
+                        </Badge>
+                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="ghost"
+                            >
+                                <FaEllipsis/>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuItem
+                                onClick={deleteColumn}
+                            >
+                                <FaTrash/>
+                                Delete column
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </CardTitle>
             </CardHeader>
             <ScrollArea className="h-full">
                 <CardContent className="flex flex-grow flex-col gap-2 p-2">
@@ -95,6 +155,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
                             <TaskCard key={task.id} task={task} />
                         ))}
                     </SortableContext>
+                    <NewKanbanTaskButton column={column}/>
                 </CardContent>
             </ScrollArea>
         </Card>
@@ -121,7 +182,8 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
             type="auto"
         >
             {/* calculate the same height as the parent TabsContent - because scroll areas don't like h-full >:( */}
-            <div className="h-[calc(100vh-3.5rem)] p-4 flex gap-4 items-center flex-row justify-center">
+            <div className="h-[calc(100vh-10rem)] flex gap-4 items-start flex-row justify-start">
+                <NewColumnDialog/>
                 {children}
             </div>
             <ScrollBar orientation="horizontal" />

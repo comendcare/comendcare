@@ -1,60 +1,88 @@
-import React from "react"
+'use client';
+
+import React from 'react';
 
 import {
-    BoldPlugin,
-    CodePlugin,
-    ItalicPlugin,
-    StrikethroughPlugin,
-    UnderlinePlugin
-} from "@udecode/plate-basic-marks/react"
-import { useEditorReadOnly } from "@udecode/plate-common/react"
+  BoldPlugin,
+  CodePlugin,
+  ItalicPlugin,
+  StrikethroughPlugin,
+  UnderlinePlugin,
+} from '@udecode/plate-basic-marks/react';
+import { useEditorReadOnly } from '@udecode/plate-common/react';
+import {
+  BoldIcon,
+  Code2Icon,
+  ItalicIcon,
+  StrikethroughIcon,
+  UnderlineIcon,
+  WandSparklesIcon,
+} from 'lucide-react';
 
-import { Icons } from "@/components/icons"
-
-import { MarkToolbarButton } from "./mark-toolbar-button"
-import { TurnIntoDropdownMenu } from "./turn-into-dropdown-menu"
+import { AIToolbarButton } from './ai-toolbar-button';
+import { CommentToolbarButton } from './comment-toolbar-button';
+import { LinkToolbarButton } from './link-toolbar-button';
+import { MarkToolbarButton } from './mark-toolbar-button';
+import { MoreDropdownMenu } from './more-dropdown-menu';
+import { ToolbarGroup } from './toolbar';
+import { TurnIntoDropdownMenu } from './turn-into-dropdown-menu';
 
 export function FloatingToolbarButtons() {
-    const readOnly = useEditorReadOnly()
+  const readOnly = useEditorReadOnly();
 
-    return (
+  return (
+    <>
+      {!readOnly && (
         <>
-            {!readOnly && (
-                <>
-                    <TurnIntoDropdownMenu />
+          {/*<ToolbarGroup>*/}
+          {/*  <AIToolbarButton tooltip="AI commands">*/}
+          {/*    <WandSparklesIcon />*/}
+          {/*    Ask AI*/}
+          {/*  </AIToolbarButton>*/}
+          {/*</ToolbarGroup>*/}
 
-                    <MarkToolbarButton
-                        nodeType={BoldPlugin.key}
-                        tooltip="Bold (⌘+B)"
-                    >
-                        <Icons.bold />
-                    </MarkToolbarButton>
-                    <MarkToolbarButton
-                        nodeType={ItalicPlugin.key}
-                        tooltip="Italic (⌘+I)"
-                    >
-                        <Icons.italic />
-                    </MarkToolbarButton>
-                    <MarkToolbarButton
-                        nodeType={UnderlinePlugin.key}
-                        tooltip="Underline (⌘+U)"
-                    >
-                        <Icons.underline />
-                    </MarkToolbarButton>
-                    <MarkToolbarButton
-                        nodeType={StrikethroughPlugin.key}
-                        tooltip="Strikethrough (⌘+⇧+M)"
-                    >
-                        <Icons.strikethrough />
-                    </MarkToolbarButton>
-                    <MarkToolbarButton
-                        nodeType={CodePlugin.key}
-                        tooltip="Code (⌘+E)"
-                    >
-                        <Icons.code />
-                    </MarkToolbarButton>
-                </>
-            )}
+          <ToolbarGroup>
+            <TurnIntoDropdownMenu />
+
+            <MarkToolbarButton nodeType={BoldPlugin.key} tooltip="Bold (⌘+B)">
+              <BoldIcon />
+            </MarkToolbarButton>
+
+            <MarkToolbarButton
+              nodeType={ItalicPlugin.key}
+              tooltip="Italic (⌘+I)"
+            >
+              <ItalicIcon />
+            </MarkToolbarButton>
+
+            <MarkToolbarButton
+              nodeType={UnderlinePlugin.key}
+              tooltip="Underline (⌘+U)"
+            >
+              <UnderlineIcon />
+            </MarkToolbarButton>
+
+            <MarkToolbarButton
+              nodeType={StrikethroughPlugin.key}
+              tooltip="Strikethrough (⌘+⇧+M)"
+            >
+              <StrikethroughIcon />
+            </MarkToolbarButton>
+
+            <MarkToolbarButton nodeType={CodePlugin.key} tooltip="Code (⌘+E)">
+              <Code2Icon />
+            </MarkToolbarButton>
+
+            <LinkToolbarButton />
+          </ToolbarGroup>
         </>
-    )
+      )}
+
+      <ToolbarGroup>
+        <CommentToolbarButton />
+
+        {!readOnly && <MoreDropdownMenu />}
+      </ToolbarGroup>
+    </>
+  );
 }

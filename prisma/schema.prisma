@@ -40,6 +40,8 @@ model User {
   country              String?
   lat                  Float?
   lng                  Float?
+  posts                Post[]
+  reactions            Reaction[]
 }
 
 model Member {
@@ -209,26 +211,28 @@ model Node {
 }
 
 model Milestone {
-  id          String               @id @unique @default(uuid())
-  node        Node?                @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  nodeId      String?              @unique
-  title       String
-  description String?
-  startDate   DateTime?
-  endDate     DateTime?
-  budget      Int?
-  papers      ExternalAttachment[]
-  notes       String?
-  status      StatusType
-  tasks       Task[]
-  roadmapId   String
-  roadmap     Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  private     Boolean              @default(false)
-  type        MilestoneType        @default(NOTYPE)
-  RFP         RFP?                 @relation(fields: [RFPId], references: [id])
-  RFPId       String?
-  asset       Asset?               @relation(fields: [assetId], references: [id])
-  assetId     String?
+  id             String               @id @unique @default(uuid())
+  node           Node?                @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  nodeId         String?              @unique
+  title          String
+  description    String?
+  startDate      DateTime?
+  endDate        DateTime?
+  budget         Int?
+  papers         ExternalAttachment[]
+  notes          String?
+  status         StatusType
+  tasks          Task[]
+  organizationId String
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  roadmapId      String
+  roadmap        Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  private        Boolean              @default(false)
+  type           MilestoneType        @default(NOTYPE)
+  RFP            RFP?                 @relation(fields: [RFPId], references: [id])
+  RFPId          String?
+  asset          Asset?               @relation(fields: [assetId], references: [id])
+  assetId        String?
 }
 
 enum MilestoneType {
@@ -256,16 +260,42 @@ enum MilestoneType {
   NOTYPE
 }
 
+model Kanban {
+  id             String       @id @default(uuid())
+  organizationId String       @unique
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  columns        Column[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Column {
+  id        String   @id @unique @default(uuid())
+  name      String   @default("New Column")
+  kanbanId  String
+  kanban    Kanban   @relation(fields: [kanbanId], references: [id], onDelete: Cascade)
+  tasks     Task[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  kanbanPosition Int @default(0) // order position within the kanban board
+}
+
 model Task {
   id             String          @id @unique @default(uuid())
-  status         StatusType
-  name           String
-  description    String?
+  status         StatusType?
+  name           String          @default("")
+  description    String?         @default("")
   checklist      ChecklistItem[]
-  milestoneId    String
-  milestone      Milestone       @relation(fields: [milestoneId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  orderPosition  Int? // order position in the milestone task list
-  kanbanPosition Int? // order position within the kanban column
+  milestoneId    String? // Optional foreign key to associate with a milestone
+  milestone      Milestone?      @relation(fields: [milestoneId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  columnId       String // Foreign key to associate with a column
+  column         Column          @relation(fields: [columnId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  date           DateTime?       @default(now())
+  orderPosition  Int // order position in the milestone task list
+  kanbanPosition Int // order position within the kanban column
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model ChecklistItem {
@@ -395,6 +425,8 @@ model Organization {
   invitation                  Invitation[]
   membershipRequest           MemberRequest[]
   condition                   ConditionToOrganization[]
+  Kanban                      Kanban?
+  Milestone                   Milestone[]
 
   @@index([userId])
 }
@@ -448,4 +480,32 @@ model Example {
   url           String?
   image         String? @db.Text
   imageBlurhash String? @db.Text
+}
+
+model Post {
+  id        String     @id
+  title     String
+  content   Json?
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  like      Reaction[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+enum ReactionType {
+  LIKE
+  LOVE
+  SUPPORT
+}
+
+model Reaction {
+  id        String       @id
+  type      ReactionType
+  author    User         @relation(fields: [authorId], references: [id])
+  authorId  String
+  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }

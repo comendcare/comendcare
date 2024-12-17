@@ -6,7 +6,7 @@ import {serialize} from "next-mdx-remote/serialize"
 import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
 import {ApiResponse} from "@/lib/types";
 import {logError} from "@/lib/utils";
-
+import {getSession} from "@/lib/auth";
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
@@ -57,7 +57,15 @@ export async function getOrganizationData(domain: string) {
         async () => {
             return prisma.organization.findUnique({
                 where: subdomain ? {subdomain} : {customDomain: domain},
-                include: {user: true}
+                include: {
+                    user: true,
+                    roadmaps: true,
+                    members: {
+                        include: {
+                            user: true
+                        }
+                    }
+                }
             })
         },
         [`${domain}-metadata`],
@@ -73,39 +81,111 @@ export async function getRoadmapsForOrganization(domain: string) {
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : null
 
-    return await unstable_cache(
-        async () => {
-            return prisma.roadmap.findMany({
-                where: {
-                    // organization: subdomain
-                    //     ? {subdomain}
-                    //     : {customDomain: domain},
-                    organization: {
-                        subdomain: subdomain
-                    },
-                    // published: true
-                },
-                select: {
-                    title: true,
-                    description: true,
-                    slug: true,
-                    image: true,
-                    imageBlurhash: true,
-                    createdAt: true
-                },
-                orderBy: [
-                    {
-                        createdAt: "desc"
-                    }
-                ]
-            })
+    const roadmaps = prisma.roadmap.findMany({
+        where: {
+            // organization: subdomain
+            //     ? {subdomain}
+            //     : {customDomain: domain},
+            organization: {
+                subdomain: subdomain,
+            },
+            // published: true
         },
-        [`${domain}-roadmaps`],
-        {
-            revalidate: 900,
-            tags: [`${domain}-roadmaps`]
-        }
-    )()
+        // select: {
+        //     title: true,
+        //     description: true,
+        //     slug: true,
+        //     image: true,
+        //     imageBlurhash: true,
+        //     createdAt: true,
+        // },
+        include: {
+            nodes: {
+                include: {
+                    data: true
+                },
+                where: {
+                    data: { private: false }
+                }
+            },
+            edges: true,
+            milestones: {
+                where: {
+                    private: false
+                },
+                include: {
+                    asset: {
+                        include: {
+                            contacts: true,
+                            attachments: true
+                        }
+                    },
+                    RFP: {
+                        include: {
+                            contacts: true,
+                            attachments: true
+                        }
+                    }
+                }
+            },
+        },
+        orderBy: [
+            {
+                createdAt: "desc"
+            }
+        ]
+    })
+    console.log(`roadmaps`, roadmaps)
+    return roadmaps
+
+    // return await unstable_cache(
+    //     async () => {
+    //         const roadmaps = prisma.roadmap.findMany({
+    //             where: {
+    //                 // organization: subdomain
+    //                 //     ? {subdomain}
+    //                 //     : {customDomain: domain},
+    //                 organization: {
+    //                     subdomain: subdomain,
+    //                 },
+    //                 // published: true
+    //             },
+    //             // select: {
+    //             //     title: true,
+    //             //     description: true,
+    //             //     slug: true,
+    //             //     image: true,
+    //             //     imageBlurhash: true,
+    //             //     createdAt: true,
+    //             // },
+    //             include: {
+    //                 nodes: {
+    //                     include: {
+    //                         data: true
+    //                     }
+    //                 },
+    //                 edges: true,
+    //                 milestones: {
+    //                     where: {
+    //                         private: false
+    //                     }
+    //                 },
+    //             },
+    //             orderBy: [
+    //                 {
+    //                     createdAt: "desc"
+    //                 }
+    //             ]
+    //         })
+    //         console.log(`roadmaps`, roadmaps)
+    //         return roadmaps
+    //     },
+    //     [`${domain}-roadmaps`],
+    //     {
+    //         revalidate: 900,
+    //         tags: [`${domain}-roadmaps`]
+    //     }
+    // )()
 }
 
 export async function getRoadmapData(domain: string, slug: string) {
@@ -412,5 +492,50 @@ export async function checkSubdomainAvailability(nickname: string) {
     } catch (error: any) {
         console.error("Database error checking subdomain availability:", error);
         return {error: "Database error. Please try again later."};
+    }
+}
+
+export async function getMilestoneDetails(id: string) {
+    try {
+        const milestone = await prisma.milestone.findUnique({
+            where: { id },
+            include: {
+                asset: {
+                    include: {
+                        contacts: true,
+                        attachments: true,
+                    }
+                },
+                RFP: {
+                    include: {
+                        contacts: true,
+                        attachments: true
+                    }
+                },
+                tasks: true,
+                papers: true
+            }
+        })
+
+        return {success: true, data: milestone}
+    } catch (error: any) {
+        console.error("Database error finding milestone details:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function getKanbanFromOrganizationId() {
+    const session = await getSession()
+    try {
+        const kanban = await prisma.kanban.findUnique({
+            where: {
+                organizationId: session?.user.organizationId
+            }
+        })
+
+        return {success: true, data: kanban}
+    } catch (error: any) {
+        console.error("Database error finding kanban details:", error)
+        return {success: false, error: "Database error. please try again later."}
     }
 }

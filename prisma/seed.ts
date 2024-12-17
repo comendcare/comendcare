@@ -156,8 +156,20 @@ async function main() {
         },
     })
 
+    const celocynKanban = await prisma.kanban.create({
+        data: {
+            organization: {
+                connect: {
+                    id: celocyn.id
+                }
+            }
+        },
+    })
+
     // create Celocyn Syndrome Foundation Roadmap
-    const celocynRoadmap = await createRoadmap(celocyn.id, exampleASORoadmap)
+    const celocynRoadmap = await createRoadmap(
+        celocyn.id, celocynKanban.id, exampleASORoadmap
+    )
 
     const arcadion = await prisma.organization.create({
         data: {
@@ -357,15 +369,82 @@ async function main() {
         },
     });
 
+    const lysogeneKanban = await prisma.kanban.create({
+        data: {
+            organization: {
+                connect: {
+                    id: lysogeneFoundation.id
+                }
+            }
+        },
+    })
+    const neuroAidKanban = await prisma.kanban.create({
+        data: {
+            organization: {
+                connect: {
+                    id: neuroAidFoundation.id
+                }
+            }
+        },
+    })
+    const myoparKanban = await prisma.kanban.create({
+        data: {
+            organization: {
+                connect: {
+                    id: myoparFoundation.id
+                }
+            }
+        },
+    })
+    const cranioKanban = await prisma.kanban.create({
+        data: {
+            organization: {
+                connect: {
+                    id: cranioFoundation.id
+                }
+            }
+        },
+    })
+    const nephroKanban = await prisma.kanban.create({
+        data: {
+            organization: {
+                connect: {
+                    id: nephroFoundation.id
+                }
+            }
+        },
+    })
+    const arcadionKanban = await prisma.kanban.create({
+        data: {
+            organization: {
+                connect: {
+                    id: arcadion.id
+                }
+            }
+        },
+    })
+
 // Create roadmaps for each foundation
-    const lysogeneRoadmap = await createRoadmap(lysogeneFoundation.id, exampleASORoadmap);
-    const neuroAidRoadmap = await createRoadmap(neuroAidFoundation.id, exampleASORoadmap);
-    const myoparRoadmap = await createRoadmap(myoparFoundation.id, exampleASORoadmap);
-    const cranioRoadmap = await createRoadmap(cranioFoundation.id, exampleASORoadmap);
-    const nephroRoadmap = await createRoadmap(nephroFoundation.id, exampleASORoadmap);
+    const lysogeneRoadmap = await createRoadmap(
+        lysogeneFoundation.id, lysogeneKanban.id, exampleASORoadmap
+    );
+    const neuroAidRoadmap = await createRoadmap(
+        neuroAidFoundation.id, neuroAidKanban.id, exampleASORoadmap
+    );
+    const myoparRoadmap = await createRoadmap(
+        myoparFoundation.id, myoparKanban.id, exampleASORoadmap
+    );
+    const cranioRoadmap = await createRoadmap(
+        cranioFoundation.id, cranioKanban.id, exampleASORoadmap
+    );
+    const nephroRoadmap = await createRoadmap(
+        nephroFoundation.id, nephroKanban.id, exampleASORoadmap
+    );
 
     // create Arcadion Disease Foundation roadmap
-    const arcadionRoadmap = await createRoadmap(arcadion.id, exampleASORoadmap)
+    const arcadionRoadmap = await createRoadmap(
+        arcadion.id, arcadionKanban.id, exampleASORoadmap
+    )
 
     console.log(arcadion)
 
@@ -509,7 +588,7 @@ async function main() {
 }
 
 const exampleASORoadmap = {
-    title: 'ASO Roadmap',
+    title: 'ASO Research Plan',
     description: 'By developing an ASO therapy, we aim to address the underlying genetic cause of our rare disease. Our plan outlines each stage, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
     milestones: [
         {
@@ -656,7 +735,7 @@ async function createConditions(organizationIds: string[]) {
     console.log("Conditions created:", {celocynSyndrome, arcadionDisease});
 }
 
-async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
+async function createRoadmap(organizationId: string, kanbanId: string, roadmapTemplate?: any | undefined) {
     const roadmap = await prisma.roadmap.create({
         data: {
             organization: {
@@ -667,6 +746,37 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
             published: true
         }
     })
+
+    const newColumns = await prisma.column.createMany({
+        data: [
+            {
+                name: "To Do",
+                kanbanId: kanbanId,
+                kanbanPosition: 0
+            },
+            {
+                name: "In Progress",
+                kanbanId: kanbanId,
+                kanbanPosition: 1
+            },
+            {
+                name: "Done",
+                kanbanId: kanbanId,
+                kanbanPosition: 2
+            }
+        ],
+        skipDuplicates: true, // Optional: Skips rows with duplicate values for unique fields
+    })
+
+    // Retrieve the created columns
+    const createdColumns = await prisma.column.findMany({
+        where: {
+            kanbanId: kanbanId
+        },
+        orderBy: {
+            kanbanPosition: 'asc'
+        }
+    });
 
     // if a roadmap template was provided, create the relevant nodes, milestones, and edges
     if (roadmapTemplate?.milestones) {
@@ -684,6 +794,7 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                         data: {
                             create: {
                                 roadmapId: roadmap.id,
+                                organizationId,
                                 status: milestone.status || "TODO",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
@@ -721,6 +832,7 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                                 milestoneId: newMilestone?.id,
                                 status: task.status || "TODO",
                                 name: task.name,
+                                columnId: createdColumns[0]?.id,
                                 orderPosition: index,
                                 kanbanPosition: index,
                                 checklist: {

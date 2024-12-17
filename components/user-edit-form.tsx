@@ -27,6 +27,8 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
+import { getPublicFile } from "@/lib/utils";
+import { handleImageUpload } from "@/lib/upload";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -57,7 +59,7 @@ export default function UserEditForm() {
     const [isDialogOpen, setDialogOpen] = useState(false);
 
     const onDrop = useCallback(
-        (acceptedFiles: FileWithPath[]) => {
+        (acceptedFiles: File[]) => {
             const file = acceptedFiles[0];
             if (!file) {
                 toast.error("Selected image is too large!");
@@ -128,6 +130,21 @@ export default function UserEditForm() {
                         lng: userData.lng || 0,
                         image: userData.image || "",
                     };
+
+                    if (userData.image) {
+                        try {
+                            const userPhoto: File = await getPublicFile(userData.image)
+                            if (userPhoto) {
+                                const fileWithPreview = Object.assign(userPhoto, {
+                                    preview: URL.createObjectURL(userPhoto),
+                                })
+                                setSelectedFile(fileWithPreview)
+                            }
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    }
+
                     setDefaultValues(fetchedValues);
                     setAddress(fetchedValues); // Set address state as well
                     form.reset(fetchedValues); // Reset form with fetched data
@@ -152,6 +169,11 @@ export default function UserEditForm() {
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
         try {
+            if (selectedFile && values.image) {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                values.image = imgUrl || undefined
+            }
+
             for (const [key, value] of Object.entries(values)) {
                 const res: any = await editUser(session?.user?.id as string, {[key]: value});
                 if (res?.error) {
@@ -161,9 +183,10 @@ export default function UserEditForm() {
             }
 
             toast.success("Successfully updated user profile!");
-            router.refresh();
-            router.push("/onboarding/organization");
+            // router.refresh();
+            // router.push("/onboarding/organization");
         } catch (error) {
+            console.error('Error:', error)
             toast.error("An error occurred while updating your profile.");
         }
     }
@@ -246,7 +269,7 @@ export default function UserEditForm() {
                                             setDialogOpen={setDialogOpen}
                                             selectedFile={selectedFile}
                                             setSelectedFile={(file: any) => {
-                                                setSelectedFile(file);
+                                                if (file == null) setSelectedFile(null)
                                                 field.onChange(file?.preview); // Update form field value
                                             }}
                                         />
@@ -319,7 +342,7 @@ export default function UserEditForm() {
                     />
                 </div>
 
-                <Button type="submit">Next</Button>
+                <Button type="submit">Save</Button>
             </form>
         </Form>
     );

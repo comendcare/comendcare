@@ -11,7 +11,7 @@ import {
 import {Separator} from "@/components/ui/separator"
 import {Input} from "@/components/ui/input";
 import {UserFeedCardSocialSection} from "@/components/user-feed-card-social-section";
-import {createDicebearAvatar} from "@/lib/utils";
+import { ProfilePhoto } from "./profile-photo"
 
 interface UserFeedTextCardProps {
     content: string
@@ -27,10 +27,15 @@ export function UserFeedTextCard({content, blockquote}: UserFeedTextCardProps) {
                         <Link href="#" className="group block flex-shrink-0">
                             <div className="flex items-center">
                                 <div>
-                                    <Avatar className="h-10 w-10">
+                                    {/* <Avatar className="h-10 w-10">
                                         <AvatarImage src={createDicebearAvatar("", 50, 40, "identicon")}/>
                                         <AvatarFallback>CN</AvatarFallback>
-                                    </Avatar>
+                                    </Avatar> */}
+                                    <ProfilePhoto 
+                                        img={undefined}
+                                        name={undefined}
+                                        className="h-11 w-11 rounded-full"
+                                    />
                                 </div>
                                 <div className="ml-3">
                                     <div className="flex text-base flex-wrap items-baseline">

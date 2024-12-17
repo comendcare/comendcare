@@ -2,7 +2,7 @@
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
 import {Organization, User} from "@prisma/client";
-import {cn, createDicebearAvatar} from "@/lib/utils";
+import {cn} from "@/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Loading from "@/app/loading";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {toast} from "sonner";
 import {getAllOrganizationsFromUserId, getUser} from "@/lib/fetchers";
+import {ProfilePhoto} from "@/components/profile-photo";
 
 export default function UserProfilePage() {
     const {data: session} = useSession()
@@ -40,7 +41,9 @@ export default function UserProfilePage() {
 
                     // Map the response to the correct structure if needed
                     if (response.success) {
-                        const organizations = response.data?.map((item: { organization: Organization }) => item.organization)
+                        const organizations = response.data?.map((item: {
+                            organization: Organization
+                        }) => item.organization)
                         setOrgs(organizations);
                     } else {
                         console.error(response.error)
@@ -72,9 +75,15 @@ export default function UserProfilePage() {
 
                     <Card>
                         <CardHeader>
-                            <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                 src={createDicebearAvatar(user.createdAt.toLocaleString() ?? "", 50, 40, "identicon")}
-                                 alt=""/>
+                            {/* <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                 src={getUserPhoto(user, session)}
+                                 alt=""/> */}
+                            <ProfilePhoto
+                                img={user?.image}
+                                name={user?.name}
+                                textSize="large"
+                                className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                            />
                             <CardTitle>
                                 <h1 className="min-w-0 truncate text-4xl font-bold text-gray-900">
                                     {user.name}
@@ -84,32 +93,45 @@ export default function UserProfilePage() {
                                 {user.title}
                             </h2>
                             <p>
-                                Joined {new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                                Joined {new Date(user.createdAt).toLocaleDateString(undefined, {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                            })}
                             </p>
                             <UserEditSettingsDialog/>
                         </CardHeader>
-                        <CardContent className="grid gap-8">
+                        <CardContent className="grid gap-2">
                             <h2 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
                                 Organizations
                             </h2>
                             <div className="flex items-center gap-4">
-                                {orgs?.map((org) =>
-                                    <>
-                                        <Avatar className="hidden h-9 w-9 sm:flex">
-                                            <AvatarImage src="/avatars/01.png" alt="Avatar"/>
-                                            <AvatarFallback>OM</AvatarFallback>
-                                        </Avatar>
-                                        <div className="grid gap-1">
-                                            <>
-                                                <p className="text-sm font-medium leading-none">
-                                                    {org.name}
-                                                </p>
-                                                <p className="text-sm text-muted-foreground">
-                                                    {`${org.subdomain}.comend.io`}
-                                                </p>
-                                            </>
-                                        </div>
-                                    </>
+                                {orgs && (
+                                    orgs.length > 0 ? orgs?.map((org) =>
+                                        <>
+                                            <Avatar className="hidden h-9 w-9 sm:flex">
+                                                <AvatarImage src="/avatars/01.png" alt="Avatar"/>
+                                                <AvatarFallback>OM</AvatarFallback>
+                                            </Avatar>
+                                            <div className="grid gap-1">
+                                                <>
+                                                    <p className="text-sm font-medium leading-none">
+                                                        {org.name}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {`${org.subdomain}.comend.io`}
+                                                    </p>
+                                                </>
+                                            </div>
+                                        </>
+                                    ) : <div className="flex flex-col space-y-2 text-left">
+                                        <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
+                                            {`No Organizations Yet`}
+                                        </h3>
+                                        <p>
+                                            {`You aren't part of any organizations yet.`}
+                                        </p>
+                                    </div>
                                 )}
                             </div>
                         </CardContent>

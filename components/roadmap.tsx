@@ -16,7 +16,7 @@ import {
     TooltipTrigger,
   } from "@/components/ui/tooltip"
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
-import { FlowView } from "@/components/flow"
+import { PrivateFlowView } from "@/components/private-flow"
 import { KanbanView } from "@/components/kanban"
 import { Button } from "./ui/button"
 import { FaQuestion, FaX } from "react-icons/fa6"
@@ -144,7 +144,6 @@ export function Roadmap({
                             <TabsList>
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
                                 <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger>
-                                <TabsTrigger value="kanban">Kanban View</TabsTrigger>
                             </TabsList>
                             {view === 'flow' && (
                                 <Tooltip>
@@ -171,7 +170,7 @@ export function Roadmap({
                             value="flow"
                             className="m-0 h-[calc(100vh-3.5rem)]"
                         >
-                            <FlowView
+                            <PrivateFlowView
                                 width={defaultLayout[0]}
                             />
                         </TabsContent>
@@ -182,14 +181,6 @@ export function Roadmap({
                             className="m-0 h-[calc(100vh-3.5rem)]"
                         >
                             <GanttChartView />
-                        </TabsContent>
-
-                        {/* Kanban View */}
-                        <TabsContent 
-                            value="kanban"
-                            className="m-0 h-[calc(100vh-3.5rem)]"
-                        >
-                            <KanbanView />
                         </TabsContent>
                     </Tabs>
                 </ResizablePanel>
@@ -331,7 +322,7 @@ const MilestoneDetailsPanel = ({
                     onClose={handleClose}
                 />
             ) : (
-                <MilestoneDetails milestoneData={milestone} />
+                <MilestoneDetails milestone={milestone} />
             )}
         </>
     )

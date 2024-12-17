@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma"
 import Form from "@/components/form"
-import { updateOrganization } from "@/lib/actions"
+import { updateOrganizationAttribute } from "@/lib/actions"
 
 export default async function SiteSettingsAppearance({
     params
@@ -24,7 +24,7 @@ export default async function SiteSettingsAppearance({
                     type: "file",
                     defaultValue: data?.image!
                 }}
-                handleSubmit={updateOrganization}
+                handleSubmit={updateOrganizationAttribute}
             />
             <Form
                 title="Logo"
@@ -35,7 +35,7 @@ export default async function SiteSettingsAppearance({
                     type: "file",
                     defaultValue: data?.logo!
                 }}
-                handleSubmit={updateOrganization}
+                handleSubmit={updateOrganizationAttribute}
             />
             <Form
                 title="Font"
@@ -46,7 +46,7 @@ export default async function SiteSettingsAppearance({
                     type: "select",
                     defaultValue: data?.font!
                 }}
-                handleSubmit={updateOrganization}
+                handleSubmit={updateOrganizationAttribute}
             />
             <Form
                 title="404 Page Message"
@@ -60,7 +60,7 @@ export default async function SiteSettingsAppearance({
                         "Blimey! You've found a page that doesn't exist.",
                     maxLength: 240
                 }}
-                handleSubmit={updateOrganization}
+                handleSubmit={updateOrganizationAttribute}
             />
         </div>
     )
