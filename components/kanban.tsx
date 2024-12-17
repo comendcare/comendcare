@@ -46,19 +46,13 @@ const defaultCols = [
 
 export type ColumnId = (typeof defaultCols)[number]["id"]
 
-const roadmapSelector = (state: RoadmapState) => ({
-    milestones: state.milestones,
-    setTask: state.setTask,
-    setTasks: state.setTasks
-})
-
 const kanbanSelector = (state: KanbanState) => ({
     columns: state.columns,
+    tasks: state.tasks
 })
 
 export function KanbanView() {
-    const { milestones } = useRoadmapStore(useShallow(roadmapSelector))
-    const { columns } = useKanbanStore(useShallow(kanbanSelector))
+    const { columns, tasks } = useKanbanStore(useShallow(kanbanSelector))
 
     return (
         <Kanban
@@ -79,7 +73,8 @@ const sortKanbanTasks = (tasks: Task[]) => {
 }
 
 function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: Task[] }) {
-    const { setTask, setTasks: setDbTasks } = useRoadmapStore(useShallow(roadmapSelector))
+    // const { setTask, setTasks: setDbTasks } = useRoadmapStore(useShallow(roadmapSelector))
+    const { tasks: stateTasks } = useKanbanStore(useShallow(kanbanSelector))
     const [columns, setColumns] = useState<Column[]>([])
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
     const columnsId = useMemo(() => columns.map(col => col.id), [columns])
@@ -105,6 +100,11 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
         setColumns(initColumns)
         setTasks(sortKanbanTasks(initTasks))
     }, [initTasks, initColumns])
+
+    useEffect(() => {
+        console.log(`TASKS CHANGED IN STATE`, stateTasks)
+        setTasks(stateTasks)
+    }, [stateTasks])
 
     function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
         const tasksInColumn = tasks.filter(task => task.status === columnId)
@@ -242,9 +242,9 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
         setActiveColumn(null)
         setActiveTask(null)
 
-        setDbTasks(tasks.map((task, index)=> (
-            {...task, kanbanPosition: index}
-        )))
+        // setDbTasks(tasks.map((task, index)=> (
+        //     {...task, kanbanPosition: index}
+        // )))
 
         const { active, over } = event
         if (!over) return

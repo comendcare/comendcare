@@ -75,6 +75,10 @@ export default async function KanbanPage({
         }
     })
 
+    const dbTasks = await prisma.task.findMany({
+
+    })
+
     return (
         <main className="flex flex-col space-y-4 p-8">
             <h1 className="text-3xl font-bold tracking-tight">
@@ -83,9 +87,7 @@ export default async function KanbanPage({
             <KanbanBoard
                 roadmapId={params.id}
                 initColumns={dbColumns || []}
-                initNodes={dbNodes || []}
-                initEdges={dbEdges || []}
-                initMilestones={dbMilestones || []}
+                initTasks={dbTasks || []}
             />
         </main>
     )
