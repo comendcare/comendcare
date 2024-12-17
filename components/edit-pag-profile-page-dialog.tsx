@@ -36,12 +36,12 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {getPublicFile} from "@/lib/utils";
+import {getPublicFile, years} from "@/lib/utils";
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {Slider} from "@/components/ui/slider";
-import {Separator} from "@/components/ui/separator";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {FaQuestionCircle} from "react-icons/fa";
 import {financesFormSchema} from "@/components/finances-onboarding-form";
 
@@ -356,7 +356,7 @@ export default function EditPAGProfileDialog() {
                 <DialogContent className="max-h-[800px] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
-                            Edit profile
+                            Edit organization profile
                         </DialogTitle>
                         <DialogDescription>
                             {`Make changes to your profile here. Click save when you're done.`}
@@ -381,7 +381,7 @@ export default function EditPAGProfileDialog() {
                                         name="orgName"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Organization name (required)`}</FormLabel>
+                                                <FormLabel>{`Organization name`}</FormLabel>
                                                 <FormDescription>{`The name of your organization`}</FormDescription>
                                                 <FormControl>
                                                     <Input
@@ -401,7 +401,7 @@ export default function EditPAGProfileDialog() {
                                         name="subdomain"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Nickname (required)`}</FormLabel>
+                                                <FormLabel>{`Nickname`}</FormLabel>
                                                 <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
                                                 <FormControl>
                                                     <Input
@@ -448,16 +448,28 @@ export default function EditPAGProfileDialog() {
                                         name="founded"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Year founded (required)`}</FormLabel>
-                                                <FormDescription>{`The year your organization was founded.`}</FormDescription>
-                                                <FormControl>
-                                                    <Input
-                                                        type="text"
-                                                        id="name"
-                                                        autoComplete="name"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
+                                                <FormLabel>Year Founded</FormLabel>
+                                                <FormDescription>
+                                                    Select the year your organization was founded.
+                                                </FormDescription>
+                                                <Select
+                                                    onValueChange={(value) => field.onChange(`${value}-01-01`)} // Convert year to a date string
+                                                    defaultValue={field.value?.split("-")[0]} // Extract the year from the date string for the default value
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a year"/>
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {years.map((year) => (
+                                                            <SelectItem key={year}
+                                                                        value={year.toString()}> {/* Use the year as a string for the SelectItem value */}
+                                                                {year}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}

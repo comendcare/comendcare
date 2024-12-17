@@ -18,6 +18,8 @@ import {Separator} from "@/components/ui/separator";
 import {FaQuestionCircle} from "react-icons/fa";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {Timer} from "lucide-react";
+import {useEffect, useState} from "react";
+import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 
 export const financesFormSchema = z.object({
     raising: z.enum(["yes", "no-but", "no"]).optional(),
@@ -29,10 +31,12 @@ export const financesFormSchema = z.object({
 export default function FinancesOnboardingForm() {
     const session = useSession()
     const router = useRouter()
+    const [defaultValues, setDefaultValues] = useState<z.infer<typeof financesFormSchema> | undefined>(undefined);
 
     const form = useForm<z.infer<typeof financesFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(financesFormSchema)
+        resolver: zodResolver(financesFormSchema),
+        defaultValues,
     })
 
     async function onSubmit(values: z.infer<typeof financesFormSchema>) {
@@ -65,6 +69,41 @@ export default function FinancesOnboardingForm() {
             toast.error("Failed to update organization.");
         }
     }
+
+    useEffect(() => {
+        async function fetchFinancesData() {
+            if (session.data?.user.organizationId) {
+                try {
+                    const response = await getOrganizationFromOrganizationId(session.data.user.organizationId);
+
+                    if (response.success) {
+                        const orgData = response.data;
+
+                        if (orgData) {
+                            const fetchedValues = {
+                                // raising: orgData.raising || undefined,
+                                raised: orgData.moneyRaised || 0,
+                                budget: orgData.researchBudget || 0,
+                                deployed: orgData.moneyDeployed || 0,
+                            };
+
+                            // Populate form with fetched data
+                            setDefaultValues(fetchedValues);
+                            form.reset(fetchedValues);
+                        }
+                    } else {
+                        console.error(response.error);
+                        toast.error(response.error);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch finances data:", error);
+                    toast.error("An error occurred while fetching finances data.");
+                }
+            }
+        }
+
+        fetchFinancesData();
+    }, [session.data?.user.organizationId, form])
 
     return (
         <TooltipProvider>
