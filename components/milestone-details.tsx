@@ -3,114 +3,94 @@
 import React from "react"
 import { ScrollArea } from "./ui/scroll-area"
 import StatusButton, { StatusType } from "./milestone-status-button"
-import { FaDollarSign } from "react-icons/fa6"
+import { FaArrowUpRightFromSquare, FaDollarSign, FaPaperclip } from "react-icons/fa6"
 import { Label } from "./ui/label"
-import { TaskType } from "./milestone-node"
+import { TaskType } from "./private-milestone-node"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle
+} from "./ui/card"
+import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { Badge } from "./ui/badge"
+import { DateView } from "./miletone-date-view"
+import { BudgetView } from "./milestone-budget-view"
+import { AssetEditForm } from "./asset-edit-form"
+import { AssetDetails } from "./asset-details"
+import { Separator } from "./ui/separator"
+import Link from "next/link"
+import { RFPDetails } from "./rfp-details.tsx"
+import { Button } from "./ui/button"
 
-export function MilestoneDetails({ milestoneData }: { milestoneData: any }) {
+export function MilestoneDetails({ milestone }: { milestone: any }) {
     return (
-        <ScrollArea>
-            <div className="flex flex-col gap-8 pr-4">
-                <div className="flex flex-col grow gap-2">
-                    <Label className="text-xl">Milestone Status:</Label>
-                    <StatusButton
-                        disabled={true}
-                        status={milestoneData.status}
-                        onStatusChange={() => {}} // disabled
-                    />
+        <Card>
+            <CardHeader className="flex flex-row gap-4">
+                <span className="flex flex-col gap-4 grow">
+                    <CardTitle className="flex flex-row gap-4 items-center scroll-m-20 text-3xl font-bold tracking-tight">
+                        {milestone.title}
+                        {milestone.type && milestone.type !== 'NOTYPE' && (
+                            <Badge className="flex text-sm h-[30px]">
+                                {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestone.type))?.label || "No type"}
+                            </Badge>
+                        )}
+                        <StatusButton
+                            disabled={true}
+                            status={milestone.status}
+                            onStatusChange={() => {}}
+                        />
+                    </CardTitle>
+                    <CardDescription>{milestone.description}</CardDescription>
+                </span>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-8">
+                <div className="flex flex-row gap-4 text-gray-500">
+                    <DateView startDate={milestone.startDate} endDate={milestone.endDate}/>
+
+                    <BudgetView budget={milestone.budget} />
                 </div>
 
-                <div className="flex flex-col grow gap-2">
-                    <Label htmlFor="title" className="text-xl">
-                        Title:
-                    </Label>
-                    <p id="title">{milestoneData.title || "No title set"}</p>
-                </div>
+                {(milestone?.asset || milestone?.RFP) && (
+                    <>
+                    <Separator />
+                    <div className="grid grid-cols-2 gap-4">
+                        {milestone.asset && (
+                            <div className="flex flex-col gap-4">
+                                <h2 className="font-semibold text-xl">{`Assets`}</h2>
+                                <AssetDetails asset={milestone.asset} />
+                            </div>
+                        )}
+    
+                        {milestone.RFP && (
+                            <div className="flex flex-col gap-4">
+                                <h2 className="font-semibold text-xl">{`Projects`}</h2>
+                                <RFPDetails rfp={milestone.RFP} />
+                            </div>
+                        )}
+                    </div>
+                    </>
+                )}
 
-                <div className="flex flex-col grow gap-2">
-                    <Label htmlFor="description" className="text-xl">
-                        Description:
-                    </Label>
-                    <p id="description">
-                        {milestoneData.description || "No description set"}
-                    </p>
-                </div>
-
-                <div className="flex flex-col grow gap-2">
-                    <Label htmlFor="timeline" className="text-xl">
-                        Timeline:
-                    </Label>
-                    <span id="timeline" className="flex gap-4">
-                        <span className="flex gap-2 items-center">
-                            <Label htmlFor="timeline-month" className="text-xl">
-                                Month:
-                            </Label>
-                            <p id="timeline-month">
-                                {milestoneData.timelineMonth || "No month set"}
-                            </p>
-                        </span>
-                        <span className="flex gap-2 items-center">
-                            <Label htmlFor="timeline-year" className="text-xl">
-                                Year:
-                            </Label>
-                            <p id="timeline-year">
-                                {milestoneData.timelineYear || "No year set"}
-                            </p>
-                        </span>
-                    </span>
-                </div>
-
-                <div className="flex flex-col grow gap-2">
-                    <Label htmlFor="budget" className="text-xl">
-                        Budget:
-                    </Label>
-                    <span className="flex gap-4">
-                        <FaDollarSign size={24} />
-                        <p id="budget">
-                            {milestoneData.budget || "No budget set"}
-                        </p>
-                    </span>
-                </div>
-
-                <div className="flex flex-col grow gap-2">
-                    <Label htmlFor="papers" className="text-xl">
-                        Associated Papers:
-                    </Label>
-                    {milestoneData.papers && milestoneData.papers.length > 0 ? (
-                        <ol id="papers">
-                            {milestoneData.papers.map(
-                                (paper: string, index: number) => (
-                                    <li
-                                        key={index}
-                                    >{`${index + 1}. ${paper}`}</li>
-                                )
-                            )}
+                {milestone.papers && milestone.papers.length > 0 && (
+                    <div className="flex flex-col gap-4">
+                        <Separator />
+                        <h2 className="font-semibold text-xl">{`Attached Papers`}</h2>
+                        <ol className="flex flex-row gap-4 flex-wrap">
+                            {milestone?.papers?.map((paper: any, index: number) => (
+                                <Link href={paper.link} key={index}>
+                                    <Button variant="secondary">
+                                        {paper.name || paper.link}
+                                        <FaPaperclip />
+                                    </Button>
+                                </Link>
+                            ))}
                         </ol>
-                    ) : (
-                        <p>{"No associated papers"}</p>
-                    )}
-                </div>
-
-                <div className="flex flex-col grow gap-2">
-                    <Label htmlFor="papers" className="text-xl">
-                        Tasks:
-                    </Label>
-                    {milestoneData.tasks && milestoneData.tasks.length > 0 ? (
-                        <ol id="tasks" className="flex flex-col gap-2">
-                            {milestoneData.tasks.map(
-                                (task: TaskType, index: number) => (
-                                    <li key={index} className="flex justify-between items-center">
-                                        <StatusButton disabled={true} status={task.status} onStatusChange={() => {}} />
-                                        <p>{task.name}</p>
-                                    </li>
-                                )
-                            )}
-                        </ol>
-                    ) : (
-                        <p>{"This milestone has no tasks"}</p>
-                    )}
-                </div>
-            </div>
-        </ScrollArea>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
     )
 }

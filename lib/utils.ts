@@ -6,6 +6,61 @@ import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 
+export const years = Array.from({ length: new Date().getFullYear() - 1970 + 1 }, (_, i) =>
+    (new Date().getFullYear() - i).toString()
+)
+
+export async function getPublicFile(fileUrl: string): Promise<File> {
+    try {
+        // Make a GET request to your API endpoint
+        const response = await fetch(`/api/gcs?fileUrl=${encodeURIComponent(fileUrl)}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+
+        console.log(`response`, response)
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch file: ${response.statusText}`);
+        }
+
+        // Parse the response as JSON
+        const { name, type, data } = await response.json();
+
+        // Decode the base64 data into a Blob
+        const byteCharacters = atob(data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type });
+
+        // Create the File object
+        return new File([blob], name, { type });
+    } catch (error) {
+        console.error('Error fetching file:', error);
+        throw error;
+    }
+}
+
+export function abbreviateNumber(num: number | null | undefined) {
+    if (num === null || num === undefined) return '';
+    if (num < 1000) return num.toString(); // No abbreviation needed
+
+    const units = ['K', 'M', 'B', 'T', 'Q']; // Thousand, Million, Billion, Trillion, Quadrillion
+    let unitIndex = -1;
+
+    while (Math.abs(num) >= 1000 && unitIndex < units.length - 1) {
+        num /= 1000;
+        unitIndex++;
+    }
+
+    return `${parseFloat(num.toFixed(1))}${units[unitIndex]}`;
+}
+
 export const formatMoney = (moneyRaised: number | undefined) => {
     if (moneyRaised === undefined) return "$0";
 

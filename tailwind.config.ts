@@ -70,6 +70,14 @@ const config: Config = {
     				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
     				border: 'hsl(var(--sidebar-border))',
     				ring: 'hsl(var(--sidebar-ring))'
+    			},
+    			brand: {
+    				DEFAULT: 'hsl(var(--brand))',
+    				foreground: 'hsl(var(--brand-foreground))'
+    			},
+    			highlight: {
+    				DEFAULT: 'hsl(var(--highlight))',
+    				foreground: 'hsl(var(--highlight-foreground))'
     			}
     		},
     		boxShadow: {
@@ -134,6 +142,11 @@ const config: Config = {
     			marquee: 'marquee var(--duration) linear infinite',
     			'marquee-vertical': 'marquee-vertical var(--duration) linear infinite',
     			rainbow: 'rainbow var(--speed, 2s) infinite linear'
+    		},
+    		screens: {
+    			'main-hover': {
+    				raw: '(hover: hover)'
+    			}
     		}
     	}
     },
@@ -154,7 +167,8 @@ const config: Config = {
                     type: "color"
                 }
             )
-        }
+        },
+        require("tailwind-scrollbar-hide")
     ]
 }
 export default config

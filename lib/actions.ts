@@ -1,9 +1,9 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma} from "@prisma/client"
+import {Roadmap, Organization, Prisma, Column, Kanban} from "@prisma/client"
 import {revalidateTag} from "next/cache"
-import {withOrganizationAuth, withRoadmapAuth} from "./auth"
+import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
@@ -38,6 +38,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                         data: {
                             create: {
                                 roadmapId: roadmap.id,
+                                organizationId,
                                 type: milestone.type || 'NOTYPE',
                                 status: milestone.status || "TODO",
                                 title: milestone.title,
@@ -69,28 +70,28 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 })
 
                 // create tasks for relevant milestone
-                if (newMilestone) {
-                    await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
-                        await prisma.task.create({
-                            data: {
-                                milestoneId: newMilestone?.id,
-                                status: task.status || "TODO",
-                                name: task.name,
-                                orderPosition: index,
-                                kanbanPosition: index,
-                                checklist: {
-                                    createMany: {
-                                        data: (task.checklist || []).map((item: any, index: number) => ({
-                                            name: item.name,
-                                            complete: item.complete || false,
-                                            orderPosition: index
-                                        }))
-                                    }
-                                }
-                            }
-                        })
-                    )))
-                }
+                // if (newMilestone) {
+                //     await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
+                //         await prisma.task.create({
+                //             data: {
+                //                 milestoneId: newMilestone?.id,
+                //                 status: task.status || "TODO",
+                //                 name: task.name,
+                //                 orderPosition: index,
+                //                 kanbanPosition: index,
+                //                 checklist: {
+                //                     createMany: {
+                //                         data: (task.checklist || []).map((item: any, index: number) => ({
+                //                             name: item.name,
+                //                             complete: item.complete || false,
+                //                             orderPosition: index
+                //                         }))
+                //                     }
+                //                 }
+                //             }
+                //         })
+                //     )))
+                // }
 
                 return node
             })
@@ -259,6 +260,37 @@ export const toggleOrganizationVerified = async (organizationId: string) => {
 }
 
 export const updateOrganization = withOrganizationAuth(
+    async (formData: FormData, organization: Organization) => {
+        // Convert FormData to a plain object
+        const data: Record<string, any> = {};
+
+        formData.forEach((value, key) => {
+            // Attempt to parse numbers
+            if (!isNaN(Number(value)) && value !== "") {
+                data[key] = Number(value);
+            } else {
+                data[key] = value;
+            }
+        });
+
+        try {
+            const response = await prisma.organization.update({
+                where: {
+                    id: organization.id,
+                },
+                data,
+            });
+
+            return response;
+        } catch (error: any) {
+            console.error("Error updating organization:", error.message);
+            throw new Error(error.message || "Failed to update organization.");
+        }
+    }
+);
+
+
+export const updateOrganizationAttribute = withOrganizationAttributeAuth(
     async (formData: FormData, organization: Organization, key: string) => {
         const value = formData.get(key) as string
 
@@ -412,7 +444,7 @@ export const updateOrganization = withOrganizationAuth(
     }
 )
 
-export const deleteOrganization = withOrganizationAuth(
+export const deleteOrganization = withOrganizationAttributeAuth(
     async (_: FormData, organization: Organization) => {
         try {
             const response = await prisma.organization.delete({
@@ -826,6 +858,19 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         // console.log(`milestones:`, milestones)
         // console.log(`edges:`, edges)
 
+        const organization = await prisma.organization.findFirst({
+            select: {
+                id: true,
+                roadmaps: {
+                    where: {id: roadmapId}
+                }
+            }
+        })
+
+        console.log(`organization`, organization)
+        if (!organization) throw new Error(`Could not find organization with roadmap id: ${roadmapId}`)
+        const organizationId: string = organization.id
+
         // Delete any nodes that are not in the request
         const nodeIds = nodes.map((node: any) => node.id)
         const nodesInDB = await prisma.node.findMany({select: {id: true}})
@@ -845,7 +890,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         // Save or update nodes
         await Promise.all(
             nodes.map(async (node: any) => {
-                await prisma.node.upsert({
+                const n = await prisma.node.upsert({
                     where: {id: node.id},
                     update: {
                         positionX: node.position?.x,
@@ -864,6 +909,9 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                                 id: node.data?.id,
                                 roadmap: {
                                     connect: {id: roadmapId}
+                                },
+                                organization: {
+                                    connect: {id: organizationId}
                                 },
                                 title: node.data?.title || "New Milestone",
                                 status: node.data?.status || "TODO",
@@ -1181,7 +1229,7 @@ export async function leaveOrganization(
 ) {
     try {
         if (!session) {
-            return {success: false, error: "Internal server error"};
+            return {success: false, error: "Session not found."};
         }
 
         const member = await prisma.member.delete({
@@ -1200,6 +1248,100 @@ export async function leaveOrganization(
         return {success: true, data: member};
     } catch (error: any) {
         logError("Error fetching membership data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+// Invite user function with updated Organization model
+export async function deleteUser(
+    session: Session | null,
+) {
+    try {
+        if (!session) {
+            return {success: false, error: "Internal server error"};
+        }
+
+        const user = await prisma.user.delete({
+            where: {
+                id: session.user.id,
+            }
+        })
+
+        if (!user) {
+            return {success: false, error: "user not found"};
+        }
+
+        return {success: true, data: user};
+    } catch (error: any) {
+        logError("Error fetching user data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function createNewKanbanTask(column: Column) {
+    try {
+        const task = prisma.task.create({
+            data: {
+                column: {
+                    connect: {
+                        id: column.id
+                    },
+                },
+                orderPosition: 0,
+                kanbanPosition: 0
+            }
+        })
+
+        if (!task) {
+            return {success: false, error: "membership not found"};
+        }
+
+        return {success: true, data: task};
+    } catch (error: any) {
+        logError("Error fetching membership data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function createKanbanColumn(kanban: Kanban) {
+    try {
+        const column = prisma.column.create({
+            data: {
+                kanban: {
+                    connect: {
+                        id: kanban.id
+                    },
+                },
+                kanbanPosition: 0
+            }
+        })
+
+        if (!column) {
+            return {success: false, error: "failed to create kanban column"};
+        }
+
+        return {success: true, data: column};
+    } catch (error: any) {
+        logError("Error creating kanban column", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function deleteKanbanColumn(column: Column) {
+    try {
+        const deletedColumn = prisma.column.delete({
+            where: {
+                id: column.id
+            }
+        })
+
+        if (!column) {
+            return {success: false, error: "failed to delete kanban column"};
+        }
+
+        return {success: true, data: deletedColumn};
+    } catch (error: any) {
+        logError("Error deleting kanban column", error);
         return {success: false, error: "Internal server error"};
     }
 }

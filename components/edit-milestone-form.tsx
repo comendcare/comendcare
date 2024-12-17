@@ -19,7 +19,7 @@ import { ScrollArea } from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import type { TaskType } from "./milestone-node"
+import type { TaskType } from "./private-milestone-node"
 import type { StatusType } from "./milestone-status-button"
 import { FaTrash, FaX } from "react-icons/fa6"
 import {

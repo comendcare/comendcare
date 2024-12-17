@@ -25,11 +25,12 @@ import {useCallback, useEffect, useState} from "react";
 import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {cn, createDicebearAvatar} from "@/lib/utils";
+import {cn, createDicebearAvatar, getPublicFile} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
+import { handleImageUpload } from "@/lib/upload";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -131,6 +132,21 @@ export default function UserOnboardingForm() {
                         lng: userData.lng || 0,
                         image: userData.image || "",
                     };
+
+                    if (userData.image) {
+                        try {
+                            const userPhoto: File = await getPublicFile(userData.image)
+                            if (userPhoto) {
+                                const fileWithPreview = Object.assign(userPhoto, {
+                                    preview: URL.createObjectURL(userPhoto),
+                                })
+                                setSelectedFile(fileWithPreview)
+                            }
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    }
+                
                     setDefaultValues(fetchedValues);
                     setAddress(fetchedValues); // Set address state as well
                     form.reset(fetchedValues); // Reset form with fetched data
@@ -155,6 +171,11 @@ export default function UserOnboardingForm() {
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
         try {
+            if (selectedFile && values.image) {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                values.image = imgUrl || undefined
+            }
+
             for (const [key, value] of Object.entries(values)) {
                 const res: any = await editUser(session?.user?.id as string, {[key]: value});
                 if (res?.error) {
@@ -252,7 +273,7 @@ export default function UserOnboardingForm() {
                                                     setDialogOpen={setDialogOpen}
                                                     selectedFile={selectedFile}
                                                     setSelectedFile={(file: any) => {
-                                                        setSelectedFile(file);
+                                                        if (file == null) setSelectedFile(null)
                                                         field.onChange(file?.preview); // Update form field value
                                                     }}
                                                 />

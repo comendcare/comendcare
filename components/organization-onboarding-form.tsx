@@ -27,12 +27,12 @@ import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
-import {cn, createDicebearAvatar, formatMoney} from "@/lib/utils";
+import {cn, createDicebearAvatar, formatMoney, years} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
-
+import { handleImageUpload } from "@/lib/upload";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -47,13 +47,13 @@ const joinOrgFormSchema = z.object({
 export const newOrgFormSchema = z.object({
     orgName: z.string().min(2, {
         message: "Your organization's name must be at least 2 characters."
-    }).max(32, {
-        message: "Your organization's name must be a maximum of 32 characters."
+    }).max(60, {
+        message: "Your organization's name must be a maximum of 60 characters."
     }),
     subdomain: z.string().min(2, {
         message: "Your organization's nickname must be at least 2 characters."
     }),
-    looking: z.array(optionSchema).min(0).optional(),
+    looking: z.string().min(0).optional(),
     founded: z.string().optional(),
     description: z.string().min(2, {
         message: "Your organization's description must be at least 2 characters long.",
@@ -68,7 +68,7 @@ export const newOrgFormSchema = z.object({
     }).optional(),
     address1: z.string().optional(),
     address2: z.string().optional(),
-    formattedAddress: z.string(),
+    formattedAddress: z.string().optional(),
     city: z.string().optional(),
     region: z.string().optional(),
     postalCode: z.string().optional(),
@@ -105,8 +105,6 @@ const OPTIONS: Option[] = [
         strengths: 'Provides full-stack capabilities with SSR, optimized for caching and streaming, and excellent support for nested routing.',
     },
 ];
-
-const years = Array.from({length: new Date().getFullYear() - 1970 + 1}, (_, i) => (1970 + i).toString());
 
 export default function OrganizationOnboardingForm() {
     const {data: session, update} = useSession()
@@ -264,6 +262,11 @@ export default function OrganizationOnboardingForm() {
             }
         });
 
+        if (selectedFile && values.image) {
+            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+            if (imgUrl) formData.set('image', imgUrl)
+        }
+
         createOrganization(formData).then((res: any) => {
             if (res.error) {
                 toast.error(res.error)
@@ -279,7 +282,7 @@ export default function OrganizationOnboardingForm() {
     }
 
     return (
-        <div className="grid grid-cols-2 gap-x-8">
+        <div className="relative grid grid-cols-2 gap-x-8">
             <div className="space-y-4 col-span-1">
 
                 {/* Toggle between joining or creating an organization*/}
@@ -354,18 +357,21 @@ export default function OrganizationOnboardingForm() {
                             <FormField
                                 control={newOrgForm.control}
                                 name="subdomain"
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                         <FormDescription>
                                             {`Enter your organization's abbreviated name, short form, or nickname.`}
-                                            <br/>
-                                            {
-                                                newOrgForm.watch("subdomain") && !newOrgForm.formState.errors.subdomain &&
-                                                <>
-                                                    {`Your organization's domain will be ${newOrgForm.watch("subdomain")}.comend.io`}
-                                                </>
-                                            }
+                                            <br />
+                                            {newOrgForm.watch("subdomain") &&
+                                                !newOrgForm.formState.errors.subdomain && (
+                                                    <>
+                                                        {`Your organization's domain will be ${newOrgForm
+                                                            .watch("subdomain")
+                                                            .toLowerCase()
+                                                            .replace(/\s+/g, "-")}.comend.io`}
+                                                    </>
+                                                )}
                                         </FormDescription>
                                         <FormControl>
                                             <Input
@@ -373,9 +379,13 @@ export default function OrganizationOnboardingForm() {
                                                 id="name"
                                                 autoComplete="name"
                                                 {...field}
+                                                onChange={(e) => {
+                                                    const value = e.target.value.toLowerCase().replace(/\s+/g, "-");
+                                                    field.onChange(value); // Update the form state with processed value
+                                                }}
                                             />
                                         </FormControl>
-                                        <FormMessage/>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -389,7 +399,6 @@ export default function OrganizationOnboardingForm() {
                                         <FormDescription>{`Your patient group's website URL.`}</FormDescription>
                                         <FormControl>
                                             <Input
-                                                type="url"
                                                 id="website"
                                                 {...field}
                                             />
@@ -456,7 +465,7 @@ export default function OrganizationOnboardingForm() {
                                 name="description"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Description</FormLabel>
+                                        <FormLabel>Description (required)</FormLabel>
                                         <FormDescription>
                                             This will be the public description of your organization.
                                         </FormDescription>
@@ -557,7 +566,7 @@ export default function OrganizationOnboardingForm() {
                                                         setDialogOpen={setDialogOpen}
                                                         selectedFile={selectedFile}
                                                         setSelectedFile={(file: any) => {
-                                                            setSelectedFile(file);
+                                                            if (file == null) setSelectedFile(null)
                                                             field.onChange(file?.preview); // Update form field value
                                                         }}
                                                     />
@@ -586,19 +595,24 @@ export default function OrganizationOnboardingForm() {
                                 name="looking"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Looking for`}</FormLabel>
-                                        <FormDescription>{`What your organization is looking for and hoping to get from joining Comend.`}</FormDescription>
+                                        <FormLabel>{`What your organization is looking for and hoping to get from joining Comend.`}</FormLabel>
+                                        <FormDescription>{`Provide as much detail as possible; we want to help you!`}</FormDescription>
                                         <FormControl>
-                                            <MultipleSelector
+                                            <Input
+                                                type="text"
+                                                id="looking"
                                                 {...field}
-                                                defaultOptions={OPTIONS}
-                                                placeholder="Select options that appeal to you..."
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
                                             />
+                                            {/*<MultipleSelector*/}
+                                            {/*    {...field}*/}
+                                            {/*    defaultOptions={OPTIONS}*/}
+                                            {/*    placeholder="Select options that appeal to you..."*/}
+                                            {/*    emptyIndicator={*/}
+                                            {/*        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
+                                            {/*            no results found.*/}
+                                            {/*        </p>*/}
+                                            {/*    }*/}
+                                            {/*/>*/}
                                         </FormControl>
                                         <FormMessage/>
                                     </FormItem>
@@ -670,9 +684,9 @@ export default function OrganizationOnboardingForm() {
                 )}
             </div>
             {isNewOrganization &&
-                <div className="col-span-1 space-y-4 border-1 rounded-lg">
-                    <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
-                        <h1 className="py-4 min-w-0 flex-1 truncate text-2xl font-bold text-gray-900">
+                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-280px)]">
+                    <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
+                        <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
                             Organization profile preview
                         </h1>
 
@@ -760,9 +774,11 @@ export default function OrganizationOnboardingForm() {
                                                             <h3 className={cn("scroll-m-20 text-md tracking-tight font-semibold")}>
                                                                 Description
                                                             </h3>
-                                                            <p className="text-sm">
-                                                                {newOrgForm.watch("description") || "Your organization's description."}
-                                                            </p>
+                                                            {newOrgForm.watch("description") ?
+                                                                <p className="text-sm line-clamp-6">
+                                                                    {newOrgForm.watch("description")}
+                                                                </p> : <Skeleton className="h-4 w-full"/>
+                                                            }
                                                         </div>
                                                         <div className="space-y-2">
                                                             <div

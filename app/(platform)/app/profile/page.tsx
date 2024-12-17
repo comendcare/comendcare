@@ -1,6 +1,6 @@
 import {cookies} from "next/headers"
 import {
-    FaCalendar, FaCircleDollarToSlot, FaEllipsis, FaPen,
+    FaCalendar, FaCircleDollarToSlot, FaCity, FaEllipsis, FaPen,
     FaPencil, FaPeopleGroup, FaPhone, FaPlus,
 } from "react-icons/fa6";
 import {Button, buttonVariants} from "@/components/ui/button";
@@ -9,7 +9,7 @@ import {DonutChartCard} from "@/components/donut-chart-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
-import {cn, createDicebearAvatar} from "@/lib/utils";
+import {cn, formatMoney} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {PAGProfileResearchPlanCard} from "@/components/pag-profile-research-plan-card";
@@ -21,13 +21,18 @@ import {PAGProfileAssetsCard} from "@/components/pag-profile-assets-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import prisma from "@/lib/prisma"
 import {PAGProfileOpenRFPsCard} from "@/components/pag-profile-open-rfps-card";
-import EditPAGProfileDialog from "@/components/edit-pag-profile-page";
+import EditPAGProfileDialog from "@/components/edit-pag-profile-page-dialog";
 import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {PAGProfileAssetsAndProjectsCard} from "@/components/pag-profile-assets-and-projects-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "sonner";
 import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
+import { ProfilePhoto } from "@/components/profile-photo";
+import { PublicRoadmapCard } from "@/components/public-roadmap-card";
+import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
+import NoOrganizationPage from "@/components/no-organization-page";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -38,7 +43,7 @@ export default async function ProfilePage() {
     const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
     let organization = null
-    let dbMilestones = []
+    // let dbMilestones = []
     if (session?.user.organizationId) {
         const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
         if (response.success) {
@@ -62,47 +67,33 @@ export default async function ProfilePage() {
         if (!organization.verified) {
             // Render unverified organization state
             return (
-                <div className="h-full flex flex-col items-center justify-center py-20">
-                    <Image
-                        alt="Organization not verified"
-                        src="https://illustrations.popsy.co/gray/abstract-art-6.svg"
-                        width={400}
-                        height={400}
-                        className="dark:hidden"
-                    />
-                    <Image
-                        alt="Organization not verified"
-                        src="https://illustrations.popsy.co/white/abstract-art-6.svg"
-                        width={400}
-                        height={400}
-                        className="hidden dark:block"
-                    />
-                    <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                        {`Your organization is not verified yet.`}
-                    </p>
-                    <p className="mt-4 text-stone-500 dark:text-stone-300">
-                        {`We're currently verifying your organization. If this is taking too long, please contact support.`}
-                    </p>
-                </div>
+                <UnverifiedOrganizationPage/>
             );
         }
-      
-        dbMilestones = await prisma.milestone.findMany({
-            where: { roadmapId: organization.roadmaps?.[0].id },
-            include: { 
-                papers: true,
-                asset: {
-                    include: { contacts: true, attachments: true }
+
+        let roadmaps = await prisma.roadmap.findMany({
+            where: { organizationId: organization?.id },
+            include: {
+                nodes: {
+                    include: { data: true }
                 },
-                RFP: {
-                    include: { contacts: true, attachments: true }
-                },
-                tasks: {
-                    orderBy: { orderPosition: 'asc' },
+                edges: true,
+                milestones: {
                     include: {
-                        checklist: { orderBy: { orderPosition: 'asc' } }
+                        asset: {
+                            include: {
+                                contacts: true,
+                                attachments: true
+                            }
+                        },
+                        RFP: {
+                            include: {
+                                contacts: true,
+                                attachments: true
+                            }
+                        }
                     }
-                } 
+                }
             }
         })
 
@@ -119,17 +110,39 @@ export default async function ProfilePage() {
 
                         <div className="flex flex-row justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
-                                <div className="flex">
-                                    <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                         src={createDicebearAvatar(organization?.createdAt.toLocaleString() ?? "", 50, 40, "identicon")}
-                                         alt=""/>
+                                <div className="flex bg-white rounded-full">
+                                    {/* <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                        src={getOrgPhoto(organization)}
+                                        alt=""/> */}
+                                    <ProfilePhoto 
+                                        img={organization.image}
+                                        name={organization.name}
+                                        className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
+                                        textSize="large"
+                                    />
                                 </div>
                                 <div
                                     className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                                     <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
-                                        <h1 className="mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">
-                                            {organization?.name}
-                                        </h1>
+                                        <div className="mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900 max-w-xl">
+                                            <HoverCard>
+                                                <HoverCardTrigger asChild>
+                                                    <h1 className="truncate cursor-pointer">
+                                                        {organization?.name}
+                                                    </h1>
+                                                </HoverCardTrigger>
+                                                <HoverCardContent
+                                                    side="top"
+                                                    className="w-fit"
+                                                >
+                                                    <div className="space-y-2">
+                                                        <h4 className="text-lg font-semibold">
+                                                            {organization?.name}
+                                                        </h4>
+                                                    </div>
+                                                </HoverCardContent>
+                                            </HoverCard>
+                                        </div>
                                         <div
                                             className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                                             {organization?.numberOfIdentifiedPatients &&
@@ -146,7 +159,7 @@ export default async function ProfilePage() {
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"
                                                     />
-                                                    ${organization?.moneyRaised?.toLocaleString()} raised
+                                                    {formatMoney(organization?.moneyRaised)} raised
                                                 </div>
                                             }
                                             <div className="mt-2 flex items-center text-gray-500">
@@ -154,6 +167,13 @@ export default async function ProfilePage() {
                                                             aria-hidden="true"/>
                                                 Founded in {new Date(organization?.createdAt ?? "").getFullYear()}
                                             </div>
+                                            {organization?.incorporationStatus === "YES" &&
+                                                <div className="mt-2 flex items-center text-gray-500">
+                                                    <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                            aria-hidden="true"/>
+                                                    {`501c3`}
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -200,9 +220,11 @@ export default async function ProfilePage() {
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="roadmap" className="flex flex-col space-y-4">
-                                    {/*<PAGProfileAssetsAndProjectsCard/>*/}
-                                    <PAGProfileAssetsAndProjectsHoverableCard/>
-                                    <PAGProfileResearchPlanCard roadmapItems={dbMilestones}/>
+                                    <PAGProfileAssetsAndProjectsHoverableCard 
+                                        assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
+                                        rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
+                                    />
+                                    <PublicRoadmapCard roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined}/>
                                 </TabsContent>
                                 <TabsContent value="activity" className="mt-0">
                                     <PAGProfileActivityCard/>
@@ -215,32 +237,7 @@ export default async function ProfilePage() {
         );
     } else {
         return (
-            <div className="h-full flex flex-col items-center justify-center py-20">
-                <Image
-                    alt="No organization"
-                    src="https://illustrations.popsy.co/gray/success.svg"
-                    width={400}
-                    height={400}
-                    className="dark:hidden"
-                />
-                <Image
-                    alt="No organization"
-                    src="https://illustrations.popsy.co/white/success.svg"
-                    width={400}
-                    height={400}
-                    className="hidden dark:block"
-                />
-                <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                    {`You're not part of an organization yet.`}
-                </p>
-                <Link
-                    href="/onboarding/organization"
-                    className={cn(buttonVariants({variant: "default"}), "gap-x-2 mt-8")}
-                >
-                    <FaPlus/>
-                    Join an organization
-                </Link>
-            </div>
+            <NoOrganizationPage/>
         );
     }
 }

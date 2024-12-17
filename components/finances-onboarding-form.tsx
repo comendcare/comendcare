@@ -18,50 +18,92 @@ import {Separator} from "@/components/ui/separator";
 import {FaQuestionCircle} from "react-icons/fa";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {Timer} from "lucide-react";
+import {useEffect, useState} from "react";
+import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 
-const invitationFormSchema = z.object({
-    raising: z.enum(["yes", "no-but", "no"], {
-        required_error: "You need to select a 501c3 status.",
-    }).optional(),
-    raised: z.number().min(2, {
-        message: "Your organization's description.",
-    }).optional(),
-    budget: z.string().min(2, {
-        message: "Your organization's description.",
-    }).optional(),
-    deployed: z.string().min(2, {
-        message: "Your organization's description.",
-    }).optional(),
+export const financesFormSchema = z.object({
+    raising: z.enum(["yes", "no-but", "no"]).optional(),
+    raised: z.number().optional(),
+    budget: z.number().optional(),
+    deployed: z.number().optional(),
 })
 
 export default function FinancesOnboardingForm() {
     const session = useSession()
     const router = useRouter()
+    const [defaultValues, setDefaultValues] = useState<z.infer<typeof financesFormSchema> | undefined>(undefined);
 
-    const form = useForm<z.infer<typeof invitationFormSchema>>({
+    const form = useForm<z.infer<typeof financesFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(invitationFormSchema)
+        resolver: zodResolver(financesFormSchema),
+        defaultValues,
     })
 
-    async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
+    async function onSubmit(values: z.infer<typeof financesFormSchema>) {
+        if (!session.data?.user.organizationId) {
+            toast.error("You're not signed into an organization right now.");
+            return;
+        }
 
-        const formData = new FormData()
+        const formData = new FormData();
 
-        if (session.data?.user.organizationId) {
-            updateOrganization(formData, session.data.user.organizationId, "key").then((res: any) => {
-                if (res.error) {
-                    toast.error(res.error)
-                } else {
-                    const {id} = res
-                    router.refresh()
-                    router.push("/onboarding/research")
-                    toast.success(`Successfully saved changes.`)
-                }
-            })
-        } else {
-            toast.error("You're not signed into an organization right now.")
+        const databaseMap: Partial<Record<keyof typeof values, string>> = {
+            raised: "moneyRaised",
+            budget: "researchBudget",
+            deployed: "moneyDeployed",
+            // raising: "raising",
+        };
+
+        Object.entries(values).forEach(([key, value]) => {
+            const mappedKey = databaseMap[key as keyof typeof databaseMap]; // Explicitly cast key
+            if (mappedKey && value !== undefined) {
+                formData.append(mappedKey, value.toString());
+            }
+        });
+
+        try {
+            const response = await updateOrganization(formData, session.data.user.organizationId);
+            toast.success("Organization updated successfully!");
+            router.push("/app/profile");
+        } catch (error) {
+            toast.error("Failed to update organization.");
         }
     }
+
+    useEffect(() => {
+        async function fetchFinancesData() {
+            if (session.data?.user.organizationId) {
+                try {
+                    const response = await getOrganizationFromOrganizationId(session.data.user.organizationId);
+
+                    if (response.success) {
+                        const orgData = response.data;
+
+                        if (orgData) {
+                            const fetchedValues = {
+                                // raising: orgData.raising || undefined,
+                                raised: orgData.moneyRaised || 0,
+                                budget: orgData.researchBudget || 0,
+                                deployed: orgData.moneyDeployed || 0,
+                            };
+
+                            // Populate form with fetched data
+                            setDefaultValues(fetchedValues);
+                            form.reset(fetchedValues);
+                        }
+                    } else {
+                        console.error(response.error);
+                        toast.error(response.error);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch finances data:", error);
+                    toast.error("An error occurred while fetching finances data.");
+                }
+            }
+        }
+
+        fetchFinancesData();
+    }, [session.data?.user.organizationId, form])
 
     return (
         <TooltipProvider>
@@ -131,7 +173,7 @@ export default function FinancesOnboardingForm() {
                                         >
                                             <FormItem className="flex items-center space-x-3 space-y-0">
                                                 <FormControl>
-                                                    <RadioGroupItem value="Yes"/>
+                                                    <RadioGroupItem value="yes"/>
                                                 </FormControl>
                                                 <FormLabel className="font-normal">
                                                     {`Yes I'm currently raising`}
@@ -243,9 +285,14 @@ export default function FinancesOnboardingForm() {
                                     <FormControl>
                                         <Input
                                             variant="currency"
-                                            type="url"
-                                            id="website"
+                                            type="number"
+                                            min={0}
+                                            id="deployed"
                                             {...field}
+                                            onChange={(e) => {
+                                                const parsedValue = parseFloat(e.target.value);
+                                                field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
+                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage/>
@@ -277,9 +324,14 @@ export default function FinancesOnboardingForm() {
                                     <FormControl>
                                         <Input
                                             variant="currency"
-                                            type="url"
-                                            id="website"
+                                            type="number"
+                                            min={0}
+                                            id="budget"
                                             {...field}
+                                            onChange={(e) => {
+                                                const parsedValue = parseFloat(e.target.value);
+                                                field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
+                                            }}
                                         />
                                     </FormControl>
                                     <FormMessage/>
@@ -289,7 +341,7 @@ export default function FinancesOnboardingForm() {
 
                         <div className="flex flex-row justify-between">
                             <div className="flex flex-row space-x-2">
-                                <Button onClick={() => router.push("/onboarding/organization")}>Previous</Button>
+                                <Button onClick={() => router.push("/onboarding/research")}>Previous</Button>
                                 <Button type="submit">Finish</Button>
                             </div>
                             <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>

@@ -300,7 +300,7 @@ async function main() {
 }
 
 const exampleASORoadmap = {
-    title: 'ASO Roadmap',
+    title: 'ASO Research Plan',
     description: 'By developing an ASO therapy, we aim to address the underlying genetic cause of our rare disease. Our plan outlines each stage, from identifying the target gene to advancing through clinical trials, with the goal of bringing a safe and effective treatment to patients who urgently need it.',
     milestones: [
         {
@@ -456,6 +456,7 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                         data: {
                             create: {
                                 roadmapId: roadmap.id,
+                                organizationId,
                                 type: milestone.type || "NOTYPE",
                                 status: milestone.status || "TODO",
                                 title: milestone.title,
@@ -486,29 +487,29 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                     }
                 })
 
-                // create tasks for relevant milestone
-                if (newMilestone) {
-                    await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
-                        await prisma.task.create({
-                            data: {
-                                milestoneId: newMilestone?.id,
-                                status: task.status || "TODO",
-                                name: task.name,
-                                orderPosition: index,
-                                kanbanPosition: index,
-                                checklist: {
-                                    createMany: {
-                                        data: (task.checklist || []).map((item: any, index: number) => ({
-                                            name: item.name,
-                                            complete: item.complete || false,
-                                            orderPosition: index
-                                        }))
-                                    }
-                                }
-                            }
-                        })
-                    )))
-                }
+                // // create tasks for relevant milestone
+                // if (newMilestone) {
+                //     await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
+                //         await prisma.task.create({
+                //             data: {
+                //                 milestoneId: newMilestone?.id,
+                //                 status: task.status || "TODO",
+                //                 name: task.name,
+                //                 orderPosition: index,
+                //                 kanbanPosition: index,
+                //                 checklist: {
+                //                     createMany: {
+                //                         data: (task.checklist || []).map((item: any, index: number) => ({
+                //                             name: item.name,
+                //                             complete: item.complete || false,
+                //                             orderPosition: index
+                //                         }))
+                //                     }
+                //                 }
+                //             }
+                //         })
+                //     )))
+                // }
 
                 return node
             })
