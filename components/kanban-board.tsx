@@ -23,23 +23,17 @@ const kanbanSelector = (state: KanbanState) => ({
 export default function KanbanBoard({
                                         initColumns,
                                         roadmapId,
-                                        initNodes,
-                                        initEdges,
-                                        initMilestones,
-                                        // initTasks
+                                        initTasks
                                     }: {
     roadmapId: string
     initColumns: any[]
-    initNodes: any[]
-    initEdges: any[]
-    initMilestones: any[]
-    // initTasks: any[]
+    initTasks: any[]
 }) {
 
     const searchParams = useSearchParams()
-    const {
-        initState: initRoadmapState
-    } = useRoadmapStore(useShallow(roadmapSelector))
+    // const {
+    //     initState: initRoadmapState
+    // } = useRoadmapStore(useShallow(roadmapSelector))
     const {
         initState: initKanbanState
     } = useKanbanStore(useShallow(kanbanSelector))
@@ -49,8 +43,9 @@ export default function KanbanBoard({
         const urlMilestone: string | null = params.get("milestone")
         const urlTask: string | null = params.get("task")
 
-        initRoadmapState(initNodes, initEdges, initMilestones, urlMilestone, urlTask, roadmapId)
-        initKanbanState(initColumns)
+        // initRoadmapState(initNodes, initEdges, initMilestones, urlMilestone, urlTask, roadmapId)
+        console.log(`init tasks`, initTasks)
+        initKanbanState(initColumns, initTasks)
     }, [])
 
     return (
