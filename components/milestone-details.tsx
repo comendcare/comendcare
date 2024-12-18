@@ -1,11 +1,11 @@
 "use client"
 
 import React from "react"
-import { ScrollArea } from "./ui/scroll-area"
-import StatusButton, { StatusType } from "./milestone-status-button"
-import { FaArrowUpRightFromSquare, FaDollarSign, FaPaperclip } from "react-icons/fa6"
-import { Label } from "./ui/label"
-import { TaskType } from "./private-milestone-node"
+import {ScrollArea} from "./ui/scroll-area"
+import StatusButton, {StatusType} from "./milestone-status-button"
+import {FaArrowUpRightFromSquare, FaDollarSign, FaPaperclip} from "react-icons/fa6"
+import {Label} from "./ui/label"
+import {TaskType} from "./private-milestone-node"
 import {
     Card,
     CardContent,
@@ -14,76 +14,82 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
-import { Badge } from "./ui/badge"
-import { DateView } from "./miletone-date-view"
-import { BudgetView } from "./milestone-budget-view"
-import { AssetEditForm } from "./asset-edit-form"
-import { AssetDetails } from "./asset-details"
-import { Separator } from "./ui/separator"
+import {MILESTONE_TYPE_OPTIONS} from "@/lib/types"
+import {Badge} from "./ui/badge"
+import {DateView} from "./miletone-date-view"
+import {BudgetView} from "./milestone-budget-view"
+import {AssetEditForm} from "./asset-edit-form"
+import {AssetDetails} from "./asset-details"
+import {Separator} from "./ui/separator"
 import Link from "next/link"
-import { RFPDetails } from "./rfp-details.tsx"
-import { Button } from "./ui/button"
+import {RFPDetails} from "./rfp-details.tsx"
+import {Button} from "./ui/button"
 
-export function MilestoneDetails({ milestone }: { milestone: any }) {
+export function MilestoneDetails({milestone}: { milestone: any }) {
     return (
         <Card>
             <CardHeader className="flex flex-row gap-4">
                 <span className="flex flex-col gap-4 grow">
-                    <CardTitle className="flex flex-row gap-4 items-center scroll-m-20 text-3xl font-bold tracking-tight">
+                    <CardTitle
+                        className="flex flex-row gap-4 items-center scroll-m-20 text-2xl font-bold tracking-tight">
                         {milestone.title}
-                        {milestone.type && milestone.type !== 'NOTYPE' && (
-                            <Badge className="flex text-sm h-[30px]">
-                                {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestone.type))?.label || "No type"}
-                            </Badge>
-                        )}
-                        <StatusButton
-                            disabled={true}
-                            status={milestone.status}
-                            onStatusChange={() => {}}
-                        />
                     </CardTitle>
-                    <CardDescription>{milestone.description}</CardDescription>
+                    <CardDescription className="text-base">
+                        {milestone.description}
+                    </CardDescription>
                 </span>
             </CardHeader>
             <CardContent className="flex flex-col gap-8">
-                <div className="flex flex-row gap-4 text-gray-500">
+                <div className="flex flex-col gap-4 text-gray-500">
+                    {milestone.type && milestone.type !== 'NOTYPE' && (
+                        <Badge className="flex text-sm h-[30px]">
+                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestone.type))?.label || "No type"}
+                        </Badge>
+                    )}
+
+                    <StatusButton
+                        disabled={true}
+                        status={milestone.status}
+                        onStatusChange={() => {
+                        }}
+                    />
+
                     <DateView startDate={milestone.startDate} endDate={milestone.endDate}/>
 
-                    <BudgetView budget={milestone.budget} />
+                    <BudgetView budget={milestone.budget}/>
                 </div>
 
                 {(milestone?.asset || milestone?.RFP) && (
                     <>
-                    <Separator />
-                    <div className="grid grid-cols-2 gap-4">
-                        {milestone.asset && (
-                            <div className="flex flex-col gap-4">
-                                <h2 className="font-semibold text-xl">{`Assets`}</h2>
-                                <AssetDetails asset={milestone.asset} />
-                            </div>
-                        )}
-    
-                        {milestone.RFP && (
-                            <div className="flex flex-col gap-4">
-                                <h2 className="font-semibold text-xl">{`Projects`}</h2>
-                                <RFPDetails rfp={milestone.RFP} />
-                            </div>
-                        )}
-                    </div>
+                        <Separator/>
+                        <div className="grid grid-cols-2 gap-4">
+                            {milestone.asset && (
+                                <div className="flex flex-col gap-4">
+                                    <h2 className="font-semibold text-xl">{`Assets`}</h2>
+                                    <AssetDetails asset={milestone.asset}/>
+                                </div>
+                            )}
+
+                            {milestone.RFP && (
+                                <div className="flex flex-col gap-4">
+                                    <h2 className="font-semibold text-xl">{`Projects`}</h2>
+                                    <RFPDetails rfp={milestone.RFP}/>
+                                </div>
+                            )}
+                        </div>
                     </>
                 )}
 
                 {milestone.papers && milestone.papers.length > 0 && (
                     <div className="flex flex-col gap-4">
-                        <Separator />
+                        <Separator/>
                         <h2 className="font-semibold text-xl">{`Attached Papers`}</h2>
                         <ol className="flex flex-row gap-4 flex-wrap">
                             {milestone?.papers?.map((paper: any, index: number) => (
                                 <Link href={paper.link} key={index}>
                                     <Button variant="secondary">
                                         {paper.name || paper.link}
-                                        <FaPaperclip />
+                                        <FaPaperclip/>
                                     </Button>
                                 </Link>
                             ))}
