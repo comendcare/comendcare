@@ -1,12 +1,13 @@
 import {create} from "zustand"
 import {temporal} from 'zundo'
 import {Column} from "@prisma/client";
-import { createNewKanbanTask } from "@/lib/actions";
+import { createKanbanColumn, createNewKanbanTask } from "@/lib/actions";
 
 export type KanbanState = {
     columns: any[],
     tasks: any[],
     initState: (columns: Column[], tasks: any[]) => void
+    addColumn: (column: any) => void,
     addTask: (task: any) => void
 }
 
@@ -15,7 +16,12 @@ export const useKanbanStore = create<KanbanState>()(
             columns: [],
             tasks: [],
             initState: (columns: Column[], tasks: any[]) => {
-                set({columns, tasks})
+                set({ columns, tasks })
+            },
+            addColumn: (column: Column) => {
+                set({ columns: [...get().columns, column] })
+                console.log(`add column`, column)
+                createKanbanColumn(column)
             },
             addTask: (task: any) => {
                 console.log(`ADD TASK`, task)

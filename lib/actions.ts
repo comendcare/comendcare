@@ -11,6 +11,7 @@ import {customAlphabet} from "nanoid";
 import {getBlurDataURL, logError} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from "@/lib/emails";
+import { getKanbanFromOrganizationId } from "./fetchers"
 
 
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
@@ -1339,24 +1340,28 @@ export async function createNewKanbanTask(column: Column) {
     }
 }
 
-export async function createKanbanColumn(kanban: Kanban) {
+export async function createKanbanColumn(column: Column) {
     try {
-        const column = prisma.column.create({
+        const { data: kanban } = await getKanbanFromOrganizationId()
+        if (!kanban) return {success: false, error: "failed to find associated kanban board"}
+
+        const newColumn = prisma.column.create({
             data: {
                 kanban: {
                     connect: {
                         id: kanban.id
                     },
                 },
+                name: column.name,
                 kanbanPosition: 0
             }
         })
 
-        if (!column) {
+        if (!newColumn) {
             return {success: false, error: "failed to create kanban column"};
         }
 
-        return {success: true, data: column};
+        return {success: true, data: newColumn};
     } catch (error: any) {
         logError("Error creating kanban column", error);
         return {success: false, error: "Internal server error"};
