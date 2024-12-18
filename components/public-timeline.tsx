@@ -10,7 +10,7 @@ export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
     subdomain: string | undefined,
     urlMilestone: string | undefined
 }) => {
-    console.log(`milestones`, roadmap?.milestones)
+
     return (
         <ol className="relative border-s border-gray-200 dark:border-gray-700 space-y-8">
             {roadmap?.milestones?.map((item: any, index: number) => (
