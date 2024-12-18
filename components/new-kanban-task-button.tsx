@@ -15,18 +15,7 @@ export default function NewKanbanTaskButton({column}: { column: Column }) {
 
     async function createTask() {
         try {
-            // await createNewKanbanTask(column).then((response) => {
-            //     if (response.success && response.data) {
-            //         toast.success("Task created successfully!");
-            //     } else {
-            //         console.error(response.error)
-            //         toast.error(response.error)
-            //     }
-            // })
-            addTask({
-                name: 'New Task',
-                columnId: column.id
-            })
+            addTask(column.id)
         } catch (error) {
             console.error(error);
             toast.error("Failed to create task.");

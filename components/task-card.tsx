@@ -93,16 +93,6 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
         <Dialog>
             <DialogTrigger asChild>
                 <Card
-                    onClick={() => {
-                        // setSelectedTaskId(task?.id)
-
-                        const params = new URLSearchParams(searchParams.toString())
-                        params.delete("task")
-                        params.set("task", task?.id)
-
-                        router.push(`${pathname}?${params.toString()}`, {scroll: false})
-                    }}
-                    ref={setNodeRef}
                     style={style}
                     className={variants({
                         dragging: isOverlay
@@ -141,7 +131,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                     </CardContent>
                 </Card>
             </DialogTrigger>
-            <DialogContent className="">
+            <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Edit Task Details</DialogTitle>
                     <DialogDescription>
@@ -150,13 +140,8 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                 </DialogHeader>
                 <EditTaskForm
                     taskData={task}
-                    // onClose={() => setIsEditing(false)}
-                    onClose={() => {
-                    }}
+                    onClose={() => {}}
                 />
-                {/*<DialogFooter>*/}
-                {/*    <Button type="submit">Save changes</Button>*/}
-                {/*</DialogFooter>*/}
             </DialogContent>
         </Dialog>
 
