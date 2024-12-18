@@ -197,8 +197,9 @@ export const PrivateFlowView = ({
             onConnect={onConnect}
             onBeforeDelete={handleDelete}
             nodeTypes={nodeTypes}
-            // fitView
+            fitView
             fitViewOptions={{ padding: 2 }}
+            style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
         >
             <MiniMap
