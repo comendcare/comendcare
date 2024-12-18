@@ -13,7 +13,7 @@ export const imgHeight = 250
 
 const tabContent = {
     profiles: {
-        title: "Research Roadmaps",
+        title: "Research Planner",
         image: <Image
             src={`https://api.microlink.io/?${encode({
                 url: "https://comend-refresh-sprint-3.vercel.app/pag/profile/ACME%20Syndrome%20Foundation",
@@ -37,7 +37,7 @@ const tabContent = {
         description: "Develop your research strategy with the help of playbooks and other groups. Then organize your tasks and share your roadmap with others.",
     },
     marketplace: {
-        title: "Rare Marketplace",
+        title: "Marketplace",
         image: (
             <Image
                 src={`https://api.microlink.io/?${encode({
@@ -64,7 +64,7 @@ const tabContent = {
             "Find and learn about those who can help you advance your research objectives based on shared biologies, projects, or goals."
     },
     forums: {
-        title: "Research Forums",
+        title: "Forum",
         image: <Image
             src={`https://api.microlink.io/?${encode({
                 url: "https://comend-refresh-sprint-3.vercel.app/pag/project/Potassium%20Ion%20Channels/discussion",
@@ -132,7 +132,6 @@ export default function TabsFeaturesSection() {
                     </h3>
                     <p className="text-xl text-muted-foreground mb-8">
                         Comend supports patient groups from formation to IND approval.
-                        Find grants, connect with researchers, contract CROs, and more - all from one intuitive platform.
                     </p>
                 </div>
             </div>

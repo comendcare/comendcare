@@ -47,7 +47,10 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
             onValueChange={handleTabChange}
         >
             <Card>
-                <CardHeader className="w-min pt-6 pb-2">
+                <CardHeader className="w-min pt-6 pb-2 space-y-4">
+                    <CardTitle>
+                        Roadmap
+                    </CardTitle>
                     <TabsList>
                         <TabsTrigger value="timeline">
                             Timeline View

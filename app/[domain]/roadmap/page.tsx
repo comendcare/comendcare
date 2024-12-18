@@ -24,6 +24,16 @@ import PublicProfileDropdown from "@/components/public-profile-dropdown";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
 import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
 import {Post} from "@/app/condition/[slug]/page";
+import { FloatingDock } from "@/components/floating-dock";
+import {IconFlag, IconShare, IconShare2} from "@tabler/icons-react";
+import {
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
 
 export async function generateMetadata({
                                            params
@@ -42,6 +52,8 @@ export async function generateMetadata({
     const title = data?.title || "Default Title" // Use a fallback title
     const description = data?.description || "Default description" // Use a fallback description
 
+    console.log("data", data)
+    console.log("organizationData", organizationData)
     if (!data || !organizationData) {
         return {
             title: "Page Not Found",
@@ -170,135 +182,175 @@ export default async function OrganizationRoadmapPage({
     return (
         <>
             {roadmaps.length > 0 ? (
-                    <div
-                        className="flex flex-col items-start justify-center my-24 gap-8 max-w-7xl m-auto w-full text-left"
-                    >
-                        {/*<PAGPublicProfileHeader organization={organization} showBackButton={true}/>*/}
+                    <>
+                        <div
+                            className="flex flex-col items-start justify-center my-24 gap-8 max-w-7xl m-auto w-full text-left"
+                        >
+                            {/*<PAGPublicProfileHeader organization={organization} showBackButton={true}/>*/}
 
-                        <PAGPublicRoadmapBreadcrumb
-                            organization={organization}
-                            roadmap={roadmaps[0]}
-                        />
+                            <PAGPublicRoadmapBreadcrumb
+                                organization={organization}
+                                roadmap={roadmaps[0]}
+                            />
 
-                        {/*<h1 className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">*/}
-                        {/*    {roadmaps[0].title}*/}
-                        {/*</h1>*/}
+                            {/*<h1 className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">*/}
+                            {/*    {roadmaps[0].title}*/}
+                            {/*</h1>*/}
 
-                        <div className="w-full flex items-center justify-between space-x-5">
+                            <div className="w-full flex items-center justify-between space-x-5">
 
-                            <div className="flex">
-                                <ProfilePhoto
-                                    img={organization?.image}
-                                    name={organization?.name}
-                                    className="h-8 w-8 rounded-full ring-4 ring-white sm:h-16 sm:w-16"
-                                    textSize="medium"
-                                />
-                            </div>
+                                <div className="flex">
+                                    <ProfilePhoto
+                                        img={organization?.image}
+                                        name={organization?.name}
+                                        className="h-8 w-8 rounded-full ring-4 ring-white sm:h-16 sm:w-16"
+                                        textSize="medium"
+                                    />
+                                </div>
 
-                            <div
-                                className="flex min-w-0 flex-1 items-center justify-center space-x-6 pb-1"
-                            >
-                                <div className="min-w-0 flex-1 sm:hidden md:block">
-                                    <div className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">
-                                        <HoverCard>
-                                            <HoverCardTrigger asChild>
-                                                <h1 className="truncate cursor-pointer">
-                                                    {`${organization?.name}'s ${roadmaps[0].title}`}
-                                                </h1>
-                                            </HoverCardTrigger>
-                                            <HoverCardContent
-                                                side="top"
-                                                className="w-fit"
-                                            >
-                                                <div className="space-y-2">
-                                                    <h4 className="text-lg font-semibold">
-                                                        {organization?.name}
-                                                    </h4>
-                                                </div>
-                                            </HoverCardContent>
-                                        </HoverCard>
-                                    </div>
-                                    <div
-                                        className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-                                        {organization?.numberOfIdentifiedPatients &&
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <FaPeopleGroup
-                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                    aria-hidden="true"/>
-                                                {organization?.numberOfIdentifiedPatients}+ patients
-                                            </div>
-                                        }
-                                        {organization?.moneyRaised &&
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <FaCircleDollarToSlot
-                                                    className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                    aria-hidden="true"
-                                                />
-                                                {formatMoney(organization?.moneyRaised)} raised
-                                            </div>
-                                        }
-                                        <div className="mt-2 flex items-center text-gray-500">
-                                            <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                        aria-hidden="true"/>
-                                            Founded in {new Date(organization?.createdAt ?? "").getFullYear()}
+                                <div
+                                    className="flex min-w-0 flex-1 items-center justify-center space-x-6 pb-1"
+                                >
+                                    <div className="min-w-0 flex-1 sm:hidden md:block">
+                                        <div className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">
+                                            <HoverCard>
+                                                <HoverCardTrigger asChild>
+                                                    <h1 className="truncate cursor-pointer">
+                                                        {`${organization?.name}'s ${roadmaps[0].title}`}
+                                                    </h1>
+                                                </HoverCardTrigger>
+                                                <HoverCardContent
+                                                    side="top"
+                                                    className="w-fit"
+                                                >
+                                                    <div className="space-y-2">
+                                                        <h4 className="text-lg font-semibold">
+                                                            {organization?.name}
+                                                        </h4>
+                                                    </div>
+                                                </HoverCardContent>
+                                            </HoverCard>
                                         </div>
-                                        {organization?.incorporationStatus === "YES" &&
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                        <div
+                                            className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+                                            {organization?.numberOfIdentifiedPatients &&
+                                                <div className="mt-2 flex items-center text-gray-500">
+                                                    <FaPeopleGroup
+                                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"/>
-                                                {`501c3`}
+                                                    {organization?.numberOfIdentifiedPatients}+ patients
+                                                </div>
+                                            }
+                                            {organization?.moneyRaised &&
+                                                <div className="mt-2 flex items-center text-gray-500">
+                                                    <FaCircleDollarToSlot
+                                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                        aria-hidden="true"
+                                                    />
+                                                    {formatMoney(organization?.moneyRaised)} raised
+                                                </div>
+                                            }
+                                            <div className="mt-2 flex items-center text-gray-500">
+                                                <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                            aria-hidden="true"/>
+                                                Founded in {new Date(organization?.createdAt ?? "").getFullYear()}
                                             </div>
-                                        }
+                                            {organization?.incorporationStatus === "YES" &&
+                                                <div className="mt-2 flex items-center text-gray-500">
+                                                    <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                            aria-hidden="true"/>
+                                                    {`501c3`}
+                                                </div>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
+
+                                <div
+                                    className="flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
+                                    <div className="flex flex-row space-x-2">
+                                        <Button
+                                            className="gap-x-2"
+                                        >
+                                            <FaPlus/>
+                                            Follow
+                                        </Button>
+                                    </div>
+                                </div>
+
                             </div>
 
-                            <div
-                                className="flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
-                                <div className="flex flex-row space-x-2">
-                                    <Button
-                                        className="gap-x-2"
-                                    >
-                                        <FaPlus/>
-                                        Follow
-                                    </Button>
+                            <p>
+                                {roadmaps[0].description}
+                            </p>
+
+                            {/*<div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">*/}
+                            <div className="grid grid-cols-3 m-auto w-full gap-4">
+                                <div className="col-span-2">
+                                    <PublicRoadmapCard
+                                        roadmap={roadmaps[0]}
+                                        subdomain={organization?.subdomain || undefined}
+                                    />
+                                </div>
+                                <div className="col-span-1">
+                                    <PublicMilestoneDetails/>
                                 </div>
                             </div>
 
-                        </div>
-
-                        <p>
-                            {roadmaps[0].description}
-                        </p>
-
-                        {/*<div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">*/}
-                        <div className="grid grid-cols-3 m-auto w-full gap-4">
-                            <div className="col-span-2">
-                                <PublicRoadmapCard
-                                    roadmap={roadmaps[0]}
-                                    subdomain={organization?.subdomain || undefined}
-                                />
-                            </div>
-                            <div className="col-span-1">
-                                <PublicMilestoneDetails/>
+                            <div className="mt-8 w-full space-y-8">
+                                <h2 className="text-center text-3xl md:text-4xl font-bold">
+                                    Recent activity
+                                </h2>
+                                <Carousel>
+                                    <CarouselContent className="p-4 gap-4">
+                                        {posts.map((post, index) => (
+                                            <ConditionProfileRecentActivityCard post={post} key={index}/>
+                                        ))}
+                                    </CarouselContent>
+                                    <CarouselPrevious/>
+                                    <CarouselNext/>
+                                </Carousel>
                             </div>
                         </div>
 
-                        <div className="mt-8 w-full space-y-8">
-                            <h2 className="text-center text-3xl md:text-4xl font-bold">
-                                Recent activity
-                            </h2>
-                            <Carousel>
-                                <CarouselContent className="p-4 gap-4">
-                                    {posts.map((post, index) => (
-                                        <ConditionProfileRecentActivityCard post={post} key={index}/>
-                                    ))}
-                                </CarouselContent>
-                                <CarouselPrevious/>
-                                <CarouselNext/>
-                            </Carousel>
-                        </div>
-                    </div>
+                        <FloatingDock
+                            items={[
+                                {
+                                    title: "Post on feed",
+                                    icon: <IconShare2/>,
+                                    href: "/app/feed",
+                                },
+                                {
+                                    title: "Share on social media",
+                                    icon: <IconShare/>,
+                                    href: "/dashboard",
+                                },
+                                {
+                                    title: "Report an issue",
+                                    icon: <IconFlag/>,
+                                    dialog: (
+                                        <>
+                                            <DialogHeader>
+                                                <DialogTitle>Edit profile</DialogTitle>
+                                                <DialogDescription>
+                                                    {`Make changes to your profile here. Click save when you're done.`}
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <div className="grid gap-4 py-4">
+                                                <Label htmlFor="name">Name</Label>
+                                                <Input id="name" defaultValue="John Doe"/>
+                                            </div>
+                                            <DialogFooter>
+                                                <Button type="submit">Save changes</Button>
+                                            </DialogFooter>
+                                        </>
+                                    ),
+                                }
+                            ]}
+                            orientation="vertical"
+                            desktopClassName="right-4"
+                        />
+                    </>
                 ) :
                 (
                     <div className="flex flex-col items-center justify-center py-20">

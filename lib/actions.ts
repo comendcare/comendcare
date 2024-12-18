@@ -1222,6 +1222,29 @@ export async function updateDBTask({tasks}: { tasks: any[] }) {
     }
 }
 
+export async function deleteOrgRoadmap(
+    roadmapId: string,
+    organizationId: string
+) {
+    try {
+        const response = await prisma.roadmap.delete({
+            where: {
+                id: roadmapId,
+                organizationId: organizationId
+            }
+        })
+
+        if (!response) {
+            return {success: false, error: 'roadmap not found'}
+        }
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        logError("Error deleting roadmap", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 // Invite user function with updated Organization model
 export async function leaveOrganization(
     session: Session | null,

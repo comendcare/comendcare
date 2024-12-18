@@ -274,7 +274,7 @@ export const CloudHeroSection = () => {
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                     className="max-w-screen-sm text-xl"
                 >
-                    {`Develop your research strategy, network with potential partners, and protect your investments.`}
+                    {`Build your research plan, discover partners, and launch new projects.`}
                 </motion.p>
             </div>
 
