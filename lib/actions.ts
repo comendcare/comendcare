@@ -1318,7 +1318,7 @@ export async function deleteUser(
     }
 }
 
-export async function createNewKanbanTask(column: Column) {
+export async function createNewKanbanTask(task: Task) {
     try {
         const newTask = prisma.task.create({
             data: {
