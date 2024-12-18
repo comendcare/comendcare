@@ -130,12 +130,13 @@ export default function EditPAGProfileDialog() {
         lat: 0,
         lng: 0,
     });
-    const [defaultValues, setDefaultValues] = useState<z.infer<typeof editOrgFormSchema> | undefined>(undefined);
+    const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof editOrgFormSchema> | undefined>(undefined);
+    const [defaultFinancesValues, setDefaultFinancesValues] = useState<z.infer<typeof financesFormSchema> | undefined>(undefined);
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(editOrgFormSchema),
-        defaultValues: defaultValues
+        defaultValues: defaultOrganizationValues
     })
 
     const [debouncedNickname] = useDebounce(editOrgForm.watch("subdomain"), 500); // Extract just the debounced value
@@ -149,7 +150,7 @@ export default function EditPAGProfileDialog() {
 
     useEffect(() => {
         if (debouncedNickname) {
-            const currentSubdomain = defaultValues?.subdomain; // The current subdomain of the organization
+            const currentSubdomain = defaultOrganizationValues?.subdomain; // The current subdomain of the organization
 
             if (debouncedNickname === currentSubdomain) {
                 // Clear errors since it's the same subdomain as before
@@ -170,7 +171,7 @@ export default function EditPAGProfileDialog() {
                 }
             });
         }
-    }, [debouncedNickname, defaultValues?.subdomain, editOrgForm])
+    }, [debouncedNickname, defaultOrganizationValues?.subdomain, editOrgForm])
 
     useEffect(() => {
         editOrgForm.setValue("address1", address.address1);
@@ -308,7 +309,7 @@ export default function EditPAGProfileDialog() {
                         }
                     }
 
-                    setDefaultValues(fetchedValues);
+                    setDefaultOrganizationValues(fetchedValues);
                     setAddress(fetchedValues); // Set address state as well
                     editOrgForm.reset(fetchedValues); // Reset form with fetched data
                 }
@@ -318,10 +319,45 @@ export default function EditPAGProfileDialog() {
         fetchUserData();
     }, [session, editOrgForm]);
 
-    const form = useForm<z.infer<typeof financesFormSchema>>({
+    const editFinancesForm = useForm<z.infer<typeof financesFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(financesFormSchema)
     })
+
+    useEffect(() => {
+        async function fetchFinancesData() {
+            if (session?.user?.organizationId) {
+                try {
+                    const response = await getOrganizationFromOrganizationId(session.user.organizationId);
+
+                    if (response.success) {
+                        const orgData = response.data;
+
+                        if (orgData) {
+                            const fetchedValues = {
+                                // raising: orgData.raising || undefined,
+                                raised: orgData.moneyRaised || 0,
+                                budget: orgData.researchBudget || 0,
+                                deployed: orgData.moneyDeployed || 0,
+                            };
+
+                            // Populate form with fetched data
+                            setDefaultFinancesValues(fetchedValues);
+                            editFinancesForm.reset(fetchedValues);
+                        }
+                    } else {
+                        console.error(response.error);
+                        toast.error(response.error);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch finances data:", error);
+                    toast.error("An error occurred while fetching finances data.");
+                }
+            }
+        }
+
+        fetchFinancesData();
+    }, [session?.user?.organizationId, editFinancesForm]);
 
     async function onFinancesFormSubmit(values: z.infer<typeof financesFormSchema>) {
 
@@ -635,11 +671,11 @@ export default function EditPAGProfileDialog() {
                         </TabsContent>
                         <TabsContent value="finances">
 
-                            <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onFinancesFormSubmit)} className="space-y-8">
+                            <Form {...editFinancesForm}>
+                                <form onSubmit={editFinancesForm.handleSubmit(onFinancesFormSubmit)} className="space-y-8">
 
                                     <FormField
-                                        control={form.control}
+                                        control={editFinancesForm.control}
                                         name="raising"
                                         render={({field}) => (
                                             <FormItem className="space-y-3">
@@ -650,7 +686,7 @@ export default function EditPAGProfileDialog() {
                                                             <FaQuestionCircle
                                                                 className="text-black h-4 inline-block align-baseline mx-1"/>
                                                         </TooltipTrigger>
-                                                        <TooltipContent>
+                                                        <TooltipContent className="max-w-[400px] break-words text-sm z-50">
                                                             <p>
                                                                 {`If raising money for your organization is a priority, we'll match you with grants.`}
                                                             </p>
@@ -715,7 +751,7 @@ export default function EditPAGProfileDialog() {
                                     {/*/>*/}
 
                                     <FormField
-                                        control={form.control}
+                                        control={editFinancesForm.control}
                                         name="raised"
                                         render={({field: {value, onChange}}) => (
                                             <FormItem>
@@ -727,7 +763,10 @@ export default function EditPAGProfileDialog() {
                                                             <FaQuestionCircle
                                                                 className="text-black h-4 inline-block align-baseline mx-1"/>
                                                         </TooltipTrigger>
-                                                        <TooltipContent>
+                                                        <TooltipContent
+                                                            align="end"
+                                                            className="max-w-[300px] break-words text-sm z-50"
+                                                        >
                                                             <p>
                                                                 {`Just a ballpark estimate so that we know to recommend vendors within a reasonable price range.`}
                                                             </p>
@@ -754,7 +793,7 @@ export default function EditPAGProfileDialog() {
                                     />
 
                                     <FormField
-                                        control={form.control}
+                                        control={editFinancesForm.control}
                                         name="deployed"
                                         render={({field}) => (
                                             <FormItem>
@@ -766,13 +805,12 @@ export default function EditPAGProfileDialog() {
                                                             <FaQuestionCircle
                                                                 className="text-black h-4 inline-block align-baseline mx-1"/>
                                                         </TooltipTrigger>
-                                                        <TooltipContent>
+                                                        <TooltipContent
+                                                            align="end"
+                                                            className="max-w-[300px] break-words text-sm z-50"
+                                                        >
                                                             <p>
-                                                                Knowing how much you have deployed to research so far
-                                                                helps
-                                                                us
-                                                                understand how much experience you have with driving
-                                                                research.
+                                                                Knowing how much you have deployed to research so far helps us understand how much experience you have with driving research.
                                                             </p>
                                                         </TooltipContent>
                                                     </Tooltip>
@@ -792,7 +830,7 @@ export default function EditPAGProfileDialog() {
                                     />
 
                                     <FormField
-                                        control={form.control}
+                                        control={editFinancesForm.control}
                                         name="budget"
                                         render={({field}) => (
                                             <FormItem>
@@ -804,7 +842,10 @@ export default function EditPAGProfileDialog() {
                                                             <FaQuestionCircle
                                                                 className="text-black h-4 inline-block align-baseline mx-1"/>
                                                         </TooltipTrigger>
-                                                        <TooltipContent>
+                                                        <TooltipContent
+                                                            align="end"
+                                                            className="max-w-[300px] break-words text-sm z-50"
+                                                        >
                                                             <p>
                                                                 Knowing how much you have budgeted to research helps us
                                                                 prioritize
