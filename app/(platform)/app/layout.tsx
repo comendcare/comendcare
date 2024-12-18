@@ -179,7 +179,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                                     // label: "128",
                                     icon: Workflow,
                                     variant: "ghost",
-                                    href: roadmapId ? `/app/roadmap/${roadmapId}` : `/app/roadmap`
+                                    href: `/app/roadmap`
                                 },
                                 {
                                     title: "Marketplace",
