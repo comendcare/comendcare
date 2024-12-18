@@ -99,7 +99,7 @@ export function EditTaskForm({
         resolver: zodResolver(editTaskForm),
         defaultValues: {
             name: taskData?.name,
-            status: taskData?.status,
+            status: taskData?.status || 'TODO',
             description: taskData?.description || undefined,
             checklist: taskData?.checklist || undefined
         }
@@ -111,21 +111,22 @@ export function EditTaskForm({
     const checklist = form.watch("checklist")
 
     // callback ensures we're not creating a new debounce every time this is called
-    const debounceUpdates = useCallback(
-        debounce(
-            (updatedValues) => handleFormSubmit(updatedValues),
-            500
-        ), []
-    )
+    // const debounceUpdates = useCallback(
+    //     debounce(
+    //         (updatedValues) => handleFormSubmit(updatedValues),
+    //         500
+    //     ), []
+    // )
 
-    useEffect(() => {
-        // callback in debounceUpdates holds onto the state of the time it was created
-        // we can't use the form.watch values directly (since they'll be outdated)
-        // we must pass in the most up to date values in the form
-        debounceUpdates({name, status, description, checklist})
-    }, [name, status, description, checklist])
+    // useEffect(() => {
+    //     // callback in debounceUpdates holds onto the state of the time it was created
+    //     // we can't use the form.watch values directly (since they'll be outdated)
+    //     // we must pass in the most up to date values in the form
+    //     debounceUpdates({name, status, description, checklist})
+    // }, [name, status, description, checklist])
 
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
+        console.log(`HANDLE FORM SUBMIT`)
         const {name, status, description, checklist} = values
 
         setTask(
@@ -207,12 +208,12 @@ export function EditTaskForm({
 
     return (
         <Form {...form}>
-            <ScrollArea>
+            <ScrollArea className={"max-h-[600px]"}>
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="flex flex-col gap-8"
                 >
-                    <FormField
+                    {/* <FormField
                         control={form.control}
                         name="status"
                         render={({field}) => (
@@ -232,7 +233,7 @@ export function EditTaskForm({
                                 <FormMessage/>
                             </FormItem>
                         )}
-                    />
+                    /> */}
 
                     <FormField
                         control={form.control}

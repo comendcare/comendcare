@@ -1322,7 +1322,12 @@ export async function createNewKanbanTask(column: Column) {
     try {
         const newTask = prisma.task.create({
             data: {
-                columnId: task.columnId,
+                id: task.id,
+                column: {
+                    connect: {
+                        id: task.columnId
+                    }
+                },
                 name: task.name,
                 orderPosition: 0,
                 kanbanPosition: 0
@@ -1347,6 +1352,7 @@ export async function createKanbanColumn(column: Column) {
 
         const newColumn = prisma.column.create({
             data: {
+                id: column.id,
                 kanban: {
                     connect: {
                         id: kanban.id
