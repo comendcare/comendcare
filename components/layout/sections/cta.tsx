@@ -21,8 +21,7 @@ export default function CTASection({
                             🎉&nbsp;&nbsp;Become a beta tester
                         </h2>
                         <p className="text-xl text-gray-900">
-                            Be the first to access features that can help you
-                            push new treatments forward.
+                            Stay in the loop for our upcoming launch in spring 2025.
                         </p>
                     </div>
 

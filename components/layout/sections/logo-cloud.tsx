@@ -26,10 +26,10 @@ export function LogoCloud() {
             name: "Drive",
             src: logoDrive
         },
-        {
-            name: "Founders Boost",
-            src: logoFoundersBoost
-        },
+        // {
+        //     name: "Founders Boost",
+        //     src: logoFoundersBoost
+        // },
         {
             name: "Next AI",
             src: logoNextAI
@@ -38,10 +38,10 @@ export function LogoCloud() {
             name: "Open Treatments",
             src: logoOpenTreatments
         },
-        {
-            name: "11ElevenLabsGrants",
-            src: logo11ElevenLabsGrants
-        },
+        // {
+        //     name: "11ElevenLabsGrants",
+        //     src: logo11ElevenLabsGrants
+        // },
         {
             name: "Cures Dev",
             src: logoCuresDev
@@ -59,7 +59,7 @@ export function LogoCloud() {
     return (
         <div className="relative px-4 md:px-8 py-24 w-full overflow-hidden space-y-8">
             <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
-                Co-designed with these organizations so far
+                Partnered with:
             </h2>
             <div className="grid grid-cols-4 gap-10 w-full max-w-3xl mx-auto  relative">
                 {logos.map(logo => (
