@@ -19,7 +19,7 @@ import { getRoadmapId } from "@/lib/fetchers";
 import { useSession } from "next-auth/react";
 import { deleteOrgRoadmap } from "@/lib/actions";
 
-export default async function PAGDashboardOrgSettingsTab() {
+export default function PAGDashboardOrgSettingsTab() {
     const {data: session} = useSession()
 
     if (!session?.user?.organizationId) {
