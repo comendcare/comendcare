@@ -19,6 +19,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import type {StatusType} from "./milestone-status-button"
 import {
     Dialog,
+    DialogClose,
     DialogTrigger
 } from "./ui/dialog"
 import {DeleteTaskDialogContent} from "./delete-task-dialog-content"
@@ -58,6 +59,7 @@ import {cva} from "class-variance-authority"
 import {debounce} from "lodash"
 import {SettingsProvider} from "@/components/editor/settings";
 import {PlateEditor} from "@/components/editor/plate-editor";
+import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -80,20 +82,18 @@ const editTaskForm = z.object({
     ).optional()
 })
 
-const selector = (state: RoadmapState) => ({
+const selector = (state: KanbanState) => ({
     setTask: state.setTask
 })
 
 export function EditTaskForm({
-                                 // milestoneId,
-                                 taskData,
-                                 onClose
-                             }: {
-    // milestoneId: string
+    taskData,
+    onClose
+}: {
     taskData: any
     onClose: () => void
 }) {
-    const {setTask} = useRoadmapStore(useShallow(selector))
+    const {setTask} = useKanbanStore(useShallow(selector))
     const form = useForm<z.infer<typeof editTaskForm>>({
         mode: "onChange",
         resolver: zodResolver(editTaskForm),
@@ -359,7 +359,9 @@ export function EditTaskForm({
                             </DialogTrigger>
                             <DeleteTaskDialogContent taskData={taskData}/>
                         </Dialog>
-                        <Button type="submit">Save Changes</Button>
+                        <DialogClose>
+                            <Button type="submit">Save Changes</Button>
+                        </DialogClose>
                     </span>
                 </form>
             </ScrollArea>
