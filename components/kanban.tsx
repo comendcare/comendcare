@@ -74,7 +74,7 @@ const sortKanbanTasks = (tasks: Task[]) => {
 
 function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: Task[] }) {
     // const { setTask, setTasks: setDbTasks } = useRoadmapStore(useShallow(roadmapSelector))
-    const { tasks: stateTasks } = useKanbanStore(useShallow(kanbanSelector))
+    const { tasks: stateTasks, columns: stateColumns } = useKanbanStore(useShallow(kanbanSelector))
     const [columns, setColumns] = useState<Column[]>([])
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
     const columnsId = useMemo(() => columns.map(col => col.id), [columns])
@@ -105,6 +105,11 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
         console.log(`TASKS CHANGED IN STATE`, stateTasks)
         setTasks(stateTasks)
     }, [stateTasks])
+
+    useEffect(() => {
+        console.log(`COLUMN CREATED`, stateColumns)
+        setColumns(stateColumns)
+    }, [stateColumns])
 
     function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
         const tasksInColumn = tasks.filter(task => task.status === columnId)
@@ -362,9 +367,9 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
         >
             <BoardContainer>
                 <SortableContext items={columnsId}>
-                    {columns.length > 0 ? columns.map(col => (
+                    {columns.length > 0 ? columns.map((col, index) => (
                         <BoardColumn
-                            key={col.id}
+                            key={index}
                             column={col}
                             tasks={tasks.filter(
                                 task => task?.columnId === col.id
