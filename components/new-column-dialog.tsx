@@ -56,17 +56,6 @@ export default function NewColumnDialog() {
 
         setOpen(false)
         try {
-            // const response = await getKanbanFromOrganizationId()
-            // if (response.success && response.data) {
-            //     await createKanbanColumn(response.data).then((response) => {
-            //         if (response.success && response.data) {
-            //             toast.success("column created successfully!");
-            //         } else {
-            //             console.error(response.error)
-            //             toast.error(response.error)
-            //         }
-            //     })
-            // }
             addColumn({
                 name: values.keyword,
                 tasks: [],
