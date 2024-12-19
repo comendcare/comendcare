@@ -124,7 +124,7 @@ export default function OrganizationSelector({
                                 <CommandItem
                                     key={org.organization.id}
                                     onSelect={() => handleOrganizationChange(org)}
-                                    className="text-sm space-x-2"
+                                    className="w-full flex flex-row justify-between text-sm space-x-2"
                                 >
                                     {/* <Avatar className="mr-2 h-5 w-5">
                                             <AvatarImage
@@ -136,12 +136,14 @@ export default function OrganizationSelector({
                                                 {org.organization.name?.[0]}
                                             </AvatarFallback>
                                         </Avatar> */}
-                                    <ProfilePhoto
-                                        img={org?.organization?.image}
-                                        name={org?.organization?.name}
-                                        className="mr-2 h-5 w-5"
-                                    />
-                                    {org.organization.name}
+                                    <div className="flex flex-row">
+                                        <ProfilePhoto
+                                            img={org?.organization?.image}
+                                            name={org?.organization?.name}
+                                            className="mr-2 h-5 w-5"
+                                        />
+                                        {org.organization.name}
+                                    </div>
                                     <Check
                                         className={cn(
                                             "ml-auto",

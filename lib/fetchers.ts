@@ -105,7 +105,7 @@ export async function getRoadmapsForOrganization(domain: string) {
                     data: true
                 },
                 where: {
-                    data: { private: false }
+                    data: {private: false}
                 }
             },
             edges: true,
@@ -498,7 +498,7 @@ export async function checkSubdomainAvailability(nickname: string) {
 export async function getMilestoneDetails(id: string) {
     try {
         const milestone = await prisma.milestone.findUnique({
-            where: { id },
+            where: {id},
             include: {
                 asset: {
                     include: {
@@ -538,4 +538,70 @@ export async function getKanbanFromOrganizationId() {
         console.error("Database error finding kanban details:", error)
         return {success: false, error: "Database error. please try again later."}
     }
+}
+
+export async function getNodesEdgesAndMilestones(roadmapId: string | null | undefined): Promise<ApiResponse<any>>  {
+    if (roadmapId) {
+        try {
+            const dbNodes = await Promise.all(
+                (
+                    await prisma.node.findMany({
+                        where: {roadmapId: roadmapId},
+                        include: {data: true}
+                    })
+                ).map(async node => {
+                    const {id, type, positionX, positionY} = node
+
+                    return {
+                        id,
+                        type,
+                        position: {
+                            x: positionX,
+                            y: positionY
+                        }
+                    }
+                })
+            )
+
+            const dbEdges = await Promise.all(
+                (await prisma.edge.findMany({
+                    where: {roadmapId: roadmapId}
+                })).map(async edge => {
+                    const {id, source, target} = edge
+
+                    return {
+                        id,
+                        source,
+                        target
+                    }
+                })
+            )
+
+            const dbMilestones = await prisma.milestone.findMany({
+                where: {roadmapId: roadmapId},
+                include: {
+                    papers: true,
+                    asset: {
+                        include: {contacts: true, attachments: true}
+                    },
+                    RFP: {
+                        include: {contacts: true, attachments: true}
+                    },
+                    tasks: {
+                        orderBy: {orderPosition: 'asc'},
+                        include: {
+                            checklist: {orderBy: {orderPosition: 'asc'}}
+                        }
+                    }
+                }
+            })
+
+            return {success: true, data: {nodes: dbNodes, edges: dbEdges, milestones: dbMilestones}}
+        } catch (error: any) {
+            console.error("Database error finding nodes, edges, and milestones details:", error)
+            return {success: false, error: "Database error. please try again later."}
+        }
+    }
+
+    return {success: false, error: "No roadmapId provided."}
 }

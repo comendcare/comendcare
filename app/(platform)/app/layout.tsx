@@ -20,8 +20,9 @@ import {redirect} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {FaPlus} from "react-icons/fa6";
 import Loading from "@/app/loading";
-import {getAllOrganizationsFromUserId, getRoadmapId} from "@/lib/fetchers";
+import {getAllOrganizationsFromUserId, getNodesEdgesAndMilestones, getRoadmapId} from "@/lib/fetchers";
 import {toast} from "sonner";
+import {initializeClientState} from "@/lib/initialize-client-state";
 
 
 export type MemberWithOrganization = Member & {
@@ -84,8 +85,16 @@ export default function AppLayout({children}: AppLayoutProps) {
 
             const response = await getRoadmapId(orgId)
             if (response.success) {
-                const organization = response.data
-                setRoadmapId(roadmapId)
+                setRoadmapId(response.data)
+                const nodesResponse = await getNodesEdgesAndMilestones(response.data)
+                if (nodesResponse.success) {
+                    initializeClientState({
+                        roadmapId: roadmapId,
+                        nodes: nodesResponse.data.nodes,
+                        edges: nodesResponse.data.edges,
+                        milestones: nodesResponse.data.milestones
+                    })
+                }
                 setIsLoading(false)
             } else {
                 console.error(response.error)
