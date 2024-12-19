@@ -3,7 +3,7 @@ import {Timer} from "lucide-react";
 import {Separator} from "@/components/ui/separator";
 
 
-export default function OrganizationOnboardingPage() {
+export default function OrganizationOnboardingResearchPage() {
     return (
         <main className="w-full max-w-7xl mx-auto">
             <div className="space-y-4 w-full">
@@ -22,13 +22,17 @@ export default function OrganizationOnboardingPage() {
                     </div>
                     <p>
                         {`
-                        Lastly, we have some questions about the nature of your disorder, it's demographic, and the ongoing efforts towards treatments and cures.
+                        We have some questions about the nature of your disorder, it's demographic, and the ongoing efforts towards treatments and cures.
                         `}
                     </p>
                 </div>
 
                 <Separator/>
-                <ResearchOnboardingForm/>
+                <ResearchOnboardingForm
+                    nextLink={"/onboarding/finances"}
+                    previousLink={"/app/profile"}
+                    showSkip={true}
+                />
             </div>
         </main>
     )
