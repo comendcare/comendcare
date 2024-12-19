@@ -7,6 +7,7 @@ import axios from "axios";
 import WaitlistEmail from "@/packages/transactional/emails/contact/waitlist-email";
 import InviteToOrganizationEmail from "@/packages/transactional/emails/invitations/invite-to-organization-email";
 import {NewMemberRequestEmail} from "@/packages/transactional/emails/invitations/new-member-request-email";
+import NewOrganizationEmail from "@/packages/transactional/emails/admins/new-organization";
 
 const limiter = rateLimit({
     interval: 600 * 1000, // 10 minutes (600 seconds * 1000 ms)
@@ -84,6 +85,36 @@ export async function sendBetaSignupEmail(params: {
         }
         await sendEmail(msg)
     }
+}
+
+export async function sendNewOrganizationEmail(params: {
+    user: { name: string | null | undefined; email: string | null | undefined }
+    organization: { name: string | null | undefined; subdomain: string | null | undefined }
+}) {
+    const emailTemplate = await render(
+        NewOrganizationEmail(
+            {
+                user: {
+                    name: params.user.name,
+                    email: params.user.email
+                },
+                organization: {
+                    name: params.organization.name,
+                    subdomain: params.organization.subdomain
+                }
+            }
+        )
+    )
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
+    const msg = {
+        to: ["hello@comendcare.com", "flawnson@comendcare.com"],
+        from: "contact@comendcare.com",
+        html: emailTemplate,
+        text: "New organization",
+        subject: "A new organization has been created."
+    }
+    await sendEmail(msg)
 }
 
 export async function sendInviteEmail(params: {
