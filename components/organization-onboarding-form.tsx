@@ -477,9 +477,14 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Description (required)</FormLabel>
-                                        <FormDescription>
-                                            This will be the public description of your organization.
-                                        </FormDescription>
+                                        <div className="w-full flex flex-row justify-between">
+                                            <FormDescription>
+                                                This will be the public description of your organization.
+                                            </FormDescription>
+                                            <FormDescription>
+                                                500 characters max.
+                                            </FormDescription>
+                                        </div>
                                         <FormControl>
                                             <Textarea
                                                 placeholder="Tell us a little bit about yourself"
@@ -607,7 +612,7 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`What your organization is looking for and hoping to get from joining Comend.`}</FormLabel>
-                                        <FormDescription>{`Provide as much detail as possible; we want to help you!`}</FormDescription>
+                                        <FormDescription>{`What are your organization’s priorities over the next year? How might Comend help?`}</FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -713,7 +718,7 @@ export default function OrganizationOnboardingForm(
 
                         <div
                             className="h-10 w-full bg-white text-gray-800 text-left px-4 flex items-center border border-gray-300 rounded-md shadow-sm">
-                            {newOrgForm.watch("subdomain")}
+                            {newOrgForm.watch("subdomain") && `${newOrgForm.watch("subdomain")}.comend.io`}
                         </div>
 
                         <div className="w-full flex flex-col space-y-8 my-8">
@@ -738,7 +743,7 @@ export default function OrganizationOnboardingForm(
                                         >
                                             <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
                                                 <h1 className="mt-6 min-w-0 flex-1 truncate text-xl font-bold text-gray-900">
-                                                    {newOrgForm.watch("orgName") || "Your organization's name"}
+                                                    {newOrgForm.watch("orgName") || <Skeleton className="h-4 w-full"/>}
                                                 </h1>
                                                 <div
                                                     className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
@@ -772,7 +777,9 @@ export default function OrganizationOnboardingForm(
 
                                     </div>
                                     <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
-                                        <h1 className="truncate text-2xl font-bold text-gray-900">{newOrgForm.watch("orgName")}</h1>
+                                        <h1 className="truncate text-2xl font-bold text-gray-900">
+                                            {newOrgForm.watch("orgName")}
+                                        </h1>
                                     </div>
                                 </div>
                             </div>
