@@ -24,8 +24,9 @@ import {cn} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {FaUserPlus, FaUsersViewfinder} from "react-icons/fa6";
 import {Badge} from "@/components/ui/badge";
-import React from "react";
+import React, {useState} from "react";
 import {faker} from "@faker-js/faker";
+import LoadingDots from "@/components/icons/loading-dots";
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -392,6 +393,7 @@ export default function ResearchOnboardingForm(
 ) {
     const session = useSession()
     const router = useRouter()
+    const [loading, setLoading] = useState(false);
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
@@ -399,47 +401,55 @@ export default function ResearchOnboardingForm(
     })
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
-        const sessionData = session.data;
-
-        if (!sessionData?.user.organizationId) {
-            toast.error("You're not signed into an organization right now.");
-            return;
-        }
-
-        // Create FormData object
-        const formData = new FormData();
-
-        // Map form values into FormData
-        const data = {
-            interestedModalities: values.modalities?.map((modality) => modality.value).join(",") || "",
-            diseaseName: values.disorder || "",
-            diseaseCategories: values.categories?.map((category) => category.value).join(",") || "",
-            prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
-            prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",
-            numberOfIdentifiedPatients: values.population ? values.population.toString() : "",
-            relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
-            associatedGenes: values.genes?.map((gene) => gene.value).join(",") || "",
-            associatedSignsAndSymptoms: values.symptoms?.map((symptom) => symptom.value).join(",") || "",
-            existingDatabasesAndStudies: values.studies?.map((study) => study.value).join(",") || "",
-            assetsUnderDevelopment: values.assets?.map((asset) => asset.value).join(",") || "",
-        };
-
-        // Append data to FormData
-        Object.entries(data).forEach(([key, value]) => {
-            if (value) {
-                formData.append(key, value);
-            }
-        });
+        setLoading(true)
 
         try {
-            // Call the updateOrganization function with FormData
-            await updateOrganization(formData, sessionData.user.organizationId);
+            const sessionData = session.data;
 
-            toast.success("Successfully updated organization.");
-            router.push(nextLink);
+            if (!sessionData?.user.organizationId) {
+                toast.error("You're not signed into an organization right now.");
+                return;
+            }
+
+            // Create FormData object
+            const formData = new FormData();
+
+            // Map form values into FormData
+            const data = {
+                interestedModalities: values.modalities?.map((modality) => modality.value).join(",") || "",
+                diseaseName: values.disorder || "",
+                diseaseCategories: values.categories?.map((category) => category.value).join(",") || "",
+                prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
+                prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",
+                numberOfIdentifiedPatients: values.population ? values.population.toString() : "",
+                relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
+                associatedGenes: values.genes?.map((gene) => gene.value).join(",") || "",
+                associatedSignsAndSymptoms: values.symptoms?.map((symptom) => symptom.value).join(",") || "",
+                existingDatabasesAndStudies: values.studies?.map((study) => study.value).join(",") || "",
+                assetsUnderDevelopment: values.assets?.map((asset) => asset.value).join(",") || "",
+            };
+
+            // Append data to FormData
+            Object.entries(data).forEach(([key, value]) => {
+                if (value) {
+                    formData.append(key, value);
+                }
+            });
+
+            try {
+                // Call the updateOrganization function with FormData
+                await updateOrganization(formData, sessionData.user.organizationId);
+
+                toast.success("Successfully updated organization.");
+                router.push(nextLink);
+            } catch (error) {
+                console.error("Failed to update organization:", error);
+                toast.error("An error occurred while updating the organization.");
+            }
         } catch (error) {
-            console.error("Failed to update organization:", error);
-            toast.error("An error occurred while updating the organization.");
+            toast.error("An error occurred while updating your profile.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -786,8 +796,8 @@ export default function ResearchOnboardingForm(
                                     <Button onClick={() => router.push(previousLink)}>
                                         Previous
                                     </Button>
-                                    <Button type="submit">
-                                        Next
+                                    <Button type="submit" disabled={loading}>
+                                        {loading ? <LoadingDots color="#808080"/> : "Next"}
                                     </Button>
                                 </div>
                                 {showSkip &&

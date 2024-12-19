@@ -33,6 +33,7 @@ import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
+import LoadingDots from "@/components/icons/loading-dots";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -137,6 +138,7 @@ export default function OrganizationOnboardingForm(
     const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -254,42 +256,38 @@ export default function OrganizationOnboardingForm(
     }
 
     async function newOrgOnSubmit(values: z.infer<typeof newOrgFormSchema>) {
-        // console.log(values)
-        // const createOrg = await createOrGetSite({
-        //         siteName: newOrgForm.getValues("orgName"),
-        //         siteSlug: newOrgForm.getValues("subdomain")
-        //     },
-        //     session.data?.user.id,
-        //     newOrgForm.getValues("description")
-        // )
-        //
-        // console.log(createOrg)
+        setLoading(true)
+        try {
+            const formData = new FormData()
 
-        const formData = new FormData()
+            Object.entries(values).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    formData.append(key, value.toString());
+                }
+            });
 
-        Object.entries(values).forEach(([key, value]) => {
-            if (value !== undefined) {
-                formData.append(key, value.toString());
+            if (selectedFile && values.image) {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                if (imgUrl) formData.set('image', imgUrl)
             }
-        });
 
-        if (selectedFile && values.image) {
-            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
-            if (imgUrl) formData.set('image', imgUrl)
+            createOrganization(formData).then((res: any) => {
+                if (res.error) {
+                    toast.error(res.error)
+                } else {
+                    va.track("Created Organization")
+                    // Update the session object with the newly created organizationId
+                    updateSession(res.id)
+                    router.refresh()
+                    router.push(nextLink)
+                    toast.success(`Successfully created organization!`)
+                }
+            })
+        } catch (error) {
+            toast.error("An error occurred while updating your profile.");
+        } finally {
+            setLoading(false);
         }
-
-        createOrganization(formData).then((res: any) => {
-            if (res.error) {
-                toast.error(res.error)
-            } else {
-                va.track("Created Organization")
-                // Update the session object with the newly created organizationId
-                updateSession(res.id)
-                router.refresh()
-                router.push(nextLink)
-                toast.success(`Successfully created organization!`)
-            }
-        })
     }
 
     return (
@@ -639,8 +637,8 @@ export default function OrganizationOnboardingForm(
                                             Previous
                                         </Button>
                                     }
-                                    <Button type="submit">
-                                        Next
+                                    <Button type="submit" disabled={loading}>
+                                        {loading ? <LoadingDots color="#808080"/> : "Next"}
                                     </Button>
                                 </div>
                                 {showSkip &&

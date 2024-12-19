@@ -403,9 +403,9 @@ export default function EditPAGProfileDialog() {
     const onCloseForm = () => {
         setDefaultOrganizationValues(defaultOrganizationValues);
         editOrgForm.reset(defaultOrganizationValues); // Reset form with fetched data
+        setDefaultFinancesValues(defaultFinancesValues);
+        editFinancesForm.reset(defaultFinancesValues); // Reset form with fetched data
     }
-
-    console.log(editOrgForm.watch("founded"))
 
     return (
         <TooltipProvider>

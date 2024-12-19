@@ -31,6 +31,7 @@ import {Skeleton} from "@/components/ui/skeleton";
 import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
 import { handleImageUpload } from "@/lib/upload";
+import LoadingDots from "@/components/icons/loading-dots";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -56,7 +57,7 @@ const accept = {
 export default function UserOnboardingForm() {
     const router = useRouter();
     const {data: session} = useSession();
-    // const [searchInput, setSearchInput] = useState("");
+    const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
 
@@ -170,6 +171,8 @@ export default function UserOnboardingForm() {
     }, [address, form]);
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
+        setLoading(true);
+
         try {
             if (selectedFile && values.image) {
                 const imgUrl = await handleImageUpload(selectedFile as File, values.image)
@@ -189,6 +192,8 @@ export default function UserOnboardingForm() {
             router.push("/onboarding/organization");
         } catch (error) {
             toast.error("An error occurred while updating your profile.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -346,7 +351,9 @@ export default function UserOnboardingForm() {
                             />
                         </div>
 
-                        <Button type="submit">Next</Button>
+                        <Button type="submit" disabled={loading}>
+                            {loading ? <LoadingDots color="#808080" /> : "Next"}
+                        </Button>
                     </form>
                 </Form>
             </div>
