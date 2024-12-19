@@ -1382,15 +1382,15 @@ export async function createKanbanColumn(column: Column) {
     }
 }
 
-export async function deleteKanbanColumn(column: Column) {
+export async function deleteKanbanColumn(columnId: string) {
     try {
         const deletedColumn = prisma.column.delete({
             where: {
-                id: column.id
+                id: columnId
             }
         })
 
-        if (!column) {
+        if (!deletedColumn) {
             return {success: false, error: "failed to delete kanban column"};
         }
 
