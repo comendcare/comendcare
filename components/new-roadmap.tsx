@@ -19,7 +19,8 @@ export default function NewRoadmapForm() {
     async function createTemplateRoadmap(roadmapData: any) {
         if (session?.user?.organizationId) {
             const roadmap = await createRoadmap(session.user.organizationId, roadmapData)
-            router.push(`/app/roadmap/${roadmap.id}`)
+            // router.push(`/app/roadmap`)
+            router.refresh()
         } else {
             console.error(`organization id is not defined in the session:`, session)
         }

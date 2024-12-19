@@ -421,7 +421,7 @@ export default async function ConditionPage({
                             {data.organizations.map((organization, index) => (
                                 <Link
                                     key={index}
-                                    href={`${organization.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                                    href={`http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/admin`}
                                     className="md:basis-1/2 lg:basis-1/3"
                                 >
                                     <CarouselItem >

@@ -1,43 +1,95 @@
-"use client"
-
 import NewRoadmapForm from "@/components/new-roadmap"
 import NoOrganization from "@/components/no-organization"
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import {getRoadmapId} from "@/lib/fetchers";
-import {toast} from "sonner";
+import { getRoadmapId } from "@/lib/fetchers"
+import { getSession } from "@/lib/auth"
+import prisma from "@/lib/prisma"
+import { Roadmap } from "@/components/roadmap"
 
-export default function RoadmapPage() {
-    const router = useRouter()
-    const {data: session} = useSession()
-    const [orgId, setOrgId] = useState<string | undefined>(undefined)
-
-    const roadmapsCheck = async () => {
-        const response = await getRoadmapId(session?.user.organizationId)
-        if (response.success) {
-            const roadmapId = response.data
-
-            if (roadmapId) router.push(`/app/roadmap/${roadmapId}`)
-        } else {
-            console.error(response.error)
-            toast.error(response.error)
-        }
+export default async function RoadmapPage() {
+    const session = await getSession();
+    const orgId = session?.user.organizationId;
+    
+    if (!orgId) {
+        return (
+            <main className="flex gap-8 flex-col w-full h-screen justify-center items-center mx-auto">
+                <NoOrganization />
+            </main>
+        )
     }
 
-    useEffect(() => {
-        // set org if the user is in an org
-        if (session?.user.organizationId) setOrgId(session?.user.organizationId)
-        // if the org already has a roadmap, we redirect them to it
-        roadmapsCheck()
-    }, [])
+    // check if this organization has an existing roadmap
+    const response = await getRoadmapId(orgId);
+    if (response.success && typeof response.data === 'string') {
+        const roadmapId = response.data;
+
+        const dbNodes = await Promise.all(
+            (
+                await prisma.node.findMany({
+                    where: { roadmapId: roadmapId },
+                    include: { data: true }
+                })
+            ).map(async node => {
+                const { id, type, positionX, positionY } = node
+    
+                return {
+                    id,
+                    type,
+                    position: {
+                        x: positionX,
+                        y: positionY
+                    }
+                }
+            })
+        )
+    
+        const dbEdges = await Promise.all(
+            (await prisma.edge.findMany({
+                where: { roadmapId: roadmapId }
+            })).map(async edge => {
+                const { id, source, target } = edge
+    
+                return {
+                    id,
+                    source,
+                    target
+                }
+            })
+        )
+    
+        const dbMilestones = await prisma.milestone.findMany({
+            where: { roadmapId: roadmapId },
+            include: { 
+                papers: true,
+                asset: {
+                    include: { contacts: true, attachments: true }
+                },
+                RFP: {
+                    include: { contacts: true, attachments: true }
+                },
+                tasks: {
+                    orderBy: { orderPosition: 'asc' },
+                    include: {
+                        checklist: { orderBy: { orderPosition: 'asc' } }
+                    }
+                } 
+            }
+        })
+
+        return (
+            <main className="flex flex-col items-center h-screen mx-auto">
+                <Roadmap
+                    roadmapId={roadmapId}
+                    initNodes={dbNodes || []}
+                    initEdges={dbEdges || []}
+                    initMilestones={dbMilestones || []}
+                />
+            </main>
+        )
+    }
 
     return (
         <main className="flex gap-8 flex-col w-full h-screen justify-center items-center mx-auto">
-            {orgId ?
-                <NewRoadmapForm />:
-                <NoOrganization />
-            }
+            <NewRoadmapForm />
         </main>
     )
 }

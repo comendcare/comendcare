@@ -130,7 +130,7 @@ async function main() {
             description: "The Arcadion Disease Foundation supports research and advocacy for Arcadion Disease, a progressive and degenerative disorder affecting the central nervous system.",
             subdomain: "arcadion",
             customDomain: "arcadion",
-            dateFounded: "2015-03-21T10:30:00Z",
+            yearFounded: "2015",
             incorporationStatus: "YES",
             website: "https://www.example.org/",
             moneyRaised: 3200000,

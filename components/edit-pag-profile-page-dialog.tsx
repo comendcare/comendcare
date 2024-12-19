@@ -7,7 +7,8 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import {useCallback, useEffect, useState} from "react";
 import {
-    createOrganization, updateOrganizationAttribute
+    updateOrganization,
+    updateOrganizationAttribute
 } from "@/lib/actions";
 import {AddressType} from "@/lib/types";
 import {Input} from "@/components/ui/input";
@@ -98,7 +99,7 @@ const editOrgFormSchema = z.object({
     website: z.string().min(2, {
         message: "Your organization's website.",
     }).optional(),
-    incorporationStatus: z.enum(["yes", "no-but", "no"], {
+    incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"], {
         required_error: "You need to select a 501c3 status.",
     }).optional(),
     address1: z.string().optional(),
@@ -118,6 +119,7 @@ export default function EditPAGProfileDialog() {
     const router = useRouter()
     const [searchInput, setSearchInput] = useState("");
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
+    const [open, setOpen] = useState(false);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [address, setAddress] = useState<AddressType>({
         address1: "",
@@ -209,43 +211,60 @@ export default function EditPAGProfileDialog() {
     });
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
-        // console.log(values)
-        // const createOrg = await createOrGetSite({
-        //         siteName: newOrgForm.getValues("orgName"),
-        //         siteSlug: newOrgForm.getValues("subdomain")
-        //     },
-        //     session.data?.user.id,
-        //     newOrgForm.getValues("description")
-        // )
-        //
-        // console.log(createOrg)
+        if (!session?.user?.organizationId) {
+            toast.error("You're not signed into an organization right now.");
+            return;
+        }
 
-        const formData = new FormData()
+        const formData = new FormData();
 
+        // Map form values to Prisma schema fields
+        const fieldMapping: Record<string, string> = {
+            orgName: "name",
+            subdomain: "subdomain",
+            looking: "interestedModalities",
+            founded: "yearFounded",
+            description: "description",
+            website: "website",
+            incorporationStatus: "incorporationStatus",
+            image: "image",
+        };
+
+        // Populate FormData with mapped fields
         Object.entries(values).forEach(([key, value]) => {
-            if (value !== undefined) {
-                formData.append(key, value.toString());
+            const mappedKey = fieldMapping[key];
+            if (mappedKey && value !== undefined && value !== null) {
+                if (Array.isArray(value)) {
+                    // Handle array fields (e.g., `interestedModalities`)
+                    formData.append(mappedKey, JSON.stringify(value));
+                } else {
+                    formData.append(mappedKey, value.toString());
+                }
             }
         });
 
+        // Handle the selected image upload
         if (selectedFile && values.image) {
-            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
-            if (imgUrl) formData.set('image', imgUrl)
-        }
-
-        if (session?.user?.organizationId) {
-            updateOrganizationAttribute(formData, session?.user.organizationId || "", "key").then((res: any) => {
-                if (res.error) {
-                    toast.error(res.error)
-                } else {
-                    router.refresh()
-                    toast.success(`Successfully saved changes.`)
+            try {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image);
+                if (imgUrl) {
+                    formData.set("image", imgUrl); // Update the FormData with the uploaded image URL
                 }
-            })
-        } else {
-            toast.error("You're not signed into an organization right now.")
+            } catch (error) {
+                console.error("Failed to upload image:", error);
+                toast.error("Image upload failed.");
+                return;
+            }
         }
 
+        try {
+            await updateOrganization(formData, session.user.organizationId);
+            toast.success("Organization profile updated successfully!");
+            router.refresh(); // Refresh the page to reflect changes
+        } catch (error) {
+            console.error("Error updating organization:", error);
+            toast.error("Failed to update organization profile.");
+        }
     }
 
     useEffect(() => {
@@ -261,17 +280,11 @@ export default function EditPAGProfileDialog() {
                 }
 
                 if (organizationData) {
-                    const incorporationStatusMap: Record<string, "yes" | "no" | "no-but" | undefined> = {
-                        YES: "yes",
-                        NO: "no",
-                        INPROGRESS: "no-but",
-                    };
-
                     const fetchedValues = {
                         id: organizationData.id || "",
                         description: organizationData.description || "",
                         orgName: organizationData.name || "", // Map `name` to `orgName`
-                        founded: organizationData.dateFounded ? organizationData.dateFounded.toISOString() : "",
+                        founded: organizationData.yearFounded ? organizationData.yearFounded : "",
                         subdomain: organizationData.subdomain || "",
                         website: organizationData.website || "",
                         address1: organizationData.address1 || "",
@@ -289,10 +302,7 @@ export default function EditPAGProfileDialog() {
                         font: organizationData.font || "",
                         imageBlurhash: organizationData.imageBlurhash || "",
                         statedGoal: organizationData.statedGoal || null,
-                        dateFounded: organizationData.dateFounded || null,
-                        incorporationStatus: organizationData.incorporationStatus
-                            ? incorporationStatusMap[organizationData.incorporationStatus.toUpperCase()] // Map the value if it exists
-                            : undefined
+                        incorporationStatus: organizationData.incorporationStatus || undefined
                     };
 
                     if (organizationData.image) {
@@ -310,7 +320,7 @@ export default function EditPAGProfileDialog() {
                     }
 
                     setDefaultOrganizationValues(fetchedValues);
-                    setAddress(fetchedValues); // Set address state as well
+                    // setAddress(fetchedValues); // Set address state as well
                     editOrgForm.reset(fetchedValues); // Reset form with fetched data
                 }
             }
@@ -360,26 +370,51 @@ export default function EditPAGProfileDialog() {
     }, [session?.user?.organizationId, editFinancesForm]);
 
     async function onFinancesFormSubmit(values: z.infer<typeof financesFormSchema>) {
+        if (!session?.user?.organizationId) {
+            toast.error("You're not signed into an organization right now.");
+            return;
+        }
 
-        const formData = new FormData()
+        const formData = new FormData();
 
-        if (session?.user?.organizationId) {
-            updateOrganizationAttribute(formData, session?.user.organizationId || "", "key").then((res: any) => {
-                if (res.error) {
-                    toast.error(res.error)
-                } else {
-                    router.refresh()
-                    toast.success(`Successfully saved changes.`)
-                }
-            })
-        } else {
-            toast.error("You're not signed into an organization right now.")
+        const databaseMap: Partial<Record<keyof typeof values, string>> = {
+            raised: "moneyRaised",
+            budget: "researchBudget",
+            deployed: "moneyDeployed",
+            // raising: "raising",
+        };
+
+        Object.entries(values).forEach(([key, value]) => {
+            const mappedKey = databaseMap[key as keyof typeof databaseMap]; // Explicitly cast key
+            if (mappedKey && value !== undefined) {
+                formData.append(mappedKey, value.toString());
+            }
+        });
+
+        try {
+            await updateOrganization(formData, session.user.organizationId);
+            toast.success("Organization updated successfully!");
+            router.refresh(); // Refresh the page to reflect changes
+        } catch (error) {
+            toast.error("Failed to update organization.");
         }
     }
 
+    const onCloseForm = () => {
+        setDefaultOrganizationValues(defaultOrganizationValues);
+        editOrgForm.reset(defaultOrganizationValues); // Reset form with fetched data
+    }
+
+    console.log(editOrgForm.watch("founded"))
+
     return (
         <TooltipProvider>
-            <Dialog>
+            <Dialog open={open} onOpenChange={(isOpen) => {
+                setOpen(isOpen);
+                if (!isOpen) {
+                    onCloseForm();
+                }
+            }}>
                 <DialogTrigger asChild>
                     <Button
                         variant="secondary"
@@ -437,25 +472,33 @@ export default function EditPAGProfileDialog() {
                                         name="subdomain"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Nickname`}</FormLabel>
-                                                <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
+                                                <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
+                                                <FormDescription>
+                                                    {`Enter your organization's abbreviated name, short form, or nickname.`}
+                                                    <br/>
+                                                    {editOrgForm.watch("subdomain") &&
+                                                        !editOrgForm.formState.errors.subdomain && (
+                                                            <>
+                                                                {`Your organization's domain will be ${editOrgForm
+                                                                    .watch("subdomain")
+                                                                    .toLowerCase()
+                                                                    .replace(/\s+/g, "-")}.comend.io`}
+                                                            </>
+                                                        )}
+                                                </FormDescription>
                                                 <FormControl>
                                                     <Input
                                                         type="text"
                                                         id="name"
                                                         autoComplete="name"
                                                         {...field}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value.toLowerCase().replace(/\s+/g, "-");
+                                                            field.onChange(value); // Update the form state with processed value
+                                                        }}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
-                                                {
-                                                    editOrgForm.watch("subdomain") && !editOrgForm.formState.errors.subdomain &&
-                                                    <FormDescription>
-                                                        <p>
-                                                            {`Your organization's domain will be ${editOrgForm.watch("subdomain")}.comend.io`}
-                                                        </p>
-                                                    </FormDescription>
-                                                }
                                             </FormItem>
                                         )}
                                     />
@@ -499,8 +542,10 @@ export default function EditPAGProfileDialog() {
                                                     </FormControl>
                                                     <SelectContent>
                                                         {years.map((year) => (
-                                                            <SelectItem key={year}
-                                                                        value={year.toString()}> {/* Use the year as a string for the SelectItem value */}
+                                                            <SelectItem
+                                                                key={year}
+                                                                value={year.toString()}
+                                                            >
                                                                 {year}
                                                             </SelectItem>
                                                         ))}
@@ -547,7 +592,7 @@ export default function EditPAGProfileDialog() {
                                                     >
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                                             <FormControl>
-                                                                <RadioGroupItem value="yes"/>
+                                                                <RadioGroupItem value="YES"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
                                                                 Yes I have a 501c3
@@ -555,7 +600,7 @@ export default function EditPAGProfileDialog() {
                                                         </FormItem>
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                                             <FormControl>
-                                                                <RadioGroupItem value="no-but"/>
+                                                                <RadioGroupItem value="INPROGRESS"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
                                                                 {`No, but I'm working on it`}
@@ -563,7 +608,7 @@ export default function EditPAGProfileDialog() {
                                                         </FormItem>
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                                             <FormControl>
-                                                                <RadioGroupItem value="no"/>
+                                                                <RadioGroupItem value="NO"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
                                                                 {`No I don't have a 501c3`}
@@ -672,7 +717,8 @@ export default function EditPAGProfileDialog() {
                         <TabsContent value="finances">
 
                             <Form {...editFinancesForm}>
-                                <form onSubmit={editFinancesForm.handleSubmit(onFinancesFormSubmit)} className="space-y-8">
+                                <form onSubmit={editFinancesForm.handleSubmit(onFinancesFormSubmit)}
+                                      className="space-y-8">
 
                                     <FormField
                                         control={editFinancesForm.control}
@@ -686,7 +732,8 @@ export default function EditPAGProfileDialog() {
                                                             <FaQuestionCircle
                                                                 className="text-black h-4 inline-block align-baseline mx-1"/>
                                                         </TooltipTrigger>
-                                                        <TooltipContent className="max-w-[400px] break-words text-sm z-50">
+                                                        <TooltipContent
+                                                            className="max-w-[400px] break-words text-sm z-50">
                                                             <p>
                                                                 {`If raising money for your organization is a priority, we'll match you with grants.`}
                                                             </p>
@@ -810,7 +857,9 @@ export default function EditPAGProfileDialog() {
                                                             className="max-w-[300px] break-words text-sm z-50"
                                                         >
                                                             <p>
-                                                                Knowing how much you have deployed to research so far helps us understand how much experience you have with driving research.
+                                                                Knowing how much you have deployed to research so far
+                                                                helps us understand how much experience you have with
+                                                                driving research.
                                                             </p>
                                                         </TooltipContent>
                                                     </Tooltip>

@@ -32,7 +32,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
-import { handleImageUpload } from "@/lib/upload";
+import {handleImageUpload} from "@/lib/upload";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -63,7 +63,7 @@ export const newOrgFormSchema = z.object({
     website: z.string().min(2, {
         message: "Your organization's website.",
     }).optional(),
-    incorporationStatus: z.enum(["yes", "no-but", "no"], {
+    incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"], {
         required_error: "You need to select a 501c3 status.",
     }).optional(),
     address1: z.string().optional(),
@@ -106,7 +106,18 @@ const OPTIONS: Option[] = [
     },
 ];
 
-export default function OrganizationOnboardingForm() {
+export default function OrganizationOnboardingForm(
+    {
+        previousLink,
+        nextLink,
+        showSkip,
+    }:
+    {
+        previousLink: string,
+        nextLink: string,
+        showSkip: boolean,
+    }
+) {
     const {data: session, update} = useSession()
     const router = useRouter()
     // const [isNewOrganization, setIsNewOrganization] = useState(true)
@@ -275,7 +286,7 @@ export default function OrganizationOnboardingForm() {
                 // Update the session object with the newly created organizationId
                 updateSession(res.id)
                 router.refresh()
-                router.push("/onboarding/finances")
+                router.push(nextLink)
                 toast.success(`Successfully created organization!`)
             }
         })
@@ -357,12 +368,12 @@ export default function OrganizationOnboardingForm() {
                             <FormField
                                 control={newOrgForm.control}
                                 name="subdomain"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                         <FormDescription>
                                             {`Enter your organization's abbreviated name, short form, or nickname.`}
-                                            <br />
+                                            <br/>
                                             {newOrgForm.watch("subdomain") &&
                                                 !newOrgForm.formState.errors.subdomain && (
                                                     <>
@@ -385,7 +396,7 @@ export default function OrganizationOnboardingForm() {
                                                 }}
                                             />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -448,8 +459,10 @@ export default function OrganizationOnboardingForm() {
                                             </FormControl>
                                             <SelectContent>
                                                 {years.map((year) => (
-                                                    <SelectItem key={year}
-                                                                value={year.toString()}> {/* Use the year as a string for the SelectItem value */}
+                                                    <SelectItem
+                                                        key={year}
+                                                        value={year.toString()}
+                                                    >
                                                         {year}
                                                     </SelectItem>
                                                 ))}
@@ -496,7 +509,7 @@ export default function OrganizationOnboardingForm() {
                                             >
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                                     <FormControl>
-                                                        <RadioGroupItem value="yes"/>
+                                                        <RadioGroupItem value="YES"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
                                                         Yes I have a 501c3
@@ -504,7 +517,7 @@ export default function OrganizationOnboardingForm() {
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                                     <FormControl>
-                                                        <RadioGroupItem value="no-but"/>
+                                                        <RadioGroupItem value="INPROGRESS"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
                                                         {`No, but I'm working on it`}
@@ -512,7 +525,7 @@ export default function OrganizationOnboardingForm() {
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                                     <FormControl>
-                                                        <RadioGroupItem value="no"/>
+                                                        <RadioGroupItem value="NO"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
                                                         {`No I don't have a 501c3`}
@@ -621,10 +634,20 @@ export default function OrganizationOnboardingForm() {
 
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
-                                    <Button onClick={() => router.push("/onboarding/user")}>Previous</Button>
-                                    <Button type="submit">Next</Button>
+                                    {previousLink &&
+                                        <Button onClick={() => router.push(previousLink)}>
+                                            Previous
+                                        </Button>
+                                    }
+                                    <Button type="submit">
+                                        Next
+                                    </Button>
                                 </div>
-                                <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
+                                {showSkip &&
+                                    <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                        Skip for now
+                                    </Button>
+                                }
                             </div>
                         </form>
                     </Form>

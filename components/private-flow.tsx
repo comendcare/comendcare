@@ -26,6 +26,7 @@ import { toast } from "sonner"
 import { isNewUser, setUserAsReturning } from "@/lib/utils"
 import { FaQuestion } from "react-icons/fa6"
 import { NewMilestoneDialogContent } from "./new-milestone-dialog-content"
+import { useSpring } from "framer-motion"
 
 const proOptions = { hideAttribution: true }
 
@@ -197,6 +198,8 @@ export const PrivateFlowView = ({
             onBeforeDelete={handleDelete}
             nodeTypes={nodeTypes}
             fitView
+            fitViewOptions={{ padding: 2 }}
+            style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
         >
             <MiniMap
@@ -204,7 +207,6 @@ export const PrivateFlowView = ({
                 maskColor='rgb(200, 200, 200, 0.8)' 
             />
             <Controls>
-                {/* <Button className="research-plan-tour-step1" onClick={() => addMilestone()}>Add Milestone</Button> */}
                 <Button className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>Add Milestone</Button>
             </Controls>
         </ReactFlow>
