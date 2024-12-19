@@ -50,7 +50,6 @@ export type ColumnId = (typeof defaultCols)[number]["id"]
 const kanbanSelector = (state: KanbanState) => ({
     columns: state.columns,
     tasks: state.tasks,
-    // setTasks: state.setTasks
 })
 
 export function KanbanView() {
@@ -59,8 +58,7 @@ export function KanbanView() {
     return (
         <Kanban
             initColumns={columns}
-            // initTasks={milestones.map(milestone => milestone?.tasks || []).flat(1)}
-            initTasks={columns.flatMap(column => column.tasks)}
+            initTasks={tasks}
         />
     )
 }
@@ -102,15 +100,15 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
         setTasks(sortKanbanTasks(initTasks))
     }, [initTasks, initColumns])
 
-    useEffect(() => {
-        console.log(`TASKS CHANGED IN STATE`, stateTasks)
-        setTasks(stateTasks)
-    }, [stateTasks])
+    // useEffect(() => {
+    //     console.log(`TASKS CHANGED IN STATE`, stateTasks)
+    //     setTasks(stateTasks)
+    // }, [stateTasks])
 
-    useEffect(() => {
-        console.log(`COLUMN CREATED`, stateColumns)
-        setColumns(stateColumns)
-    }, [stateColumns])
+    // useEffect(() => {
+    //     console.log(`COLUMN CREATED`, stateColumns)
+    //     setColumns(stateColumns)
+    // }, [stateColumns])
 
     function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
         const tasksInColumn = tasks.filter(task => task.status === columnId)

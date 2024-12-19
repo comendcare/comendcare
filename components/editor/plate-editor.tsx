@@ -18,19 +18,18 @@ import {
 import { HeadingPlugin } from '@udecode/plate-heading/react';
 import { BlockquotePlugin } from '@udecode/plate-block-quote/react';
 import { Value } from '@udecode/slate';
+import { FixedToolbarPlugin } from './plugins/fixed-toolbar-plugin';
+import { FloatingToolbarPlugin } from './plugins/floating-toolbar-plugin';
 
 export function PlateEditor({ value, onChange }: { value: any[], onChange: (...event: any[]) => void }) {
-  // const editor = useCreateEditor();
-  const editor = usePlateEditor({
-    plugins: [
-      HeadingPlugin,
-      BlockquotePlugin,
-      BoldPlugin,
-      ItalicPlugin,
-      UnderlinePlugin,
-    ],
-    value,
-  })
+  const editor = useCreateEditor({ value })
+  // const editor = usePlateEditor({
+  //   plugins: [
+  //     FixedToolbarPlugin,
+  //     // FloatingToolbarPlugin,
+  //   ],
+  //   value
+  // })
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -42,7 +41,7 @@ export function PlateEditor({ value, onChange }: { value: any[], onChange: (...e
         }}
       >
         <EditorContainer>
-          <Editor variant="demo" />
+          <Editor variant="none" />
         </EditorContainer>
       </Plate>
     </DndProvider>

@@ -62,6 +62,7 @@ export const useKanbanStore = create<KanbanState>()(
 
                     return task
                 })
+                console.log(`set task`, newProperties)
                 set({ tasks: updatedTasks })
                 updateDBTask({ tasks: updatedTasks })
             },

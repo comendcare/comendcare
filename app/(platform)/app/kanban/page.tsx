@@ -71,7 +71,11 @@ export default async function KanbanPage({
             }
         },
         include: {
-            tasks: true
+            tasks: {
+                include: {
+                    checklist: true
+                }
+            }
         }
     })
 
@@ -87,7 +91,7 @@ export default async function KanbanPage({
             <KanbanBoard
                 roadmapId={params.id}
                 initColumns={dbColumns || []}
-                initTasks={dbTasks || []}
+                initTasks={dbColumns.flatMap(column => column.tasks) || []}
             />
         </main>
     )
