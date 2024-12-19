@@ -64,6 +64,7 @@ export default function OrganizationSelector({
         });
         router.refresh()
     };
+    console.log(selectedOrganization)
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -108,7 +109,7 @@ export default function OrganizationSelector({
                             className="mr-2 h-5 w-5"
                         />
                         <p className="truncate">
-                            {selectedOrganization?.organization.name}
+                            {selectedOrganization ? selectedOrganization?.organization.name : "Create or join an organization"}
                         </p>
                         <ChevronsUpDown className="ml-auto opacity-50"/>
                     </Button>
