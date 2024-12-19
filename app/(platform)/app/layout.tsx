@@ -153,15 +153,10 @@ export default function AppLayout({children}: AppLayoutProps) {
                             )}
                         >
                             <Image priority src={logo} alt="Librarey logo" className="size-6"/>
-                            {session.user.organizationId ?
-                                <OrganizationSelector
-                                    isCollapsed={isCollapsed}
-                                    organizations={organizations}
-                                />
-                                : <Button>
-                                    {isCollapsed ? <FaPlus/> : "Create or join an organization"}
-                                </Button>
-                            }
+                            <OrganizationSelector
+                                isCollapsed={isCollapsed}
+                                organizations={organizations}
+                            />
                         </div>
                         <Separator/>
                         <AppNav
