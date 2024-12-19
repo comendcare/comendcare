@@ -85,7 +85,7 @@ export default function UserProfilePage() {
                                 className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
                             />
                             <CardTitle>
-                                <h1 className="min-w-0 truncate text-4xl font-bold text-gray-900">
+                                <h1 className="min-w-0 truncate text-2xl font-bold text-gray-900">
                                     {user.name}
                                 </h1>
                             </CardTitle>
