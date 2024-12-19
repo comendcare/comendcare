@@ -10,7 +10,7 @@ import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
 import {getBlurDataURL, logError} from "@/lib/utils";
 import {Session} from "next-auth";
-import {sendInviteEmail, sendMemberRequestEmail} from "@/lib/emails";
+import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from "@/lib/emails";
 
 
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
@@ -211,6 +211,22 @@ export const createOrganization = async (formData: FormData) => {
         await revalidateTag(
             `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
         )
+
+        await sendNewOrganizationEmail(
+            {
+                user: {
+                    name: session.user.name,
+                    email: session.user.email
+                },
+                organization: {
+                    name: response.name,
+                    subdomain: response.subdomain
+                }
+            }
+        ).then(() => {
+            console.log("email sent")
+        })
+
         return response
     } catch (error: any) {
         if (error.code === "P2002") {

@@ -7,6 +7,7 @@ import { MilestoneMarketplaceListElement } from "./marketplace-milestone-list-el
 import { MilestoneMarketplaceCard } from "./marketplace-milestone-card";
 import InfiniteScroll from "./ui/infinite-scroll";
 import Image from "next/image";
+import ComendLoadingSpinner from "./comend-loading-spinner";
 
 const selector = (state: MilestoneSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -17,6 +18,8 @@ const selector = (state: MilestoneSearchState) => ({
 
 export function MilestoneSearchResults() {
     const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useMilestoneSearchStore(useShallow(selector))
+
+    if (!searchResults) return <ComendLoadingSpinner />
 
     const ResultsView = () => {
         if (view === "list") {

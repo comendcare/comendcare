@@ -7,6 +7,7 @@ import { useShallow } from "zustand/react/shallow";
 import { OrganizationMarketplaceListElement } from "./marketplace-pag-list-element";
 import InfiniteScroll from "./ui/infinite-scroll";
 import Image from "next/image";
+import ComendLoadingSpinner from "./comend-loading-spinner";
 
 const selector = (state: OrganizationSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -17,6 +18,8 @@ const selector = (state: OrganizationSearchState) => ({
 
 export function OrganizationSearchResults() {
     const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useOrganizationSearchStore(useShallow(selector))
+
+    if (!searchResults) return <ComendLoadingSpinner />
 
     const ResultsView = () => {
         if (view === "list") {

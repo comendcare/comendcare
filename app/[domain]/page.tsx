@@ -24,6 +24,17 @@ import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import CTASection from "@/components/layout/sections/cta";
 import PublicPageFooter from "@/components/public-page-footer";
+import { FloatingDock } from "@/components/floating-dock";
+import {IconFlag, IconShare, IconShare2} from "@tabler/icons-react";
+import {
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {Button} from "@/components/ui/button"
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -157,6 +168,43 @@ export default async function OrganizationHomePage({
 
                 </div>
             </main>
+            <FloatingDock
+                items={[
+                    {
+                        title: "Post on feed",
+                        icon: <IconShare2/>,
+                        href: "/app/feed",
+                    },
+                    {
+                        title: "Share on social media",
+                        icon: <IconShare/>,
+                        href: "/dashboard",
+                    },
+                    {
+                        title: "Report an issue",
+                        icon: <IconFlag/>,
+                        dialog: (
+                            <>
+                                <DialogHeader>
+                                    <DialogTitle>Edit profile</DialogTitle>
+                                    <DialogDescription>
+                                        {`Make changes to your profile here. Click save when you're done.`}
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                    <Label htmlFor="name">Name</Label>
+                                    <Input id="name" defaultValue="John Doe"/>
+                                </div>
+                                <DialogFooter>
+                                    <Button type="submit">Save changes</Button>
+                                </DialogFooter>
+                            </>
+                        ),
+                    }
+                ]}
+                orientation="vertical"
+                desktopClassName="right-4"
+            />
         </>
     )
 }
