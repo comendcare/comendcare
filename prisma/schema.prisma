@@ -42,6 +42,7 @@ model User {
   lng                  Float?
   posts                Post[]
   reactions            Reaction[]
+  tasks                Task[]
 }
 
 model Member {
@@ -200,6 +201,12 @@ enum StatusType {
   DONE
 }
 
+enum PriorityType {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 model Node {
   id        String     @id @unique @default(uuid())
   type      String
@@ -284,9 +291,14 @@ model Column {
 model Task {
   id             String          @id @unique @default(uuid())
   status         StatusType?
+  priority       PriorityType?
   name           String          @default("")
   description    String?         @default("")
   checklist      ChecklistItem[]
+  private        Boolean         @default(false)
+  stakeholders   User[]
+  startDate      DateTime?
+  endDate        DateTime?
   milestoneId    String? // Optional foreign key to associate with a milestone
   milestone      Milestone?      @relation(fields: [milestoneId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   columnId       String // Foreign key to associate with a column
