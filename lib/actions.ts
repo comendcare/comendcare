@@ -1214,7 +1214,7 @@ export async function updateDBTask({tasks}: { tasks: any[] }) {
                     where: {id: task.id},
                     data: {
                         name: task.name,
-                        status: task.status,
+                        // status: task.status,
                         description: task.description,
                         orderPosition: task.orderPosition,
                         kanbanPosition: task.kanbanPosition,

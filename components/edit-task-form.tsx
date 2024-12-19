@@ -93,7 +93,7 @@ export function EditTaskForm({
     taskData: any
     onClose: () => void
 }) {
-    const {setTask} = useKanbanStore(useShallow(selector))
+    const { setTask } = useKanbanStore(useShallow(selector))
     const form = useForm<z.infer<typeof editTaskForm>>({
         mode: "onChange",
         resolver: zodResolver(editTaskForm),
@@ -127,14 +127,16 @@ export function EditTaskForm({
 
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
         console.log(`HANDLE FORM SUBMIT`)
-        const {name, status, description, checklist} = values
+        // const {name, status, description, checklist} = values
+
+        console.log(`description`, description)
 
         setTask(
             taskData?.id,
             {
                 name,
                 status,
-                ...(description ? {description} : undefined),
+                ...(description ? {description: JSON.stringify(description)} : undefined),
                 ...(checklist
                     ? {checklist: checklist.map((item, index) => ({...item, orderPosition: index}))}
                     : undefined)
@@ -206,10 +208,6 @@ export function EditTaskForm({
         },
     }
 
-    useEffect(() => {
-        console.log(`description`, description)
-    }, [description])
-
     return (
         <Form {...form}>
             <ScrollArea className={"max-h-[600px]"}>
@@ -263,7 +261,7 @@ export function EditTaskForm({
                         name="description"
                         render={({field}) => (
                             <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Description:`}</FormLabel>
+                                {/* <FormLabel className="text-xl">{`Description:`}</FormLabel> */}
                                 <FormControl>
                                     {/* <Textarea
                                         id="description"
