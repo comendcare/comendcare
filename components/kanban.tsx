@@ -15,7 +15,8 @@ import {
     Announcements,
     UniqueIdentifier,
     TouchSensor,
-    MouseSensor
+    MouseSensor,
+    closestCorners
 } from "@dnd-kit/core"
 import { SortableContext, arrayMove } from "@dnd-kit/sortable"
 import { type Task, TaskCard } from "@/components/task-card"
@@ -48,7 +49,8 @@ export type ColumnId = (typeof defaultCols)[number]["id"]
 
 const kanbanSelector = (state: KanbanState) => ({
     columns: state.columns,
-    tasks: state.tasks
+    tasks: state.tasks,
+    // setTasks: state.setTasks
 })
 
 export function KanbanView() {
@@ -73,14 +75,13 @@ const sortKanbanTasks = (tasks: Task[]) => {
 }
 
 function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: Task[] }) {
-    // const { setTask, setTasks: setDbTasks } = useRoadmapStore(useShallow(roadmapSelector))
     const { tasks: stateTasks, columns: stateColumns } = useKanbanStore(useShallow(kanbanSelector))
     const [columns, setColumns] = useState<Column[]>([])
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
     const columnsId = useMemo(() => columns.map(col => col.id), [columns])
 
     // kanban requires its own state outside of the zustand state, so we can move things around properly
-    const [tasks, setTasks] = useState(sortKanbanTasks(initTasks))
+    const [tasks, setTasks] = useState<Task[]>(sortKanbanTasks(initTasks))
 
     const [activeColumn, setActiveColumn] = useState<Column | null>(null)
 
@@ -278,6 +279,7 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
     }
 
     function onDragOver(event: DragOverEvent) {
+        console.log(`DRAG OVER`)
         const { active, over } = event
         if (!over) return
 

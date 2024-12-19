@@ -72,13 +72,13 @@ const editTaskForm = z.object({
         .min(1, "Name is required")
         .max(100, "Name must be less than 100 characters"),
     status: statusTypeSchema,
-    description: z.string().optional(),
+    description: z.array(z.record(z.any())),
     checklist: z.array(
         z.object({
             id: z.string(),
             name: z.string(),
             complete: z.boolean(),
-        })
+        }) 
     ).optional()
 })
 
@@ -100,7 +100,7 @@ export function EditTaskForm({
         defaultValues: {
             name: taskData?.name,
             status: taskData?.status || 'TODO',
-            description: taskData?.description || undefined,
+            description: JSON.parse(taskData?.description || "[]") || [],
             checklist: taskData?.checklist || undefined
         }
     })
@@ -206,12 +206,16 @@ export function EditTaskForm({
         },
     }
 
+    useEffect(() => {
+        console.log(`description`, description)
+    }, [description])
+
     return (
         <Form {...form}>
             <ScrollArea className={"max-h-[600px]"}>
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="flex flex-col gap-8"
+                    className="flex flex-col gap-8 p-4"
                 >
                     {/* <FormField
                         control={form.control}
@@ -261,23 +265,27 @@ export function EditTaskForm({
                             <FormItem className="flex flex-col grow">
                                 <FormLabel className="text-xl">{`Description:`}</FormLabel>
                                 <FormControl>
-                                    <Textarea
+                                    {/* <Textarea
                                         id="description"
                                         placeholder={`Enter a description`}
-                                        defaultValue={field.value}
-                                        {...field}
-                                    />
+                                        // defaultValue={field.value}
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        // {...field}
+                                    /> */}
+                                    <div className="w-full" data-registry="plate">
+                                        <SettingsProvider>
+                                            <PlateEditor 
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                            />
+                                        </SettingsProvider>
+                                    </div>
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>
                         )}
                     />
-
-                    <div className="w-full" data-registry="plate">
-                        <SettingsProvider>
-                            <PlateEditor/>
-                        </SettingsProvider>
-                    </div>
 
                     <FormField
                         control={form.control}
