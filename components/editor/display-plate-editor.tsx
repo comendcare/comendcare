@@ -126,7 +126,7 @@ export function DisplayPlateEditor({ value }: { value: any[] }) {
   // it's not interactive and it doesn't include the toolbars
   const editor = usePlateEditor({ 
     override: {
-      components: withDraggables(
+      components:
         withPlaceholders({
           [AudioPlugin.key]: MediaAudioElement,
           [BlockquotePlugin.key]: BlockquoteElement,
@@ -172,7 +172,6 @@ export function DisplayPlateEditor({ value }: { value: any[] }) {
           [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
           [VideoPlugin.key]: MediaVideoElement,
         })
-      ),
     },
     plugins: [ ...editorPlugins ],
     value
@@ -190,7 +189,7 @@ export function DisplayPlateEditor({ value }: { value: any[] }) {
   return (
     <Plate editor={editor}>
       <EditorContainer className='w-full p-0 m-0'>
-        <Editor className='w-full p-0 m-0' disabled variant="none" placeholder="Type your message here." />
+        <Editor disabled variant="fullWidth" />
       </EditorContainer>
     </Plate>
   );

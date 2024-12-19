@@ -23,13 +23,6 @@ import { FloatingToolbarPlugin } from './plugins/floating-toolbar-plugin';
 
 export function PlateEditor({ value, onChange }: { value: any[], onChange: (...event: any[]) => void }) {
   const editor = useCreateEditor({ value })
-  // const editor = usePlateEditor({
-  //   plugins: [
-  //     FixedToolbarPlugin,
-  //     // FloatingToolbarPlugin,
-  //   ],
-  //   value
-  // })
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -41,7 +34,7 @@ export function PlateEditor({ value, onChange }: { value: any[], onChange: (...e
         }}
       >
         <EditorContainer>
-          <Editor variant="none" />
+          <Editor variant="fullWidth" />
         </EditorContainer>
       </Plate>
     </DndProvider>

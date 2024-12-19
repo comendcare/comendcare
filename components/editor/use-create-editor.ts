@@ -92,7 +92,6 @@ import { TableElement } from '@/components/plate-ui/table-element';
 import { TableRowElement } from '@/components/plate-ui/table-row-element';
 import { TocElement } from '@/components/plate-ui/toc-element';
 import { ToggleElement } from '@/components/plate-ui/toggle-element';
-import { withDraggables } from '@/components/plate-ui/with-draggables';
 import { Value } from '@udecode/plate-common';
 
 const DEFAULT_VALUE = [
@@ -115,7 +114,7 @@ const DEFAULT_VALUE = [
 export const useCreateEditor = ({ value }: { value?: Value | undefined | null }) => {
   return usePlateEditor({
     override: {
-      components: withDraggables(
+      components:
         withPlaceholders({
           // [AIPlugin.key]: AILeaf,
           [AudioPlugin.key]: MediaAudioElement,
@@ -161,8 +160,7 @@ export const useCreateEditor = ({ value }: { value?: Value | undefined | null })
           [TogglePlugin.key]: ToggleElement,
           [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
           [VideoPlugin.key]: MediaVideoElement,
-        })
-      ),
+        }),
     },
     plugins: [
       // ...copilotPlugins,
