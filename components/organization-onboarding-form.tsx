@@ -32,7 +32,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
-import { handleImageUpload } from "@/lib/upload";
+import {handleImageUpload} from "@/lib/upload";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -106,7 +106,18 @@ const OPTIONS: Option[] = [
     },
 ];
 
-export default function OrganizationOnboardingForm() {
+export default function OrganizationOnboardingForm(
+    {
+        previousLink,
+        nextLink,
+        showSkip,
+    }:
+    {
+        previousLink: string,
+        nextLink: string,
+        showSkip: boolean,
+    }
+) {
     const {data: session, update} = useSession()
     const router = useRouter()
     // const [isNewOrganization, setIsNewOrganization] = useState(true)
@@ -275,7 +286,7 @@ export default function OrganizationOnboardingForm() {
                 // Update the session object with the newly created organizationId
                 updateSession(res.id)
                 router.refresh()
-                router.push("/onboarding/finances")
+                router.push(nextLink)
                 toast.success(`Successfully created organization!`)
             }
         })
@@ -357,12 +368,12 @@ export default function OrganizationOnboardingForm() {
                             <FormField
                                 control={newOrgForm.control}
                                 name="subdomain"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                         <FormDescription>
                                             {`Enter your organization's abbreviated name, short form, or nickname.`}
-                                            <br />
+                                            <br/>
                                             {newOrgForm.watch("subdomain") &&
                                                 !newOrgForm.formState.errors.subdomain && (
                                                     <>
@@ -385,7 +396,7 @@ export default function OrganizationOnboardingForm() {
                                                 }}
                                             />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -621,10 +632,20 @@ export default function OrganizationOnboardingForm() {
 
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
-                                    <Button onClick={() => router.push("/onboarding/user")}>Previous</Button>
-                                    <Button type="submit">Next</Button>
+                                    {previousLink &&
+                                        <Button onClick={() => router.push(previousLink)}>
+                                            Previous
+                                        </Button>
+                                    }
+                                    <Button type="submit">
+                                        Next
+                                    </Button>
                                 </div>
-                                <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
+                                {showSkip &&
+                                    <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                        Skip
+                                    </Button>
+                                }
                             </div>
                         </form>
                     </Form>

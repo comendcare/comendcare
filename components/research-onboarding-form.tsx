@@ -378,7 +378,18 @@ export const mechanisms = [
     {id: "EPIGENETIC_MODIFICATION", name: "Epigenetic modification"}
 ];
 
-export default function ResearchOnboardingForm() {
+export default function ResearchOnboardingForm(
+    {
+        previousLink,
+        nextLink,
+        showSkip,
+    }:
+    {
+        previousLink: string,
+        nextLink: string,
+        showSkip: boolean,
+    }
+) {
     const session = useSession()
     const router = useRouter()
 
@@ -425,7 +436,7 @@ export default function ResearchOnboardingForm() {
             await updateOrganization(formData, sessionData.user.organizationId);
 
             toast.success("Successfully updated organization.");
-            router.push("/app/finances"); // Redirect to the profile page
+            router.push(nextLink);
         } catch (error) {
             console.error("Failed to update organization:", error);
             toast.error("An error occurred while updating the organization.");
@@ -772,10 +783,18 @@ export default function ResearchOnboardingForm() {
 
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
-                                    <Button onClick={() => router.push("/onboarding/organization")}>Previous</Button>
-                                    <Button type="submit">Next</Button>
+                                    <Button onClick={() => router.push(previousLink)}>
+                                        Previous
+                                    </Button>
+                                    <Button type="submit">
+                                        Next
+                                    </Button>
                                 </div>
-                                <Button variant="ghost" onClick={() => router.push("/app/finances")}>Skip</Button>
+                                {showSkip &&
+                                    <Button variant="ghost" onClick={() => router.push("/app/finances")}>
+                                        Skip
+                                    </Button>
+                                }
                             </div>
                         </form>
                     </Form>
