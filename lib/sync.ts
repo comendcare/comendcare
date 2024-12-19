@@ -116,7 +116,7 @@ export const syncToTypesense = async (env: {
               "index": true,
               "infix": false,
               "locale": "",
-              "name": "dateFounded",
+              "name": "yearFounded",
               "optional": false,
               "sort": false,
               "stem": false,

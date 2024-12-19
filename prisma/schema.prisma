@@ -388,7 +388,7 @@ model Organization {
   customDomain                String?                   @unique
   message404                  String?                   @default("Blimey! You've found a page that doesn't exist.") @db.Text
   statedGoal                  Goal?
-  dateFounded                 DateTime?
+  yearFounded                 String?
   incorporationStatus         IncorporationStatus?
   website                     String?
   moneyRaised                 Int?

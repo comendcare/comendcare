@@ -63,7 +63,7 @@ export const newOrgFormSchema = z.object({
     website: z.string().min(2, {
         message: "Your organization's website.",
     }).optional(),
-    incorporationStatus: z.enum(["yes", "no-but", "no"], {
+    incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"], {
         required_error: "You need to select a 501c3 status.",
     }).optional(),
     address1: z.string().optional(),
@@ -459,8 +459,10 @@ export default function OrganizationOnboardingForm(
                                             </FormControl>
                                             <SelectContent>
                                                 {years.map((year) => (
-                                                    <SelectItem key={year}
-                                                                value={year.toString()}> {/* Use the year as a string for the SelectItem value */}
+                                                    <SelectItem
+                                                        key={year}
+                                                        value={year.toString()}
+                                                    >
                                                         {year}
                                                     </SelectItem>
                                                 ))}
@@ -507,7 +509,7 @@ export default function OrganizationOnboardingForm(
                                             >
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                                     <FormControl>
-                                                        <RadioGroupItem value="yes"/>
+                                                        <RadioGroupItem value="YES"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
                                                         Yes I have a 501c3
@@ -515,7 +517,7 @@ export default function OrganizationOnboardingForm(
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                                     <FormControl>
-                                                        <RadioGroupItem value="no-but"/>
+                                                        <RadioGroupItem value="INPROGRESS"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
                                                         {`No, but I'm working on it`}
@@ -523,7 +525,7 @@ export default function OrganizationOnboardingForm(
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                                     <FormControl>
-                                                        <RadioGroupItem value="no"/>
+                                                        <RadioGroupItem value="NO"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
                                                         {`No I don't have a 501c3`}
@@ -643,7 +645,7 @@ export default function OrganizationOnboardingForm(
                                 </div>
                                 {showSkip &&
                                     <Button variant="ghost" onClick={() => router.push("/app/profile")}>
-                                        Skip
+                                        Skip for now
                                     </Button>
                                 }
                             </div>

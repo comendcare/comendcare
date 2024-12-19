@@ -17,7 +17,7 @@ const pag = {
     "numberOfPatients": 150,
     "amountRaised": 350000,
     "dateJoined": "2023-01-15",
-    "dateFounded": "2015-03-12",
+    "yearFounded": "2015",
     "topics": ["monogenic", "basic science", "gene replacement"],
     "teamMembers": [
         {

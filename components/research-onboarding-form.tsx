@@ -792,7 +792,7 @@ export default function ResearchOnboardingForm(
                                 </div>
                                 {showSkip &&
                                     <Button variant="ghost" onClick={() => router.push("/app/finances")}>
-                                        Skip
+                                        Skip for now
                                     </Button>
                                 }
                             </div>
