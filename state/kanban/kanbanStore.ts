@@ -7,11 +7,13 @@ import { nanoid } from "nanoid";
 export type KanbanState = {
     columns: any[],
     tasks: any[],
-    initState: (columns: Column[], tasks: any[]) => void
+    initState: (columns: Column[], tasks: any[]) => void,
     addColumn: (column: any) => void,
     deleteColumn: (columnId: string) => void,
+    setColumns: (columns: Column[]) => void,
     addTask: (columnId: string) => void,
-    setTask: (taskId: string, newProperties: any) => void
+    setTask: (taskId: string, newProperties: any) => void,
+    setTasks: (tasks: any[]) => void
 }
 
 export const useKanbanStore = create<KanbanState>()(
@@ -33,6 +35,9 @@ export const useKanbanStore = create<KanbanState>()(
             deleteColumn: (columnId: string) => {
                 set({ columns: get().columns.filter(col => col.id !== columnId) })
                 deleteKanbanColumn(columnId)
+            },
+            setColumns: (columns: Column[]) => {
+                set({ columns })
             },
             addTask: (columnId: string) => {
                 const task = {
@@ -59,21 +64,17 @@ export const useKanbanStore = create<KanbanState>()(
                 })
                 set({ tasks: updatedTasks })
                 updateDBTask({ tasks: updatedTasks })
+            },
+            setTasks: (tasks: any[]) => {
                 // const milestones = get().milestones.map(milestone => {
-                //     if (milestone?.tasks?.map((task: any) => task.id).includes(taskId)) {
-                //         return {
-                //             ...milestone,
-                //             tasks: milestone.tasks.map((task: any) => (
-                //                 task.id === taskId ? {...task, ...newProperties} : task
-                //             ))
-                //         }
-                //     } else {
-                //         return milestone
+                //     return {
+                //         ...milestone,
+                //         tasks: tasks.filter(task => task.milestoneId === milestone.id)
                 //     }
                 // })
                 // set({ milestones })
-                // const task = get().milestones.map(milestone => milestone?.tasks || []).flat(1).filter(task => task.id === taskId)
-                // if (task) updateDBTask({ tasks: task })
+                set({ tasks })
+                updateDBTask({ tasks })
             },
         }),
         {
