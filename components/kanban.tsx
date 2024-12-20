@@ -51,7 +51,8 @@ export type ColumnId = string
 const kanbanSelector = (state: KanbanState) => ({
     columns: state.columns,
     tasks: state.tasks,
-    setTasks: state.setTasks
+    setTasks: state.setTasks,
+    setColumns: state.setColumns
 })
 
 export function KanbanView() {
@@ -75,7 +76,7 @@ const sortKanbanTasks = (tasks: Task[]) => {
 }
 
 function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: Task[] }) {
-    const { tasks: stateTasks, columns: stateColumns, setTasks: setDbTasks } = useKanbanStore(useShallow(kanbanSelector))
+    const { tasks: stateTasks, columns: stateColumns, setTasks: setDbTasks, setColumns: setDbColumns } = useKanbanStore(useShallow(kanbanSelector))
     const [columns, setColumns] = useState<Column[]>([])
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
     const columnsId = useMemo(() => columns.map(col => col.id), [columns])
@@ -229,7 +230,7 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
     }
 
     const isBrowser = typeof window !== "undefined"
-
+    
     function onDragStart(event: DragStartEvent) {
         if (!hasDraggableData(event.active)) return
         const data = event.active.data.current
@@ -267,15 +268,23 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
         const isActiveAColumn = activeData?.type === "Column"
         if (!isActiveAColumn) return
 
-        setColumns(columns => {
-            const activeColumnIndex = columns.findIndex(
-                col => col.id === activeId
-            )
+        // setColumns(columns => {
+        //     const activeColumnIndex = columns.findIndex(
+        //         col => col.id === activeId
+        //     )
 
-            const overColumnIndex = columns.findIndex(col => col.id === overId)
+        //     const overColumnIndex = columns.findIndex(col => col.id === overId)
 
-            return arrayMove(columns, activeColumnIndex, overColumnIndex)
-        })
+        //     return arrayMove(columns, activeColumnIndex, overColumnIndex)
+        // })
+
+        const activeColumnIndex = columns.findIndex(
+            col => col.id === activeId
+        )
+
+        const overColumnIndex = columns.findIndex(col => col.id === overId)
+
+        setDbColumns(arrayMove(columns, activeColumnIndex, overColumnIndex).map((col, index) => ({...col, kanbanPosition: index})))
     }
 
     function onDragOver(event: DragOverEvent) {

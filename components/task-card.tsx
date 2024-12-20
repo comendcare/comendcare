@@ -153,8 +153,8 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                     </CardContent>
                     <CardFooter>
                         {task?.stakeholders && task?.stakeholders.length > 0 && (
-                            task.stakeholders.map(stakeholder => (
-                                <ProfilePhoto img={stakeholder.image} name={stakeholder.name}/>
+                            task.stakeholders.map((stakeholder, index) => (
+                                <ProfilePhoto key={index} img={stakeholder.image} name={stakeholder.name}/>
                             ))
                         )}
                     </CardFooter>

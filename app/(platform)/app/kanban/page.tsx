@@ -70,6 +70,9 @@ export default async function KanbanPage({
                 }
             }
         },
+        orderBy: [
+            { kanbanPosition: 'asc' },
+          ],
         include: {
             tasks: {
                 include: {

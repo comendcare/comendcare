@@ -1204,6 +1204,28 @@ async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneT
     }
 }
 
+export async function updateDBColumns({ columns }: { columns: Column[] }) {
+    try {
+        console.log(`column:`, columns)
+
+        await Promise.all(
+            columns.map(async (column: any) => {
+                await prisma.column.update({
+                    where: {id: column.id},
+                    data: {
+                        name: column.name,
+                        kanbanPosition: column.kanbanPosition
+                    }
+                })
+            })
+        )
+
+        console.log(`Successfully updated Task`)
+    } catch (error) {
+        console.error(`Error updating Task: `, error)
+    }
+}
+
 export async function updateDBTask({tasks}: { tasks: any[] }) {
     try {
         console.log(`tasks:`, tasks)
