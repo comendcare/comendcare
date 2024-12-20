@@ -101,7 +101,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
     }, [task]); // Dependency on task.description to trigger re-render
 
     return (
-        <Dialog className="w-[1000px]">
+        <Dialog>
             <DialogTrigger asChild>
                 <Card
                     style={style}
@@ -158,7 +158,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                     </CardFooter>
                 </Card>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="min-w-fit min-h-fit">
                 <DialogHeader>
                     <DialogTitle>Edit Task Details</DialogTitle>
                     <DialogDescription>

@@ -348,6 +348,7 @@ export function EditTaskForm({
                                 <FormControl>
                                     <MultipleSelector 
                                         {...field}
+                                        showHoverCard={false}
                                         placeholder="Select stakeholders..."
                                         options={fetchedMembers ? fetchedMembers?.map((member: User) => ({
                                             value: member.id || "",
