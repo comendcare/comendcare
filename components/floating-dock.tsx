@@ -249,7 +249,7 @@ function IconContainer({
                         </AnimatePresence>
                     </motion.div>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">{dialog}</DialogContent>
+                <DialogContent className="">{dialog}</DialogContent>
             </Dialog>
         );
     }

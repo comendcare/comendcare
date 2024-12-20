@@ -8,7 +8,6 @@ import PAGDashboardAnalyticsTab from "@/components/pag-dashboard-analytics-tab";
 import PAGDashboardMembersTab from "@/components/pag-dashboard-members-tab";
 import PAGDashboardInvitationsTab from "@/components/pag-dashboard-invitations-tab";
 import PAGDashboardRequestsTab from "@/components/pag-dashboard-requests-tab";
-import PAGDashboardOrgSettingsTab from "@/components/pag-dashboard-org-settings-tab";
 
 export default function DashboardPage() {
     return (
@@ -30,9 +29,6 @@ export default function DashboardPage() {
                     <TabsTrigger value="requests">
                         Requests
                     </TabsTrigger>
-                    <TabsTrigger value="org-settings">
-                        Organization Settings
-                    </TabsTrigger>
                 </TabsList>
                 <TabsContent value="analytics" className="space-y-4 w-full">
                     <PAGDashboardAnalyticsTab />
@@ -45,9 +41,6 @@ export default function DashboardPage() {
                 </TabsContent>
                 <TabsContent value="requests" className="space-y-4 w-full">
                     <PAGDashboardRequestsTab />
-                </TabsContent>
-                <TabsContent value="org-settings" className="space-y-4 w-full">
-                    <PAGDashboardOrgSettingsTab />
                 </TabsContent>
             </Tabs>
         </main>
