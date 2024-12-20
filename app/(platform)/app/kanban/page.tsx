@@ -72,9 +72,10 @@ export default async function KanbanPage({
         },
         orderBy: [
             { kanbanPosition: 'asc' },
-          ],
+        ],
         include: {
             tasks: {
+                orderBy: [ { kanbanPosition: 'asc' } ],
                 include: {
                     checklist: true,
                     stakeholders: true,

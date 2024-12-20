@@ -1206,12 +1206,10 @@ async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneT
 
 export async function updateDBColumns({ columns }: { columns: Column[] }) {
     try {
-        console.log(`column:`, columns)
-
         await Promise.all(
             columns.map(async (column: any) => {
                 await prisma.column.update({
-                    where: {id: column.id},
+                    where: {id: column?.id},
                     data: {
                         name: column.name,
                         kanbanPosition: column.kanbanPosition
@@ -1226,14 +1224,16 @@ export async function updateDBColumns({ columns }: { columns: Column[] }) {
     }
 }
 
-export async function updateDBTask({tasks}: { tasks: any[] }) {
+export async function updateDBTask({tasks}: { tasks: Task[] }) {
     try {
         console.log(`tasks:`, tasks)
 
         await Promise.all(
             tasks.map(async (task: any) => {
+                if (!task) return
+                console.log(`task`, task)
                 await prisma.task.update({
-                    where: {id: task.id},
+                    where: {id: task?.id},
                     data: {
                         name: task.name,
                         // status: task.status,
@@ -1252,11 +1252,13 @@ export async function updateDBTask({tasks}: { tasks: any[] }) {
                         },
                         stakeholders: {
                             set: [],
-                            connect: task.stakeholders.map((stakeholder: User) => ({ id: stakeholder.id }))
+                            connect: task.stakeholders.map((stakeholder: User) => ({ id: stakeholder?.id }))
                         },
-                        milestone: {
-                            connect: { id: task.milestone.id }
-                        },
+                        ...(task.milestone?.id ? ({
+                            milestone: {
+                                connect: { id: task.milestone?.id }
+                            },
+                        }) : undefined),
                         endDate: task.endDate,
                         priority: task.priority,
                         private: task.private,

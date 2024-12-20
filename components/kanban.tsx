@@ -284,7 +284,10 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
 
         const overColumnIndex = columns.findIndex(col => col.id === overId)
 
-        setDbColumns(arrayMove(columns, activeColumnIndex, overColumnIndex).map((col, index) => ({...col, kanbanPosition: index})))
+        setDbColumns(
+            arrayMove(columns, activeColumnIndex, overColumnIndex)
+                .map((col, index) => ({...col, kanbanPosition: index}))
+        )
     }
 
     function onDragOver(event: DragOverEvent) {
