@@ -38,7 +38,8 @@ export interface Task {
     checklist?: any[],
     orderPosition: number,
     kanbanPosition: number,
-    stakeholders: User[]
+    stakeholders: User[],
+    endDate: Date
 }
 
 interface TaskCardProps {
@@ -125,6 +126,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                         </Button>
                         <div className="flex flex-col">
                             <CardTitle className="text-lg">{task?.name}</CardTitle>
+                            {task?.endDate && task.endDate.toLocaleDateString()}
                         </div>
                     </CardHeader>
                     <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap flex flex-col gap-8">
