@@ -60,11 +60,12 @@ import {debounce} from "lodash"
 import {SettingsProvider} from "@/components/editor/settings";
 import {PlateEditor} from "@/components/editor/plate-editor";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
-import { getMembers, getOrganizationData } from "@/lib/fetchers"
+import { getMembers, getMilestones, getOrganizationData } from "@/lib/fetchers"
 import MultiSelect from "./multi-select"
 import MultipleSelector from "./ui/multiple-selector"
-import { Member, User } from "@prisma/client"
+import { Member, Milestone, User } from "@prisma/client"
 import { useSession } from "next-auth/react"
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "./ui/select"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -92,6 +93,7 @@ const editTaskForm = z.object({
         }) 
     ).optional(),
     stakeholders: z.array(optionSchema).min(0).optional(),
+    milestone: z.string().optional()
 })
 
 const selector = (state: KanbanState) => ({
@@ -116,22 +118,31 @@ export function EditTaskForm({
             description: JSON.parse(taskData?.description || "[]") || [],
             checklist: taskData?.checklist || undefined,
             stakeholders: taskData?.stakeholders?.map((stakeholder: User) => ({ value: stakeholder.id, label: stakeholder.name })) || [],
+            milestone: taskData?.milestone?.id || undefined
         }
     })
 
     const [fetchedMembers, setFetchedMembers] = useState<User[]>([])
+    const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
 
     useEffect(() => {
-        const fetchOrgMembers = async () => {
+        const fetchData = async () => {
             const response = await getMembers(session?.user?.organizationId || undefined)
             if (response.success) {
                 setFetchedMembers(response?.data?.map(member => member.user) as User[])
             } else {
                 console.error(response.error)
             }
+
+            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
+            if (milestonesResponse.success) {
+                setFetchedMilestones(milestonesResponse?.data as Milestone[])
+            } else {
+                console.error(milestonesResponse.error)
+            }
         }
 
-        fetchOrgMembers()
+        fetchData()
     }, [])
 
     const name = form.watch("name")
@@ -139,10 +150,12 @@ export function EditTaskForm({
     const description = form.watch("description")
     const checklist = form.watch("checklist")
     const stakeholders = form.watch("stakeholders")
+    const milestone = form.watch("milestone")
 
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
         const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
         console.log(`stakeholder ids`, stakeholderIds)
+        console.log(`milestone`, milestone)
 
         setTask(
             taskData?.id,
@@ -153,7 +166,8 @@ export function EditTaskForm({
                 ...(checklist
                     ? {checklist: checklist.map((item, index) => ({...item, orderPosition: index}))}
                     : undefined),
-                ...(stakeholders ? { stakeholders: fetchedMembers.filter(member => stakeholderIds?.includes(member.id)) }: undefined)
+                ...(stakeholders ? { stakeholders: fetchedMembers?.filter(member => stakeholderIds?.includes(member.id)) }: undefined),
+                ...(milestone ? { milestone: { id: milestone } }: undefined)
             }
         )
         toast('Success!', {
@@ -273,7 +287,7 @@ export function EditTaskForm({
                         name="checklist"
                         render={({field}) => (
                             <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Checklist:`}</FormLabel>
+                                <FormLabel className="text-xl">{`Checklist`}</FormLabel>
                                 <FormControl>
                                     <>
                                         <DndContext
@@ -344,7 +358,7 @@ export function EditTaskForm({
                         name="stakeholders"
                         render={({field}) => (
                             <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Stakeholders:`}</FormLabel>
+                                <FormLabel className="text-xl">{`Stakeholders`}</FormLabel>
                                 <FormControl>
                                     <MultipleSelector 
                                         {...field}
@@ -360,6 +374,33 @@ export function EditTaskForm({
                             </FormItem>
                         )}
                     />
+
+                    <FormField 
+                        control={form.control}
+                        name="milestone"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow">
+                                <FormLabel className="text-xl">{`Milestone`}</FormLabel>
+                                <Select
+                                    defaultValue={field.value}
+                                    onValueChange={field.onChange}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Link to a milestone" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {fetchedMilestones.map((m: Milestone, index: number) => (
+                                            <SelectItem value={m.id} key={index}>
+                                                {m.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </FormItem>
+                        )}
+                    />      
 
                     <span className="flex justify-end gap-4 flex-wrap">
                         <Dialog>

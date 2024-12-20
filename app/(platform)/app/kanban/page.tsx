@@ -74,7 +74,8 @@ export default async function KanbanPage({
             tasks: {
                 include: {
                     checklist: true,
-                    stakeholders: true
+                    stakeholders: true,
+                    milestone: true
                 }
             }
         }
