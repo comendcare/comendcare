@@ -51,6 +51,7 @@ import { FloatingDock } from "@/components/floating-dock";
 import {IconBrandGithub, IconEdit, IconFlag, IconHome, IconShare, IconShare2, IconShare3} from "@tabler/icons-react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
+import ShareDialog from "@/components/share-dialog";
 
 export type Post = {
     id: string
@@ -547,7 +548,7 @@ export default async function ConditionPage({
                     {
                         title: "Share on social media",
                         icon: <IconShare />,
-                        href: "/dashboard",
+                        dialog: <ShareDialog url={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${slug}`} />
                     },
                     {
                         title: "Report an issue",

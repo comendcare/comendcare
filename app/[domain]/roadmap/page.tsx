@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/dialog"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
+import ShareDialog from "@/components/share-dialog";
 
 export async function generateMetadata({
                                            params
@@ -323,7 +324,7 @@ export default async function OrganizationRoadmapPage({
                                 {
                                     title: "Share on social media",
                                     icon: <IconShare/>,
-                                    href: "/dashboard",
+                                    dialog: <ShareDialog url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/${roadmaps[0].id}`} />
                                 },
                                 {
                                     title: "Report an issue",
