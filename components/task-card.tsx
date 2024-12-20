@@ -101,7 +101,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
     }, [task]); // Dependency on task.description to trigger re-render
 
     return (
-        <Dialog>
+        <Dialog className="w-[1000px]">
             <DialogTrigger asChild>
                 <Card
                     style={style}
@@ -127,22 +127,27 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                             <CardTitle className="text-lg">{task?.name}</CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">
+                    <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap flex flex-col gap-8">
                         {description && (
                             <ScrollArea className="max-h-[200px]">
-                                <DisplayPlateEditor value={description}/>
+                                <DisplayPlateEditor value={description} />
                             </ScrollArea>
                         )}
-                        <ol id="checklist" className="flex flex-col gap-2">
-                            {task?.checklist?.map(
-                                (item: any, index: number) => (
-                                    <li key={index} className="flex gap-2 items-center">
-                                        <Checkbox checked={item.complete} disabled={true}/>
-                                        <p>{item.name}</p>
-                                    </li>
-                                )
-                            )}
-                        </ol>
+                        {task?.checklist && task.checklist.length > 0 && (
+                            <div className="flex flex-col gap-2 px-4">
+                                <h2 className="font-semibold">Checklist:</h2>
+                                <ol id="checklist" className="flex flex-col gap-2">
+                                    {task?.checklist?.map(
+                                        (item: any, index: number) => (
+                                            <li key={index} className="flex gap-2 items-center">
+                                                <Checkbox checked={item.complete} disabled={true}/>
+                                                <p>{item.name}</p>
+                                            </li>
+                                        )
+                                    )}
+                                </ol>
+                            </div>
+                        )}
                     </CardContent>
                     <CardFooter>
                         {task?.stakeholders && task?.stakeholders.length > 0 && (

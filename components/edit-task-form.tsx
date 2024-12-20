@@ -115,7 +115,7 @@ export function EditTaskForm({
             status: taskData?.status || 'TODO',
             description: JSON.parse(taskData?.description || "[]") || [],
             checklist: taskData?.checklist || undefined,
-            stakeholders: taskData?.stakeholders.map((stakeholder: User) => ({ value: stakeholder.id, label: stakeholder.name })) || [],
+            stakeholders: taskData?.stakeholders?.map((stakeholder: User) => ({ value: stakeholder.id, label: stakeholder.name })) || [],
         }
     })
 
