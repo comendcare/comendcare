@@ -1,7 +1,7 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod"
-import React, {useCallback, useEffect} from "react"
+import React, {useCallback, useEffect, useState} from "react"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {
@@ -60,9 +60,20 @@ import {debounce} from "lodash"
 import {SettingsProvider} from "@/components/editor/settings";
 import {PlateEditor} from "@/components/editor/plate-editor";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
+import { getMembers, getOrganizationData } from "@/lib/fetchers"
+import MultiSelect from "./multi-select"
+import MultipleSelector from "./ui/multiple-selector"
+import { Member, User } from "@prisma/client"
+import { useSession } from "next-auth/react"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
+
+const optionSchema = z.object({
+    label: z.string(),
+    value: z.string(),
+    disable: z.boolean().optional(),
+})
 
 const editTaskForm = z.object({
     name: z
@@ -79,7 +90,8 @@ const editTaskForm = z.object({
             name: z.string(),
             complete: z.boolean(),
         }) 
-    ).optional()
+    ).optional(),
+    stakeholders: z.array(optionSchema).min(0).optional(),
 })
 
 const selector = (state: KanbanState) => ({
@@ -93,6 +105,7 @@ export function EditTaskForm({
     taskData: any
     onClose: () => void
 }) {
+    const { data: session } = useSession()
     const { setTask } = useKanbanStore(useShallow(selector))
     const form = useForm<z.infer<typeof editTaskForm>>({
         mode: "onChange",
@@ -101,35 +114,34 @@ export function EditTaskForm({
             name: taskData?.name,
             status: taskData?.status || 'TODO',
             description: JSON.parse(taskData?.description || "[]") || [],
-            checklist: taskData?.checklist || undefined
+            checklist: taskData?.checklist || undefined,
+            stakeholders: taskData?.stakeholders || [],
         }
     })
+
+    const [fetchedMembers, setFetchedMembers] = useState<User[]>([])
+
+    useEffect(() => {
+        const fetchOrgMembers = async () => {
+            const response = await getMembers(session?.user?.organizationId || undefined)
+            if (response.success) {
+                setFetchedMembers(response?.data?.map(member => member.user) as User[])
+            } else {
+                console.error(response.error)
+            }
+        }
+
+        fetchOrgMembers()
+    }, [])
 
     const name = form.watch("name")
     const status = form.watch("status")
     const description = form.watch("description")
     const checklist = form.watch("checklist")
-
-    // callback ensures we're not creating a new debounce every time this is called
-    // const debounceUpdates = useCallback(
-    //     debounce(
-    //         (updatedValues) => handleFormSubmit(updatedValues),
-    //         500
-    //     ), []
-    // )
-
-    // useEffect(() => {
-    //     // callback in debounceUpdates holds onto the state of the time it was created
-    //     // we can't use the form.watch values directly (since they'll be outdated)
-    //     // we must pass in the most up to date values in the form
-    //     debounceUpdates({name, status, description, checklist})
-    // }, [name, status, description, checklist])
+    const stakeholders = form.watch("stakeholders")
 
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
-        console.log(`HANDLE FORM SUBMIT`)
-        // const {name, status, description, checklist} = values
-
-        console.log(`description`, description)
+        const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
 
         setTask(
             taskData?.id,
@@ -139,7 +151,8 @@ export function EditTaskForm({
                 ...(description ? {description: JSON.stringify(description)} : undefined),
                 ...(checklist
                     ? {checklist: checklist.map((item, index) => ({...item, orderPosition: index}))}
-                    : undefined)
+                    : undefined),
+                ...(stakeholders ? { stakeholders: fetchedMembers.filter(member => stakeholderIds?.includes(member.id)) }: undefined)
             }
         )
         toast('Success!', {
@@ -261,16 +274,7 @@ export function EditTaskForm({
                         name="description"
                         render={({field}) => (
                             <FormItem className="flex flex-col grow">
-                                {/* <FormLabel className="text-xl">{`Description:`}</FormLabel> */}
                                 <FormControl>
-                                    {/* <Textarea
-                                        id="description"
-                                        placeholder={`Enter a description`}
-                                        // defaultValue={field.value}
-                                        value={field.value}
-                                        onChange={field.onChange}
-                                        // {...field}
-                                    /> */}
                                     <div className="w-full" data-registry="plate">
                                         <SettingsProvider>
                                             <PlateEditor 
@@ -350,6 +354,27 @@ export function EditTaskForm({
                                             )
                                         }}>Add a checklist item</Button>
                                     </>
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="stakeholders"
+                        render={({field}) => (
+                            <FormItem className="flex flex-col grow">
+                                <FormLabel className="text-xl">{`Stakeholders:`}</FormLabel>
+                                <FormControl>
+                                    <MultipleSelector 
+                                        {...field}
+                                        placeholder="Select stakeholders..."
+                                        options={fetchedMembers ? fetchedMembers?.map((member: User) => ({
+                                            value: member.id || "",
+                                            label: member.name || ""
+                                        })): []}
+                                    />
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>

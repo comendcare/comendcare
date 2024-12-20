@@ -267,15 +267,15 @@ const TaskDetailsPanel = ({
                     <FaX />
                 </Button>
             </span>
-            {isEditing ? (
-                <EditTaskForm 
-                    taskData={task}
-                    // onClose={() => setIsEditing(false)}
-                    onClose={() => {}}
-                />
+            {/* {isEditing ? (
+                // <EditTaskForm 
+                //     taskData={task}
+                //     // onClose={() => setIsEditing(false)}
+                //     onClose={() => {}}
+                // />
             ) : (
                 <TaskDetails taskData={task}/>
-            )}
+            )} */}
         </>
     )
 }

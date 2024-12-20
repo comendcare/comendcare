@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma, Column, Kanban, Task} from "@prisma/client"
+import {Roadmap, Organization, Prisma, Column, Kanban, Task, User} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
@@ -1227,6 +1227,9 @@ export async function updateDBTask({tasks}: { tasks: any[] }) {
                                     orderPosition: item?.orderPosition
                                 }))
                             }
+                        },
+                        stakeholders: {
+                            connect: task.stakeholders.map((stakeholder: User) => ({ id: stakeholder.id }))
                         }
                     }
                 })
