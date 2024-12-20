@@ -62,18 +62,10 @@ export const useKanbanStore = create<KanbanState>()(
 
                     return task
                 })
-                console.log(`set task`, newProperties)
                 set({ tasks: updatedTasks })
                 updateDBTask({ tasks: updatedTasks })
             },
             setTasks: (tasks: any[]) => {
-                // const milestones = get().milestones.map(milestone => {
-                //     return {
-                //         ...milestone,
-                //         tasks: tasks.filter(task => task.milestoneId === milestone.id)
-                //     }
-                // })
-                // set({ milestones })
                 set({ tasks })
                 updateDBTask({ tasks })
             },
