@@ -35,6 +35,7 @@ import {
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Button} from "@/components/ui/button"
+import ShareDialog from "@/components/share-dialog";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -178,7 +179,7 @@ export default async function OrganizationHomePage({
                     {
                         title: "Share on social media",
                         icon: <IconShare/>,
-                        href: "/dashboard",
+                        dialog: <ShareDialog url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} />
                     },
                     {
                         title: "Report an issue",

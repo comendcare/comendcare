@@ -1,8 +1,5 @@
 import Image from "next/image"
-import Link from "next/link";
-import {cn} from "@/lib/utils";
-import {buttonVariants} from "@/components/ui/button";
-import {FaPlus} from "react-icons/fa6";
+import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button";
 
 
 export default function NoOrganizationPage() {
@@ -22,16 +19,12 @@ export default function NoOrganizationPage() {
                 height={400}
                 className="hidden dark:block"
             />
-            <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                {`You're not part of an organization yet.`}
-            </p>
-            <Link
-                href="/onboarding/organization"
-                className={cn(buttonVariants({variant: "default"}), "gap-x-2 mt-8")}
-            >
-                <FaPlus/>
-                Join an organization
-            </Link>
+            <div className="flex flex-col justify-center items-center space-y-8">
+                <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                    {`You're not part of an organization yet.`}
+                </p>
+                <CreateOrJoinOrganizationButton/>
+            </div>
         </div>
     )
 }

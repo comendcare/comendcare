@@ -30,7 +30,8 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
-import { handleImageUpload } from "@/lib/upload";
+import {handleImageUpload} from "@/lib/upload";
+import LoadingDots from "@/components/icons/loading-dots";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -56,7 +57,7 @@ const accept = {
 export default function UserOnboardingForm() {
     const router = useRouter();
     const {data: session} = useSession();
-    // const [searchInput, setSearchInput] = useState("");
+    const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
 
@@ -146,7 +147,7 @@ export default function UserOnboardingForm() {
                             console.error(e)
                         }
                     }
-                
+
                     setDefaultValues(fetchedValues);
                     setAddress(fetchedValues); // Set address state as well
                     form.reset(fetchedValues); // Reset form with fetched data
@@ -170,6 +171,8 @@ export default function UserOnboardingForm() {
     }, [address, form]);
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
+        setLoading(true);
+
         try {
             if (selectedFile && values.image) {
                 const imgUrl = await handleImageUpload(selectedFile as File, values.image)
@@ -189,6 +192,8 @@ export default function UserOnboardingForm() {
             router.push("/onboarding/organization");
         } catch (error) {
             toast.error("An error occurred while updating your profile.");
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -283,7 +288,8 @@ export default function UserOnboardingForm() {
                                                     className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
                                                 >
                                                     <input {...getInputProps()} />
-                                                    <AvatarFallback className="text-center flex flex-col justify-center gap-y-4">
+                                                    <AvatarFallback
+                                                        className="text-center flex flex-col justify-center gap-y-4">
                                                         <FaUpload/>
                                                         Click or drop!
                                                     </AvatarFallback>
@@ -346,7 +352,9 @@ export default function UserOnboardingForm() {
                             />
                         </div>
 
-                        <Button type="submit">Next</Button>
+                        <Button type="submit" disabled={loading}>
+                            {loading ? <LoadingDots color="#808080"/> : "Next"}
+                        </Button>
                     </form>
                 </Form>
             </div>
@@ -366,21 +374,19 @@ export default function UserOnboardingForm() {
                                 </div>
 
                                 <div
-                                    className="sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
-                                >
-                                    <div
-                                        className="mt-6 min-w-0 flex-1 truncate text-xl font-bold text-gray-900 sm:hidden md:block">
-                                        {form.watch("name") || <Skeleton className="h-4 w-full"/>}
-                                    </div>
+                                    className="mt-4 min-w-0 flex-1 truncate text-xl font-bold text-gray-900 sm:hidden md:block">
+                                    {form.watch("name") || <Skeleton className="h-4 w-full"/>}
                                 </div>
 
                                 <div>
                                     {form.watch("title") || <Skeleton className="h-4 w-full"/>}
                                 </div>
 
-                                {/*<p>*/}
-                                {/*    Joined {new Date(form.watch("createdAt")).toDateString()}*/}
-                                {/*</p>*/}
+                                <div
+                                    className="mt-4 min-w-0 flex-1 truncate text-lg font-bold text-gray-900 sm:hidden md:block">
+                                    Organizations
+                                </div>
+                                <Skeleton className="h-4 w-full"/>
 
                                 <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
                                     <h1 className="truncate text-2xl font-bold text-gray-900">

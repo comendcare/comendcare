@@ -33,7 +33,8 @@ export default function OnboardingWelcomePage() {
                         <li>
                             <span className="font-semibold text-gray-900 dark:text-white">
                                 About you:
-                            </span> Create your profile to get started. This will be connected to your Patient Advocacy Organization for a personalized experience.
+                            </span> Create your profile to get started. This will be connected to your Patient Advocacy
+                            Organization for a personalized experience.
                         </li>
                         <li>
                             <span className="font-semibold text-gray-900 dark:text-white">
@@ -43,7 +44,8 @@ export default function OnboardingWelcomePage() {
                         <li>
                             <span className="font-semibold text-gray-900 dark:text-white">
                                 Research:
-                            </span> Provide insights into your current research efforts to unlock tailored opportunities.
+                            </span> Provide insights into your current research efforts to unlock tailored
+                            opportunities.
                         </li>
                         <li>
                             <span className="font-semibold text-gray-900 dark:text-white">
@@ -51,6 +53,9 @@ export default function OnboardingWelcomePage() {
                             </span> Outline the financial landscape supporting your research initiatives.
                         </li>
                     </ol>
+                    <p>
+                        {`Anything you add here is editable after you've completed onboarding.`}
+                    </p>
                     <p className="font-semibold">
                         {`Nothing that you share here will be shared with others, and you have complete control of what info is made public on your organization profile and research plan.`}
                     </p>

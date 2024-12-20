@@ -4,7 +4,7 @@ import {useState} from "react";
 import {getSession} from "@/lib/auth"
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
 import NoOrganizationPage from "@/components/no-organization-page";
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getOrganizationFromOrganizationId, getRoadmapId} from "@/lib/fetchers";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -20,6 +20,7 @@ import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
+import {deleteOrgRoadmap} from "@/lib/actions";
 
 export default function OrganizationSettingsPage({organization}: {organization: Organization}) {
     const {data: session, update} = useSession()
@@ -44,6 +45,27 @@ export default function OrganizationSettingsPage({organization}: {organization: 
             setIsDeleting(false); // Re-enable the button
         }
     };
+
+    async function handleDeleteRoadmap () {
+        try {
+            if (!session?.user?.organizationId) throw new Error('Organization id is not defined')
+
+            const { success, data: roadmapId } = await getRoadmapId(session?.user?.organizationId)
+
+            if (!success || !roadmapId) throw new Error('Could not find research plan')
+
+            const response = await deleteOrgRoadmap(roadmapId, session?.user?.organizationId)
+
+            if (!response.success) {
+                toast.error("An error occurred. Please try again later.")
+                return
+            }
+
+            toast.success("Research plan deleted successfully.");
+        } catch (error) {
+            toast.error("An error occurred. Please try again later.");
+        }
+    }
 
     if (organization) {
         if (!organization.verified) {
@@ -76,7 +98,50 @@ export default function OrganizationSettingsPage({organization}: {organization: 
                         </p>
                     </div>
 
-                    <div className="w-full border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between gap-4">
+
+                    <div className="mt-10 border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between">
+                        <span className="flex flex-grow flex-col">
+                            <span className="text-sm font-medium leading-6 text-gray-900">
+                                Delete Organization Research Plan
+                            </span>
+                            <span className="text-sm text-gray-500">
+                                {`The research plan for your organization will be deleted.`}
+                            </span>
+                        </span>
+
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive">
+                                    Delete research plan
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you absolutely sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete
+                                        your account and remove your data from our servers.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction asChild>
+                                        <Button
+                                            variant="destructive"
+                                            onClick={handleDeleteRoadmap}
+                                        >
+                                            {"Continue"}
+                                        </Button>
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
+
+                    <div
+                        className="w-full border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between gap-4">
                         <span className="flex flex-grow flex-col">
                             <span className="text-sm font-medium leading-6 text-gray-900">
                                 Delete Organization
@@ -119,6 +184,7 @@ export default function OrganizationSettingsPage({organization}: {organization: 
                             </AlertDialogContent>
                         </AlertDialog>
                     </div>
+
                 </div>
             </main>
         )
