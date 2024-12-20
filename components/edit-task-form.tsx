@@ -37,7 +37,7 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {GripVertical} from "lucide-react"
+import {CalendarIcon, GripVertical} from "lucide-react"
 import {
     DndContext,
     type DragEndEvent,
@@ -66,6 +66,10 @@ import MultipleSelector from "./ui/multiple-selector"
 import { Member, Milestone, User } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "./ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+import { Calendar } from "./ui/calendar"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -93,7 +97,8 @@ const editTaskForm = z.object({
         }) 
     ).optional(),
     stakeholders: z.array(optionSchema).min(0).optional(),
-    milestone: z.string().optional()
+    milestone: z.string().optional(),
+    targetDate: z.any().optional()
 })
 
 const selector = (state: KanbanState) => ({
@@ -118,7 +123,8 @@ export function EditTaskForm({
             description: JSON.parse(taskData?.description || "[]") || [],
             checklist: taskData?.checklist || undefined,
             stakeholders: taskData?.stakeholders?.map((stakeholder: User) => ({ value: stakeholder.id, label: stakeholder.name })) || [],
-            milestone: taskData?.milestone?.id || undefined
+            milestone: taskData?.milestone?.id || undefined,
+            targetDate: taskData?.endDate || undefined
         }
     })
 
@@ -151,11 +157,12 @@ export function EditTaskForm({
     const checklist = form.watch("checklist")
     const stakeholders = form.watch("stakeholders")
     const milestone = form.watch("milestone")
+    const targetDate = form.watch("targetDate")
 
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
         const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
-        console.log(`stakeholder ids`, stakeholderIds)
-        console.log(`milestone`, milestone)
+
+        console.log(`targetDate`, targetDate)
 
         setTask(
             taskData?.id,
@@ -167,7 +174,8 @@ export function EditTaskForm({
                     ? {checklist: checklist.map((item, index) => ({...item, orderPosition: index}))}
                     : undefined),
                 ...(stakeholders ? { stakeholders: fetchedMembers?.filter(member => stakeholderIds?.includes(member.id)) }: undefined),
-                ...(milestone ? { milestone: { id: milestone } }: undefined)
+                ...(milestone ? { milestone: { id: milestone } }: undefined),
+                ...(targetDate ? { endDate: targetDate } : undefined)
             }
         )
         toast('Success!', {
@@ -400,7 +408,39 @@ export function EditTaskForm({
                                 </Select>
                             </FormItem>
                         )}
-                    />      
+                    />   
+
+                    <FormField 
+                        control={form.control}
+                        name="targetDate"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow">
+                                <FormLabel className="text-xl">{`Target Date`}</FormLabel>
+                                <Popover >
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                        )}
+                                        >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value || new Date()}
+                                            onSelect={field.onChange}
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </FormItem>
+                        )}
+                    />
 
                     <span className="flex justify-end gap-4 flex-wrap">
                         <Dialog>

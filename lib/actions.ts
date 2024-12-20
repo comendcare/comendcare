@@ -1234,7 +1234,8 @@ export async function updateDBTask({tasks}: { tasks: any[] }) {
                         },
                         milestone: {
                             connect: { id: task.milestone.id }
-                        }
+                        },
+                        endDate: task.endDate
                     }
                 })
             })
