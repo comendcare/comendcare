@@ -1206,7 +1206,7 @@ async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneT
 
 export async function updateDBTask({tasks}: { tasks: any[] }) {
     try {
-        // console.log(`tasks:`, tasks)
+        console.log(`tasks:`, tasks)
 
         await Promise.all(
             tasks.map(async (task: any) => {
@@ -1237,7 +1237,10 @@ export async function updateDBTask({tasks}: { tasks: any[] }) {
                         },
                         endDate: task.endDate,
                         priority: task.priority,
-                        private: task.private
+                        private: task.private,
+                        column: {
+                            connect: { id: task.columnId }
+                        }
                     }
                 })
             })

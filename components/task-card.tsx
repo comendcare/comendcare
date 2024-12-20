@@ -87,24 +87,24 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
         }
     })
 
-    const [description, setDescription] = useState(null);
+    const [description, setDescription] = useState(null)
 
     useEffect(() => {
       if (task?.description) {
         try {
             const newDescription = JSON.parse(task?.description || "[]")
-            console.log(newDescription)
-            setDescription(newDescription); // Parse and update state when description changes
+            setDescription(newDescription) // Parse and update state when description changes
         } catch (e) {
             console.error(`could not parse description`, e)
         }
       }
-    }, [task]); // Dependency on task.description to trigger re-render
+    }, [task]) // Dependency on task.description to trigger re-render
 
     return (
         <Dialog>
             <DialogTrigger asChild>
                 <Card
+                    ref={setNodeRef} // necessary for drag and drop to work
                     style={style}
                     className={variants({
                         dragging: isOverlay
