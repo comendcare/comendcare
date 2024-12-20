@@ -98,7 +98,8 @@ const editTaskForm = z.object({
     ).optional(),
     stakeholders: z.array(optionSchema).min(0).optional(),
     milestone: z.string().optional(),
-    targetDate: z.any().optional()
+    targetDate: z.any().optional(),
+    priority: z.string().optional()
 })
 
 const selector = (state: KanbanState) => ({
@@ -124,7 +125,8 @@ export function EditTaskForm({
             checklist: taskData?.checklist || undefined,
             stakeholders: taskData?.stakeholders?.map((stakeholder: User) => ({ value: stakeholder.id, label: stakeholder.name })) || [],
             milestone: taskData?.milestone?.id || undefined,
-            targetDate: taskData?.endDate || undefined
+            targetDate: taskData?.endDate || undefined,
+            priority: taskData?.priority || undefined
         }
     })
 
@@ -158,6 +160,7 @@ export function EditTaskForm({
     const stakeholders = form.watch("stakeholders")
     const milestone = form.watch("milestone")
     const targetDate = form.watch("targetDate")
+    const priority = form.watch("priority")
 
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
         const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
@@ -175,7 +178,8 @@ export function EditTaskForm({
                     : undefined),
                 ...(stakeholders ? { stakeholders: fetchedMembers?.filter(member => stakeholderIds?.includes(member.id)) }: undefined),
                 ...(milestone ? { milestone: { id: milestone } }: undefined),
-                ...(targetDate ? { endDate: targetDate } : undefined)
+                ...(targetDate ? { endDate: targetDate } : undefined),
+                ...(priority ? { priority } : undefined)
             }
         )
         toast('Success!', {
@@ -441,6 +445,37 @@ export function EditTaskForm({
                             </FormItem>
                         )}
                     />
+
+                    <FormField 
+                        control={form.control}
+                        name="priority"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow">
+                                <FormLabel className="text-xl">{`Priority`}</FormLabel>
+                                <Select
+                                    defaultValue={field.value}
+                                    onValueChange={field.onChange}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a priority" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="LOW">
+                                            Low
+                                        </SelectItem>
+                                        <SelectItem value="MEDIUM">
+                                            Medium
+                                        </SelectItem>
+                                        <SelectItem value="HIGH">
+                                            High
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormItem>
+                        )}
+                    />   
 
                     <span className="flex justify-end gap-4 flex-wrap">
                         <Dialog>
