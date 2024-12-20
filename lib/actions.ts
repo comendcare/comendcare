@@ -1236,7 +1236,8 @@ export async function updateDBTask({tasks}: { tasks: any[] }) {
                             connect: { id: task.milestone.id }
                         },
                         endDate: task.endDate,
-                        priority: task.priority
+                        priority: task.priority,
+                        private: task.private
                     }
                 })
             })

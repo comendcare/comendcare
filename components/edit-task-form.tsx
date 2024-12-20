@@ -70,6 +70,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Calendar } from "./ui/calendar"
+import { PrivateBadge } from "./private-badge"
+import { Switch } from "./ui/switch"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -99,7 +101,8 @@ const editTaskForm = z.object({
     stakeholders: z.array(optionSchema).min(0).optional(),
     milestone: z.string().optional(),
     targetDate: z.any().optional(),
-    priority: z.string().optional()
+    priority: z.string().optional(),
+    private: z.boolean()
 })
 
 const selector = (state: KanbanState) => ({
@@ -126,7 +129,8 @@ export function EditTaskForm({
             stakeholders: taskData?.stakeholders?.map((stakeholder: User) => ({ value: stakeholder.id, label: stakeholder.name })) || [],
             milestone: taskData?.milestone?.id || undefined,
             targetDate: taskData?.endDate || undefined,
-            priority: taskData?.priority || undefined
+            priority: taskData?.priority || undefined,
+            private: taskData?.private || false
         }
     })
 
@@ -161,6 +165,7 @@ export function EditTaskForm({
     const milestone = form.watch("milestone")
     const targetDate = form.watch("targetDate")
     const priority = form.watch("priority")
+    const isPrivate = form.watch("private")
 
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
         const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
@@ -179,7 +184,8 @@ export function EditTaskForm({
                 ...(stakeholders ? { stakeholders: fetchedMembers?.filter(member => stakeholderIds?.includes(member.id)) }: undefined),
                 ...(milestone ? { milestone: { id: milestone } }: undefined),
                 ...(targetDate ? { endDate: targetDate } : undefined),
-                ...(priority ? { priority } : undefined)
+                ...(priority ? { priority } : undefined),
+                private: isPrivate || false
             }
         )
         toast('Success!', {
@@ -476,6 +482,26 @@ export function EditTaskForm({
                             </FormItem>
                         )}
                     />   
+
+                    <FormField
+                        control={form.control}
+                        name="private"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow flex flex-row align-center justify-between gap-4">
+                                <FormLabel className="text-xl">{`Private`}</FormLabel>
+                                {field.value && (
+                                    <PrivateBadge />
+                                )}
+                                <FormControl>
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
                     <span className="flex justify-end gap-4 flex-wrap">
                         <Dialog>
