@@ -126,7 +126,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                         </Button>
                         <div className="flex flex-col">
                             <CardTitle className="text-lg">{task?.name}</CardTitle>
-                            {task?.endDate && task.endDate.toLocaleDateString()}
+                            {task?.endDate && <p className="text-sm text-muted-foreground">{task.endDate.toDateString()}</p>}
                         </div>
                     </CardHeader>
                     <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap flex flex-col gap-8">
@@ -137,7 +137,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                         )}
                         {task?.checklist && task.checklist.length > 0 && (
                             <div className="flex flex-col gap-2 px-4">
-                                <h2 className="font-semibold">Checklist:</h2>
+                                <h2 className="font-semibold">Checklist</h2>
                                 <ol id="checklist" className="flex flex-col gap-2">
                                     {task?.checklist?.map(
                                         (item: any, index: number) => (
