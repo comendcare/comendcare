@@ -1231,6 +1231,9 @@ export async function updateDBTask({tasks}: { tasks: any[] }) {
                         stakeholders: {
                             set: [],
                             connect: task.stakeholders.map((stakeholder: User) => ({ id: stakeholder.id }))
+                        },
+                        milestone: {
+                            connect: { id: task.milestone.id }
                         }
                     }
                 })
