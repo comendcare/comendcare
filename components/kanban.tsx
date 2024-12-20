@@ -268,16 +268,6 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
         const isActiveAColumn = activeData?.type === "Column"
         if (!isActiveAColumn) return
 
-        // setColumns(columns => {
-        //     const activeColumnIndex = columns.findIndex(
-        //         col => col.id === activeId
-        //     )
-
-        //     const overColumnIndex = columns.findIndex(col => col.id === overId)
-
-        //     return arrayMove(columns, activeColumnIndex, overColumnIndex)
-        // })
-
         const activeColumnIndex = columns.findIndex(
             col => col.id === activeId
         )
