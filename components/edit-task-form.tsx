@@ -115,7 +115,7 @@ export function EditTaskForm({
             status: taskData?.status || 'TODO',
             description: JSON.parse(taskData?.description || "[]") || [],
             checklist: taskData?.checklist || undefined,
-            stakeholders: taskData?.stakeholders || [],
+            stakeholders: taskData?.stakeholders.map((stakeholder: User) => ({ value: stakeholder.id, label: stakeholder.name })) || [],
         }
     })
 
@@ -142,6 +142,7 @@ export function EditTaskForm({
 
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
         const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
+        console.log(`stakeholder ids`, stakeholderIds)
 
         setTask(
             taskData?.id,
@@ -228,28 +229,6 @@ export function EditTaskForm({
                     onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="flex flex-col gap-8 p-4"
                 >
-                    {/* <FormField
-                        control={form.control}
-                        name="status"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Task Status:`}</FormLabel>
-                                <FormControl>
-                                    <StatusButton
-                                        status={
-                                            field?.value as StatusType
-                                        }
-                                        onStatusChange={status =>
-                                            form.setValue("status", status)
-                                        }
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    /> */}
-
                     <FormField
                         control={form.control}
                         name="name"
