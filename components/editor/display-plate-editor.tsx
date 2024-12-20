@@ -189,7 +189,7 @@ export function DisplayPlateEditor({ value }: { value: any[] }) {
   return (
     <Plate editor={editor}>
       <EditorContainer className='w-full p-0 m-0'>
-        <Editor disabled variant="fullWidth" />
+        <Editor disabled variant="fullWidthDisplay" />
       </EditorContainer>
     </Plate>
   );

@@ -87,6 +87,7 @@ const editorVariants = cva(
         fullWidth: 'size-full p-8 text-base',
         none: '',
         select: 'px-3 py-2 text-base data-[readonly]:w-fit',
+        fullWidthDisplay: 'size-full px-8 pt-0 pb-8 text-base'
       },
     },
   }

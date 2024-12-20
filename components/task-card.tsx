@@ -26,6 +26,8 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import { DisplayPlateEditor } from "./editor/display-plate-editor"
 import { ScrollArea } from "./ui/scroll-area"
+import { User } from "@prisma/client"
+import { ProfilePhoto } from "./profile-photo"
 
 export interface Task {
     columnId: string;
@@ -36,6 +38,7 @@ export interface Task {
     checklist?: any[],
     orderPosition: number,
     kanbanPosition: number,
+    stakeholders: User[]
 }
 
 interface TaskCardProps {
@@ -83,20 +86,9 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
         }
     })
 
-    // const [description, setDescription] = useState(JSON.parse(task?.description || "[]"))
-
-    // useEffect(() => {
-    //     try {
-    //         setDescription(JSON.parse(task?.description || "[]"))
-    //     } catch (e) {
-    //         console.error(`could not parse description`, e)
-    //     }
-    // }, [task])
-
     const [description, setDescription] = useState(null);
 
     useEffect(() => {
-        console.log(`TASK DESCRIPTION UPDATED...`, task?.description)
       if (task?.description) {
         try {
             const newDescription = JSON.parse(task?.description || "[]")
@@ -107,7 +99,6 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
         }
       }
     }, [task]); // Dependency on task.description to trigger re-render
-  
 
     return (
         <Dialog>
@@ -153,6 +144,13 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                             )}
                         </ol>
                     </CardContent>
+                    <CardFooter>
+                        {task?.stakeholders && task?.stakeholders.length > 0 && (
+                            task.stakeholders.map(stakeholder => (
+                                <ProfilePhoto img={stakeholder.image} name={stakeholder.name}/>
+                            ))
+                        )}
+                    </CardFooter>
                 </Card>
             </DialogTrigger>
             <DialogContent>
