@@ -6,16 +6,39 @@ import {Eye, UserPlus, Users, Workflow} from "lucide-react";
 import {MagnifyingGlassIcon} from "@radix-ui/react-icons";
 import prisma from "@/lib/prisma"
 import {getSession} from "@/lib/auth";
+import Image from "next/image";
+import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button";
 
 export default async function PAGDashboardAnalyticsTab() {
     const session = await getSession()
 
     if (!session?.user.organizationId) {
-        return <div>No session or organization ID found.</div>;
+        return <div className="h-full flex flex-col items-center justify-center py-20">
+            <Image
+                alt="missing roadmap"
+                src="https://illustrations.popsy.co/gray/keynote-presentation.svg"
+                width={400}
+                height={400}
+                className="dark:hidden"
+            />
+            <Image
+                alt="missing roadmap"
+                src="https://illustrations.popsy.co/white/keynote-presentation.svg"
+                width={400}
+                height={400}
+                className="hidden dark:block"
+            />
+            <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                {`You're not part of an organization yet.`}
+            </p>
+            <div className="mt-8">
+                <CreateOrJoinOrganizationButton/>
+            </div>
+        </div>
     }
 
     const organization = await prisma.organization.findUnique({
-        where: { id: session.user.organizationId },
+        where: {id: session.user.organizationId},
         include: {
             roadmaps: true,
             members: true
@@ -28,7 +51,7 @@ export default async function PAGDashboardAnalyticsTab() {
 
     const milestones = organization.roadmaps[0]
         ? await prisma.milestone.findMany({
-            where: { roadmapId: organization.roadmaps[0].id },
+            where: {roadmapId: organization.roadmaps[0].id},
         })
         : []
 

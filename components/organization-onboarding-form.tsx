@@ -33,6 +33,7 @@ import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
+import LoadingDots from "@/components/icons/loading-dots";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -137,6 +138,7 @@ export default function OrganizationOnboardingForm(
     const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -254,42 +256,38 @@ export default function OrganizationOnboardingForm(
     }
 
     async function newOrgOnSubmit(values: z.infer<typeof newOrgFormSchema>) {
-        // console.log(values)
-        // const createOrg = await createOrGetSite({
-        //         siteName: newOrgForm.getValues("orgName"),
-        //         siteSlug: newOrgForm.getValues("subdomain")
-        //     },
-        //     session.data?.user.id,
-        //     newOrgForm.getValues("description")
-        // )
-        //
-        // console.log(createOrg)
+        setLoading(true)
+        try {
+            const formData = new FormData()
 
-        const formData = new FormData()
+            Object.entries(values).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    formData.append(key, value.toString());
+                }
+            });
 
-        Object.entries(values).forEach(([key, value]) => {
-            if (value !== undefined) {
-                formData.append(key, value.toString());
+            if (selectedFile && values.image) {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                if (imgUrl) formData.set('image', imgUrl)
             }
-        });
 
-        if (selectedFile && values.image) {
-            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
-            if (imgUrl) formData.set('image', imgUrl)
+            createOrganization(formData).then((res: any) => {
+                if (res.error) {
+                    toast.error(res.error)
+                } else {
+                    va.track("Created Organization")
+                    // Update the session object with the newly created organizationId
+                    updateSession(res.id)
+                    router.refresh()
+                    router.push(nextLink)
+                    toast.success(`Successfully created organization!`)
+                }
+            })
+        } catch (error) {
+            toast.error("An error occurred while updating your profile.");
+        } finally {
+            setLoading(false);
         }
-
-        createOrganization(formData).then((res: any) => {
-            if (res.error) {
-                toast.error(res.error)
-            } else {
-                va.track("Created Organization")
-                // Update the session object with the newly created organizationId
-                updateSession(res.id)
-                router.refresh()
-                router.push(nextLink)
-                toast.success(`Successfully created organization!`)
-            }
-        })
     }
 
     return (
@@ -479,9 +477,14 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Description (required)</FormLabel>
-                                        <FormDescription>
-                                            This will be the public description of your organization.
-                                        </FormDescription>
+                                        <div className="w-full flex flex-row justify-between">
+                                            <FormDescription>
+                                                This will be the public description of your organization.
+                                            </FormDescription>
+                                            <FormDescription>
+                                                500 characters max.
+                                            </FormDescription>
+                                        </div>
                                         <FormControl>
                                             <Textarea
                                                 placeholder="Tell us a little bit about yourself"
@@ -609,7 +612,7 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`What your organization is looking for and hoping to get from joining Comend.`}</FormLabel>
-                                        <FormDescription>{`Provide as much detail as possible; we want to help you!`}</FormDescription>
+                                        <FormDescription>{`What are your organization’s priorities over the next year? How might Comend help?`}</FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -639,8 +642,8 @@ export default function OrganizationOnboardingForm(
                                             Previous
                                         </Button>
                                     }
-                                    <Button type="submit">
-                                        Next
+                                    <Button type="submit" disabled={loading}>
+                                        {loading ? <LoadingDots color="#808080"/> : "Next"}
                                     </Button>
                                 </div>
                                 {showSkip &&
@@ -715,7 +718,7 @@ export default function OrganizationOnboardingForm(
 
                         <div
                             className="h-10 w-full bg-white text-gray-800 text-left px-4 flex items-center border border-gray-300 rounded-md shadow-sm">
-                            {newOrgForm.watch("subdomain")}
+                            {newOrgForm.watch("subdomain") && `${newOrgForm.watch("subdomain")}.comend.io`}
                         </div>
 
                         <div className="w-full flex flex-col space-y-8 my-8">
@@ -740,7 +743,7 @@ export default function OrganizationOnboardingForm(
                                         >
                                             <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
                                                 <h1 className="mt-6 min-w-0 flex-1 truncate text-xl font-bold text-gray-900">
-                                                    {newOrgForm.watch("orgName") || "Your organization's name"}
+                                                    {newOrgForm.watch("orgName") || <Skeleton className="h-4 w-full"/>}
                                                 </h1>
                                                 <div
                                                     className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
@@ -774,7 +777,9 @@ export default function OrganizationOnboardingForm(
 
                                     </div>
                                     <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
-                                        <h1 className="truncate text-2xl font-bold text-gray-900">{newOrgForm.watch("orgName")}</h1>
+                                        <h1 className="truncate text-2xl font-bold text-gray-900">
+                                            {newOrgForm.watch("orgName")}
+                                        </h1>
                                     </div>
                                 </div>
                             </div>

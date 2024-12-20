@@ -403,9 +403,9 @@ export default function EditPAGProfileDialog() {
     const onCloseForm = () => {
         setDefaultOrganizationValues(defaultOrganizationValues);
         editOrgForm.reset(defaultOrganizationValues); // Reset form with fetched data
+        setDefaultFinancesValues(defaultFinancesValues);
+        editFinancesForm.reset(defaultFinancesValues); // Reset form with fetched data
     }
-
-    console.log(editOrgForm.watch("founded"))
 
     return (
         <TooltipProvider>
@@ -562,9 +562,14 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Description</FormLabel>
-                                                <FormDescription>
-                                                    This will be the public description of your organization.
-                                                </FormDescription>
+                                                <div className="w-full flex flex-row justify-between">
+                                                    <FormDescription>
+                                                        This will be the public description of your organization.
+                                                    </FormDescription>
+                                                    <FormDescription>
+                                                        500 characters max.
+                                                    </FormDescription>
+                                                </div>
                                                 <FormControl>
                                                     <Textarea
                                                         placeholder="Tell us a little bit about yourself"
