@@ -605,3 +605,14 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
 
     return {success: false, error: "No roadmapId provided."}
 }
+
+export async function getPosts() {
+    try {
+        const posts = await prisma.post.findMany()
+
+        return {success: true, data: posts}
+    } catch (error: any) {
+        console.error("Database error finding posts details:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}

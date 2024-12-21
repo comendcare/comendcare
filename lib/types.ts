@@ -1,4 +1,10 @@
 import type { Option } from "@/components/ui/multiple-selector"
+import {User, Post} from "@prisma/client";
+
+export type extendedPost = Post & {
+    user: User
+    comments: Comment[]
+}
 
 // export type MilestoneTypes =
 //   BASICSCIENCE
