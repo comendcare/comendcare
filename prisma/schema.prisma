@@ -58,7 +58,7 @@ model Member {
   meta           Json?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   organizationId String
 
   @@unique([userId, organizationId])
@@ -68,7 +68,7 @@ model Invitation {
   id             String       @id @default(cuid())
   email          String
   role           String       @db.VarChar
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   organizationId String
   accepted       Boolean      @default(false)
   createdAt      DateTime     @default(now())
@@ -83,7 +83,7 @@ model MemberRequest {
   email          String
   role           String       @db.VarChar
   user           User         @relation(fields: [userId], references: [id])
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   organizationId String
   accepted       Boolean      @default(false)
   createdAt      DateTime     @default(now())

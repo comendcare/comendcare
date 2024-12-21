@@ -38,7 +38,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
 
                     <ResizablePanel
                         defaultSize={defaultLayout[1]}
-                        minSize={10}
+                        minSize={15}
                         className="p-8 flex flex-col gap-4"
                     >
                         <FiltersPanel />
