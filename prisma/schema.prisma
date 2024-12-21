@@ -41,6 +41,7 @@ model User {
   lat                  Float?
   lng                  Float?
   posts                Post[]
+  comments             Comment[]
   reactions            Reaction[]
 }
 
@@ -484,13 +485,26 @@ model Example {
 
 model Post {
   id        String     @id
-  title     String
+  title     String?
+  text      String?
   content   Json?
   author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
   like      Reaction[]
+  comments  Comment[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+}
+
+model Comment {
+  id        String   @id
+  text      String
+  userId    String
+  author    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum ReactionType {
