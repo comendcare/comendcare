@@ -39,16 +39,20 @@ import {useSession} from "next-auth/react";
 import Link from "next/link";
 import {Separator} from "@/components/ui/separator";
 import {ProfilePhoto} from "@/components/profile-photo"
+import {createPost, updateOrganization} from "@/lib/actions";
+import {toast} from "sonner";
+import {useRouter} from "next/navigation";
 
 
 const formSchema = z.object({
-    post: z.string().min(2, {
-        message: "Username must be at least 2 characters.",
+    text: z.string().min(2, {
+        message: "Post must be at least 2 characters.",
     }),
 })
 
 
 export default async function NewPostDialog() {
+    const router = useRouter()
     const {data: session} = useSession()
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -57,6 +61,22 @@ export default async function NewPostDialog() {
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        const formData = new FormData()
+
+        Object.entries(values).forEach(([key, value]) => {
+            if (value !== undefined) {
+                formData.append(key, value.toString());
+            }
+        });
+
+        try {
+            await createPost(formData)
+            toast.success("Post created successfully!");
+            router.refresh(); // Refresh the page to reflect changes
+        } catch (error) {
+            console.error("Error updating organization:", error);
+            toast.error("Failed to update organization profile.");
+        }
     }
 
     return (
@@ -98,7 +118,7 @@ export default async function NewPostDialog() {
                         </DialogHeader>
                         <FormField
                             control={form.control}
-                            name="post"
+                            name="text"
                             render={({field}) => (
                                 <FormItem>
                                     <FormControl>
@@ -115,8 +135,8 @@ export default async function NewPostDialog() {
                         <EmojiPicker
                             onChange={(value) => {
                                 // Append the emoji to the "post" field's current value
-                                const currentValue = form.getValues("post") || "";
-                                form.setValue("post", currentValue + value, {
+                                const currentValue = form.getValues("text") || "";
+                                form.setValue("text", currentValue + value, {
                                     shouldValidate: true,
                                 });
                             }}

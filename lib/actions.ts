@@ -1385,13 +1385,15 @@ export async function deleteKanbanColumn(column: Column) {
     }
 }
 
-export async function createPost(postData: Post) {
+export async function createPost(formData: FormData) {
     const session = await getSession()
+
+    const text = formData.get("text") as string
 
     try {
         const post = prisma.post.create({
             data: {
-                text: postData.text,
+                text: text,
                 author: {
                     connect: {
                         id: session?.user.id

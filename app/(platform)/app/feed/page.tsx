@@ -1,9 +1,10 @@
 import NewPostDialog from "@/components/new-post-dialog";
 import {getSession} from "@/lib/auth";
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getOrganizationFromOrganizationId, getPosts} from "@/lib/fetchers";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
 import NoOrganizationPage from "@/components/no-organization-page";
-import {Post} from "@/components/post";
+import Image from "next/image";
+import {PostList} from "@/components/post-list";
 
 export default async function FeedPage() {
     const session = await getSession()
@@ -19,6 +20,8 @@ export default async function FeedPage() {
         }
     }
 
+    const posts = await getPosts()
+
     if (organization) {
         if (!organization.verified) {
             // Render unverified organization state
@@ -26,12 +29,37 @@ export default async function FeedPage() {
                 <UnverifiedOrganizationPage/>
             );
         }
-        return (
-            <main className="flex flex-col items-center w-full max-w-2xl mx-auto px-4">
-                <NewPostDialog/>
-                <Post/>
-            </main>
-        )
+
+        if (!posts.data) {
+            return (
+                <div className="h-full flex flex-col items-center justify-center py-20">
+                    <Image
+                        alt="missing roadmap"
+                        src="https://illustrations.popsy.co/gray/success.svg"
+                        width={400}
+                        height={400}
+                        className="dark:hidden"
+                    />
+                    <Image
+                        alt="missing roadmap"
+                        src="https://illustrations.popsy.co/white/success.svg"
+                        width={400}
+                        height={400}
+                        className="hidden dark:block"
+                    />
+                    <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                        No members yet.
+                    </p>
+                </div>
+            )
+        } else if (posts.data) {
+            return (
+                <main className="flex flex-col items-center w-full max-w-2xl mx-auto px-4">
+                    <NewPostDialog/>
+                    <PostList posts={posts.data}/>
+                </main>
+            )
+        }
     } else {
         return (
             <NoOrganizationPage/>

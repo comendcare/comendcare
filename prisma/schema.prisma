@@ -484,8 +484,7 @@ model Example {
 }
 
 model Post {
-  id        String     @id
-  title     String?
+  id        String     @id @default(cuid())
   text      String?
   content   Json?
   author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
@@ -494,17 +493,19 @@ model Post {
   comments  Comment[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  mentions  Mention[]
 }
 
 model Comment {
-  id        String   @id
+  id        String    @id @default(cuid())
   text      String
   userId    String
-  author    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   postId    String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  mentions  Mention[]
 }
 
 enum ReactionType {
@@ -514,7 +515,7 @@ enum ReactionType {
 }
 
 model Reaction {
-  id        String       @id
+  id        String       @id @default(cuid())
   type      ReactionType
   author    User         @relation(fields: [authorId], references: [id])
   authorId  String
@@ -522,4 +523,26 @@ model Reaction {
   postId    String
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
+}
+
+enum MentionedType {
+  USER
+  ROADMAP
+  ORGANIZATION
+  CONDITION
+}
+
+model Mention {
+  id     String  @id @default(cuid())
+  postId String? // For mentions in posts
+  post   Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  commentId String? // For mentions in comments
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  mentionedType MentionedType
+  mentionedId   String // ID of the mentioned entity (e.g., User, Roadmap, Organization, etc.)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
