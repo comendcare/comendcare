@@ -48,8 +48,8 @@ export function Post({data}: PostProps) {
     const {hasLiked, toggleLike, likeCount} = useLike(postId);
 
     const postByCurrentUser = React.useMemo(() => {
-        return data.user.id === session?.user.id
-    }, [data.user.id, session?.user.id]);
+        return data.author.id === session?.user.id
+    }, [data.author.id, session?.user.id]);
 
     const createdAt = React.useMemo(() => {
         return formatDates(data.createdAt);
@@ -66,14 +66,14 @@ export function Post({data}: PostProps) {
     const onDelete = React.useCallback(async () => {
     }, []);
 
-    const firstName = data.user?.firstName;
-    const lastName = data.user?.lastName || "";
+    const firstName = data.author?.firstName;
+    const lastName = data.author?.lastName || "";
 
     const [ref, {height}] = useMeasure();
 
     return (
         <MotionConfig transition={{duration: 0.3}}>
-            <Card className="rounded-sm">
+            <Card className="rounded-sm w-full">
                 <CardHeader className="space-y-1 md:space-y-1.5 p-4">
                     <div className="flex justify-between">
                         <div className="flex gap-1.5 md:gap-2 items-center">
@@ -94,7 +94,7 @@ export function Post({data}: PostProps) {
                             />
                             {/*</UserTooltip>*/}
                             <div className="flex flex-col">
-                                <Link href={`/profile/${data.user?.id}`} passHref>
+                                <Link href={`/profile/${data.author?.id}`} passHref>
                                     {/*<UserName*/}
                                     {/*    firstName={firstName}*/}
                                     {/*    lastName={lastName}*/}
@@ -124,7 +124,7 @@ export function Post({data}: PostProps) {
                                         variant="ghost"
                                         onClick={onDelete}
                                         disabled={isDeletingPost}
-                                        className="rounded-md w-full"
+                                        className="rounded-md w-full flex flex-row justify-start"
                                     >
                                         {isDeletingPost ? (
                                             <Icons.spinner className="w-4 h-4 mr-2 animate-spin"/>

@@ -1,8 +1,8 @@
 import type { Option } from "@/components/ui/multiple-selector"
-import {User, Post} from "@prisma/client";
+import {User, Post, Comment} from "@prisma/client";
 
 export type extendedPost = Post & {
-    user: User
+    author: User
     comments: Comment[]
 }
 

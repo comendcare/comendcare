@@ -608,7 +608,12 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
 
 export async function getPosts() {
     try {
-        const posts = await prisma.post.findMany()
+        const posts = await prisma.post.findMany({
+            include: {
+                author: true,
+                comments: true,
+            }
+        })
 
         return {success: true, data: posts}
     } catch (error: any) {
