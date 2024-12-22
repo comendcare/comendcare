@@ -66,8 +66,6 @@ export function Post({data}: PostProps) {
     const onDelete = React.useCallback(async () => {
     }, []);
 
-    const firstName = data.author?.firstName;
-    const lastName = data.author?.lastName || "";
 
     const [ref, {height}] = useMeasure();
 
@@ -101,7 +99,7 @@ export function Post({data}: PostProps) {
                                     {/*    verified={verified}*/}
                                     {/*    className="md:text-lg font-medium"*/}
                                     {/*/>*/}
-                                    {firstName} {lastName}
+                                    {data.author?.name}
                                 </Link>
                                 <span className="font-light text-muted-foreground text-[0.6rem] md:text-xs leading-3">
                                     {createdAt}
