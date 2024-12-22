@@ -612,6 +612,9 @@ export async function getPosts() {
             include: {
                 author: true,
                 comments: true,
+            },
+            orderBy: {
+                createdAt: "desc"
             }
         })
 
