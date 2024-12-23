@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma, Column, Kanban} from "@prisma/client"
+import {Roadmap, Organization, Prisma, Column, Kanban, Post} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
@@ -1365,6 +1365,34 @@ export async function deleteKanbanColumn(column: Column) {
         return {success: true, data: deletedColumn};
     } catch (error: any) {
         logError("Error deleting kanban column", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function createPost(formData: FormData) {
+    const session = await getSession()
+
+    const text = formData.get("text") as string
+
+    try {
+        const post = prisma.post.create({
+            data: {
+                text: text,
+                author: {
+                    connect: {
+                        id: session?.user.id
+                    }
+                }
+            }
+        })
+
+        if (!post) {
+            return {success: false, error: "failed to create post"};
+        }
+
+        return {success: true, data: post};
+    } catch (error: any) {
+        logError("Error creating post", error);
         return {success: false, error: "Internal server error"};
     }
 }
