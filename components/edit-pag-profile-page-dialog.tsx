@@ -6,10 +6,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import {useCallback, useEffect, useState} from "react";
-import {
-    updateOrganization,
-    updateOrganizationAttribute
-} from "@/lib/actions";
+import {updateOrganization} from "@/lib/actions";
 import {AddressType} from "@/lib/types";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
