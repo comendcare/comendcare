@@ -71,7 +71,7 @@ export default function OrganizationSettingsPage({organization}: {organization: 
         if (!organization.verified) {
             // Render unverified organization state
             return (
-                <UnverifiedOrganizationPage/>
+                <UnverifiedOrganizationPage organization={organization} />
             );
         }
 
