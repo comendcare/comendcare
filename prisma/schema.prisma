@@ -489,7 +489,7 @@ model Post {
   content   Json?
   author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
-  like      Reaction[]
+  reaction  Reaction[]
   comments  Comment[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt

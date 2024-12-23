@@ -31,7 +31,7 @@ export default async function DashboardPage() {
         if (!organization.verified) {
             // Render unverified organization state
             return (
-                <UnverifiedOrganizationPage/>
+                <UnverifiedOrganizationPage organization={organization} />
             );
         }
         return (

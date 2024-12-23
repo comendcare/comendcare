@@ -26,7 +26,7 @@ export default async function FeedPage() {
         if (!organization.verified) {
             // Render unverified organization state
             return (
-                <UnverifiedOrganizationPage/>
+                <UnverifiedOrganizationPage organization={organization} />
             );
         }
 
