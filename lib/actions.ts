@@ -11,6 +11,7 @@ import {customAlphabet} from "nanoid";
 import {getBlurDataURL, logError} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from "@/lib/emails";
+import {ApiResponse} from "@/lib/types";
 
 
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
@@ -116,16 +117,14 @@ const nanoid = customAlphabet(
     7
 ) // 7-character random string
 
-export const createMemberRequest = async (organizationId: string) => {
+export const createMemberRequest = async (organizationId: string): Promise<ApiResponse<any>> => {
     const session = await getSession()
     if (!session?.user.id) {
-        return {
-            error: "Not authenticated"
-        }
+        throw new Error("You must be signed in to perform this action")
     }
 
     try {
-        const response = await prisma.memberRequest.create({
+        const memberRequest = await prisma.memberRequest.create({
             data: {
                 email: session.user.email,
                 role: "admin",
@@ -168,11 +167,15 @@ export const createMemberRequest = async (organizationId: string) => {
             })
         }
 
-        return response
-    } catch (error: any) {
-        return {
-            error: error.message
+        if (!memberRequest) {
+            console.error("Error creating member request.")
+            return {success: false, error: "Database error. please try again later."}
         }
+
+        return {success: true, data: memberRequest}
+    } catch (error: any) {
+        console.error("Error creating member request:", error)
+        return {success: false, error: "Database error. please try again later."}
     }
 }
 
@@ -701,7 +704,7 @@ export async function inviteUser(
         organizationName: string
         organizationImage: string
     }
-) {
+): Promise<ApiResponse<any>> {
     try {
         if (!session) {
             throw new Error("You must be signed in to perform this action")
@@ -744,34 +747,15 @@ export async function inviteUser(
             console.log("email sent")
         })
 
-        return invitation
+        if (!invitation) {
+            console.error("Error inviting user.")
+            return {success: false, error: "Database error. please try again later."}
+        }
 
-        // return await prisma.member.create({
-        //     data: {
-        //         email: lowerCaseEmail,
-        //         organization: {
-        //             connect: {
-        //                 id: organization.organizationId
-        //             }
-        //         },
-        //         role: role,
-        //         invitedBy: {
-        //             connect: {
-        //                 id: session?.user?.id
-        //             }
-        //         },
-        //         meta: {
-        //             invitationId,
-        //         },
-        //     },
-        // }).then((res) => {
-        //     console.log(`Membership created for ${email}`)
-        //
-        //     return res
-        // })
-    } catch (error) {
+        return {success: true, data: invitation}
+    } catch (error: any) {
         console.error("Error inviting user:", error)
-        throw new Error("Failed to invite user.")
+        return {success: false, error: "Database error. please try again later."}
     }
 }
 
