@@ -36,6 +36,7 @@ import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Button} from "@/components/ui/button"
 import ShareDialog from "@/components/share-dialog";
+import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -107,6 +108,13 @@ export default async function OrganizationHomePage({
         }
     }
 
+    if (organization.verified) {
+        // Render unverified organization state
+        return (
+            <UnverifiedOrganizationPage organization={organization} />
+        );
+    }
+
     return (
         <>
             <main className="grid grid-cols-8 w-full max-w-7xl mx-auto mt-16 gap-4">
@@ -137,7 +145,7 @@ export default async function OrganizationHomePage({
                                 </TabsTrigger>
                             </TabsList>
                             <TabsContent value="roadmap" className="flex flex-col space-y-4">
-                                <PAGProfileAssetsAndProjectsHoverableCard 
+                                <PAGProfileAssetsAndProjectsHoverableCard
                                     assets={(roadmaps?.[0]?.milestones.filter(milestone => milestone.asset) || []).map(milestone => milestone.asset)}
                                     rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
                                 />
