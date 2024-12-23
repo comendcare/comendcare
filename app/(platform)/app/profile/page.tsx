@@ -28,11 +28,11 @@ import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "sonner";
 import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
-import { ProfilePhoto } from "@/components/profile-photo";
-import { PublicRoadmapCard } from "@/components/public-roadmap-card";
+import {ProfilePhoto} from "@/components/profile-photo";
+import {PublicRoadmapCard} from "@/components/public-roadmap-card";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
-import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
 import NoOrganizationPage from "@/components/no-organization-page";
+import ComendVerifiedBadge from "@/components/comend-verified-badge";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -64,18 +64,12 @@ export default async function ProfilePage() {
     }
 
     if (organization) {
-        if (!organization.verified) {
-            // Render unverified organization state
-            return (
-                <UnverifiedOrganizationPage/>
-            );
-        }
 
         let roadmaps = await prisma.roadmap.findMany({
-            where: { organizationId: organization?.id },
+            where: {organizationId: organization?.id},
             include: {
                 nodes: {
-                    include: { data: true }
+                    include: {data: true}
                 },
                 edges: true,
                 milestones: {
@@ -114,7 +108,7 @@ export default async function ProfilePage() {
                                     {/* <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
                                         src={getOrgPhoto(organization)}
                                         alt=""/> */}
-                                    <ProfilePhoto 
+                                    <ProfilePhoto
                                         img={organization.image}
                                         name={organization.name}
                                         className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
@@ -124,10 +118,11 @@ export default async function ProfilePage() {
                                 <div
                                     className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                                     <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
-                                        <div className="mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900 max-w-xl">
-                                            <HoverCard>
+                                        <div
+                                            className="flex flex-row items-baseline mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900 max-w-2xl gap-x-4">
+                                            <HoverCard openDelay={0} closeDelay={0}>
                                                 <HoverCardTrigger asChild>
-                                                    <h1 className="truncate cursor-pointer">
+                                                    <h1 className="truncate">
                                                         {organization?.name}
                                                     </h1>
                                                 </HoverCardTrigger>
@@ -142,6 +137,9 @@ export default async function ProfilePage() {
                                                     </div>
                                                 </HoverCardContent>
                                             </HoverCard>
+
+                                            <ComendVerifiedBadge verified={organization.verified}/>
+
                                         </div>
                                         <div
                                             className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
@@ -220,11 +218,12 @@ export default async function ProfilePage() {
                                     </TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="roadmap" className="flex flex-col space-y-4">
-                                    <PAGProfileAssetsAndProjectsHoverableCard 
+                                    <PAGProfileAssetsAndProjectsHoverableCard
                                         assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
                                         rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                                     />
-                                    <PublicRoadmapCard roadmap={roadmaps[0]} subdomain={organization?.subdomain || undefined}/>
+                                    <PublicRoadmapCard roadmap={roadmaps[0]}
+                                                       subdomain={organization?.subdomain || undefined}/>
                                 </TabsContent>
                                 <TabsContent value="activity" className="mt-0">
                                     <PAGProfileActivityCard/>
