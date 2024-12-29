@@ -34,7 +34,7 @@ export const optionSchema = z.object({
     disable: z.boolean().optional(),
 });
 
-const invitationFormSchema = z.object({
+const researchOnboardingFormSchema = z.object({
     modalities: z.array(optionSchema).min(0).optional(),
     disorder: z.string()
         .min(2, {
@@ -395,12 +395,12 @@ export default function ResearchOnboardingForm(
     const router = useRouter()
     const [loading, setLoading] = useState(false);
 
-    const form = useForm<z.infer<typeof invitationFormSchema>>({
+    const form = useForm<z.infer<typeof researchOnboardingFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(invitationFormSchema)
+        resolver: zodResolver(researchOnboardingFormSchema)
     })
 
-    async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
+    async function onSubmit(values: z.infer<typeof researchOnboardingFormSchema>) {
         setLoading(true)
 
         try {

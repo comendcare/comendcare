@@ -119,7 +119,7 @@ export default async function ProfilePage() {
                                     className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                                     <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
                                         <div
-                                            className="flex flex-row items-baseline mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900 max-w-2xl gap-x-4">
+                                            className="flex flex-row items-baseline mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900 max-w-2xl gap-x-2">
                                             <HoverCard openDelay={0} closeDelay={0}>
                                                 <HoverCardTrigger asChild>
                                                     <h1 className="truncate">

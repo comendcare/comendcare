@@ -33,6 +33,7 @@ import {ProfilePhoto} from "@/components/profile-photo"
 import {IconShare, IconThumbUp, IconThumbUpFilled} from "@tabler/icons-react";
 import {useSession} from "next-auth/react";
 import {FaEllipsis} from "react-icons/fa6";
+import {deletePost} from "@/lib/actions";
 
 interface PostProps {
     data: extendedPost;
@@ -64,7 +65,8 @@ export function Post({data}: PostProps) {
     }, []);
 
     const onDelete = React.useCallback(async () => {
-    }, []);
+        await deletePost(data.id)
+    }, [data.id]);
 
 
     const [ref, {height}] = useMeasure();
@@ -129,7 +131,9 @@ export function Post({data}: PostProps) {
                                         ) : (
                                             <Icons.trash className="w-4 h-4 mr-2"/>
                                         )}
-                                        <span className="font-medium text-sm">Delete</span>
+                                        <span className="font-medium text-sm">
+                                            Delete Post
+                                        </span>
                                     </Button>
                                 </PopoverContent>
                             </Popover>

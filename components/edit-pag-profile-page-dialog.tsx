@@ -265,7 +265,7 @@ export default function EditPAGProfileDialog() {
     }
 
     useEffect(() => {
-        async function fetchUserData() {
+        async function fetchOrganizationData() {
             if (session?.user?.organizationId) {
                 let organizationData
                 const response = await getOrganizationFromOrganizationId(session.user.organizationId);
@@ -323,7 +323,7 @@ export default function EditPAGProfileDialog() {
             }
         }
 
-        fetchUserData();
+        fetchOrganizationData();
     }, [session, editOrgForm]);
 
     const editFinancesForm = useForm<z.infer<typeof financesFormSchema>>({

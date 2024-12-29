@@ -21,6 +21,7 @@ export default async function FeedPage() {
     }
 
     const posts = await getPosts()
+    console.log(posts)
 
     if (organization) {
         if (!organization.verified) {
@@ -48,7 +49,7 @@ export default async function FeedPage() {
                         className="hidden dark:block"
                     />
                     <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                        No members yet.
+                        No posts yet.
                     </p>
                 </div>
             )
