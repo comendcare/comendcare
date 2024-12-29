@@ -108,7 +108,7 @@ export default async function OrganizationHomePage({
         }
     }
 
-    if (organization.verified) {
+    if (!organization.verified) {
         // Render unverified organization state
         return (
             <UnverifiedOrganizationPage organization={organization} />

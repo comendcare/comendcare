@@ -43,6 +43,7 @@ model User {
   posts                Post[]
   comments             Comment[]
   reactions            Reaction[]
+  follows              Follow[]
 }
 
 model Member {
@@ -432,6 +433,24 @@ model Organization {
   @@index([userId])
 }
 
+model Follow {
+  id           String       @id @default(cuid())
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  followedType FollowedType
+  followedId   String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@unique([userId, followedType, followedId])
+}
+
+enum FollowedType {
+  ORGANIZATION
+  // USER
+  // CONDITION
+}
+
 model Condition {
   id                          String                    @id @default(cuid())
   name                        String
@@ -484,15 +503,14 @@ model Example {
 }
 
 model Post {
-  id        String     @id @default(cuid())
+  id        String    @id @default(cuid())
   text      String?
   content   Json?
-  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
-  reaction  Reaction[]
   comments  Comment[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   mentions  Mention[]
 }
 
@@ -514,15 +532,22 @@ enum ReactionType {
   SUPPORT
 }
 
+enum ReactableType {
+  POST
+  COMMENT
+}
+
 model Reaction {
-  id        String       @id @default(cuid())
-  type      ReactionType
-  author    User         @relation(fields: [authorId], references: [id])
-  authorId  String
-  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id            String        @id @default(cuid())
+  type          ReactionType
+  author        User          @relation(fields: [authorId], references: [id])
+  authorId      String
+  reactableType ReactableType
+  reactableId   String // Can be a Post ID or Comment ID
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
+
+  @@unique([authorId, reactableType, reactableId])
 }
 
 enum MentionedType {

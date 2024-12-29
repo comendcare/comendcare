@@ -1396,3 +1396,22 @@ export async function createPost(formData: FormData) {
         return {success: false, error: "Internal server error"};
     }
 }
+
+export async function deletePost(postId: string) {
+    try {
+        const post = prisma.post.delete({
+            where: {
+                id: postId
+            }
+        })
+
+        if (!post) {
+            return {success: false, error: "failed to delete post"};
+        }
+
+        return {success: true, data: post};
+    } catch (error: any) {
+        logError("Error deleting post", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
