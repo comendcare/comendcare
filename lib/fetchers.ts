@@ -624,3 +624,25 @@ export async function getPosts() {
         return {success: false, error: "Database error. please try again later."}
     }
 }
+
+export async function getPostComments(postId: string) {
+    try {
+        const comments = await prisma.comment.findMany({
+            where: {
+                postId: postId
+            },
+            include: {
+                author: true,
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        })
+
+        console.log(comments)
+        return {success: true, data: comments}
+    } catch (error: any) {
+        console.error("Database error finding comments:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}

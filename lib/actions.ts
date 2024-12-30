@@ -1415,3 +1415,42 @@ export async function deletePost(postId: string) {
         return {success: false, error: "Internal server error"};
     }
 }
+
+export async function createComment(postId: string | null, text: string) {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        if (!postId) {
+            return {success: false, error: "Post ID not provided."};
+        }
+
+        const comment = prisma.comment.create({
+            data: {
+                post: {
+                    connect: {
+                        id: postId
+                    }
+                },
+                author: {
+                    connect: {
+                        id: session?.user.id
+                    }
+                },
+                text: text
+            }
+        })
+
+        if (!comment) {
+            return {success: false, error: "failed to create comment"};
+        }
+
+        return {success: true, data: comment};
+    } catch (error: any) {
+        logError("Error creating comment", error);
+        return {success: false, error: "Internal server error"};
+    }
+}

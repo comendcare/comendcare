@@ -7,6 +7,7 @@ import {ProfilePhoto} from "@/components/profile-photo"
 import {CommentInput} from "@/components/comment-input";
 import {useState} from "react";
 import {useSession} from "next-auth/react";
+import {createComment} from "@/lib/actions";
 
 interface CommentFormProps {
     postId: string | null;
@@ -16,13 +17,20 @@ export function CommentForm({postId}: CommentFormProps) {
     const { data: session } = useSession()
     const [commentValue, setCommentValue] = useState("");
     const inputRef = React.useRef<HTMLInputElement | null>(null);
-    const [isLoading, setIsLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(false)
 
     React.useEffect(() => {
         inputRef.current?.focus();
     }, []);
 
+    let comment
     const onSubmit = React.useCallback(async () => {
+        const response = await createComment(postId, commentValue)
+        if (response.success) {
+            comment = response.data
+        } else {
+            console.error(response.error)
+        }
     }, []);
 
     const disabled = isLoading || commentValue.trim() === "";
