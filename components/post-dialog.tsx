@@ -21,9 +21,14 @@ import {useSession} from "next-auth/react";
 import {FaEllipsis} from "react-icons/fa6";
 import Link from "next/link";
 import {formatDates} from "@/lib/utils";
-import {deletePost} from "@/lib/actions";
+import {createComment, deletePost} from "@/lib/actions";
 import {useRouter, useSearchParams} from "next/navigation";
 import Image from "next/image"
+import {CommentList} from "@/components/comment-list";
+import {CommentInput} from "@/components/comment-input";
+import {useState} from "react";
+import {toast} from "sonner";
+import PostActionBar from "@/components/post-action-bar";
 
 export function PostDialog(
     {
@@ -39,6 +44,26 @@ export function PostDialog(
     const searchParams = useSearchParams()
     const [isDeletingPost, setIsDeletingPost] = React.useState(false);
     const [isOpen, setIsOpen] = React.useState(false);
+    const [commentValue, setCommentValue] = useState("");
+    const inputRef = React.useRef<HTMLInputElement | null>(null);
+    const [isLoading, setIsLoading] = useState(false)
+
+    React.useEffect(() => {
+        inputRef.current?.focus();
+    }, []);
+
+    let comment
+    const onSubmit = React.useCallback(async () => {
+        const response = await createComment(post.id, commentValue)
+        if (response.success) {
+            comment = response.data
+        } else {
+            console.error(response.error)
+            toast.error("Something went wrong and we couldn't post your comment... Please try again later.")
+        }
+    }, [commentValue, isLoading, post.id])
+
+    const disabled = isLoading || commentValue.trim() === "";
 
     const params = new URLSearchParams(searchParams.toString())
 
@@ -135,6 +160,7 @@ export function PostDialog(
                     </DialogTitle>
                     <DialogDescription>
                         {post.text}
+                        <PostActionBar data={post} />
                     </DialogDescription>
                 </DialogHeader>
 

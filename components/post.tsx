@@ -36,6 +36,7 @@ import {deletePost} from "@/lib/actions";
 import {useRouter} from "next/navigation";
 import {CommentList} from "@/components/comment-list";
 import {PostDialog} from "@/components/post-dialog";
+import PostActionBar from "@/components/post-action-bar";
 
 interface PostProps {
     data: PostWithAuthorAndComments;
@@ -71,7 +72,6 @@ export function Post({data}: PostProps) {
         await deletePost(data.id)
         router.refresh()
     }, [data.id]);
-
 
     const [ref, {height}] = useMeasure();
 
@@ -184,84 +184,7 @@ export function Post({data}: PostProps) {
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col text-muted-foreground">
-                    <div className="flex w-full justify-between text-muted-foreground text-sm mb-1">
-                        {likeCount > 0 && (
-                            <div className="flex items-center gap-1">
-                                <IconThumbUpFilled className="text-facebook-primary w-4 h-4"/>
-                                <span>{likeCount}</span>
-                            </div>
-                        )}
-
-                        {data.comments.length !== 0 ? (
-                            <div className="flex w-full justify-end">
-                                <div>
-                                    <span className="flex items-center gap-1">
-                                        <p>{data.comments.length}</p>
-                                        <Icons.comment className="w-4 h-4 md:hidden"/>
-                                        <p className="hidden md:block">Comments</p>
-                                    </span>
-                                </div>
-                            </div>
-                        ) : null}
-                    </div>
-                    <Separator className="mb-2"/>
-                    <div className="flex w-full text-base font-medium">
-                        <Button
-                            variant="ghost"
-                            className="flex-1 active:scale-95"
-                            onClick={() => toggleLike()}
-                        >
-                            <span
-                                className={cn(
-                                    "flex items-center",
-                                    hasLiked ? "text-facebook-primary" : "text-muted-foreground"
-                                )}
-                            >
-                                <IconThumbUp className={cn("w-5 h-5 md:w-6 md:h-6 mr-2")}/>
-                                <span>Like</span>
-                            </span>
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            className="flex-1 active:scale-95"
-                            onClick={toggleComment}
-                        >
-                            <Icons.comment className="w-5 h-5 md:w-6 md:h-6 mr-2"/>
-                            <span>Comment</span>
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            className="flex-1 sm:flex cursor-not-allowed"
-                        >
-                            <IconShare className="w-5 h-5 md:w-6 md:h-6 mr-2"/>
-                            <span>Share</span>
-                        </Button>
-                    </div>
-                    <div className="w-full">
-                        <motion.div animate={{height}} className="overflow-hidden w-full">
-                            {showComment && (
-                                <>
-                                    <AnimatePresence>
-                                        <div ref={ref} className="w-full py-1">
-                                            <Separator className="mt-2"/>
-                                            <motion.div
-                                                layout
-                                                {...setTransition({
-                                                    duration: 0.5,
-                                                })}
-                                                className="w-full flex flex-col pt-2"
-                                            >
-                                                <CommentList postId={postId}/>
-                                                <CommentForm
-                                                    postId={postId}
-                                                />
-                                            </motion.div>
-                                        </div>
-                                    </AnimatePresence>
-                                </>
-                            )}
-                        </motion.div>
-                    </div>
+                    <PostActionBar data={data} />
                 </CardFooter>
             </Card>
         </MotionConfig>
