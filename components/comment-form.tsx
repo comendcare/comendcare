@@ -8,6 +8,7 @@ import {CommentInput} from "@/components/comment-input";
 import {useState} from "react";
 import {useSession} from "next-auth/react";
 import {createComment} from "@/lib/actions";
+import {toast} from "sonner";
 
 interface CommentFormProps {
     postId: string | null;
@@ -30,8 +31,9 @@ export function CommentForm({postId}: CommentFormProps) {
             comment = response.data
         } else {
             console.error(response.error)
+            toast.error("Something went wrong and we couldn't post your comment... Please try again later.")
         }
-    }, []);
+    }, [commentValue, isLoading, postId])
 
     const disabled = isLoading || commentValue.trim() === "";
     return (
