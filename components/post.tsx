@@ -12,12 +12,11 @@ import {
     CardHeader,
 } from "@/components/ui/card";
 import {Icons} from "@/components/icons";
-import {extendedPost} from "@/lib/types";
+import {PostWithAuthorAndComments} from "@/lib/types";
 import {Button} from "@/components/ui/button";
 import {Separator} from "@/components/ui/separator";
 import {cn, formatDates} from "@/lib/utils";
 import {CommentForm} from "@/components/comment-form";
-// import {CommentList} from "@/components/comment/comment-list";
 import {useLike} from "@/lib/hooks/use-like";
 // import {UserName} from "@/components/user/user-name";
 import {
@@ -34,12 +33,15 @@ import {IconShare, IconThumbUp, IconThumbUpFilled} from "@tabler/icons-react";
 import {useSession} from "next-auth/react";
 import {FaEllipsis} from "react-icons/fa6";
 import {deletePost} from "@/lib/actions";
+import {useRouter} from "next/navigation";
+import {CommentList} from "@/components/comment-list";
 
 interface PostProps {
-    data: extendedPost;
+    data: PostWithAuthorAndComments;
 }
 
 export function Post({data}: PostProps) {
+    const router = useRouter();
     const {data: session} = useSession()
     const postId = data.id;
     const [showComment, setShowComment] = React.useState(false);
@@ -66,6 +68,7 @@ export function Post({data}: PostProps) {
 
     const onDelete = React.useCallback(async () => {
         await deletePost(data.id)
+        router.refresh()
     }, [data.id]);
 
 
@@ -241,7 +244,7 @@ export function Post({data}: PostProps) {
                                                 })}
                                                 className="w-full flex flex-col pt-2"
                                             >
-                                                {/*<CommentList postId={postId}/>*/}
+                                                <CommentList postId={postId}/>
                                                 <CommentForm
                                                     postId={postId}
                                                 />

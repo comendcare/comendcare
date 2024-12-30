@@ -3,10 +3,10 @@
 import * as React from "react";
 import {AnimatePresence} from "framer-motion";
 import {Post} from "@/components/post";
-import {extendedPost} from "@/lib/types";
+import {PostWithAuthorAndComments} from "@/lib/types";
 import Image from "next/image";
 
-export function PostList({posts}: { posts: extendedPost[] }) {
+export function PostList({posts}: { posts: PostWithAuthorAndComments[] }) {
     return (
         <AnimatePresence mode="popLayout">
             {posts.length > 0 ? posts.map(post =>
