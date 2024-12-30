@@ -35,6 +35,7 @@ import {FaEllipsis} from "react-icons/fa6";
 import {deletePost} from "@/lib/actions";
 import {useRouter} from "next/navigation";
 import {CommentList} from "@/components/comment-list";
+import {PostDialog} from "@/components/post-dialog";
 
 interface PostProps {
     data: PostWithAuthorAndComments;
@@ -91,8 +92,8 @@ export function Post({data}: PostProps) {
                             {/*    larger*/}
                             {/*>*/}
                             <ProfilePhoto
-                                img={session?.user.image}
-                                name={session?.user.name}
+                                img={data.author?.image}
+                                name={data.author?.name}
                                 className="h-8 w-8 rounded-full"
                             />
                             {/*</UserTooltip>*/}
@@ -145,17 +146,23 @@ export function Post({data}: PostProps) {
                 </CardHeader>
                 <CardContent>
                     <div className="w-full flex flex-col">
-                        <p
-                            onClick={toggleShowMoreText}
-                            className={cn(
-                                "break-words text-sm md:text-base",
-                                showMoreText
-                                    ? "line-clamp-none" : "line-clamp-6",
-                                "whitespace-pre-line"
-                            )}
-                        >
-                            {data.text}
-                        </p>
+                        <PostDialog
+                            trigger={
+                                <p
+                                    onClick={toggleShowMoreText}
+                                    className={cn(
+                                        "break-words text-sm md:text-base",
+                                        showMoreText
+                                            ? "line-clamp-none" : "line-clamp-6",
+                                        "whitespace-pre-line"
+                                    )}
+                                >
+                                    {data.text}
+                                </p>
+                            }
+                            post={data}
+                        />
+
                         {/*<div*/}
                         {/*    className={cn(*/}
                         {/*        "w-full grid",*/}
