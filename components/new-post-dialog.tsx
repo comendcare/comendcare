@@ -108,7 +108,7 @@ export default async function NewPostDialog() {
                     </CardContent>
                 </Card>
             </DialogTrigger>
-            <DialogContent className="min-w-40 sm:w-1/3">
+            <DialogContent className="min-w-40 sm:w-1/2 max-w-4xl">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                         <DialogHeader>

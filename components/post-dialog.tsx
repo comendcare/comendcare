@@ -106,7 +106,10 @@ export function PostDialog(
             <DialogTrigger asChild>
                 {trigger}
             </DialogTrigger>
-            <DialogContent className="grid grid-cols-3 max-w-full grid-flow-dense">
+            <DialogContent
+                showCloseButton={false}
+                className="grid grid-cols-3 max-w-full grid-flow-dense"
+            >
                 <DialogHeader className="col-span-1 order-2">
                     <DialogTitle>
                         <div className="flex justify-between">
