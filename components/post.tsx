@@ -98,7 +98,7 @@ export function Post({data}: PostProps) {
                             />
                             {/*</UserTooltip>*/}
                             <div className="flex flex-col">
-                                <Link href={`/profile/${data.author?.id}`} passHref>
+                                <Link href={`/app/user/${data.author?.id}`} passHref>
                                     {/*<UserName*/}
                                     {/*    firstName={firstName}*/}
                                     {/*    lastName={lastName}*/}

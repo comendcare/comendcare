@@ -527,6 +527,10 @@ export async function getMilestoneDetails(id: string) {
 export async function getKanbanFromOrganizationId() {
     const session = await getSession()
     try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
         const kanban = await prisma.kanban.findUnique({
             where: {
                 organizationId: session?.user.organizationId
@@ -540,7 +544,7 @@ export async function getKanbanFromOrganizationId() {
     }
 }
 
-export async function getNodesEdgesAndMilestones(roadmapId: string | null | undefined): Promise<ApiResponse<any>>  {
+export async function getNodesEdgesAndMilestones(roadmapId: string | null | undefined): Promise<ApiResponse<any>> {
     if (roadmapId) {
         try {
             const dbNodes = await Promise.all(
@@ -639,8 +643,32 @@ export async function getPostComments(postId: string) {
             }
         })
 
-        console.log(comments)
         return {success: true, data: comments}
+    } catch (error: any) {
+        console.error("Database error finding comments:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function isUserFollowing(id: string) {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        const follow = await prisma.follow.findUnique({
+            where: {
+                userId_followedType_followedId: {
+                    userId: session.user.id,
+                    followedType: "ORGANIZATION", // right now we only allow following organizations
+                    followedId: id,
+                },
+            },
+        })
+
+        return {success: true, data: follow !== null}
     } catch (error: any) {
         console.error("Database error finding comments:", error)
         return {success: false, error: "Database error. please try again later."}

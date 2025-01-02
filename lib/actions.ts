@@ -1454,3 +1454,38 @@ export async function createComment(postId: string | null, text: string) {
         return {success: false, error: "Internal server error"};
     }
 }
+
+export async function createFollow(organizationId: string | null) {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        if (!organizationId) {
+            return {success: false, error: "Organization ID not provided."};
+        }
+
+        const follow = prisma.follow.create({
+            data: {
+                user: {
+                    connect: {
+                        id: session.user.id
+                    }
+                },
+                followedId: organizationId,
+                followedType: "ORGANIZATION",
+            }
+        })
+
+        if (!follow) {
+            return {success: false, error: "failed to follow organization"};
+        }
+
+        return {success: true, data: follow};
+    } catch (error: any) {
+        logError("Error following organization", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
