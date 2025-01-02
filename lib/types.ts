@@ -1,4 +1,14 @@
 import type { Option } from "@/components/ui/multiple-selector"
+import {User, Post, Comment, Prisma} from "@prisma/client";
+
+export type CommentWithUser = Prisma.CommentGetPayload<{
+    include: { author: true };
+}>;
+
+export type PostWithAuthorAndComments = Post & {
+    author: User
+    comments: Comment[]
+}
 
 // export type MilestoneTypes =
 //   BASICSCIENCE

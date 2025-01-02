@@ -64,7 +64,6 @@ export default function OrganizationSelector({
         });
         router.refresh()
     };
-    console.log(selectedOrganization)
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
