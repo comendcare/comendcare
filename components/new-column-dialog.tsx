@@ -53,7 +53,7 @@ export default function NewColumnDialog() {
             if (response.success && response.data) {
                 await createKanbanColumn(response.data).then((response) => {
                     if (response.success && response.data) {
-                        toast.success("column created successfully!");
+                        toast.success("Column created successfully!");
                     } else {
                         console.error(response.error)
                         toast.error(response.error)

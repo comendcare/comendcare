@@ -85,7 +85,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
         try {
             await deleteKanbanColumn(column).then((response) => {
                 if (response.success && response.data) {
-                    toast.success("column deleted successfully!");
+                    toast.success("Column deleted successfully!");
                 } else {
                     console.error(response.error)
                     toast.error(response.error)

@@ -1,7 +1,8 @@
 import Image from "next/image"
+import {Organization} from "@prisma/client";
 
 
-export default function UnverifiedOrganizationPage() {
+export default function UnverifiedOrganizationPage({organization}: {organization: Organization}) {
     return (
         <div className="h-full flex flex-col items-center justify-center py-20">
             <Image
@@ -22,7 +23,7 @@ export default function UnverifiedOrganizationPage() {
                 {`Your organization is not verified yet.`}
             </p>
             <p className="mt-4 text-stone-500 dark:text-stone-300">
-                {`We're currently verifying your organization. If this is taking too long, please contact support.`}
+                {`We're currently verifying ${organization.name}. If this is taking too long, please contact support.`}
             </p>
         </div>
     )
