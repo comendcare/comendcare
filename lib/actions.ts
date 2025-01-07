@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma, Column, Kanban, Post} from "@prisma/client"
+import {Roadmap, Organization, Prisma, Column, Kanban, Post, Task, User} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
@@ -11,6 +11,7 @@ import {customAlphabet} from "nanoid";
 import {getBlurDataURL, logError} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from "@/lib/emails";
+import { getKanbanFromOrganizationId } from "./fetchers"
 import {ApiResponse} from "@/lib/types";
 
 
@@ -1187,17 +1188,39 @@ async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneT
     }
 }
 
-export async function updateDBTask({tasks}: { tasks: any[] }) {
+export async function updateDBColumns({ columns }: { columns: Column[] }) {
     try {
-        // console.log(`tasks:`, tasks)
+        await Promise.all(
+            columns.map(async (column: any) => {
+                await prisma.column.update({
+                    where: {id: column?.id},
+                    data: {
+                        name: column.name,
+                        kanbanPosition: column.kanbanPosition
+                    }
+                })
+            })
+        )
+
+        console.log(`Successfully updated Task`)
+    } catch (error) {
+        console.error(`Error updating Task: `, error)
+    }
+}
+
+export async function updateDBTask({tasks}: { tasks: Task[] }) {
+    try {
+        console.log(`tasks:`, tasks)
 
         await Promise.all(
             tasks.map(async (task: any) => {
+                if (!task) return
+                console.log(`task`, task)
                 await prisma.task.update({
-                    where: {id: task.id},
+                    where: {id: task?.id},
                     data: {
                         name: task.name,
-                        status: task.status,
+                        // status: task.status,
                         description: task.description,
                         orderPosition: task.orderPosition,
                         kanbanPosition: task.kanbanPosition,
@@ -1210,6 +1233,21 @@ export async function updateDBTask({tasks}: { tasks: any[] }) {
                                     orderPosition: item?.orderPosition
                                 }))
                             }
+                        },
+                        stakeholders: {
+                            set: [],
+                            connect: task.stakeholders.map((stakeholder: User) => ({ id: stakeholder?.id }))
+                        },
+                        ...(task.milestone?.id ? ({
+                            milestone: {
+                                connect: { id: task.milestone?.id }
+                            },
+                        }) : undefined),
+                        endDate: task.endDate,
+                        priority: task.priority,
+                        private: task.private,
+                        column: {
+                            connect: { id: task.columnId }
                         }
                     }
                 })
@@ -1301,64 +1339,79 @@ export async function deleteUser(
     }
 }
 
-export async function createNewKanbanTask(column: Column) {
+export async function createNewKanbanTask(task: Prisma.TaskGetPayload<{
+    select: {
+        id: true,
+        name: true,
+        orderPosition: true,
+        kanbanPosition: true,
+        columnId: true
+    }
+}>) {
     try {
-        const task = prisma.task.create({
+        const newTask = prisma.task.create({
             data: {
+                id: task.id,
                 column: {
                     connect: {
-                        id: column.id
-                    },
+                        id: task.columnId
+                    }
                 },
+                name: task.name,
                 orderPosition: 0,
                 kanbanPosition: 0
             }
         })
 
-        if (!task) {
+        if (!newTask) {
             return {success: false, error: "membership not found"};
         }
 
-        return {success: true, data: task};
+        return {success: true, data: newTask};
     } catch (error: any) {
         logError("Error fetching membership data", error);
         return {success: false, error: "Internal server error"};
     }
 }
 
-export async function createKanbanColumn(kanban: Kanban) {
+export async function createKanbanColumn(column: Column) {
     try {
-        const column = prisma.column.create({
+        const { data: kanban } = await getKanbanFromOrganizationId()
+        if (!kanban) return {success: false, error: "failed to find associated kanban board"}
+
+        const newColumn = prisma.column.create({
             data: {
+                id: column.id,
                 kanban: {
                     connect: {
                         id: kanban.id
                     },
                 },
+                name: column.name,
                 kanbanPosition: 0
             }
         })
 
-        if (!column) {
+        if (!newColumn) {
             return {success: false, error: "failed to create kanban column"};
         }
 
-        return {success: true, data: column};
+        return {success: true, data: newColumn};
     } catch (error: any) {
         logError("Error creating kanban column", error);
         return {success: false, error: "Internal server error"};
     }
 }
 
-export async function deleteKanbanColumn(column: Column) {
+export async function deleteKanbanColumn(columnId: string) {
     try {
         const deletedColumn = prisma.column.delete({
             where: {
-                id: column.id
+                id: columnId
             }
         })
 
-        if (!column) {
+        if (!deletedColumn) {
             return {success: false, error: "failed to delete kanban column"};
         }
 

@@ -17,13 +17,17 @@ import {
     DialogDescription
 } from "./ui/dialog"
 import {EditTaskForm} from "./edit-task-form"
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {usePathname, useRouter, useSearchParams} from "next/navigation"
 import {Checkbox} from "./ui/checkbox"
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
+import { DisplayPlateEditor } from "./editor/display-plate-editor"
+import { ScrollArea } from "./ui/scroll-area"
+import { User } from "@prisma/client"
+import { ProfilePhoto } from "./profile-photo"
 
 export interface Task {
     columnId: string;
@@ -34,6 +38,8 @@ export interface Task {
     checklist?: any[],
     orderPosition: number,
     kanbanPosition: number,
+    stakeholders: User[],
+    endDate: Date
 }
 
 interface TaskCardProps {
@@ -48,12 +54,7 @@ export interface TaskDragData {
     task: Task
 }
 
-const selector = (state: RoadmapState) => ({
-    setSelectedTaskId: state.setSelectedTaskId
-})
-
 export function TaskCard({task, isOverlay}: TaskCardProps) {
-    const {setSelectedTaskId} = useRoadmapStore(useShallow(selector))
     const {
         setNodeRef,
         attributes,
@@ -71,9 +72,6 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
             roleDescription: "Task"
         }
     })
-    const router = useRouter()
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
 
     const style = {
         transition,
@@ -89,20 +87,24 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
         }
     })
 
+    const [description, setDescription] = useState(null)
+
+    useEffect(() => {
+      if (task?.description) {
+        try {
+            const newDescription = JSON.parse(task?.description || "[]")
+            setDescription(newDescription) // Parse and update state when description changes
+        } catch (e) {
+            console.error(`could not parse description`, e)
+        }
+      }
+    }, [task]) // Dependency on task.description to trigger re-render
+
     return (
         <Dialog>
             <DialogTrigger asChild>
                 <Card
-                    onClick={() => {
-                        // setSelectedTaskId(task?.id)
-
-                        const params = new URLSearchParams(searchParams.toString())
-                        params.delete("task")
-                        params.set("task", task?.id)
-
-                        router.push(`${pathname}?${params.toString()}`, {scroll: false})
-                    }}
-                    ref={setNodeRef}
+                    ref={setNodeRef} // necessary for drag and drop to work
                     style={style}
                     className={variants({
                         dragging: isOverlay
@@ -124,24 +126,41 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                         </Button>
                         <div className="flex flex-col">
                             <CardTitle className="text-lg">{task?.name}</CardTitle>
-                            <CardDescription>{task?.description}</CardDescription>
+                            {task?.endDate && <p className="text-sm text-muted-foreground">{task.endDate.toDateString()}</p>}
                         </div>
                     </CardHeader>
-                    <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">
-                        <ol id="checklist" className="flex flex-col gap-2">
-                            {task?.checklist?.map(
-                                (item: any, index: number) => (
-                                    <li key={index} className="flex gap-2 items-center">
-                                        <Checkbox checked={item.complete} disabled={true}/>
-                                        <p>{item.name}</p>
-                                    </li>
-                                )
-                            )}
-                        </ol>
+                    <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap flex flex-col gap-8">
+                        {description && (
+                            <ScrollArea className="max-h-[200px]">
+                                <DisplayPlateEditor value={description} />
+                            </ScrollArea>
+                        )}
+                        {task?.checklist && task.checklist.length > 0 && (
+                            <div className="flex flex-col gap-2 px-4">
+                                <h2 className="font-semibold">Checklist</h2>
+                                <ol id="checklist" className="flex flex-col gap-2">
+                                    {task?.checklist?.map(
+                                        (item: any, index: number) => (
+                                            <li key={index} className="flex gap-2 items-center">
+                                                <Checkbox checked={item.complete} disabled={true}/>
+                                                <p>{item.name}</p>
+                                            </li>
+                                        )
+                                    )}
+                                </ol>
+                            </div>
+                        )}
                     </CardContent>
+                    <CardFooter>
+                        {task?.stakeholders && task?.stakeholders.length > 0 && (
+                            task.stakeholders.map((stakeholder, index) => (
+                                <ProfilePhoto key={index} img={stakeholder.image} name={stakeholder.name}/>
+                            ))
+                        )}
+                    </CardFooter>
                 </Card>
             </DialogTrigger>
-            <DialogContent className="">
+            <DialogContent className="min-w-fit min-h-fit">
                 <DialogHeader>
                     <DialogTitle>Edit Task Details</DialogTitle>
                     <DialogDescription>
@@ -150,13 +169,8 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                 </DialogHeader>
                 <EditTaskForm
                     taskData={task}
-                    // onClose={() => setIsEditing(false)}
-                    onClose={() => {
-                    }}
+                    onClose={() => {}}
                 />
-                {/*<DialogFooter>*/}
-                {/*    <Button type="submit">Save changes</Button>*/}
-                {/*</DialogFooter>*/}
             </DialogContent>
         </Dialog>
 
