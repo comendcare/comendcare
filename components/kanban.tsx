@@ -26,26 +26,10 @@ import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSession } from "next-auth/react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 
-// const defaultCols = [
-//     {
-//         id: "TODO" as const,
-//         name: "To Do",
-//         styling: "bg-red-100 border-red-600 text-red-800 hover-red-400"
-//     },
-//     {
-//         id: "INPROGRESS" as const,
-//         name: "In progress",
-//         styling: "bg-yellow-100 border-yellow-600 text-yellow-800"
-//     },
-//     {
-//         id: "DONE" as const,
-//         name: "Done",
-//         styling: "bg-green-100 border-green-600 text-green-800"
-//     }
-// ] satisfies any[]
-
-// export type ColumnId = (typeof defaultCols)[number]["id"]
 export type ColumnId = string
 
 const kanbanSelector = (state: KanbanState) => ({
@@ -57,36 +41,53 @@ const kanbanSelector = (state: KanbanState) => ({
 
 export function KanbanView() {
     const { columns, tasks } = useKanbanStore(useShallow(kanbanSelector))
+    const [sortBy, setSortBy] = useState<string>('default')
 
     return (
-        <Kanban
-            initColumns={columns}
-            initTasks={tasks}
-        />
+        <Tabs defaultValue="team" className="w-full">
+            <div className="flex flex-row gap-8 items-center">
+                <TabsList className="grid w-[400px] grid-cols-2">
+                    <TabsTrigger value="team">Team Tasks</TabsTrigger>
+                    <TabsTrigger value="personal">My Tasks</TabsTrigger>
+                </TabsList>
+                <h2>Sort By:</h2>
+                <Select onValueChange={(value: string) => setSortBy(value)}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue defaultValue={'default'} placeholder={"Default"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="default">{`Default`}</SelectItem>
+                        <SelectItem value="priority">{`Priority (High - Low)`}</SelectItem>
+                        <SelectItem value="date">{`Date (Earliest - Latest)`}</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            <TabsContent value="team">
+                <Kanban
+                    initColumns={columns}
+                    initTasks={tasks}
+                    filter={"team"}
+                    sortBy={sortBy}
+                />
+            </TabsContent>
+            <TabsContent value="personal">
+                <Kanban
+                    initColumns={columns}
+                    initTasks={tasks}
+                    filter={"personal"}
+                    sortBy={sortBy}
+                />
+            </TabsContent>
+        </Tabs>
     )
 }
 
-const sortKanbanTasks = (tasks: Task[]) => {
-    return tasks.sort((a: Task, b: Task) => {
-        if (a.kanbanPosition !== undefined && b.kanbanPosition !== undefined && a.kanbanPosition !== b.kanbanPosition) {
-            return a.kanbanPosition - b.kanbanPosition
-        }
-        return a.orderPosition - b.orderPosition
-    })
-}
-
-function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: Task[] }) {
+function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Column[], initTasks: Task[], filter: 'team' | 'personal' | undefined, sortBy?: string | undefined }) {
+    const {data: session} = useSession()
     const { tasks: stateTasks, columns: stateColumns, setTasks: setDbTasks, setColumns: setDbColumns } = useKanbanStore(useShallow(kanbanSelector))
     const [columns, setColumns] = useState<Column[]>([])
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
     const columnsId = useMemo(() => columns.map(col => col.id), [columns])
-
-    // kanban requires its own state outside of the zustand state, so we can move things around properly
-    const [tasks, setTasks] = useState<Task[]>(sortKanbanTasks(initTasks))
-
-    const [activeColumn, setActiveColumn] = useState<Column | null>(null)
-
-    const [activeTask, setActiveTask] = useState<Task | null>(null)
 
     const sensors = useSensors(
         useSensor(MouseSensor),
@@ -96,22 +97,51 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
         })
     )
 
+    const sortKanbanTasks = (tasks: Task[]) => {    
+        const priorities = ['HIGH', 'MEDIUM', 'LOW']
+
+        if (sortBy === 'default') {
+            // sort default (kanban & order position)
+            tasks = tasks.sort((a: Task, b: Task) => {
+                if (a.kanbanPosition !== undefined && b.kanbanPosition !== undefined && a.kanbanPosition !== b.kanbanPosition) {
+                    return a.kanbanPosition - b.kanbanPosition
+                }
+                return a.orderPosition - b.orderPosition
+            })
+        } else if (sortBy === 'priority') {
+            // sort by task priority (if it has one)
+            tasks = tasks.sort((a: Task, b: Task) => {
+                if (a.priority && b.priority && priorities.includes(a.priority) && priorities.includes(b.priority) && priorities.indexOf(a.priority) !== priorities.indexOf(b.priority)) {
+                    return priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
+                }
+                return 0
+            })
+        } else if (sortBy === 'date') {
+            // sort by task target date (if it has one)
+            tasks = tasks.sort((a: Task, b: Task) => {
+                if (a.endDate && b.endDate && a.endDate.getTime() !== b.endDate.getTime()) {
+                    return a.endDate.getTime() - b.endDate.getTime()
+                }
+                return 0
+            })
+        }
+    
+        return tasks
+    }
+
+    // kanban requires its own state outside of the zustand state, so we can move things around properly
+    const [tasks, setTasks] = useState<Task[]>(sortKanbanTasks(initTasks))
+
+    const [activeColumn, setActiveColumn] = useState<Column | null>(null)
+
+    const [activeTask, setActiveTask] = useState<Task | null>(null)
+
     useEffect(() => {
         // ensure we're updating the kanban tasks state whenever the zustand tasks state changes
         // React doesn't automatically re-render the component when initTasks changes
         setColumns(initColumns)
         setTasks(sortKanbanTasks(initTasks))
-    }, [initTasks, initColumns])
-
-    // useEffect(() => {
-    //     console.log(`TASKS CHANGED IN STATE`, stateTasks)
-    //     setTasks(stateTasks)
-    // }, [stateTasks])
-
-    // useEffect(() => {
-    //     console.log(`COLUMN CREATED`, stateColumns)
-    //     setColumns(stateColumns)
-    // }, [stateColumns])
+    }, [initTasks, initColumns, filter, sortBy])
 
     function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
         const tasksInColumn = tasks.filter(task => task.columnId === columnId)
@@ -374,9 +404,10 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
                         <BoardColumn
                             key={index}
                             column={col}
-                            tasks={tasks.filter(
-                                task => task?.columnId === col.id
-                            )}
+                            tasks={tasks.filter(task => {
+                                if (filter == "personal" && session?.user.id && !task.stakeholders.map(stakeholder => stakeholder.id).includes(session?.user.id)) return false
+                                return task?.columnId === col.id 
+                            })}
                         />
                     )) : <div>{`You don't have any columns`}</div>}
                 </SortableContext>
@@ -389,9 +420,7 @@ function Kanban({ initColumns, initTasks }: { initColumns: Column[], initTasks: 
                             <BoardColumn
                                 isOverlay
                                 column={activeColumn}
-                                tasks={tasks.filter(
-                                    task => task?.columnId === activeColumn.id
-                                )}
+                                tasks={tasks.filter(task => task?.columnId === activeColumn.id)}
                             />
                         )}
                         {activeTask && <TaskCard task={activeTask} isOverlay />}
