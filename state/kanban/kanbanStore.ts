@@ -11,6 +11,7 @@ export type KanbanState = {
     initState: (columns: Column[], tasks: any[]) => void,
     addColumn: (column: any) => void,
     deleteColumn: (columnId: string) => void,
+    setColumn: (columnId: string, newProperties: any) => void,
     setColumns: (columns: Column[]) => void,
     addTask: (columnId: string) => void,
     setTask: (taskId: string, newProperties: any) => void,
@@ -50,6 +51,20 @@ export const useKanbanStore = create<KanbanState>()(
                         toast.error(response.error)
                     }
                 })
+            },
+            setColumn: (columnId: string, newProperties: any) => {
+                const updatedColumns = get().columns.map(column => {
+                    if (column.id === columnId) {
+                        return ({
+                            ...column,
+                            ...newProperties
+                        })
+                    }
+
+                    return column
+                })
+                set({ columns: updatedColumns })
+                updateDBColumns({ columns: updatedColumns })
             },
             setColumns: (columns: Column[]) => {
                 set({ columns })

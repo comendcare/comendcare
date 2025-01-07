@@ -27,6 +27,7 @@ import {getKanbanFromOrganizationId} from "@/lib/fetchers";
 import {deleteKanbanColumn} from "@/lib/actions";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
+import EditColumnDialog from "./edit-column-dialog"
 
 
 export type ColumnType = "Column"
@@ -137,6 +138,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
+                            <EditColumnDialog column={column}/>
                             <DropdownMenuItem
                                 onClick={handleDelete}
                             >
