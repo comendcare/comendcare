@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import KanbanBoard from "@/components/kanban-board";
 import {getSession} from "@/lib/auth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default async function KanbanPage({
                                              params
@@ -85,20 +86,38 @@ export default async function KanbanPage({
         }
     })
 
-    const dbTasks = await prisma.task.findMany({
-
-    })
-
     return (
         <main className="flex flex-col space-y-4 p-8">
             <h1 className="text-3xl font-bold tracking-tight">
                 Kanban
             </h1>
-            <KanbanBoard
-                roadmapId={params.id}
-                initColumns={dbColumns || []}
-                initTasks={dbColumns.flatMap(column => column.tasks) || []}
-            />
+            <Tabs defaultValue="team" className="w-full">
+                <TabsList className="grid w-[400px] grid-cols-2">
+                    <TabsTrigger value="team">Team Tasks</TabsTrigger>
+                    <TabsTrigger value="personal">My Tasks</TabsTrigger>
+                </TabsList>
+                <TabsContent value="team">
+                    <KanbanBoard
+                        roadmapId={params.id}
+                        initColumns={dbColumns || []}
+                        initTasks={
+                            dbColumns
+                                .flatMap(column => column.tasks) || []
+                        }
+                    />
+                </TabsContent>
+                <TabsContent value="personal">
+                    <KanbanBoard
+                        roadmapId={params.id}
+                        initColumns={dbColumns || []}
+                        initTasks={
+                            (dbColumns
+                                .flatMap(column => column.tasks) || [])
+                                .filter(task => session?.user?.id && task.stakeholders.map(stakeholder => stakeholder.id).includes(session?.user.id))
+                        }
+                    />
+                </TabsContent>
+            </Tabs>
         </main>
     )
 }
