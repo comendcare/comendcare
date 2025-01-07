@@ -39,7 +39,8 @@ export interface Task {
     orderPosition: number,
     kanbanPosition: number,
     stakeholders: User[],
-    endDate: Date
+    endDate: Date,
+    priority: 'HIGH' | 'MEDIUM' | 'LOW'
 }
 
 interface TaskCardProps {

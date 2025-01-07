@@ -636,6 +636,42 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
     return {success: false, error: "No roadmapId provided."}
 }
 
+export async function getColumns(orgId: string | null | undefined): Promise<ApiResponse<any>> {
+    if (orgId) {
+        try {
+            const dbColumns = await prisma.column.findMany({
+                where: {
+                    kanban: {
+                        organization: {
+                            id: orgId
+                        }
+                    }
+                },
+                orderBy: [
+                    { kanbanPosition: 'asc' },
+                ],
+                include: {
+                    tasks: {
+                        orderBy: [ { kanbanPosition: 'asc' } ],
+                        include: {
+                            checklist: true,
+                            stakeholders: true,
+                            milestone: true
+                        }
+                    }
+                }
+            })
+
+            return { success: true, data: { columns: dbColumns } }
+        } catch (error: any) {
+            console.error("Database error finding kanban column details:", error)
+            return { success: false, error: "Database error. please try again later." }
+        }
+    }
+
+    return {success: false, error: "No roadmapId provided."}
+}
+
 export async function getPosts() {
     try {
         const posts = await prisma.post.findMany({

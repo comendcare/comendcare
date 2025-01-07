@@ -20,7 +20,7 @@ import {redirect} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {FaPlus} from "react-icons/fa6";
 import Loading from "@/app/loading";
-import {getAllOrganizationsFromUserId, getNodesEdgesAndMilestones, getRoadmapId} from "@/lib/fetchers";
+import {getAllOrganizationsFromUserId, getColumns, getNodesEdgesAndMilestones, getRoadmapId} from "@/lib/fetchers";
 import {toast} from "sonner";
 import {initializeClientState} from "@/lib/initialize-client-state";
 
@@ -87,12 +87,14 @@ export default function AppLayout({children}: AppLayoutProps) {
             if (response.success) {
                 setRoadmapId(response.data)
                 const nodesResponse = await getNodesEdgesAndMilestones(response.data)
-                if (nodesResponse.success) {
+                const kanbanResponse = await getColumns(orgId)
+                if (nodesResponse.success && kanbanResponse.success) {
                     initializeClientState({
                         roadmapId: roadmapId,
                         nodes: nodesResponse.data.nodes,
                         edges: nodesResponse.data.edges,
-                        milestones: nodesResponse.data.milestones
+                        milestones: nodesResponse.data.milestones,
+                        columns: kanbanResponse.data.columns
                     })
                 }
                 setIsLoading(false)
