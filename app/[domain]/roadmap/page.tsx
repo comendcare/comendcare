@@ -13,7 +13,6 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 import {Button} from "@/components/ui/button"
 import {PublicRoadmapCard} from "@/components/public-roadmap-card"
 import {PublicMilestoneDetails} from "@/components/public-milestone-details"
-import PAGPublicProfileHeader from "@/components/pag-public-profile-header"
 import {FaArrowLeft, FaCalendar, FaCircleDollarToSlot, FaCity, FaPeopleGroup, FaPlus} from "react-icons/fa6"
 import {BackButton} from "@/components/back-button"
 import PAGPublicRoadmapBreadcrumb from "@/components/pag-public-roadmap-breadcrumb";
@@ -187,8 +186,6 @@ export default async function OrganizationRoadmapPage({
                         <div
                             className="flex flex-col items-start justify-center my-24 gap-8 max-w-7xl m-auto w-full text-left"
                         >
-                            {/*<PAGPublicProfileHeader organization={organization} showBackButton={true}/>*/}
-
                             <PAGPublicRoadmapBreadcrumb
                                 organization={organization}
                                 roadmap={roadmaps[0]}

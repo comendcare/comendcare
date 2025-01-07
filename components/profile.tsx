@@ -16,7 +16,7 @@ import {
 import {FaArrowRightFromBracket} from "react-icons/fa6";
 import Loading from "@/app/loading";
 import { getUser } from "@/lib/fetchers"
-import { ProfilePhoto } from "./profile-photo"
+import { ProfilePhoto } from "@/components/profile-photo"
 
 export default function Profile({isCollapsed = false}: {isCollapsed?: boolean }) {
     const {data: session, status} = useSession()

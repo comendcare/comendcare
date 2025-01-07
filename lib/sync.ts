@@ -352,7 +352,7 @@ export const syncToTypesense = async (env: {
 // Run sync on start
 syncToTypesense({
     DATABASE_URL: process.env.DATABASE_URL!,
-    TYPESENSE_ADMIN_API_KEY: process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!,
+    TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
     TYPESENSE_URL: "https://" + process.env.NEXT_PUBLIC_TYPESENSE_NODE!,
     PULSE_API_KEY: process.env.PULSE_API_KEY!
 }).catch((error) => {

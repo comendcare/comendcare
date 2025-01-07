@@ -5,6 +5,26 @@ import {ColumnDragData} from "@/components/board-column";
 import {TaskDragData} from "@/components/task-card";
 import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
+import {formatDistanceToNowStrict} from "date-fns";
+
+export function formatDates(date: Date) {
+    const distance = formatDistanceToNowStrict(new Date(date));
+    const formattedDistance = distance
+        .replace("seconds", "s")
+        .replace("second", "s")
+        .replace("minutes", "m")
+        .replace("minute", "m")
+        .replace("hours", "h")
+        .replace("hour", "h")
+        .replace("days", "d")
+        .replace("day", "d")
+        .replace("months", "mo")
+        .replace("month", "mo")
+        .replace("years", "y")
+        .replace("year", "y");
+
+    return formattedDistance;
+}
 
 export const years = Array.from({ length: new Date().getFullYear() - 1970 + 1 }, (_, i) =>
     (new Date().getFullYear() - i).toString()

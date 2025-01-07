@@ -44,17 +44,29 @@ export default function InvitationForm() {
     })
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
-        const invitation = await inviteUser(
-            session.data,
-            form.getValues("email"),
-            "admin",
-            await getIp(),
-            {
-                organizationId: params?.id as string,
-                organizationName: organization?.name as string,
-                organizationImage: organization?.image as string,
+        try {
+            const response = await inviteUser(
+                session.data,
+                form.getValues("email"),
+                "admin",
+                await getIp(),
+                {
+                    organizationId: params?.id as string,
+                    organizationName: organization?.name as string,
+                    organizationImage: organization?.image as string,
+                }
+            )
+
+            if (response.success) {
+                const invitation = response.data
+                toast.success(`Invitation to ${invitation.email} sent successfully.`)
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
             }
-        )
+        } catch (error) {
+            toast.error("An error occurred. Please try again later.");
+        }
     }
 
     return (
