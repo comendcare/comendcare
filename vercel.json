@@ -1,7 +1,8 @@
 {
-  "functions": {
-    "lib/sync.ts": {
-      "cron": "*/5 * * * *"
+  "crons": [
+    {
+      "path": "/lib/sync",
+      "schedule": "*/5 * * * *"
     }
-  }
+  ]
 }
