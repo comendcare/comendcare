@@ -86,7 +86,7 @@ const addPulseExtension = (
 };
 
 // Main sync function
-export const syncToTypesense = async (env: {
+const syncToTypesense = async (env: {
     DATABASE_URL: string,
     TYPESENSE_ADMIN_API_KEY: string,
     TYPESENSE_URL: string,
