@@ -11,20 +11,21 @@ export default function PAGFollowButton({organizationId}: { organizationId: stri
     const [isFollowing, setIsFollowing] = useState<boolean | null>(null); // Use state to track following status
     const [loading, setLoading] = useState(false); // Track loading state for actions
 
-    // Function to check if the user is following
     async function checkIfFollowing() {
         setLoading(true); // Show loading while fetching data
         try {
             const response = await isUserFollowing(organizationId);
-            if (response.success && response.data) {
-                setIsFollowing(response.data); // Set following status
+
+            if (response.success) {
+                // Ensure response.data is a boolean or null
+                setIsFollowing(response.data ?? null);
             } else {
-                console.error(response.error);
+                console.error(response.error || "Unexpected response structure");
                 toast.error("Failed to check if you're already following this organization.");
             }
         } catch (error) {
             console.error(error);
-            toast.error("Failed to check if you're already following this organization.");
+            toast.error("An error occurred while checking your following status.");
         } finally {
             setLoading(false); // Hide loading after fetching
         }
