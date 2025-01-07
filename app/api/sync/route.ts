@@ -281,26 +281,26 @@ const syncToTypesense = async (env: {
             milestoneStream.stop();
         });
 
-        const FIVE_MINUTES = 5 * 60 * 1000;
-        let timeoutId: NodeJS.Timeout;
-
-        const resetTimeout = () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-            timeoutId = setTimeout(() => {
-                console.log('No events for 5 minutes. Terminating stream.');
-                orgStream.stop();
-                milestoneStream.stop();
-                throw Error('Stream terminated due to inactivity');
-            }, FIVE_MINUTES);
-        };
-
-        resetTimeout();
+        // const FIVE_MINUTES = 5 * 60 * 1000;
+        // let timeoutId: NodeJS.Timeout;
+        //
+        // const resetTimeout = () => {
+        //     if (timeoutId) {
+        //         clearTimeout(timeoutId);
+        //     }
+        //     timeoutId = setTimeout(() => {
+        //         console.log('No events for 5 minutes. Terminating stream.');
+        //         orgStream.stop();
+        //         milestoneStream.stop();
+        //         throw Error('Stream terminated due to inactivity');
+        //     }, FIVE_MINUTES);
+        // };
+        //
+        // resetTimeout();
 
         const handleOrgStream = async () => {
             for await (const event of orgStream) {
-                resetTimeout();
+                // resetTimeout();
                 console.log(`handle organization event`, event);
                 try {
                     switch (event.action) {
@@ -325,7 +325,7 @@ const syncToTypesense = async (env: {
 
         const handleMilestoneStream = async () => {
             for await (const event of milestoneStream) {
-                resetTimeout();
+                // resetTimeout();
                 console.log(`handle milestone event`, event);
                 try {
                     switch (event.action) {
@@ -357,7 +357,8 @@ const syncToTypesense = async (env: {
     } catch (error) {
         console.error('syncToTypesense job failed:', error);
         throw error;
-    }};
+    }
+};
 
 // Handle POST requests
 export async function POST(req: Request) {
