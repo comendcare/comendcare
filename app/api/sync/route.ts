@@ -386,5 +386,25 @@ export async function POST(req: Request) {
 
 // Optionally handle GET requests
 export async function GET() {
-    return NextResponse.json({ message: 'Use POST to trigger sync' }, { status: 405 });
+    try {
+        const env = {
+            DATABASE_URL: process.env.DATABASE_URL!,
+            TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
+            TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+            PULSE_API_KEY: process.env.PULSE_API_KEY!,
+        };
+
+        const result = await syncToTypesense(env);
+        return NextResponse.json(result, { status: 200 });
+    } catch (error) {
+        console.error('Error handling GET request:', error);
+
+        // Narrow down the error type
+        let errorMessage = 'An unexpected error occurred';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
+    }
 }
