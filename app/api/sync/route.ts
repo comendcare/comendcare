@@ -93,6 +93,8 @@ const syncToTypesense = async (env: {
     PULSE_API_KEY: string
 }) => {
     console.log('Starting syncToTypesense job...');
+    let orgStream: any
+    let milestoneStream: any
 
     try {
         // Initialize Prisma and extend with Pulse
@@ -273,8 +275,8 @@ const syncToTypesense = async (env: {
         console.log(`Created typesense milestones collection...`)
 
         // Stream organization changes
-        const orgStream = await prisma.organization.stream({name: 'organization-events'});
-        const milestoneStream = await prisma.milestone.stream({name: 'milestone-events'});
+        orgStream = await prisma.organization.stream({name: 'organization-events'});
+        milestoneStream = await prisma.milestone.stream({name: 'milestone-events'});
 
         process.on('exit', () => {
             orgStream.stop();
@@ -357,6 +359,9 @@ const syncToTypesense = async (env: {
     } catch (error) {
         console.error('syncToTypesense job failed:', error);
         throw error;
+    } finally {
+        if (orgStream) orgStream.stop();
+        if (milestoneStream) milestoneStream.stop();
     }
 };
 
