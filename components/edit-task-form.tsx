@@ -1,7 +1,7 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod"
-import React, {useCallback, useEffect} from "react"
+import React, {useCallback, useEffect, useState} from "react"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {
@@ -19,6 +19,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import type {StatusType} from "./milestone-status-button"
 import {
     Dialog,
+    DialogClose,
     DialogTrigger
 } from "./ui/dialog"
 import {DeleteTaskDialogContent} from "./delete-task-dialog-content"
@@ -36,7 +37,7 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {GripVertical} from "lucide-react"
+import {CalendarIcon, GripVertical} from "lucide-react"
 import {
     DndContext,
     type DragEndEvent,
@@ -58,9 +59,28 @@ import {cva} from "class-variance-authority"
 import {debounce} from "lodash"
 import {SettingsProvider} from "@/components/editor/settings";
 import {PlateEditor} from "@/components/editor/plate-editor";
+import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
+import { getMembers, getMilestones, getOrganizationData } from "@/lib/fetchers"
+import MultiSelect from "./multi-select"
+import MultipleSelector from "./ui/multiple-selector"
+import { Member, Milestone, User } from "@prisma/client"
+import { useSession } from "next-auth/react"
+import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "./ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+import { Calendar } from "./ui/calendar"
+import { PrivateBadge } from "./private-badge"
+import { Switch } from "./ui/switch"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
+
+const optionSchema = z.object({
+    label: z.string(),
+    value: z.string(),
+    disable: z.boolean().optional(),
+})
 
 const editTaskForm = z.object({
     name: z
@@ -70,73 +90,102 @@ const editTaskForm = z.object({
         .min(1, "Name is required")
         .max(100, "Name must be less than 100 characters"),
     status: statusTypeSchema,
-    description: z.string().optional(),
+    description: z.array(z.record(z.any())),
     checklist: z.array(
         z.object({
             id: z.string(),
             name: z.string(),
             complete: z.boolean(),
-        })
-    ).optional()
+        }) 
+    ).optional(),
+    stakeholders: z.array(optionSchema).min(0).optional(),
+    milestone: z.string().optional(),
+    targetDate: z.any().optional(),
+    priority: z.string().optional(),
+    private: z.boolean()
 })
 
-const selector = (state: RoadmapState) => ({
+const selector = (state: KanbanState) => ({
     setTask: state.setTask
 })
 
 export function EditTaskForm({
-                                 // milestoneId,
-                                 taskData,
-                                 onClose
-                             }: {
-    // milestoneId: string
+    taskData,
+    onClose
+}: {
     taskData: any
     onClose: () => void
 }) {
-    const {setTask} = useRoadmapStore(useShallow(selector))
+    const { data: session } = useSession()
+    const { setTask } = useKanbanStore(useShallow(selector))
     const form = useForm<z.infer<typeof editTaskForm>>({
         mode: "onChange",
         resolver: zodResolver(editTaskForm),
         defaultValues: {
             name: taskData?.name,
-            status: taskData?.status,
-            description: taskData?.description || undefined,
-            checklist: taskData?.checklist || undefined
+            status: taskData?.status || 'TODO',
+            description: JSON.parse(taskData?.description || "[]") || [],
+            checklist: taskData?.checklist || undefined,
+            stakeholders: taskData?.stakeholders?.map((stakeholder: User) => ({ value: stakeholder.id, label: stakeholder.name })) || [],
+            milestone: taskData?.milestone?.id || undefined,
+            targetDate: taskData?.endDate || undefined,
+            priority: taskData?.priority || undefined,
+            private: taskData?.private || false
         }
     })
+
+    const [fetchedMembers, setFetchedMembers] = useState<User[]>([])
+    const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await getMembers(session?.user?.organizationId || undefined)
+            if (response.success) {
+                setFetchedMembers(response?.data?.map(member => member.user) as User[])
+            } else {
+                console.error(response.error)
+            }
+
+            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
+            if (milestonesResponse.success) {
+                setFetchedMilestones(milestonesResponse?.data as Milestone[])
+            } else {
+                console.error(milestonesResponse.error)
+            }
+        }
+
+        fetchData()
+    }, [])
 
     const name = form.watch("name")
     const status = form.watch("status")
     const description = form.watch("description")
     const checklist = form.watch("checklist")
-
-    // callback ensures we're not creating a new debounce every time this is called
-    const debounceUpdates = useCallback(
-        debounce(
-            (updatedValues) => handleFormSubmit(updatedValues),
-            500
-        ), []
-    )
-
-    useEffect(() => {
-        // callback in debounceUpdates holds onto the state of the time it was created
-        // we can't use the form.watch values directly (since they'll be outdated)
-        // we must pass in the most up to date values in the form
-        debounceUpdates({name, status, description, checklist})
-    }, [name, status, description, checklist])
+    const stakeholders = form.watch("stakeholders")
+    const milestone = form.watch("milestone")
+    const targetDate = form.watch("targetDate")
+    const priority = form.watch("priority")
+    const isPrivate = form.watch("private")
 
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
-        const {name, status, description, checklist} = values
+        const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
+
+        console.log(`targetDate`, targetDate)
 
         setTask(
             taskData?.id,
             {
                 name,
                 status,
-                ...(description ? {description} : undefined),
+                ...(description ? {description: JSON.stringify(description)} : undefined),
                 ...(checklist
                     ? {checklist: checklist.map((item, index) => ({...item, orderPosition: index}))}
-                    : undefined)
+                    : undefined),
+                ...(stakeholders ? { stakeholders: fetchedMembers?.filter(member => stakeholderIds?.includes(member.id)) }: undefined),
+                ...(milestone ? { milestone: { id: milestone } }: undefined),
+                ...(targetDate ? { endDate: targetDate } : undefined),
+                ...(priority ? { priority } : undefined),
+                private: isPrivate || false
             }
         )
         toast('Success!', {
@@ -207,33 +256,11 @@ export function EditTaskForm({
 
     return (
         <Form {...form}>
-            <ScrollArea>
+            <ScrollArea className={"max-h-[600px]"}>
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="flex flex-col gap-8"
+                    className="flex flex-col gap-8 p-4"
                 >
-                    <FormField
-                        control={form.control}
-                        name="status"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Task Status:`}</FormLabel>
-                                <FormControl>
-                                    <StatusButton
-                                        status={
-                                            field?.value as StatusType
-                                        }
-                                        onStatusChange={status =>
-                                            form.setValue("status", status)
-                                        }
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
                     <FormField
                         control={form.control}
                         name="name"
@@ -258,32 +285,27 @@ export function EditTaskForm({
                         name="description"
                         render={({field}) => (
                             <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Description:`}</FormLabel>
                                 <FormControl>
-                                    <Textarea
-                                        id="description"
-                                        placeholder={`Enter a description`}
-                                        defaultValue={field.value}
-                                        {...field}
-                                    />
+                                    <div className="w-full" data-registry="plate">
+                                        <SettingsProvider>
+                                            <PlateEditor 
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                            />
+                                        </SettingsProvider>
+                                    </div>
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>
                         )}
                     />
 
-                    <div className="w-full" data-registry="plate">
-                        <SettingsProvider>
-                            <PlateEditor/>
-                        </SettingsProvider>
-                    </div>
-
                     <FormField
                         control={form.control}
                         name="checklist"
                         render={({field}) => (
                             <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Checklist:`}</FormLabel>
+                                <FormLabel className="text-xl">{`Checklist`}</FormLabel>
                                 <FormControl>
                                     <>
                                         <DndContext
@@ -349,6 +371,138 @@ export function EditTaskForm({
                         )}
                     />
 
+                    <FormField
+                        control={form.control}
+                        name="stakeholders"
+                        render={({field}) => (
+                            <FormItem className="flex flex-col grow">
+                                <FormLabel className="text-xl">{`Stakeholders`}</FormLabel>
+                                <FormControl>
+                                    <MultipleSelector 
+                                        {...field}
+                                        showHoverCard={false}
+                                        placeholder="Select stakeholders..."
+                                        options={fetchedMembers ? fetchedMembers?.map((member: User) => ({
+                                            value: member.id || "",
+                                            label: member.name || ""
+                                        })): []}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField 
+                        control={form.control}
+                        name="milestone"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow">
+                                <FormLabel className="text-xl">{`Milestone`}</FormLabel>
+                                <Select
+                                    defaultValue={field.value}
+                                    onValueChange={field.onChange}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Link to a milestone" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {fetchedMilestones.map((m: Milestone, index: number) => (
+                                            <SelectItem value={m.id} key={index}>
+                                                {m.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </FormItem>
+                        )}
+                    />   
+
+                    <FormField 
+                        control={form.control}
+                        name="targetDate"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow">
+                                <FormLabel className="text-xl">{`Target Date`}</FormLabel>
+                                <Popover >
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                        )}
+                                        >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value || new Date()}
+                                            onSelect={field.onChange}
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField 
+                        control={form.control}
+                        name="priority"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow">
+                                <FormLabel className="text-xl">{`Priority`}</FormLabel>
+                                <Select
+                                    defaultValue={field.value}
+                                    onValueChange={field.onChange}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a priority" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="LOW">
+                                            Low
+                                        </SelectItem>
+                                        <SelectItem value="MEDIUM">
+                                            Medium
+                                        </SelectItem>
+                                        <SelectItem value="HIGH">
+                                            High
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormItem>
+                        )}
+                    />   
+
+                    <FormField
+                        control={form.control}
+                        name="private"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow flex flex-row align-center justify-between gap-4">
+                                <FormLabel className="text-xl">{`Private`}</FormLabel>
+                                {field.value && (
+                                    <PrivateBadge />
+                                )}
+                                <FormControl>
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
                     <span className="flex justify-end gap-4 flex-wrap">
                         <Dialog>
                             <DialogTrigger>
@@ -358,7 +512,9 @@ export function EditTaskForm({
                             </DialogTrigger>
                             <DeleteTaskDialogContent taskData={taskData}/>
                         </Dialog>
-                        <Button type="submit">Save Changes</Button>
+                        <DialogClose>
+                            <Button type="submit">Save Changes</Button>
+                        </DialogClose>
                     </span>
                 </form>
             </ScrollArea>
