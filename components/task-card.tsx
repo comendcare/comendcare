@@ -29,6 +29,8 @@ import { ScrollArea } from "./ui/scroll-area"
 import { User } from "@prisma/client"
 import { ProfilePhoto } from "./profile-photo"
 
+type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
+
 export interface Task {
     columnId: string;
     id: string
@@ -40,7 +42,7 @@ export interface Task {
     kanbanPosition: number,
     stakeholders: User[],
     endDate: Date,
-    priority: 'HIGH' | 'MEDIUM' | 'LOW'
+    priority: PriorityType
 }
 
 interface TaskCardProps {
@@ -125,9 +127,10 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                             <span className="sr-only">Move task</span>
                             <GripVertical/>
                         </Button>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col gap-1">
                             <CardTitle className="text-lg">{task?.name}</CardTitle>
                             {task?.endDate && <p className="text-sm text-muted-foreground">{task.endDate.toDateString()}</p>}
+                            {task?.priority && <PriorityBadge value={task.priority}/>}
                         </div>
                     </CardHeader>
                     <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap flex flex-col gap-8">
@@ -175,5 +178,28 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
             </DialogContent>
         </Dialog>
 
+    )
+}
+
+const PriorityBadge = ({value}: {value: PriorityType}) => {
+    const options = {
+        'HIGH': {
+            text: 'High',
+            style: 'bg-red-600 w-fit'
+        },
+        'MEDIUM': {
+            text: 'Medium',
+            style: 'bg-yellow-600 w-fit'
+        },
+        'LOW': {
+            text: 'Low',
+            style: 'bg-green-600 w-fit'
+        }
+    }
+
+    return (
+        <Badge className={options[value].style || ''}>
+            {options[value].text || 'priority'}
+        </Badge>
     )
 }
