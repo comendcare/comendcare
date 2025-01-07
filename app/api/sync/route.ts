@@ -101,6 +101,17 @@ const syncToTypesense = async (env: {
         const prisma = addPulseExtension(initPrismaClient(), env.PULSE_API_KEY);
         console.log(`Added prisma pulse extension...`)
 
+        // Stop existing streams (if any)
+        try {
+            const tempOrgStream = await prisma.organization.stream({ name: 'organization-events' });
+            const tempMilestoneStream = await prisma.milestone.stream({ name: 'milestone-events' });
+            tempOrgStream.stop();
+            tempMilestoneStream.stop();
+            console.log('Stopped existing streams.');
+        } catch (err) {
+            console.log('No existing streams to stop or already stopped.');
+        }
+
         // Ensure TypeSense organization collection exists
         await createTypeSenseCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
             name: 'organizations',
