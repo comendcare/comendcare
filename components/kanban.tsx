@@ -97,20 +97,21 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
         })
     )
 
-    const sortKanbanTasks = (tasks: Task[]) => {    
+    const sortKanbanTasks = (taskList: Task[]) => {    
         const priorities = ['HIGH', 'MEDIUM', 'LOW']
 
-        if (sortBy === 'default') {
-            // sort default (kanban & order position)
-            tasks = tasks.sort((a: Task, b: Task) => {
-                if (a.kanbanPosition !== undefined && b.kanbanPosition !== undefined && a.kanbanPosition !== b.kanbanPosition) {
-                    return a.kanbanPosition - b.kanbanPosition
-                }
-                return a.orderPosition - b.orderPosition
-            })
-        } else if (sortBy === 'priority') {
+        // sort default (kanban & order position)
+        // always reset to default before re-sorting, to ensure sorting result is always the same
+        taskList = taskList.sort((a: Task, b: Task) => {
+            if (a.kanbanPosition !== undefined && b.kanbanPosition !== undefined && a.kanbanPosition !== b.kanbanPosition) {
+                return a.kanbanPosition - b.kanbanPosition
+            }
+            return a.orderPosition - b.orderPosition
+        })
+
+        if (sortBy === 'priority') {
             // sort by task priority (if it has one)
-            tasks = tasks.sort((a: Task, b: Task) => {
+            taskList = taskList.sort((a: Task, b: Task) => {
                 if (a.priority && b.priority && priorities.includes(a.priority) && priorities.includes(b.priority) && priorities.indexOf(a.priority) !== priorities.indexOf(b.priority)) {
                     return priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
                 }
@@ -118,15 +119,15 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
             })
         } else if (sortBy === 'date') {
             // sort by task target date (if it has one)
-            tasks = tasks.sort((a: Task, b: Task) => {
+            taskList = taskList.sort((a: Task, b: Task) => {
                 if (a.endDate && b.endDate && a.endDate.getTime() !== b.endDate.getTime()) {
                     return a.endDate.getTime() - b.endDate.getTime()
                 }
                 return 0
             })
         }
-    
-        return tasks
+
+        return taskList
     }
 
     // kanban requires its own state outside of the zustand state, so we can move things around properly

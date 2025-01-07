@@ -1,8 +1,6 @@
 import {PrismaClient} from '@prisma/client';
 import {withPulse} from '@prisma/extension-pulse/node';
 
-export const runtime = "edge"
-
 export const dynamic = 'force-dynamic'; // Prevent caching
 
 // Initialize Prisma Client with PostgreSQL adapter
