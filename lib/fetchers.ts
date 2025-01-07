@@ -292,6 +292,32 @@ export async function getMembers(organizationId: string | undefined) {
     }
 }
 
+export async function getMilestones(organizationId: string | undefined) {
+    if (!organizationId) {
+        return {success: false, error: "No organization id provided."};
+    }
+
+    try {
+        const fetchedMilestones = await prisma?.milestone.findMany({
+            // include: {user: true},
+            where: {organizationId},
+        })
+
+
+        if (!fetchedMilestones) {
+            return {success: false, error: "milestones not found"};
+        }
+
+        return {
+            success: true,
+            data: fetchedMilestones
+        };
+    } catch (error: any) {
+        logError("Error fetching members", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 export async function getInvitees(organizationId: string | undefined) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};
