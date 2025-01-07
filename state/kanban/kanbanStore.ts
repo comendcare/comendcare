@@ -3,6 +3,7 @@ import {temporal} from 'zundo'
 import {Column, Task} from "@prisma/client";
 import { createKanbanColumn, createNewKanbanTask, deleteKanbanColumn, updateDBColumns, updateDBTask } from "@/lib/actions";
 import { nanoid } from "nanoid";
+import { toast } from "sonner";
 
 export type KanbanState = {
     columns: any[],
@@ -30,11 +31,25 @@ export const useKanbanStore = create<KanbanState>()(
                 }
 
                 set({ columns: [...get().columns, column] })
-                createKanbanColumn(column)
+                createKanbanColumn(column).then((response) => {
+                    if (response.success && response.data) {
+                        toast.success("Column created successfully!")
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+                })
             },
             deleteColumn: (columnId: string) => {
                 set({ columns: get().columns.filter(col => col.id !== columnId) })
-                deleteKanbanColumn(columnId)
+                deleteKanbanColumn(columnId).then((response) => {
+                    if (response.success && response.data) {
+                        toast.success("Column deleted successfully!");
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+                })
             },
             setColumns: (columns: Column[]) => {
                 set({ columns })
@@ -50,7 +65,13 @@ export const useKanbanStore = create<KanbanState>()(
                 }
 
                 set({ tasks: [...get().tasks, task] })
-                createNewKanbanTask(task)
+                createNewKanbanTask(task).then((response) => {
+                    if (response.success && response.data) {
+                        toast.success("Task added successfully!")
+                    } else {
+
+                    }
+                })
             },
             setTask: (taskId: string, newProperties: any) => {
                 const updatedTasks = get().tasks.map(task => {

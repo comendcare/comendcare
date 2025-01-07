@@ -18,7 +18,6 @@ export default function NewKanbanTaskButton({column}: { column: Column }) {
             addTask(column.id)
         } catch (error) {
             console.error(error);
-            toast.error("Failed to create task.");
         }
     }
 
