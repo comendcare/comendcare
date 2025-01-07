@@ -31,8 +31,15 @@ import {getNewColumnFormSchema} from "@/lib/schemas";
 import {cn} from "@/lib/utils";
 import {createKanbanColumn, createNewKanbanTask} from "@/lib/actions";
 import {getKanbanFromOrganizationId} from "@/lib/fetchers";
+import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
+import { useShallow } from "zustand/react/shallow"
+
+const kanbanSelector = (state: KanbanState) => ({
+    addColumn: state.addColumn
+})
 
 export default function NewColumnDialog() {
+    const { addColumn } = useKanbanStore(useShallow(kanbanSelector))
     const [open, setOpen] = useState(false)
     const newMonitorFormSchema = getNewColumnFormSchema([])
 
@@ -45,24 +52,17 @@ export default function NewColumnDialog() {
         }
     })
 
-    async function onSubmit() {
+    async function onSubmit(values: any) {
 
         setOpen(false)
         try {
-            const response = await getKanbanFromOrganizationId()
-            if (response.success && response.data) {
-                await createKanbanColumn(response.data).then((response) => {
-                    if (response.success && response.data) {
-                        toast.success("Column created successfully!");
-                    } else {
-                        console.error(response.error)
-                        toast.error(response.error)
-                    }
-                })
-            }
+            addColumn({
+                name: values.keyword,
+                tasks: [],
+                kanbanPosition: 0
+            })
         } catch (error) {
             console.error(error);
-            toast.error("Failed to create task.");
         }
     }
 

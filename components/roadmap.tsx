@@ -17,7 +17,6 @@ import {
   } from "@/components/ui/tooltip"
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
 import { PrivateFlowView } from "@/components/private-flow"
-import { KanbanView } from "@/components/kanban"
 import { Button } from "./ui/button"
 import { FaQuestion, FaX } from "react-icons/fa6"
 import { EditMilestoneForm } from "./edit-milestone-form"
@@ -268,15 +267,15 @@ const TaskDetailsPanel = ({
                     <FaX />
                 </Button>
             </span>
-            {isEditing ? (
-                <EditTaskForm 
-                    taskData={task}
-                    // onClose={() => setIsEditing(false)}
-                    onClose={() => {}}
-                />
+            {/* {isEditing ? (
+                // <EditTaskForm 
+                //     taskData={task}
+                //     // onClose={() => setIsEditing(false)}
+                //     onClose={() => {}}
+                // />
             ) : (
                 <TaskDetails taskData={task}/>
-            )}
+            )} */}
         </>
     )
 }
