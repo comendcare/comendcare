@@ -2,10 +2,7 @@ import { NextResponse } from 'next/server';
 import {PrismaClient} from '@prisma/client';
 import {withPulse} from '@prisma/extension-pulse/node';
 
-export const config = {
-    runtime: 'edge', // Use 'serverless' if the task exceeds Edge runtime limits
-};
-
+export const runtime = "edge"
 export const dynamic = 'force-dynamic'; // Prevent caching
 
 // Initialize Prisma Client with PostgreSQL adapter
