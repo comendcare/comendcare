@@ -245,8 +245,14 @@ export default function OrganizationOnboardingForm(
     async function joinOrgOnSubmit() {
         const orgValue = joinOrgForm.watch("org")?.[0]?.value;
         if (typeof orgValue === "string") {
-            await createMemberRequest(orgValue);
-            toast.success(`A membership request has been sent to ${joinOrgForm.watch("org")?.[0]?.label}`)
+            const response = await createMemberRequest(orgValue);
+
+            if (response.success) {
+                toast.success(`A membership request has been sent to ${joinOrgForm.watch("org")?.[0]?.label}`)
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
+            }
 
             router.push("/app/profile")
         } else {

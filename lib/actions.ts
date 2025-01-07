@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma, Column, Kanban, Task, User} from "@prisma/client"
+import {Roadmap, Organization, Prisma, Column, Kanban, Post, Task, User} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
@@ -12,6 +12,7 @@ import {getBlurDataURL, logError} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from "@/lib/emails";
 import { getKanbanFromOrganizationId } from "./fetchers"
+import {ApiResponse} from "@/lib/types";
 
 
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
@@ -117,16 +118,14 @@ const nanoid = customAlphabet(
     7
 ) // 7-character random string
 
-export const createMemberRequest = async (organizationId: string) => {
+export const createMemberRequest = async (organizationId: string): Promise<ApiResponse<any>> => {
     const session = await getSession()
     if (!session?.user.id) {
-        return {
-            error: "Not authenticated"
-        }
+        throw new Error("You must be signed in to perform this action")
     }
 
     try {
-        const response = await prisma.memberRequest.create({
+        const memberRequest = await prisma.memberRequest.create({
             data: {
                 email: session.user.email,
                 role: "admin",
@@ -169,11 +168,15 @@ export const createMemberRequest = async (organizationId: string) => {
             })
         }
 
-        return response
-    } catch (error: any) {
-        return {
-            error: error.message
+        if (!memberRequest) {
+            console.error("Error creating member request.")
+            return {success: false, error: "Database error. please try again later."}
         }
+
+        return {success: true, data: memberRequest}
+    } catch (error: any) {
+        console.error("Error creating member request:", error)
+        return {success: false, error: "Database error. please try again later."}
     }
 }
 
@@ -702,7 +705,7 @@ export async function inviteUser(
         organizationName: string
         organizationImage: string
     }
-) {
+): Promise<ApiResponse<any>> {
     try {
         if (!session) {
             throw new Error("You must be signed in to perform this action")
@@ -745,34 +748,15 @@ export async function inviteUser(
             console.log("email sent")
         })
 
-        return invitation
+        if (!invitation) {
+            console.error("Error inviting user.")
+            return {success: false, error: "Database error. please try again later."}
+        }
 
-        // return await prisma.member.create({
-        //     data: {
-        //         email: lowerCaseEmail,
-        //         organization: {
-        //             connect: {
-        //                 id: organization.organizationId
-        //             }
-        //         },
-        //         role: role,
-        //         invitedBy: {
-        //             connect: {
-        //                 id: session?.user?.id
-        //             }
-        //         },
-        //         meta: {
-        //             invitationId,
-        //         },
-        //     },
-        // }).then((res) => {
-        //     console.log(`Membership created for ${email}`)
-        //
-        //     return res
-        // })
-    } catch (error) {
+        return {success: true, data: invitation}
+    } catch (error: any) {
         console.error("Error inviting user:", error)
-        throw new Error("Failed to invite user.")
+        return {success: false, error: "Database error. please try again later."}
     }
 }
 
@@ -1434,6 +1418,127 @@ export async function deleteKanbanColumn(columnId: string) {
         return {success: true, data: deletedColumn};
     } catch (error: any) {
         logError("Error deleting kanban column", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function createPost(formData: FormData) {
+    const session = await getSession()
+
+    const text = formData.get("text") as string
+
+    try {
+        const post = prisma.post.create({
+            data: {
+                text: text,
+                author: {
+                    connect: {
+                        id: session?.user.id
+                    }
+                }
+            }
+        })
+
+        if (!post) {
+            return {success: false, error: "failed to create post"};
+        }
+
+        return {success: true, data: post};
+    } catch (error: any) {
+        logError("Error creating post", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function deletePost(postId: string) {
+    try {
+        const post = prisma.post.delete({
+            where: {
+                id: postId
+            }
+        })
+
+        if (!post) {
+            return {success: false, error: "failed to delete post"};
+        }
+
+        return {success: true, data: post};
+    } catch (error: any) {
+        logError("Error deleting post", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function createComment(postId: string | null, text: string) {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        if (!postId) {
+            return {success: false, error: "Post ID not provided."};
+        }
+
+        const comment = prisma.comment.create({
+            data: {
+                post: {
+                    connect: {
+                        id: postId
+                    }
+                },
+                author: {
+                    connect: {
+                        id: session?.user.id
+                    }
+                },
+                text: text
+            }
+        })
+
+        if (!comment) {
+            return {success: false, error: "failed to create comment"};
+        }
+
+        return {success: true, data: comment};
+    } catch (error: any) {
+        logError("Error creating comment", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function createFollow(organizationId: string | null) {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        if (!organizationId) {
+            return {success: false, error: "Organization ID not provided."};
+        }
+
+        const follow = prisma.follow.create({
+            data: {
+                user: {
+                    connect: {
+                        id: session.user.id
+                    }
+                },
+                followedId: organizationId,
+                followedType: "ORGANIZATION",
+            }
+        })
+
+        if (!follow) {
+            return {success: false, error: "failed to follow organization"};
+        }
+
+        return {success: true, data: follow};
+    } catch (error: any) {
+        logError("Error following organization", error);
         return {success: false, error: "Internal server error"};
     }
 }

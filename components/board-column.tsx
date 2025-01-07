@@ -91,6 +91,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
     async function handleDelete () {
         try {
             deleteColumn(column.id)
+            toast.success("Column deleted successfully!")
         } catch (error) {
             console.error(error);
             toast.error("Failed to delete task.");

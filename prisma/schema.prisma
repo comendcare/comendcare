@@ -41,8 +41,10 @@ model User {
   lat                  Float?
   lng                  Float?
   posts                Post[]
+  comments             Comment[]
   reactions            Reaction[]
   tasks                Task[]
+  follows              Follow[]
 }
 
 model Member {
@@ -59,7 +61,7 @@ model Member {
   meta           Json?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   organizationId String
 
   @@unique([userId, organizationId])
@@ -69,7 +71,7 @@ model Invitation {
   id             String       @id @default(cuid())
   email          String
   role           String       @db.VarChar
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   organizationId String
   accepted       Boolean      @default(false)
   createdAt      DateTime     @default(now())
@@ -84,7 +86,7 @@ model MemberRequest {
   email          String
   role           String       @db.VarChar
   user           User         @relation(fields: [userId], references: [id])
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   organizationId String
   accepted       Boolean      @default(false)
   createdAt      DateTime     @default(now())
@@ -443,6 +445,24 @@ model Organization {
   @@index([userId])
 }
 
+model Follow {
+  id           String       @id @default(cuid())
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  followedType FollowedType
+  followedId   String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@unique([userId, followedType, followedId])
+}
+
+enum FollowedType {
+  ORGANIZATION
+  // USER
+  // CONDITION
+}
+
 model Condition {
   id                          String                    @id @default(cuid())
   name                        String
@@ -495,14 +515,27 @@ model Example {
 }
 
 model Post {
-  id        String     @id
-  title     String
+  id        String    @id @default(cuid())
+  text      String?
   content   Json?
-  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
-  like      Reaction[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  mentions  Mention[]
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  text      String
+  userId    String
+  author    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  postId    String
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  mentions  Mention[]
 }
 
 enum ReactionType {
@@ -511,13 +544,42 @@ enum ReactionType {
   SUPPORT
 }
 
+enum ReactableType {
+  POST
+  COMMENT
+}
+
 model Reaction {
-  id        String       @id
-  type      ReactionType
-  author    User         @relation(fields: [authorId], references: [id])
-  authorId  String
-  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id            String        @id @default(cuid())
+  type          ReactionType
+  author        User          @relation(fields: [authorId], references: [id])
+  authorId      String
+  reactableType ReactableType
+  reactableId   String // Can be a Post ID or Comment ID
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
+
+  @@unique([authorId, reactableType, reactableId])
+}
+
+enum MentionedType {
+  USER
+  ROADMAP
+  ORGANIZATION
+  CONDITION
+}
+
+model Mention {
+  id     String  @id @default(cuid())
+  postId String? // For mentions in posts
+  post   Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  commentId String? // For mentions in comments
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  mentionedType MentionedType
+  mentionedId   String // ID of the mentioned entity (e.g., User, Roadmap, Organization, etc.)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

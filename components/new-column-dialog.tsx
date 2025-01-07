@@ -61,6 +61,8 @@ export default function NewColumnDialog() {
                 tasks: [],
                 kanbanPosition: 0
             })
+        
+            toast.success("Column created successfully!");
         } catch (error) {
             console.error(error);
             toast.error("Failed to create task.");
