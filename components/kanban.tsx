@@ -110,20 +110,24 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
         })
 
         if (sortBy === 'priority') {
-            // sort by task priority (if it has one)
+            // sort by task priority (if it has one), move those without priority to the end
             taskList = taskList.sort((a: Task, b: Task) => {
-                if (a.priority && b.priority && priorities.includes(a.priority) && priorities.includes(b.priority) && priorities.indexOf(a.priority) !== priorities.indexOf(b.priority)) {
-                    return priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
-                }
-                return 0
+                if ((!a.priority || !priorities.includes(a.priority)) && (!b.priority || !priorities.includes(b.priority))) return 0
+                if (!a.priority || !priorities.includes(a.priority)) return 1
+                if (!b.priority || !priorities.includes(b.priority)) return -1
+
+                // Both tasks have priority, sort by priority
+                return priorities.indexOf(a.priority) - priorities.indexOf(b.priority)
             })
         } else if (sortBy === 'date') {
-            // sort by task target date (if it has one)
+            // sort by task target date (if it has one), move those without an end date to the end
             taskList = taskList.sort((a: Task, b: Task) => {
-                if (a.endDate && b.endDate && a.endDate.getTime() !== b.endDate.getTime()) {
-                    return a.endDate.getTime() - b.endDate.getTime()
-                }
-                return 0
+                if (!a.endDate && !b.endDate) return 0
+                if (!a.endDate) return 1
+                if (!b.endDate) return -1
+
+                // Both tasks have end dates, sort by the end date
+                return a.endDate.getTime() - b.endDate.getTime()
             })
         }
 
