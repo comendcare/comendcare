@@ -102,7 +102,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
 
         // sort default (kanban & order position)
         // always reset to default before re-sorting, to ensure sorting result is always the same
-        taskList = taskList.sort((a: Task, b: Task) => {
+        taskList = taskList?.sort((a: Task, b: Task) => {
             if (a.kanbanPosition !== undefined && b.kanbanPosition !== undefined && a.kanbanPosition !== b.kanbanPosition) {
                 return a.kanbanPosition - b.kanbanPosition
             }
@@ -111,7 +111,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
 
         if (sortBy === 'priority') {
             // sort by task priority (if it has one), move those without priority to the end
-            taskList = taskList.sort((a: Task, b: Task) => {
+            taskList = taskList?.sort((a: Task, b: Task) => {
                 if ((!a.priority || !priorities.includes(a.priority)) && (!b.priority || !priorities.includes(b.priority))) return 0
                 if (!a.priority || !priorities.includes(a.priority)) return 1
                 if (!b.priority || !priorities.includes(b.priority)) return -1
@@ -121,7 +121,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
             })
         } else if (sortBy === 'date') {
             // sort by task target date (if it has one), move those without an end date to the end
-            taskList = taskList.sort((a: Task, b: Task) => {
+            taskList = taskList?.sort((a: Task, b: Task) => {
                 if (!a.endDate && !b.endDate) return 0
                 if (!a.endDate) return 1
                 if (!b.endDate) return -1
@@ -149,7 +149,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
     }, [initTasks, initColumns, filter, sortBy])
 
     function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
-        const tasksInColumn = tasks.filter(task => task.columnId === columnId)
+        const tasksInColumn = tasks?.filter(task => task.columnId === columnId)
         const taskPosition = tasksInColumn.findIndex(task => task.id === taskId)
         const column = columns.find(col => col.id === columnId)
         return {
@@ -409,7 +409,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
                         <BoardColumn
                             key={index}
                             column={col}
-                            tasks={tasks.filter(task => {
+                            tasks={tasks?.filter(task => {
                                 if (filter == "personal" && session?.user.id && !task.stakeholders.map(stakeholder => stakeholder.id).includes(session?.user.id)) return false
                                 return task?.columnId === col.id 
                             })}
@@ -425,7 +425,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
                             <BoardColumn
                                 isOverlay
                                 column={activeColumn}
-                                tasks={tasks.filter(task => task?.columnId === activeColumn.id)}
+                                tasks={tasks?.filter(task => task?.columnId === activeColumn.id)}
                             />
                         )}
                         {activeTask && <TaskCard task={activeTask} isOverlay />}

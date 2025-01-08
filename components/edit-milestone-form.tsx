@@ -109,6 +109,7 @@ const selector = (state: RoadmapState) => ({
 
 const kanbanSelector = (state: KanbanState) => ({
     columns: state.columns,
+    tasks: state.tasks,
     setTask: state.setTask,
 })
 
@@ -122,7 +123,7 @@ export function EditMilestoneForm({
     const { setMilestone } = useRoadmapStore(
         useShallow(selector)
     )
-    const { setTask } = useKanbanStore(useShallow(kanbanSelector))
+    const { columns: kanbanColumns, tasks: kanbanTasks, setTask } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
 
     const editMilestoneForm = z.object({
@@ -171,7 +172,7 @@ export function EditMilestoneForm({
             },
             budget: milestoneData?.budget || undefined,
             papers: milestoneData?.papers || undefined,
-            tasks: milestoneData?.tasks || [],
+            tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
             status: milestoneData?.status || "TODO",
             private: milestoneData?.private || false,
             asset: milestoneData?.asset || undefined,
@@ -236,14 +237,6 @@ export function EditMilestoneForm({
                 ? { papers }
                 : undefined
             ),
-            ...(tasks 
-                ? { tasks: tasks.map((task: any, index: number) => ({
-                    ...task, 
-                    orderPosition: index,
-                    milestoneId: milestoneData?.id
-                }))}
-                : undefined
-            ),
             ...(type
                 ? { type }
                 : { type: 'NOTYPE'}
@@ -254,14 +247,17 @@ export function EditMilestoneForm({
             RFP
         })
 
-        tasks?.forEach((t, index) => {
-            setTask(t.id, {
-                name: t.name,
-                orderPosition: index,
-                columnId: t.columnId
-            })
-        })
-
+        if (tasks) {
+            for (let i = 0; i < tasks.length; i++) {
+                setTask(tasks[i].id, {
+                    name: tasks[i].name,
+                    orderPosition: i,
+                    columnId: tasks[i].columnId,
+                    milestone: { id: milestoneData?.id }
+                })
+            }
+        }
+        
         toast('Success!', {
             position: "bottom-left",
             description: 'The changes to your milestone have been successfully saved.'
@@ -650,6 +646,7 @@ export function EditMilestoneForm({
                                             onColumnChange={(newColumnId) => {
                                                 form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, columnId: newColumnId} : t))
                                             }}
+                                            kanbanColumns={kanbanColumns}
                                         />
                                     ))}
                                     </SortableContext>
@@ -657,13 +654,21 @@ export function EditMilestoneForm({
                                 </DndContext>
                                 </>
                             )}
-                            {/* <Button variant="secondary" onClick={(e: any) => {
-                                e.preventDefault()
-                                form.setValue(
-                                    'tasks',
-                                    [...field?.value || [], { name: 'New Task', status: 'TODO', id: nanoid() }]
-                                )
-                            }}>Add a task</Button> */}
+                            {/* <LinkTask 
+                                milestoneId={milestoneData?.id} 
+                                // kanbanColumns={kanbanColumns}
+                                kanbanTasks={kanbanTasks}
+                                onLink={(taskId) => {
+                                    const newTask = kanbanTasks?.find((task) => task.id === taskId)
+                                    form.setValue(
+                                        'tasks', 
+                                        [...field?.value || [], {
+                                            ...newTask,
+                                            milestoneId: milestoneData?.id
+                                        }] 
+                                    )
+                                }}
+                            /> */}
                             </>
                         </FormControl>
                         <FormMessage />
@@ -752,18 +757,48 @@ const EditTitle = ({ form }: { form: any }) => {
     )
 }
 
+const LinkTask = ({ milestoneId, kanbanTasks, onLink }: { milestoneId: string, kanbanTasks: any[], onLink: (id: string) => void }) => {
+    const [isLinking, setIsLinking] = useState(false)
+
+    if (isLinking) {
+        return (
+            <Select 
+                onValueChange={(value: string) => {
+                    onLink(value)
+                    setIsLinking(false)
+                }}
+            >
+                <SelectTrigger className="w-full">
+                    <SelectValue placeholder={'Link another task'}/>
+                </SelectTrigger>
+                <SelectContent>
+                    {kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).map(task => (
+                        <SelectItem value={task.id}>{task.name}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        )
+    }
+
+    return (
+        <Button disabled={kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).length === 0} onClick={() => {setIsLinking(true)}}>Link another task</Button>
+    )
+}
+
 const TaskField = ({
     index,
     task,
     onDelete,
     onNameChange,
     onColumnChange,
+    kanbanColumns,
 }: {
     index: number
     task: TaskType
     onDelete: () => void
     onNameChange: (newName: string) => void
     onColumnChange: (newColumnId: string) => void
+    kanbanColumns: any[]
 }) => {
     const {
         attributes,
@@ -773,7 +808,6 @@ const TaskField = ({
         transition,
         isDragging
     } = useSortable({ id: task.id || "" })
-    const { columns: kanbanColumns } = useKanbanStore(useShallow(kanbanSelector))
     const style = {
         transition,
         transform: CSS.Translate.toString(transform)
@@ -844,9 +878,9 @@ const TaskField = ({
             </div>
 
             {/* delete task */}
-            <Button variant="secondary" size="icon" onClick={deleteTask}>
+            {/* <Button variant="secondary" size="icon" onClick={deleteTask}>
                 <FaTrash />
-            </Button>
+            </Button> */}
         </li>
     )
 }
