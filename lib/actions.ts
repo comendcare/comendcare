@@ -1239,10 +1239,14 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
                             connect: task.stakeholders.map((stakeholder: User) => ({ id: stakeholder?.id }))
                         },
                         ...(task.milestone?.id ? ({
+                            // milestone is linked, connect it
                             milestone: {
                                 connect: { id: task.milestone?.id }
                             },
-                        }) : undefined),
+                        }) : {
+                            // milestone is not linked, disconnect it
+                            milestone: { disconnect: true }
+                        }),
                         endDate: task.endDate,
                         priority: task.priority,
                         private: task.private,
