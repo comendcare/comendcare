@@ -35,7 +35,6 @@ export const optionSchema = z.object({
 });
 
 const researchOnboardingFormSchema = z.object({
-    modalities: z.array(optionSchema).min(0).optional(),
     disorder: z.string()
         .min(2, {
             message: "The name of your disorder needs to be longer than 2 characters",
@@ -44,6 +43,15 @@ const researchOnboardingFormSchema = z.object({
             message: "The name of your disorder needs to be shorter than 60 characters",
         })
         .optional(),
+    summary: z.string()
+        .min(50, {
+            message: "The name of your disorder needs to be longer than 2 characters",
+        })
+        .max(500, {
+            message: "The name of your disorder needs to be shorter than 60 characters",
+        })
+        .optional(),
+    modalities: z.array(optionSchema).min(0).optional(),
     categories: z.array(optionSchema).optional(),
     prevalenceNumerator: z.string().min(1, {
         message: "Your organization's prevalence.",
@@ -58,6 +66,7 @@ const researchOnboardingFormSchema = z.object({
     mechanisms: z.array(z.string()).optional(),
     genes: z.array(optionSchema).optional(),
     biomarkers: z.array(optionSchema).optional(),
+    systems: z.array(optionSchema).optional(),
     symptoms: z.array(optionSchema).optional(),
     studies: z.array(optionSchema).optional(),
     assets: z.array(optionSchema).optional(),
@@ -370,6 +379,275 @@ export const OPTIONS: Option[] = [
     },
 ];
 
+export const MODALITIES: Option[] = [
+    {
+        id: '1',
+        label: 'Gene Therapy (AAV)',
+        value: 'GENE_THERAPY_AAV',
+        description: 'A therapeutic approach using adeno-associated viruses (AAV) to deliver genetic material into cells, often to correct or replace defective genes.',
+        strengths: 'High precision in targeting specific cells, long-term expression of therapeutic genes, and growing clinical success in various diseases.',
+    },
+    {
+        id: '2',
+        label: 'Gene Editing',
+        value: 'GENE_EDITING',
+        description: 'A technology for directly altering the DNA of an organism, including techniques like CRISPR/Cas9 to modify genes for therapeutic purposes.',
+        strengths: 'Highly versatile, precise gene modifications, and potential for permanent therapeutic outcomes.',
+    },
+    {
+        id: '3',
+        label: 'Antisense Oligonucleotide (ASO)',
+        value: 'ANTISENSE_OLIGONUCLEOTIDE',
+        description: 'Short, synthetic strands of DNA or RNA designed to bind to specific mRNA sequences, modifying gene expression or protein production.',
+        strengths: 'Targets specific genes, reversible effects, and customizable for various genetic disorders.',
+    },
+    {
+        id: '4',
+        label: 'Other RNA Therapy',
+        value: 'OTHER_RNA_THERAPY',
+        description: 'A broad category of therapies leveraging RNA molecules, such as RNA interference (RNAi) and mRNA vaccines, to modulate gene expression or induce immune responses.',
+        strengths: 'Rapid development timelines, adaptable to different diseases, and avoids permanent DNA alterations.',
+    },
+    {
+        id: '5',
+        label: 'Enzyme Replacement',
+        value: 'ENZYME_REPLACEMENT',
+        description: 'A treatment approach involving the administration of exogenous enzymes to replace deficient or malfunctioning enzymes in patients.',
+        strengths: 'Addresses underlying enzyme deficiencies, well-established for several metabolic disorders, and provides symptomatic relief.',
+    },
+    {
+        id: '6',
+        label: 'Drug Repurposing or Drug Screening',
+        value: 'DRUG_REPURPOSING_SCREENING',
+        description: 'Strategies to identify new therapeutic uses for existing drugs or discover novel compounds for specific diseases through systematic screening.',
+        strengths: 'Reduces development timelines, leverages existing safety profiles, and cost-effective compared to de novo drug development.',
+    },
+    {
+        id: '7',
+        label: 'Pathway Modulators',
+        value: 'PATHWAY_MODULATORS',
+        description: 'Therapies designed to target and modulate biological pathways involved in disease processes, such as signaling cascades and metabolic pathways.',
+        strengths: 'Addresses disease mechanisms at a systemic level, potential for broad applications, and integrates well with other therapeutic modalities.',
+    },
+    {
+        id: '8',
+        label: 'Antibodies',
+        value: 'ANTIBODIES',
+        description: 'Biologics that use engineered or natural antibodies to target specific proteins or antigens for therapeutic purposes.',
+        strengths: 'Highly specific targeting, strong efficacy in immune-related diseases, and a proven track record in therapy.',
+    },
+    {
+        id: '9',
+        label: 'Vaccine',
+        value: 'VACCINE',
+        description: 'Biological preparations that provide immunity to specific diseases, often by stimulating the immune system to recognize and combat pathogens.',
+        strengths: 'Prevents disease proactively, adaptable to various pathogens, and scalable for public health impact.',
+    },
+    {
+        id: '10',
+        label: 'Novel Chemistry',
+        value: 'NOVEL_CHEMISTRY',
+        description: 'Innovative small molecule drugs designed using advanced chemical techniques to target unique mechanisms of action.',
+        strengths: 'Highly customizable for specific targets, scalable production, and potential for oral administration.',
+    },
+    {
+        id: '11',
+        label: 'Stem Cell Transplant',
+        value: 'STEM_CELL_TRANSPLANT',
+        description: 'The use of stem cells to regenerate or repair damaged tissues and treat conditions like hematological diseases and genetic disorders.',
+        strengths: 'Potential for long-term regeneration, versatile applications, and addresses root causes of diseases.',
+    },
+    {
+        id: '12',
+        label: 'Other',
+        value: 'OTHER',
+        description: 'Any additional or emerging therapeutic approaches not covered in the predefined categories.',
+        strengths: 'Flexibility to incorporate novel, interdisciplinary methods and adaptability to unique challenges.',
+    },
+];
+
+export const ASSOCIATED_SYSTEMS: Option[] = [
+    {
+        id: '1',
+        label: 'Neuro',
+        value: 'NEURO',
+        description: 'Associated with neurological systems, including the brain, spinal cord, and peripheral nerves.',
+        strengths: 'Focuses on diseases and conditions affecting neural pathways and cognitive functions.',
+    },
+    {
+        id: '2',
+        label: 'Musculoskeletal',
+        value: 'MUSCULOSKELETAL',
+        description: 'Pertains to the musculoskeletal system, including bones, muscles, and connective tissues.',
+        strengths: 'Addresses conditions like degenerative diseases, structural defects, and mobility impairments.',
+    },
+    {
+        id: '3',
+        label: 'Hepatic',
+        value: 'HEPATIC',
+        description: 'Relates to the liver and its associated functions in metabolism and detoxification.',
+        strengths: 'Targets liver-specific conditions and systemic metabolic disorders.',
+    },
+    {
+        id: '4',
+        label: 'Cardiovascular',
+        value: 'CARDIOVASCULAR',
+        description: 'Concerns the heart and blood vessels, including circulatory system-related disorders.',
+        strengths: 'Focuses on cardiovascular health, blood flow optimization, and structural heart issues.',
+    },
+    {
+        id: '5',
+        label: 'Respiratory',
+        value: 'RESPIRATORY',
+        description: 'Involves the lungs and respiratory pathways, addressing diseases affecting breathing and oxygen exchange.',
+        strengths: 'Targets conditions such as asthma, fibrosis, and respiratory infections.',
+    },
+    {
+        id: '6',
+        label: 'Urological',
+        value: 'UROLOGICAL',
+        description: 'Pertains to the urinary system, including kidneys, ureters, bladder, and urethra.',
+        strengths: 'Addresses urological disorders like renal diseases and urinary tract issues.',
+    },
+    {
+        id: '7',
+        label: 'Dermatological',
+        value: 'DERMATOLOGICAL',
+        description: 'Relates to the skin, hair, and nails, including various dermatological diseases and conditions.',
+        strengths: 'Targets skin-related issues, including genetic disorders and immune-mediated skin diseases.',
+    },
+    {
+        id: '8',
+        label: 'Endocrine',
+        value: 'ENDOCRINE',
+        description: 'Concerns the endocrine system, including glands that regulate hormones.',
+        strengths: 'Focuses on hormonal imbalances, glandular disorders, and metabolic dysfunction.',
+    },
+    {
+        id: '9',
+        label: 'Metabolic',
+        value: 'METABOLIC',
+        description: 'Involves metabolic pathways and disorders, such as enzyme deficiencies and inborn errors of metabolism.',
+        strengths: 'Addresses systemic metabolic dysfunctions and energy production issues.',
+    },
+    {
+        id: '10',
+        label: 'Hematological',
+        value: 'HEMATOLOGICAL',
+        description: 'Pertains to blood and its components, including red cells, white cells, platelets, and plasma.',
+        strengths: 'Targets conditions like anemias, clotting disorders, and blood cancers.',
+    },
+    {
+        id: '11',
+        label: 'Immune',
+        value: 'IMMUNE',
+        description: 'Relates to the immune system, focusing on disorders like immunodeficiency, autoimmunity, and hypersensitivities.',
+        strengths: 'Addresses immune system regulation and immune-related genetic conditions.',
+    },
+    {
+        id: '12',
+        label: 'Ophthalmic',
+        value: 'OPHTHALMIC',
+        description: 'Associated with the eyes and vision-related disorders.',
+        strengths: 'Focuses on conditions impacting visual acuity, ocular structures, and retinal health.',
+    },
+    {
+        id: '13',
+        label: 'Overgrowth',
+        value: 'OVERGROWTH',
+        description: 'Involves abnormal tissue growth or overdevelopment of organs and structures.',
+        strengths: 'Targets syndromes with excessive tissue growth and associated complications.',
+    },
+    {
+        id: '14',
+        label: 'Systemic',
+        value: 'SYSTEMIC',
+        description: 'Concerns diseases affecting multiple organ systems or the entire body.',
+        strengths: 'Addresses conditions with widespread impact and systemic treatment approaches.',
+    },
+    {
+        id: '15',
+        label: 'Digestive',
+        value: 'DIGESTIVE',
+        description: 'Involves the gastrointestinal tract and associated organs, including the stomach, intestines, and liver.',
+        strengths: 'Focuses on conditions like malabsorption, inflammation, and structural abnormalities.',
+    },
+    {
+        id: '16',
+        label: 'Other',
+        value: 'OTHER',
+        description: 'Any additional or unclassified associated systems not included in the predefined categories.',
+        strengths: 'Allows flexibility to include emerging or unique system-related conditions.',
+    },
+];
+
+export const MOLECULAR_MECHANISMS: Option[] = [
+    {
+        id: '1',
+        label: 'Loss-of-Function',
+        value: 'LOSS_OF_FUNCTION',
+        description: 'A molecular mechanism where a mutation results in the reduced or complete loss of a protein\'s normal activity.',
+        strengths: 'Enables targeted therapies to restore or compensate for the lost function.',
+    },
+    {
+        id: '2',
+        label: 'Gain-of-Function',
+        value: 'GAIN_OF_FUNCTION',
+        description: 'A molecular mechanism where a mutation results in increased, novel, or constitutive activity of a protein.',
+        strengths: 'Focuses on strategies to inhibit or regulate the aberrant activity caused by the mutation.',
+    },
+    {
+        id: '3',
+        label: 'Haploinsufficiency',
+        value: 'HAPLOINSUFFICIENCY',
+        description: 'A mechanism where one copy of a gene is insufficient to produce adequate protein levels for normal function.',
+        strengths: 'Targets strategies to enhance expression or compensate for the insufficient protein levels.',
+    },
+    {
+        id: '4',
+        label: 'Epigenetic Dysregulation',
+        value: 'EPIGENETIC_DYSREGULATION',
+        description: 'Changes in DNA methylation, histone modification, or chromatin structure affect gene expression without altering the DNA sequence.',
+        strengths: 'Targets therapies to restore normal gene expression patterns or epigenetic states.',
+    },
+    {
+        id: '5',
+        label: 'Splicing Defects',
+        value: 'SPLICING_DEFECTS',
+        description: 'Mutations disrupt normal RNA splicing, leading to aberrant or truncated protein production.',
+        strengths: 'Targets therapies to correct splicing or bypass splicing errors.',
+    },
+    {
+        id: '6',
+        label: 'Mitochondrial Dysfunction',
+        value: 'MITOCHONDRIAL_DYSFUNCTION',
+        description: 'Mutations in mitochondrial or nuclear DNA affect energy production and cellular signaling.',
+        strengths: 'Focuses on therapies to support mitochondrial function or compensate for energy deficits.',
+    },
+    {
+        id: '7',
+        label: 'Unstable Repeat Expansions',
+        value: 'UNSTABLE_REPEAT_EXPANSIONS',
+        description: 'Nucleotide repeat expansions cause toxicity or disrupt normal gene function.',
+        strengths: 'Focuses on reducing repeats, mitigating toxicity, or bypassing the effects of expansions.',
+    },
+    {
+        id: '8',
+        label: 'Microdeletions or Duplications',
+        value: 'MICRODELETIONS_DUPLICATIONS',
+        description: 'Structural variations that remove or duplicate parts of a gene or regulatory region, affecting expression or function.',
+        strengths: 'Allows for targeted approaches to correct or bypass structural variations.',
+    },
+    {
+        id: '9',
+        label: 'Unknown',
+        value: 'UNKNOWN',
+        description: 'A molecular mechanism where the specific effect of the mutation on the protein\'s function is not yet determined.',
+        strengths: 'Allows exploration and categorization of mechanisms as new insights become available.',
+    },
+];
+
+
 export const mechanisms = [
     {id: "GENETIC_MUTATION", name: "Genetic mutation"},
     {id: "CHROMOSOMAL_ABNORMALITY", name: "Chromosomal abnormality"},
@@ -453,6 +731,25 @@ export default function ResearchOnboardingForm(
         }
     }
 
+    const handleAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <TooltipProvider>
             <div className="relative grid grid-cols-2 gap-x-8">
@@ -465,8 +762,8 @@ export default function ResearchOnboardingForm(
                                 name="disorder"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Name of disorder`}</FormLabel>
-                                        <FormDescription>{`The name of your rare disease/disorder.`}</FormDescription>
+                                        <FormLabel>{`Name of condition`}</FormLabel>
+                                        <FormDescription>{`The name of your rare condition/disorder.`}</FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -481,12 +778,32 @@ export default function ResearchOnboardingForm(
 
                             <FormField
                                 control={form.control}
+                                name="summary"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>{`Description of condition`}</FormLabel>
+                                        <FormDescription>{`A few lines describing your condition and what makes it unique`}</FormDescription>
+                                        <FormControl>
+                                            <Textarea
+                                                id="summary"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
                                 name="categories"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Disease categories</FormLabel>
+                                        <FormLabel>
+                                            Mechanisms of Action
+                                        </FormLabel>
                                         <FormDescription className="flex items-center">
-                                            {`What type of disorder is ${'disoder name'}`}
+                                            {`What type of condition is ${'disoder name'}`}
                                             <Tooltip delayDuration={0}>
                                                 <TooltipTrigger>
                                                     <FaQuestionCircle
@@ -502,7 +819,7 @@ export default function ResearchOnboardingForm(
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
-                                                defaultOptions={OPTIONS}
+                                                defaultOptions={MOLECULAR_MECHANISMS}
                                                 placeholder="Select categories that apply to you..."
                                                 emptyIndicator={
                                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
@@ -521,9 +838,11 @@ export default function ResearchOnboardingForm(
                                 name="modalities"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Modalities</FormLabel>
+                                        <FormLabel>
+                                            Modalities of interest
+                                        </FormLabel>
                                         <FormDescription className="flex items-center">
-                                            {`The treatment modalities of interest by your organization.`}
+                                            {`The treatment modalities of interest of your organization.`}
                                             <Tooltip delayDuration={0}>
                                                 <TooltipTrigger>
                                                     <FaQuestionCircle
@@ -539,7 +858,7 @@ export default function ResearchOnboardingForm(
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
-                                                defaultOptions={OPTIONS}
+                                                defaultOptions={MODALITIES}
                                                 placeholder="Select modalities you like..."
                                                 emptyIndicator={
                                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
@@ -644,7 +963,7 @@ export default function ResearchOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Relevant disease mechanisms</FormLabel>
-                                        <FormDescription>{`The relevant mechanisms of your disorder.`}</FormDescription>
+                                        <FormDescription>{`The relevant mechanisms of your condition.`}</FormDescription>
                                         <FormControl>
                                             <ToggleGroup
                                                 type="multiple"
@@ -676,17 +995,15 @@ export default function ResearchOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Associated genes</FormLabel>
-                                        <FormDescription>{`The genes associated with your disorder.`}</FormDescription>
+                                        <FormDescription>{`The genes associated with your condition.`}</FormDescription>
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
-                                                defaultOptions={OPTIONS}
-                                                placeholder="Select the associated genes of your disorder..."
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
+                                                onSearch={handleAsyncSearch}
+                                                placeholder="Search for genes..."
+                                                loadingIndicator={<p>Loading genes...</p>}
+                                                emptyIndicator={<p>No genes found.</p>}
+                                                showHoverCard={false}
                                             />
                                         </FormControl>
                                         <FormMessage/>
@@ -696,89 +1013,16 @@ export default function ResearchOnboardingForm(
 
                             <FormField
                                 control={form.control}
-                                name="biomarkers"
+                                name="systems"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Associated biomarkers</FormLabel>
-                                        <FormDescription>{`The biomarkers that have been identified for your disorder.`}</FormDescription>
+                                        <FormLabel>Associated systems</FormLabel>
+                                        <FormDescription>{`The systems affected by your condition.`}</FormDescription>
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
-                                                defaultOptions={OPTIONS}
-                                                placeholder="Select the associated biomarkers of your disorder..."
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="symptoms"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Associated signs and symptoms</FormLabel>
-                                        <FormDescription>{`The hallmark signs and symptoms of your disorder.`}</FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={OPTIONS}
-                                                placeholder="Select the associated signs and symptoms of your disorder..."
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="studies"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Existing patient databases or clinical studies</FormLabel>
-                                        <FormDescription>{`Does your organization have any patient databases or clinical studies?`}</FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={OPTIONS}
-                                                placeholder="Select the associated signs and symptoms of your disorder..."
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="assets"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Assets under development</FormLabel>
-                                        <FormDescription>{`Does your disorder have any existing or assets under development?`}</FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={OPTIONS}
-                                                placeholder="Select the assets that apply to you..."
-                                                creatable
+                                                defaultOptions={ASSOCIATED_SYSTEMS}
+                                                placeholder="Select the associated systems of your condition..."
                                                 emptyIndicator={
                                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                         no results found.
@@ -809,6 +1053,7 @@ export default function ResearchOnboardingForm(
                         </form>
                     </Form>
                 </div>
+
                 <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-280px)]">
                     <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
                         <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
@@ -831,7 +1076,7 @@ export default function ResearchOnboardingForm(
                             <div className="grid grid-cols-4">
                                 <div className="space-y-2">
                                     <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
-                                        Disease Categories
+                                        Mechanism of Action
                                     </h3>
                                     <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
                                         {form.watch("categories") ? form.watch("categories")?.map((category, index) =>

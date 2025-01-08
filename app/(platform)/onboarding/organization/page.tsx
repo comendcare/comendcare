@@ -27,7 +27,7 @@ export default function OrganizationOnboardingPage() {
                 <Separator/>
                 <OrganizationOnboardingForm
                     previousLink={"/onboarding/user"}
-                    nextLink={"/onboarding/finances"}
+                    nextLink={"/onboarding/research"}
                     showSkip={true}
                 />
             </div>
