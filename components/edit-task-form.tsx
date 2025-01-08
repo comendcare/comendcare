@@ -182,7 +182,7 @@ export function EditTaskForm({
                     ? {checklist: checklist.map((item, index) => ({...item, orderPosition: index}))}
                     : undefined),
                 ...(stakeholders ? { stakeholders: fetchedMembers?.filter(member => stakeholderIds?.includes(member.id)) }: undefined),
-                ...(milestone ? { milestone: { id: milestone } }: undefined),
+                ...(milestone ? { milestone: { id: milestone }, milestoneId: milestone }: undefined),
                 ...(targetDate ? { endDate: targetDate } : undefined),
                 ...(priority ? { priority } : undefined),
                 private: isPrivate || false

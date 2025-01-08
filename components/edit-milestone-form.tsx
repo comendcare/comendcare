@@ -20,7 +20,7 @@ import StatusButton from "./milestone-status-button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import type { StatusType } from "./milestone-status-button"
-import { FaTrash, FaX } from "react-icons/fa6"
+import { FaLinkSlash, FaX } from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -33,7 +33,6 @@ import {
     DialogTrigger
 } from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
-import { nanoid } from "nanoid"
 import { toast } from "sonner"
 import {
     DndContext,
@@ -111,6 +110,7 @@ const kanbanSelector = (state: KanbanState) => ({
     columns: state.columns,
     tasks: state.tasks,
     setTask: state.setTask,
+    setTasks: state.setTasks
 })
 
 export function EditMilestoneForm({
@@ -123,7 +123,7 @@ export function EditMilestoneForm({
     const { setMilestone } = useRoadmapStore(
         useShallow(selector)
     )
-    const { columns: kanbanColumns, tasks: kanbanTasks, setTask } = useKanbanStore(useShallow(kanbanSelector))
+    const { columns: kanbanColumns, tasks: kanbanTasks, setTask, setTasks } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
 
     const editMilestoneForm = z.object({
@@ -257,6 +257,17 @@ export function EditMilestoneForm({
                 })
             }
         }
+
+        // disconnect tasks that are no longer associated with this milestone
+        kanbanTasks.forEach(task => {
+            if (task.milestoneId === milestoneData?.id && !tasks?.map(t => t.id).includes(task.id)) {
+                setTask(task.id, {
+                    ...task,
+                    milestone: undefined,
+                    milestoneId: undefined
+                })
+            }
+        })
         
         toast('Success!', {
             position: "bottom-left",
@@ -878,9 +889,9 @@ const TaskField = ({
             </div>
 
             {/* delete task */}
-            {/* <Button variant="secondary" size="icon" onClick={deleteTask}>
-                <FaTrash />
-            </Button> */}
+            <Button variant="secondary" size="icon" onClick={deleteTask}>
+                <FaLinkSlash />
+            </Button>
         </li>
     )
 }
