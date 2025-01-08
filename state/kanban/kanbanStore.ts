@@ -99,15 +99,19 @@ export const useKanbanStore = create<KanbanState>()(
 
                     return task
                 })
-                set({ tasks: updatedTasks })
                 updateDBTask({ tasks: updatedTasks })
+                set({ tasks: updatedTasks })
             },
             setTasks: (tasks: any[]) => {
-                set({ tasks })
                 updateDBTask({ tasks })
+                set({ tasks: tasks })
             },
         }),
         {
             limit: 100, // limit the stored history states to 100
+            onSave: (pastState, currentState) => {
+                console.log(`Saved Kanban State: `, currentState)
+                return
+            },
         })
 )

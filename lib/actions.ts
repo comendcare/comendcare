@@ -14,7 +14,6 @@ import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from 
 import { getKanbanFromOrganizationId } from "./fetchers"
 import {ApiResponse} from "@/lib/types";
 
-
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
     const roadmap = await prisma.roadmap.create({
         data: {
@@ -1211,13 +1210,14 @@ export async function updateDBColumns({ columns }: { columns: Column[] }) {
 export async function updateDBTask({tasks}: { tasks: Task[] }) {
     try {
         console.log(`tasks:`, tasks)
+        let updatedTasks: Task[] = []
 
         await Promise.all(
             tasks.map(async (task: any) => {
                 if (!task) return
-                console.log(`task`, task)
-                await prisma.task.update({
+                const t = await prisma.task.update({
                     where: {id: task?.id},
+                    include: { milestone: true },
                     data: {
                         name: task.name,
                         // status: task.status,
@@ -1251,10 +1251,13 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
                         }
                     }
                 })
+
+                updatedTasks.push(t)
             })
         )
 
         console.log(`Successfully updated Task`)
+        return updatedTasks
     } catch (error) {
         console.error(`Error updating Task: `, error)
     }

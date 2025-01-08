@@ -22,18 +22,14 @@ import { FaQuestion, FaX } from "react-icons/fa6"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useState } from "react"
 import { MilestoneDetails } from "./milestone-details"
-import { EditTaskForm } from "./edit-task-form"
-import { TaskDetails } from "./task-details"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { GanttChartView } from "./gantt-chart"
 import { useOnborda } from "./onborda/OnbordaContext"
-import {FaQuestionCircle, FaRegQuestionCircle} from "react-icons/fa";
+import { FaRegQuestionCircle } from "react-icons/fa";
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
-    selectedTaskId: state.selectedTaskId,
-    setSelectedTaskId: state.setSelectedTaskId,
     milestones: state.milestones,
     initState: state.initState
 })
@@ -56,8 +52,6 @@ export function Roadmap({
     const { 
         selectedNodeId, 
         setSelectedNodeId, 
-        selectedTaskId, 
-        setSelectedTaskId, 
         milestones, 
         initState
     } = useRoadmapStore(useShallow(selector))
@@ -86,7 +80,7 @@ export function Roadmap({
             router.push(`${pathname}?${params.toString()}`, { scroll: false })
         }
         if (open) {
-            setSelectedTaskId(null)
+            // setSelectedTaskId(null)
 
             const params = new URLSearchParams(searchParams.toString())
             params.delete("task")
@@ -96,7 +90,7 @@ export function Roadmap({
 
     const handleTaskPanelChange = (open: boolean) => {
         if (!open) {
-            setSelectedTaskId(null)
+            // setSelectedTaskId(null)
 
             const params = new URLSearchParams(searchParams.toString())
             params.delete("task")
@@ -116,7 +110,7 @@ export function Roadmap({
 
         // close all panels when switching tabs
         setSelectedNodeId(null)
-        setSelectedTaskId(null)
+        // setSelectedTaskId(null)
 
         const params = new URLSearchParams(searchParams.toString())
         params.delete("view")
@@ -202,81 +196,8 @@ export function Roadmap({
                         </ResizablePanel>
                     </>
                 )}
-
-                {selectedTaskId != null && (
-                    <>
-                        <ResizableHandle withHandle />
-
-                        <ResizablePanel
-                            defaultSize={defaultLayout[1]}
-                            minSize={30}
-                            className="p-10 flex flex-col gap-4"
-                        >
-                            <TaskDetailsPanel 
-                                milestones={milestones}
-                                selectedTaskId={selectedTaskId}
-                                handlePanelChange={handleTaskPanelChange}
-                            />
-                        </ResizablePanel>
-                    </>
-                )}
             </ResizablePanelGroup>
         </TooltipProvider>
-    )
-}
-
-const TaskDetailsPanel = ({
-    milestones,
-    selectedTaskId,
-    // milestoneId,
-    // task,
-    handlePanelChange
-}: {
-    milestones: any[]
-    selectedTaskId: string
-    // milestoneId: string
-    // task: any
-    handlePanelChange: (open: boolean) => void
-}) => {
-    // const [isEditing, setIsEditing] = useState(false)    // disabled while details view is disabled
-    const [isEditing, setIsEditing] = useState(true)
-    const task = milestones.map(milestone => milestone.tasks).flat(1).find(task => task?.id === selectedTaskId)
-    // const milestone = milestones.find(milestone => milestone.tasks.includes(selectedTaskId))
-
-    const handleClose = () => {
-        // setIsEditing(false)
-        handlePanelChange(false)
-    }
-
-    return (
-        <>
-            <span className="flex flex-row justify-between items-center gap-4">
-                <h1 className="text-2xl font-bold grow">
-                    {isEditing ? `Edit Task Details` : `Task Details`}
-                </h1>
-                {/* {isEditing ? (
-                    <Button onClick={() => setIsEditing(false)}>
-                        Cancel Editing
-                    </Button>
-                ) : (
-                    <Button onClick={() => setIsEditing(true)}>
-                        Edit Task
-                    </Button>
-                )} */}
-                <Button variant="secondary" onClick={handleClose}>
-                    <FaX />
-                </Button>
-            </span>
-            {/* {isEditing ? (
-                // <EditTaskForm 
-                //     taskData={task}
-                //     // onClose={() => setIsEditing(false)}
-                //     onClose={() => {}}
-                // />
-            ) : (
-                <TaskDetails taskData={task}/>
-            )} */}
-        </>
     )
 }
 
