@@ -583,3 +583,48 @@ model Mention {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Gene {
+  id                   Int       @id @default(autoincrement()) // Auto-generated primary key
+  uuid                 String?   @unique // Unique identifier for the record
+  symbol               String?   @unique // Official gene symbol
+  name                 String? // Full name of the gene or RNA
+  hgncId               String? // HGNC identifier for the gene
+  locusGroup           String? // Group classification (e.g., protein-coding gene, non-coding RNA)
+  locusType            String? // Type of locus (e.g., gene with protein product, RNA, pseudogene)
+  location             String? // Chromosomal location (e.g., 19q13.43)
+  locationSortable     String? // Sortable location string
+  entrezId             String? // NCBI Entrez Gene identifier
+  ensemblGeneId        String?   @unique // Ensembl gene identifier
+  ucscId               String? // UCSC Genome Browser identifier
+  refseqAccessions     String[] // Array of RefSeq accession numbers
+  vegaId               String? // Vega Genome Browser identifier
+  omimIds              String[] // Array of OMIM IDs
+  uniprotIds           String[] // Array of UniProt IDs
+  aliasSymbols         String[] // Alternate symbols for the gene
+  prevSymbols          String[] // Previously used symbols
+  prevNames            String[] // Previously used names
+  aliasNames           String[] // Alternate names for the gene
+  geneGroups           String[] // Functional groups the gene belongs to
+  geneGroupIds         Int[] // Array of group IDs for the functional groups
+  pubmedIds            Int[] // Array of PubMed IDs referencing the gene
+  agr                  String? // Alliance of Genome Resources ID
+  status               String? // Approval status (e.g., "Approved")
+  dateApprovedReserved DateTime? // Date when the record was approved or reserved
+  dateModified         DateTime? // Last modification date
+  dateNameChanged      DateTime? // Date when the gene's name was changed
+  dateSymbolChanged    DateTime? // Date when the gene's symbol was changed
+  rnaCentralIds        String[] // Array of RNA Central IDs (for RNA entities)
+  lncipedia            String? // LncRNA-specific ID in Lncipedia
+  pseudogeneOrg        String? // Pseudogene.org ID (for pseudogenes)
+  merops               String? // MEROPS protease family ID
+  maneSelect           String[] // MANE Select transcript IDs
+  ena                  String[] // Array of ENA IDs
+  ccdsIds              String[] // Array of CCDS IDs
+  rgdIds               String[] // Array of RGD IDs (Rat Genome Database)
+  mgdIds               String[] // Array of MGD IDs (Mouse Genome Database)
+  orphanet             Int? // Orphanet ID for rare diseases
+  lsdb                 String[] // Locus-Specific Database links
+
+  @@index([symbol], map: "idx_symbol") // Index for faster search by symbol
+}
