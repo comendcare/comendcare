@@ -19,7 +19,6 @@ import { ScrollArea } from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import type { TaskType } from "./private-milestone-node"
 import type { StatusType } from "./milestone-status-button"
 import { FaTrash, FaX } from "react-icons/fa6"
 import {
@@ -61,6 +60,7 @@ import { AssetEditForm } from "./asset-edit-form"
 import { RFPEditForm } from "./rfp-edit-form"
 import { PapersEditForm } from "./papers-edit-form"
 import { FaEdit } from "react-icons/fa"
+import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 
 type AssetType = Prisma.AssetGetPayload<{ 
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -85,6 +85,7 @@ type RFPType = Prisma.RFPGetPayload<{
     }
 }>
 type AttachmentType = AssetType['attachments'][0]
+type TaskType = Prisma.TaskGetPayload<{}>
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -106,6 +107,11 @@ const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone
 })
 
+const kanbanSelector = (state: KanbanState) => ({
+    columns: state.columns,
+    setTask: state.setTask,
+})
+
 export function EditMilestoneForm({
     milestoneData,
     onClose
@@ -116,6 +122,7 @@ export function EditMilestoneForm({
     const { setMilestone } = useRoadmapStore(
         useShallow(selector)
     )
+    const { setTask } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
 
     const editMilestoneForm = z.object({
@@ -140,13 +147,7 @@ export function EditMilestoneForm({
         }),
         budget: z.number().optional(),
         papers: z.array(z.custom<AttachmentType>()).optional(),
-        tasks: z.array(
-            z.object({
-                id: z.string(),
-                name: z.string(),
-                status: statusTypeSchema,
-            })
-        ).optional(),
+        tasks: z.array(z.custom<TaskType>()).optional(),
         status: z.string(),
         private: z.boolean(),
         asset: z.custom<AssetType>().optional(),
@@ -252,6 +253,15 @@ export function EditMilestoneForm({
             asset,
             RFP
         })
+
+        tasks?.forEach((t, index) => {
+            setTask(t.id, {
+                name: t.name,
+                orderPosition: index,
+                columnId: t.columnId
+            })
+        })
+
         toast('Success!', {
             position: "bottom-left",
             description: 'The changes to your milestone have been successfully saved.'
@@ -637,8 +647,8 @@ export function EditMilestoneForm({
                                             onNameChange={(newName) => {
                                                 form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, name: newName} : t))
                                             }}
-                                            onStatusChange={(status) => {
-                                                form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, status} : t))
+                                            onColumnChange={(newColumnId) => {
+                                                form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, columnId: newColumnId} : t))
                                             }}
                                         />
                                     ))}
@@ -647,13 +657,13 @@ export function EditMilestoneForm({
                                 </DndContext>
                                 </>
                             )}
-                            <Button variant="secondary" onClick={(e: any) => {
+                            {/* <Button variant="secondary" onClick={(e: any) => {
                                 e.preventDefault()
                                 form.setValue(
                                     'tasks',
                                     [...field?.value || [], { name: 'New Task', status: 'TODO', id: nanoid() }]
                                 )
-                            }}>Add a task</Button>
+                            }}>Add a task</Button> */}
                             </>
                         </FormControl>
                         <FormMessage />
@@ -747,15 +757,13 @@ const TaskField = ({
     task,
     onDelete,
     onNameChange,
-    // onCompleteChange
-    onStatusChange
+    onColumnChange,
 }: {
     index: number
     task: TaskType
     onDelete: () => void
     onNameChange: (newName: string) => void
-    // onCompleteChange: (complete: boolean) => void
-    onStatusChange: (status: StatusType) => void
+    onColumnChange: (newColumnId: string) => void
 }) => {
     const {
         attributes,
@@ -765,7 +773,7 @@ const TaskField = ({
         transition,
         isDragging
     } = useSortable({ id: task.id || "" })
-
+    const { columns: kanbanColumns } = useKanbanStore(useShallow(kanbanSelector))
     const style = {
         transition,
         transform: CSS.Translate.toString(transform)
@@ -778,6 +786,10 @@ const TaskField = ({
 
     const nameChanged = (e: React.FormEvent<HTMLInputElement>) => {
         onNameChange(e.currentTarget.value)
+    }
+
+    const columnChanged = (newColumnId: string) => {
+        onColumnChange(newColumnId)
     }
 
     const variants = cva("flex flex-row gap-2 items-center", {
@@ -797,6 +809,7 @@ const TaskField = ({
                 dragging: isDragging ? "overlay" : undefined
             })}
         >
+            {/* move task */}
             <Button
                 type="button"
                 variant={"ghost"}
@@ -807,7 +820,20 @@ const TaskField = ({
                 <span className="sr-only">Move task</span>
                 <GripVertical />
             </Button>
-            <StatusButton status={task.status} onStatusChange={onStatusChange}/>
+
+            {/* select kanban column */}
+            <Select onValueChange={(value: string) => columnChanged(value)} value={task.columnId}>
+                <SelectTrigger className="w-[180px]">
+                    <SelectValue/>
+                </SelectTrigger>
+                <SelectContent>
+                    {kanbanColumns.map(column => (
+                        <SelectItem value={column.id}>{column.name}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+
+            {/* task name */}
             <div className="grow">
                 <Input
                     placeholder={task.name}
@@ -816,6 +842,8 @@ const TaskField = ({
                     className="h-full"
                 />
             </div>
+
+            {/* delete task */}
             <Button variant="secondary" size="icon" onClick={deleteTask}>
                 <FaTrash />
             </Button>
