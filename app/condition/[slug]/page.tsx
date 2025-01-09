@@ -479,7 +479,7 @@ export default async function ConditionPage({
                                     <CardContent
                                         className="flex flex-col items-center justify-center p-6 text-center">
                                         <FolderOpen className="w-12 h-12 text-gray-400 mb-4"/>
-                                        <h3 className="text-lg font-semibold mb-2">No RFPs</h3>
+                                        <h3 className="text-lg font-semibold mb-2">No Projects</h3>
                                         <p className="text-sm text-gray-500">
                                             {`We don't have any requests for proposals yet.`}
                                         </p>
