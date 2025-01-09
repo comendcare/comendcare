@@ -321,7 +321,7 @@ export default async function OrganizationRoadmapPage({
                                 {
                                     title: "Share on social media",
                                     icon: <IconShare/>,
-                                    dialog: <ShareDialog url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/${roadmaps[0].id}`} />
+                                    dialog: <ShareDialog url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`} />
                                 },
                                 {
                                     title: "Report an issue",

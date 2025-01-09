@@ -105,7 +105,7 @@ export const PAGProfileAssetsAndProjectsCard = () => {
                 </CardTitle>
                 <Button
                     variant="ghost"
-                    onClick={() => router.push("/app/roadmap")}
+                    onClick={() => router.push("/app/research-plan")}
                     className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                 >
                     Edit research plan

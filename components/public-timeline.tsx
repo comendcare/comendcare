@@ -17,7 +17,7 @@ export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
                 <a
                     href={
                         subdomain ?
-                            `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${item?.id}&view=timeline` :
+                            `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${item?.id}&view=timeline` :
                             ''
                     }
                     key={index}
