@@ -7,6 +7,13 @@ import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
 
+export function toKebabCase(name: string) {
+    return name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric characters with hyphens
+        .replace(/^-+|-+$/g, '');   // Remove leading or trailing hyphens
+}
+
 export function formatDates(date: Date) {
     const distance = formatDistanceToNowStrict(new Date(date));
     const formattedDistance = distance

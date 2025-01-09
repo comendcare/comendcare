@@ -8,10 +8,10 @@ import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
-import {getBlurDataURL, logError} from "@/lib/utils";
+import {getBlurDataURL, logError, toKebabCase} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from "@/lib/emails";
-import { getKanbanFromOrganizationId } from "./fetchers"
+import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse} from "@/lib/types";
 
 
@@ -177,6 +177,34 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
     } catch (error: any) {
         console.error("Error creating member request:", error)
         return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export const createCondition = async (formData: FormData) => {
+    const session = await getSession()
+    if (!session?.user.id) {
+        return {
+            error: "Not authenticated"
+        }
+    }
+    const name = formData.get("name") as string
+    const summary = formData.get("summary") as string
+    const slug = toKebabCase(formData.get("name") as string)
+
+    try {
+        const response = await prisma.condition.create({
+            data: {
+                name,
+                summary,
+                slug,
+            }
+        })
+
+        return response
+    } catch (error: any) {
+        return {
+            error: error.message
+        }
     }
 }
 
@@ -417,23 +445,6 @@ export const updateOrganizationAttribute = withOrganizationAttributeAuth(
                     data: {
                         [key]: url,
                         ...(blurhash && {imageBlurhash: blurhash})
-                    }
-                })
-            } else {
-                const prevalenceNumerator: number | undefined = parseInt(formData.get('prevalenceNumerator') as string) || undefined
-                const prevalenceDenominator: number | undefined = parseInt(formData.get('prevalenceDenominator') as string) || undefined
-
-                response = await prisma.organization.update({
-                    where: {
-                        id: organization.id
-                    },
-                    data: {
-                        [key]: value,
-                        // add prevalenceRatio (if applicable)
-                        ...(prevalenceNumerator && prevalenceDenominator ?
-                                {prevalenceRatio: prevalenceNumerator / prevalenceDenominator} :
-                                undefined
-                        )
                     }
                 })
             }
@@ -1188,7 +1199,7 @@ async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneT
     }
 }
 
-export async function updateDBColumns({ columns }: { columns: Column[] }) {
+export async function updateDBColumns({columns}: { columns: Column[] }) {
     try {
         await Promise.all(
             columns.map(async (column: any) => {
@@ -1236,18 +1247,18 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
                         },
                         stakeholders: {
                             set: [],
-                            connect: task.stakeholders.map((stakeholder: User) => ({ id: stakeholder?.id }))
+                            connect: task.stakeholders.map((stakeholder: User) => ({id: stakeholder?.id}))
                         },
                         ...(task.milestone?.id ? ({
                             milestone: {
-                                connect: { id: task.milestone?.id }
+                                connect: {id: task.milestone?.id}
                             },
                         }) : undefined),
                         endDate: task.endDate,
                         priority: task.priority,
                         private: task.private,
                         column: {
-                            connect: { id: task.columnId }
+                            connect: {id: task.columnId}
                         }
                     }
                 })
@@ -1376,7 +1387,7 @@ export async function createNewKanbanTask(task: Prisma.TaskGetPayload<{
 
 export async function createKanbanColumn(column: Column) {
     try {
-        const { data: kanban } = await getKanbanFromOrganizationId()
+        const {data: kanban} = await getKanbanFromOrganizationId()
         if (!kanban) return {success: false, error: "failed to find associated kanban board"}
 
         const newColumn = prisma.column.create({
