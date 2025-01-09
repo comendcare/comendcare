@@ -12,7 +12,7 @@ import {
 import { Input } from "./ui/input"
 import { Textarea } from "./ui/textarea"
 import { UseFormReturn } from "react-hook-form"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { Separator } from "./ui/separator"
 import { FaTrash } from "react-icons/fa6"
 
@@ -38,6 +38,7 @@ export function AssetEditForm({ form, asset }: { form: UseFormReturn<any>, asset
                     <Card>
                         <CardHeader>
                             <CardTitle>Asset</CardTitle>
+                            <CardDescription>A research asset is any resource, tool, or data that helps advance scientific studies, such as samples or datasets.</CardDescription>
                         </CardHeader>
 
                         <CardContent className="flex flex-col gap-4">
