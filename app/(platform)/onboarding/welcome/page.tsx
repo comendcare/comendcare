@@ -76,8 +76,6 @@ export default function OnboardingWelcomePage() {
                         {/* Form inputs */}
                         <Skeleton className="h-10 w-full rounded-md"/>
                         <Skeleton className="h-10 w-full rounded-md"/>
-                        <Skeleton className="h-10 w-full rounded-md"/>
-                        <Skeleton className="h-10 w-full rounded-md"/>
                         <Skeleton className="h-10 w-full rounded-md" />
                         <Skeleton className="h-10 w-2/3 rounded-md" />
                         {/* Button */}
