@@ -157,26 +157,27 @@ export const PrivateFlowView = ({
 
     useEffect(() => {
         if (isNewUser()) {
-            toast("Welcome to your research plan!", {
-                id: "onborda",
-                duration: 300000,
-                description: `Would you like to take a quick tour?`,
-                action: (
-                    <div className="flex flex-col space-y-2 ml-4">
-                        <Button
-                            onClick={startOnbordaAndRemoveToast}
-                        >{`Yes please!`}</Button>
-                        <Button
-                            onClick={() => {
-                                toast.dismiss()
-                                setUserAsReturning()
-                            }}
-                        >
-                            {`No thanks!`}
-                        </Button>
-                    </div>
-                )
-            })
+            // toast("Welcome to your research plan!", {
+            //     id: "onborda",
+            //     duration: 300000,
+            //     description: `Would you like to take a quick tour?`,
+            //     action: (
+            //         <div className="flex flex-col space-y-2 ml-4">
+            //             <Button
+            //                 onClick={startOnbordaAndRemoveToast}
+            //             >{`Yes please!`}</Button>
+            //             <Button
+            //                 onClick={() => {
+            //                     toast.dismiss()
+            //                     setUserAsReturning()
+            //                 }}
+            //             >
+            //                 {`No thanks!`}
+            //             </Button>
+            //         </div>
+            //     )
+            // })
+            startOnbordaAndRemoveToast()
         }
     }, [nodes])
 
