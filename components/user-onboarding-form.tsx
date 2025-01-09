@@ -25,7 +25,7 @@ import {useCallback, useEffect, useState} from "react";
 import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {cn, createDicebearAvatar, getPublicFile} from "@/lib/utils";
+import {cn, createDicebearAvatar, getPublicFile, nameToInitials} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {FaUpload} from "react-icons/fa6";
@@ -35,7 +35,7 @@ import LoadingDots from "@/components/icons/loading-dots";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
-    title: z.string().min(2, {message: "Your role must be at least 2 characters."}),
+    title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
     address1: z.string().optional(),
@@ -243,26 +243,6 @@ export default function UserOnboardingForm() {
                             )}
                         />
 
-                        {/*<FormField*/}
-                        {/*    control={form.control}*/}
-                        {/*    name="formattedAddress"*/}
-                        {/*    render={({field}) => (*/}
-                        {/*        <FormItem>*/}
-                        {/*            <FormLabel>Address</FormLabel>*/}
-                        {/*            <FormControl>*/}
-                        {/*                <AutocompleteComponent*/}
-                        {/*                    address={address}*/}
-                        {/*                    setAddress={setAddress}*/}
-                        {/*                    searchInput={searchInput}*/}
-                        {/*                    setSearchInput={setSearchInput}*/}
-                        {/*                />*/}
-                        {/*            </FormControl>*/}
-                        {/*            <FormDescription>Your address.</FormDescription>*/}
-                        {/*            <FormMessage/>*/}
-                        {/*        </FormItem>*/}
-                        {/*    )}*/}
-                        {/*/>*/}
-
                         <FormField
                             control={form.control}
                             name="image"
@@ -368,9 +348,17 @@ export default function UserOnboardingForm() {
                         <div className="col-span-2">
                             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                                 <div className="flex">
-                                    <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
-                                         src={createDicebearAvatar(form.watch("name")?.toLocaleString() ?? "", 50, 40, "identicon")}
-                                         alt=""/>
+                                    {selectedFile?.preview ?
+                                        <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
+                                             src={selectedFile?.preview}
+                                             alt=""/>
+                                        :
+                                        <p
+                                            className={"flex items-center justify-center bg-muted h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18 text-2xl"}
+                                        >
+                                            {nameToInitials(form.watch("name"))}
+                                        </p>
+                                    }
                                 </div>
 
                                 <div

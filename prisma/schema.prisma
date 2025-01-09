@@ -316,58 +316,46 @@ model Edge {
 }
 
 model Organization {
-  id                          String                    @id @default(cuid())
-  name                        String?
-  description                 String?
-  logo                        String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png")
-  font                        String                    @default("font-cal")
-  image                       String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png")
-  imageBlurhash               String?                   @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC")
-  subdomain                   String?                   @unique
-  customDomain                String?                   @unique
-  message404                  String?                   @default("Blimey! You've found a page that doesn't exist.")
-  createdAt                   DateTime                  @default(now())
-  updatedAt                   DateTime                  @updatedAt
-  userId                      String?
-  assetsUnderDevelopment      String[]
-  associatedGenes             String[]
-  associatedSignsAndSymptoms  String[]
-  diseaseCategories           String[]
-  diseaseName                 String?
-  existingDatabasesAndStudies String[]
-  incorporationStatus         IncorporationStatus?
-  interestedModalities        String[]
-  moneyDeployed               Int?
-  moneyRaised                 Int?
-  numberOfIdentifiedPatients  Int?
-  relevantDiseaseMechanisms   String[]
-  researchBudget              Int?
-  statedGoal                  Goal?
-  website                     String?
-  address1                    String?
-  address2                    String?
-  city                        String?
-  country                     String?
-  formattedAddress            String?
-  lat                         String?
-  lng                         String?
-  postalCode                  String?
-  region                      String?
-  prevalenceDenominator       Int?
-  prevalenceNumerator         Int?
-  prevalenceRatio             Float?
-  public                      Boolean                   @default(true)
-  verified                    Boolean                   @default(false)
-  yearFounded                 String?
-  client                      Client[]
-  condition                   ConditionToOrganization[]
-  invitation                  Invitation[]
-  Kanban                      Kanban?
-  members                     Member[]
-  membershipRequest           MemberRequest[]
-  Milestone                   Milestone[]
-  user                        User?                     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  roadmaps                    Roadmap[]
+  id                  String                    @id @default(cuid())
+  public              Boolean                   @default(true)
+  verified            Boolean                   @default(false)
+  name                String?
+  description         String?                   @db.Text
+  logo                String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
+  font                String                    @default("font-cal")
+  image               String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png") @db.Text
+  imageBlurhash       String?                   @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
+  subdomain           String?                   @unique
+  customDomain        String?                   @unique
+  message404          String?                   @default("Blimey! You've found a page that doesn't exist.") @db.Text
+  statedGoal          Goal?
+  yearFounded         String?
+  incorporationStatus IncorporationStatus?
+  website             String?
+  moneyRaised         Int?
+  moneyDeployed       Int?
+  researchBudget      Int?
+  address1            String?
+  address2            String?
+  formattedAddress    String?
+  city                String?
+  region              String?
+  postalCode          String?
+  country             String?
+  lat                 String?
+  lng                 String?
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
+  user                User?                     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId              String?
+  roadmaps            Roadmap[]
+  members             Member[]
+  client              Client[]
+  invitation          Invitation[]
+  membershipRequest   MemberRequest[]
+  condition           ConditionToOrganization[]
+  Kanban              Kanban?
+  Milestone           Milestone[]
 
   @@index([userId])
 }
@@ -396,6 +384,7 @@ model Condition {
   numberOfIdentifiedPatients  Int?
   relevantDiseaseMechanisms   String[]
   associatedGenes             String[]
+  associatedSystems           String[]
   associatedSignsAndSymptoms  String[]
   existingDatabasesAndStudies String[]
   assetsUnderDevelopment      String[]
@@ -564,4 +553,64 @@ enum MentionedType {
   ROADMAP
   ORGANIZATION
   CONDITION
+}
+
+model Mention {
+  id     String  @id @default(cuid())
+  postId String? // For mentions in posts
+  post   Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  commentId String? // For mentions in comments
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  mentionedType MentionedType
+  mentionedId   String // ID of the mentioned entity (e.g., User, Roadmap, Organization, etc.)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Gene {
+  id                   Int       @id @default(autoincrement()) // Auto-generated primary key
+  uuid                 String?   @unique // Unique identifier for the record
+  symbol               String?   @unique // Official gene symbol
+  name                 String? // Full name of the gene or RNA
+  hgncId               String? // HGNC identifier for the gene
+  locusGroup           String? // Group classification (e.g., protein-coding gene, non-coding RNA)
+  locusType            String? // Type of locus (e.g., gene with protein product, RNA, pseudogene)
+  location             String? // Chromosomal location (e.g., 19q13.43)
+  locationSortable     String? // Sortable location string
+  entrezId             String? // NCBI Entrez Gene identifier
+  ensemblGeneId        String?   @unique // Ensembl gene identifier
+  ucscId               String? // UCSC Genome Browser identifier
+  refseqAccessions     String[] // Array of RefSeq accession numbers
+  vegaId               String? // Vega Genome Browser identifier
+  omimIds              String[] // Array of OMIM IDs
+  uniprotIds           String[] // Array of UniProt IDs
+  aliasSymbols         String[] // Alternate symbols for the gene
+  prevSymbols          String[] // Previously used symbols
+  prevNames            String[] // Previously used names
+  aliasNames           String[] // Alternate names for the gene
+  geneGroups           String[] // Functional groups the gene belongs to
+  geneGroupIds         Int[] // Array of group IDs for the functional groups
+  pubmedIds            Int[] // Array of PubMed IDs referencing the gene
+  agr                  String? // Alliance of Genome Resources ID
+  status               String? // Approval status (e.g., "Approved")
+  dateApprovedReserved DateTime? // Date when the record was approved or reserved
+  dateModified         DateTime? // Last modification date
+  dateNameChanged      DateTime? // Date when the gene's name was changed
+  dateSymbolChanged    DateTime? // Date when the gene's symbol was changed
+  rnaCentralIds        String[] // Array of RNA Central IDs (for RNA entities)
+  lncipedia            String? // LncRNA-specific ID in Lncipedia
+  pseudogeneOrg        String? // Pseudogene.org ID (for pseudogenes)
+  merops               String? // MEROPS protease family ID
+  maneSelect           String[] // MANE Select transcript IDs
+  ena                  String[] // Array of ENA IDs
+  ccdsIds              String[] // Array of CCDS IDs
+  rgdIds               String[] // Array of RGD IDs (Rat Genome Database)
+  mgdIds               String[] // Array of MGD IDs (Mouse Genome Database)
+  orphanet             Int? // Orphanet ID for rare diseases
+  lsdb                 String[] // Locus-Specific Database links
+
+  @@index([symbol], map: "idx_symbol") // Index for faster search by symbol
 }
