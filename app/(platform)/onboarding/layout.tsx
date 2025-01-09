@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     title: "Onboarding | Comend",
 };
 
-export default async function AuthLayout({children}: { children: ReactNode }) {
+export default async function OnboardingLayout({children}: { children: ReactNode }) {
     const session = await getSession()
 
     if (!session) {

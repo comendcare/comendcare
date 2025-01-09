@@ -1,4 +1,3 @@
-import OrganizationOnboardingForm from "@/components/organization-onboarding-form";
 import {Separator} from "@/components/ui/separator";
 import FinancesOnboardingForm from "@/components/finances-onboarding-form";
 import {TooltipProvider} from "@/components/ui/tooltip";

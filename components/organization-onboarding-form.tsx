@@ -27,7 +27,7 @@ import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
-import {cn, createDicebearAvatar, formatMoney, years} from "@/lib/utils";
+import {cn, createDicebearAvatar, formatMoney, nameToInitials, years} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
@@ -53,6 +53,8 @@ export const newOrgFormSchema = z.object({
     }),
     subdomain: z.string().min(2, {
         message: "Your organization's nickname must be at least 2 characters."
+    }).max(60, {
+        message: "Your organization's nickname must be a maximum of 50 characters."
     }),
     looking: z.string().min(0).optional(),
     founded: z.string().optional(),
@@ -355,7 +357,14 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Name (required)`}</FormLabel>
-                                        <FormDescription>{`The name of your organization.`}</FormDescription>
+                                        <div className="w-full flex flex-row justify-between">
+                                            <FormDescription>
+                                                {`The name of your organization.`}
+                                            </FormDescription>
+                                            <FormDescription>
+                                                {`60 characters max.`}
+                                            </FormDescription>
+                                        </div>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -375,19 +384,24 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
-                                        <FormDescription>
-                                            {`Enter your organization's abbreviated name, short form, or nickname.`}
-                                            <br/>
-                                            {newOrgForm.watch("subdomain") &&
-                                                !newOrgForm.formState.errors.subdomain && (
-                                                    <>
-                                                        {`Your organization's domain will be ${newOrgForm
-                                                            .watch("subdomain")
-                                                            .toLowerCase()
-                                                            .replace(/\s+/g, "-")}.comend.io`}
-                                                    </>
-                                                )}
-                                        </FormDescription>
+                                        <div className="w-full flex flex-row justify-between">
+                                            <FormDescription>
+                                                {`Enter your organization's abbreviated name, short form, or nickname.`}
+                                                <br/>
+                                                {newOrgForm.watch("subdomain") &&
+                                                    !newOrgForm.formState.errors.subdomain && (
+                                                        <>
+                                                            {`Your organization's domain will be ${newOrgForm
+                                                                .watch("subdomain")
+                                                                .toLowerCase()
+                                                                .replace(/\s+/g, "-")}.comend.io`}
+                                                        </>
+                                                    )}
+                                            </FormDescription>
+                                            <FormDescription>
+                                                50 characters max.
+                                            </FormDescription>
+                                        </div>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -707,7 +721,7 @@ export default function OrganizationOnboardingForm(
                                         Join Organization
                                     </Button>
                                     <Button variant="ghost" onClick={() => router.push("/app/profile")}>
-                                        Skip
+                                        Skip for now
                                     </Button>
                                 </div>
                             </form>
@@ -739,9 +753,18 @@ export default function OrganizationOnboardingForm(
                                     <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
 
                                         <div className="flex">
-                                            <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
-                                                 src={createDicebearAvatar(newOrgForm.watch("orgName")?.toLocaleString() ?? "", 50, 40, "identicon")}
-                                                 alt=""/>
+                                            {selectedFile?.preview ?
+                                                <img
+                                                    className="h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
+                                                    src={selectedFile?.preview}
+                                                    alt=""/>
+                                                :
+                                                <p
+                                                    className={"flex items-center justify-center bg-muted h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18 text-2xl"}
+                                                >
+                                                    {nameToInitials(newOrgForm.watch("orgName"))}
+                                                </p>
+                                            }
                                         </div>
 
                                         <div
@@ -813,21 +836,6 @@ export default function OrganizationOnboardingForm(
                                                                     {newOrgForm.watch("description")}
                                                                 </p> : <Skeleton className="h-4 w-full"/>
                                                             }
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                            <div
-                                                                className="flex flex-row items-center justify-between w-full">
-                                                                <h3 className={cn("scroll-m-20 text-md tracking-tight font-semibold")}>
-                                                                    Relevant topics
-                                                                </h3>
-                                                            </div>
-                                                            {/*<div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-1">*/}
-                                                            {/*    {pag?.topics.map((item, index) =>*/}
-                                                            {/*        <Badge key={index} className="flex text-sm">*/}
-                                                            {/*            {item.charAt(0).toUpperCase() + item.slice(1)}*/}
-                                                            {/*        </Badge>*/}
-                                                            {/*    )}*/}
-                                                            {/*</div>*/}
                                                         </div>
                                                     </div>
                                                 </div>

@@ -36,22 +36,6 @@ export function OrganizationMarketplaceListElement({ organization }: { organizat
                         ))}
                     </span>
                 )}
-                {organization?.numberOfIdentifiedPatients &&
-                    <div className="m-0 flex items-center text-gray-500">
-                        <FaPeopleGroup
-                            className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                            aria-hidden="true"/>
-                        {organization?.numberOfIdentifiedPatients}+ patients
-                    </div>
-                }
-                {organization?.prevalenceNumerator && organization?.prevalenceDenominator &&
-                    <div className="m-0 flex items-center text-gray-500">
-                        <FaGlobe
-                            className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                            aria-hidden="true"/>
-                        {organization.prevalenceNumerator} of {organization?.prevalenceDenominator}
-                    </div>
-                }
                 {organization?.moneyRaised &&
                     <div className="m-0 flex items-center text-gray-500">
                         <FaCircleDollarToSlot

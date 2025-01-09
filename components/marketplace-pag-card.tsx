@@ -39,22 +39,6 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                             </span>
                         )}
                         <div className="w-full grid gap-4 grid-cols-2">
-                            {organization?.numberOfIdentifiedPatients &&
-                                <div className="m-0 flex items-center">
-                                    <FaPeopleGroup
-                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                        aria-hidden="true"/>
-                                    {organization?.numberOfIdentifiedPatients}+ patients
-                                </div>
-                            }
-                            {organization?.prevalenceNumerator && organization?.prevalenceDenominator &&
-                                <div className="m-0 flex items-center">
-                                    <FaGlobe
-                                        className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                        aria-hidden="true"/>
-                                    {organization.prevalenceNumerator} in {abbreviateNumber(organization?.prevalenceDenominator)}
-                                </div>
-                            }
                             {organization?.moneyRaised &&
                                 <div className="m-0 flex items-center">
                                     <FaCircleDollarToSlot
