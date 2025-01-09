@@ -1215,7 +1215,8 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
         await Promise.all(
             tasks.map(async (task: any) => {
                 if (!task) return
-                const t = await prisma.task.update({
+
+                let t = await prisma.task.update({
                     where: {id: task?.id},
                     include: { milestone: true },
                     data: {
@@ -1236,17 +1237,18 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
                         },
                         stakeholders: {
                             set: [],
-                            connect: task.stakeholders.map((stakeholder: User) => ({ id: stakeholder?.id }))
+                            connect: task.stakeholders?.map((stakeholder: User) => ({ id: stakeholder?.id })) || []
                         },
-                        ...(task.milestone?.id ? ({
-                            // milestone is linked, connect it
-                            milestone: {
-                                connect: { id: task.milestone?.id }
-                            },
-                        }) : {
-                            // milestone is not linked, disconnect it
-                            milestone: { disconnect: true }
-                        }),
+                        // ...(task.milestoneId ? ({
+                        //     // milestone is linked, connect it
+                        //     milestone: {
+                        //         connect: { id: task.milestoneId }
+                        //     },
+                        // }) : undefined),
+
+                        milestone: task.milestoneId
+                            ? { connect: { id: task.milestoneId } } // Connect if milestoneId exists
+                            : { disconnect: true }, // Disconnect if milestoneId is undefined
                         endDate: task.endDate,
                         priority: task.priority,
                         private: task.private,
@@ -1255,6 +1257,20 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
                         }
                     }
                 })
+
+                // handle milestone linking
+                // if (task?.milestoneId) {
+                //     console.log(`link`, task)
+                //     t = await prisma.task.update({
+                //         where: {id: task?.id},
+                //         include: { milestone: true },
+                //         data: {
+                //             milestone: { connect: { id: task.milestoneId } }
+                //         }
+                //     })
+                // }
+
+                console.log(`updated tasks`, t)
 
                 updatedTasks.push(t)
             })

@@ -247,27 +247,55 @@ export function EditMilestoneForm({
             RFP
         })
 
-        if (tasks) {
-            for (let i = 0; i < tasks.length; i++) {
-                setTask(tasks[i].id, {
-                    name: tasks[i].name,
-                    orderPosition: i,
-                    columnId: tasks[i].columnId,
-                    milestone: { id: milestoneData?.id }
-                })
-            }
-        }
+        // if (tasks) {
+        //     for (let i = 0; i < tasks.length; i++) {
+        //         setTask(tasks[i].id, {
+        //             name: tasks[i].name,
+        //             orderPosition: i,
+        //             columnId: tasks[i].columnId,
+        //             milestone: { id: milestoneData?.id },
+        //             milestoneId: milestoneData?.id
+        //         })
+        //     }
+        // }
 
         // disconnect tasks that are no longer associated with this milestone
-        kanbanTasks.forEach(task => {
-            if (task.milestoneId === milestoneData?.id && !tasks?.map(t => t.id).includes(task.id)) {
-                setTask(task.id, {
+        // kanbanTasks.forEach(task => {
+        //     if (task.milestoneId === milestoneData?.id && !tasks?.map(t => t.id).includes(task.id)) {
+        //         setTask(task.id, {
+        //             ...task,
+        //             milestone: undefined,
+        //             milestoneId: undefined
+        //         })
+        //     }
+        // })
+
+        setTasks(kanbanTasks.map(task => {
+            const newTask = tasks?.find(t => t.id === task.id)
+
+            // link relevant tasks to this milestone
+            if (newTask) {
+                return {
                     ...task,
-                    milestone: undefined,
-                    milestoneId: undefined
-                })
+                    name: newTask.name,
+                    columnId: newTask.columnId,
+                    milestone: { id: milestoneData?.id },
+                    milestoneId: milestoneData?.id,
+                }
             }
-        })
+
+            // unlink tasks that are no longer attached to this milestone
+            // if (!newTask && milestoneData?.id && task.milestoneId === milestoneData.id) {
+            //     console.log(`unlink task`, task.name)
+            //     return {
+            //         ...task,
+            //         milestone: undefined,
+            //         milestoneId: undefined
+            //     }
+            // }
+
+            return task
+        }))
         
         toast('Success!', {
             position: "bottom-left",
@@ -648,7 +676,7 @@ export function EditMilestoneForm({
                                             key={task.id} 
                                             index={index} 
                                             task={task} 
-                                            onDelete={() => {
+                                            onUnlink={() => {
                                                 form.setValue('tasks', field?.value?.filter((t, i) => i !== index))
                                             }}
                                             onNameChange={(newName) => {
@@ -665,9 +693,8 @@ export function EditMilestoneForm({
                                 </DndContext>
                                 </>
                             )}
-                            {/* <LinkTask 
+                            <LinkTask 
                                 milestoneId={milestoneData?.id} 
-                                // kanbanColumns={kanbanColumns}
                                 kanbanTasks={kanbanTasks}
                                 onLink={(taskId) => {
                                     const newTask = kanbanTasks?.find((task) => task.id === taskId)
@@ -675,11 +702,12 @@ export function EditMilestoneForm({
                                         'tasks', 
                                         [...field?.value || [], {
                                             ...newTask,
-                                            milestoneId: milestoneData?.id
+                                            milestoneId: milestoneData?.id,
+                                            milestone: { id: milestoneData?.id }
                                         }] 
                                     )
                                 }}
-                            /> */}
+                            />
                             </>
                         </FormControl>
                         <FormMessage />
@@ -780,7 +808,7 @@ const LinkTask = ({ milestoneId, kanbanTasks, onLink }: { milestoneId: string, k
                 }}
             >
                 <SelectTrigger className="w-full">
-                    <SelectValue placeholder={'Link another task'}/>
+                    <SelectValue placeholder={'Select a task'}/>
                 </SelectTrigger>
                 <SelectContent>
                     {kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).map(task => (
@@ -792,21 +820,31 @@ const LinkTask = ({ milestoneId, kanbanTasks, onLink }: { milestoneId: string, k
     }
 
     return (
-        <Button disabled={kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).length === 0} onClick={() => {setIsLinking(true)}}>Link another task</Button>
+        <Button 
+            disabled={kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).length === 0} 
+            variant={'secondary'}
+            onClick={() => {setIsLinking(true)}}
+        >
+            {kanbanTasks?.filter((task: any) => task.milestoneId === milestoneId).length === 0 ? (
+                `Link kanban task`
+            ): (
+                `Link another kanban task`
+            )}
+        </Button>
     )
 }
 
 const TaskField = ({
     index,
     task,
-    onDelete,
+    onUnlink,
     onNameChange,
     onColumnChange,
     kanbanColumns,
 }: {
     index: number
     task: TaskType
-    onDelete: () => void
+    onUnlink: () => void
     onNameChange: (newName: string) => void
     onColumnChange: (newColumnId: string) => void
     kanbanColumns: any[]
@@ -824,9 +862,9 @@ const TaskField = ({
         transform: CSS.Translate.toString(transform)
     }
 
-    const deleteTask = (e: React.MouseEvent<HTMLElement>) => {
+    const unlinkTask = (e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault()
-        onDelete()
+        onUnlink()
     }
 
     const nameChanged = (e: React.FormEvent<HTMLInputElement>) => {
@@ -889,7 +927,7 @@ const TaskField = ({
             </div>
 
             {/* delete task */}
-            <Button variant="secondary" size="icon" onClick={deleteTask}>
+            <Button variant="secondary" size="icon" onClick={unlinkTask}>
                 <FaLinkSlash />
             </Button>
         </li>
