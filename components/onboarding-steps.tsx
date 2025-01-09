@@ -27,22 +27,22 @@ const allSteps: Step[] = [
     },
     {
         name: 'About you',
-        description: 'Your profile information.',
+        description: "Create your profile to get started. This will be connected to your Patient Advocacy Organization for a personalized experience.",
         href: '/onboarding/user',
     },
     {
         name: 'Organization',
-        description: 'Basic information about your organization.',
+        description: "Share key details about your group and its mission to showcase your work and focus areas.",
         href: '/onboarding/organization',
     },
     {
         name: 'Research',
-        description: 'The current research efforts in your disorder.',
+        description: "Provide insights into your current research efforts to unlock tailored opportunities.",
         href: '/onboarding/research',
     },
     {
         name: 'Finances',
-        description: 'Your budget and raising efforts.',
+        description: "Help us understand the financial landscape supporting your research to identify relevant opportunities.",
         href: '/onboarding/finances',
     },
 ];
@@ -80,7 +80,7 @@ export default function OnboardingSteps() {
 
     return (
         <TooltipProvider>
-            <nav aria-label="Progress">
+            <nav aria-label="Progress" className="max-w-80">
                 <ol role="list" className="overflow-hidden">
                     {updatedSteps.map((step, stepIdx) => (
                         <li
@@ -106,7 +106,7 @@ export default function OnboardingSteps() {
                                             </span>
                                         </span>
                                         <span className="ml-4 flex min-w-0 flex-col">
-                                            <span className="text-sm font-medium">{step.name}</span>
+                                            <span className="text-xl font-semibold">{step.name}</span>
                                             <span className="text-sm text-gray-500">{step.description}</span>
                                         </span>
                                     </a>
@@ -127,7 +127,7 @@ export default function OnboardingSteps() {
                                             </span>
                                         </span>
                                         <span className="ml-4 flex min-w-0 flex-col">
-                                            <span className="text-sm font-medium text-indigo-600">{step.name}</span>
+                                            <span className="text-xl font-semibold text-indigo-600">{step.name}</span>
                                             <span className="text-sm text-gray-500">{step.description}</span>
                                         </span>
                                     </a>
@@ -149,7 +149,7 @@ export default function OnboardingSteps() {
                                             </span>
                                         </span>
                                         <span className="ml-4 flex min-w-0 flex-col">
-                                            <span className="text-sm font-medium text-gray-500">{step.name}</span>
+                                            <span className="text-xl font-semibold text-gray-500">{step.name}</span>
                                             <span className="text-sm text-gray-500">{step.description}</span>
                                         </span>
                                     </a>
@@ -173,7 +173,7 @@ export default function OnboardingSteps() {
                                                 </span>
                                                 <span className="ml-4 flex min-w-0 flex-col">
                                                     <span
-                                                        className="text-sm font-medium text-gray-500">{step.name}</span>
+                                                        className="text-xl font-semibold text-gray-500">{step.name}</span>
                                                     <span className="text-sm text-gray-500">{step.description}</span>
                                                 </span>
                                             </div>

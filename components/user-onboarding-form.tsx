@@ -35,7 +35,7 @@ import LoadingDots from "@/components/icons/loading-dots";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
-    title: z.string().min(2, {message: "Your role must be at least 2 characters."}),
+    title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
     address1: z.string().optional(),
@@ -242,26 +242,6 @@ export default function UserOnboardingForm() {
                                 </FormItem>
                             )}
                         />
-
-                        {/*<FormField*/}
-                        {/*    control={form.control}*/}
-                        {/*    name="formattedAddress"*/}
-                        {/*    render={({field}) => (*/}
-                        {/*        <FormItem>*/}
-                        {/*            <FormLabel>Address</FormLabel>*/}
-                        {/*            <FormControl>*/}
-                        {/*                <AutocompleteComponent*/}
-                        {/*                    address={address}*/}
-                        {/*                    setAddress={setAddress}*/}
-                        {/*                    searchInput={searchInput}*/}
-                        {/*                    setSearchInput={setSearchInput}*/}
-                        {/*                />*/}
-                        {/*            </FormControl>*/}
-                        {/*            <FormDescription>Your address.</FormDescription>*/}
-                        {/*            <FormMessage/>*/}
-                        {/*        </FormItem>*/}
-                        {/*    )}*/}
-                        {/*/>*/}
 
                         <FormField
                             control={form.control}
