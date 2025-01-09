@@ -27,33 +27,6 @@ export default function OnboardingWelcomePage() {
                         All questions in this form are optional unless marked as (required).`}
                     </p>
                     <p>
-                        {`There are 4 sections`}
-                    </p>
-                    <ol className="space-y-1 list-decimal list-inside">
-                        <li>
-                            <span className="font-semibold text-gray-900 dark:text-white">
-                                About you:
-                            </span> Create your profile to get started. This will be connected to your Patient Advocacy
-                            Organization for a personalized experience.
-                        </li>
-                        <li>
-                            <span className="font-semibold text-gray-900 dark:text-white">
-                                Organization:
-                            </span> Share key details about your group and its mission.
-                        </li>
-                        <li>
-                            <span className="font-semibold text-gray-900 dark:text-white">
-                                Research:
-                            </span> Provide insights into your current research efforts to unlock tailored
-                            opportunities.
-                        </li>
-                        <li>
-                            <span className="font-semibold text-gray-900 dark:text-white">
-                                Finance:
-                            </span> Outline the financial landscape supporting your research initiatives.
-                        </li>
-                    </ol>
-                    <p>
                         {`Anything you add here is editable after you've completed onboarding.`}
                     </p>
                     <p className="font-semibold">
@@ -77,6 +50,7 @@ export default function OnboardingWelcomePage() {
                         <Skeleton className="h-10 w-full rounded-md"/>
                         <Skeleton className="h-10 w-full rounded-md"/>
                         <Skeleton className="h-10 w-full rounded-md" />
+                        <Skeleton className="h-10 w-full rounded-md" />
                         <Skeleton className="h-10 w-2/3 rounded-md" />
                         {/* Button */}
                         <Skeleton className="h-10 w-1/4 rounded-md" />
@@ -85,7 +59,7 @@ export default function OnboardingWelcomePage() {
                         variant="default"
                         onClick={() => router.push("/onboarding/user")}
                     >
-                        Next
+                        {`Let's get started!`}
                     </Button>
                 </div>
 

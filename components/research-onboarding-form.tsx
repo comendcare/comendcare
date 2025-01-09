@@ -647,7 +647,14 @@ export default function ResearchOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Name of condition`}</FormLabel>
-                                        <FormDescription>{`The name of your rare condition/disorder.`}</FormDescription>
+                                        <div className="w-full flex flex-row justify-between">
+                                            <FormDescription>
+                                                {`The name of your rare condition/disorder.`}
+                                            </FormDescription>
+                                            <FormDescription>
+                                                60 characters max.
+                                            </FormDescription>
+                                        </div>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -666,7 +673,14 @@ export default function ResearchOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Summary of condition`}</FormLabel>
-                                        <FormDescription>{`A few lines describing your condition and what makes it unique`}</FormDescription>
+                                        <div className="w-full flex flex-row justify-between">
+                                            <FormDescription>
+                                                {`A few lines describing your condition and what makes it unique`}
+                                            </FormDescription>
+                                            <FormDescription>
+                                                500 characters max.
+                                            </FormDescription>
+                                        </div>
                                         <FormControl>
                                             <Textarea
                                                 id="summary"
