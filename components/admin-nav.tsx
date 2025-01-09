@@ -122,13 +122,13 @@ export default function AdminNav({ children }: { children: ReactNode }) {
                 },
                 {
                     name: "Editor",
-                    href: `/admin/roadmap/${id}`,
+                    href: `/admin/research-plan/${id}`,
                     isActive: segments.length === 2,
                     icon: <Edit3 width={18} />
                 },
                 {
                     name: "Settings",
-                    href: `/admin/roadmap/${id}/settings`,
+                    href: `/admin/research-plan/${id}/settings`,
                     isActive: segments.includes("settings"),
                     icon: <Settings width={18} />
                 }

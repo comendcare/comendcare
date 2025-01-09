@@ -120,7 +120,7 @@ export const DonutChartCard = () => {
                             </p>
                             <Link
                                 className={cn(buttonVariants({variant: "default"}))}
-                                href={`/app/roadmap`}
+                                href={`/app/research-plan`}
                             >
                                 Create research plan
                             </Link>
