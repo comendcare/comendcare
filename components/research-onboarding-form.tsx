@@ -573,11 +573,6 @@ export default function ResearchOnboardingForm(
         try {
             const sessionData = session.data;
 
-            if (!sessionData?.user.organizationId) {
-                toast.error("You're not signed into an organization right now.");
-                return;
-            }
-
             // Create FormData object
             const formData = new FormData();
 
@@ -985,7 +980,7 @@ export default function ResearchOnboardingForm(
                                         Associated Systems
                                     </h3>
                                     <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
-                                        {form.watch("symptoms") ? form.watch("symptoms")?.map((sign, index) =>
+                                        {form.watch("systems") ? form.watch("systems")?.map((sign, index) =>
                                             <Badge key={index}>
                                                 {sign.label}
                                             </Badge>
