@@ -136,18 +136,6 @@ async function main() {
             moneyRaised: 3200000,
             moneyDeployed: 1200000,
             researchBudget: 800000,
-            interestedModalities: ["Gene Therapy", "CRISPR"],
-            diseaseName: "Arcadion Disease",
-            diseaseCategories: ["Neurodegenerative Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 700000,
-            prevalenceRatio: 1/700000,
-            numberOfIdentifiedPatients: 22,
-            relevantDiseaseMechanisms: ["Genetic Mutation", "Mitochondrial Dysfunction"],
-            associatedGenes: ["ARC1", "NEU4"],
-            associatedSignsAndSymptoms: ["Muscle weakness", "Memory loss", "Difficulty swallowing"],
-            existingDatabasesAndStudies: ["Arcadion Patient Registry", "Arcadion Disease Natural History Study"],
-            assetsUnderDevelopment: ["Gene therapy vector", "Patient-derived cell line"],
             user: {
                 connect: {
                     id: flawnson.id

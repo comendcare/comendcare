@@ -136,18 +136,6 @@ async function main() {
             moneyRaised: 5000000,
             moneyDeployed: 2000000,
             researchBudget: 1000000,
-            interestedModalities: ["AAV", "ASO"],
-            diseaseName: "Celocyn Syndrome",
-            diseaseCategories: ["Neuroencephalomyelopathy"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 1000000,
-            prevalenceRatio: 1/1000000,
-            numberOfIdentifiedPatients: 37,
-            relevantDiseaseMechanisms: ["Neurology"],
-            associatedGenes: ["GEL3", "M4SF"],
-            associatedSignsAndSymptoms: ["Severe migraines", "Early onset dementia"],
-            existingDatabasesAndStudies: ["Celocyn Syndrome Registry"],
-            assetsUnderDevelopment: ["Mouse model", "Cell line"],
             user: {
                 connect: {
                     id: bob.id
@@ -184,18 +172,6 @@ async function main() {
             moneyRaised: 3200000,
             moneyDeployed: 1200000,
             researchBudget: 800000,
-            interestedModalities: ["Gene Therapy", "CRISPR"],
-            diseaseName: "Arcadion Disease",
-            diseaseCategories: ["Neurodegenerative Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 700000,
-            prevalenceRatio: 1/700000,
-            numberOfIdentifiedPatients: 22,
-            relevantDiseaseMechanisms: ["Genetic Mutation", "Mitochondrial Dysfunction"],
-            associatedGenes: ["ARC1", "NEU4"],
-            associatedSignsAndSymptoms: ["Muscle weakness", "Memory loss", "Difficulty swallowing"],
-            existingDatabasesAndStudies: ["Arcadion Patient Registry", "Arcadion Disease Natural History Study"],
-            assetsUnderDevelopment: ["Gene therapy vector", "Patient-derived cell line"],
             user: {
                 connect: {
                     id: flawnson.id
@@ -217,18 +193,6 @@ async function main() {
             moneyRaised: 1500000,
             moneyDeployed: 700000,
             researchBudget: 500000,
-            interestedModalities: ["Enzyme Replacement Therapy", "Gene Therapy"],
-            diseaseName: "Lysogene Syndrome",
-            diseaseCategories: ["Lysosomal Storage Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 500000,
-            prevalenceRatio: 1/500000,
-            numberOfIdentifiedPatients: 58,
-            relevantDiseaseMechanisms: ["Cellular Metabolism"],
-            associatedGenes: ["LYSO1"],
-            associatedSignsAndSymptoms: ["Organomegaly", "Developmental delay"],
-            existingDatabasesAndStudies: ["Lysogene Global Registry"],
-            assetsUnderDevelopment: ["Animal model", "Biomarker assays"],
             user: {
                 connect: {
                     id: alice.id
@@ -250,18 +214,6 @@ async function main() {
             moneyRaised: 2500000,
             moneyDeployed: 1000000,
             researchBudget: 600000,
-            interestedModalities: ["Stem Cell Therapy", "RNA Therapy"],
-            diseaseName: "NeuroAid Disorder",
-            diseaseCategories: ["Neurodegenerative Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 800000,
-            prevalenceRatio: 1/800000,
-            numberOfIdentifiedPatients: 40,
-            relevantDiseaseMechanisms: ["Neuroinflammation", "Protein Aggregation"],
-            associatedGenes: ["NEUA", "NF4B"],
-            associatedSignsAndSymptoms: ["Loss of motor control", "Seizures"],
-            existingDatabasesAndStudies: ["NeuroAid Patient Database"],
-            assetsUnderDevelopment: ["Patient registry", "Preclinical model"],
             user: {
                 connect: {
                     id: charlie.id
@@ -283,18 +235,6 @@ async function main() {
             moneyRaised: 1800000,
             moneyDeployed: 800000,
             researchBudget: 450000,
-            interestedModalities: ["Gene Editing", "Cell Therapy"],
-            diseaseName: "Myopar Disease",
-            diseaseCategories: ["Muscular Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 200000,
-            prevalenceRatio: 1/200000,
-            numberOfIdentifiedPatients: 15,
-            relevantDiseaseMechanisms: ["Muscle Degeneration"],
-            associatedGenes: ["MYOP1", "MUS2"],
-            associatedSignsAndSymptoms: ["Muscle atrophy", "Fatigue", "Joint stiffness"],
-            existingDatabasesAndStudies: ["Myopar Patient Registry"],
-            assetsUnderDevelopment: ["Muscle cell line", "Gene editing vectors"],
             user: {
                 connect: {
                     id: dave.id
@@ -316,18 +256,6 @@ async function main() {
             moneyRaised: 2200000,
             moneyDeployed: 1100000,
             researchBudget: 500000,
-            interestedModalities: ["Tissue Engineering", "Bone Morphogenetic Proteins"],
-            diseaseName: "Cranio Syndrome",
-            diseaseCategories: ["Craniofacial Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 900000,
-            prevalenceRatio: 1/900000,
-            numberOfIdentifiedPatients: 25,
-            relevantDiseaseMechanisms: ["Bone Malformation"],
-            associatedGenes: ["CRN1"],
-            associatedSignsAndSymptoms: ["Facial deformity", "Respiratory issues"],
-            existingDatabasesAndStudies: ["Cranio Patient Database"],
-            assetsUnderDevelopment: ["3D-printed bone scaffolds", "Growth factor assays"],
             user: {
                 connect: {
                     id: eve.id
@@ -349,18 +277,6 @@ async function main() {
             moneyRaised: 3000000,
             moneyDeployed: 1400000,
             researchBudget: 700000,
-            interestedModalities: ["Gene Therapy", "Small Molecule Therapy"],
-            diseaseName: "Nephro Disease",
-            diseaseCategories: ["Renal Disorder"],
-            prevalenceNumerator: 1,
-            prevalenceDenominator: 600000,
-            prevalenceRatio: 1/600000,
-            numberOfIdentifiedPatients: 30,
-            relevantDiseaseMechanisms: ["Kidney Dysfunction"],
-            associatedGenes: ["NEP1", "REN4"],
-            associatedSignsAndSymptoms: ["Frequent urination", "High blood pressure"],
-            existingDatabasesAndStudies: ["Nephro Natural History Study"],
-            assetsUnderDevelopment: ["Kidney cell line", "Small molecule screening assays"],
             user: {
                 connect: {
                     id: frank.id

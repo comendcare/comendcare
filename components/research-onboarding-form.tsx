@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {updateOrganization} from "@/lib/actions";
+import {createCondition, updateOrganization} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -37,18 +37,18 @@ export const optionSchema = z.object({
 const researchOnboardingFormSchema = z.object({
     disorder: z.string()
         .min(2, {
-            message: "The name of your disorder needs to be longer than 2 characters",
+            message: "The name of your condition needs to be longer than 2 characters",
         })
         .max(60, {
-            message: "The name of your disorder needs to be shorter than 60 characters",
+            message: "The name of your condition needs to be shorter than 60 characters",
         })
         .optional(),
     summary: z.string()
-        .min(50, {
-            message: "The name of your disorder needs to be longer than 2 characters",
+        .min(30, {
+            message: "The summary of your condition needs to be longer than 30 characters",
         })
         .max(500, {
-            message: "The name of your disorder needs to be shorter than 60 characters",
+            message: "The name of your condition needs to be shorter than 500 characters",
         })
         .optional(),
     modalities: z.array(optionSchema).min(0).optional(),
@@ -297,88 +297,6 @@ export const MILESTONE_OUTCOME_OPTIONS: string[] = [
     'Decision',
 ]
 
-export const OPTIONS: Option[] = [
-    {
-        id: '1',
-        label: 'nextjs',
-        value: 'Nextjs',
-        description: 'A React framework for building server-side rendered (SSR) and static web applications. It simplifies routing, API handling, and rendering optimizations.',
-        strengths: 'Out-of-the-box SSR and static site generation (SSG), built-in API routes, and strong developer tooling with performance optimizations.',
-    },
-    {
-        id: '2',
-        label: 'React',
-        value: 'react',
-        description: 'A popular JavaScript library for building user interfaces, especially for single-page applications (SPAs). React focuses on the component-based architecture.',
-        strengths: 'Highly reusable components, vast community support, and strong performance with Virtual DOM rendering.',
-    },
-    {
-        id: '3',
-        label: 'Remix',
-        value: 'remix',
-        description: 'A modern framework focused on seamless data fetching and SSR for web applications. Remix emphasizes web standards and progressive enhancement.',
-        strengths: 'Provides full-stack capabilities with SSR, optimized for caching and streaming, and excellent support for nested routing.',
-    },
-    {
-        id: '4',
-        label: 'Vite',
-        value: 'vite',
-        description: 'A fast, next-generation frontend build tool that offers a modern development experience with minimal configuration.',
-        strengths: 'Extremely fast hot module replacement (HMR), native support for modern JavaScript frameworks, and optimized builds with minimal configuration.',
-    },
-    {
-        id: '5',
-        label: 'Nuxt',
-        value: 'nuxt',
-        description: 'A framework built on top of Vue.js, offering server-side rendering, static site generation, and powerful meta handling.',
-        strengths: 'Provides SSR and static site generation, excellent support for SEO, and an integrated module ecosystem.',
-    },
-    {
-        id: '6',
-        label: 'Vue',
-        value: 'vue',
-        description: 'A progressive JavaScript framework for building user interfaces, known for its simplicity and ease of integration.',
-        strengths: 'Lightweight, flexible, and offers two-way data binding with a gentle learning curve.',
-    },
-    {
-        id: '7',
-        label: 'Svelte',
-        value: 'svelte',
-        description: 'A compiler-based framework that shifts work from the browser to build time, producing highly optimized JavaScript code.',
-        strengths: 'Produces highly efficient code, has no virtual DOM, and offers a straightforward syntax.',
-    },
-    {
-        id: '8',
-        label: 'Angular',
-        value: 'angular',
-        description: 'A robust, full-featured framework maintained by Google, designed for building large-scale, complex applications.',
-        strengths: 'Provides powerful tools for enterprise-level applications, strong TypeScript support, and a comprehensive framework out of the box.',
-    },
-    {
-        id: '9',
-        label: 'Ember',
-        value: 'ember',
-        disable: true,
-        description: 'A mature framework known for its convention-over-configuration approach, used primarily for ambitious web applications.',
-        strengths: 'Offers strong conventions, built-in best practices, and a cohesive ecosystem with long-term stability.',
-    },
-    {
-        id: '10',
-        label: 'Gatsby',
-        value: 'gatsby',
-        disable: true,
-        description: 'A React-based framework for building static websites and apps, with a focus on performance and data integration.',
-        strengths: 'Optimized for static site generation, supports rich plugins, and offers fast page loads with modern web practices.',
-    },
-    {
-        id: '11',
-        label: 'Astro',
-        value: 'astro',
-        description: 'A modern framework for building content-rich websites that ships minimal JavaScript to the browser.',
-        strengths: 'Ships minimal JavaScript by default, offers multi-framework support, and provides excellent performance for content-driven sites.',
-    },
-];
-
 export const MODALITIES: Option[] = [
     {
         id: '1',
@@ -553,27 +471,6 @@ export const ASSOCIATED_SYSTEMS: Option[] = [
     },
     {
         id: '13',
-        label: 'Overgrowth',
-        value: 'OVERGROWTH',
-        description: 'Involves abnormal tissue growth or overdevelopment of organs and structures.',
-        strengths: 'Targets syndromes with excessive tissue growth and associated complications.',
-    },
-    {
-        id: '14',
-        label: 'Systemic',
-        value: 'SYSTEMIC',
-        description: 'Concerns diseases affecting multiple organ systems or the entire body.',
-        strengths: 'Addresses conditions with widespread impact and systemic treatment approaches.',
-    },
-    {
-        id: '15',
-        label: 'Digestive',
-        value: 'DIGESTIVE',
-        description: 'Involves the gastrointestinal tract and associated organs, including the stomach, intestines, and liver.',
-        strengths: 'Focuses on conditions like malabsorption, inflammation, and structural abnormalities.',
-    },
-    {
-        id: '16',
         label: 'Other',
         value: 'OTHER',
         description: 'Any additional or unclassified associated systems not included in the predefined categories.',
@@ -648,15 +545,6 @@ export const MOLECULAR_MECHANISMS: Option[] = [
 ];
 
 
-export const mechanisms = [
-    {id: "GENETIC_MUTATION", name: "Genetic mutation"},
-    {id: "CHROMOSOMAL_ABNORMALITY", name: "Chromosomal abnormality"},
-    {id: "IMMUNE_DYSFUNCTION", name: "Immune dysfunction"},
-    {id: "METABOLIC_DEFECT", name: "Metabolic pathway defect"},
-    {id: "MITOCHONDRIAL_ABNORMALITY", name: "Mitochondrial abnormality"},
-    {id: "EPIGENETIC_MODIFICATION", name: "Epigenetic modification"}
-];
-
 export default function ResearchOnboardingForm(
     {
         previousLink,
@@ -669,6 +557,7 @@ export default function ResearchOnboardingForm(
         showSkip: boolean,
     }
 ) {
+    faker.seed(123)
     const session = useSession()
     const router = useRouter()
     const [loading, setLoading] = useState(false);
@@ -695,13 +584,14 @@ export default function ResearchOnboardingForm(
             // Map form values into FormData
             const data = {
                 interestedModalities: values.modalities?.map((modality) => modality.value).join(",") || "",
-                diseaseName: values.disorder || "",
+                name: values.disorder || "",
                 diseaseCategories: values.categories?.map((category) => category.value).join(",") || "",
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",
                 numberOfIdentifiedPatients: values.population ? values.population.toString() : "",
                 relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
                 associatedGenes: values.genes?.map((gene) => gene.value).join(",") || "",
+                associatedSystems: values.systems?.map((symptom) => symptom.value).join(",") || "",
                 associatedSignsAndSymptoms: values.symptoms?.map((symptom) => symptom.value).join(",") || "",
                 existingDatabasesAndStudies: values.studies?.map((study) => study.value).join(",") || "",
                 assetsUnderDevelopment: values.assets?.map((asset) => asset.value).join(",") || "",
@@ -710,24 +600,23 @@ export default function ResearchOnboardingForm(
             // Append data to FormData
             Object.entries(data).forEach(([key, value]) => {
                 if (value) {
-                    formData.append(key, value);
+                    formData.append(key, value)
                 }
             });
 
             try {
-                // Call the updateOrganization function with FormData
-                await updateOrganization(formData, sessionData.user.organizationId);
+                await createCondition(formData)
 
-                toast.success("Successfully updated organization.");
-                router.push(nextLink);
+                toast.success("Successfully created condition.")
+                router.push(nextLink)
             } catch (error) {
-                console.error("Failed to update organization:", error);
-                toast.error("An error occurred while updating the organization.");
+                console.error("Failed to create condition:", error)
+                toast.error("An error occurred while creating the condition.")
             }
         } catch (error) {
-            toast.error("An error occurred while updating your profile.");
+            toast.error("An error occurred while creating the condition.")
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
     }
 
@@ -781,7 +670,7 @@ export default function ResearchOnboardingForm(
                                 name="summary"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Description of condition`}</FormLabel>
+                                        <FormLabel>{`Summary of condition`}</FormLabel>
                                         <FormDescription>{`A few lines describing your condition and what makes it unique`}</FormDescription>
                                         <FormControl>
                                             <Textarea
@@ -872,67 +761,6 @@ export default function ResearchOnboardingForm(
                                 )}
                             />
 
-                            <div className="flex flex-col">
-                                <FormField
-                                    control={form.control}
-                                    name="prevalenceNumerator"
-                                    render={({field: numeratorField}) => (
-                                        <FormItem>
-                                            <FormLabel>{`Estimated total prevalence`}</FormLabel>
-                                            <FormDescription>
-                                                {`The estimated total number of patients in the world.`}
-                                            </FormDescription>
-                                            <FormControl>
-                                                <div className="flex flex-row items-end justify-start space-x-2">
-                                                    <Input
-                                                        type="number"
-                                                        id="prevalenceNumerator"
-                                                        {...numeratorField}
-                                                        className="w-16"
-                                                        min={0}
-                                                    />
-                                                    <span>in</span>
-                                                    <FormField
-                                                        control={form.control}
-                                                        name="prevalenceDenominator"
-                                                        render={({field: denominatorField}) => (
-                                                            <FormControl>
-                                                                <Input
-                                                                    type="number"
-                                                                    id="prevalenceDenominator"
-                                                                    {...denominatorField}
-                                                                    className="w-32"
-                                                                    min={0}
-                                                                />
-                                                            </FormControl>
-                                                        )}
-                                                    />
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <FormField
-                                control={form.control}
-                                name="population"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`Number of patients identified`}</FormLabel>
-                                        <FormDescription>{`The number of known patients (not the estimated total). The people in this count should be reachable by your organization.`}</FormDescription>
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                id="population"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
                             {/*<FormField*/}
                             {/*    control={form.control}*/}
                             {/*    name="mechanisms"*/}
@@ -957,37 +785,37 @@ export default function ResearchOnboardingForm(
                             {/*    )}*/}
                             {/*/>*/}
 
-                            <FormField
-                                control={form.control}
-                                name="mechanisms"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Relevant disease mechanisms</FormLabel>
-                                        <FormDescription>{`The relevant mechanisms of your condition.`}</FormDescription>
-                                        <FormControl>
-                                            <ToggleGroup
-                                                type="multiple"
-                                                variant="outline"
-                                                value={field.value}
-                                                onValueChange={
-                                                    field.onChange
-                                                }
-                                                className="w-fit flex flex-wrap gap-2 justify-start"
-                                            >
-                                                {mechanisms.map(type => (
-                                                    <ToggleGroupItem
-                                                        key={type.id}
-                                                        value={type.id}
-                                                    >
-                                                        {type.name}
-                                                    </ToggleGroupItem>
-                                                ))}
-                                            </ToggleGroup>
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={form.control}*/}
+                            {/*    name="mechanisms"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>Relevant disease mechanisms</FormLabel>*/}
+                            {/*            <FormDescription>{`The relevant mechanisms of your condition.`}</FormDescription>*/}
+                            {/*            <FormControl>*/}
+                            {/*                <ToggleGroup*/}
+                            {/*                    type="multiple"*/}
+                            {/*                    variant="outline"*/}
+                            {/*                    value={field.value}*/}
+                            {/*                    onValueChange={*/}
+                            {/*                        field.onChange*/}
+                            {/*                    }*/}
+                            {/*                    className="w-fit flex flex-wrap gap-2 justify-start"*/}
+                            {/*                >*/}
+                            {/*                    {mechanisms.map(type => (*/}
+                            {/*                        <ToggleGroupItem*/}
+                            {/*                            key={type.id}*/}
+                            {/*                            value={type.id}*/}
+                            {/*                        >*/}
+                            {/*                            {type.name}*/}
+                            {/*                        </ToggleGroupItem>*/}
+                            {/*                    ))}*/}
+                            {/*                </ToggleGroup>*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
                             <FormField
                                 control={form.control}
@@ -1035,6 +863,66 @@ export default function ResearchOnboardingForm(
                                 )}
                             />
 
+                            <FormField
+                                control={form.control}
+                                name="prevalenceNumerator"
+                                render={({field: numeratorField}) => (
+                                    <FormItem>
+                                        <FormLabel>{`Estimated total prevalence`}</FormLabel>
+                                        <FormDescription>
+                                            {`The estimated total number of patients in the world.`}
+                                        </FormDescription>
+                                        <FormControl>
+                                            <div className="flex flex-row items-end justify-start space-x-2">
+                                                <Input
+                                                    type="number"
+                                                    id="prevalenceNumerator"
+                                                    {...numeratorField}
+                                                    className="w-16"
+                                                    min={0}
+                                                />
+                                                <span>in</span>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="prevalenceDenominator"
+                                                    render={({field: denominatorField}) => (
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                id="prevalenceDenominator"
+                                                                {...denominatorField}
+                                                                className="w-32"
+                                                                min={0}
+                                                            />
+                                                        </FormControl>
+                                                    )}
+                                                />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="population"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>{`Number of patients identified`}</FormLabel>
+                                        <FormDescription>{`The number of known patients (not the estimated total). The people in this count should be reachable by your organization.`}</FormDescription>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                id="population"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
                                     <Button onClick={() => router.push(previousLink)}>
@@ -1073,10 +961,10 @@ export default function ResearchOnboardingForm(
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-4">
+                            <div className="grid grid-cols-3">
                                 <div className="space-y-2">
                                     <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
-                                        Mechanism of Action
+                                        Mechanisms of Action
                                     </h3>
                                     <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
                                         {form.watch("categories") ? form.watch("categories")?.map((category, index) =>
@@ -1091,9 +979,10 @@ export default function ResearchOnboardingForm(
                                         }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
                                     </div>
                                 </div>
+
                                 <div className="space-y-2">
                                     <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
-                                        Signs and Symptoms
+                                        Associated Systems
                                     </h3>
                                     <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
                                         {form.watch("symptoms") ? form.watch("symptoms")?.map((sign, index) =>
@@ -1108,6 +997,7 @@ export default function ResearchOnboardingForm(
                                         }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
                                     </div>
                                 </div>
+
                                 <div className="space-y-2">
                                     <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
                                         Associated Genes
@@ -1125,26 +1015,6 @@ export default function ResearchOnboardingForm(
                                         }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}
                                     </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
-                                        Disease Mechanisms
-                                    </h3>
-                                    <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
-                                        {form.watch("mechanisms") ? form.watch("mechanisms")?.map((mechanismId, index) => {
-                                            // Find the mechanism by its id
-                                            const mechanism = mechanisms.find(m => m.id === mechanismId);
-                                            return (
-                                                <Badge key={index}>
-                                                    {mechanism?.name || mechanismId} {/* Fallback to id if name not found */}
-                                                </Badge>
-                                            );
-                                        }) : Array.from({
-                                            length: faker.number.int({
-                                                min: 1,
-                                                max: 3
-                                            })
-                                        }).map((_, index) => <Skeleton key={index} className="h-4 w-1/4"/>)}                                    </div>
-                                </div>
                             </div>
 
                             <div className="grid gap-8 grid-cols-2 w-full">
@@ -1155,14 +1025,18 @@ export default function ResearchOnboardingForm(
                                             Description
                                         </h3>
                                         <p className="flex flex-col space-y-2">
-                                            <Skeleton className="h-4 w-1/3"/>
-                                            <Skeleton className="h-4 w-full rounded-md"/>
-                                            <Skeleton className="h-4 w-full rounded-md"/>
-                                            <Skeleton className="h-4 w-full rounded-md"/>
-                                            <Skeleton className="h-4 w-full rounded-md"/>
-                                            <Skeleton className="h-4 w-full rounded-md"/>
-                                            <Skeleton className="h-4 w-2/3 rounded-md"/>
-                                            <Skeleton className="h-4 w-1/4 rounded-md"/>
+                                            {form.watch("summary") ? (
+                                                <span>{form.watch("summary")}</span>
+                                            ) : (
+                                                <>
+                                                    <Skeleton className="h-4 w-1/3"/>
+                                                    <Skeleton className="h-4 w-full rounded-md"/>
+                                                    <Skeleton className="h-4 w-full rounded-md"/>
+                                                    <Skeleton className="h-4 w-full rounded-md"/>
+                                                    <Skeleton className="h-4 w-2/3 rounded-md"/>
+                                                    <Skeleton className="h-4 w-1/4 rounded-md"/>
+                                                </>
+                                            )}
                                         </p>
                                     </div>
                                 </div>
@@ -1198,13 +1072,6 @@ export default function ResearchOnboardingForm(
                                                 </div>
                                             </CardContent>
                                         </Card>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <h3 className={cn("scroll-m-20 tracking-tight font-semibold")}>
-                                            Similar conditions
-                                        </h3>
-                                        <Skeleton className="h-4 w-2/3 rounded-md"/>
-                                        <Skeleton className="h-4 w-1/4 rounded-md"/>
                                     </div>
 
                                 </div>

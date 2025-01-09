@@ -13,7 +13,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
             <Card className="organization-profile-tour-step3">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
-                        Conditions
+                        Condition
                     </CardTitle>
                 </CardHeader>
 
@@ -25,37 +25,40 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                         >
                             <div className="space-y-2">
                                 <div className="inline-flex flex-row justify-between items-center">
-                                    <Link
-                                        href={`http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${condition.slug}`}
-                                        className="hover:underline inline-flex flex-row justify-center items-center gap-x-2 text-base"
-                                    >
-                                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
-                                            {condition.name}
-                                        </h3>
-                                        <FaArrowUpRightFromSquare/>
-                                    </Link>
+                                    {/*<Link*/}
+                                    {/*    href={`http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${condition.slug}`}*/}
+                                    {/*    className="hover:underline inline-flex flex-row justify-center items-center gap-x-2 text-base"*/}
+                                    {/*>*/}
+                                    <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
+                                        {condition.name}
+                                    </h3>
+                                    {/*    <FaArrowUpRightFromSquare/>*/}
+                                    {/*</Link>*/}
                                 </div>
                                 <p>
                                     {condition.summary}
                                 </p>
                             </div>
+
                             <div className="space-y-2">
                                 <div className="flex flex-row items-center justify-between w-full">
                                     <h4 className="scroll-m-20 text-base font-semibold">
-                                        Relevant signs and symptoms
+                                        Statistics
                                     </h4>
                                 </div>
                                 <ul className="flex flex-col list-disc list-inside">
-                                    {condition?.associatedSignsAndSymptoms.map((item, index) =>
-                                        <li key={index}>
-                                            {item}
-                                        </li>
-                                    )}
+                                    <li>
+                                        {`${condition.prevalenceNumerator} in ${condition.prevalenceDenominator} prevalence`}
+                                    </li>
+                                    <li>
+                                        {`${condition.numberOfIdentifiedPatients} patients identified`}
+                                    </li>
                                 </ul>
                             </div>
+
                             <div className="space-y-2">
                                 <div className="flex flex-row items-center justify-between w-full">
-                                    <h4 className="scroll-m-20 text-base font-semibold">
+                                <h4 className="scroll-m-20 text-base font-semibold">
                                         Relevant topics
                                     </h4>
                                 </div>
