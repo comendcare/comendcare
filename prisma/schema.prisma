@@ -455,18 +455,6 @@ model Reaction {
   @@unique([authorId, reactableType, reactableId])
 }
 
-model Mention {
-  id            String        @id @default(cuid())
-  postId        String?
-  commentId     String?
-  mentionedType MentionedType
-  mentionedId   String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  comment       Comment?      @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  post          Post?         @relation(fields: [postId], references: [id], onDelete: Cascade)
-}
-
 enum ClientType {
   READ
   WRITE
