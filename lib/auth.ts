@@ -159,7 +159,7 @@ export const authOptions: NextAuthOptions = {
     callbacks: {
 
         async signIn({user, account, profile, email, credentials}) {
-            await createMembershipsFromInvitations(user)
+            // await createMembershipsFromInvitations(user)
 
             const isAllowedToSignIn = true
             if (isAllowedToSignIn) {

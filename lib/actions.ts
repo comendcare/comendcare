@@ -1229,7 +1229,7 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
 
                 let t = await prisma.task.update({
                     where: {id: task?.id},
-                    include: { milestone: true },
+                    include: {milestone: true},
                     data: {
                         name: task.name,
                         // status: task.status,
@@ -1248,7 +1248,7 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
                         },
                         stakeholders: {
                             set: [],
-                            connect: task.stakeholders?.map((stakeholder: User) => ({ id: stakeholder?.id })) || []
+                            connect: task.stakeholders?.map((stakeholder: User) => ({id: stakeholder?.id})) || []
                         },
                         // ...(task.milestoneId ? ({
                         //     // milestone is linked, connect it
@@ -1258,8 +1258,8 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
                         // }) : undefined),
 
                         milestone: task.milestoneId
-                            ? { connect: { id: task.milestoneId } } // Connect if milestoneId exists
-                            : { disconnect: true }, // Disconnect if milestoneId is undefined
+                            ? {connect: {id: task.milestoneId}} // Connect if milestoneId exists
+                            : {disconnect: true}, // Disconnect if milestoneId is undefined
                         endDate: task.endDate,
                         priority: task.priority,
                         private: task.private,
@@ -1574,5 +1574,52 @@ export async function createFollow(organizationId: string | null) {
     } catch (error: any) {
         logError("Error following organization", error);
         return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function acceptInvitation(invitationId: string) {
+    try {
+        const session = await getSession();
+        if (!session?.user?.id) {
+            throw new Error("You must be signed in to perform this action");
+        }
+
+        // Check if the invitation exists and is not already accepted
+        const invitation = await prisma.invitation.findUnique({
+            where: {
+                id: invitationId,
+            },
+        });
+
+        if (!invitation || invitation.accepted) {
+            console.log("No valid invitation found or it has already been accepted.");
+            return {success: false, error: "failed to follow organization"};
+        }
+
+        // Process invitation: create membership and mark invitation as accepted
+        await prisma.$transaction([
+            prisma.member.create({
+                data: {
+                    email: invitation.email,
+                    organizationId: invitation.organizationId,
+                    role: invitation.role || "admin",
+                    userId: session.user.id,
+                },
+            }),
+            prisma.invitation.update({
+                where: {
+                    id: invitationId,
+                },
+                data: {
+                    accepted: true,
+                },
+            }),
+        ]);
+
+        return {success: true, data: invitation};
+    } catch (error) {
+        console.error();
+        logError("Error accepting invitation:", error);
+        return {success: false, error: "Failed to accept invitation. Please try again."};
     }
 }
