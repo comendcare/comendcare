@@ -1,6 +1,7 @@
 import "./globals.css"
 import { ThemeProvider } from "@/app/theme-provider"
 import type { Metadata, ResolvingMetadata } from "next"
+import { Analytics } from '@vercel/analytics/next';
 
 // Import Montserrat Display and Source Sans Pro
 import { Poppins, Source_Sans_3 } from "next/font/google"
@@ -232,6 +233,7 @@ export default function RootLayout({
                             <Suspense>
                             {children}
                             {/* <FeedbackForm /> */}
+                            <Analytics />
                             </Suspense>
                         </Onborda>
                     </ThemeProvider>
