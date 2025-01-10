@@ -812,7 +812,7 @@ const LinkTask = ({ milestoneId, kanbanTasks, onLink }: { milestoneId: string, k
                 </SelectTrigger>
                 <SelectContent>
                     {kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).map(task => (
-                        <SelectItem value={task.id}>{task.name}</SelectItem>
+                        <SelectItem key={task.id} value={task.id}>{task.name}</SelectItem>
                     ))}
                 </SelectContent>
             </Select>
@@ -911,7 +911,7 @@ const TaskField = ({
                 </SelectTrigger>
                 <SelectContent>
                     {kanbanColumns.map(column => (
-                        <SelectItem value={column.id}>{column.name}</SelectItem>
+                        <SelectItem key={column.id} value={column.id}>{column.name}</SelectItem>
                     ))}
                 </SelectContent>
             </Select>
