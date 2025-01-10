@@ -318,6 +318,35 @@ export async function getMilestones(organizationId: string | undefined) {
     }
 }
 
+export async function getInvitations() {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        const invitations = await prisma?.invitation.findMany({
+            where: {
+                email: session.user.email,
+                accepted: false
+            },
+        })
+
+        if (!invitations) {
+            return {success: false, error: "invitations not found"};
+        }
+
+        return {
+            success: true,
+            data: invitations
+        };
+    } catch (error: any) {
+        logError("Error fetching invitations", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 export async function getInvitees(organizationId: string | undefined) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};
