@@ -14,7 +14,8 @@ import { templateMilestones, templateRoadmaps, emptyMilestoneTemplate, emptyRoad
 export default function NewRoadmapForm() {
     const {data: session} = useSession()
     const router = useRouter()
-    const [customMilestones, setCustomMilestones] = useState<any[]>([])
+    const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+    const [selectedRoadmap, setSelectedRoadmap] = useState<any>(undefined)
 
     async function createTemplateRoadmap(roadmapData: any) {
         if (session?.user?.organizationId) {
@@ -55,9 +56,9 @@ export default function NewRoadmapForm() {
                                         <CheckBubble data={milestoneData} onCheckedChanged={
                                             (checked: boolean) => {
                                                 if (checked) {
-                                                    setCustomMilestones([...customMilestones, milestoneData])
+                                                    setSelectedMilestones([...selectedMilestones, milestoneData])
                                                 } else {
-                                                    setCustomMilestones(customMilestones.filter(m => (
+                                                    setSelectedMilestones(selectedMilestones.filter(m => (
                                                         m.title !== milestoneData.title &&
                                                         m.description !== milestoneData.description
                                                     )))
@@ -90,11 +91,12 @@ export default function NewRoadmapForm() {
                 <span className="flex flex-col sm:flex-row gap-4">
                 <div className="flex flex-row space-x-2">
                     <Button
+                        disabled={selectedMilestones.length === 0}
                         onClick={() => {
                             createTemplateRoadmap({
                                 title: '',
                                 description: '',
-                                milestones: customMilestones
+                                milestones: selectedMilestones
                             })
                         }}
                     >
@@ -123,12 +125,20 @@ export default function NewRoadmapForm() {
                     }}
                     className="w-full"
                 >
-                    <CarouselContent>
+                    <CarouselContent className="overflow-visible p-2">
                         {templateRoadmaps.map((roadmapData, index) => (
-                            <CarouselItem key={index} className="xl:basis-1/2">
-                                <button onClick={() => createTemplateRoadmap(roadmapData)}>
-                                <Card className="bg-white shadow-sm rounded-lg overflow-hidden text-left">
+                            <CarouselItem key={index} className="xl:basis-1/2 overflow-visible">
+                                <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible" >
                                     <CardHeader>
+                                        <CheckBubble data={roadmapData} onCheckedChanged={
+                                            (checked: boolean) => {
+                                                if (checked) {
+                                                    setSelectedRoadmap(roadmapData)
+                                                } else {
+                                                    setSelectedRoadmap(undefined)
+                                                }
+                                            }
+                                        }/>
                                         <CardTitle>{roadmapData.title}</CardTitle>
                                         <CardDescription>
                                             {roadmapData.description}
@@ -146,7 +156,6 @@ export default function NewRoadmapForm() {
                                         </ul>
                                     </CardContent>
                                 </Card>
-                                </button>
                             </CarouselItem>
                         ))}
                     </CarouselContent>
@@ -155,6 +164,14 @@ export default function NewRoadmapForm() {
                 </Carousel>
 
                 <span className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-row space-x-2">
+                        <Button 
+                            disabled={!selectedRoadmap}
+                            onClick={() => createTemplateRoadmap(selectedRoadmap)}
+                        >
+                            Create a Research Plan  from selected Template
+                        </Button>
+                    </div>
                     <div className="flex flex-row space-x-2">
                         <Button 
                             variant="secondary"
