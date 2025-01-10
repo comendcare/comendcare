@@ -39,7 +39,7 @@ const selector = (state: RoadmapState) => ({
     onNodesChange: state.onNodesChange,
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
-    addNode: state.addNode,
+    addNodes: state.addNodes,
 })
 
 export const PrivateFlowView = ({
@@ -55,7 +55,7 @@ export const PrivateFlowView = ({
         edges,
         onNodesChange,
         onEdgesChange,
-        addNode,
+        addNodes,
         onConnect,
     } = useRoadmapStore(useShallow(selector))
     const { fitView } = useReactFlow()
@@ -73,7 +73,9 @@ export const PrivateFlowView = ({
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
     // if a position is not provided, place in the center
-    const addMilestone = (defaultData: any, position?: { x: number; y: number }) => {
+    const addMilestones = (newMilestones: any[]) => {
+        const newNodes: any[] = []
+
         // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
         const {
             height,
@@ -82,33 +84,40 @@ export const PrivateFlowView = ({
         } = store.getState()
 
         const zoomMultiplier = 1 / zoomLevel
-        const centerX =
+        let centerX =
             -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        const centerY =
+        let centerY =
             -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
 
-        const id = nanoid()
-        const newNode: Node = {
-            id: id,
-            type: "MILESTONE",
-            position: {
-                x: position ? position?.x : centerX,
-                y: position ? position?.y : centerY
-            },
-            data: {
-                id: nanoid(),
-                nodeId: id,
-                type: defaultData?.type || 'NOTYPE',
-                title: defaultData?.title || `New Milestone`,
-                ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                // papers: defaultData?.papers || [],
-                // tasks: defaultData?.tasks || [],
-                status: defaultData?.status || "TODO"
+        newMilestones.forEach(defaultData => {
+            const id = nanoid()
+            const newNode: Node = {
+                id: id,
+                type: "MILESTONE",
+                position: {
+                    x: centerX,
+                    y: centerY
+                },
+                data: {
+                    id: nanoid(),
+                    nodeId: id,
+                    type: defaultData?.type || 'NOTYPE',
+                    title: defaultData?.title || `New Milestone`,
+                    ...(defaultData?.description ? { description: defaultData.description } : undefined),
+                    // papers: defaultData?.papers || [],
+                    // tasks: defaultData?.tasks || [],
+                    status: defaultData?.status || "TODO"
+                }
             }
-        }
 
-        addNode(newNode)
-        return newNode
+            centerX += 200
+            centerY += 200
+
+            newNodes.push(newNode)
+        })
+
+        addNodes(newNodes)
+        return newNodes
     }
 
     const handleDelete = async ({nodes, edges}: {nodes: Node[], edges: Edge[]}) => {
@@ -212,7 +221,7 @@ export const PrivateFlowView = ({
             </Controls>
         </ReactFlow>
         <Dialog open={newMilestoneIsOpen} onOpenChange={setNewMilestoneIsOpen}>
-            <NewMilestoneDialogContent addMilestone={addMilestone} />
+            <NewMilestoneDialogContent addMilestones={addMilestones} />
         </Dialog>
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
