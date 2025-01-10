@@ -30,7 +30,7 @@ export type RoadmapState = {
     onConnect: (connection: any) => void
     setNodes: (nodes: Node[]) => void
     setEdges: (edges: Edge[]) => void
-    addNode: (node: Node) => void
+    addNodes: (node: Node[]) => void
     deleteNode: (nodeId: string) => void
     initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void
     saveState: () => void
@@ -105,12 +105,12 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ edges })
             debounceUpdateFlow(get().roadmapId, get().nodes, edges)
         },
-        addNode: (node: Node) => {
-            const nodes = [...get().nodes, node]
-            const milestones = [...get().milestones, node.data]
-            set({ nodes, milestones })
-            debounceUpdateFlow(get().roadmapId, nodes, get().edges)
-            updateDBMilestones({ milestones: [node.data] })
+        addNodes: (nodes: Node[]) => {
+            const newNodes = [...get().nodes, ...nodes]
+            const milestones = [...get().milestones, ...nodes.map(node => node.data)]
+            set({ nodes: newNodes, milestones })
+            debounceUpdateFlow(get().roadmapId, newNodes, get().edges)
+            updateDBMilestones({ milestones: nodes.map(node => node.data) })
         },
         deleteNode: (nodeId: string | undefined) => {
             const nodes = [...get().nodes].filter(({ id }) => id !== nodeId)
