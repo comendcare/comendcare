@@ -6,7 +6,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
-import {createCondition, updateOrganization} from "@/lib/actions";
+import {connectOrganizationToCondition, createCondition, updateOrganization} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -600,7 +600,14 @@ export default function ResearchOnboardingForm(
             });
 
             try {
-                await createCondition(formData)
+                await createCondition(formData).then((response) => {
+                    if (response.success && response.data) {
+                        connectOrganizationToCondition(session.data?.user.organizationId, response.data.id)
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+                })
 
                 toast.success("Successfully created condition.")
                 router.push(nextLink)
