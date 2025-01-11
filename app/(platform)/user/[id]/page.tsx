@@ -176,15 +176,15 @@ export default function UserProfilePage() {
                             </p>
                             <UserEditSettingsDialog/>
                         </CardHeader>
-                        <CardContent className="grid gap-2">
+                        <CardContent className="grid gap-4">
                             <div className="grid gap-2">
                                 <h2 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
                                     Organizations
                                 </h2>
-                                <div className="flex items-center gap-4">
+                                <div className="flex flex-col items-start gap-4">
                                     {orgs && (
                                         orgs.length > 0 ? orgs?.map((org) =>
-                                            <>
+                                            <div key={org.id} className="flex items-center gap-4">
                                                 <Avatar className="hidden h-9 w-9 sm:flex">
                                                     <AvatarImage src="/avatars/01.png" alt="Avatar"/>
                                                     <AvatarFallback>OM</AvatarFallback>
@@ -199,7 +199,7 @@ export default function UserProfilePage() {
                                                         </p>
                                                     </>
                                                 </div>
-                                            </>
+                                            </div>
                                         ) : <div className="flex flex-col space-y-2 text-left">
                                             <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
                                                 {`No Organizations Yet`}
