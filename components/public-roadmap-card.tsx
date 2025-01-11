@@ -25,18 +25,22 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
     }
 
     if (!roadmap) {
-        return <div className="flex flex-col items-center justify-center space-x-4">
-            <h1 className="font-cal text-4xl">No Roadmaps Yet</h1>
-            <Image
-                alt="missing roadmap"
-                src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                width={400}
-                height={400}
-            />
-            <p className="text-lg text-stone-500">
-                You do not have any roadmaps yet. Create one to get started.
-            </p>
-        </div>
+        return <Card>
+            <CardContent>
+                <div className="flex flex-col items-center justify-center space-x-4 my-8">
+                    <h1 className="font-cal text-4xl">No Roadmaps Yet</h1>
+                    <Image
+                        alt="missing roadmap"
+                        src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                        width={400}
+                        height={400}
+                    />
+                    <p className="text-lg text-stone-500">
+                        You do not have any roadmaps yet. Create one to get started.
+                    </p>
+                </div>
+            </CardContent>
+        </Card>
     }
 
     return (

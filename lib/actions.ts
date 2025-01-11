@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma, Column, Kanban, Post, Task, User} from "@prisma/client"
+import {Roadmap, Organization, Prisma, Column, Kanban, Post, Task, User, Condition} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
@@ -191,7 +191,7 @@ export const createCondition = async (formData: FormData) => {
     const slug = toKebabCase(formData.get("name") as string)
 
     try {
-        const response = await prisma.condition.create({
+        const condition = await prisma.condition.create({
             data: {
                 name,
                 summary,
@@ -199,13 +199,51 @@ export const createCondition = async (formData: FormData) => {
             }
         })
 
-        return response
-    } catch (error: any) {
-        return {
-            error: error.message
+        if (!condition) {
+            console.error("Error creating condition.")
+            return {success: false, error: "Database error. please try again later."}
         }
+
+        return {success: true, data: condition}
+    } catch (error: any) {
+        console.error("Error creating condition:", error)
+        return {success: false, error: "Database error. please try again later."}
     }
 }
+
+export const connectOrganizationToCondition = async (organizationId: string | null | undefined, conditionId: string) => {
+    const session = await getSession();
+    if (!session?.user?.id) {
+        return {
+            error: "Not authenticated",
+        };
+    }
+
+    if (!organizationId) {
+        return {
+            error: "No organization Id",
+        };
+    }
+
+    try {
+        const conditionOrganization = await prisma.conditionToOrganization.create({
+            data: {
+                conditionId: conditionId, // Specify the condition ID
+                organizationId: organizationId, // Specify the organization ID
+            },
+        });
+
+        if (!conditionOrganization) {
+            console.error("Error creating condition connection to organization.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        return {success: true, data: conditionOrganization}
+    } catch (error: any) {
+        console.error("Error creating condition connection to organization:", error)
+        return {success: false, error: error.message || "An error occurred while connecting the organization to the condition"}
+    }
+};
 
 export const createOrganization = async (formData: FormData) => {
     const session = await getSession()
