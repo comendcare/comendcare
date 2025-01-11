@@ -180,15 +180,33 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
 }
 
 export const createCondition = async (formData: FormData) => {
-    const session = await getSession()
+    const session = await getSession();
     if (!session?.user.id) {
         return {
             error: "Not authenticated"
-        }
+        };
     }
-    const name = formData.get("name") as string
-    const summary = formData.get("summary") as string
-    const slug = toKebabCase(formData.get("name") as string)
+
+    const name = formData.get("name") as string;
+    const summary = formData.get("summary") as string;
+    const slug = toKebabCase(name);
+    const interestedModalities = (formData.get("interestedModalities") as string || "").split(",");
+    const diseaseCategories = (formData.get("diseaseCategories") as string || "").split(",");
+    const prevalenceNumerator = formData.get("prevalenceNumerator")
+        ? parseInt(formData.get("prevalenceNumerator") as string, 10)
+        : null;
+    const prevalenceDenominator = formData.get("prevalenceDenominator")
+        ? parseInt(formData.get("prevalenceDenominator") as string, 10)
+        : null;
+    const numberOfIdentifiedPatients = formData.get("numberOfIdentifiedPatients")
+        ? parseInt(formData.get("numberOfIdentifiedPatients") as string, 10)
+        : null;
+    const relevantDiseaseMechanisms = (formData.get("relevantDiseaseMechanisms") as string || "").split(",");
+    const associatedGenes = (formData.get("associatedGenes") as string || "").split(",");
+    const associatedSystems = (formData.get("associatedSystems") as string || "").split(",");
+    const associatedSignsAndSymptoms = (formData.get("associatedSignsAndSymptoms") as string || "").split(",");
+    const existingDatabasesAndStudies = (formData.get("existingDatabasesAndStudies") as string || "").split(",");
+    const assetsUnderDevelopment = (formData.get("assetsUnderDevelopment") as string || "").split(",");
 
     try {
         const condition = await prisma.condition.create({
@@ -196,20 +214,31 @@ export const createCondition = async (formData: FormData) => {
                 name,
                 summary,
                 slug,
+                interestedModalities,
+                diseaseCategories,
+                prevalenceNumerator,
+                prevalenceDenominator,
+                numberOfIdentifiedPatients,
+                relevantDiseaseMechanisms,
+                associatedGenes,
+                associatedSystems,
+                associatedSignsAndSymptoms,
+                existingDatabasesAndStudies,
+                assetsUnderDevelopment,
             }
-        })
+        });
 
         if (!condition) {
-            console.error("Error creating condition.")
-            return {success: false, error: "Database error. please try again later."}
+            console.error("Error creating condition.");
+            return { success: false, error: "Database error. Please try again later." };
         }
 
-        return {success: true, data: condition}
+        return { success: true, data: condition };
     } catch (error: any) {
-        console.error("Error creating condition:", error)
-        return {success: false, error: "Database error. please try again later."}
+        console.error("Error creating condition:", error);
+        return { success: false, error: "Database error. Please try again later." };
     }
-}
+};
 
 export const connectOrganizationToCondition = async (organizationId: string | null | undefined, conditionId: string) => {
     const session = await getSession();
