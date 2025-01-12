@@ -578,18 +578,18 @@ export default function ResearchOnboardingForm(
 
             // Map form values into FormData
             const data = {
-                interestedModalities: values.modalities?.map((modality) => modality.value).join(",") || "",
+                interestedModalities: values.modalities?.map((modality) => modality.label).join(",") || "",
                 name: values.disorder || "",
-                diseaseCategories: values.categories?.map((category) => category.value).join(",") || "",
+                diseaseCategories: values.categories?.map((category) => category.label).join(",") || "",
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",
                 numberOfIdentifiedPatients: values.population ? values.population.toString() : "",
                 relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
-                associatedGenes: values.genes?.map((gene) => gene.value).join(",") || "",
-                associatedSystems: values.systems?.map((symptom) => symptom.value).join(",") || "",
+                associatedGenes: values.genes?.map((gene) => gene.label).join(",") || "",
+                associatedSystems: values.systems?.map((symptom) => symptom.label).join(",") || "",
                 associatedSignsAndSymptoms: values.symptoms?.map((symptom) => symptom.value).join(",") || "",
-                existingDatabasesAndStudies: values.studies?.map((study) => study.value).join(",") || "",
-                assetsUnderDevelopment: values.assets?.map((asset) => asset.value).join(",") || "",
+                existingDatabasesAndStudies: values.studies?.map((study) => study.label).join(",") || "",
+                assetsUnderDevelopment: values.assets?.map((asset) => asset.label).join(",") || "",
             };
 
             // Append data to FormData
