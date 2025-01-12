@@ -13,7 +13,7 @@ export default function OrganizationOnboardingResearchPage() {
                     <div className="space-y-2">
                         <div className="flex flex-row justify-between">
                             <h1 className="text-xl font-semibold">
-                                Research onboarding
+                                Condition onboarding
                             </h1>
 
                             <p
