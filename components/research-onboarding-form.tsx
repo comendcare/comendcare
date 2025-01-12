@@ -34,7 +34,7 @@ export const optionSchema = z.object({
     disable: z.boolean().optional(),
 });
 
-const researchOnboardingFormSchema = z.object({
+export const researchFormSchema = z.object({
     disorder: z.string()
         .min(2, {
             message: "The name of your condition needs to be longer than 2 characters",
@@ -562,12 +562,12 @@ export default function ResearchOnboardingForm(
     const router = useRouter()
     const [loading, setLoading] = useState(false);
 
-    const form = useForm<z.infer<typeof researchOnboardingFormSchema>>({
+    const form = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(researchOnboardingFormSchema)
+        resolver: zodResolver(researchFormSchema)
     })
 
-    async function onSubmit(values: z.infer<typeof researchOnboardingFormSchema>) {
+    async function onSubmit(values: z.infer<typeof researchFormSchema>) {
         setLoading(true)
 
         try {

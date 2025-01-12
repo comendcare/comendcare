@@ -458,6 +458,11 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
                     include: {
                         user: true
                     }
+                },
+                condition: {
+                    include: {
+                        condition: true
+                    }
                 }
             }
         });
@@ -470,6 +475,32 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
     } catch (error: any) {
         logError("Error fetching organization data", error);
         return {success: false, error: "Internal server error"};
+    }
+};
+
+export const getConditionsFromOrganizationId = async (organizationId: string) => {
+    try {
+        const conditions = await prisma.condition.findMany({
+            where: {
+                organizations: {
+                    some: {
+                        organizationId: organizationId, // Filter by organizationId
+                    },
+                },
+            },
+            include: {
+                organizations: true, // Include related ConditionToOrganization data if needed
+            },
+        });
+
+        if (!conditions || conditions.length === 0) {
+            return { success: false, error: "No conditions found for the organization" };
+        }
+
+        return { success: true, data: conditions };
+    } catch (error: any) {
+        logError("Error fetching conditions for organization", error);
+        return { success: false, error: "Internal server error" };
     }
 };
 
