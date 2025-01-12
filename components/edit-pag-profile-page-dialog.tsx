@@ -6,7 +6,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import React, {useCallback, useEffect, useState} from "react";
-import {updateOrganization} from "@/lib/actions";
+import {updateOrganization, updateCondition} from "@/lib/actions";
 import {AddressType} from "@/lib/types";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
@@ -464,28 +464,55 @@ export default function EditPAGProfileDialog() {
             return;
         }
 
-        const formData = new FormData();
-
-        const databaseMap: Partial<Record<keyof typeof values, string>> = {
-            // raised: "moneyRaised",
-            // budget: "researchBudget",
-            // deployed: "moneyDeployed",
-            // raising: "raising",
-        };
-
-        Object.entries(values).forEach(([key, value]) => {
-            const mappedKey = databaseMap[key as keyof typeof databaseMap]; // Explicitly cast key
-            if (mappedKey && value !== undefined) {
-                formData.append(mappedKey, value.toString());
-            }
-        });
+        setLoading(true); // Show loading state
 
         try {
-            await updateOrganization(formData, session.user.organizationId);
-            toast.success("Organization updated successfully!");
-            router.refresh(); // Refresh the page to reflect changes
+            // Create a new FormData object
+            const formData = new FormData();
+
+            // Map the form values to match the Condition schema
+            const mappedData: Record<string, any> = {
+                name: values.disorder || "",
+                summary: values.summary || "",
+                interestedModalities: values.modalities?.map((item) => item.label) || [],
+                diseaseCategories: values.categories?.map((item) => item.label) || [],
+                prevalenceNumerator: values.prevalenceNumerator ? parseInt(values.prevalenceNumerator, 10) : null,
+                prevalenceDenominator: values.prevalenceDenominator ? parseInt(values.prevalenceDenominator, 10) : null,
+                numberOfIdentifiedPatients: values.population ? parseInt(values.population, 10) : null,
+                relevantDiseaseMechanisms: values.mechanisms || [],
+                associatedGenes: values.genes?.map((item) => item.label) || [],
+                associatedSystems: values.systems?.map((item) => item.label) || [],
+                associatedSignsAndSymptoms: values.symptoms?.map((item) => item.label) || [],
+                existingDatabasesAndStudies: values.studies?.map((item) => item.label) || [],
+                assetsUnderDevelopment: values.assets?.map((item) => item.label) || [],
+            };
+
+            // Add mapped data to FormData
+            Object.entries(mappedData).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    if (Array.isArray(value)) {
+                        formData.append(key, JSON.stringify(value));
+                    } else {
+                        formData.append(key, value.toString());
+                    }
+                }
+            });
+
+            // Call the `updateCondition` function
+            const response = await updateCondition(formData, session.user.organizationId);
+
+            if (response.success) {
+                toast.success("Condition updated successfully!");
+                router.refresh(); // Refresh the page to reflect changes
+            } else {
+                console.error(response.error);
+                toast.error(response.error || "Failed to update condition.");
+            }
         } catch (error) {
-            toast.error("Failed to update organization.");
+            console.error("Unexpected error updating condition:", error);
+            toast.error("An unexpected error occurred.");
+        } finally {
+            setLoading(false); // Hide loading state
         }
     }
 

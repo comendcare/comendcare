@@ -1690,3 +1690,45 @@ export async function acceptInvitation(invitationId: string) {
         return {success: false, error: "Failed to accept invitation. Please try again."};
     }
 }
+
+
+export async function updateCondition(formData: FormData, organizationId: string) {
+    try {
+        // Convert FormData to a plain object
+        const data: Record<string, any> = {};
+        formData.forEach((value, key) => {
+            if (!isNaN(Number(value)) && value !== "") {
+                data[key] = Number(value);
+            } else if (typeof value === "string" && value.startsWith("[")) {
+                try {
+                    data[key] = JSON.parse(value);
+                } catch {
+                    data[key] = value;
+                }
+            } else {
+                data[key] = value;
+            }
+        });
+
+        // Find the first condition associated with the organization
+        const conditions = await prisma.conditionToOrganization.findMany({
+            where: { organizationId },
+            include: { condition: true },
+        });
+
+        if (!conditions || conditions.length === 0) {
+            throw new Error("No associated condition found for the organization.");
+        }
+
+        // Update the condition in Prisma
+        const updatedCondition = await prisma.condition.update({
+            where: { id: conditions[0].conditionId },
+            data,
+        });
+
+        return { success: true, data: updatedCondition };
+    } catch (error: any) {
+        console.error("Error updating condition:", error);
+        return { success: false, error: error.message || "Failed to update condition." };
+    }
+}
