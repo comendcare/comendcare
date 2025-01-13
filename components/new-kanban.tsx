@@ -20,12 +20,12 @@ export default function NewKanbanForm() {
     }
 
     return (
-        <div className="flex flex-col gap-8 align-center">
-            <h1 className="text-3xl font-bold tracking-tight">
-                Your org does not have a kanban board
+        <div className="flex flex-col gap-8 justify-center items-center p-10 text-center">
+            <h1 className="text-3xl font-bold tracking-tight text-wrap">
+                Your organization does not have a kanban board
             </h1>
-            <Button onClick={handleCreateKanban}>
-                Create Kanban
+            <Button className="w-fit" onClick={handleCreateKanban}>
+                Create kanban board
             </Button>
         </div>
     )
