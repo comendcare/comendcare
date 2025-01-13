@@ -215,8 +215,6 @@ export function EditMilestoneForm({
         const { title, description, type, startDate, endDate, budget, papers, tasks, status, private: isPrivate, asset, RFP } = values;
         const now = new Date()
 
-        console.log(`save milestone data`, values)
-        
         setMilestone(milestoneData?.nodeId, {
             title,
             ...(description !== undefined && description !== null
@@ -247,29 +245,6 @@ export function EditMilestoneForm({
             RFP
         })
 
-        // if (tasks) {
-        //     for (let i = 0; i < tasks.length; i++) {
-        //         setTask(tasks[i].id, {
-        //             name: tasks[i].name,
-        //             orderPosition: i,
-        //             columnId: tasks[i].columnId,
-        //             milestone: { id: milestoneData?.id },
-        //             milestoneId: milestoneData?.id
-        //         })
-        //     }
-        // }
-
-        // disconnect tasks that are no longer associated with this milestone
-        // kanbanTasks.forEach(task => {
-        //     if (task.milestoneId === milestoneData?.id && !tasks?.map(t => t.id).includes(task.id)) {
-        //         setTask(task.id, {
-        //             ...task,
-        //             milestone: undefined,
-        //             milestoneId: undefined
-        //         })
-        //     }
-        // })
-
         setTasks(kanbanTasks.map(task => {
             const newTask = tasks?.find(t => t.id === task.id)
 
@@ -285,14 +260,14 @@ export function EditMilestoneForm({
             }
 
             // unlink tasks that are no longer attached to this milestone
-            // if (!newTask && milestoneData?.id && task.milestoneId === milestoneData.id) {
-            //     console.log(`unlink task`, task.name)
-            //     return {
-            //         ...task,
-            //         milestone: undefined,
-            //         milestoneId: undefined
-            //     }
-            // }
+            if (!newTask && milestoneData?.id && task.milestoneId === milestoneData.id) {
+                console.log(`unlink task`, task.name)
+                return {
+                    ...task,
+                    milestone: undefined,
+                    milestoneId: undefined
+                }
+            }
 
             return task
         }))
@@ -927,9 +902,9 @@ const TaskField = ({
             </div>
 
             {/* delete task */}
-            {/* <Button variant="secondary" size="icon" onClick={unlinkTask}>
+            <Button variant="secondary" size="icon" onClick={unlinkTask}>
                 <FaLinkSlash />
-            </Button> */}
+            </Button>
         </li>
     )
 }
