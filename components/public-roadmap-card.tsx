@@ -7,6 +7,8 @@ import {PublicFlowView} from "./public-flow";
 import {PublicTimelineView} from "./public-timeline";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "./ui/tabs";
 import Image from "next/image"
+import {Button} from "@/components/ui/button";
+import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 
 export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomain: string | undefined }) => {
     const router = useRouter()
@@ -51,11 +53,21 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
             onValueChange={handleTabChange}
         >
             <Card>
-                <CardHeader className="w-min pt-6 pb-2 space-y-4">
-                    <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
-                        Roadmap
-                    </CardTitle>
-                    <TabsList>
+                <CardHeader className="w-full pt-6 pb-2 space-y-4">
+                    <div className="flex flex-row items-center justify-between space-y-0">
+                        <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                            Research Plan
+                        </CardTitle>
+                        <Button
+                            variant="ghost"
+                            onClick={() => router.push("/app/research-plan")}
+                            className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
+                        >
+                            Edit research plan
+                            <FaArrowUpRightFromSquare/>
+                        </Button>
+                    </div>
+                    <TabsList className="w-min">
                         <TabsTrigger value="timeline">
                             Timeline View
                         </TabsTrigger>

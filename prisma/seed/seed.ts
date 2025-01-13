@@ -10,6 +10,7 @@ async function main() {
         create: {
             email: 'flawnsontong1@gmail.com',
             name: 'Flawnson Tong',
+            title: "Founder"
         },
     })
 
@@ -19,6 +20,7 @@ async function main() {
         create: {
             email: 'albert@comendcare.com',
             name: 'Albert Wang',
+            title: "Founder"
         },
     })
 
@@ -28,6 +30,7 @@ async function main() {
         create: {
             email: 'betty.trevino@comendcare.com',
             name: 'Betty Trevino',
+            title: "Founder"
         },
     })
 
@@ -36,7 +39,8 @@ async function main() {
         update: {},
         create: { 
             email: 'megan@comendcare.com',
-            name: 'Megan McClure'
+            name: 'Megan McClure',
+            title: "Software developer"
         }
     })
 
@@ -46,6 +50,7 @@ async function main() {
         create: {
             email: 'alice@prisma.io',
             name: 'Alice',
+            title: "Founder"
         },
     })
 
@@ -55,6 +60,7 @@ async function main() {
         create: {
             email: 'bob@prisma.io',
             name: 'Bob',
+            title: "Founder"
         },
     })
 
@@ -64,6 +70,7 @@ async function main() {
         create: {
             email: 'charlie@prisma.io',
             name: 'Charlie',
+            title: "Founder"
         },
     });
 
@@ -73,6 +80,7 @@ async function main() {
         create: {
             email: 'dave@prisma.io',
             name: 'Dave',
+            title: "Researcher"
         },
     });
 
@@ -82,6 +90,7 @@ async function main() {
         create: {
             email: 'eve@prisma.io',
             name: 'Eve',
+            title: "Researcher"
         },
     });
 
@@ -91,6 +100,7 @@ async function main() {
         create: {
             email: 'frank@prisma.io',
             name: 'Frank',
+            title: "Chief Finance Officer"
         },
     });
 
@@ -100,6 +110,7 @@ async function main() {
         create: {
             email: 'grace@prisma.io',
             name: 'Grace',
+            title: "Chief Science Officer"
         },
     });
 
@@ -109,6 +120,7 @@ async function main() {
         create: {
             email: 'heidi@prisma.io',
             name: 'Heidi',
+            title: "Director of Research"
         },
     });
 
@@ -118,6 +130,7 @@ async function main() {
         create: {
             email: 'ivan@prisma.io',
             name: 'Ivan',
+            title: "Donor engagement lead"
         },
     });
 
