@@ -14,12 +14,14 @@ import { templateMilestones } from "@/lib/templates";
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { ScrollArea } from "./ui/scroll-area";
 import { CheckBubble } from "./check-bubble"
+import { useRouter } from "next/navigation"
 
 export function NewMilestoneDialogContent({
     addMilestones
 }: {
     addMilestones: (newMilestones: any[]) => any[]
 }) {
+    const router = useRouter()
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
 
     const handleAddEmptyMilestone = () => {
@@ -27,7 +29,7 @@ export function NewMilestoneDialogContent({
     }
 
     return (
-        <DialogContent>
+        <DialogContent className="min-w-fit">
             <DialogHeader>
                 <DialogTitle className="text-2xl">
                     Select from a milestone template
@@ -70,6 +72,17 @@ export function NewMilestoneDialogContent({
                         Cancel
                     </Button>
                 </DialogClose>
+
+                <Button
+                    variant="secondary"
+                    type="button"
+                    onClick={() => {
+                        router.push('/app/research-plan/templates')
+                    }}
+                >
+                    See all templates
+                </Button>
+
                 <DialogClose>
                     <Button
                         variant="secondary"
@@ -79,6 +92,7 @@ export function NewMilestoneDialogContent({
                         Create empty Milestone
                     </Button>
                 </DialogClose>
+                
                 <DialogClose>
                     <Button
                         disabled={selectedMilestones.length === 0}
