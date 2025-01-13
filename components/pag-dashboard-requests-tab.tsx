@@ -6,6 +6,7 @@ import Image from "next/image";
 import {getMemberRequests} from "@/lib/fetchers";
 import {toast} from "sonner";
 import { ProfilePhoto } from "./profile-photo";
+import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button";
 
 export default async function PAGDashboardRequestsTab() {
     const session = await getSession();
@@ -28,10 +29,10 @@ export default async function PAGDashboardRequestsTab() {
                     className="hidden dark:block"
                 />
                 <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                    No organization yet.
+                    {`You're not part of an organization yet.`}
                 </p>
                 <div className="mt-8">
-                    <InviteUserToOrgDialog />
+                    <CreateOrJoinOrganizationButton/>
                 </div>
             </div>
         );

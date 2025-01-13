@@ -44,7 +44,7 @@ export default function PAGPublicRoadmapBreadcrumb({ organization, roadmap }: {
         roadmap && {
             label: roadmap.title,
             href: organization?.subdomain
-                ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap`
+                ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`
                 : ""
         },
         milestone && { label: milestone.title, isPage: true }

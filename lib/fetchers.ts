@@ -105,7 +105,7 @@ export async function getRoadmapsForOrganization(domain: string) {
                     data: true
                 },
                 where: {
-                    data: { private: false }
+                    data: {private: false}
                 }
             },
             edges: true,
@@ -292,6 +292,61 @@ export async function getMembers(organizationId: string | undefined) {
     }
 }
 
+export async function getMilestones(organizationId: string | undefined) {
+    if (!organizationId) {
+        return {success: false, error: "No organization id provided."};
+    }
+
+    try {
+        const fetchedMilestones = await prisma?.milestone.findMany({
+            // include: {user: true},
+            where: {organizationId},
+        })
+
+
+        if (!fetchedMilestones) {
+            return {success: false, error: "milestones not found"};
+        }
+
+        return {
+            success: true,
+            data: fetchedMilestones
+        };
+    } catch (error: any) {
+        logError("Error fetching members", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getInvitations() {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        const invitations = await prisma?.invitation.findMany({
+            where: {
+                email: session.user.email,
+                accepted: false
+            },
+        })
+
+        if (!invitations) {
+            return {success: false, error: "invitations not found"};
+        }
+
+        return {
+            success: true,
+            data: invitations
+        };
+    } catch (error: any) {
+        logError("Error fetching invitations", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 export async function getInvitees(organizationId: string | undefined) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};
@@ -403,6 +458,11 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
                     include: {
                         user: true
                     }
+                },
+                condition: {
+                    include: {
+                        condition: true
+                    }
                 }
             }
         });
@@ -415,6 +475,32 @@ export const getOrganizationFromOrganizationId = async (organizationId: string) 
     } catch (error: any) {
         logError("Error fetching organization data", error);
         return {success: false, error: "Internal server error"};
+    }
+};
+
+export const getConditionsFromOrganizationId = async (organizationId: string) => {
+    try {
+        const conditions = await prisma.condition.findMany({
+            where: {
+                organizations: {
+                    some: {
+                        organizationId: organizationId, // Filter by organizationId
+                    },
+                },
+            },
+            include: {
+                organizations: true, // Include related ConditionToOrganization data if needed
+            },
+        });
+
+        if (!conditions || conditions.length === 0) {
+            return { success: false, error: "No conditions found for the organization" };
+        }
+
+        return { success: true, data: conditions };
+    } catch (error: any) {
+        logError("Error fetching conditions for organization", error);
+        return { success: false, error: "Internal server error" };
     }
 };
 
@@ -498,7 +584,7 @@ export async function checkSubdomainAvailability(nickname: string) {
 export async function getMilestoneDetails(id: string) {
     try {
         const milestone = await prisma.milestone.findUnique({
-            where: { id },
+            where: {id},
             include: {
                 asset: {
                     include: {
@@ -527,6 +613,10 @@ export async function getMilestoneDetails(id: string) {
 export async function getKanbanFromOrganizationId() {
     const session = await getSession()
     try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
         const kanban = await prisma.kanban.findUnique({
             where: {
                 organizationId: session?.user.organizationId
@@ -536,6 +626,173 @@ export async function getKanbanFromOrganizationId() {
         return {success: true, data: kanban}
     } catch (error: any) {
         console.error("Database error finding kanban details:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function getNodesEdgesAndMilestones(roadmapId: string | null | undefined): Promise<ApiResponse<any>> {
+    if (roadmapId) {
+        try {
+            const dbNodes = await Promise.all(
+                (
+                    await prisma.node.findMany({
+                        where: {roadmapId: roadmapId},
+                        include: {data: true}
+                    })
+                ).map(async node => {
+                    const {id, type, positionX, positionY} = node
+
+                    return {
+                        id,
+                        type,
+                        position: {
+                            x: positionX,
+                            y: positionY
+                        }
+                    }
+                })
+            )
+
+            const dbEdges = await Promise.all(
+                (await prisma.edge.findMany({
+                    where: {roadmapId: roadmapId}
+                })).map(async edge => {
+                    const {id, source, target} = edge
+
+                    return {
+                        id,
+                        source,
+                        target
+                    }
+                })
+            )
+
+            const dbMilestones = await prisma.milestone.findMany({
+                where: {roadmapId: roadmapId},
+                include: {
+                    papers: true,
+                    asset: {
+                        include: {contacts: true, attachments: true}
+                    },
+                    RFP: {
+                        include: {contacts: true, attachments: true}
+                    },
+                    tasks: {
+                        orderBy: {orderPosition: 'asc'},
+                        include: {
+                            checklist: {orderBy: {orderPosition: 'asc'}}
+                        }
+                    }
+                }
+            })
+
+            return {success: true, data: {nodes: dbNodes, edges: dbEdges, milestones: dbMilestones}}
+        } catch (error: any) {
+            console.error("Database error finding nodes, edges, and milestones details:", error)
+            return {success: false, error: "Database error. please try again later."}
+        }
+    }
+
+    return {success: false, error: "No roadmapId provided."}
+}
+
+export async function getColumns(orgId: string | null | undefined): Promise<ApiResponse<any>> {
+    if (orgId) {
+        try {
+            const dbColumns = await prisma.column.findMany({
+                where: {
+                    kanban: {
+                        organization: {
+                            id: orgId
+                        }
+                    }
+                },
+                orderBy: [
+                    { kanbanPosition: 'asc' },
+                ],
+                include: {
+                    tasks: {
+                        orderBy: [ { kanbanPosition: 'asc' } ],
+                        include: {
+                            checklist: true,
+                            stakeholders: true,
+                            milestone: true
+                        }
+                    }
+                }
+            })
+
+            return { success: true, data: { columns: dbColumns } }
+        } catch (error: any) {
+            console.error("Database error finding kanban column details:", error)
+            return { success: false, error: "Database error. please try again later." }
+        }
+    }
+
+    return {success: false, error: "No roadmapId provided."}
+}
+
+export async function getPosts() {
+    try {
+        const posts = await prisma.post.findMany({
+            include: {
+                author: true,
+                comments: true,
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        })
+
+        return {success: true, data: posts}
+    } catch (error: any) {
+        console.error("Database error finding posts details:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function getPostComments(postId: string) {
+    try {
+        const comments = await prisma.comment.findMany({
+            where: {
+                postId: postId
+            },
+            include: {
+                author: true,
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        })
+
+        return {success: true, data: comments}
+    } catch (error: any) {
+        console.error("Database error finding comments:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function isUserFollowing(id: string) {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        const follow = await prisma.follow.findUnique({
+            where: {
+                userId_followedType_followedId: {
+                    userId: session.user.id,
+                    followedType: "ORGANIZATION", // right now we only allow following organizations
+                    followedId: id,
+                },
+            },
+        })
+
+        return {success: true, data: follow !== null}
+    } catch (error: any) {
+        console.error("Database error finding comments:", error)
         return {success: false, error: "Database error. please try again later."}
     }
 }

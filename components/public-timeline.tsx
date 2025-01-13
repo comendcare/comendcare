@@ -10,14 +10,14 @@ export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
     subdomain: string | undefined,
     urlMilestone: string | undefined
 }) => {
-    console.log(`milestones`, roadmap?.milestones)
+
     return (
         <ol className="relative border-s border-gray-200 dark:border-gray-700 space-y-8">
             {roadmap?.milestones?.map((item: any, index: number) => (
                 <a
                     href={
                         subdomain ?
-                            `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${item?.id}&view=timeline` :
+                            `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${item?.id}&view=timeline` :
                             ''
                     }
                     key={index}

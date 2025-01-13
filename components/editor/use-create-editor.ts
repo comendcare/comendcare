@@ -92,12 +92,29 @@ import { TableElement } from '@/components/plate-ui/table-element';
 import { TableRowElement } from '@/components/plate-ui/table-row-element';
 import { TocElement } from '@/components/plate-ui/toc-element';
 import { ToggleElement } from '@/components/plate-ui/toggle-element';
-import { withDraggables } from '@/components/plate-ui/with-draggables';
+import { Value } from '@udecode/plate-common';
 
-export const useCreateEditor = () => {
+const DEFAULT_VALUE = [
+  {
+    children: [{ text: 'Playground' }],
+    type: 'h1',
+  },
+  {
+    children: [
+      { text: 'A rich-text editor with AI capabilities. Try the ' },
+      { bold: true, text: 'AI commands' },
+      { text: ' or use ' },
+      { kbd: true, text: 'Cmd+J' },
+      { text: ' to open the AI menu.' },
+    ],
+    type: ParagraphPlugin.key,
+  },
+]
+
+export const useCreateEditor = ({ value }: { value?: Value | undefined | null }) => {
   return usePlateEditor({
     override: {
-      components: withDraggables(
+      components:
         withPlaceholders({
           // [AIPlugin.key]: AILeaf,
           [AudioPlugin.key]: MediaAudioElement,
@@ -143,8 +160,7 @@ export const useCreateEditor = () => {
           [TogglePlugin.key]: ToggleElement,
           [UnderlinePlugin.key]: withProps(PlateLeaf, { as: 'u' }),
           [VideoPlugin.key]: MediaVideoElement,
-        })
-      ),
+        }),
     },
     plugins: [
       // ...copilotPlugins,
@@ -152,21 +168,6 @@ export const useCreateEditor = () => {
       FixedToolbarPlugin,
       FloatingToolbarPlugin,
     ],
-    value: [
-      {
-        children: [{ text: 'Playground' }],
-        type: 'h1',
-      },
-      {
-        children: [
-          { text: 'A rich-text editor with AI capabilities. Try the ' },
-          { bold: true, text: 'AI commands' },
-          { text: ' or use ' },
-          { kbd: true, text: 'Cmd+J' },
-          { text: ' to open the AI menu.' },
-        ],
-        type: ParagraphPlugin.key,
-      },
-    ],
+    value: value || DEFAULT_VALUE,
   });
 };

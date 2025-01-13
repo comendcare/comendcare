@@ -27,12 +27,13 @@ import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
-import {cn, createDicebearAvatar, formatMoney, years} from "@/lib/utils";
+import {cn, createDicebearAvatar, formatMoney, nameToInitials, years} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
-import { handleImageUpload } from "@/lib/upload";
+import {handleImageUpload} from "@/lib/upload";
+import LoadingDots from "@/components/icons/loading-dots";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -52,6 +53,8 @@ export const newOrgFormSchema = z.object({
     }),
     subdomain: z.string().min(2, {
         message: "Your organization's nickname must be at least 2 characters."
+    }).max(60, {
+        message: "Your organization's nickname must be a maximum of 50 characters."
     }),
     looking: z.string().min(0).optional(),
     founded: z.string().optional(),
@@ -63,7 +66,7 @@ export const newOrgFormSchema = z.object({
     website: z.string().min(2, {
         message: "Your organization's website.",
     }).optional(),
-    incorporationStatus: z.enum(["yes", "no-but", "no"], {
+    incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"], {
         required_error: "You need to select a 501c3 status.",
     }).optional(),
     address1: z.string().optional(),
@@ -106,7 +109,18 @@ const OPTIONS: Option[] = [
     },
 ];
 
-export default function OrganizationOnboardingForm() {
+export default function OrganizationOnboardingForm(
+    {
+        previousLink,
+        nextLink,
+        showSkip,
+    }:
+    {
+        previousLink: string,
+        nextLink: string,
+        showSkip: boolean,
+    }
+) {
     const {data: session, update} = useSession()
     const router = useRouter()
     // const [isNewOrganization, setIsNewOrganization] = useState(true)
@@ -126,6 +140,7 @@ export default function OrganizationOnboardingForm() {
     const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -232,8 +247,14 @@ export default function OrganizationOnboardingForm() {
     async function joinOrgOnSubmit() {
         const orgValue = joinOrgForm.watch("org")?.[0]?.value;
         if (typeof orgValue === "string") {
-            await createMemberRequest(orgValue);
-            toast.success(`A membership request has been sent to ${joinOrgForm.watch("org")?.[0]?.label}`)
+            const response = await createMemberRequest(orgValue);
+
+            if (response.success) {
+                toast.success(`A membership request has been sent to ${joinOrgForm.watch("org")?.[0]?.label}`)
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
+            }
 
             router.push("/app/profile")
         } else {
@@ -243,42 +264,38 @@ export default function OrganizationOnboardingForm() {
     }
 
     async function newOrgOnSubmit(values: z.infer<typeof newOrgFormSchema>) {
-        // console.log(values)
-        // const createOrg = await createOrGetSite({
-        //         siteName: newOrgForm.getValues("orgName"),
-        //         siteSlug: newOrgForm.getValues("subdomain")
-        //     },
-        //     session.data?.user.id,
-        //     newOrgForm.getValues("description")
-        // )
-        //
-        // console.log(createOrg)
+        setLoading(true)
+        try {
+            const formData = new FormData()
 
-        const formData = new FormData()
+            Object.entries(values).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    formData.append(key, value.toString());
+                }
+            });
 
-        Object.entries(values).forEach(([key, value]) => {
-            if (value !== undefined) {
-                formData.append(key, value.toString());
+            if (selectedFile && values.image) {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                if (imgUrl) formData.set('image', imgUrl)
             }
-        });
 
-        if (selectedFile && values.image) {
-            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
-            if (imgUrl) formData.set('image', imgUrl)
+            createOrganization(formData).then((res: any) => {
+                if (res.error) {
+                    toast.error(res.error)
+                } else {
+                    va.track("Created Organization")
+                    // Update the session object with the newly created organizationId
+                    updateSession(res.id)
+                    router.refresh()
+                    router.push(nextLink)
+                    toast.success(`Successfully created organization!`)
+                }
+            })
+        } catch (error) {
+            toast.error("An error occurred while updating your profile.");
+        } finally {
+            setLoading(false);
         }
-
-        createOrganization(formData).then((res: any) => {
-            if (res.error) {
-                toast.error(res.error)
-            } else {
-                va.track("Created Organization")
-                // Update the session object with the newly created organizationId
-                updateSession(res.id)
-                router.refresh()
-                router.push("/onboarding/finances")
-                toast.success(`Successfully created organization!`)
-            }
-        })
     }
 
     return (
@@ -340,7 +357,14 @@ export default function OrganizationOnboardingForm() {
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Name (required)`}</FormLabel>
-                                        <FormDescription>{`The name of your organization.`}</FormDescription>
+                                        <div className="w-full flex flex-row justify-between">
+                                            <FormDescription>
+                                                {`The name of your organization.`}
+                                            </FormDescription>
+                                            <FormDescription>
+                                                {`60 characters max.`}
+                                            </FormDescription>
+                                        </div>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -357,22 +381,27 @@ export default function OrganizationOnboardingForm() {
                             <FormField
                                 control={newOrgForm.control}
                                 name="subdomain"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
-                                        <FormDescription>
-                                            {`Enter your organization's abbreviated name, short form, or nickname.`}
-                                            <br />
-                                            {newOrgForm.watch("subdomain") &&
-                                                !newOrgForm.formState.errors.subdomain && (
-                                                    <>
-                                                        {`Your organization's domain will be ${newOrgForm
-                                                            .watch("subdomain")
-                                                            .toLowerCase()
-                                                            .replace(/\s+/g, "-")}.comend.io`}
-                                                    </>
-                                                )}
-                                        </FormDescription>
+                                        <div className="w-full flex flex-row justify-between">
+                                            <FormDescription>
+                                                {`Enter your organization's abbreviated name, short form, or nickname.`}
+                                                <br/>
+                                                {newOrgForm.watch("subdomain") &&
+                                                    !newOrgForm.formState.errors.subdomain && (
+                                                        <>
+                                                            {`Your organization's domain will be ${newOrgForm
+                                                                .watch("subdomain")
+                                                                .toLowerCase()
+                                                                .replace(/\s+/g, "-")}.comend.io`}
+                                                        </>
+                                                    )}
+                                            </FormDescription>
+                                            <FormDescription>
+                                                50 characters max.
+                                            </FormDescription>
+                                        </div>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -385,7 +414,7 @@ export default function OrganizationOnboardingForm() {
                                                 }}
                                             />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -448,8 +477,10 @@ export default function OrganizationOnboardingForm() {
                                             </FormControl>
                                             <SelectContent>
                                                 {years.map((year) => (
-                                                    <SelectItem key={year}
-                                                                value={year.toString()}> {/* Use the year as a string for the SelectItem value */}
+                                                    <SelectItem
+                                                        key={year}
+                                                        value={year.toString()}
+                                                    >
                                                         {year}
                                                     </SelectItem>
                                                 ))}
@@ -466,9 +497,14 @@ export default function OrganizationOnboardingForm() {
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Description (required)</FormLabel>
-                                        <FormDescription>
-                                            This will be the public description of your organization.
-                                        </FormDescription>
+                                        <div className="w-full flex flex-row justify-between">
+                                            <FormDescription>
+                                                This will be the public description of your organization.
+                                            </FormDescription>
+                                            <FormDescription>
+                                                500 characters max.
+                                            </FormDescription>
+                                        </div>
                                         <FormControl>
                                             <Textarea
                                                 placeholder="Tell us a little bit about yourself"
@@ -496,7 +532,7 @@ export default function OrganizationOnboardingForm() {
                                             >
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                                     <FormControl>
-                                                        <RadioGroupItem value="yes"/>
+                                                        <RadioGroupItem value="YES"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
                                                         Yes I have a 501c3
@@ -504,7 +540,7 @@ export default function OrganizationOnboardingForm() {
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                                     <FormControl>
-                                                        <RadioGroupItem value="no-but"/>
+                                                        <RadioGroupItem value="INPROGRESS"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
                                                         {`No, but I'm working on it`}
@@ -512,7 +548,7 @@ export default function OrganizationOnboardingForm() {
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                                     <FormControl>
-                                                        <RadioGroupItem value="no"/>
+                                                        <RadioGroupItem value="NO"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
                                                         {`No I don't have a 501c3`}
@@ -596,7 +632,7 @@ export default function OrganizationOnboardingForm() {
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`What your organization is looking for and hoping to get from joining Comend.`}</FormLabel>
-                                        <FormDescription>{`Provide as much detail as possible; we want to help you!`}</FormDescription>
+                                        <FormDescription>{`What are your organization’s priorities over the next year? How might Comend help?`}</FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -621,10 +657,20 @@ export default function OrganizationOnboardingForm() {
 
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
-                                    <Button onClick={() => router.push("/onboarding/user")}>Previous</Button>
-                                    <Button type="submit">Next</Button>
+                                    {previousLink &&
+                                        <Button onClick={() => router.push(previousLink)}>
+                                            Previous
+                                        </Button>
+                                    }
+                                    <Button type="submit" disabled={loading}>
+                                        {loading ? <LoadingDots color="#808080"/> : "Next"}
+                                    </Button>
                                 </div>
-                                <Button variant="ghost" onClick={() => router.push("/app/profile")}>Skip</Button>
+                                {showSkip &&
+                                    <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                        Skip for now
+                                    </Button>
+                                }
                             </div>
                         </form>
                     </Form>
@@ -675,7 +721,7 @@ export default function OrganizationOnboardingForm() {
                                         Join Organization
                                     </Button>
                                     <Button variant="ghost" onClick={() => router.push("/app/profile")}>
-                                        Skip
+                                        Skip for now
                                     </Button>
                                 </div>
                             </form>
@@ -692,7 +738,7 @@ export default function OrganizationOnboardingForm() {
 
                         <div
                             className="h-10 w-full bg-white text-gray-800 text-left px-4 flex items-center border border-gray-300 rounded-md shadow-sm">
-                            {newOrgForm.watch("subdomain")}
+                            {newOrgForm.watch("subdomain") && `${newOrgForm.watch("subdomain")}.comend.io`}
                         </div>
 
                         <div className="w-full flex flex-col space-y-8 my-8">
@@ -707,9 +753,18 @@ export default function OrganizationOnboardingForm() {
                                     <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
 
                                         <div className="flex">
-                                            <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
-                                                 src={createDicebearAvatar(newOrgForm.watch("orgName")?.toLocaleString() ?? "", 50, 40, "identicon")}
-                                                 alt=""/>
+                                            {selectedFile?.preview ?
+                                                <img
+                                                    className="h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
+                                                    src={selectedFile?.preview}
+                                                    alt=""/>
+                                                :
+                                                <p
+                                                    className={"flex items-center justify-center bg-muted h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18 text-2xl"}
+                                                >
+                                                    {nameToInitials(newOrgForm.watch("orgName"))}
+                                                </p>
+                                            }
                                         </div>
 
                                         <div
@@ -717,7 +772,7 @@ export default function OrganizationOnboardingForm() {
                                         >
                                             <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
                                                 <h1 className="mt-6 min-w-0 flex-1 truncate text-xl font-bold text-gray-900">
-                                                    {newOrgForm.watch("orgName") || "Your organization's name"}
+                                                    {newOrgForm.watch("orgName") || <Skeleton className="h-4 w-full"/>}
                                                 </h1>
                                                 <div
                                                     className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
@@ -751,7 +806,9 @@ export default function OrganizationOnboardingForm() {
 
                                     </div>
                                     <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
-                                        <h1 className="truncate text-2xl font-bold text-gray-900">{newOrgForm.watch("orgName")}</h1>
+                                        <h1 className="truncate text-2xl font-bold text-gray-900">
+                                            {newOrgForm.watch("orgName")}
+                                        </h1>
                                     </div>
                                 </div>
                             </div>
@@ -779,21 +836,6 @@ export default function OrganizationOnboardingForm() {
                                                                     {newOrgForm.watch("description")}
                                                                 </p> : <Skeleton className="h-4 w-full"/>
                                                             }
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                            <div
-                                                                className="flex flex-row items-center justify-between w-full">
-                                                                <h3 className={cn("scroll-m-20 text-md tracking-tight font-semibold")}>
-                                                                    Relevant topics
-                                                                </h3>
-                                                            </div>
-                                                            {/*<div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-1">*/}
-                                                            {/*    {pag?.topics.map((item, index) =>*/}
-                                                            {/*        <Badge key={index} className="flex text-sm">*/}
-                                                            {/*            {item.charAt(0).toUpperCase() + item.slice(1)}*/}
-                                                            {/*        </Badge>*/}
-                                                            {/*    )}*/}
-                                                            {/*</div>*/}
                                                         </div>
                                                     </div>
                                                 </div>

@@ -54,9 +54,7 @@ import { DateView } from "./miletone-date-view";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
-    setSelectedNodeId: state.setSelectedNodeId,
-    setTask: state.setTask,
-    setTasks: state.setTasks
+    setSelectedNodeId: state.setSelectedNodeId
 })
 
 export function GanttChartView() {

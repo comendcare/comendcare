@@ -17,20 +17,20 @@ export const ComingSoonSection = () => {
     const router = useRouter()
 
     const benefitList: BenefitsProps[] = [
-        {
-            icon: "Wallet",
-            title: "Grant funding database",
-            description:
-                "Find funding opportunities for your organization and advertise your own grants for others.",
-            eta: "early 2025"
-        },
-        {
-            icon: "ChartLine",
-            title: "Therapeutic overviews",
-            description:
-                "Stay on top of the latest efforts, evidence, and eligibility in rapidly advancing technologies.",
-            eta: "spring 2025"
-        },
+        // {
+        //     icon: "Wallet",
+        //     title: "Grant funding database",
+        //     description:
+        //         "Find funding opportunities for your organization and advertise your own grants for others.",
+        //     eta: "early 2025"
+        // },
+        // {
+        //     icon: "ChartLine",
+        //     title: "Therapeutic overviews",
+        //     description:
+        //         "Stay on top of the latest efforts, evidence, and eligibility in rapidly advancing technologies.",
+        //     eta: "spring 2025"
+        // },
         {
             icon: "Sparkle",
             title: "Research agreements",

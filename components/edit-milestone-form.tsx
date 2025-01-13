@@ -19,9 +19,8 @@ import { ScrollArea } from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
-import type { TaskType } from "./private-milestone-node"
 import type { StatusType } from "./milestone-status-button"
-import { FaTrash, FaX } from "react-icons/fa6"
+import { FaLinkSlash, FaX } from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -34,7 +33,6 @@ import {
     DialogTrigger
 } from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
-import { nanoid } from "nanoid"
 import { toast } from "sonner"
 import {
     DndContext,
@@ -61,6 +59,7 @@ import { AssetEditForm } from "./asset-edit-form"
 import { RFPEditForm } from "./rfp-edit-form"
 import { PapersEditForm } from "./papers-edit-form"
 import { FaEdit } from "react-icons/fa"
+import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 
 type AssetType = Prisma.AssetGetPayload<{ 
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -85,6 +84,7 @@ type RFPType = Prisma.RFPGetPayload<{
     }
 }>
 type AttachmentType = AssetType['attachments'][0]
+type TaskType = Prisma.TaskGetPayload<{}>
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -106,6 +106,13 @@ const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone
 })
 
+const kanbanSelector = (state: KanbanState) => ({
+    columns: state.columns,
+    tasks: state.tasks,
+    setTask: state.setTask,
+    setTasks: state.setTasks
+})
+
 export function EditMilestoneForm({
     milestoneData,
     onClose
@@ -116,6 +123,7 @@ export function EditMilestoneForm({
     const { setMilestone } = useRoadmapStore(
         useShallow(selector)
     )
+    const { columns: kanbanColumns, tasks: kanbanTasks, setTask, setTasks } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
 
     const editMilestoneForm = z.object({
@@ -140,13 +148,7 @@ export function EditMilestoneForm({
         }),
         budget: z.number().optional(),
         papers: z.array(z.custom<AttachmentType>()).optional(),
-        tasks: z.array(
-            z.object({
-                id: z.string(),
-                name: z.string(),
-                status: statusTypeSchema,
-            })
-        ).optional(),
+        tasks: z.array(z.custom<TaskType>()).optional(),
         status: z.string(),
         private: z.boolean(),
         asset: z.custom<AssetType>().optional(),
@@ -170,7 +172,7 @@ export function EditMilestoneForm({
             },
             budget: milestoneData?.budget || undefined,
             papers: milestoneData?.papers || undefined,
-            tasks: milestoneData?.tasks || [],
+            tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
             status: milestoneData?.status || "TODO",
             private: milestoneData?.private || false,
             asset: milestoneData?.asset || undefined,
@@ -213,8 +215,6 @@ export function EditMilestoneForm({
         const { title, description, type, startDate, endDate, budget, papers, tasks, status, private: isPrivate, asset, RFP } = values;
         const now = new Date()
 
-        console.log(`save milestone data`, values)
-        
         setMilestone(milestoneData?.nodeId, {
             title,
             ...(description !== undefined && description !== null
@@ -235,14 +235,6 @@ export function EditMilestoneForm({
                 ? { papers }
                 : undefined
             ),
-            ...(tasks 
-                ? { tasks: tasks.map((task: any, index: number) => ({
-                    ...task, 
-                    orderPosition: index,
-                    milestoneId: milestoneData?.id
-                }))}
-                : undefined
-            ),
             ...(type
                 ? { type }
                 : { type: 'NOTYPE'}
@@ -252,6 +244,34 @@ export function EditMilestoneForm({
             asset,
             RFP
         })
+
+        setTasks(kanbanTasks.map(task => {
+            const newTask = tasks?.find(t => t.id === task.id)
+
+            // link relevant tasks to this milestone
+            if (newTask) {
+                return {
+                    ...task,
+                    name: newTask.name,
+                    columnId: newTask.columnId,
+                    milestone: { id: milestoneData?.id },
+                    milestoneId: milestoneData?.id,
+                }
+            }
+
+            // unlink tasks that are no longer attached to this milestone
+            if (!newTask && milestoneData?.id && task.milestoneId === milestoneData.id) {
+                console.log(`unlink task`, task.name)
+                return {
+                    ...task,
+                    milestone: undefined,
+                    milestoneId: undefined
+                }
+            }
+
+            return task
+        }))
+        
         toast('Success!', {
             position: "bottom-left",
             description: 'The changes to your milestone have been successfully saved.'
@@ -631,15 +651,16 @@ export function EditMilestoneForm({
                                             key={task.id} 
                                             index={index} 
                                             task={task} 
-                                            onDelete={() => {
+                                            onUnlink={() => {
                                                 form.setValue('tasks', field?.value?.filter((t, i) => i !== index))
                                             }}
                                             onNameChange={(newName) => {
                                                 form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, name: newName} : t))
                                             }}
-                                            onStatusChange={(status) => {
-                                                form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, status} : t))
+                                            onColumnChange={(newColumnId) => {
+                                                form.setValue('tasks', field?.value?.map((t, i) => i === index ? {...t, columnId: newColumnId} : t))
                                             }}
+                                            kanbanColumns={kanbanColumns}
                                         />
                                     ))}
                                     </SortableContext>
@@ -647,13 +668,21 @@ export function EditMilestoneForm({
                                 </DndContext>
                                 </>
                             )}
-                            <Button variant="secondary" onClick={(e: any) => {
-                                e.preventDefault()
-                                form.setValue(
-                                    'tasks',
-                                    [...field?.value || [], { name: 'New Task', status: 'TODO', id: nanoid() }]
-                                )
-                            }}>Add a task</Button>
+                            <LinkTask 
+                                milestoneId={milestoneData?.id} 
+                                kanbanTasks={kanbanTasks}
+                                onLink={(taskId) => {
+                                    const newTask = kanbanTasks?.find((task) => task.id === taskId)
+                                    form.setValue(
+                                        'tasks', 
+                                        [...field?.value || [], {
+                                            ...newTask,
+                                            milestoneId: milestoneData?.id,
+                                            milestone: { id: milestoneData?.id }
+                                        }] 
+                                    )
+                                }}
+                            />
                             </>
                         </FormControl>
                         <FormMessage />
@@ -742,20 +771,58 @@ const EditTitle = ({ form }: { form: any }) => {
     )
 }
 
+const LinkTask = ({ milestoneId, kanbanTasks, onLink }: { milestoneId: string, kanbanTasks: any[], onLink: (id: string) => void }) => {
+    const [isLinking, setIsLinking] = useState(false)
+
+    if (isLinking) {
+        return (
+            <Select 
+                onValueChange={(value: string) => {
+                    onLink(value)
+                    setIsLinking(false)
+                }}
+            >
+                <SelectTrigger className="w-full">
+                    <SelectValue placeholder={'Select a task'}/>
+                </SelectTrigger>
+                <SelectContent>
+                    {kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).map(task => (
+                        <SelectItem key={task.id} value={task.id}>{task.name}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        )
+    }
+
+    return (
+        <Button 
+            disabled={kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).length === 0} 
+            variant={'secondary'}
+            onClick={() => {setIsLinking(true)}}
+        >
+            {kanbanTasks?.filter((task: any) => task.milestoneId === milestoneId).length === 0 ? (
+                `Link kanban task`
+            ): (
+                `Link another kanban task`
+            )}
+        </Button>
+    )
+}
+
 const TaskField = ({
     index,
     task,
-    onDelete,
+    onUnlink,
     onNameChange,
-    // onCompleteChange
-    onStatusChange
+    onColumnChange,
+    kanbanColumns,
 }: {
     index: number
     task: TaskType
-    onDelete: () => void
+    onUnlink: () => void
     onNameChange: (newName: string) => void
-    // onCompleteChange: (complete: boolean) => void
-    onStatusChange: (status: StatusType) => void
+    onColumnChange: (newColumnId: string) => void
+    kanbanColumns: any[]
 }) => {
     const {
         attributes,
@@ -765,19 +832,22 @@ const TaskField = ({
         transition,
         isDragging
     } = useSortable({ id: task.id || "" })
-
     const style = {
         transition,
         transform: CSS.Translate.toString(transform)
     }
 
-    const deleteTask = (e: React.MouseEvent<HTMLElement>) => {
+    const unlinkTask = (e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault()
-        onDelete()
+        onUnlink()
     }
 
     const nameChanged = (e: React.FormEvent<HTMLInputElement>) => {
         onNameChange(e.currentTarget.value)
+    }
+
+    const columnChanged = (newColumnId: string) => {
+        onColumnChange(newColumnId)
     }
 
     const variants = cva("flex flex-row gap-2 items-center", {
@@ -797,6 +867,7 @@ const TaskField = ({
                 dragging: isDragging ? "overlay" : undefined
             })}
         >
+            {/* move task */}
             <Button
                 type="button"
                 variant={"ghost"}
@@ -807,7 +878,20 @@ const TaskField = ({
                 <span className="sr-only">Move task</span>
                 <GripVertical />
             </Button>
-            <StatusButton status={task.status} onStatusChange={onStatusChange}/>
+
+            {/* select kanban column */}
+            <Select onValueChange={(value: string) => columnChanged(value)} value={task.columnId}>
+                <SelectTrigger className="w-[180px]">
+                    <SelectValue/>
+                </SelectTrigger>
+                <SelectContent>
+                    {kanbanColumns.map(column => (
+                        <SelectItem key={column.id} value={column.id}>{column.name}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+
+            {/* task name */}
             <div className="grow">
                 <Input
                     placeholder={task.name}
@@ -816,8 +900,10 @@ const TaskField = ({
                     className="h-full"
                 />
             </div>
-            <Button variant="secondary" size="icon" onClick={deleteTask}>
-                <FaTrash />
+
+            {/* delete task */}
+            <Button variant="secondary" size="icon" onClick={unlinkTask}>
+                <FaLinkSlash />
             </Button>
         </li>
     )

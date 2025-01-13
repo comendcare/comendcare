@@ -12,7 +12,7 @@ import {
 import { Input } from "./ui/input"
 import { Textarea } from "./ui/textarea"
 import { UseFormReturn } from "react-hook-form"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { Separator } from "./ui/separator"
 import { FaT, FaTrash } from "react-icons/fa6"
 import {
@@ -50,7 +50,8 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                 {RFP ? (
                     <Card>
                         <CardHeader>
-                            <CardTitle>RFP</CardTitle>
+                            <CardTitle>Project</CardTitle>
+                            <CardDescription>A research project is a milestone document inviting others to submit bids for a specific service or solution.</CardDescription>
                         </CardHeader>
 
                         <CardContent className="flex flex-col gap-4">
@@ -79,7 +80,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                     render={({field}) => (
                                         <Textarea
                                             id="RFPDescription"
-                                            placeholder={`Enter a description for this RFP`}
+                                            placeholder={`Enter a description for this Project`}
                                             // defaultValue={field.value || ''}
                                             value={field.value || ''}
                                             onChange={field.onChange}
@@ -300,7 +301,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                 }}
                             >
                                 <FaTrash />
-                                {`Remove RFP`}
+                                {`Remove Project`}
                             </Button>
                         </CardFooter>
                     </Card>
@@ -321,7 +322,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                 endDate: null
                             })
                         }}
-                    >{`Add a RFP`}</Button>
+                    >{`Add a Project`}</Button>
                 )}
             </FormControl>
         </FormItem>

@@ -124,13 +124,13 @@ export default function Nav({ children }: { children: ReactNode }) {
                 },
                 {
                     name: "Editor",
-                    href: `/roadmap/${id}`,
+                    href: `/research-plan/${id}`,
                     isActive: segments.length === 2,
                     icon: <Edit3 width={18} />
                 },
                 {
                     name: "Settings",
-                    href: `/roadmap/${id}/settings`,
+                    href: `/research-plan/${id}/settings`,
                     isActive: segments.includes("settings"),
                     icon: <Settings width={18} />
                 }

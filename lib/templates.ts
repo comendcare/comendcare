@@ -4,14 +4,12 @@ export const templateMilestones = [
         description: 'Our observational research effort that follows individuals with a specific disease over time, collecting data on how the disease develops and progresses without intervention.',
         type: 'NATURALHISTORYSTUDY',
         papers: [],
-        tasks: []
     },
     {
         title: 'Review Literature',
         description: 'Examine existing research to better understand the disease, identify gaps in knowledge, and assess the latest findings on potential treatments.',
         type: 'LITERATUREREVIEW',
         papers: [],
-        tasks: []
     },
     {
         title: 'Identify Existing Disease Models',
@@ -19,58 +17,43 @@ export const templateMilestones = [
         status: 'INPROGRESS',
         // type: 'LITERATUREREVIEW',
         papers: [],
-        tasks: []
     },
     {
         title: 'Construct Mouse Models',
-        description: '',
+        description: 'Recommended tasks: Secure Funding, Ethical Standards Advocacy, and Prioritize Model Features.',
         status: 'INPROGRESS',
         type: 'ANIMALMODEL',
         papers: [],
-        tasks: [
-            { name: 'Secure Funding' },
-            { name: 'Ethical Standards Advocacy' },
-            { name: 'Prioritize Model Features', description: 'Work with researchers to prioritize features in the model that most directly address patient needs and research goals.' }
-        ]
     },
     {
         title: 'Construct Patient-Derived Cells',
         description: 'Work with researchers to create cell lines that replicate disease characteristics.',
         type: 'CELLLINE',
         papers: [],
-        tasks: [
-            { name: 'Coordinate Patient Participation' },
-            { name: 'Secure Funding' },
-            { name: 'Determine Cell Model Relevancy', description: 'Determine if each cell model is relevant for testing therapies and studying disease mechanisms that refect our patients real experiences.'}
-        ]
     },
     {
         title: 'Design ASO Construct',
         description: 'Design an ASO (Antisense Oligonucleotide) construct that specifically targets the genetic mutations driving our disease.',
         type: 'CONSTRUCTDESIGN',
         papers: [],
-        tasks: []
     },
     {
         title: 'Produce Plasmid',
         description: 'Create a DNA template essential for developing and testing therapies.',
         type: 'PLASMIDPRODUCTION',
         papers: [],
-        tasks: []
     },
     {
         title: 'Proof-Of-Concept Study',
         description: 'Design and conduct initial experiments to demonstrate that a potential therapy or intervention can effectively target the disease.',
         type: 'PROOFOFCONCEPTSTUDY',
         papers: [],
-        tasks: []
     },
     {
         title: 'Animal Toxicology Study',
         description: 'Conduct preclinical trials to evaluate the safety and potential side effects of a therapy.',
         type: 'TOXICOLOGYSTUDY',
         papers: [],
-        tasks: []
     }
 ]
 

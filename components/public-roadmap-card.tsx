@@ -7,6 +7,8 @@ import {PublicFlowView} from "./public-flow";
 import {PublicTimelineView} from "./public-timeline";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "./ui/tabs";
 import Image from "next/image"
+import {Button} from "@/components/ui/button";
+import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 
 export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomain: string | undefined }) => {
     const router = useRouter()
@@ -25,18 +27,22 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
     }
 
     if (!roadmap) {
-        return <div className="flex flex-col items-center justify-center space-x-4">
-            <h1 className="font-cal text-4xl">No Roadmaps Yet</h1>
-            <Image
-                alt="missing roadmap"
-                src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                width={400}
-                height={400}
-            />
-            <p className="text-lg text-stone-500">
-                You do not have any roadmaps yet. Create one to get started.
-            </p>
-        </div>
+        return <Card>
+            <CardContent>
+                <div className="flex flex-col items-center justify-center space-x-4 my-8">
+                    <h1 className="font-cal text-4xl">No Roadmaps Yet</h1>
+                    <Image
+                        alt="missing roadmap"
+                        src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                        width={400}
+                        height={400}
+                    />
+                    <p className="text-lg text-stone-500">
+                        You do not have any roadmaps yet. Create one to get started.
+                    </p>
+                </div>
+            </CardContent>
+        </Card>
     }
 
     return (
@@ -47,8 +53,21 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
             onValueChange={handleTabChange}
         >
             <Card>
-                <CardHeader className="w-min pt-6 pb-2">
-                    <TabsList>
+                <CardHeader className="w-full pt-6 pb-2 space-y-4">
+                    <div className="flex flex-row items-center justify-between space-y-0">
+                        <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                            Research Plan
+                        </CardTitle>
+                        <Button
+                            variant="ghost"
+                            onClick={() => router.push("/app/research-plan")}
+                            className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
+                        >
+                            Edit research plan
+                            <FaArrowUpRightFromSquare/>
+                        </Button>
+                    </div>
+                    <TabsList className="w-min">
                         <TabsTrigger value="timeline">
                             Timeline View
                         </TabsTrigger>

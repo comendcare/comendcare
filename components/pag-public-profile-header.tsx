@@ -1,11 +1,11 @@
 import {formatMoney} from "@/lib/utils";
-import {FaCity, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaPlus} from "react-icons/fa6";
-import {Button} from "@/components/ui/button";
+import {FaCity, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup} from "react-icons/fa6";
 import {Organization} from "@prisma/client";
 import PublicProfileDropdown from "@/components/public-profile-dropdown";
 import {ProfilePhoto} from "./profile-photo";
 import {BackButton} from "./back-button";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import PAGFollowButton from "@/components/pag-follow-button";
 
 export default function PAGPublicProfileHeader({organization, showBackButton}: {
     organization: Organization,
@@ -61,14 +61,6 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                                 </div>
                                 <div
                                     className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-                                    {organization?.numberOfIdentifiedPatients &&
-                                        <div className="mt-2 flex items-center text-gray-500">
-                                            <FaPeopleGroup
-                                                className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                aria-hidden="true"/>
-                                            {organization?.numberOfIdentifiedPatients}+ patients
-                                        </div>
-                                    }
                                     {organization?.moneyRaised &&
                                         <div className="mt-2 flex items-center text-gray-500">
                                             <FaCircleDollarToSlot
@@ -97,12 +89,7 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                         <div
                             className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
                             <div className="flex flex-row space-x-2">
-                                <Button
-                                    className="gap-x-2"
-                                >
-                                    <FaPlus/>
-                                    Follow
-                                </Button>
+                                {/*<PAGFollowButton organizationId={organization.id} />*/}
                                 <PublicProfileDropdown website={organization?.website}/>
                             </div>
                         </div>

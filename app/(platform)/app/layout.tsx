@@ -20,8 +20,9 @@ import {redirect} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {FaPlus} from "react-icons/fa6";
 import Loading from "@/app/loading";
-import {getAllOrganizationsFromUserId, getRoadmapId} from "@/lib/fetchers";
+import {getAllOrganizationsFromUserId, getColumns, getKanbanFromOrganizationId, getNodesEdgesAndMilestones, getRoadmapId} from "@/lib/fetchers";
 import {toast} from "sonner";
+import {initializeKanbanState, initializeRoadmapState} from "@/lib/initialize-client-state";
 
 
 export type MemberWithOrganization = Member & {
@@ -84,12 +85,34 @@ export default function AppLayout({children}: AppLayoutProps) {
 
             const response = await getRoadmapId(orgId)
             if (response.success) {
-                const organization = response.data
-                setRoadmapId(roadmapId)
+                setRoadmapId(response.data)
+                const nodesResponse = await getNodesEdgesAndMilestones(response.data)
+                if (nodesResponse.success) {
+                    initializeRoadmapState({
+                        roadmapId: response.data,
+                        nodes: nodesResponse.data.nodes,
+                        edges: nodesResponse.data.edges,
+                        milestones: nodesResponse.data.milestones
+                    })
+                }
                 setIsLoading(false)
             } else {
                 console.error(response.error)
                 toast.error(response.error)
+            }
+
+            const kanban = await getKanbanFromOrganizationId()
+            if (kanban.success) {
+                const kanbanResponse = await getColumns(orgId)
+                if (kanbanResponse.success) {
+                    initializeKanbanState({
+                        columns: kanbanResponse.data.columns
+                    })
+                }
+                setIsLoading(false)
+            } else {
+                console.error(kanban.error)
+                toast.error(kanban.error)
             }
         }
     }
@@ -144,15 +167,10 @@ export default function AppLayout({children}: AppLayoutProps) {
                             )}
                         >
                             <Image priority src={logo} alt="Librarey logo" className="size-6"/>
-                            {session.user.organizationId ?
-                                <OrganizationSelector
-                                    isCollapsed={isCollapsed}
-                                    organizations={organizations}
-                                />
-                                : <Button>
-                                    {isCollapsed ? <FaPlus/> : "Create or join an organization"}
-                                </Button>
-                            }
+                            <OrganizationSelector
+                                isCollapsed={isCollapsed}
+                                organizations={organizations}
+                            />
                         </div>
                         <Separator/>
                         <AppNav
@@ -179,14 +197,14 @@ export default function AppLayout({children}: AppLayoutProps) {
                                     // label: "128",
                                     icon: Workflow,
                                     variant: "ghost",
-                                    href: roadmapId ? `/app/roadmap/${roadmapId}` : `/app/roadmap`
+                                    href: `/app/research-plan`
                                 },
                                 {
                                     title: "Marketplace",
                                     // label: "9",
                                     icon: Store,
                                     variant: "ghost",
-                                    href: "/app/marketplace"
+                                    href: "/app/marketplace/patient-groups"
                                 },
                                 {title: "Settings", icon: Cog, variant: "ghost", href: "/app/settings"},
                             ]}

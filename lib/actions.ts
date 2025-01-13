@@ -1,17 +1,18 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma, Column, Kanban} from "@prisma/client"
+import {Roadmap, Organization, Prisma, Column, Kanban, Post, Task, User, Condition} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
-import {getBlurDataURL, logError} from "@/lib/utils";
+import {getBlurDataURL, logError, toKebabCase} from "@/lib/utils";
 import {Session} from "next-auth";
-import {sendInviteEmail, sendMemberRequestEmail} from "@/lib/emails";
-
+import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from "@/lib/emails";
+import {getKanbanFromOrganizationId} from "./fetchers"
+import {ApiResponse} from "@/lib/types";
 
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
     const roadmap = await prisma.roadmap.create({
@@ -116,16 +117,14 @@ const nanoid = customAlphabet(
     7
 ) // 7-character random string
 
-export const createMemberRequest = async (organizationId: string) => {
+export const createMemberRequest = async (organizationId: string): Promise<ApiResponse<any>> => {
     const session = await getSession()
     if (!session?.user.id) {
-        return {
-            error: "Not authenticated"
-        }
+        throw new Error("You must be signed in to perform this action")
     }
 
     try {
-        const response = await prisma.memberRequest.create({
+        const memberRequest = await prisma.memberRequest.create({
             data: {
                 email: session.user.email,
                 role: "admin",
@@ -168,13 +167,112 @@ export const createMemberRequest = async (organizationId: string) => {
             })
         }
 
-        return response
-    } catch (error: any) {
-        return {
-            error: error.message
+        if (!memberRequest) {
+            console.error("Error creating member request.")
+            return {success: false, error: "Database error. please try again later."}
         }
+
+        return {success: true, data: memberRequest}
+    } catch (error: any) {
+        console.error("Error creating member request:", error)
+        return {success: false, error: "Database error. please try again later."}
     }
 }
+
+export const createCondition = async (formData: FormData) => {
+    const session = await getSession();
+    if (!session?.user.id) {
+        return {
+            error: "Not authenticated"
+        };
+    }
+
+    const name = formData.get("name") as string;
+    const summary = formData.get("summary") as string;
+    const slug = toKebabCase(name);
+    const interestedModalities = (formData.get("interestedModalities") as string || "").split(",");
+    const diseaseCategories = (formData.get("diseaseCategories") as string || "").split(",");
+    const prevalenceNumerator = formData.get("prevalenceNumerator")
+        ? parseInt(formData.get("prevalenceNumerator") as string, 10)
+        : null;
+    const prevalenceDenominator = formData.get("prevalenceDenominator")
+        ? parseInt(formData.get("prevalenceDenominator") as string, 10)
+        : null;
+    const numberOfIdentifiedPatients = formData.get("numberOfIdentifiedPatients")
+        ? parseInt(formData.get("numberOfIdentifiedPatients") as string, 10)
+        : null;
+    const relevantDiseaseMechanisms = (formData.get("relevantDiseaseMechanisms") as string || "").split(",");
+    const associatedGenes = (formData.get("associatedGenes") as string || "").split(",");
+    const associatedSystems = (formData.get("associatedSystems") as string || "").split(",");
+    const associatedSignsAndSymptoms = (formData.get("associatedSignsAndSymptoms") as string || "").split(",");
+    const existingDatabasesAndStudies = (formData.get("existingDatabasesAndStudies") as string || "").split(",");
+    const assetsUnderDevelopment = (formData.get("assetsUnderDevelopment") as string || "").split(",");
+
+    try {
+        const condition = await prisma.condition.create({
+            data: {
+                name,
+                summary,
+                slug,
+                interestedModalities,
+                diseaseCategories,
+                prevalenceNumerator,
+                prevalenceDenominator,
+                numberOfIdentifiedPatients,
+                relevantDiseaseMechanisms,
+                associatedGenes,
+                associatedSystems,
+                associatedSignsAndSymptoms,
+                existingDatabasesAndStudies,
+                assetsUnderDevelopment,
+            }
+        });
+
+        if (!condition) {
+            console.error("Error creating condition.");
+            return { success: false, error: "Database error. Please try again later." };
+        }
+
+        return { success: true, data: condition };
+    } catch (error: any) {
+        console.error("Error creating condition:", error);
+        return { success: false, error: "Database error. Please try again later." };
+    }
+};
+
+export const connectOrganizationToCondition = async (organizationId: string | null | undefined, conditionId: string) => {
+    const session = await getSession();
+    if (!session?.user?.id) {
+        return {
+            error: "Not authenticated",
+        };
+    }
+
+    if (!organizationId) {
+        return {
+            error: "No organization Id",
+        };
+    }
+
+    try {
+        const conditionOrganization = await prisma.conditionToOrganization.create({
+            data: {
+                conditionId: conditionId, // Specify the condition ID
+                organizationId: organizationId, // Specify the organization ID
+            },
+        });
+
+        if (!conditionOrganization) {
+            console.error("Error creating condition connection to organization.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        return {success: true, data: conditionOrganization}
+    } catch (error: any) {
+        console.error("Error creating condition connection to organization:", error)
+        return {success: false, error: error.message || "An error occurred while connecting the organization to the condition"}
+    }
+};
 
 export const createOrganization = async (formData: FormData) => {
     const session = await getSession()
@@ -183,9 +281,22 @@ export const createOrganization = async (formData: FormData) => {
             error: "Not authenticated"
         }
     }
-    const name = formData.get("orgName") as string
-    const description = formData.get("description") as string
-    const subdomain = formData.get("subdomain") as string
+
+    const name = formData.get("orgName") as string;
+    const description = formData.get("description") as string;
+    const subdomain = formData.get("subdomain") as string;
+    const website = formData.get("website") as string | null;
+    const incorporationStatus = formData.get("incorporationStatus") as "YES" | "NO" | "INPROGRESS" | null;
+    const address1 = formData.get("address1") as string | null;
+    const address2 = formData.get("address2") as string | null;
+    const formattedAddress = formData.get("formattedAddress") as string | null;
+    const city = formData.get("city") as string | null;
+    const region = formData.get("region") as string | null;
+    const postalCode = formData.get("postalCode") as string | null;
+    const country = formData.get("country") as string | null;
+    const lat = formData.get("lat") as string | null;
+    const lng = formData.get("lng") as string | null;
+    const image = formData.get("image") as string | null;
 
     try {
         const response = await prisma.organization.create({
@@ -193,13 +304,25 @@ export const createOrganization = async (formData: FormData) => {
                 name,
                 description,
                 subdomain,
+                website,
+                incorporationStatus,
+                address1,
+                address2,
+                formattedAddress,
+                city,
+                region,
+                postalCode,
+                country,
+                lat,
+                lng,
+                image,
                 user: {
                     connect: {
-                        id: session.user.id
-                    }
-                }
-            }
-        })
+                        id: session.user.id,
+                    },
+                },
+            },
+        });
         await prisma.member.create({
             data: {
                 userId: session.user.id,
@@ -211,6 +334,22 @@ export const createOrganization = async (formData: FormData) => {
         await revalidateTag(
             `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
         )
+
+        await sendNewOrganizationEmail(
+            {
+                user: {
+                    name: session.user.name,
+                    email: session.user.email
+                },
+                organization: {
+                    name: response.name,
+                    subdomain: response.subdomain
+                }
+            }
+        ).then(() => {
+            console.log("email sent")
+        })
+
         return response
     } catch (error: any) {
         if (error.code === "P2002") {
@@ -397,23 +536,6 @@ export const updateOrganizationAttribute = withOrganizationAttributeAuth(
                     data: {
                         [key]: url,
                         ...(blurhash && {imageBlurhash: blurhash})
-                    }
-                })
-            } else {
-                const prevalenceNumerator: number | undefined = parseInt(formData.get('prevalenceNumerator') as string) || undefined
-                const prevalenceDenominator: number | undefined = parseInt(formData.get('prevalenceDenominator') as string) || undefined
-
-                response = await prisma.organization.update({
-                    where: {
-                        id: organization.id
-                    },
-                    data: {
-                        [key]: value,
-                        // add prevalenceRatio (if applicable)
-                        ...(prevalenceNumerator && prevalenceDenominator ?
-                                {prevalenceRatio: prevalenceNumerator / prevalenceDenominator} :
-                                undefined
-                        )
                     }
                 })
             }
@@ -685,10 +807,14 @@ export async function inviteUser(
         organizationName: string
         organizationImage: string
     }
-) {
+): Promise<ApiResponse<any>> {
     try {
         if (!session) {
             throw new Error("You must be signed in to perform this action")
+        }
+
+        if (email === session.user.email) {
+            throw new Error("Cannot send invitation to yourself")
         }
 
         const lowerCaseEmail = email.toLowerCase()
@@ -728,34 +854,15 @@ export async function inviteUser(
             console.log("email sent")
         })
 
-        return invitation
+        if (!invitation) {
+            console.error("Error inviting user.")
+            return {success: false, error: "Database error. please try again later."}
+        }
 
-        // return await prisma.member.create({
-        //     data: {
-        //         email: lowerCaseEmail,
-        //         organization: {
-        //             connect: {
-        //                 id: organization.organizationId
-        //             }
-        //         },
-        //         role: role,
-        //         invitedBy: {
-        //             connect: {
-        //                 id: session?.user?.id
-        //             }
-        //         },
-        //         meta: {
-        //             invitationId,
-        //         },
-        //     },
-        // }).then((res) => {
-        //     console.log(`Membership created for ${email}`)
-        //
-        //     return res
-        // })
-    } catch (error) {
+        return {success: true, data: invitation}
+    } catch (error: any) {
         console.error("Error inviting user:", error)
-        throw new Error("Failed to invite user.")
+        return {success: false, error: "Database error. please try again later."}
     }
 }
 
@@ -914,7 +1021,21 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                                     connect: {id: organizationId}
                                 },
                                 title: node.data?.title || "New Milestone",
+                                type: node.data?.type || undefined,
+                                description: node.data?.description,
+                                startDate: node.data?.startDate,
+                                endDate: node.data?.endDate,
+                                budget: node.data?.budget,
+                                papers: {
+                                    createMany: {
+                                        data: (node.data?.papers || []).map((paper: any) => ({
+                                            link: paper.link,
+                                            ...(paper.name ? {name: paper.name} : undefined)
+                                        }))
+                                    }
+                                },
                                 status: node.data?.status || "TODO",
+                                private: node.data?.private || false,
                             }
                         }
                     }
@@ -967,8 +1088,8 @@ export async function updateDBMilestones({milestones}: { milestones: any[] }) {
         await Promise.all(
             milestones.map(async (milestone: any) => {
                 const previousMilestone = await prisma.milestone.findUnique({
-                    // where: { nodeId: milestone.nodeId },
-                    where: {id: milestone.id},
+                    where: { nodeId: milestone.nodeId },
+                    // where: {id: milestone.id},
                     include: {
                         papers: true,
                         asset: {
@@ -986,18 +1107,9 @@ export async function updateDBMilestones({milestones}: { milestones: any[] }) {
                     throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`);
                 }
 
-                const previousTasks = previousMilestone?.tasks || []
-                const tasksToDelete = previousTasks.filter((task) => !milestone.tasks.map((t: any) => t.id).includes(task.id))
-                const tasksToUpdate = milestone.tasks?.filter((task: any) => previousMilestone?.tasks.map((t: any) => t.id).includes(task.id))
-                const tasksToCreate = milestone.tasks.filter((task: any) => !previousMilestone?.tasks.map((t: any) => t.id).includes(task.id))
-
-                // console.log(`tasks to delete`, tasksToDelete)
-                // console.log(`tasks to update`, tasksToUpdate)
-                // console.log(`tasks to create`, tasksToCreate)
-
                 await prisma.milestone.update({
-                    // where: { nodeId: milestone.nodeId },
-                    where: {id: milestone.id},
+                    where: { nodeId: milestone.nodeId },
+                    // where: {id: milestone.id},
                     include: {
                         papers: true,
                         asset: {
@@ -1006,7 +1118,6 @@ export async function updateDBMilestones({milestones}: { milestones: any[] }) {
                         RFP: {
                             include: {contacts: true, attachments: true}
                         },
-                        tasks: true
                     },
                     data: {
                         title: milestone.title,
@@ -1024,22 +1135,6 @@ export async function updateDBMilestones({milestones}: { milestones: any[] }) {
                                 }))
                             }
                         },
-                        tasks: {
-                            deleteMany: tasksToDelete
-                                .filter((task: any) => task.id !== null && task.id !== undefined)
-                                .map(task => ({id: task.id})),
-                            createMany: {
-                                data: tasksToCreate
-                                    .filter((task: any) => task.id !== undefined && task.id !== undefined)
-                                    .map((task: any) => ({
-                                        id: task?.id || nanoid(),
-                                        name: task?.name || "New Task",
-                                        status: task?.status || "TODO",
-                                        orderPosition: task.orderPosition || 0,
-                                        kanbanPosition: task.kanbanPosition || 0,
-                                    }))
-                            }
-                        },
                         status: milestone.status || "TODO",
                         private: milestone.private || false,
                     }
@@ -1048,18 +1143,6 @@ export async function updateDBMilestones({milestones}: { milestones: any[] }) {
                 updateAssets(previousMilestone, milestone)
 
                 updateRFP(previousMilestone, milestone)
-
-                for (let i = 0; i < tasksToUpdate.length; i++) {
-                    const task = tasksToUpdate[i]
-                    await prisma.task.update({
-                        where: {id: task.id},
-                        data: {
-                            name: task.name,
-                            status: task.status,
-                            orderPosition: task.orderPosition || 0
-                        }
-                    })
-                }
             })
         )
 
@@ -1187,17 +1270,41 @@ async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneT
     }
 }
 
-export async function updateDBTask({tasks}: { tasks: any[] }) {
+export async function updateDBColumns({columns}: { columns: Column[] }) {
     try {
-        // console.log(`tasks:`, tasks)
+        await Promise.all(
+            columns.map(async (column: any) => {
+                await prisma.column.update({
+                    where: {id: column?.id},
+                    data: {
+                        name: column.name,
+                        kanbanPosition: column.kanbanPosition
+                    }
+                })
+            })
+        )
+
+        console.log(`Successfully updated Task`)
+    } catch (error) {
+        console.error(`Error updating Task: `, error)
+    }
+}
+
+export async function updateDBTask({tasks}: { tasks: Task[] }) {
+    try {
+        console.log(`tasks:`, tasks)
+        let updatedTasks: Task[] = []
 
         await Promise.all(
             tasks.map(async (task: any) => {
-                await prisma.task.update({
-                    where: {id: task.id},
+                if (!task) return
+
+                let t = await prisma.task.update({
+                    where: {id: task?.id},
+                    include: {milestone: true},
                     data: {
                         name: task.name,
-                        status: task.status,
+                        // status: task.status,
                         description: task.description,
                         orderPosition: task.orderPosition,
                         kanbanPosition: task.kanbanPosition,
@@ -1210,15 +1317,54 @@ export async function updateDBTask({tasks}: { tasks: any[] }) {
                                     orderPosition: item?.orderPosition
                                 }))
                             }
+                        },
+                        stakeholders: {
+                            set: [],
+                            connect: task.stakeholders?.map((stakeholder: User) => ({id: stakeholder?.id})) || []
+                        },
+                        milestone: task.milestoneId
+                            ? {connect: { id: task.milestoneId }} // Connect if milestoneId exists
+                            : {disconnect: true}, // Disconnect if milestoneId is undefined
+                        endDate: task.endDate,
+                        priority: task.priority,
+                        private: task.private,
+                        column: {
+                            connect: {id: task.columnId}
                         }
                     }
                 })
+
+                updatedTasks.push(t)
             })
         )
 
         console.log(`Successfully updated Task`)
+        return updatedTasks
     } catch (error) {
         console.error(`Error updating Task: `, error)
+    }
+}
+
+export async function deleteOrgRoadmap(
+    roadmapId: string,
+    organizationId: string
+) {
+    try {
+        const response = await prisma.roadmap.delete({
+            where: {
+                id: roadmapId,
+                organizationId: organizationId
+            }
+        })
+
+        if (!response) {
+            return {success: false, error: 'roadmap not found'}
+        }
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        logError("Error deleting roadmap", error)
+        return {success: false, error: "Internal server error"}
     }
 }
 
@@ -1278,64 +1424,110 @@ export async function deleteUser(
     }
 }
 
-export async function createNewKanbanTask(column: Column) {
+export async function createKanban(orgId: string) {
     try {
-        const task = prisma.task.create({
+        const newKanban = await prisma.kanban.create({
             data: {
+                organization: { connect: { id: orgId } },
+                columns: {
+                    create: [
+                        {
+                            name: "To Do",
+                            kanbanPosition: 0
+                        },
+                        {
+                            name: 'In Progress',
+                            kanbanPosition: 1
+                        },
+                        {
+                            name: 'Done',
+                            kanbanPosition: 2
+                        }
+                    ]
+                }
+            }
+        })
+
+        return {success: true, data: newKanban}
+    } catch (error: any) {
+        logError(`Error creating kanban task for ${orgId}`, error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
+export async function createNewKanbanTask(task: Prisma.TaskGetPayload<{
+    select: {
+        id: true,
+        name: true,
+        orderPosition: true,
+        kanbanPosition: true,
+        columnId: true
+    }
+}>) {
+    try {
+        const newTask = prisma.task.create({
+            data: {
+                id: task.id,
                 column: {
                     connect: {
-                        id: column.id
-                    },
+                        id: task.columnId
+                    }
                 },
+                name: task.name,
                 orderPosition: 0,
                 kanbanPosition: 0
             }
         })
 
-        if (!task) {
+        if (!newTask) {
             return {success: false, error: "membership not found"};
         }
 
-        return {success: true, data: task};
+        return {success: true, data: newTask};
     } catch (error: any) {
         logError("Error fetching membership data", error);
         return {success: false, error: "Internal server error"};
     }
 }
 
-export async function createKanbanColumn(kanban: Kanban) {
+export async function createKanbanColumn(column: Column) {
     try {
-        const column = prisma.column.create({
+        const {data: kanban} = await getKanbanFromOrganizationId()
+        if (!kanban) return {success: false, error: "failed to find associated kanban board"}
+
+        const newColumn = prisma.column.create({
             data: {
+                id: column.id,
                 kanban: {
                     connect: {
                         id: kanban.id
                     },
                 },
+                name: column.name,
                 kanbanPosition: 0
             }
         })
 
-        if (!column) {
+        if (!newColumn) {
             return {success: false, error: "failed to create kanban column"};
         }
 
-        return {success: true, data: column};
+        return {success: true, data: newColumn};
     } catch (error: any) {
         logError("Error creating kanban column", error);
         return {success: false, error: "Internal server error"};
     }
 }
 
-export async function deleteKanbanColumn(column: Column) {
+export async function deleteKanbanColumn(columnId: string) {
     try {
         const deletedColumn = prisma.column.delete({
             where: {
-                id: column.id
+                id: columnId
             }
         })
 
-        if (!column) {
+        if (!deletedColumn) {
             return {success: false, error: "failed to delete kanban column"};
         }
 
@@ -1343,5 +1535,215 @@ export async function deleteKanbanColumn(column: Column) {
     } catch (error: any) {
         logError("Error deleting kanban column", error);
         return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function createPost(formData: FormData) {
+    const session = await getSession()
+
+    const text = formData.get("text") as string
+
+    try {
+        const post = prisma.post.create({
+            data: {
+                text: text,
+                author: {
+                    connect: {
+                        id: session?.user.id
+                    }
+                }
+            }
+        })
+
+        if (!post) {
+            return {success: false, error: "failed to create post"};
+        }
+
+        return {success: true, data: post};
+    } catch (error: any) {
+        logError("Error creating post", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function deletePost(postId: string) {
+    try {
+        const post = prisma.post.delete({
+            where: {
+                id: postId
+            }
+        })
+
+        if (!post) {
+            return {success: false, error: "failed to delete post"};
+        }
+
+        return {success: true, data: post};
+    } catch (error: any) {
+        logError("Error deleting post", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function createComment(postId: string | null, text: string) {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        if (!postId) {
+            return {success: false, error: "Post ID not provided."};
+        }
+
+        const comment = prisma.comment.create({
+            data: {
+                post: {
+                    connect: {
+                        id: postId
+                    }
+                },
+                author: {
+                    connect: {
+                        id: session?.user.id
+                    }
+                },
+                text: text
+            }
+        })
+
+        if (!comment) {
+            return {success: false, error: "failed to create comment"};
+        }
+
+        return {success: true, data: comment};
+    } catch (error: any) {
+        logError("Error creating comment", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function createFollow(organizationId: string | null) {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        if (!organizationId) {
+            return {success: false, error: "Organization ID not provided."};
+        }
+
+        const follow = prisma.follow.create({
+            data: {
+                user: {
+                    connect: {
+                        id: session.user.id
+                    }
+                },
+                followedId: organizationId,
+                followedType: "ORGANIZATION",
+            }
+        })
+
+        if (!follow) {
+            return {success: false, error: "failed to follow organization"};
+        }
+
+        return {success: true, data: follow};
+    } catch (error: any) {
+        logError("Error following organization", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function acceptInvitation(invitationId: string) {
+    try {
+        const session = await getSession();
+        if (!session?.user?.id) {
+            throw new Error("You must be signed in to perform this action");
+        }
+
+        // Check if the invitation exists and is not already accepted
+        const invitation = await prisma.invitation.findUnique({
+            where: {
+                id: invitationId,
+            },
+        });
+
+        if (!invitation || invitation.accepted) {
+            console.log("No valid invitation found or it has already been accepted.");
+            return {success: false, error: "failed to follow organization"};
+        }
+
+        // Process invitation: create membership and mark invitation as accepted
+        await prisma.$transaction([
+            prisma.member.create({
+                data: {
+                    email: invitation.email,
+                    organizationId: invitation.organizationId,
+                    role: invitation.role || "admin",
+                    userId: session.user.id,
+                },
+            }),
+            prisma.invitation.update({
+                where: {
+                    id: invitationId,
+                },
+                data: {
+                    accepted: true,
+                },
+            }),
+        ]);
+
+        return {success: true, data: invitation};
+    } catch (error) {
+        console.error();
+        logError("Error accepting invitation:", error);
+        return {success: false, error: "Failed to accept invitation. Please try again."};
+    }
+}
+
+
+export async function updateCondition(formData: FormData, organizationId: string) {
+    try {
+        // Convert FormData to a plain object
+        const data: Record<string, any> = {};
+        formData.forEach((value, key) => {
+            if (!isNaN(Number(value)) && value !== "") {
+                data[key] = Number(value);
+            } else if (typeof value === "string" && value.startsWith("[")) {
+                try {
+                    data[key] = JSON.parse(value);
+                } catch {
+                    data[key] = value;
+                }
+            } else {
+                data[key] = value;
+            }
+        });
+
+        // Find the first condition associated with the organization
+        const conditions = await prisma.conditionToOrganization.findMany({
+            where: { organizationId },
+            include: { condition: true },
+        });
+
+        if (!conditions || conditions.length === 0) {
+            throw new Error("No associated condition found for the organization.");
+        }
+
+        // Update the condition in Prisma
+        const updatedCondition = await prisma.condition.update({
+            where: { id: conditions[0].conditionId },
+            data,
+        });
+
+        return { success: true, data: updatedCondition };
+    } catch (error: any) {
+        console.error("Error updating condition:", error);
+        return { success: false, error: error.message || "Failed to update condition." };
     }
 }

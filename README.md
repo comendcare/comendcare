@@ -56,6 +56,9 @@ Multi-tenancy features are based off the way [Openpanel](https://github.com/Open
     2. Run the command `docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=comend --name comend-psql postgres`
     3. Check docker desktop to confirm that the container has been created and running
 
+  
+   > Note: if the container cannot run because something is already running on the port, run the following commands to quit existing processes. `sudo lsof -i tcp:5432` this should list the PID of the process running on the port. Then run `sudo kill -9 <PID>`
+
 4. Create the database
 
    > Note: After switching to the postgres user you can call `psql` to switch to psql

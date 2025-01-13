@@ -25,6 +25,9 @@ import {FaEllipsis, FaTrash} from "react-icons/fa6";
 import {toast} from "sonner";
 import {getKanbanFromOrganizationId} from "@/lib/fetchers";
 import {deleteKanbanColumn} from "@/lib/actions";
+import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
+import { useShallow } from "zustand/react/shallow"
+import EditColumnDialog from "./edit-column-dialog"
 
 
 export type ColumnType = "Column"
@@ -40,7 +43,12 @@ interface BoardColumnProps {
     isOverlay?: boolean
 }
 
+const selector = (state: KanbanState) => ({
+    deleteColumn: state.deleteColumn
+})
+
 export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
+    const {deleteColumn} = useKanbanStore(useShallow(selector))
     const tasksIds = useMemo(() => {
         return tasks.map(task => task.id)
     }, [tasks])
@@ -81,19 +89,11 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
         }
     )
 
-    async function deleteColumn () {
+    async function handleDelete () {
         try {
-            await deleteKanbanColumn(column).then((response) => {
-                if (response.success && response.data) {
-                    toast.success("column deleted successfully!");
-                } else {
-                    console.error(response.error)
-                    toast.error(response.error)
-                }
-            })
+            deleteColumn(column.id)
         } catch (error) {
             console.error(error);
-            toast.error("Failed to delete task.");
         }
     }
 
@@ -138,8 +138,9 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
+                            <EditColumnDialog column={column}/>
                             <DropdownMenuItem
-                                onClick={deleteColumn}
+                                onClick={handleDelete}
                             >
                                 <FaTrash/>
                                 Delete column
