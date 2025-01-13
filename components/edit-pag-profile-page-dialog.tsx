@@ -5,10 +5,8 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
-import {useCallback, useEffect, useState} from "react";
-import {
-    createOrganization, updateOrganizationAttribute
-} from "@/lib/actions";
+import React, {useCallback, useEffect, useState} from "react";
+import {updateOrganization, updateCondition} from "@/lib/actions";
 import {AddressType} from "@/lib/types";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
@@ -24,7 +22,7 @@ import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {
-    checkSubdomainAvailability,
+    checkSubdomainAvailability, getConditionsFromOrganizationId,
     getOrganizationFromOrganizationId,
 } from "@/lib/fetchers";
 import {FaPen, FaUpload} from "react-icons/fa6";
@@ -36,7 +34,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {getPublicFile, years} from "@/lib/utils";
+import {formatMoney, getPublicFile, years} from "@/lib/utils";
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
@@ -44,6 +42,12 @@ import {Slider} from "@/components/ui/slider";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {FaQuestionCircle} from "react-icons/fa";
 import {financesFormSchema} from "@/components/finances-onboarding-form";
+import {
+    ASSOCIATED_SYSTEMS,
+    MODALITIES,
+    MOLECULAR_MECHANISMS,
+    researchFormSchema
+} from "@/components/research-onboarding-form";
 
 const OPTIONS: Option[] = [
     {
@@ -98,7 +102,7 @@ const editOrgFormSchema = z.object({
     website: z.string().min(2, {
         message: "Your organization's website.",
     }).optional(),
-    incorporationStatus: z.enum(["yes", "no-but", "no"], {
+    incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"], {
         required_error: "You need to select a 501c3 status.",
     }).optional(),
     address1: z.string().optional(),
@@ -118,7 +122,9 @@ export default function EditPAGProfileDialog() {
     const router = useRouter()
     const [searchInput, setSearchInput] = useState("");
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
+    const [open, setOpen] = useState(false);
     const [isDialogOpen, setDialogOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [address, setAddress] = useState<AddressType>({
         address1: "",
         address2: "",
@@ -130,12 +136,14 @@ export default function EditPAGProfileDialog() {
         lat: 0,
         lng: 0,
     });
-    const [defaultValues, setDefaultValues] = useState<z.infer<typeof editOrgFormSchema> | undefined>(undefined);
+    const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof editOrgFormSchema> | undefined>(undefined);
+    const [defaultFinancesValues, setDefaultFinancesValues] = useState<z.infer<typeof financesFormSchema> | undefined>(undefined);
+    const [defaultResearchValues, setDefaultResearchValues] = useState<z.infer<typeof researchFormSchema> | undefined>(undefined);
 
     const editOrgForm = useForm<z.infer<typeof editOrgFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(editOrgFormSchema),
-        defaultValues: defaultValues
+        defaultValues: defaultOrganizationValues
     })
 
     const [debouncedNickname] = useDebounce(editOrgForm.watch("subdomain"), 500); // Extract just the debounced value
@@ -149,7 +157,7 @@ export default function EditPAGProfileDialog() {
 
     useEffect(() => {
         if (debouncedNickname) {
-            const currentSubdomain = defaultValues?.subdomain; // The current subdomain of the organization
+            const currentSubdomain = defaultOrganizationValues?.subdomain; // The current subdomain of the organization
 
             if (debouncedNickname === currentSubdomain) {
                 // Clear errors since it's the same subdomain as before
@@ -170,7 +178,7 @@ export default function EditPAGProfileDialog() {
                 }
             });
         }
-    }, [debouncedNickname, defaultValues?.subdomain, editOrgForm])
+    }, [debouncedNickname, defaultOrganizationValues?.subdomain, editOrgForm])
 
     useEffect(() => {
         editOrgForm.setValue("address1", address.address1);
@@ -208,47 +216,64 @@ export default function EditPAGProfileDialog() {
     });
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
-        // console.log(values)
-        // const createOrg = await createOrGetSite({
-        //         siteName: newOrgForm.getValues("orgName"),
-        //         siteSlug: newOrgForm.getValues("subdomain")
-        //     },
-        //     session.data?.user.id,
-        //     newOrgForm.getValues("description")
-        // )
-        //
-        // console.log(createOrg)
+        if (!session?.user?.organizationId) {
+            toast.error("You're not signed into an organization right now.");
+            return;
+        }
 
-        const formData = new FormData()
+        const formData = new FormData();
 
+        // Map form values to Prisma schema fields
+        const fieldMapping: Record<string, string> = {
+            orgName: "name",
+            subdomain: "subdomain",
+            looking: "interestedModalities",
+            founded: "yearFounded",
+            description: "description",
+            website: "website",
+            incorporationStatus: "incorporationStatus",
+            image: "image",
+        };
+
+        // Populate FormData with mapped fields
         Object.entries(values).forEach(([key, value]) => {
-            if (value !== undefined) {
-                formData.append(key, value.toString());
+            const mappedKey = fieldMapping[key];
+            if (mappedKey && value !== undefined && value !== null) {
+                if (Array.isArray(value)) {
+                    // Handle array fields (e.g., `interestedModalities`)
+                    formData.append(mappedKey, JSON.stringify(value));
+                } else {
+                    formData.append(mappedKey, value.toString());
+                }
             }
         });
 
+        // Handle the selected image upload
         if (selectedFile && values.image) {
-            const imgUrl = await handleImageUpload(selectedFile as File, values.image)
-            if (imgUrl) formData.set('image', imgUrl)
-        }
-
-        if (session?.user?.organizationId) {
-            updateOrganizationAttribute(formData, session?.user.organizationId || "", "key").then((res: any) => {
-                if (res.error) {
-                    toast.error(res.error)
-                } else {
-                    router.refresh()
-                    toast.success(`Successfully saved changes.`)
+            try {
+                const imgUrl = await handleImageUpload(selectedFile as File, values.image);
+                if (imgUrl) {
+                    formData.set("image", imgUrl); // Update the FormData with the uploaded image URL
                 }
-            })
-        } else {
-            toast.error("You're not signed into an organization right now.")
+            } catch (error) {
+                console.error("Failed to upload image:", error);
+                toast.error("Image upload failed.");
+                return;
+            }
         }
 
+        try {
+            await updateOrganization(formData, session.user.organizationId);
+            toast.success("Organization profile updated successfully!");
+            router.refresh(); // Refresh the page to reflect changes
+        } catch (error) {
+            console.error("Error updating organization:", error);
+            toast.error("Failed to update organization profile.");
+        }
     }
 
     useEffect(() => {
-        async function fetchUserData() {
+        async function fetchOrganizationData() {
             if (session?.user?.organizationId) {
                 let organizationData
                 const response = await getOrganizationFromOrganizationId(session.user.organizationId);
@@ -260,17 +285,11 @@ export default function EditPAGProfileDialog() {
                 }
 
                 if (organizationData) {
-                    const incorporationStatusMap: Record<string, "yes" | "no" | "no-but" | undefined> = {
-                        YES: "yes",
-                        NO: "no",
-                        INPROGRESS: "no-but",
-                    };
-
                     const fetchedValues = {
                         id: organizationData.id || "",
                         description: organizationData.description || "",
                         orgName: organizationData.name || "", // Map `name` to `orgName`
-                        founded: organizationData.dateFounded ? organizationData.dateFounded.toISOString() : "",
+                        founded: organizationData.yearFounded ? organizationData.yearFounded : "",
                         subdomain: organizationData.subdomain || "",
                         website: organizationData.website || "",
                         address1: organizationData.address1 || "",
@@ -288,10 +307,7 @@ export default function EditPAGProfileDialog() {
                         font: organizationData.font || "",
                         imageBlurhash: organizationData.imageBlurhash || "",
                         statedGoal: organizationData.statedGoal || null,
-                        dateFounded: organizationData.dateFounded || null,
-                        incorporationStatus: organizationData.incorporationStatus
-                            ? incorporationStatusMap[organizationData.incorporationStatus.toUpperCase()] // Map the value if it exists
-                            : undefined
+                        incorporationStatus: organizationData.incorporationStatus || undefined
                     };
 
                     if (organizationData.image) {
@@ -308,42 +324,234 @@ export default function EditPAGProfileDialog() {
                         }
                     }
 
-                    setDefaultValues(fetchedValues);
-                    setAddress(fetchedValues); // Set address state as well
+                    setDefaultOrganizationValues(fetchedValues);
+                    // setAddress(fetchedValues); // Set address state as well
                     editOrgForm.reset(fetchedValues); // Reset form with fetched data
                 }
             }
         }
 
-        fetchUserData();
+        fetchOrganizationData();
     }, [session, editOrgForm]);
 
-    const form = useForm<z.infer<typeof financesFormSchema>>({
+    const editFinancesForm = useForm<z.infer<typeof financesFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(financesFormSchema)
     })
 
-    async function onFinancesFormSubmit(values: z.infer<typeof financesFormSchema>) {
+    useEffect(() => {
+        async function fetchFinancesData() {
+            if (session?.user?.organizationId) {
+                try {
+                    const response = await getOrganizationFromOrganizationId(session.user.organizationId);
 
-        const formData = new FormData()
+                    if (response.success) {
+                        const orgData = response.data;
 
-        if (session?.user?.organizationId) {
-            updateOrganizationAttribute(formData, session?.user.organizationId || "", "key").then((res: any) => {
-                if (res.error) {
-                    toast.error(res.error)
-                } else {
-                    router.refresh()
-                    toast.success(`Successfully saved changes.`)
+                        if (orgData) {
+                            const fetchedValues = {
+                                // raising: orgData.raising || undefined,
+                                raised: orgData.moneyRaised || 0,
+                                budget: orgData.researchBudget || 0,
+                                deployed: orgData.moneyDeployed || 0,
+                            };
+
+                            // Populate form with fetched data
+                            setDefaultFinancesValues(fetchedValues);
+                            editFinancesForm.reset(fetchedValues);
+                        }
+                    } else {
+                        console.error(response.error);
+                        toast.error(response.error);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch finances data:", error);
+                    toast.error("An error occurred while fetching finances data.");
                 }
-            })
-        } else {
-            toast.error("You're not signed into an organization right now.")
+            }
+        }
+
+        fetchFinancesData();
+    }, [session?.user?.organizationId, editFinancesForm]);
+
+    async function onFinancesFormSubmit(values: z.infer<typeof financesFormSchema>) {
+        if (!session?.user?.organizationId) {
+            toast.error("You're not signed into an organization right now.");
+            return;
+        }
+
+        const formData = new FormData();
+
+        const databaseMap: Partial<Record<keyof typeof values, string>> = {
+            raised: "moneyRaised",
+            budget: "researchBudget",
+            deployed: "moneyDeployed",
+            // raising: "raising",
+        };
+
+        Object.entries(values).forEach(([key, value]) => {
+            const mappedKey = databaseMap[key as keyof typeof databaseMap]; // Explicitly cast key
+            if (mappedKey && value !== undefined) {
+                formData.append(mappedKey, value.toString());
+            }
+        });
+
+        try {
+            await updateOrganization(formData, session.user.organizationId);
+            toast.success("Organization updated successfully!");
+            router.refresh(); // Refresh the page to reflect changes
+        } catch (error) {
+            toast.error("Failed to update organization.");
         }
     }
 
+    const editResearchForm = useForm<z.infer<typeof researchFormSchema>>({
+        mode: "onChange",
+        resolver: zodResolver(researchFormSchema)
+    })
+
+    useEffect(() => {
+        async function fetchResearchData() {
+            if (!session?.user?.organizationId) {
+                toast.error("You must be signed into an organization.");
+                return;
+            }
+
+            try {
+                // Fetch conditions for the given organization ID
+                const response = await getConditionsFromOrganizationId(session.user.organizationId);
+
+                if (response.success) {
+                    const conditions = response.data;
+
+                    if (conditions && conditions.length > 0) {
+                        const fetchedValues = conditions.map((condition) => ({
+                            disorder: condition.name || "",
+                            summary: condition.summary || "",
+                            categories: condition.diseaseCategories.map((cat) => ({ label: cat, value: cat })) || [],
+                            modalities: condition.interestedModalities.map((mod) => ({ label: mod, value: mod })) || [],
+                            genes: condition.associatedGenes.map((gene) => ({ label: gene, value: gene })) || [],
+                            systems: condition.associatedSystems.map((system) => ({ label: system, value: system })) || [],
+                            prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
+                            prevalenceDenominator: condition.prevalenceDenominator?.toString() || "",
+                            population: condition.numberOfIdentifiedPatients?.toString() || "",
+                        }));
+
+                        // Assuming you're working with one condition at a time (e.g., the first condition)
+                        const defaultValues = fetchedValues[0] || {};
+
+                        setDefaultResearchValues(defaultValues);
+                        editResearchForm.reset(defaultValues);
+                    } else {
+                        toast.error("No conditions found for this organization.");
+                    }
+                } else {
+                    console.error(response.error);
+                    toast.error(response.error);
+                }
+            } catch (error) {
+                console.error("Failed to fetch research data:", error);
+                toast.error("An error occurred while fetching research data.");
+            }
+        }
+
+        fetchResearchData();
+    }, [session?.user?.organizationId, editResearchForm]);
+
+    async function onResearchFormSubmit(values: z.infer<typeof researchFormSchema>) {
+        if (!session?.user?.organizationId) {
+            toast.error("You're not signed into an organization right now.");
+            return;
+        }
+
+        setLoading(true); // Show loading state
+
+        try {
+            // Create a new FormData object
+            const formData = new FormData();
+
+            // Map the form values to match the Condition schema
+            const mappedData: Record<string, any> = {
+                name: values.disorder || "",
+                summary: values.summary || "",
+                interestedModalities: values.modalities?.map((item) => item.label) || [],
+                diseaseCategories: values.categories?.map((item) => item.label) || [],
+                prevalenceNumerator: values.prevalenceNumerator ? parseInt(values.prevalenceNumerator, 10) : null,
+                prevalenceDenominator: values.prevalenceDenominator ? parseInt(values.prevalenceDenominator, 10) : null,
+                numberOfIdentifiedPatients: values.population ? parseInt(values.population, 10) : null,
+                relevantDiseaseMechanisms: values.mechanisms || [],
+                associatedGenes: values.genes?.map((item) => item.label) || [],
+                associatedSystems: values.systems?.map((item) => item.label) || [],
+                associatedSignsAndSymptoms: values.symptoms?.map((item) => item.label) || [],
+                existingDatabasesAndStudies: values.studies?.map((item) => item.label) || [],
+                assetsUnderDevelopment: values.assets?.map((item) => item.label) || [],
+            };
+
+            // Add mapped data to FormData
+            Object.entries(mappedData).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    if (Array.isArray(value)) {
+                        formData.append(key, JSON.stringify(value));
+                    } else {
+                        formData.append(key, value.toString());
+                    }
+                }
+            });
+
+            // Call the `updateCondition` function
+            const response = await updateCondition(formData, session.user.organizationId);
+
+            if (response.success) {
+                toast.success("Condition updated successfully!");
+                router.refresh(); // Refresh the page to reflect changes
+            } else {
+                console.error(response.error);
+                toast.error(response.error || "Failed to update condition.");
+            }
+        } catch (error) {
+            console.error("Unexpected error updating condition:", error);
+            toast.error("An unexpected error occurred.");
+        } finally {
+            setLoading(false); // Hide loading state
+        }
+    }
+
+    const onCloseForm = () => {
+        setDefaultOrganizationValues(defaultOrganizationValues);
+        editOrgForm.reset(defaultOrganizationValues); // Reset form with fetched data
+        setDefaultFinancesValues(defaultFinancesValues);
+        editFinancesForm.reset(defaultFinancesValues); // Reset form with fetched data
+        setDefaultResearchValues(defaultResearchValues);
+        editResearchForm.reset(defaultResearchValues); // Reset form with fetched data
+    }
+
+    const handleAsyncSearch = async (query: string): Promise<Option[]> => {
+        if (!query) return []; // Return empty if no input
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(`/api/genes?search=${query}`);
+            const data = await response.json();
+
+            // Return the fetched options
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch genes:", error);
+            return [];
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <TooltipProvider>
-            <Dialog>
+            <Dialog open={open} onOpenChange={(isOpen) => {
+                setOpen(isOpen);
+                if (!isOpen) {
+                    onCloseForm();
+                }
+            }}>
                 <DialogTrigger asChild>
                     <Button
                         variant="secondary"
@@ -367,6 +575,9 @@ export default function EditPAGProfileDialog() {
                         <TabsList>
                             <TabsTrigger value="organization">
                                 Organization
+                            </TabsTrigger>
+                            <TabsTrigger value="research">
+                                Condition
                             </TabsTrigger>
                             <TabsTrigger value="finances">
                                 Finances
@@ -401,25 +612,33 @@ export default function EditPAGProfileDialog() {
                                         name="subdomain"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Nickname`}</FormLabel>
-                                                <FormDescription>{`The abbreviated, short form, or nickname for your organization.`}</FormDescription>
+                                                <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
+                                                <FormDescription>
+                                                    {`Enter your organization's abbreviated name, short form, or nickname.`}
+                                                    <br/>
+                                                    {editOrgForm.watch("subdomain") &&
+                                                        !editOrgForm.formState.errors.subdomain && (
+                                                            <>
+                                                                {`Your organization's domain will be ${editOrgForm
+                                                                    .watch("subdomain")
+                                                                    .toLowerCase()
+                                                                    .replace(/\s+/g, "-")}.comend.io`}
+                                                            </>
+                                                        )}
+                                                </FormDescription>
                                                 <FormControl>
                                                     <Input
                                                         type="text"
                                                         id="name"
                                                         autoComplete="name"
                                                         {...field}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value.toLowerCase().replace(/\s+/g, "-");
+                                                            field.onChange(value); // Update the form state with processed value
+                                                        }}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
-                                                {
-                                                    editOrgForm.watch("subdomain") && !editOrgForm.formState.errors.subdomain &&
-                                                    <FormDescription>
-                                                        <p>
-                                                            {`Your organization's domain will be ${editOrgForm.watch("subdomain")}.comend.io`}
-                                                        </p>
-                                                    </FormDescription>
-                                                }
                                             </FormItem>
                                         )}
                                     />
@@ -433,7 +652,6 @@ export default function EditPAGProfileDialog() {
                                                 <FormDescription>{`Your patient group's website URL.`}</FormDescription>
                                                 <FormControl>
                                                     <Input
-                                                        type="url"
                                                         id="website"
                                                         {...field}
                                                     />
@@ -463,8 +681,10 @@ export default function EditPAGProfileDialog() {
                                                     </FormControl>
                                                     <SelectContent>
                                                         {years.map((year) => (
-                                                            <SelectItem key={year}
-                                                                        value={year.toString()}> {/* Use the year as a string for the SelectItem value */}
+                                                            <SelectItem
+                                                                key={year}
+                                                                value={year.toString()}
+                                                            >
                                                                 {year}
                                                             </SelectItem>
                                                         ))}
@@ -481,9 +701,14 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Description</FormLabel>
-                                                <FormDescription>
-                                                    This will be the public description of your organization.
-                                                </FormDescription>
+                                                <div className="w-full flex flex-row justify-between">
+                                                    <FormDescription>
+                                                        This will be the public description of your organization.
+                                                    </FormDescription>
+                                                    <FormDescription>
+                                                        500 characters max.
+                                                    </FormDescription>
+                                                </div>
                                                 <FormControl>
                                                     <Textarea
                                                         placeholder="Tell us a little bit about yourself"
@@ -511,7 +736,7 @@ export default function EditPAGProfileDialog() {
                                                     >
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                                             <FormControl>
-                                                                <RadioGroupItem value="yes"/>
+                                                                <RadioGroupItem value="YES"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
                                                                 Yes I have a 501c3
@@ -519,7 +744,7 @@ export default function EditPAGProfileDialog() {
                                                         </FormItem>
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                                             <FormControl>
-                                                                <RadioGroupItem value="no-but"/>
+                                                                <RadioGroupItem value="INPROGRESS"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
                                                                 {`No, but I'm working on it`}
@@ -527,7 +752,7 @@ export default function EditPAGProfileDialog() {
                                                         </FormItem>
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                                             <FormControl>
-                                                                <RadioGroupItem value="no"/>
+                                                                <RadioGroupItem value="NO"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
                                                                 {`No I don't have a 501c3`}
@@ -546,6 +771,9 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Address</FormLabel>
+                                                <FormDescription>
+                                                    {`Your organization's address.`}
+                                                </FormDescription>
                                                 <FormControl>
                                                     <AutocompleteComponent
                                                         address={address}
@@ -554,9 +782,6 @@ export default function EditPAGProfileDialog() {
                                                         setSearchInput={setSearchInput}
                                                     />
                                                 </FormControl>
-                                                <FormDescription>
-                                                    {`Your organization's address.`}
-                                                </FormDescription>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
@@ -570,6 +795,9 @@ export default function EditPAGProfileDialog() {
                                                 <FormLabel>
                                                     Organization Logo
                                                 </FormLabel>
+                                                <FormDescription>
+                                                    {`This will be used as your organization profile's image.`}
+                                                </FormDescription>
                                                 <FormControl>
                                                     <div className="flex flex-col items-start space-y-4">
                                                         {selectedFile ? (
@@ -597,9 +825,6 @@ export default function EditPAGProfileDialog() {
                                                         )}
                                                     </div>
                                                 </FormControl>
-                                                <FormDescription>
-                                                    {`This will be used as your organization profile's image.`}
-                                                </FormDescription>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
@@ -633,18 +858,74 @@ export default function EditPAGProfileDialog() {
                                 </form>
                             </Form>
                         </TabsContent>
-                        <TabsContent value="finances">
 
-                            <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onFinancesFormSubmit)} className="space-y-8">
+                        <TabsContent value="research">
+
+                            <Form {...editResearchForm}>
+                                <form onSubmit={editResearchForm.handleSubmit(onResearchFormSubmit)}
+                                      className="space-y-8">
 
                                     <FormField
-                                        control={form.control}
-                                        name="raising"
+                                        control={editResearchForm.control}
+                                        name="disorder"
                                         render={({field}) => (
-                                            <FormItem className="space-y-3">
-                                                <FormLabel className="flex items-center">
-                                                    {`Are you currently raising money?`}
+                                            <FormItem>
+                                                <FormLabel>{`Name of condition`}</FormLabel>
+                                                <div className="w-full flex flex-row justify-between">
+                                                    <FormDescription>
+                                                        {`The name of your rare condition/disorder.`}
+                                                    </FormDescription>
+                                                    <FormDescription>
+                                                        60 characters max.
+                                                    </FormDescription>
+                                                </div>
+                                                <FormControl>
+                                                    <Input
+                                                        type="text"
+                                                        id="disorder"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="summary"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Summary of condition`}</FormLabel>
+                                                <div className="w-full flex flex-row justify-between">
+                                                    <FormDescription>
+                                                        {`A few lines describing your condition and what makes it unique`}
+                                                    </FormDescription>
+                                                    <FormDescription>
+                                                        500 characters max.
+                                                    </FormDescription>
+                                                </div>
+                                                <FormControl>
+                                                    <Textarea
+                                                        id="summary"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="categories"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Mechanisms of Action
+                                                </FormLabel>
+                                                <FormDescription className="flex items-center">
+                                                    {`What type of condition is ${'disoder name'}`}
                                                     <Tooltip delayDuration={0}>
                                                         <TooltipTrigger>
                                                             <FaQuestionCircle
@@ -652,47 +933,242 @@ export default function EditPAGProfileDialog() {
                                                         </TooltipTrigger>
                                                         <TooltipContent>
                                                             <p>
-                                                                {`If raising money for your organization is a priority, we'll match you with grants.`}
+                                                                {`This will help us match you with the experts of your particular modality.`}
                                                             </p>
                                                         </TooltipContent>
                                                     </Tooltip>
-                                                </FormLabel>
+                                                </FormDescription>
                                                 <FormControl>
-                                                    <RadioGroup
-                                                        onValueChange={field.onChange}
-                                                        defaultValue={field.value}
-                                                        className="flex flex-col space-y-1"
-                                                    >
-                                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                                            <FormControl>
-                                                                <RadioGroupItem value="yes"/>
-                                                            </FormControl>
-                                                            <FormLabel className="font-normal">
-                                                                {`Yes I'm currently raising`}
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                                            <FormControl>
-                                                                <RadioGroupItem value="no-but"/>
-                                                            </FormControl>
-                                                            <FormLabel className="font-normal">
-                                                                {`No, but I'm planning to soon`}
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                                            <FormControl>
-                                                                <RadioGroupItem value="no"/>
-                                                            </FormControl>
-                                                            <FormLabel className="font-normal">
-                                                                {`No I'm not raising money`}
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                    </RadioGroup>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        defaultOptions={MOLECULAR_MECHANISMS}
+                                                        placeholder="Select categories that apply to you..."
+                                                        emptyIndicator={
+                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                no results found.
+                                                            </p>
+                                                        }
+                                                    />
                                                 </FormControl>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
                                     />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="modalities"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Modalities of interest
+                                                </FormLabel>
+                                                <FormDescription className="flex items-center">
+                                                    {`The treatment modalities of interest of your organization.`}
+                                                    <Tooltip delayDuration={0}>
+                                                        <TooltipTrigger>
+                                                            <FaQuestionCircle
+                                                                className="text-black h-4 inline-block align-baseline mx-1"/>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>
+                                                                {`This will help us match you with the experts of your particular modality.`}
+                                                            </p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        defaultOptions={MODALITIES}
+                                                        placeholder="Select modalities you like..."
+                                                        emptyIndicator={
+                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                no results found.
+                                                            </p>
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="genes"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Associated genes</FormLabel>
+                                                <FormDescription>{`The genes associated with your condition.`}</FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        onSearch={handleAsyncSearch}
+                                                        placeholder="Search for genes..."
+                                                        loadingIndicator={<p>Loading genes...</p>}
+                                                        emptyIndicator={<p>No genes found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="systems"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Associated systems</FormLabel>
+                                                <FormDescription>{`The systems affected by your condition.`}</FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        defaultOptions={ASSOCIATED_SYSTEMS}
+                                                        placeholder="Select the associated systems of your condition..."
+                                                        emptyIndicator={
+                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                no results found.
+                                                            </p>
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="prevalenceNumerator"
+                                        render={({field: numeratorField}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Estimated total prevalence`}</FormLabel>
+                                                <FormDescription>
+                                                    {`The estimated total number of patients in the world.`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <div className="flex flex-row items-end justify-start space-x-2">
+                                                        <Input
+                                                            type="number"
+                                                            id="prevalenceNumerator"
+                                                            {...numeratorField}
+                                                            className="w-16"
+                                                            min={0}
+                                                        />
+                                                        <span>in</span>
+                                                        <FormField
+                                                            control={editResearchForm.control}
+                                                            name="prevalenceDenominator"
+                                                            render={({field: denominatorField}) => (
+                                                                <FormControl>
+                                                                    <Input
+                                                                        type="number"
+                                                                        id="prevalenceDenominator"
+                                                                        {...denominatorField}
+                                                                        className="w-32"
+                                                                        min={0}
+                                                                    />
+                                                                </FormControl>
+                                                            )}
+                                                        />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="population"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Number of patients identified`}</FormLabel>
+                                                <FormDescription>{`The number of known patients (not the estimated total). The people in this count should be reachable by your organization.`}</FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        id="population"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <Button type="submit">
+                                        Save
+                                    </Button>
+                                </form>
+                            </Form>
+                        </TabsContent>
+
+                        <TabsContent value="finances">
+
+                            <Form {...editFinancesForm}>
+                                <form onSubmit={editFinancesForm.handleSubmit(onFinancesFormSubmit)}
+                                      className="space-y-8">
+
+                                    {/*<FormField*/}
+                                    {/*    control={editFinancesForm.control}*/}
+                                    {/*    name="raising"*/}
+                                    {/*    render={({field}) => (*/}
+                                    {/*        <FormItem className="space-y-3">*/}
+                                    {/*            <FormLabel className="flex items-center">*/}
+                                    {/*                {`Are you currently raising money?`}*/}
+                                    {/*                <Tooltip delayDuration={0}>*/}
+                                    {/*                    <TooltipTrigger>*/}
+                                    {/*                        <FaQuestionCircle*/}
+                                    {/*                            className="text-black h-4 inline-block align-baseline mx-1"/>*/}
+                                    {/*                    </TooltipTrigger>*/}
+                                    {/*                    <TooltipContent*/}
+                                    {/*                        className="max-w-[400px] break-words text-sm z-50">*/}
+                                    {/*                        <p>*/}
+                                    {/*                            {`If raising money for your organization is a priority, we'll match you with grants.`}*/}
+                                    {/*                        </p>*/}
+                                    {/*                    </TooltipContent>*/}
+                                    {/*                </Tooltip>*/}
+                                    {/*            </FormLabel>*/}
+                                    {/*            <FormControl>*/}
+                                    {/*                <RadioGroup*/}
+                                    {/*                    onValueChange={field.onChange}*/}
+                                    {/*                    defaultValue={field.value}*/}
+                                    {/*                    className="flex flex-col space-y-1"*/}
+                                    {/*                >*/}
+                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                    {/*                        <FormControl>*/}
+                                    {/*                            <RadioGroupItem value="yes"/>*/}
+                                    {/*                        </FormControl>*/}
+                                    {/*                        <FormLabel className="font-normal">*/}
+                                    {/*                            {`Yes I'm currently raising`}*/}
+                                    {/*                        </FormLabel>*/}
+                                    {/*                    </FormItem>*/}
+                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                    {/*                        <FormControl>*/}
+                                    {/*                            <RadioGroupItem value="no-but"/>*/}
+                                    {/*                        </FormControl>*/}
+                                    {/*                        <FormLabel className="font-normal">*/}
+                                    {/*                            {`No, but I'm planning to soon`}*/}
+                                    {/*                        </FormLabel>*/}
+                                    {/*                    </FormItem>*/}
+                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                    {/*                        <FormControl>*/}
+                                    {/*                            <RadioGroupItem value="no"/>*/}
+                                    {/*                        </FormControl>*/}
+                                    {/*                        <FormLabel className="font-normal">*/}
+                                    {/*                            {`No I'm not raising money`}*/}
+                                    {/*                        </FormLabel>*/}
+                                    {/*                    </FormItem>*/}
+                                    {/*                </RadioGroup>*/}
+                                    {/*            </FormControl>*/}
+                                    {/*            <FormMessage/>*/}
+                                    {/*        </FormItem>*/}
+                                    {/*    )}*/}
+                                    {/*/>*/}
 
                                     {/*<FormField*/}
                                     {/*    control={form.control}*/}
@@ -715,11 +1191,11 @@ export default function EditPAGProfileDialog() {
                                     {/*/>*/}
 
                                     <FormField
-                                        control={form.control}
+                                        control={editFinancesForm.control}
                                         name="raised"
-                                        render={({field: {value, onChange}}) => (
+                                        render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Raised - {value}</FormLabel>
+                                                <FormLabel>Raised - {formatMoney(field.value)}</FormLabel>
                                                 <FormDescription className="flex items-center">
                                                     {`The total amount of funding raised to date by your patient group.`}
                                                     <Tooltip delayDuration={0}>
@@ -727,7 +1203,10 @@ export default function EditPAGProfileDialog() {
                                                             <FaQuestionCircle
                                                                 className="text-black h-4 inline-block align-baseline mx-1"/>
                                                         </TooltipTrigger>
-                                                        <TooltipContent>
+                                                        <TooltipContent
+                                                            align="end"
+                                                            className="max-w-[300px] break-words text-sm z-50"
+                                                        >
                                                             <p>
                                                                 {`Just a ballpark estimate so that we know to recommend vendors within a reasonable price range.`}
                                                             </p>
@@ -735,13 +1214,24 @@ export default function EditPAGProfileDialog() {
                                                     </Tooltip>
                                                 </FormDescription>
                                                 <FormControl>
-                                                    <Slider
+                                                    {/*<Slider*/}
+                                                    {/*    min={0}*/}
+                                                    {/*    max={1000000}*/}
+                                                    {/*    step={50000}*/}
+                                                    {/*    defaultValue={value ? [value] : [0]}*/}
+                                                    {/*    onValueChange={(vals: number[]) => {*/}
+                                                    {/*        onChange(vals[0]);*/}
+                                                    {/*    }}*/}
+                                                    {/*/>*/}
+                                                    <Input
+                                                        variant="currency"
+                                                        type="number"
                                                         min={0}
-                                                        max={1000000}
-                                                        step={50000}
-                                                        defaultValue={value ? [value] : [0]}
-                                                        onValueChange={(vals: number[]) => {
-                                                            onChange(vals[0]);
+                                                        id="deployed"
+                                                        {...field}
+                                                        onChange={(e) => {
+                                                            const parsedValue = parseFloat(e.target.value);
+                                                            field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
                                                         }}
                                                     />
                                                 </FormControl>
@@ -754,11 +1244,11 @@ export default function EditPAGProfileDialog() {
                                     />
 
                                     <FormField
-                                        control={form.control}
+                                        control={editFinancesForm.control}
                                         name="deployed"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Money deployed to research`}</FormLabel>
+                                                <FormLabel>{`Money deployed to research`} - {formatMoney(field.value)}</FormLabel>
                                                 <FormDescription className="flex items-center">
                                                     {`The total amount of money deployed to research to date.`}
                                                     <Tooltip delayDuration={0}>
@@ -766,13 +1256,14 @@ export default function EditPAGProfileDialog() {
                                                             <FaQuestionCircle
                                                                 className="text-black h-4 inline-block align-baseline mx-1"/>
                                                         </TooltipTrigger>
-                                                        <TooltipContent>
+                                                        <TooltipContent
+                                                            align="end"
+                                                            className="max-w-[300px] break-words text-sm z-50"
+                                                        >
                                                             <p>
                                                                 Knowing how much you have deployed to research so far
-                                                                helps
-                                                                us
-                                                                understand how much experience you have with driving
-                                                                research.
+                                                                helps us understand how much experience you have with
+                                                                driving research.
                                                             </p>
                                                         </TooltipContent>
                                                     </Tooltip>
@@ -784,6 +1275,10 @@ export default function EditPAGProfileDialog() {
                                                         min={0}
                                                         id="deployed"
                                                         {...field}
+                                                        onChange={(e) => {
+                                                            const parsedValue = parseFloat(e.target.value);
+                                                            field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
+                                                        }}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
@@ -792,11 +1287,11 @@ export default function EditPAGProfileDialog() {
                                     />
 
                                     <FormField
-                                        control={form.control}
+                                        control={editFinancesForm.control}
                                         name="budget"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Annual research budget`}</FormLabel>
+                                                <FormLabel>{`Annual research budget`} - {formatMoney(field.value)}</FormLabel>
                                                 <FormDescription className="flex items-center">
                                                     {`The amount of money allocated to advancing research.`}
                                                     <Tooltip delayDuration={0}>
@@ -804,7 +1299,10 @@ export default function EditPAGProfileDialog() {
                                                             <FaQuestionCircle
                                                                 className="text-black h-4 inline-block align-baseline mx-1"/>
                                                         </TooltipTrigger>
-                                                        <TooltipContent>
+                                                        <TooltipContent
+                                                            align="end"
+                                                            className="max-w-[300px] break-words text-sm z-50"
+                                                        >
                                                             <p>
                                                                 Knowing how much you have budgeted to research helps us
                                                                 prioritize
@@ -820,6 +1318,10 @@ export default function EditPAGProfileDialog() {
                                                         min={0}
                                                         id="budget"
                                                         {...field}
+                                                        onChange={(e) => {
+                                                            const parsedValue = parseFloat(e.target.value);
+                                                            field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
+                                                        }}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>

@@ -3,39 +3,16 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {cn, nameToInitials} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
 import {Badge} from "@/components/ui/badge";
-import EditProfileAboutDialog from "@/components/edit-profile-about-dialog";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";
 import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {CalendarDays} from "lucide-react";
-import { ProfilePhoto } from "./profile-photo";
+import {ProfilePhoto} from "./profile-photo";
 
-const pag = {
-    "groupName": "Myhre Syndrome Foundation",
-    "description": "The Myhre Syndrome Foundation is dedicated to improving the lives of individuals affected by Myhre Syndrome, a rare genetic disorder characterized by distinctive facial features, skeletal anomalies, and developmental delays. The foundation provides support to families, promotes awareness, and funds critical research to uncover potential treatments.",
-    "numberOfPatients": 150,
-    "amountRaised": 350000,
-    "dateJoined": "2023-01-15",
-    "dateFounded": "2015-03-12",
-    "topics": ["monogenic", "basic science", "gene replacement"],
-    "teamMembers": [
-        {
-            "name": "Dr. Sarah Johnson",
-            "title": "Chief Medical Officer",
-            "description": "Dr. Sarah Johnson has been a medical research wizard for over 20 years and has brought her magic to the Rare Disease Foundation for the past 8 years. She’s the heartbeat of our medical team, leading us with passion and a focus on innovation and patient care.",
-            "dateJoined": "2015-04-10"
-        },
-        {
-            "name": "Michael Brown",
-            "title": "Executive Director",
-            "description": "Michael Brown has been steering the ship at the Rare Disease Foundation for 5 years, after 15 years of leading non-profits to success. He’s our strategic mastermind, ensuring everything runs smoothly and we stay on course.",
-            "dateJoined": "2018-06-15"
-        }
-    ]
-}
-
-export const PagProfileAboutCard = ({organization}: { organization: Organization & { members: (Member & {user: User})[] } | null }) => {
+export const PagProfileAboutCard = ({organization}: {
+    organization: Organization & { members: (Member & { user: User })[] } | null
+}) => {
     faker.seed(235)
 
     return (
@@ -50,9 +27,6 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
             <CardContent>
                 <div className="flex flex-col space-y-4">
                     <div className="space-y-2">
-                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
-                            Description
-                        </h3>
                         <p>
                             {organization?.description}
                         </p>
@@ -65,7 +39,7 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
                         {organization?.members ? organization?.members.map((member, index) =>
                                 <div
                                     key={index}
-                                    className="flex space-x-4"
+                                    className="flex items-center space-x-4"
                                 >
                                     <Avatar>
                                         <AvatarImage src={member.user.image || ""}/>
@@ -73,15 +47,17 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
                                             {nameToInitials(member.user.name)}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <div className="space-y-2">
+                                    <div className="space-y-1">
                                         <h4 className="text-sm font-semibold">
                                             {member.user.name}
                                         </h4>
-                                        <div className="flex items-center">
-                                            <span className="text-xs text-muted-foreground">
-                                                Joined December 2021
-                                            </span>
-                                        </div>
+                                        {member.user.title &&
+                                            <div className="flex items-center">
+                                                <span className="text-xs text-muted-foreground">
+                                                    {member.user.title}
+                                                </span>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             )

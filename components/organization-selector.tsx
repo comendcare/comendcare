@@ -21,17 +21,6 @@ import {
     CommandSeparator,
 } from "@/components/ui/command";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {
     Popover,
     PopoverContent,
     PopoverTrigger,
@@ -39,7 +28,7 @@ import {
 import {MemberWithOrganization} from "@/app/(platform)/app/layout";
 import {FaCity} from "react-icons/fa6";
 import {useEffect} from "react";
-import { ProfilePhoto } from "./profile-photo";
+import {ProfilePhoto} from "./profile-photo";
 import {useRouter} from "next/navigation";
 
 interface TeamSwitcherProps {
@@ -54,7 +43,6 @@ export default function OrganizationSelector({
     const router = useRouter();
     const {data: session, update} = useSession();
     const [open, setOpen] = React.useState(false);
-    const [showNewTeamDialog, setShowNewTeamDialog] = React.useState(false);
     const [selectedOrganization, setSelectedOrganization] = React.useState(organizations?.[0] || null);
 
     useEffect(() => {
@@ -78,13 +66,12 @@ export default function OrganizationSelector({
     };
 
     return (
-        <Dialog open={showNewTeamDialog} onOpenChange={setShowNewTeamDialog}>
-            <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                    {isCollapsed ? (
-                        <Button variant="outline" className="w-[48px]">
-                            <div className="flex flex-row items-center justify-between">
-                                {/* <Avatar className="h-5 w-5">
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                {isCollapsed ? (
+                    <Button variant="outline" className="w-[48px]">
+                        <div className="flex flex-row items-center justify-between">
+                            {/* <Avatar className="h-5 w-5">
                                     <AvatarImage
                                         src={getOrgPhoto(selectedOrganization?.organization)}
                                         alt={selectedOrganization?.organization.name || ""}
@@ -92,22 +79,22 @@ export default function OrganizationSelector({
                                     />
                                     <AvatarFallback>{selectedOrganization?.organization.name?.[0]}</AvatarFallback>
                                 </Avatar> */}
-                                <ProfilePhoto 
-                                    img={selectedOrganization?.organization?.image}
-                                    name={selectedOrganization?.organization?.name}
-                                    className="h-5 w-5"
-                                />
-                            </div>
-                        </Button>
-                    ) : (
-                        <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={open}
-                            aria-label="Select an organization"
-                            className={cn("w-full justify-between truncate")}
-                        >
-                            {/* <Avatar className="mr-2 h-5 w-5">
+                            <ProfilePhoto
+                                img={selectedOrganization?.organization?.image}
+                                name={selectedOrganization?.organization?.name}
+                                className="h-5 w-5"
+                            />
+                        </div>
+                    </Button>
+                ) : (
+                    <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={open}
+                        aria-label="Select an organization"
+                        className={cn("w-full justify-between truncate")}
+                    >
+                        {/* <Avatar className="mr-2 h-5 w-5">
                                 <AvatarImage
                                     src={getOrgPhoto(selectedOrganization?.organization)}
                                     alt={selectedOrganization?.organization.name || ""}
@@ -115,31 +102,31 @@ export default function OrganizationSelector({
                                 />
                                 <AvatarFallback>{selectedOrganization?.organization.name?.[0]}</AvatarFallback>
                             </Avatar> */}
-                            <ProfilePhoto 
-                                img={selectedOrganization?.organization?.image}
-                                name={selectedOrganization?.organization?.name}
-                                className="mr-2 h-5 w-5"
-                            />
-                            <p className="truncate">
-                                {selectedOrganization?.organization.name}
-                            </p>
-                            <ChevronsUpDown className="ml-auto opacity-50"/>
-                        </Button>
-                    )}
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                    <Command>
-                        {/*<CommandInput placeholder="Search organization..." />*/}
-                        <CommandList>
-                            <CommandEmpty>No organization found.</CommandEmpty>
-                            <CommandGroup heading="Organizations">
-                                {organizations.map((org) => (
-                                    <CommandItem
-                                        key={org.organization.id}
-                                        onSelect={() => handleOrganizationChange(org)}
-                                        className="text-sm"
-                                    >
-                                        {/* <Avatar className="mr-2 h-5 w-5">
+                        <ProfilePhoto
+                            img={selectedOrganization?.organization?.image}
+                            name={selectedOrganization?.organization?.name}
+                            className="mr-2 h-5 w-5"
+                        />
+                        <p className="truncate">
+                            {selectedOrganization ? selectedOrganization?.organization.name : "Create or join an organization"}
+                        </p>
+                        <ChevronsUpDown className="ml-auto opacity-50"/>
+                    </Button>
+                )}
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0">
+                <Command>
+                    {/*<CommandInput placeholder="Search organization..." />*/}
+                    <CommandList>
+                        <CommandEmpty>No organization found.</CommandEmpty>
+                        <CommandGroup heading="Organizations">
+                            {organizations.map((org) => (
+                                <CommandItem
+                                    key={org.organization.id}
+                                    onSelect={() => handleOrganizationChange(org)}
+                                    className="w-full flex flex-row justify-between text-sm space-x-2"
+                                >
+                                    {/* <Avatar className="mr-2 h-5 w-5">
                                             <AvatarImage
                                                 src={getOrgPhoto(org?.organization)}
                                                 alt={org.organization.name || ""}
@@ -149,67 +136,44 @@ export default function OrganizationSelector({
                                                 {org.organization.name?.[0]}
                                             </AvatarFallback>
                                         </Avatar> */}
-                                        <ProfilePhoto 
+                                    <div className="flex flex-row">
+                                        <ProfilePhoto
                                             img={org?.organization?.image}
                                             name={org?.organization?.name}
                                             className="mr-2 h-5 w-5"
                                         />
                                         {org.organization.name}
-                                        <Check
-                                            className={cn(
-                                                "ml-auto",
-                                                selectedOrganization?.organization.id ===
-                                                org.organization.id
-                                                    ? "opacity-100"
-                                                    : "opacity-0"
-                                            )}
-                                        />
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
-                        </CommandList>
-                        <CommandSeparator/>
-                        <CommandList>
-                            <CommandGroup>
-                                <DialogTrigger asChild>
-                                    <CommandItem
-                                        onSelect={() => {
-                                            setOpen(false);
-                                            setShowNewTeamDialog(true);
-                                        }}
-                                        className="flex flex-row gap-x-2"
-                                    >
-                                        <PlusCircle className="h-5 w-5"/>
-                                        Create or join organization
-                                    </CommandItem>
-                                </DialogTrigger>
-                            </CommandGroup>
-                        </CommandList>
-                    </Command>
-                </PopoverContent>
-            </Popover>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Create or join organization</DialogTitle>
-                    <DialogDescription>
-                        Add a new organization to manage projects and members.
-                    </DialogDescription>
-                </DialogHeader>
-                <div>
-                    <div className="space-y-4 py-2 pb-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Organization name</Label>
-                            <Input id="name" placeholder="Acme Inc."/>
-                        </div>
-                    </div>
-                </div>
-                <DialogFooter>
-                    <Button variant="outline" onClick={() => setShowNewTeamDialog(false)}>
-                        Cancel
-                    </Button>
-                    <Button type="submit">Create</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                                    </div>
+                                    <Check
+                                        className={cn(
+                                            "ml-auto",
+                                            selectedOrganization?.organization.id ===
+                                            org.organization.id
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                        )}
+                                    />
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                    <CommandSeparator/>
+                    <CommandList>
+                        <CommandGroup>
+                            <CommandItem
+                                onSelect={() => {
+                                    setOpen(false);
+                                    router.push("/app/create/new-organization")
+                                }}
+                                className="flex flex-row gap-x-2"
+                            >
+                                <PlusCircle className="h-5 w-5"/>
+                                Create or join organization
+                            </CommandItem>
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
     );
 }

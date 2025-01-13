@@ -85,15 +85,17 @@ export function PAGFilters() {
             <ScrollArea className="w-full h-full">
             <form
                 onSubmit={form.handleSubmit(handleSubmit)}
-                className="flex flex-col gap-8 p-1 pr-4"
+                className="flex flex-col gap-4 pr-4"
             >
-                <h1 className="text-2xl">{`Organization Filters`}</h1>
+                <h1 className={"scroll-m-20 text-3xl font-bold tracking-tight"}>
+                    Filters
+                </h1>
                 <FormField
                     control={form.control}
                     name="mechanisms"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Disease Mechanisms</FormLabel>
+                            <FormLabel className="font-semibold text-base">Disease Mechanisms</FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -118,7 +120,7 @@ export function PAGFilters() {
                     name="systemsAffected"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Systems Affected</FormLabel>
+                            <FormLabel className="font-semibold text-base">Systems Affected</FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -142,7 +144,7 @@ export function PAGFilters() {
                     name="modalities"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Modalities</FormLabel>
+                            <FormLabel className="font-semibold text-base">Modalities</FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -167,7 +169,7 @@ export function PAGFilters() {
                     name="milestoneTypes"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Milestone Types</FormLabel>
+                            <FormLabel className="font-semibold text-base">Milestone Types</FormLabel>
                             <FormDescription>{`Types of milestones an organization may have in their research plan`}</FormDescription>
                             <FormControl>
                                 <ToggleGroup
@@ -199,7 +201,7 @@ export function PAGFilters() {
                     name="milestoneStatus"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Milestone Status</FormLabel>
+                            <FormLabel className="font-semibold text-base">Milestone Status</FormLabel>
                             <FormControl>
                                 <ToggleGroup
                                     type="multiple"
@@ -230,7 +232,7 @@ export function PAGFilters() {
                     name="milestoneOutcomes"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Milestone Outcomes</FormLabel>
+                            <FormLabel className="font-semibold text-base">Milestone Outcomes</FormLabel>
                             <FormControl>
                                 <ToggleGroup
                                     type="multiple"
@@ -284,7 +286,7 @@ export function PAGFilters() {
                     name="moneyDeployed"
                     render={({ field }) => (
                         <FormItem className="flex flex-col grow">
-                            <FormLabel>$ Deployed for Research</FormLabel>
+                            <FormLabel className="font-semibold text-base">$ Deployed for Research</FormLabel>
                             <FormControl>
                                 <DoubleSliderBarChart 
                                     chartData={moneyDeployedChartData}

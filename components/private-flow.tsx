@@ -26,6 +26,7 @@ import { toast } from "sonner"
 import { isNewUser, setUserAsReturning } from "@/lib/utils"
 import { FaQuestion } from "react-icons/fa6"
 import { NewMilestoneDialogContent } from "./new-milestone-dialog-content"
+import { useSpring } from "framer-motion"
 
 const proOptions = { hideAttribution: true }
 
@@ -38,7 +39,7 @@ const selector = (state: RoadmapState) => ({
     onNodesChange: state.onNodesChange,
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
-    addNode: state.addNode,
+    addNodes: state.addNodes,
 })
 
 export const PrivateFlowView = ({
@@ -54,7 +55,7 @@ export const PrivateFlowView = ({
         edges,
         onNodesChange,
         onEdgesChange,
-        addNode,
+        addNodes,
         onConnect,
     } = useRoadmapStore(useShallow(selector))
     const { fitView } = useReactFlow()
@@ -72,7 +73,9 @@ export const PrivateFlowView = ({
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
     // if a position is not provided, place in the center
-    const addMilestone = (defaultData: any, position?: { x: number; y: number }) => {
+    const addMilestones = (newMilestones: any[]) => {
+        const newNodes: any[] = []
+
         // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
         const {
             height,
@@ -81,33 +84,40 @@ export const PrivateFlowView = ({
         } = store.getState()
 
         const zoomMultiplier = 1 / zoomLevel
-        const centerX =
+        let centerX =
             -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        const centerY =
+        let centerY =
             -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
 
-        const id = nanoid()
-        const newNode: Node = {
-            id: id,
-            type: "MILESTONE",
-            position: {
-                x: position ? position?.x : centerX,
-                y: position ? position?.y : centerY
-            },
-            data: {
-                id: nanoid(),
-                nodeId: id,
-                type: defaultData?.type || 'NOTYPE',
-                title: defaultData?.title || `New Milestone`,
-                ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                // papers: defaultData?.papers || [],
-                // tasks: defaultData?.tasks || [],
-                status: defaultData?.status || "TODO"
+        newMilestones.forEach(defaultData => {
+            const id = nanoid()
+            const newNode: Node = {
+                id: id,
+                type: "MILESTONE",
+                position: {
+                    x: centerX,
+                    y: centerY
+                },
+                data: {
+                    id: nanoid(),
+                    nodeId: id,
+                    type: defaultData?.type || 'NOTYPE',
+                    title: defaultData?.title || `New Milestone`,
+                    ...(defaultData?.description ? { description: defaultData.description } : undefined),
+                    // papers: defaultData?.papers || [],
+                    // tasks: defaultData?.tasks || [],
+                    status: defaultData?.status || "TODO"
+                }
             }
-        }
 
-        addNode(newNode)
-        return newNode
+            centerX += 200
+            centerY += 200
+
+            newNodes.push(newNode)
+        })
+
+        addNodes(newNodes)
+        return newNodes
     }
 
     const handleDelete = async ({nodes, edges}: {nodes: Node[], edges: Edge[]}) => {
@@ -156,26 +166,27 @@ export const PrivateFlowView = ({
 
     useEffect(() => {
         if (isNewUser()) {
-            toast("Welcome to your research plan!", {
-                id: "onborda",
-                duration: 300000,
-                description: `Would you like to take a quick tour?`,
-                action: (
-                    <div className="flex flex-col space-y-2 ml-4">
-                        <Button
-                            onClick={startOnbordaAndRemoveToast}
-                        >{`Yes please!`}</Button>
-                        <Button
-                            onClick={() => {
-                                toast.dismiss()
-                                setUserAsReturning()
-                            }}
-                        >
-                            {`No thanks!`}
-                        </Button>
-                    </div>
-                )
-            })
+            // toast("Welcome to your research plan!", {
+            //     id: "onborda",
+            //     duration: 300000,
+            //     description: `Would you like to take a quick tour?`,
+            //     action: (
+            //         <div className="flex flex-col space-y-2 ml-4">
+            //             <Button
+            //                 onClick={startOnbordaAndRemoveToast}
+            //             >{`Yes please!`}</Button>
+            //             <Button
+            //                 onClick={() => {
+            //                     toast.dismiss()
+            //                     setUserAsReturning()
+            //                 }}
+            //             >
+            //                 {`No thanks!`}
+            //             </Button>
+            //         </div>
+            //     )
+            // })
+            startOnbordaAndRemoveToast()
         }
     }, [nodes])
 
@@ -197,6 +208,8 @@ export const PrivateFlowView = ({
             onBeforeDelete={handleDelete}
             nodeTypes={nodeTypes}
             fitView
+            fitViewOptions={{ padding: 2 }}
+            style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
         >
             <MiniMap
@@ -204,12 +217,11 @@ export const PrivateFlowView = ({
                 maskColor='rgb(200, 200, 200, 0.8)' 
             />
             <Controls>
-                {/* <Button className="research-plan-tour-step1" onClick={() => addMilestone()}>Add Milestone</Button> */}
                 <Button className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>Add Milestone</Button>
             </Controls>
         </ReactFlow>
         <Dialog open={newMilestoneIsOpen} onOpenChange={setNewMilestoneIsOpen}>
-            <NewMilestoneDialogContent addMilestone={addMilestone} />
+            <NewMilestoneDialogContent addMilestones={addMilestones} />
         </Dialog>
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>

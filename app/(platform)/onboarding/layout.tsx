@@ -8,16 +8,11 @@ export const metadata: Metadata = {
     title: "Onboarding | Comend",
 };
 
-export default async function AuthLayout({children}: { children: ReactNode }) {
+export default async function OnboardingLayout({children}: { children: ReactNode }) {
     const session = await getSession()
 
     if (!session) {
         redirect("/login")
-    }
-
-    // Redirect if user is already a part of an org (either that they have created or that they have been invited to)
-    if (session.user.organizationId) {
-        redirect("/app/profile")
     }
 
     return (

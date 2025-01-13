@@ -30,6 +30,7 @@ import {
 import {deleteUser, leaveOrganization} from "@/lib/actions";
 import {useSession} from "next-auth/react";
 import {revalidatePath} from "next/cache";
+import { signOut } from "next-auth/react"
 
 const FormSchema = z.object({
     organizationName: z.string().min(2, {
@@ -66,6 +67,7 @@ export default function UserSettings() {
         setIsDeleting(true); // Disable the button
 
         try {
+            await signOut()
             const response = await deleteUser(session)
 
             if (response.success) {

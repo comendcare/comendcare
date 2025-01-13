@@ -116,13 +116,13 @@ export const DonutChartCard = () => {
                         />
                         <div className="flex flex-col space-y-4">
                             <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
-                                {`You don't have any roadmaps yet.`}
+                                {`You don't have any research plans yet.`}
                             </p>
                             <Link
                                 className={cn(buttonVariants({variant: "default"}))}
-                                href={`/app/roadmap`}
+                                href={`/app/research-plan`}
                             >
-                                Create roadmap
+                                Create research plan
                             </Link>
                         </div>
                     </div>

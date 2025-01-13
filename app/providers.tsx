@@ -18,6 +18,7 @@ export function Providers({children}: { children: React.ReactNode }) {
                 theme="dark"
                 className="hidden dark:block"
                 closeButton
+                duration={5000}
             />
             <ModalProvider>
                 <ReactFlowProvider>

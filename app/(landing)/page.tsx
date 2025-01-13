@@ -43,7 +43,7 @@ export default function App() {
             <TabsFeaturesSection />
             {/*<WhoSection/>*/}
             {/*<FeaturesSection/>*/}
-            <StatsSection />
+            {/*<StatsSection />*/}
             <ComingSoonSection />
             {/*<FAQSection/>*/}
             <WhatElseSection />

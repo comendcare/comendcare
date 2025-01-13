@@ -20,11 +20,6 @@ export type RoadmapState = {
     setRoadmapId: (id: string) => void
     selectedNodeId: string | null
     setSelectedNodeId: (id: string | null) => void
-    selectedTaskId: string | null,
-    setSelectedTaskId: (id: string | null) => void
-    // tasks: any[]
-    setTask: (taskId: string, newProperties: any) => void
-    setTasks: (tasks: any[]) => void
     milestones: any[]
     setMilestone: (id: string, newProperties: any) => void
     setMilestones: (milestones: any[]) => void
@@ -35,7 +30,7 @@ export type RoadmapState = {
     onConnect: (connection: any) => void
     setNodes: (nodes: Node[]) => void
     setEdges: (edges: Edge[]) => void
-    addNode: (node: Node) => void
+    addNodes: (node: Node[]) => void
     deleteNode: (nodeId: string) => void
     initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void
     saveState: () => void
@@ -54,37 +49,6 @@ export const useRoadmapStore = create<RoadmapState>()(
         selectedNodeId: null,
         setSelectedNodeId: (id: string | null) => {
             set({ selectedNodeId: id })
-        },
-        selectedTaskId: null,
-        setSelectedTaskId: (id: string | null) => {
-            set({ selectedTaskId: id })
-        },
-        setTask: (taskId: string, newProperties: any) => {
-            const milestones = get().milestones.map(milestone => {
-                if (milestone?.tasks?.map((task: any) => task.id).includes(taskId)) {
-                    return {
-                        ...milestone,
-                        tasks: milestone.tasks.map((task: any) => (
-                            task.id === taskId ? {...task, ...newProperties} : task
-                        ))
-                    }
-                } else {
-                    return milestone
-                }
-            })
-            set({ milestones })
-            const task = get().milestones.map(milestone => milestone?.tasks || []).flat(1).filter(task => task.id === taskId)
-            if (task) updateDBTask({ tasks: task })
-        },
-        setTasks: (tasks: any[]) => {
-            const milestones = get().milestones.map(milestone => {
-                return {
-                    ...milestone,
-                    tasks: tasks.filter(task => task.milestoneId === milestone.id)
-                }
-            })
-            set({ milestones })
-            updateDBTask({ tasks })
         },
         milestones: [],
         setMilestone: (nodeId: string, newProperties: any) => {
@@ -141,12 +105,12 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ edges })
             debounceUpdateFlow(get().roadmapId, get().nodes, edges)
         },
-        addNode: (node: Node) => {
-            const nodes = [...get().nodes, node]
-            const milestones = [...get().milestones, node.data]
-            set({ nodes, milestones })
-            debounceUpdateFlow(get().roadmapId, nodes, get().edges)
-            updateDBMilestones({ milestones: [node.data] })
+        addNodes: (nodes: Node[]) => {
+            const newNodes = [...get().nodes, ...nodes]
+            const milestones = [...get().milestones, ...nodes.map(node => node.data)]
+            set({ nodes: newNodes, milestones })
+            debounceUpdateFlow(get().roadmapId, newNodes, get().edges)
+            // updateDBMilestones({ milestones: milestones })
         },
         deleteNode: (nodeId: string | undefined) => {
             const nodes = [...get().nodes].filter(({ id }) => id !== nodeId)
@@ -168,7 +132,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // },
                 style: { stroke: 'black' }
             }))
-            set({ nodes, edges: edgesWithMarker, milestones, selectedNodeId, selectedTaskId, roadmapId })
+            set({ nodes, edges: edgesWithMarker, milestones, selectedNodeId, roadmapId })
         },
         saveState: () => {
             const state = get()
@@ -189,7 +153,7 @@ export const useRoadmapStore = create<RoadmapState>()(
         //     }, 500)
         // ),
         onSave: (pastState, currentState) => {
-            console.log(`Saved State: `, currentState)
+            console.log(`Saved Roadmap State: `, currentState)
             // debouncedSaveToDatabase(currentState.nodes, currentState.edges, currentState.milestones)
             return
         },

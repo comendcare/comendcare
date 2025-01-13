@@ -52,7 +52,9 @@ export function MilestoneFilters() {
                 onSubmit={form.handleSubmit(handleSubmit)}
                 className="flex flex-col gap-8 p-1 pr-4"
             >
-                <h1 className="text-2xl">{`Milestone Filters`}</h1>
+                <h1 className={"scroll-m-20 text-3xl font-bold tracking-tight"}>
+                    Filters
+                </h1>
 
                 <span className="flex justify-end gap-4 flex-wrap">
                     <Button type="submit" variant="destructive" onClick={() => {

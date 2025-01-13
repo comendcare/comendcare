@@ -51,6 +51,7 @@ import { FloatingDock } from "@/components/floating-dock";
 import {IconBrandGithub, IconEdit, IconFlag, IconHome, IconShare, IconShare2, IconShare3} from "@tabler/icons-react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
+import ShareDialog from "@/components/share-dialog";
 
 export type Post = {
     id: string
@@ -421,7 +422,7 @@ export default async function ConditionPage({
                             {data.organizations.map((organization, index) => (
                                 <Link
                                     key={index}
-                                    href={`${organization.organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                                    href={`http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/admin`}
                                     className="md:basis-1/2 lg:basis-1/3"
                                 >
                                     <CarouselItem >
@@ -478,7 +479,7 @@ export default async function ConditionPage({
                                     <CardContent
                                         className="flex flex-col items-center justify-center p-6 text-center">
                                         <FolderOpen className="w-12 h-12 text-gray-400 mb-4"/>
-                                        <h3 className="text-lg font-semibold mb-2">No RFPs</h3>
+                                        <h3 className="text-lg font-semibold mb-2">No Projects</h3>
                                         <p className="text-sm text-gray-500">
                                             {`We don't have any requests for proposals yet.`}
                                         </p>
@@ -547,7 +548,7 @@ export default async function ConditionPage({
                     {
                         title: "Share on social media",
                         icon: <IconShare />,
-                        href: "/dashboard",
+                        dialog: <ShareDialog url={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${slug}`} />
                     },
                     {
                         title: "Report an issue",
@@ -571,7 +572,8 @@ export default async function ConditionPage({
                         ),
                     }
                 ]}
-                desktopClassName="fixed bottom-4 left-1/2 transform -translate-x-1/2"
+                orientation="vertical"
+                desktopClassName="right-4"
             />
 
         </TooltipProvider>

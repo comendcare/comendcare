@@ -53,7 +53,7 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
     return (
         <a href={
             props?.data?.subdomain ? 
-                `http://${props.data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/roadmap/?milestone=${props?.data?.id}&view=flow` :
+                `http://${props.data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${props?.data?.id}&view=flow` :
                 ''
             }
             // target="_blank"

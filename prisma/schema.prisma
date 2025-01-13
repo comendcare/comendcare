@@ -10,56 +10,53 @@ datasource db {
 model User {
   id                   String          @id @default(cuid())
   name                 String?
-  // if you are using Github OAuth, you can get rid of the username attribute (that is for Twitter OAuth)
   username             String?
-  title                String?
   gh_username          String?
   email                String?         @unique
   emailVerified        DateTime?
   image                String?
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
-  accounts             Account[]
-  sessions             Session[]
-  roadmaps             Roadmap[]
-  firstName            String?
-  lastName             String?
-  organizations        Organization[]
-  membershipRequests   MemberRequest[]
-  memberships          Member[]
-  sentInvitations      Member[]        @relation("invitedBy")
   deletedAt            DateTime?
-  notificationSettings Boolean         @default(false)
-  consentSettings      Boolean         @default(false)
   address1             String?
   address2             String?
-  formattedAddress     String?
   city                 String?
-  region               String?
-  postalCode           String?
   country              String?
+  formattedAddress     String?
+  notificationSettings Boolean         @default(false)
+  postalCode           String?
+  region               String?
+  title                String?
   lat                  Float?
   lng                  Float?
+  consentSettings      Boolean         @default(false)
+  accounts             Account[]
+  comments             Comment[]
+  follows              Follow[]
+  sentInvitations      Member[]        @relation("invitedBy")
+  memberships          Member[]
+  membershipRequests   MemberRequest[]
+  organizations        Organization[]
   posts                Post[]
   reactions            Reaction[]
+  roadmaps             Roadmap[]
+  sessions             Session[]
+  tasks                Task[]          @relation("TaskToUser")
 }
 
 model Member {
   id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   role           String
   email          String
-  // userId is nullable because we want to allow invites to be sent to emails that are not registered
   userId         String
-  user           User         @relation(fields: [userId], references: [id])
   invitedById    String?
-  invitedBy      User?        @relation("invitedBy", fields: [invitedById], references: [id])
-  // organizationId String
-  // organization   Organization @relation(fields: [organizationId], references: [id])
   meta           Json?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
+  invitedBy      User?        @relation("invitedBy", fields: [invitedById], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id])
 
   @@unique([userId, organizationId])
 }
@@ -68,11 +65,11 @@ model Invitation {
   id             String       @id @default(cuid())
   email          String
   role           String       @db.VarChar
-  organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
-  accepted       Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
+  accepted       Boolean      @default(false)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([email, organizationId])
 }
@@ -82,47 +79,28 @@ model MemberRequest {
   userId         String
   email          String
   role           String       @db.VarChar
-  user           User         @relation(fields: [userId], references: [id])
-  organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
   accepted       Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id])
 
   @@unique([userId, organizationId])
 }
 
-enum ClientType {
-  READ
-  WRITE
-  ROOT
-}
-
-enum IncorporationStatus {
-  YES
-  NO
-  INPROGRESS
-}
-
-enum Goal {
-  YES
-  NO
-  INPROGRESS
-}
-
 model Client {
-  id               String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name             String
   secret           String?
-  type             ClientType @default(WRITE)
+  type             ClientType    @default(WRITE)
   organizationSlug String
   organizationId   String?
   cors             String?
-  crossDomain      Boolean    @default(false)
-
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @default(now()) @updatedAt
-  organization Organization? @relation(fields: [organizationId], references: [id])
+  crossDomain      Boolean       @default(false)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @default(now()) @updatedAt
+  organization     Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model Account {
@@ -141,8 +119,7 @@ model Account {
   session_state            String?
   oauth_token_secret       String?
   oauth_token              String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -168,26 +145,330 @@ model VerificationToken {
 
 model Roadmap {
   id             String        @id @default(cuid())
-  title          String?       @db.Text
-  description    String?       @db.Text
-  content        String?       @db.Text
+  title          String?
+  description    String?
+  content        String?
   slug           String        @default(cuid())
-  image          String?       @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png") @db.Text
-  imageBlurhash  String?       @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
+  image          String?       @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png")
+  imageBlurhash  String?       @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC")
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   published      Boolean       @default(true)
-  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   organizationId String?
-  user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId         String?
-  nodes          Node[]
   edges          Edge[]
   milestones     Milestone[]
+  nodes          Node[]
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([slug, organizationId])
   @@index([organizationId])
   @@index([userId])
+}
+
+model Node {
+  id        String     @id @unique @default(uuid())
+  type      String
+  positionX Int
+  positionY Int
+  roadmapId String
+  data      Milestone?
+  roadmap   Roadmap    @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+}
+
+model Milestone {
+  id             String               @id @unique @default(uuid())
+  nodeId         String?              @unique
+  title          String
+  description    String?
+  notes          String?
+  status         StatusType
+  budget         Int?
+  roadmapId      String
+  endDate        DateTime?
+  startDate      DateTime?
+  private        Boolean              @default(false)
+  type           MilestoneType        @default(NOTYPE)
+  RFPId          String?
+  assetId        String?
+  organizationId String
+  papers         ExternalAttachment[]
+  RFP            RFP?                 @relation(fields: [RFPId], references: [id])
+  asset          Asset?               @relation(fields: [assetId], references: [id])
+  node           Node?                @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  roadmap        Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  tasks          Task[]
+}
+
+model Kanban {
+  id             String       @id @default(uuid())
+  organizationId String       @unique
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  columns        Column[]
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Column {
+  id             String   @id @unique @default(uuid())
+  name           String   @default("New Column")
+  kanbanId       String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  kanbanPosition Int      @default(0)
+  kanban         Kanban   @relation(fields: [kanbanId], references: [id], onDelete: Cascade)
+  tasks          Task[]
+}
+
+model Task {
+  id             String          @id @unique @default(uuid())
+  status         StatusType?
+  name           String          @default("")
+  description    String?         @default("")
+  milestoneId    String?
+  kanbanPosition Int
+  orderPosition  Int
+  columnId       String
+  createdAt      DateTime        @default(now())
+  date           DateTime?       @default(now())
+  updatedAt      DateTime        @updatedAt
+  endDate        DateTime?
+  priority       PriorityType?
+  private        Boolean         @default(false)
+  startDate      DateTime?
+  checklist      ChecklistItem[]
+  column         Column          @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  milestone      Milestone?      @relation(fields: [milestoneId], references: [id])
+  stakeholders   User[]          @relation("TaskToUser")
+}
+
+model ChecklistItem {
+  id            String  @id @unique @default(uuid())
+  name          String
+  complete      Boolean
+  taskId        String
+  orderPosition Int?
+  task          Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model RFP {
+  id            String               @id @unique @default(uuid())
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  name          String
+  funding       Int
+  description   String?
+  researchFocus MilestoneType        @default(NOTYPE)
+  openTo        RFPOpenToType        @default(ALL)
+  startDate     DateTime?
+  endDate       DateTime?
+  attachments   ExternalAttachment[]
+  contacts      ExternalContact[]
+  Milestone     Milestone[]
+}
+
+model Asset {
+  id          String               @id @unique @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  attachments ExternalAttachment[]
+  contacts    ExternalContact[]
+  Milestone   Milestone[]
+}
+
+model ExternalAttachment {
+  id          String     @id @unique @default(uuid())
+  name        String?
+  link        String
+  rFPId       String?
+  assetId     String?
+  milestoneId String?
+  Asset       Asset?     @relation(fields: [assetId], references: [id])
+  Milestone   Milestone? @relation(fields: [milestoneId], references: [id])
+  RFP         RFP?       @relation(fields: [rFPId], references: [id])
+}
+
+model ExternalContact {
+  id      String  @id @unique @default(uuid())
+  name    String
+  role    String?
+  email   String
+  rFPId   String?
+  assetId String?
+  Asset   Asset?  @relation(fields: [assetId], references: [id])
+  RFP     RFP?    @relation(fields: [rFPId], references: [id])
+}
+
+model Edge {
+  id        String  @id @unique @default(uuid())
+  source    String
+  target    String
+  type      String?
+  data      Json?
+  roadmapId String
+  roadmap   Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+}
+
+model Organization {
+  id                  String                    @id @default(cuid())
+  public              Boolean                   @default(true)
+  verified            Boolean                   @default(false)
+  name                String?
+  description         String?                   @db.Text
+  logo                String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
+  font                String                    @default("font-cal")
+  image               String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png") @db.Text
+  imageBlurhash       String?                   @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
+  subdomain           String?                   @unique
+  customDomain        String?                   @unique
+  message404          String?                   @default("Blimey! You've found a page that doesn't exist.") @db.Text
+  statedGoal          Goal?
+  yearFounded         String?
+  incorporationStatus IncorporationStatus?
+  website             String?
+  moneyRaised         Int?
+  moneyDeployed       Int?
+  researchBudget      Int?
+  address1            String?
+  address2            String?
+  formattedAddress    String?
+  city                String?
+  region              String?
+  postalCode          String?
+  country             String?
+  lat                 String?
+  lng                 String?
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
+  user                User?                     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId              String?
+  roadmaps            Roadmap[]
+  members             Member[]
+  client              Client[]
+  invitation          Invitation[]
+  membershipRequest   MemberRequest[]
+  condition           ConditionToOrganization[]
+  Kanban              Kanban?
+  Milestone           Milestone[]
+
+  @@index([userId])
+}
+
+model Follow {
+  id           String       @id @default(cuid())
+  userId       String
+  followedType FollowedType
+  followedId   String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, followedType, followedId])
+}
+
+model Condition {
+  id                          String                    @id @default(cuid())
+  name                        String
+  slug                        String                    @unique
+  description                 String?
+  interestedModalities        String[]
+  diseaseCategories           String[]
+  prevalenceNumerator         Int?
+  prevalenceDenominator       Int?
+  numberOfIdentifiedPatients  Int?
+  relevantDiseaseMechanisms   String[]
+  associatedGenes             String[]
+  associatedSystems           String[]
+  associatedSignsAndSymptoms  String[]
+  existingDatabasesAndStudies String[]
+  assetsUnderDevelopment      String[]
+  createdAt                   DateTime                  @default(now())
+  updatedAt                   DateTime                  @updatedAt
+  gardURL                     String?
+  nordURL                     String?
+  summary                     String?
+  prevalenceRatio             Float?
+  organizations               ConditionToOrganization[]
+}
+
+model ConditionToOrganization {
+  conditionId    String
+  organizationId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  condition      Condition    @relation(fields: [conditionId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@id([conditionId, organizationId])
+}
+
+model Example {
+  id            Int     @id @default(autoincrement())
+  name          String?
+  description   String?
+  domainCount   Int?
+  url           String?
+  image         String?
+  imageBlurhash String?
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  content   Json?
+  authorId  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  text      String?
+  comments  Comment[]
+  mentions  Mention[]
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  text      String
+  userId    String
+  postId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mentions  Mention[]
+}
+
+model Reaction {
+  id            String        @id @default(cuid())
+  type          ReactionType
+  authorId      String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now()) @updatedAt
+  reactableId   String
+  reactableType ReactableType
+  author        User          @relation(fields: [authorId], references: [id])
+
+  @@unique([authorId, reactableType, reactableId])
+}
+
+enum ClientType {
+  READ
+  WRITE
+  ROOT
+}
+
+enum IncorporationStatus {
+  YES
+  NO
+  INPROGRESS
+}
+
+enum Goal {
+  YES
+  NO
+  INPROGRESS
 }
 
 enum NodeType {
@@ -200,39 +481,10 @@ enum StatusType {
   DONE
 }
 
-model Node {
-  id        String     @id @unique @default(uuid())
-  type      String
-  positionX Int
-  positionY Int
-  data      Milestone?
-  roadmapId String
-  roadmap   Roadmap    @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-}
-
-model Milestone {
-  id             String               @id @unique @default(uuid())
-  node           Node?                @relation(fields: [nodeId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  nodeId         String?              @unique
-  title          String
-  description    String?
-  startDate      DateTime?
-  endDate        DateTime?
-  budget         Int?
-  papers         ExternalAttachment[]
-  notes          String?
-  status         StatusType
-  tasks          Task[]
-  organizationId String
-  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  roadmapId      String
-  roadmap        Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  private        Boolean              @default(false)
-  type           MilestoneType        @default(NOTYPE)
-  RFP            RFP?                 @relation(fields: [RFPId], references: [id])
-  RFPId          String?
-  asset          Asset?               @relation(fields: [assetId], references: [id])
-  assetId        String?
+enum PriorityType {
+  LOW
+  MEDIUM
+  HIGH
 }
 
 enum MilestoneType {
@@ -260,103 +512,6 @@ enum MilestoneType {
   NOTYPE
 }
 
-model Kanban {
-  id             String       @id @default(uuid())
-  organizationId String       @unique
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  columns        Column[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-}
-
-model Column {
-  id        String   @id @unique @default(uuid())
-  name      String   @default("New Column")
-  kanbanId  String
-  kanban    Kanban   @relation(fields: [kanbanId], references: [id], onDelete: Cascade)
-  tasks     Task[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  kanbanPosition Int @default(0) // order position within the kanban board
-}
-
-model Task {
-  id             String          @id @unique @default(uuid())
-  status         StatusType?
-  name           String          @default("")
-  description    String?         @default("")
-  checklist      ChecklistItem[]
-  milestoneId    String? // Optional foreign key to associate with a milestone
-  milestone      Milestone?      @relation(fields: [milestoneId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  columnId       String // Foreign key to associate with a column
-  column         Column          @relation(fields: [columnId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  date           DateTime?       @default(now())
-  orderPosition  Int // order position in the milestone task list
-  kanbanPosition Int // order position within the kanban column
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-}
-
-model ChecklistItem {
-  id            String  @id @unique @default(uuid())
-  name          String
-  complete      Boolean
-  taskId        String
-  task          Task    @relation(fields: [taskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  orderPosition Int? // order position in the task checklist
-}
-
-model RFP {
-  id            String               @id @unique @default(uuid())
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-  name          String
-  funding       Int
-  description   String?
-  contacts      ExternalContact[]
-  attachments   ExternalAttachment[]
-  researchFocus MilestoneType        @default(NOTYPE)
-  openTo        RFPOpenToType        @default(ALL)
-  startDate     DateTime?
-  endDate       DateTime?
-  Milestone     Milestone[]
-}
-
-model Asset {
-  id          String               @id @unique @default(uuid())
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  name        String
-  description String?
-  contacts    ExternalContact[]
-  attachments ExternalAttachment[]
-  Milestone   Milestone[]
-}
-
-model ExternalAttachment {
-  id          String     @id @unique @default(uuid())
-  name        String?
-  link        String
-  RFP         RFP?       @relation(fields: [rFPId], references: [id])
-  rFPId       String?
-  Asset       Asset?     @relation(fields: [assetId], references: [id])
-  assetId     String?
-  Milestone   Milestone? @relation(fields: [milestoneId], references: [id])
-  milestoneId String?
-}
-
-model ExternalContact {
-  id      String  @id @unique @default(uuid())
-  name    String
-  role    String?
-  email   String
-  RFP     RFP?    @relation(fields: [rFPId], references: [id])
-  rFPId   String?
-  Asset   Asset?  @relation(fields: [assetId], references: [id])
-  assetId String?
-}
-
 enum RFPOpenToType {
   CRO
   ACADEMIC
@@ -364,133 +519,8 @@ enum RFPOpenToType {
   NONE
 }
 
-model Edge {
-  id        String  @id @unique @default(uuid())
-  source    String
-  target    String
-  type      String?
-  data      Json?
-  roadmapId String
-  roadmap   Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-}
-
-model Organization {
-  id                          String                    @id @default(cuid())
-  public                      Boolean                   @default(true)
-  verified                    Boolean                   @default(false)
-  name                        String?
-  description                 String?                   @db.Text
-  logo                        String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
-  font                        String                    @default("font-cal")
-  image                       String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png") @db.Text
-  imageBlurhash               String?                   @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
-  subdomain                   String?                   @unique
-  customDomain                String?                   @unique
-  message404                  String?                   @default("Blimey! You've found a page that doesn't exist.") @db.Text
-  statedGoal                  Goal?
-  dateFounded                 DateTime?
-  incorporationStatus         IncorporationStatus?
-  website                     String?
-  moneyRaised                 Int?
-  moneyDeployed               Int?
-  researchBudget              Int?
-  interestedModalities        String[]
-  diseaseName                 String?
-  diseaseCategories           String[]
-  prevalenceNumerator         Int?
-  prevalenceDenominator       Int?
-  prevalenceRatio             Float?
-  numberOfIdentifiedPatients  Int?
-  relevantDiseaseMechanisms   String[]
-  associatedGenes             String[]
-  associatedSignsAndSymptoms  String[]
-  existingDatabasesAndStudies String[]
-  assetsUnderDevelopment      String[]
-  address1                    String?
-  address2                    String?
-  formattedAddress            String?
-  city                        String?
-  region                      String?
-  postalCode                  String?
-  country                     String?
-  lat                         String?
-  lng                         String?
-  createdAt                   DateTime                  @default(now())
-  updatedAt                   DateTime                  @updatedAt
-  user                        User?                     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId                      String?
-  roadmaps                    Roadmap[]
-  members                     Member[]
-  client                      Client[]
-  invitation                  Invitation[]
-  membershipRequest           MemberRequest[]
-  condition                   ConditionToOrganization[]
-  Kanban                      Kanban?
-  Milestone                   Milestone[]
-
-  @@index([userId])
-}
-
-model Condition {
-  id                          String                    @id @default(cuid())
-  name                        String
-  slug                        String                    @unique
-  nordURL                     String?
-  gardURL                     String?
-  description                 String?                   @db.Text
-  summary                     String?                   @db.Text
-  interestedModalities        String[]
-  diseaseCategories           String[]
-  prevalenceNumerator         Int?
-  prevalenceDenominator       Int?
-  prevalenceRatio             Float?
-  numberOfIdentifiedPatients  Int?
-  relevantDiseaseMechanisms   String[]
-  associatedGenes             String[]
-  associatedSignsAndSymptoms  String[]
-  existingDatabasesAndStudies String[]
-  assetsUnderDevelopment      String[]
-  createdAt                   DateTime                  @default(now())
-  updatedAt                   DateTime                  @updatedAt
-  organizations               ConditionToOrganization[]
-}
-
-// Normally, an imlpicit relation would do, but this is necessary for prisma pulse replication.
-// See https://www.prisma.io/docs/pulse/database-setup/general-database-instructions#replica-identity
-model ConditionToOrganization {
-  conditionId    String
-  organizationId String
-
-  // Relations
-  condition    Condition    @relation(fields: [conditionId], references: [id], onDelete: Cascade)
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Composite Primary Key
-  @@id([conditionId, organizationId])
-}
-
-model Example {
-  id            Int     @id @default(autoincrement())
-  name          String?
-  description   String? @db.Text
-  domainCount   Int?
-  url           String?
-  image         String? @db.Text
-  imageBlurhash String? @db.Text
-}
-
-model Post {
-  id        String     @id
-  title     String
-  content   Json?
-  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String
-  like      Reaction[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+enum FollowedType {
+  ORGANIZATION
 }
 
 enum ReactionType {
@@ -499,13 +529,74 @@ enum ReactionType {
   SUPPORT
 }
 
-model Reaction {
-  id        String       @id
-  type      ReactionType
-  author    User         @relation(fields: [authorId], references: [id])
-  authorId  String
-  post      Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+enum ReactableType {
+  POST
+  COMMENT
+}
+
+enum MentionedType {
+  USER
+  ROADMAP
+  ORGANIZATION
+  CONDITION
+}
+
+model Mention {
+  id     String  @id @default(cuid())
+  postId String? // For mentions in posts
+  post   Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  commentId String? // For mentions in comments
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  mentionedType MentionedType
+  mentionedId   String // ID of the mentioned entity (e.g., User, Roadmap, Organization, etc.)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Gene {
+  id                   Int       @id @default(autoincrement()) // Auto-generated primary key
+  uuid                 String?   @unique // Unique identifier for the record
+  symbol               String?   @unique // Official gene symbol
+  name                 String? // Full name of the gene or RNA
+  hgncId               String? // HGNC identifier for the gene
+  locusGroup           String? // Group classification (e.g., protein-coding gene, non-coding RNA)
+  locusType            String? // Type of locus (e.g., gene with protein product, RNA, pseudogene)
+  location             String? // Chromosomal location (e.g., 19q13.43)
+  locationSortable     String? // Sortable location string
+  entrezId             String? // NCBI Entrez Gene identifier
+  ensemblGeneId        String?   @unique // Ensembl gene identifier
+  ucscId               String? // UCSC Genome Browser identifier
+  refseqAccessions     String[] // Array of RefSeq accession numbers
+  vegaId               String? // Vega Genome Browser identifier
+  omimIds              String[] // Array of OMIM IDs
+  uniprotIds           String[] // Array of UniProt IDs
+  aliasSymbols         String[] // Alternate symbols for the gene
+  prevSymbols          String[] // Previously used symbols
+  prevNames            String[] // Previously used names
+  aliasNames           String[] // Alternate names for the gene
+  geneGroups           String[] // Functional groups the gene belongs to
+  geneGroupIds         Int[] // Array of group IDs for the functional groups
+  pubmedIds            Int[] // Array of PubMed IDs referencing the gene
+  agr                  String? // Alliance of Genome Resources ID
+  status               String? // Approval status (e.g., "Approved")
+  dateApprovedReserved DateTime? // Date when the record was approved or reserved
+  dateModified         DateTime? // Last modification date
+  dateNameChanged      DateTime? // Date when the gene's name was changed
+  dateSymbolChanged    DateTime? // Date when the gene's symbol was changed
+  rnaCentralIds        String[] // Array of RNA Central IDs (for RNA entities)
+  lncipedia            String? // LncRNA-specific ID in Lncipedia
+  pseudogeneOrg        String? // Pseudogene.org ID (for pseudogenes)
+  merops               String? // MEROPS protease family ID
+  maneSelect           String[] // MANE Select transcript IDs
+  ena                  String[] // Array of ENA IDs
+  ccdsIds              String[] // Array of CCDS IDs
+  rgdIds               String[] // Array of RGD IDs (Rat Genome Database)
+  mgdIds               String[] // Array of MGD IDs (Mouse Genome Database)
+  orphanet             Int? // Orphanet ID for rare diseases
+  lsdb                 String[] // Locus-Specific Database links
+
+  @@index([symbol], map: "idx_symbol") // Index for faster search by symbol
 }
