@@ -27,7 +27,7 @@ import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import StatusButton from "./milestone-status-button"
 import {nanoid} from "nanoid"
-import {FaTrash} from "react-icons/fa6"
+import {FaLinkSlash, FaTrash} from "react-icons/fa6"
 import {Checkbox} from "./ui/checkbox"
 import {toast} from "sonner"
 import {
@@ -170,8 +170,6 @@ export function EditTaskForm({
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
         const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
 
-        console.log(`targetDate`, targetDate)
-
         setTask(
             taskData?.id,
             {
@@ -182,7 +180,8 @@ export function EditTaskForm({
                     ? {checklist: checklist.map((item, index) => ({...item, orderPosition: index}))}
                     : undefined),
                 ...(stakeholders ? { stakeholders: fetchedMembers?.filter(member => stakeholderIds?.includes(member.id)) }: undefined),
-                ...(milestone ? { milestone: { id: milestone }, milestoneId: milestone }: undefined),
+                milestone: { id: milestone },
+                milestoneId: milestone,
                 ...(targetDate ? { endDate: targetDate } : undefined),
                 ...(priority ? { priority } : undefined),
                 private: isPrivate || false
@@ -399,23 +398,31 @@ export function EditTaskForm({
                         render={({ field }) => (
                             <FormItem className="h-full grow">
                                 <FormLabel className="text-xl">{`Milestone`}</FormLabel>
-                                <Select
-                                    defaultValue={field.value}
-                                    onValueChange={field.onChange}
-                                >
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Link to a milestone" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        {fetchedMilestones.map((m: Milestone, index: number) => (
-                                            <SelectItem value={m.id} key={index}>
-                                                {m.title}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <div className="flex flex-row gap-4">
+                                    <Select
+                                        value={milestone || ''}
+                                        onValueChange={field.onChange}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Link to a milestone" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {fetchedMilestones.map((m: Milestone, index: number) => (
+                                                <SelectItem value={m.id} key={index}>
+                                                    {m.title}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <Button variant="secondary" size="icon" onClick={(e) => {
+                                        e.preventDefault()
+                                        form.setValue('milestone', undefined)
+                                    }}>
+                                        <FaLinkSlash />
+                                    </Button>
+                                </div>
                             </FormItem>
                         )}
                     />   
