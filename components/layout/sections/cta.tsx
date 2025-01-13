@@ -18,7 +18,7 @@ export default function CTASection({
                             id="cta-section-heading"
                             className="text-black text-3xl md:text-4xl font-bold mb-4"
                         >
-                            🎉&nbsp;&nbsp;Become a beta tester
+                            🎉&nbsp;&nbsp;Subscribe for updates
                         </h2>
                         <p className="text-xl text-gray-900">
                             Stay in the loop for our upcoming launch in spring 2025.
