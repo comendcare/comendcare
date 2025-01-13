@@ -20,9 +20,9 @@ import {redirect} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {FaPlus} from "react-icons/fa6";
 import Loading from "@/app/loading";
-import {getAllOrganizationsFromUserId, getColumns, getNodesEdgesAndMilestones, getRoadmapId} from "@/lib/fetchers";
+import {getAllOrganizationsFromUserId, getColumns, getKanbanFromOrganizationId, getNodesEdgesAndMilestones, getRoadmapId} from "@/lib/fetchers";
 import {toast} from "sonner";
-import {initializeClientState} from "@/lib/initialize-client-state";
+import {initializeKanbanState, initializeRoadmapState} from "@/lib/initialize-client-state";
 
 
 export type MemberWithOrganization = Member & {
@@ -87,20 +87,32 @@ export default function AppLayout({children}: AppLayoutProps) {
             if (response.success) {
                 setRoadmapId(response.data)
                 const nodesResponse = await getNodesEdgesAndMilestones(response.data)
-                const kanbanResponse = await getColumns(orgId)
-                if (nodesResponse.success && kanbanResponse.success) {
-                    initializeClientState({
+                if (nodesResponse.success) {
+                    initializeRoadmapState({
                         roadmapId: roadmapId,
                         nodes: nodesResponse.data.nodes,
                         edges: nodesResponse.data.edges,
-                        milestones: nodesResponse.data.milestones,
-                        columns: kanbanResponse.data.columns
+                        milestones: nodesResponse.data.milestones
                     })
                 }
                 setIsLoading(false)
             } else {
                 console.error(response.error)
                 toast.error(response.error)
+            }
+
+            const kanban = await getKanbanFromOrganizationId()
+            if (kanban.success) {
+                const kanbanResponse = await getColumns(orgId)
+                if (kanbanResponse.success) {
+                    initializeKanbanState({
+                        columns: kanbanResponse.data.columns
+                    })
+                }
+                setIsLoading(false)
+            } else {
+                console.error(kanban.error)
+                toast.error(kanban.error)
             }
         }
     }
