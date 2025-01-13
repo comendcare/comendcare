@@ -17,8 +17,6 @@ model User {
   image                String?
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
-  firstName            String?
-  lastName             String?
   deletedAt            DateTime?
   address1             String?
   address2             String?

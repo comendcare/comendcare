@@ -20,9 +20,10 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import {Timer} from "lucide-react";
 import {useEffect, useState} from "react";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {formatMoney} from "@/lib/utils";
 
 export const financesFormSchema = z.object({
-    raising: z.enum(["yes", "no-but", "no"]).optional(),
+    // raising: z.enum(["yes", "no-but", "no"]).optional(),
     raised: z.number().optional(),
     budget: z.number().optional(),
     deployed: z.number().optional(),
@@ -85,61 +86,61 @@ export default function FinancesOnboardingForm(
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
-                <FormField
-                    control={form.control}
-                    name="raising"
-                    render={({field}) => (
-                        <FormItem className="space-y-3">
-                            <FormLabel className="flex items-center">
-                                {`Are you currently raising money?`}
-                                <Tooltip delayDuration={0}>
-                                    <TooltipTrigger>
-                                        <FaQuestionCircle
-                                            className="text-black h-4 inline-block align-baseline mx-1"/>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>
-                                            {`If raising money for your organization is a priority, we'll match you with grants.`}
-                                        </p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </FormLabel>
-                            <FormControl>
-                                <RadioGroup
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                    className="flex flex-col space-y-1"
-                                >
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="yes"/>
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            {`Yes I'm currently raising`}
-                                        </FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="no-but"/>
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            {`No, but I'm planning to soon`}
-                                        </FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="no"/>
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            {`No I'm not raising money`}
-                                        </FormLabel>
-                                    </FormItem>
-                                </RadioGroup>
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+                {/*<FormField*/}
+                {/*    control={form.control}*/}
+                {/*    name="raising"*/}
+                {/*    render={({field}) => (*/}
+                {/*        <FormItem className="space-y-3">*/}
+                {/*            <FormLabel className="flex items-center">*/}
+                {/*                {`Are you currently raising money?`}*/}
+                {/*                <Tooltip delayDuration={0}>*/}
+                {/*                    <TooltipTrigger>*/}
+                {/*                        <FaQuestionCircle*/}
+                {/*                            className="text-black h-4 inline-block align-baseline mx-1"/>*/}
+                {/*                    </TooltipTrigger>*/}
+                {/*                    <TooltipContent>*/}
+                {/*                        <p>*/}
+                {/*                            {`If raising money for your organization is a priority, we'll match you with grants.`}*/}
+                {/*                        </p>*/}
+                {/*                    </TooltipContent>*/}
+                {/*                </Tooltip>*/}
+                {/*            </FormLabel>*/}
+                {/*            <FormControl>*/}
+                {/*                <RadioGroup*/}
+                {/*                    onValueChange={field.onChange}*/}
+                {/*                    defaultValue={field.value}*/}
+                {/*                    className="flex flex-col space-y-1"*/}
+                {/*                >*/}
+                {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                {/*                        <FormControl>*/}
+                {/*                            <RadioGroupItem value="yes"/>*/}
+                {/*                        </FormControl>*/}
+                {/*                        <FormLabel className="font-normal">*/}
+                {/*                            {`Yes I'm currently raising`}*/}
+                {/*                        </FormLabel>*/}
+                {/*                    </FormItem>*/}
+                {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                {/*                        <FormControl>*/}
+                {/*                            <RadioGroupItem value="no-but"/>*/}
+                {/*                        </FormControl>*/}
+                {/*                        <FormLabel className="font-normal">*/}
+                {/*                            {`No, but I'm planning to soon`}*/}
+                {/*                        </FormLabel>*/}
+                {/*                    </FormItem>*/}
+                {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                {/*                        <FormControl>*/}
+                {/*                            <RadioGroupItem value="no"/>*/}
+                {/*                        </FormControl>*/}
+                {/*                        <FormLabel className="font-normal">*/}
+                {/*                            {`No I'm not raising money`}*/}
+                {/*                        </FormLabel>*/}
+                {/*                    </FormItem>*/}
+                {/*                </RadioGroup>*/}
+                {/*            </FormControl>*/}
+                {/*            <FormMessage/>*/}
+                {/*        </FormItem>*/}
+                {/*    )}*/}
+                {/*/>*/}
 
                 {/*<FormField*/}
                 {/*    control={form.control}*/}
@@ -164,9 +165,9 @@ export default function FinancesOnboardingForm(
                 <FormField
                     control={form.control}
                     name="raised"
-                    render={({field: {value, onChange}}) => (
+                    render={({field}) => (
                         <FormItem>
-                            <FormLabel>Raised - {value}</FormLabel>
+                            <FormLabel>Raised - {formatMoney(field.value)}</FormLabel>
                             <FormDescription className="flex items-center">
                                 {`The total amount of funding raised to date by your patient group.`}
                                 <Tooltip delayDuration={0}>
@@ -182,13 +183,24 @@ export default function FinancesOnboardingForm(
                                 </Tooltip>
                             </FormDescription>
                             <FormControl>
-                                <Slider
+                                {/*<Slider*/}
+                                {/*    min={0}*/}
+                                {/*    max={1000000}*/}
+                                {/*    step={50000}*/}
+                                {/*    defaultValue={value ? [value] : [0]}*/}
+                                {/*    onValueChange={(vals: number[]) => {*/}
+                                {/*        onChange(vals[0]);*/}
+                                {/*    }}*/}
+                                {/*/>*/}
+                                <Input
+                                    variant="currency"
+                                    type="number"
                                     min={0}
-                                    max={1000000}
-                                    step={50000}
-                                    defaultValue={value ? [value] : [0]}
-                                    onValueChange={(vals: number[]) => {
-                                        onChange(vals[0]);
+                                    id="raised"
+                                    {...field}
+                                    onChange={(e) => {
+                                        const parsedValue = parseFloat(e.target.value);
+                                        field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
                                     }}
                                 />
                             </FormControl>
@@ -205,7 +217,7 @@ export default function FinancesOnboardingForm(
                     name="deployed"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>{`Money deployed to research`}</FormLabel>
+                            <FormLabel>{`Money deployed to research`} - {formatMoney(field.value)}</FormLabel>
                             <FormDescription className="flex items-center">
                                 {`The total amount of money deployed to research to date.`}
                                 <Tooltip delayDuration={0}>
@@ -244,7 +256,7 @@ export default function FinancesOnboardingForm(
                     name="budget"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>{`Annual research budget`}</FormLabel>
+                            <FormLabel>{`Annual research budget`} - {formatMoney(field.value)}</FormLabel>
                             <FormDescription className="flex items-center">
                                 {`The amount of money allocated to advancing research.`}
                                 <Tooltip delayDuration={0}>

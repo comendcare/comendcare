@@ -52,7 +52,7 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
         >
             <Card>
                 <CardHeader className="w-min pt-6 pb-2 space-y-4">
-                    <CardTitle>
+                    <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                         Roadmap
                     </CardTitle>
                     <TabsList>

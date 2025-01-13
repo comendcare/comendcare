@@ -34,7 +34,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {getPublicFile, years} from "@/lib/utils";
+import {formatMoney, getPublicFile, years} from "@/lib/utils";
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
@@ -652,7 +652,6 @@ export default function EditPAGProfileDialog() {
                                                 <FormDescription>{`Your patient group's website URL.`}</FormDescription>
                                                 <FormControl>
                                                     <Input
-                                                        type="url"
                                                         id="website"
                                                         {...field}
                                                     />
@@ -772,6 +771,9 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Address</FormLabel>
+                                                <FormDescription>
+                                                    {`Your organization's address.`}
+                                                </FormDescription>
                                                 <FormControl>
                                                     <AutocompleteComponent
                                                         address={address}
@@ -780,9 +782,6 @@ export default function EditPAGProfileDialog() {
                                                         setSearchInput={setSearchInput}
                                                     />
                                                 </FormControl>
-                                                <FormDescription>
-                                                    {`Your organization's address.`}
-                                                </FormDescription>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
@@ -796,6 +795,9 @@ export default function EditPAGProfileDialog() {
                                                 <FormLabel>
                                                     Organization Logo
                                                 </FormLabel>
+                                                <FormDescription>
+                                                    {`This will be used as your organization profile's image.`}
+                                                </FormDescription>
                                                 <FormControl>
                                                     <div className="flex flex-col items-start space-y-4">
                                                         {selectedFile ? (
@@ -823,9 +825,6 @@ export default function EditPAGProfileDialog() {
                                                         )}
                                                     </div>
                                                 </FormControl>
-                                                <FormDescription>
-                                                    {`This will be used as your organization profile's image.`}
-                                                </FormDescription>
                                                 <FormMessage/>
                                             </FormItem>
                                         )}
@@ -1114,62 +1113,62 @@ export default function EditPAGProfileDialog() {
                                 <form onSubmit={editFinancesForm.handleSubmit(onFinancesFormSubmit)}
                                       className="space-y-8">
 
-                                    <FormField
-                                        control={editFinancesForm.control}
-                                        name="raising"
-                                        render={({field}) => (
-                                            <FormItem className="space-y-3">
-                                                <FormLabel className="flex items-center">
-                                                    {`Are you currently raising money?`}
-                                                    <Tooltip delayDuration={0}>
-                                                        <TooltipTrigger>
-                                                            <FaQuestionCircle
-                                                                className="text-black h-4 inline-block align-baseline mx-1"/>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent
-                                                            className="max-w-[400px] break-words text-sm z-50">
-                                                            <p>
-                                                                {`If raising money for your organization is a priority, we'll match you with grants.`}
-                                                            </p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <RadioGroup
-                                                        onValueChange={field.onChange}
-                                                        defaultValue={field.value}
-                                                        className="flex flex-col space-y-1"
-                                                    >
-                                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                                            <FormControl>
-                                                                <RadioGroupItem value="yes"/>
-                                                            </FormControl>
-                                                            <FormLabel className="font-normal">
-                                                                {`Yes I'm currently raising`}
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                                            <FormControl>
-                                                                <RadioGroupItem value="no-but"/>
-                                                            </FormControl>
-                                                            <FormLabel className="font-normal">
-                                                                {`No, but I'm planning to soon`}
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                        <FormItem className="flex items-center space-x-3 space-y-0">
-                                                            <FormControl>
-                                                                <RadioGroupItem value="no"/>
-                                                            </FormControl>
-                                                            <FormLabel className="font-normal">
-                                                                {`No I'm not raising money`}
-                                                            </FormLabel>
-                                                        </FormItem>
-                                                    </RadioGroup>
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
+                                    {/*<FormField*/}
+                                    {/*    control={editFinancesForm.control}*/}
+                                    {/*    name="raising"*/}
+                                    {/*    render={({field}) => (*/}
+                                    {/*        <FormItem className="space-y-3">*/}
+                                    {/*            <FormLabel className="flex items-center">*/}
+                                    {/*                {`Are you currently raising money?`}*/}
+                                    {/*                <Tooltip delayDuration={0}>*/}
+                                    {/*                    <TooltipTrigger>*/}
+                                    {/*                        <FaQuestionCircle*/}
+                                    {/*                            className="text-black h-4 inline-block align-baseline mx-1"/>*/}
+                                    {/*                    </TooltipTrigger>*/}
+                                    {/*                    <TooltipContent*/}
+                                    {/*                        className="max-w-[400px] break-words text-sm z-50">*/}
+                                    {/*                        <p>*/}
+                                    {/*                            {`If raising money for your organization is a priority, we'll match you with grants.`}*/}
+                                    {/*                        </p>*/}
+                                    {/*                    </TooltipContent>*/}
+                                    {/*                </Tooltip>*/}
+                                    {/*            </FormLabel>*/}
+                                    {/*            <FormControl>*/}
+                                    {/*                <RadioGroup*/}
+                                    {/*                    onValueChange={field.onChange}*/}
+                                    {/*                    defaultValue={field.value}*/}
+                                    {/*                    className="flex flex-col space-y-1"*/}
+                                    {/*                >*/}
+                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                    {/*                        <FormControl>*/}
+                                    {/*                            <RadioGroupItem value="yes"/>*/}
+                                    {/*                        </FormControl>*/}
+                                    {/*                        <FormLabel className="font-normal">*/}
+                                    {/*                            {`Yes I'm currently raising`}*/}
+                                    {/*                        </FormLabel>*/}
+                                    {/*                    </FormItem>*/}
+                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                    {/*                        <FormControl>*/}
+                                    {/*                            <RadioGroupItem value="no-but"/>*/}
+                                    {/*                        </FormControl>*/}
+                                    {/*                        <FormLabel className="font-normal">*/}
+                                    {/*                            {`No, but I'm planning to soon`}*/}
+                                    {/*                        </FormLabel>*/}
+                                    {/*                    </FormItem>*/}
+                                    {/*                    <FormItem className="flex items-center space-x-3 space-y-0">*/}
+                                    {/*                        <FormControl>*/}
+                                    {/*                            <RadioGroupItem value="no"/>*/}
+                                    {/*                        </FormControl>*/}
+                                    {/*                        <FormLabel className="font-normal">*/}
+                                    {/*                            {`No I'm not raising money`}*/}
+                                    {/*                        </FormLabel>*/}
+                                    {/*                    </FormItem>*/}
+                                    {/*                </RadioGroup>*/}
+                                    {/*            </FormControl>*/}
+                                    {/*            <FormMessage/>*/}
+                                    {/*        </FormItem>*/}
+                                    {/*    )}*/}
+                                    {/*/>*/}
 
                                     {/*<FormField*/}
                                     {/*    control={form.control}*/}
@@ -1194,9 +1193,9 @@ export default function EditPAGProfileDialog() {
                                     <FormField
                                         control={editFinancesForm.control}
                                         name="raised"
-                                        render={({field: {value, onChange}}) => (
+                                        render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Raised - {value}</FormLabel>
+                                                <FormLabel>Raised - {formatMoney(field.value)}</FormLabel>
                                                 <FormDescription className="flex items-center">
                                                     {`The total amount of funding raised to date by your patient group.`}
                                                     <Tooltip delayDuration={0}>
@@ -1215,13 +1214,24 @@ export default function EditPAGProfileDialog() {
                                                     </Tooltip>
                                                 </FormDescription>
                                                 <FormControl>
-                                                    <Slider
+                                                    {/*<Slider*/}
+                                                    {/*    min={0}*/}
+                                                    {/*    max={1000000}*/}
+                                                    {/*    step={50000}*/}
+                                                    {/*    defaultValue={value ? [value] : [0]}*/}
+                                                    {/*    onValueChange={(vals: number[]) => {*/}
+                                                    {/*        onChange(vals[0]);*/}
+                                                    {/*    }}*/}
+                                                    {/*/>*/}
+                                                    <Input
+                                                        variant="currency"
+                                                        type="number"
                                                         min={0}
-                                                        max={1000000}
-                                                        step={50000}
-                                                        defaultValue={value ? [value] : [0]}
-                                                        onValueChange={(vals: number[]) => {
-                                                            onChange(vals[0]);
+                                                        id="deployed"
+                                                        {...field}
+                                                        onChange={(e) => {
+                                                            const parsedValue = parseFloat(e.target.value);
+                                                            field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
                                                         }}
                                                     />
                                                 </FormControl>
@@ -1238,7 +1248,7 @@ export default function EditPAGProfileDialog() {
                                         name="deployed"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Money deployed to research`}</FormLabel>
+                                                <FormLabel>{`Money deployed to research`} - {formatMoney(field.value)}</FormLabel>
                                                 <FormDescription className="flex items-center">
                                                     {`The total amount of money deployed to research to date.`}
                                                     <Tooltip delayDuration={0}>
@@ -1265,6 +1275,10 @@ export default function EditPAGProfileDialog() {
                                                         min={0}
                                                         id="deployed"
                                                         {...field}
+                                                        onChange={(e) => {
+                                                            const parsedValue = parseFloat(e.target.value);
+                                                            field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
+                                                        }}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
@@ -1277,7 +1291,7 @@ export default function EditPAGProfileDialog() {
                                         name="budget"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Annual research budget`}</FormLabel>
+                                                <FormLabel>{`Annual research budget`} - {formatMoney(field.value)}</FormLabel>
                                                 <FormDescription className="flex items-center">
                                                     {`The amount of money allocated to advancing research.`}
                                                     <Tooltip delayDuration={0}>
@@ -1304,6 +1318,10 @@ export default function EditPAGProfileDialog() {
                                                         min={0}
                                                         id="budget"
                                                         {...field}
+                                                        onChange={(e) => {
+                                                            const parsedValue = parseFloat(e.target.value);
+                                                            field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
+                                                        }}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
