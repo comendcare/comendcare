@@ -19,22 +19,22 @@ function writeDecodedFile(filename: string, base64Content: string) {
 // In production, write certificates from environment variables to the /tmp/ directory
 if (process.env.NODE_ENV === "production") {
     // Decode and write client-cert.pem
-    if (process.env.CLIENT_CERT_BASE64) {
-        writeDecodedFile("client-cert.pem", process.env.CLIENT_CERT_BASE64)
+    if (process.env.PRODUCTION_CLIENT_CERT_BASE64) {
+        writeDecodedFile("client-cert.pem", process.env.PRODUCTION_CLIENT_CERT_BASE64)
     } else {
         console.log("CLIENT_CERT_BASE64 environment variable is not set.")
     }
 
     // Decode and write client-key.pem
-    if (process.env.CLIENT_KEY_BASE64) {
-        writeDecodedFile("client-key.pem", process.env.CLIENT_KEY_BASE64)
+    if (process.env.PRODUCTION_CLIENT_KEY_BASE64) {
+        writeDecodedFile("client-key.pem", process.env.PRODUCTION_CLIENT_KEY_BASE64)
     } else {
         console.log("CLIENT_KEY_BASE64 environment variable is not set.")
     }
 
     // Decode and write server-ca.pem
-    if (process.env.SERVER_CA_BASE64) {
-        writeDecodedFile("server-ca.pem", process.env.SERVER_CA_BASE64)
+    if (process.env.PRODUCTION_SERVER_CA_BASE64) {
+        writeDecodedFile("server-ca.pem", process.env.PRODUCTION_SERVER_CA_BASE64)
     } else {
         console.log("SERVER_CA_BASE64 environment variable is not set.")
     }
