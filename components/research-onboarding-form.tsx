@@ -580,6 +580,7 @@ export default function ResearchOnboardingForm(
             const data = {
                 interestedModalities: values.modalities?.map((modality) => modality.label).join(",") || "",
                 name: values.disorder || "",
+                summary: values.summary || "",
                 diseaseCategories: values.categories?.map((category) => category.label).join(",") || "",
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",

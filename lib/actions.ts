@@ -281,9 +281,22 @@ export const createOrganization = async (formData: FormData) => {
             error: "Not authenticated"
         }
     }
-    const name = formData.get("orgName") as string
-    const description = formData.get("description") as string
-    const subdomain = formData.get("subdomain") as string
+
+    const name = formData.get("orgName") as string;
+    const description = formData.get("description") as string;
+    const subdomain = formData.get("subdomain") as string;
+    const website = formData.get("website") as string | null;
+    const incorporationStatus = formData.get("incorporationStatus") as "YES" | "NO" | "INPROGRESS" | null;
+    const address1 = formData.get("address1") as string | null;
+    const address2 = formData.get("address2") as string | null;
+    const formattedAddress = formData.get("formattedAddress") as string | null;
+    const city = formData.get("city") as string | null;
+    const region = formData.get("region") as string | null;
+    const postalCode = formData.get("postalCode") as string | null;
+    const country = formData.get("country") as string | null;
+    const lat = formData.get("lat") as string | null;
+    const lng = formData.get("lng") as string | null;
+    const image = formData.get("image") as string | null;
 
     try {
         const response = await prisma.organization.create({
@@ -291,13 +304,25 @@ export const createOrganization = async (formData: FormData) => {
                 name,
                 description,
                 subdomain,
+                website,
+                incorporationStatus,
+                address1,
+                address2,
+                formattedAddress,
+                city,
+                region,
+                postalCode,
+                country,
+                lat,
+                lng,
+                image,
                 user: {
                     connect: {
-                        id: session.user.id
-                    }
-                }
-            }
-        })
+                        id: session.user.id,
+                    },
+                },
+            },
+        });
         await prisma.member.create({
             data: {
                 userId: session.user.id,
