@@ -1346,15 +1346,8 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
                             set: [],
                             connect: task.stakeholders?.map((stakeholder: User) => ({id: stakeholder?.id})) || []
                         },
-                        // ...(task.milestoneId ? ({
-                        //     // milestone is linked, connect it
-                        //     milestone: {
-                        //         connect: { id: task.milestoneId }
-                        //     },
-                        // }) : undefined),
-
                         milestone: task.milestoneId
-                            ? {connect: {id: task.milestoneId}} // Connect if milestoneId exists
+                            ? {connect: { id: task.milestoneId }} // Connect if milestoneId exists
                             : {disconnect: true}, // Disconnect if milestoneId is undefined
                         endDate: task.endDate,
                         priority: task.priority,
@@ -1364,20 +1357,6 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
                         }
                     }
                 })
-
-                // handle milestone linking
-                // if (task?.milestoneId) {
-                //     console.log(`link`, task)
-                //     t = await prisma.task.update({
-                //         where: {id: task?.id},
-                //         include: { milestone: true },
-                //         data: {
-                //             milestone: { connect: { id: task.milestoneId } }
-                //         }
-                //     })
-                // }
-
-                console.log(`updated tasks`, t)
 
                 updatedTasks.push(t)
             })
