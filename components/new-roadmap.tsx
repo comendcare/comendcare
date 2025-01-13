@@ -71,14 +71,14 @@ export default function NewRoadmapForm() {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="flex flex-col gap-8 overflow-visible">
-                                        <ul className="flex flex-col gap-2">
-                                            {milestoneData.tasks?.map((task, index) => (
+                                        {/* <ul className="flex flex-col gap-2">
+                                            {milestoneData.tasks?.map((task: Task, index) => (
                                                 <li key={index} className="flex flex-row gap-2 items-center">
                                                     <FaCheck size={20} className="h-4 w-4 text-green-500"/>
                                                     <p className="grow">{task.name}</p>
                                                 </li>
                                             ))}
-                                        </ul>
+                                        </ul> */}
                                     </CardContent>
                                 </Card>
                             </CarouselItem>
