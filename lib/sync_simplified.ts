@@ -6,11 +6,24 @@ process.on('SIGINT', () => {
     process.exit(0)
 })
 
+const PULSE_API_KEY = (() => {
+    const key = process.env.NEXT_PUBLIC_NODE_ENV === 'development'
+        ? process.env.PREVIEW_PULSE_API_KEY
+        : process.env.PRODUCTION_PULSE_API_KEY;
+
+    if (!key) {
+        throw new Error('PULSE_API_KEY is not defined. Please check your environment variables.');
+    }
+
+    return key;
+})()
+
+// Initialize Prisma Client with Pulse extension
 export const prisma = new PrismaClient({
     log: ["query", "info", "warn", "error"],
 }).$extends(
     withPulse({
-        apiKey: process.env['PULSE_API_KEY'] as string,
+        apiKey: PULSE_API_KEY,
     })
 );
 

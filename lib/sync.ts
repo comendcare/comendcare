@@ -88,7 +88,6 @@ const addPulseExtension = (
 
 // Main sync function
 export const syncToTypesense = async (env: {
-    DATABASE_URL: string,
     TYPESENSE_ADMIN_API_KEY: string,
     TYPESENSE_URL: string,
     PULSE_API_KEY: string
@@ -358,12 +357,23 @@ export const syncToTypesense = async (env: {
     }
 };
 
+const PULSE_API_KEY = (() => {
+    const key = process.env.NEXT_PUBLIC_NODE_ENV === 'development'
+        ? process.env.PREVIEW_PULSE_API_KEY
+        : process.env.PRODUCTION_PULSE_API_KEY;
+
+    if (!key) {
+        throw new Error('PULSE_API_KEY is not defined. Please check your environment variables.');
+    }
+
+    return key;
+})()
+
 // Run sync on start
 syncToTypesense({
-    DATABASE_URL: process.env.DATABASE_URL!,
     TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
     TYPESENSE_URL: "https://" + process.env.NEXT_PUBLIC_TYPESENSE_NODE!,
-    PULSE_API_KEY: process.env.PULSE_API_KEY!
+    PULSE_API_KEY: PULSE_API_KEY
 }).catch((error) => {
     console.error("Failed to initialize Typesense sync:", error);
 });
