@@ -25,9 +25,6 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
             <CardContent>
                 <div className="flex flex-col space-y-4">
                     <div className="space-y-2">
-                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
-                            Description
-                        </h3>
                         <p>
                             {organization?.description}
                         </p>
@@ -48,13 +45,13 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
                                             {nameToInitials(member.user.name)}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <div className="space-y-2">
+                                    <div className="space-y-1">
                                         <h4 className="text-sm font-semibold">
                                             {member.user.name}
                                         </h4>
                                         <div className="flex items-center">
                                             <span className="text-xs text-muted-foreground">
-                                                Joined December 2021
+                                                {member.user.title}
                                             </span>
                                         </div>
                                     </div>
