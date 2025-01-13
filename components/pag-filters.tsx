@@ -87,7 +87,9 @@ export function PAGFilters() {
                 onSubmit={form.handleSubmit(handleSubmit)}
                 className="flex flex-col gap-4 pr-4"
             >
-                <h1 className="text-2xl">{`Organization Filters`}</h1>
+                <h1 className={"scroll-m-20 text-3xl font-bold tracking-tight"}>
+                    Filters
+                </h1>
                 <FormField
                     control={form.control}
                     name="mechanisms"

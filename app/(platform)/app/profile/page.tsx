@@ -173,12 +173,12 @@ export default async function ProfilePage() {
                                 <div className="flex flex-row space-x-2">
                                     {/*<EditPAGProfileHeaderDialog/>*/}
                                     <EditPAGProfileDialog/>
-                                    <Button
-                                        className="gap-x-2"
-                                    >
-                                        <FaPlus/>
-                                        Add post
-                                    </Button>
+                                    {/*<Button*/}
+                                    {/*    className="gap-x-2"*/}
+                                    {/*>*/}
+                                    {/*    <FaPlus/>*/}
+                                    {/*    Add post*/}
+                                    {/*</Button>*/}
                                     <PrivateProfileDropdown subdomain={organization.subdomain}/>
                                 </div>
                             </div>
@@ -196,31 +196,31 @@ export default async function ProfilePage() {
                             {/*<PAGProfileAssetsCard/>*/}
                             {/*<PAGProfileOpenRFPsCard/>*/}
                         </div>
-                        <div className="col-span-4">
-                            <Tabs defaultValue="roadmap" className="w-full">
-                                <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="roadmap">
-                                        Roadmap
-                                    </TabsTrigger>
-                                    <TabsTrigger
-                                        value="activity"
-                                        className="organization-profile-tour-step6"
-                                    >
-                                        Activity
-                                    </TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="roadmap" className="flex flex-col space-y-4">
+                        <div className="col-span-4 space-y-4">
+                            {/*<Tabs defaultValue="roadmap" className="w-full">*/}
+                            {/*    <TabsList className="grid w-full grid-cols-2">*/}
+                            {/*        <TabsTrigger value="roadmap">*/}
+                            {/*            Roadmap*/}
+                            {/*        </TabsTrigger>*/}
+                            {/*        <TabsTrigger*/}
+                            {/*            value="activity"*/}
+                            {/*            className="organization-profile-tour-step6"*/}
+                            {/*        >*/}
+                            {/*            Activity*/}
+                            {/*        </TabsTrigger>*/}
+                            {/*    </TabsList>*/}
+                            {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
                                     <PAGProfileAssetsAndProjectsHoverableCard
                                         assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
                                         rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                                     />
                                     <PublicRoadmapCard roadmap={roadmaps[0]}
                                                        subdomain={organization?.subdomain || undefined}/>
-                                </TabsContent>
-                                <TabsContent value="activity" className="mt-0">
-                                    <PAGProfileActivityCard/>
-                                </TabsContent>
-                            </Tabs>
+                            {/*    </TabsContent>*/}
+                            {/*    <TabsContent value="activity" className="mt-0">*/}
+                            {/*        <PAGProfileActivityCard/>*/}
+                            {/*    </TabsContent>*/}
+                            {/*</Tabs>*/}
                         </div>
                     </div>
                 </div>

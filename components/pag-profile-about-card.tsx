@@ -8,9 +8,11 @@ import Link from "next/link";
 import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {CalendarDays} from "lucide-react";
-import { ProfilePhoto } from "./profile-photo";
+import {ProfilePhoto} from "./profile-photo";
 
-export const PagProfileAboutCard = ({organization}: { organization: Organization & { members: (Member & {user: User})[] } | null }) => {
+export const PagProfileAboutCard = ({organization}: {
+    organization: Organization & { members: (Member & { user: User })[] } | null
+}) => {
     faker.seed(235)
 
     return (
@@ -37,7 +39,7 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
                         {organization?.members ? organization?.members.map((member, index) =>
                                 <div
                                     key={index}
-                                    className="flex space-x-4"
+                                    className="flex items-center space-x-4"
                                 >
                                     <Avatar>
                                         <AvatarImage src={member.user.image || ""}/>
@@ -49,11 +51,13 @@ export const PagProfileAboutCard = ({organization}: { organization: Organization
                                         <h4 className="text-sm font-semibold">
                                             {member.user.name}
                                         </h4>
-                                        <div className="flex items-center">
-                                            <span className="text-xs text-muted-foreground">
-                                                {member.user.title}
-                                            </span>
-                                        </div>
+                                        {member.user.title &&
+                                            <div className="flex items-center">
+                                                <span className="text-xs text-muted-foreground">
+                                                    {member.user.title}
+                                                </span>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             )
