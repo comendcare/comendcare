@@ -927,9 +927,9 @@ const TaskField = ({
             </div>
 
             {/* delete task */}
-            <Button variant="secondary" size="icon" onClick={unlinkTask}>
+            {/* <Button variant="secondary" size="icon" onClick={unlinkTask}>
                 <FaLinkSlash />
-            </Button>
+            </Button> */}
         </li>
     )
 }
