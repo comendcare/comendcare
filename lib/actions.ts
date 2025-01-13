@@ -1469,6 +1469,37 @@ export async function deleteUser(
     }
 }
 
+export async function createKanban(orgId: string) {
+    try {
+        const newKanban = await prisma.kanban.create({
+            data: {
+                organization: { connect: { id: orgId } },
+                columns: {
+                    create: [
+                        {
+                            name: "To Do",
+                            kanbanPosition: 0
+                        },
+                        {
+                            name: 'In Progress',
+                            kanbanPosition: 1
+                        },
+                        {
+                            name: 'Done',
+                            kanbanPosition: 2
+                        }
+                    ]
+                }
+            }
+        })
+
+        return {success: true, data: newKanban}
+    } catch (error: any) {
+        logError(`Error creating kanban task for ${orgId}`, error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 export async function createNewKanbanTask(task: Prisma.TaskGetPayload<{
     select: {
         id: true,

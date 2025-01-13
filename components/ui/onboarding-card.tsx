@@ -15,7 +15,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 const selector = (state: RoadmapState) => ({
     setOnboardingActive: state.setOnboardingActive,
     nodes: state.nodes,
-    addNode: state.addNode,
+    addNodes: state.addNodes,
     setSelectedNodeId: state.setSelectedNodeId
 })
 
@@ -33,7 +33,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
     const {
         setOnboardingActive,
         nodes,
-        addNode,
+        addNodes,
         setSelectedNodeId
     } = useRoadmapStore(useShallow(selector))
 
@@ -94,7 +94,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
             }
         }
 
-        addNode(newNode)
+        addNodes([newNode])
         return newNode
     }
 
