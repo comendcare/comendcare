@@ -89,7 +89,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                 const nodesResponse = await getNodesEdgesAndMilestones(response.data)
                 if (nodesResponse.success) {
                     initializeRoadmapState({
-                        roadmapId: roadmapId,
+                        roadmapId: response.data,
                         nodes: nodesResponse.data.nodes,
                         edges: nodesResponse.data.edges,
                         milestones: nodesResponse.data.milestones
