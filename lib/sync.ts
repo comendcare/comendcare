@@ -369,10 +369,34 @@ const PULSE_API_KEY = (() => {
     return key;
 })()
 
+const TYPESENSE_URL = (() => {
+    const key = process.env.NEXT_PUBLIC_NODE_ENV === 'development'
+        ? process.env.NEXT_PUBLIC_PREVIEW_TYPESENSE_NODE
+        : process.env.NEXT_PUBLIC_PRODUCTION_TYPESENSE_NODE;
+
+    if (!key) {
+        throw new Error('TYPESENSE_URL is not defined. Please check your environment variables.');
+    }
+
+    return key;
+})()
+
+const TYPESENSE_ADMIN_API_KEY = (() => {
+    const key = process.env.NEXT_PUBLIC_NODE_ENV === 'development'
+        ? process.env.PREVIEW_TYPESENSE_ADMIN_API_KEY
+        : process.env.PRODUCTION_TYPESENSE_ADMIN_API_KEY;
+
+    if (!key) {
+        throw new Error('TYPESENSE_ADMIN_API_KEY is not defined. Please check your environment variables.');
+    }
+
+    return key;
+})()
+
 // Run sync on start
 syncToTypesense({
-    TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
-    TYPESENSE_URL: "https://" + process.env.NEXT_PUBLIC_TYPESENSE_NODE!,
+    TYPESENSE_ADMIN_API_KEY: TYPESENSE_ADMIN_API_KEY!,
+    TYPESENSE_URL: "https://" + TYPESENSE_URL,
     PULSE_API_KEY: PULSE_API_KEY
 }).catch((error) => {
     console.error("Failed to initialize Typesense sync:", error);

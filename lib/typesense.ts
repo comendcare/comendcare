@@ -9,13 +9,13 @@ import Typesense from "typesense";
 
 export const typesense = new Typesense.Client({
     'nodes': [{
-        'host': process.env.NEXT_PUBLIC_TYPESENSE_NODE || "", // For self-hosting locally use "localhost"
+        'host': process.env.NEXT_PUBLIC_PRODUCTION_TYPESENSE_NODE || "", // For self-hosting locally use "localhost"
         'port': 443,      // For self-hosting locally use "8108"
         'protocol': 'https'   // For self-hosting locally use "http"
     }],
     'apiKey': (process.env.NEXT_PUBLIC_NODE_ENV === "development"
-            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-            : process.env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY)
+            ? process.env.PRODUCTION_TYPESENSE_ADMIN_API_KEY
+            : process.env.NEXT_PUBLIC_TYPESENSE_PRODUCTION_SEARCH_ONLY_API_KEY)
         || "",
     'connectionTimeoutSeconds': 2
 })
