@@ -110,7 +110,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             const milestones = [...get().milestones, ...nodes.map(node => node.data)]
             set({ nodes: newNodes, milestones })
             debounceUpdateFlow(get().roadmapId, newNodes, get().edges)
-            updateDBMilestones({ milestones: nodes.map(node => node.data) })
+            // updateDBMilestones({ milestones: milestones })
         },
         deleteNode: (nodeId: string | undefined) => {
             const nodes = [...get().nodes].filter(({ id }) => id !== nodeId)
