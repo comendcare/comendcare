@@ -788,6 +788,10 @@ export async function inviteUser(
             throw new Error("You must be signed in to perform this action")
         }
 
+        if (email === session.user.email) {
+            throw new Error("Cannot send invitation to yourself")
+        }
+
         const lowerCaseEmail = email.toLowerCase()
 
         let invitationId: string | undefined
