@@ -286,6 +286,7 @@ export const createOrganization = async (formData: FormData) => {
     const description = formData.get("description") as string;
     const subdomain = formData.get("subdomain") as string;
     const website = formData.get("website") as string | null;
+    const founded = formData.get("founded") as string | null;
     const incorporationStatus = formData.get("incorporationStatus") as "YES" | "NO" | "INPROGRESS" | null;
     const address1 = formData.get("address1") as string | null;
     const address2 = formData.get("address2") as string | null;
@@ -304,6 +305,7 @@ export const createOrganization = async (formData: FormData) => {
                 name,
                 description,
                 subdomain,
+                yearFounded: founded?.toString(),
                 website,
                 incorporationStatus,
                 address1,
