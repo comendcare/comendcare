@@ -51,7 +51,7 @@ const userFormSchema = z.object({
 });
 
 const accept = {
-    "image/*": [],
+    "image/*": [".jpg", ".jpeg", ".png"],
 };
 
 export default function UserOnboardingForm() {
@@ -65,7 +65,13 @@ export default function UserOnboardingForm() {
         (acceptedFiles: FileWithPath[]) => {
             const file = acceptedFiles[0];
             if (!file) {
-                toast.error("Selected image is too large!");
+                toast.error("No file selected!");
+                return;
+            }
+
+            // Additional check to exclude SVG
+            if (file.type === "image/svg+xml") {
+                toast.error("SVG files are not allowed. Please select a valid image.");
                 return;
             }
 

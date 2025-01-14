@@ -62,7 +62,7 @@ export const newOrgFormSchema = z.object({
         message: "Your organization's description must be at least 2 characters long.",
     }).max(500, {
         message: "Your organization's description must less than 500 characters long.",
-    }),
+    }).optional(),
     website: z.string().min(2, {
         message: "Your organization's website.",
     }).optional(),
@@ -82,7 +82,7 @@ export const newOrgFormSchema = z.object({
 })
 
 const accept = {
-    "image/*": [],
+    "image/*": [".jpg", ".jpeg", ".png"],
 };
 
 const OPTIONS: Option[] = [
@@ -146,7 +146,13 @@ export default function OrganizationOnboardingForm(
         (acceptedFiles: FileWithPath[]) => {
             const file = acceptedFiles[0];
             if (!file) {
-                toast.error("Selected image is too large!");
+                toast.error("No file selected!");
+                return;
+            }
+
+            // Additional check to exclude SVG
+            if (file.type === "image/svg+xml") {
+                toast.error("SVG files are not allowed. Please select a valid image.");
                 return;
             }
 
