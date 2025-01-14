@@ -10,21 +10,27 @@ import { ScrollArea } from "./ui/scroll-area";
 import { useState } from "react";
 import { CheckBubble } from "./check-bubble";
 import { templateMilestones, templateRoadmaps, emptyMilestoneTemplate, emptyRoadmapTemplate } from '@/lib/templates'
+import ComendLoadingSpinner from "./comend-loading-spinner";
 
 export default function NewRoadmapForm() {
     const {data: session} = useSession()
     const router = useRouter()
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const [selectedRoadmap, setSelectedRoadmap] = useState<any>(undefined)
+    const [isLoading, setIsLoading] = useState(false)
 
     async function createTemplateRoadmap(roadmapData: any) {
+        setIsLoading(true)
         if (session?.user?.organizationId) {
             const roadmap = await createRoadmap(session.user.organizationId, roadmapData)
-            router.push(`/app/research-plan`)
             router.refresh()
         } else {
             console.error(`organization id is not defined in the session:`, session)
         }
+    }
+
+    if (isLoading) {
+        return <ComendLoadingSpinner />
     }
 
     return (
