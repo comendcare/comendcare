@@ -600,13 +600,14 @@ export function EditMilestoneForm({
                                         className="h-full"
                                         id="budget"
                                         type="number"
-                                        placeholder={`Enter a number`}
+                                        // placeholder={`Enter a number`}
                                         defaultValue={field.value}
                                         onChange={e =>
                                             field.onChange(
                                                 Number(e.target.value)
                                             )
                                         }
+                                        variant={"currency"}
                                     />
                                 </FormControl>
                             </span>

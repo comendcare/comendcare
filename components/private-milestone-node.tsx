@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import { FaArrowRight, FaCalendar, FaPlus } from "react-icons/fa6"
+import { FaArrowRight, FaCalendar, FaEllipsis, FaPlus } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
 import { truncate, cn } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
@@ -17,6 +17,7 @@ import { PrivateBadge } from "./private-badge"
 import {monthsList} from "@/lib/data";
 import { Badge } from "./ui/badge"
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 
 export type PrivateMilestoneNode = Node<
     {
@@ -35,6 +36,8 @@ export type PrivateMilestoneNode = Node<
         notes?: string
         status: StatusType
         handleEditClick: (nodeId: string) => void,
+        handleDelete: (nodeId: string) => void,
+        handleDuplicate: (nodeId: string) => void,
         onboardingMilestone: boolean,
         private: boolean
     },
@@ -51,17 +54,45 @@ type StatusType = "TODO" | "INPROGRESS" | "DONE"
 
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     const handleEditClick = () => {
-        if (props.data?.handleEditClick) {
-            props.data.handleEditClick(props?.id)
-        }
+        props.data?.handleEditClick(props?.id)
+    }
+    
+    const handleDeleteClick = () => {
+        props.data?.handleDelete(props?.id)
+    }
+
+    const handleDuplicate = () => {
+        props.data?.handleDuplicate(props?.id)
     }
 
     return (
         <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "")}>
             <CardHeader>
-                {props.data?.private && (
-                    <PrivateBadge className="-mt-2 justify-end" />
-                )}
+                <div className="-mt-4 -mr-4 h-fit flex flex-row align-center justify-end gap-4">
+                    {props.data?.private && (
+                        <PrivateBadge className="justify-start" />
+                    )}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild className="justify-end h-full">
+                            <Button
+                                variant="ghost"
+                                className="p-2 h-auto justify-end h-full"
+                            >
+                                <FaEllipsis />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem onClick={handleDeleteClick}>
+                                    Delete
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleDuplicate}>
+                                    Duplicate
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
                 <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
                 {/* Description length in node is truncated to 200 characters. */}
                 <CardDescription>

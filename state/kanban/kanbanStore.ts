@@ -110,7 +110,7 @@ export const useKanbanStore = create<KanbanState>()(
         {
             limit: 100, // limit the stored history states to 100
             onSave: (pastState, currentState) => {
-                console.log(`Saved Kanban State: `, currentState)
+                // console.log(`Saved Kanban State: `, currentState)
                 return
             },
         })

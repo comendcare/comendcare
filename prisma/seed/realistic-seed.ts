@@ -301,7 +301,7 @@ const exampleASORoadmap = {
             tasks: []
         },
         {
-            title: 'Review Literature',
+            title: 'Literature Review',
             description: 'Examine existing research to better understand the disease, identify gaps in knowledge, and assess the latest findings on potential treatments.',
             type: 'LITERATUREREVIEW',
             status: 'DONE',

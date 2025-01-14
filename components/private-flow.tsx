@@ -7,9 +7,8 @@ import {
     Controls,
     useReactFlow,
     useStoreApi,
-    ReactFlowProvider
 } from "@xyflow/react"
-import type { Edge, Node } from "@xyflow/react"
+import type { ConnectionState, Edge, FinalConnectionState, Node } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
 
 import "@xyflow/react/dist/base.css"
@@ -18,15 +17,24 @@ import PrivateMilestoneNode from "@/components/private-milestone-node"
 import { Button } from "./ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
-import { Dialog } from "./ui/dialog"
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { toast } from "sonner"
 import { isNewUser, setUserAsReturning } from "@/lib/utils"
-import { FaQuestion } from "react-icons/fa6"
-import { NewMilestoneDialogContent } from "./new-milestone-dialog-content"
-import { useSpring } from "framer-motion"
+import { ScrollArea } from "./ui/scroll-area"
+import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { CheckBubble } from "./check-bubble"
+import { templateMilestones } from "@/lib/templates"
 
 const proOptions = { hideAttribution: true }
 
@@ -69,6 +77,55 @@ export const PrivateFlowView = ({
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     const { startOnborda } = useOnborda()
+    const { screenToFlowPosition } = useReactFlow()
+    const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+
+    const onConnectEnd = useCallback(
+        (event: any, connectionState: any) => {
+            // when a connection is dropped on the pane it's not valid
+            if (!connectionState.isValid) {
+                // we need to remove the wrapper bounds, in order to get the correct position
+                const id = nanoid();
+                const { clientX, clientY } =
+                    'changedTouches' in event ? event.changedTouches[0] : event;
+                const newNode: Node = {
+                    id,
+                    type: "MILESTONE",
+                    position: screenToFlowPosition({
+                        x: clientX,
+                        y: clientY,
+                    }),
+                    data: {
+                        id: nanoid(),
+                        nodeId: id,
+                        type: 'NOTYPE',
+                        title: `New Milestone`,
+                        status: "TODO"
+                    },
+                    origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.5] : [0.0, 0.5],
+                }
+
+                addNodes([newNode])
+
+                // Handle connection direction based on the dragged handle
+                const source = connectionState.fromHandle?.position === "left" 
+                    ? id
+                    : connectionState.fromNode?.id
+            
+                const target = connectionState.fromHandle?.position === "left" 
+                    ? connectionState.fromNode?.id
+                    : id
+
+                // Add the edge
+                onConnect({
+                    id: `edge-${source}-${target}`,
+                    source,
+                    target,
+                })
+            }
+        },
+        [screenToFlowPosition],
+    );
 
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
@@ -131,7 +188,7 @@ export const PrivateFlowView = ({
         }
     }
 
-    // add handleEditClick() callback to nodes in the flow
+    // add handleEditClick(), handleDelete(), and handleDuplicate() callback functions to nodes in the flow
     // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
     const updatedNodes = nodes.map((node: Node, index: number) => ({
         ...node,
@@ -145,6 +202,24 @@ export const PrivateFlowView = ({
                 params.set("milestone", nodeId)
         
                 router.push(`${pathname}?${params.toString()}`, { scroll: false })
+            },
+            handleDelete: (nodeId: string) => {
+                const nodesList = nodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
+                const edgesList = edges.filter((edge: Edge) => edge.source === nodeId || edge.target === nodeId)
+
+                handleDelete({
+                    nodes: nodesList || [],
+                    edges: edgesList || []
+                })
+            },
+            handleDuplicate: (nodeId: string) => {
+                const milestone = milestones.find(milestone => milestone.nodeId === nodeId)
+
+                if (milestone) {
+                    addMilestones([{
+                        ...milestone,
+                    }])
+                }
             },
             // first node is the onboarding node
             onboardingMilestone: index === 0
@@ -205,12 +280,14 @@ export const PrivateFlowView = ({
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onConnectEnd={onConnectEnd}
             onBeforeDelete={handleDelete}
             nodeTypes={nodeTypes}
             fitView
             fitViewOptions={{ padding: 2 }}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
+            
         >
             <MiniMap
                 nodeColor='#757575'
@@ -220,8 +297,89 @@ export const PrivateFlowView = ({
                 <Button className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>Add Milestone</Button>
             </Controls>
         </ReactFlow>
-        <Dialog open={newMilestoneIsOpen} onOpenChange={setNewMilestoneIsOpen}>
-            <NewMilestoneDialogContent addMilestones={addMilestones} />
+        <Dialog open={newMilestoneIsOpen} onOpenChange={(open: boolean) => {
+            if (!open) setSelectedMilestones([])
+            setNewMilestoneIsOpen(open)
+        }}>
+            <DialogContent className="min-w-fit">
+                <DialogHeader>
+                    <DialogTitle className="text-2xl">
+                        Select from a milestone template
+                    </DialogTitle>
+                    <DialogDescription>
+                        {`Templates can help you find inspiration and get started faster. Click on a Milestone Template to add it to your Research Plan.`}
+                    </DialogDescription>
+                </DialogHeader>
+
+                <ScrollArea className="w-full max-h-96 overflow-visible">
+                    <ol className="w-full pr-4 flex flex-col gap-4 overflow-visible pt-2">
+                        {templateMilestones.map((milestoneData, index) => (
+                            <li key={index} className="w-full overflow-visible">
+                                <Card className="relative text-left overflow-visible">
+                                    <CardHeader>
+                                        <CheckBubble data={milestoneData} onCheckedChanged={
+                                            (checked: boolean) => {
+                                                if (checked) {
+                                                    setSelectedMilestones([...selectedMilestones, milestoneData])
+                                                } else {
+                                                    setSelectedMilestones(selectedMilestones.filter(m => (
+                                                        m.title !== milestoneData.title &&
+                                                        m.description !== milestoneData.description
+                                                    )))
+                                                }
+                                            }
+                                        }/>
+                                        <CardTitle>{milestoneData.title}</CardTitle>
+                                        <CardDescription>{milestoneData.description}</CardDescription>
+                                    </CardHeader>
+                                </Card>
+                            </li>
+                        ))}
+                    </ol>
+                </ScrollArea>
+
+                <DialogFooter>
+                    <DialogClose>
+                        <Button variant="secondary" type="button">
+                            Cancel
+                        </Button>
+                    </DialogClose>
+
+                    <Button
+                        variant="secondary"
+                        type="button"
+                        onClick={() => {
+                            router.push('/app/research-plan/templates')
+                        }}
+                    >
+                        See all templates
+                    </Button>
+
+                    <DialogClose>
+                        <Button
+                            variant="secondary"
+                            type="button"
+                            // onClick={handleAddEmptyMilestone}
+                            onClick={() => addMilestones([{name: 'New Milestone'}])}
+                        >
+                            Create empty Milestone
+                        </Button>
+                    </DialogClose>
+                    
+                    <DialogClose>
+                        <Button
+                            disabled={selectedMilestones.length === 0}
+                            type="button"
+                            onClick={() => {
+                                console.log(`add milestones`, selectedMilestones)
+                                addMilestones(selectedMilestones)
+                            }}
+                        >
+                            Create selected Milestones
+                        </Button>
+                    </DialogClose>
+                </DialogFooter>
+            </DialogContent>
         </Dialog>
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
