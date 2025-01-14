@@ -297,7 +297,7 @@ export default function EditPAGProfileDialog() {
                         id: organizationData.id || "",
                         description: organizationData.description || "",
                         orgName: organizationData.name || "", // Map `name` to `orgName`
-                        founded: organizationData.yearFounded ? organizationData.yearFounded : "",
+                        founded: organizationData.yearFounded ? organizationData.yearFounded.toString() : "",
                         subdomain: organizationData.subdomain || "",
                         website: organizationData.website || "",
                         address1: organizationData.address1 || "",
