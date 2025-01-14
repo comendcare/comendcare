@@ -192,11 +192,22 @@ export const PrivateFlowView = ({
                 router.push(`${pathname}?${params.toString()}`, { scroll: false })
             },
             handleDelete: (nodeId: string) => {
-                console.log(`handle delete`, nodeId)
+                const nodesList = nodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
+                const edgesList = edges.filter((edge: Edge) => edge.source === nodeId || edge.target === nodeId)
+
+                handleDelete({
+                    nodes: nodesList || [],
+                    edges: edgesList || []
+                })
             },
             handleDuplicate: (nodeId: string) => {
-                console.log(`handle duplicate`, nodeId)
-                addMilestones([{ name: 'New Milestone' }])
+                const milestone = milestones.find(milestone => milestone.nodeId === nodeId)
+
+                if (milestone) {
+                    addMilestones([{
+                        ...milestone
+                    }])
+                }
             },
             // first node is the onboarding node
             onboardingMilestone: index === 0

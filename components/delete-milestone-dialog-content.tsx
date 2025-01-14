@@ -34,7 +34,7 @@ export function DeleteMilestoneDialogContent({
     }
 
     const handleDeleteMilestone = (e: React.MouseEvent<HTMLElement>) => {
-        console.log(`handle Milestone delete...`)
+        console.log(`handle Milestone delete...`, milestoneData?.nodeId)
         deleteNode(milestoneData?.nodeId)
         toast(
             <div className="relative p-2 flex flex-col">
