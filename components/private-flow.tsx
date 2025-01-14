@@ -17,13 +17,24 @@ import PrivateMilestoneNode from "@/components/private-milestone-node"
 import { Button } from "./ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
-import { Dialog } from "./ui/dialog"
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { toast } from "sonner"
 import { isNewUser, setUserAsReturning } from "@/lib/utils"
-import { NewMilestoneDialogContent } from "./new-milestone-dialog-content"
+import { ScrollArea } from "./ui/scroll-area"
+import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { CheckBubble } from "./check-bubble"
+import { templateMilestones } from "@/lib/templates"
 
 const proOptions = { hideAttribution: true }
 
@@ -67,6 +78,7 @@ export const PrivateFlowView = ({
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     const { startOnborda } = useOnborda()
     const { screenToFlowPosition } = useReactFlow()
+    const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
 
     const onConnectEnd = useCallback(
         (event: any, connectionState: any) => {
@@ -285,8 +297,89 @@ export const PrivateFlowView = ({
                 <Button className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>Add Milestone</Button>
             </Controls>
         </ReactFlow>
-        <Dialog open={newMilestoneIsOpen} onOpenChange={setNewMilestoneIsOpen}>
-            <NewMilestoneDialogContent addMilestones={addMilestones} />
+        <Dialog open={newMilestoneIsOpen} onOpenChange={(open: boolean) => {
+            if (!open) setSelectedMilestones([])
+            setNewMilestoneIsOpen(open)
+        }}>
+            <DialogContent className="min-w-fit">
+                <DialogHeader>
+                    <DialogTitle className="text-2xl">
+                        Select from a milestone template
+                    </DialogTitle>
+                    <DialogDescription>
+                        {`Templates can help you find inspiration and get started faster. Click on a Milestone Template to add it to your Research Plan.`}
+                    </DialogDescription>
+                </DialogHeader>
+
+                <ScrollArea className="w-full max-h-96 overflow-visible">
+                    <ol className="w-full pr-4 flex flex-col gap-4 overflow-visible pt-2">
+                        {templateMilestones.map((milestoneData, index) => (
+                            <li key={index} className="w-full overflow-visible">
+                                <Card className="relative text-left overflow-visible">
+                                    <CardHeader>
+                                        <CheckBubble data={milestoneData} onCheckedChanged={
+                                            (checked: boolean) => {
+                                                if (checked) {
+                                                    setSelectedMilestones([...selectedMilestones, milestoneData])
+                                                } else {
+                                                    setSelectedMilestones(selectedMilestones.filter(m => (
+                                                        m.title !== milestoneData.title &&
+                                                        m.description !== milestoneData.description
+                                                    )))
+                                                }
+                                            }
+                                        }/>
+                                        <CardTitle>{milestoneData.title}</CardTitle>
+                                        <CardDescription>{milestoneData.description}</CardDescription>
+                                    </CardHeader>
+                                </Card>
+                            </li>
+                        ))}
+                    </ol>
+                </ScrollArea>
+
+                <DialogFooter>
+                    <DialogClose>
+                        <Button variant="secondary" type="button">
+                            Cancel
+                        </Button>
+                    </DialogClose>
+
+                    <Button
+                        variant="secondary"
+                        type="button"
+                        onClick={() => {
+                            router.push('/app/research-plan/templates')
+                        }}
+                    >
+                        See all templates
+                    </Button>
+
+                    <DialogClose>
+                        <Button
+                            variant="secondary"
+                            type="button"
+                            // onClick={handleAddEmptyMilestone}
+                            onClick={() => addMilestones([{name: 'New Milestone'}])}
+                        >
+                            Create empty Milestone
+                        </Button>
+                    </DialogClose>
+                    
+                    <DialogClose>
+                        <Button
+                            disabled={selectedMilestones.length === 0}
+                            type="button"
+                            onClick={() => {
+                                console.log(`add milestones`, selectedMilestones)
+                                addMilestones(selectedMilestones)
+                            }}
+                        >
+                            Create selected Milestones
+                        </Button>
+                    </DialogClose>
+                </DialogFooter>
+            </DialogContent>
         </Dialog>
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
