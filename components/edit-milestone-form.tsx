@@ -89,18 +89,18 @@ type TaskType = Prisma.TaskGetPayload<{}>
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
-const today = new Date()
+// const today = new Date()
 
-const getYearsList = () => {
-    const currentYear = today.getFullYear()
-    let years = []
+// const getYearsList = () => {
+//     const currentYear = today.getFullYear()
+//     let years = []
 
-    for (let i = currentYear - 100; i <= currentYear + 100; i++) {
-        years.push(i.toString())
-    }
+//     for (let i = currentYear - 100; i <= currentYear + 100; i++) {
+//         years.push(i.toString())
+//     }
 
-    return years
-}
+//     return years
+// }
 
 const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone
@@ -129,7 +129,7 @@ export function EditMilestoneForm({
     const editMilestoneForm = z.object({
         title: z
             .string({
-                required_error: "Please provide a title."
+                required_error: "Please provide a title"
             })
             .min(1, "Title is required")
             .max(100, "Title must be less than 100 characters"),
@@ -140,11 +140,11 @@ export function EditMilestoneForm({
         type: z.string(),
         startDate: z.object({
             month: z.string().optional(),
-            year: z.string().optional(),
+            year: z.string().min(4, "Year must be 4 digits").max(4, "Year must be 4 digits").optional(),
         }),
         endDate: z.object({
             month: z.string().optional(),
-            year: z.string().optional()
+            year: z.string().min(4, "Year must be 4 digits").max(4, "Year must be 4 digits").optional()
         }),
         budget: z.number().optional(),
         papers: z.array(z.custom<AttachmentType>()).optional(),
@@ -441,7 +441,7 @@ export function EditMilestoneForm({
 
                 <Separator />
 
-                <span className="flex flex-col gap-2">
+                <span className="flex flex-col gap-2 align-center">
                     <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Timeline`}</FormLabel>
 
                     <FormItem className="w-full grid grid-cols-[50px_auto_auto] gap-4 items-center">
@@ -485,7 +485,7 @@ export function EditMilestoneForm({
                             name="startDate.year"
                             render={({ field }) => (
                                 <FormItem className="h-full grow">
-                                    <Select
+                                    {/* <Select
                                         defaultValue={field.value}
                                         onValueChange={field.onChange}
                                     >
@@ -509,7 +509,13 @@ export function EditMilestoneForm({
                                                 )
                                             )}
                                         </SelectContent>
-                                    </Select>
+                                    </Select> */}
+                                    <Input
+                                        className="h-full"
+                                        placeholder="Enter a year..."
+                                        defaultValue={field.value}
+                                        {...field}
+                                    />
                                 </FormItem>
                             )}
                         />
@@ -554,7 +560,7 @@ export function EditMilestoneForm({
                             name="endDate.year"
                             render={({ field }) => (
                                 <FormItem className="h-full grow">
-                                    <Select
+                                    {/* <Select
                                         defaultValue={field.value}
                                         onValueChange={field.onChange}
                                     >
@@ -578,7 +584,13 @@ export function EditMilestoneForm({
                                                 )
                                             )}
                                         </SelectContent>
-                                    </Select>
+                                    </Select> */}
+                                    <Input
+                                        className="h-full"
+                                        placeholder="Enter a year..."
+                                        defaultValue={field.value}
+                                        {...field}
+                                    />
                                 </FormItem>
                             )}
                         />
