@@ -17,7 +17,6 @@ export function initializeRoadmapState(initData: {
     milestones: any[]
 }) {
     if (typeof window !== "undefined") {
-        console.log(`init roadmap state`)
         const initRoadmapState = useRoadmapStore.getState().initState;
         const { roadmapId, nodes, edges, milestones } = initData;
 
@@ -30,7 +29,6 @@ export function initializeKanbanState(initData: {
     columns: ColumnType[]
 }) {
     if (typeof window !== "undefined") {
-        console.log(`init kanban state`)
         const initKanbanState = useKanbanStore.getState().initState;
         const { columns } = initData;
 

@@ -69,6 +69,40 @@ export const PrivateFlowView = ({
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     const { startOnborda } = useOnborda()
+    const { screenToFlowPosition } = useReactFlow()
+
+    const onConnectEnd = useCallback(
+        (event: any, connectionState: any) => {
+            console.log(`connection ended`)
+            // when a connection is dropped on the pane it's not valid
+            if (!connectionState.isValid) {
+                // we need to remove the wrapper bounds, in order to get the correct position
+                const id = nanoid();
+                const { clientX, clientY } =
+                    'changedTouches' in event ? event.changedTouches[0] : event;
+                const newNode: Node = {
+                    id,
+                    type: "MILESTONE",
+                    position: screenToFlowPosition({
+                        x: clientX,
+                        y: clientY,
+                    }),
+                    data: {
+                        id: nanoid(),
+                        nodeId: id,
+                        type: 'NOTYPE',
+                        title: `New Milestone`,
+                        status: "TODO"
+                    },
+                    origin: [0.0, 0.5],
+                }
+
+                addNodes([newNode])
+                onConnect({ id, source: connectionState.fromNode.id, target: id })
+            }
+        },
+        [screenToFlowPosition],
+    );
 
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
@@ -205,12 +239,14 @@ export const PrivateFlowView = ({
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onConnectEnd={onConnectEnd}
             onBeforeDelete={handleDelete}
             nodeTypes={nodeTypes}
             fitView
             fitViewOptions={{ padding: 2 }}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
+            
         >
             <MiniMap
                 nodeColor='#757575'
