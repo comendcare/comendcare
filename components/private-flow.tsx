@@ -205,7 +205,7 @@ export const PrivateFlowView = ({
 
                 if (milestone) {
                     addMilestones([{
-                        ...milestone
+                        ...milestone,
                     }])
                 }
             },

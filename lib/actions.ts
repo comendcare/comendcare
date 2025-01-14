@@ -965,16 +965,13 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         // console.log(`milestones:`, milestones)
         // console.log(`edges:`, edges)
 
-        const organization = await prisma.organization.findFirst({
-            select: {
-                id: true,
-                roadmaps: {
-                    where: {id: roadmapId}
-                }
+        const organizations = await prisma.organization.findMany({
+            include: {
+                roadmaps: true
             }
         })
+        const organization = organizations.find(org => org.roadmaps.map(r => r.id).includes(roadmapId))
 
-        console.log(`organization`, organization)
         if (!organization) throw new Error(`Could not find organization with roadmap id: ${roadmapId}`)
         const organizationId: string = organization.id
 
@@ -998,6 +995,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         await Promise.all(
             nodes.map(async (node: any) => {
                 const n = await prisma.node.upsert({
+                    include: { data: true },
                     where: {id: node.id},
                     update: {
                         positionX: node.position?.x,
