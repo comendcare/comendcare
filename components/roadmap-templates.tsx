@@ -13,6 +13,7 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { nanoid } from "nanoid";
 import type { Node } from "@xyflow/react"
+import ComendLoadingSpinner from "./comend-loading-spinner";
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -30,6 +31,7 @@ export default function RoadmapTemplates() {
     const router = useRouter()
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const [selectedRoadmap, setSelectedRoadmap] = useState<any>(undefined)
+    const [isLoading, setIsLoading] = useState(false)
 
     const {
         addNodes,
@@ -69,6 +71,12 @@ export default function RoadmapTemplates() {
 
         addNodes(newNodes)
         return newNodes
+    }
+
+    if (isLoading) {
+        return (
+            <ComendLoadingSpinner />
+        )
     }
 
     return (
@@ -127,6 +135,7 @@ export default function RoadmapTemplates() {
                     <Button
                         disabled={selectedMilestones.length === 0}
                         onClick={() => {
+                            setIsLoading(true)
                             const newNodes = addMilestones(selectedMilestones)
                             setTimeout(() => {
                                 router.push('/app/research-plan')
@@ -140,6 +149,7 @@ export default function RoadmapTemplates() {
                     <Button 
                         variant="secondary"
                         onClick={() => {
+                            setIsLoading(true)
                             const newNode = addMilestones([{name: 'New Milestone'}])
                             setTimeout(() => {
                                 router.push('/app/research-plan')
@@ -203,6 +213,7 @@ export default function RoadmapTemplates() {
                         <Button 
                             disabled={!selectedRoadmap}
                             onClick={() => {
+                                setIsLoading(true)
                                 const newNodes = addMilestones(selectedRoadmap.milestones)
                                 setTimeout(() => {
                                     router.push('/app/research-plan')
