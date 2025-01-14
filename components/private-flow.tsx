@@ -7,9 +7,8 @@ import {
     Controls,
     useReactFlow,
     useStoreApi,
-    ReactFlowProvider
 } from "@xyflow/react"
-import type { Edge, Node } from "@xyflow/react"
+import type { ConnectionState, Edge, FinalConnectionState, Node } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
 
 import "@xyflow/react/dist/base.css"
@@ -24,9 +23,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { toast } from "sonner"
 import { isNewUser, setUserAsReturning } from "@/lib/utils"
-import { FaQuestion } from "react-icons/fa6"
 import { NewMilestoneDialogContent } from "./new-milestone-dialog-content"
-import { useSpring } from "framer-motion"
 
 const proOptions = { hideAttribution: true }
 
@@ -73,7 +70,6 @@ export const PrivateFlowView = ({
 
     const onConnectEnd = useCallback(
         (event: any, connectionState: any) => {
-            console.log(`connection ended`)
             // when a connection is dropped on the pane it's not valid
             if (!connectionState.isValid) {
                 // we need to remove the wrapper bounds, in order to get the correct position
@@ -94,11 +90,26 @@ export const PrivateFlowView = ({
                         title: `New Milestone`,
                         status: "TODO"
                     },
-                    origin: [0.0, 0.5],
+                    origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.5] : [0.0, 0.5],
                 }
 
                 addNodes([newNode])
-                onConnect({ id, source: connectionState.fromNode.id, target: id })
+
+                // Handle connection direction based on the dragged handle
+                const source = connectionState.fromHandle?.position === "left" 
+                    ? id
+                    : connectionState.fromNode?.id
+            
+                const target = connectionState.fromHandle?.position === "left" 
+                    ? connectionState.fromNode?.id
+                    : id
+
+                // Add the edge
+                onConnect({
+                    id: `edge-${source}-${target}`,
+                    source,
+                    target,
+                })
             }
         },
         [screenToFlowPosition],
@@ -165,7 +176,7 @@ export const PrivateFlowView = ({
         }
     }
 
-    // add handleEditClick() callback to nodes in the flow
+    // add handleEditClick(), handleDelete(), and handleDuplicate() callback functions to nodes in the flow
     // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
     const updatedNodes = nodes.map((node: Node, index: number) => ({
         ...node,
@@ -179,6 +190,13 @@ export const PrivateFlowView = ({
                 params.set("milestone", nodeId)
         
                 router.push(`${pathname}?${params.toString()}`, { scroll: false })
+            },
+            handleDelete: (nodeId: string) => {
+                console.log(`handle delete`, nodeId)
+            },
+            handleDuplicate: (nodeId: string) => {
+                console.log(`handle duplicate`, nodeId)
+                addMilestones([{ name: 'New Milestone' }])
             },
             // first node is the onboarding node
             onboardingMilestone: index === 0
