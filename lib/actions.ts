@@ -407,6 +407,10 @@ export const updateOrganization = withOrganizationAuth(
 
         formData.forEach((value, key) => {
             // Attempt to parse numbers
+            if (data[key] === "yearFounded") {
+                data[key] = value.toString();
+            }
+
             if (!isNaN(Number(value)) && value !== "") {
                 data[key] = Number(value);
             } else {
