@@ -87,7 +87,6 @@ const addPulseExtension = (
 
 // Main sync function
 const syncToTypesense = async (env: {
-    DATABASE_URL: string,
     TYPESENSE_ADMIN_API_KEY: string,
     TYPESENSE_URL: string,
     PULSE_API_KEY: string
@@ -380,7 +379,6 @@ const syncToTypesense = async (env: {
 export async function POST(req: Request) {
     try {
         const env = {
-            DATABASE_URL: process.env.DATABASE_URL!,
             TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
             TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
             PULSE_API_KEY: process.env.PULSE_API_KEY!,
@@ -405,7 +403,6 @@ export async function POST(req: Request) {
 export async function GET() {
     try {
         const env = {
-            DATABASE_URL: process.env.DATABASE_URL!,
             TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
             TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
             PULSE_API_KEY: process.env.PULSE_API_KEY!,
