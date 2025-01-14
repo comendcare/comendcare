@@ -300,9 +300,8 @@ export async function getMilestones(organizationId: string | undefined) {
     try {
         const fetchedMilestones = await prisma?.milestone.findMany({
             // include: {user: true},
-            where: {organizationId},
+            where: { organizationId }
         })
-
 
         if (!fetchedMilestones) {
             return {success: false, error: "milestones not found"};

@@ -135,7 +135,7 @@ export function Roadmap({
                         <div className="flex flex-row items-center p-1 gap-x-1">
                             <TabsList>
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
-                                <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger>
+                                {/* <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger> */}
                             </TabsList>
                             {view === 'flow' && (
                                 <Tooltip>
