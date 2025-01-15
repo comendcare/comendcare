@@ -602,8 +602,12 @@ export default function ResearchOnboardingForm(
 
             try {
                 await createCondition(formData).then((response) => {
+                    console.log("created")
+                    console.log(response.success)
+                    console.log(response.data)
                     if (response.success && response.data) {
                         connectOrganizationToCondition(session.data?.user.organizationId, response.data.id)
+                        console.log("connected")
                     } else {
                         console.error(response.error)
                         toast.error(response.error)
