@@ -588,9 +588,6 @@ export default function ResearchOnboardingForm(
                 relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
                 associatedGenes: values.genes?.map((gene) => gene.label).join(",") || "",
                 associatedSystems: values.systems?.map((symptom) => symptom.label).join(",") || "",
-                associatedSignsAndSymptoms: values.symptoms?.map((symptom) => symptom.value).join(",") || "",
-                existingDatabasesAndStudies: values.studies?.map((study) => study.label).join(",") || "",
-                assetsUnderDevelopment: values.assets?.map((asset) => asset.label).join(",") || "",
             };
 
             // Append data to FormData
@@ -601,21 +598,17 @@ export default function ResearchOnboardingForm(
             });
 
             try {
-                await createCondition(formData).then((response) => {
-                    console.log("created")
-                    console.log(response.success)
-                    console.log(response.data)
+                await createCondition(formData).then(async (response) => {
                     if (response.success && response.data) {
-                        connectOrganizationToCondition(session.data?.user.organizationId, response.data.id)
-                        console.log("connected")
+                        const conditionOrg = await connectOrganizationToCondition(session.data?.user.organizationId, response.data.id)
+                        toast.success("Successfully created condition.")
+                        router.push(nextLink)
                     } else {
                         console.error(response.error)
                         toast.error(response.error)
                     }
                 })
 
-                toast.success("Successfully created condition.")
-                router.push(nextLink)
             } catch (error) {
                 console.error("Failed to create condition:", error)
                 toast.error("An error occurred while creating the condition.")
