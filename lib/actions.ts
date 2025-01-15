@@ -341,7 +341,7 @@ export const createOrganization = async (formData: FormData) => {
             }
         })
 
-        await addTypeSenseDocument(process.env.TYPESENSE_URL!, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'organizations');
+        await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'organizations');
 
         await revalidateTag(
             `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
@@ -436,7 +436,7 @@ export const updateOrganization = withOrganizationAuth(
                 data,
             });
 
-            await updateTypeSenseDocument(process.env.TYPESENSE_URL!, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'organizations');
+            await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'organizations');
 
             return response;
         } catch (error: any) {
@@ -592,7 +592,7 @@ export const deleteOrganization = withOrganizationAttributeAuth(
             });
 
             const deleteTypeSense = deleteTypeSenseDocument(
-                process.env.TYPESENSE_URL!,
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
                 process.env.TYPESENSE_ADMIN_API_KEY!,
                 organization.id,
                 'organizations'
