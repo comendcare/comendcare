@@ -116,6 +116,15 @@ const syncToTypesense = async (env: {
             name: 'organizations',
             "fields": [
                 {
+                    "name": 'id',
+                    "type": 'string',
+                    "facet": false,
+                    "index": true,
+                    "optional": false, // Ensure it's marked as required, ID is required
+                    "sort": true,
+                    "store": true,
+                },
+                {
                     "facet": false,
                     "index": true,
                     "infix": false,
@@ -145,7 +154,7 @@ const syncToTypesense = async (env: {
                     "infix": false,
                     "locale": "",
                     "name": "name",
-                    "optional": false,
+                    "optional": true,
                     "sort": true,
                     "stem": false,
                     "store": true,
@@ -163,54 +172,54 @@ const syncToTypesense = async (env: {
                     "store": true,
                     "type": "int64"
                 },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "numberOfIdentifiedPatients",
-                    "optional": true,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "int64"
-                },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "prevalenceDenominator",
-                    "optional": true,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "int64"
-                },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "prevalenceNumerator",
-                    "optional": true,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "int64"
-                },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "prevalenceRatio",
-                    "optional": true,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "float"
-                },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "numberOfIdentifiedPatients",
+                //     "optional": true,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "int64"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "prevalenceDenominator",
+                //     "optional": false,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "int64"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "prevalenceNumerator",
+                //     "optional": false,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "int64"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "prevalenceRatio",
+                //     "optional": true,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "float"
+                // },
                 {
                     "facet": false,
                     "index": true,
@@ -223,30 +232,30 @@ const syncToTypesense = async (env: {
                     "store": true,
                     "type": "int64"
                 },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "interestedModalities",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string[]"
-                },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "diseaseCategories",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string[]"
-                }
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "interestedModalities",
+                //     "optional": true,
+                //     "sort": false,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "string[]"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "diseaseCategories",
+                //     "optional": true,
+                //     "sort": false,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "string[]"
+                // }
                 // add additional fields as needed
             ],
         });
