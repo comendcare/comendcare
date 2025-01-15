@@ -116,6 +116,15 @@ const syncToTypesense = async (env: {
             name: 'organizations',
             "fields": [
                 {
+                    "name": 'id',
+                    "type": 'string',
+                    "facet": false,
+                    "index": true,
+                    "optional": false, // Ensure it's marked as required
+                    "sort": true,
+                    "store": true,
+                },
+                {
                     "facet": false,
                     "index": true,
                     "infix": false,
@@ -318,26 +327,15 @@ const syncToTypesense = async (env: {
                     switch (event.action) {
                         case 'create':
                             console.log("Syncing created organization to Typesense:", event.created);
-                            await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
-                                id: event.after.id, // Ensure the ID from your database is used
-                                ...event.after,     // Include all other fields to update
-                            }, 'organizations')
+                            await addTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.created, 'organizations');
                             break;
                         case 'update':
                             console.log("Syncing updated organization to Typesense:", event.after);
-                            await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
-                                id: event.after.id, // Ensure the ID from your database is used
-                                ...event.after,     // Include all other fields to update
-                            }, 'organizations')
+                            await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.after, 'organizations');
                             break;
                         case 'delete':
                             console.log("Deleting organization from Typesense:", event.deleted);
-                            await deleteTypeSenseDocument(
-                                env.TYPESENSE_URL,
-                                env.TYPESENSE_ADMIN_API_KEY,
-                                event.deleted.id, // Use the correct ID from your database
-                                'organizations'
-                            )
+                            await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id, 'organizations');
                             break;
                     }
                 } catch (error) {
