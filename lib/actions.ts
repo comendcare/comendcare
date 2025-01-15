@@ -1486,11 +1486,11 @@ export async function createNewKanbanTask(task: Prisma.TaskGetPayload<{
         name: true,
         orderPosition: true,
         kanbanPosition: true,
-        columnId: true
+        columnId: true,
     }
 }>) {
     try {
-        const newTask = prisma.task.create({
+        const newTask = await prisma.task.create({
             data: {
                 id: task.id,
                 column: {
@@ -1500,13 +1500,15 @@ export async function createNewKanbanTask(task: Prisma.TaskGetPayload<{
                 },
                 name: task.name,
                 orderPosition: 0,
-                kanbanPosition: 0
+                kanbanPosition: 0,
             }
         })
 
         if (!newTask) {
             return {success: false, error: "membership not found"};
         }
+
+        console.log(`new task`, newTask)
 
         return {success: true, data: newTask};
     } catch (error: any) {
@@ -1559,6 +1561,25 @@ export async function deleteKanbanColumn(columnId: string) {
         return {success: true, data: deletedColumn};
     } catch (error: any) {
         logError("Error deleting kanban column", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function deleteKanbanTask(taskId: string) {
+    try {
+        const deletedTask = prisma.task.delete({
+            where: {
+                id: taskId
+            }
+        })
+
+        if (!deletedTask) {
+            return {success: false, error: "failed to delete kanban task"};
+        }
+
+        return {success: true, data: deletedTask};
+    } catch (error: any) {
+        logError("Error deleting kanban task", error);
         return {success: false, error: "Internal server error"};
     }
 }

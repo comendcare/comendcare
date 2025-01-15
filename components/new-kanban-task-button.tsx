@@ -15,7 +15,7 @@ export default function NewKanbanTaskButton({column}: { column: Column }) {
 
     async function createTask() {
         try {
-            addTask(column.id)
+            await addTask(column.id)
         } catch (error) {
             console.error(error);
         }

@@ -60,6 +60,7 @@ import { RFPEditForm } from "./rfp-edit-form"
 import { PapersEditForm } from "./papers-edit-form"
 import { FaEdit } from "react-icons/fa"
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
+import { nanoid } from "nanoid"
 
 type AssetType = Prisma.AssetGetPayload<{ 
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -110,7 +111,8 @@ const kanbanSelector = (state: KanbanState) => ({
     columns: state.columns,
     tasks: state.tasks,
     setTask: state.setTask,
-    setTasks: state.setTasks
+    setTasks: state.setTasks,
+    addTask: state.addTask
 })
 
 export function EditMilestoneForm({
@@ -123,7 +125,7 @@ export function EditMilestoneForm({
     const { setMilestone } = useRoadmapStore(
         useShallow(selector)
     )
-    const { columns: kanbanColumns, tasks: kanbanTasks, setTask, setTasks } = useKanbanStore(useShallow(kanbanSelector))
+    const { columns: kanbanColumns, tasks: kanbanTasks, setTask, setTasks, addTask } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
 
     const editMilestoneForm = z.object({
@@ -261,7 +263,6 @@ export function EditMilestoneForm({
 
             // unlink tasks that are no longer attached to this milestone
             if (!newTask && milestoneData?.id && task.milestoneId === milestoneData.id) {
-                console.log(`unlink task`, task.name)
                 return {
                     ...task,
                     milestone: undefined,
@@ -485,31 +486,6 @@ export function EditMilestoneForm({
                             name="startDate.year"
                             render={({ field }) => (
                                 <FormItem className="h-full grow">
-                                    {/* <Select
-                                        defaultValue={field.value}
-                                        onValueChange={field.onChange}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select a year" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {getYearsList().map(
-                                                (
-                                                    year: string,
-                                                    index: number
-                                                ) => (
-                                                    <SelectItem
-                                                        value={year}
-                                                        key={index}
-                                                    >
-                                                        {year}
-                                                    </SelectItem>
-                                                )
-                                            )}
-                                        </SelectContent>
-                                    </Select> */}
                                     <Input
                                         className="h-full"
                                         placeholder="Enter a year..."
@@ -560,31 +536,6 @@ export function EditMilestoneForm({
                             name="endDate.year"
                             render={({ field }) => (
                                 <FormItem className="h-full grow">
-                                    {/* <Select
-                                        defaultValue={field.value}
-                                        onValueChange={field.onChange}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select a year" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {getYearsList().map(
-                                                (
-                                                    year: string,
-                                                    index: number
-                                                ) => (
-                                                    <SelectItem
-                                                        value={year}
-                                                        key={index}
-                                                    >
-                                                        {year}
-                                                    </SelectItem>
-                                                )
-                                            )}
-                                        </SelectContent>
-                                    </Select> */}
                                     <Input
                                         className="h-full"
                                         placeholder="Enter a year..."
@@ -612,7 +563,6 @@ export function EditMilestoneForm({
                                         className="h-full"
                                         id="budget"
                                         type="number"
-                                        // placeholder={`Enter a number`}
                                         defaultValue={field.value}
                                         onChange={e =>
                                             field.onChange(
@@ -696,6 +646,28 @@ export function EditMilestoneForm({
                                     )
                                 }}
                             />
+                            <Button 
+                                variant={'secondary'}
+                                onClick={async () => {
+                                    const columnId = kanbanColumns[0].id
+
+                                    // form.setValue(
+                                    //     'tasks', 
+                                    //     [...field?.value || [], {
+                                    //         id: nanoid(),
+                                    //         name: "New Task",
+                                    //         description: null,
+                                    //         columnId,
+                                    //         orderPosition: 0,
+                                    //         kanbanPosition: 0,
+                                    //         milestoneId: milestoneData?.id,
+                                    //         // milestone: { id: milestoneData?.id }
+                                    //     }] 
+                                    // )
+                                }}
+                            >
+                                {`Add a new kanban task`}
+                            </Button>
                             </>
                         </FormControl>
                         <FormMessage />

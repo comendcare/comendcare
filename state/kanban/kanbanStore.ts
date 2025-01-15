@@ -1,7 +1,7 @@
 import {create} from "zustand"
 import {temporal} from 'zundo'
 import {Column, Task} from "@prisma/client";
-import { createKanbanColumn, createNewKanbanTask, deleteKanbanColumn, updateDBColumns, updateDBTask } from "@/lib/actions";
+import { createKanbanColumn, createNewKanbanTask, deleteKanbanColumn, deleteKanbanTask, updateDBColumns, updateDBTask } from "@/lib/actions";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
 
@@ -13,9 +13,10 @@ export type KanbanState = {
     deleteColumn: (columnId: string) => void,
     setColumn: (columnId: string, newProperties: any) => void,
     setColumns: (columns: Column[]) => void,
-    addTask: (columnId: string) => void,
+    addTask: (columnId: string) => Promise<Task | void>,
     setTask: (taskId: string, newProperties: any) => void,
-    setTasks: (tasks: any[]) => void
+    setTasks: (tasks: any[]) => void,
+    deleteTask: (taskId: string) => void,
 }
 
 export const useKanbanStore = create<KanbanState>()(
@@ -70,23 +71,27 @@ export const useKanbanStore = create<KanbanState>()(
                 set({ columns })
                 updateDBColumns({ columns })
             },
-            addTask: (columnId: string) => {
+            addTask: async (columnId: string) => {
                 const task = {
                     id: nanoid(),
                     name: "New Task",
                     columnId,
                     orderPosition: 0,
-                    kanbanPosition: 0
+                    kanbanPosition: 0,
                 }
 
-                set({ tasks: [...get().tasks, task] })
-                createNewKanbanTask(task).then((response) => {
-                    if (response.success && response.data) {
-                        toast.success("Task added successfully!")
-                    } else {
+                // create task in the database
+                const response = await createNewKanbanTask(task)
 
-                    }
-                })
+                if (response.success && response.data) {
+                    // if task was created successfully, update zustand state
+                    set({ tasks: [...get().tasks, response.data] })
+
+                    toast.success("Task added successfully!")
+                    return response.data
+                } else {
+                    console.error("Error adding task", response.error)
+                }
             },
             setTask: (taskId: string, newProperties: any) => {
                 const updatedTasks = get().tasks.map(task => {
@@ -106,11 +111,22 @@ export const useKanbanStore = create<KanbanState>()(
                 updateDBTask({ tasks })
                 set({ tasks: tasks })
             },
+            deleteTask: (taskId: string) => {
+                set({ tasks: get().tasks.filter(task => task.id !== taskId) })
+                deleteKanbanTask(taskId).then((response) => {
+                    if (response.success && response.data) {
+                        toast.success("Task deleted successfully!");
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+                })
+            },
         }),
         {
             limit: 100, // limit the stored history states to 100
             onSave: (pastState, currentState) => {
-                // console.log(`Saved Kanban State: `, currentState)
+                console.log(`Saved Kanban State: `, currentState)
                 return
             },
         })
