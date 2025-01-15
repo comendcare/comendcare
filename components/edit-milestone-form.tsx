@@ -110,7 +110,7 @@ const selector = (state: RoadmapState) => ({
 const kanbanSelector = (state: KanbanState) => ({
     columns: state.columns,
     tasks: state.tasks,
-    setTask: state.setTask,
+    updateTask: state.updateTask,
     setTasks: state.setTasks,
     addTask: state.addTask
 })
@@ -125,7 +125,7 @@ export function EditMilestoneForm({
     const { setMilestone } = useRoadmapStore(
         useShallow(selector)
     )
-    const { columns: kanbanColumns, tasks: kanbanTasks, setTask, setTasks, addTask } = useKanbanStore(useShallow(kanbanSelector))
+    const { columns: kanbanColumns, tasks: kanbanTasks, updateTask, setTasks, addTask } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
 
     const editMilestoneForm = z.object({

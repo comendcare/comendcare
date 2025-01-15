@@ -31,11 +31,11 @@ import { DropdownMenuItem } from "./ui/dropdown-menu"
 import { Column } from "@prisma/client"
 
 const kanbanSelector = (state: KanbanState) => ({
-    setColumn: state.setColumn
+    updateColumn: state.updateColumn
 })
 
 export default function EditColumnDialog({column}: {column: Column}) {
-    const { setColumn } = useKanbanStore(useShallow(kanbanSelector))
+    const { updateColumn } = useKanbanStore(useShallow(kanbanSelector))
     const [open, setOpen] = useState(false)
     const newMonitorFormSchema = getNewColumnFormSchema([])
 
@@ -52,7 +52,7 @@ export default function EditColumnDialog({column}: {column: Column}) {
     async function onSubmit() {
         setOpen(false)
         try {
-            setColumn(column.id, {...column, name: keyword})
+            updateColumn(column.id, {...column, name: keyword})
         } catch (error) {
             console.error(error);
         }
