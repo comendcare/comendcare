@@ -130,3 +130,21 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
+
+export async function GET() {
+    try {
+        const env = {
+            TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
+            TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+            PULSE_API_KEY: process.env.PULSE_API_KEY!,
+        };
+
+        const result = await syncToTypesense(env);
+        return NextResponse.json(result, { status: 200 });
+    } catch (error) {
+        console.error('Error handling POST request:', error);
+
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
+    }
+}
