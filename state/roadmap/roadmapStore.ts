@@ -11,7 +11,7 @@ import {
     EdgeChange
 } from "@xyflow/react"
 import { debounce } from "lodash"
-import { updateDBFlow, updateDBMilestones, updateDBTask } from "@/lib/actions"
+import { updateDBFlow, updateDBMilestones} from "@/lib/actions"
 
 export type RoadmapState = {
     onboardingActive: boolean,

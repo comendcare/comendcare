@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma, Column, Kanban, Post, Task, User, Condition} from "@prisma/client"
+import {Roadmap, Organization, Prisma, Kanban, Post, User, Condition} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
@@ -20,6 +20,27 @@ import {Session} from "next-auth";
 import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse} from "@/lib/types";
+
+export type Milestone = Prisma.MilestoneGetPayload<{
+    include: {
+        papers: true,
+        asset: {
+            include: { contacts: true, attachments: true }
+        },
+        RFP: {
+            include: { contacts: true, attachments: true }
+        },
+        tasks: true
+    }
+}>
+
+export type Column = Prisma.ColumnGetPayload<{
+    // include: { tasks: true }
+}>
+
+export type Task = Prisma.TaskGetPayload<{
+    include: { checklist: true },
+}>
 
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
     const roadmap = await prisma.roadmap.create({
@@ -1095,19 +1116,6 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
     }
 }
 
-type MilestoneType = Prisma.MilestoneGetPayload<{
-    include: {
-        papers: true,
-        asset: {
-            include: { contacts: true, attachments: true }
-        },
-        RFP: {
-            include: { contacts: true, attachments: true }
-        },
-        tasks: true
-    }
-}>
-
 export async function updateDBMilestones({milestones}: { milestones: any[] }) {
     try {
         await Promise.all(
@@ -1177,7 +1185,7 @@ export async function updateDBMilestones({milestones}: { milestones: any[] }) {
     }
 }
 
-async function updateAssets(previousMilestone: MilestoneType, milestone: MilestoneType) {
+async function updateAssets(previousMilestone: Milestone, milestone: Milestone) {
     if (milestone.asset) {
         await prisma.milestone.update({
             where: {id: milestone.id},
@@ -1232,7 +1240,7 @@ async function updateAssets(previousMilestone: MilestoneType, milestone: Milesto
     }
 }
 
-async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneType) {
+async function updateRFP(previousMilestone: Milestone, milestone: Milestone) {
     if (milestone.RFP) {
         await prisma.milestone.update({
             where: {id: milestone.id},
@@ -1292,81 +1300,6 @@ async function updateRFP(previousMilestone: MilestoneType, milestone: MilestoneT
                 RFP: {delete: true}
             }
         })
-    }
-}
-
-export async function updateDBColumns({columns}: { columns: Column[] }) {
-    try {
-        await Promise.all(
-            columns.map(async (column: any) => {
-                await prisma.column.update({
-                    where: {id: column?.id},
-                    data: {
-                        name: column.name,
-                        kanbanPosition: column.kanbanPosition
-                    }
-                })
-            })
-        )
-
-        console.log(`Successfully updated Task`)
-    } catch (error) {
-        console.error(`Error updating Task: `, error)
-    }
-}
-
-export async function updateDBTask({tasks}: { tasks: Task[] }) {
-    try {
-        console.log(`tasks:`, tasks)
-        let updatedTasks: Task[] = []
-
-        await Promise.all(
-            tasks.map(async (task: any) => {
-                if (!task) return
-
-                let t = await prisma.task.update({
-                    where: {id: task?.id},
-                    include: {milestone: true},
-                    data: {
-                        name: task.name,
-                        // status: task.status,
-                        description: task.description,
-                        orderPosition: task.orderPosition,
-                        kanbanPosition: task.kanbanPosition,
-                        checklist: {
-                            deleteMany: {},
-                            createMany: {
-                                data: (task.checklist || []).map((item: any) => ({
-                                    name: item?.name || "New Item",
-                                    complete: item?.complete || false,
-                                    orderPosition: item?.orderPosition
-                                }))
-                            }
-                        },
-                        stakeholders: {
-                            set: [],
-                            connect: task.stakeholders?.map((stakeholder: User) => ({id: stakeholder?.id})) || []
-                        },
-                        milestone: task.milestoneId
-                            ? {connect: { id: task.milestoneId }} // Connect if milestoneId exists
-                            : {disconnect: true}, // Disconnect if milestoneId is undefined
-                        endDate: task.endDate,
-                        priority: task.priority,
-                        private: task.private,
-                        column: {
-                            connect: {id: task.columnId}
-                        }
-                    }
-                })
-
-                updatedTasks.push(t)
-            })
-        )
-
-        console.log(`Successfully updated Task`)
-        return updatedTasks
-    } catch (error) {
-        console.error(`Error updating Task: `, error)
     }
 }
 
@@ -1477,110 +1410,6 @@ export async function createKanban(orgId: string) {
     } catch (error: any) {
         logError(`Error creating kanban task for ${orgId}`, error)
         return {success: false, error: "Internal server error"}
-    }
-}
-
-export async function createNewKanbanTask(task: Prisma.TaskGetPayload<{
-    select: {
-        id: true,
-        name: true,
-        orderPosition: true,
-        kanbanPosition: true,
-        columnId: true,
-    }
-}>) {
-    try {
-        const newTask = await prisma.task.create({
-            data: {
-                id: task.id,
-                column: {
-                    connect: {
-                        id: task.columnId
-                    }
-                },
-                name: task.name,
-                orderPosition: 0,
-                kanbanPosition: 0,
-            }
-        })
-
-        if (!newTask) {
-            return {success: false, error: "membership not found"};
-        }
-
-        console.log(`new task`, newTask)
-
-        return {success: true, data: newTask};
-    } catch (error: any) {
-        logError("Error fetching membership data", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function createKanbanColumn(column: Column) {
-    try {
-        const {data: kanban} = await getKanbanFromOrganizationId()
-        if (!kanban) return {success: false, error: "failed to find associated kanban board"}
-
-        const newColumn = prisma.column.create({
-            data: {
-                id: column.id,
-                kanban: {
-                    connect: {
-                        id: kanban.id
-                    },
-                },
-                name: column.name,
-                kanbanPosition: 0
-            }
-        })
-
-        if (!newColumn) {
-            return {success: false, error: "failed to create kanban column"};
-        }
-
-        return {success: true, data: newColumn};
-    } catch (error: any) {
-        logError("Error creating kanban column", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function deleteKanbanColumn(columnId: string) {
-    try {
-        const deletedColumn = prisma.column.delete({
-            where: {
-                id: columnId
-            }
-        })
-
-        if (!deletedColumn) {
-            return {success: false, error: "failed to delete kanban column"};
-        }
-
-        return {success: true, data: deletedColumn};
-    } catch (error: any) {
-        logError("Error deleting kanban column", error);
-        return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function deleteKanbanTask(taskId: string) {
-    try {
-        const deletedTask = prisma.task.delete({
-            where: {
-                id: taskId
-            }
-        })
-
-        if (!deletedTask) {
-            return {success: false, error: "failed to delete kanban task"};
-        }
-
-        return {success: true, data: deletedTask};
-    } catch (error: any) {
-        logError("Error deleting kanban task", error);
-        return {success: false, error: "Internal server error"};
     }
 }
 
@@ -1752,7 +1581,6 @@ export async function acceptInvitation(invitationId: string) {
     }
 }
 
-
 export async function updateCondition(formData: FormData, organizationId: string) {
     try {
         // Convert FormData to a plain object
@@ -1795,5 +1623,207 @@ export async function updateCondition(formData: FormData, organizationId: string
     } catch (error: any) {
         console.error("Error updating condition:", error);
         return { success: false, error: error.message || "Failed to update condition." };
+    }
+}
+
+/* HANDLE KANBAN COLUMNS - create, update, delete ------------------------------------------------------------------------ */
+export async function createColumn(column: Partial<Column>) {
+    try {
+        const {data: kanban} = await getKanbanFromOrganizationId()
+        if (!kanban) return {success: false, error: "failed to find associated kanban board"}
+
+        const newColumn = await prisma.column.create({
+            data: {
+                name: column.name || 'New column',
+                id: nanoid(),
+                kanban: {
+                    connect: { id: kanban.id }
+                },
+                kanbanPosition: column.kanbanPosition || 0
+            }
+        })
+
+        if (!newColumn) {
+            return {success: false, error: "failed to create kanban column"};
+        }
+
+        // Typesense - if updating typesense, update here...
+
+        return {success: true, data: newColumn};
+    } catch (error: any) {
+        logError("Error creating kanban column", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function updateColumns({columns}: { columns: Column[] }) {
+    try {
+        let updatedColumns: Column[] = []
+        
+        await Promise.all(
+            columns.map(async (column: any) => {
+                let c = await prisma.column.update({
+                    where: {id: column?.id},
+                    data: {
+                        name: column.name,
+                        kanbanPosition: column.kanbanPosition
+                    }
+                })
+
+                if (!c) {
+                    logError("Could not update column", column)
+                } else {
+                    updatedColumns.push(c)
+                }
+            })
+        )
+
+        // Typesense - if updating typesense, update here...
+
+        return { success: true, data: updatedColumns }
+    } catch (error) {
+        logError("Could not update column", error)
+        return { success: false, error: "Internal server error" }
+    }
+}
+
+export async function deleteColumn(columnId: string) {
+    try {
+        const deletedColumn = await prisma.column.delete({
+            where: {
+                id: columnId
+            }
+        })
+
+        if (!deletedColumn) {
+            return {success: false, error: "failed to delete kanban column"};
+        }
+
+        // Typesense - if updating typesense, update here...
+
+        return {success: true, data: deletedColumn};
+    } catch (error: any) {
+        logError("Error deleting kanban column", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+/* HANDLE KANBAN TASKS - create, update, delete -------------------------------------------------------------------------- */
+export async function createTask(columnId: string) {
+    try {
+        const newTask: Task = await prisma.task.create({
+            include: { checklist: true },
+            data: {
+                name: 'New Task',
+                id: nanoid(),
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                kanbanPosition: 0,
+                // status: null,
+                // description: null,
+                // milestoneId: null,
+                orderPosition: 0,
+                columnId,
+                // date: null,
+                // endDate: null,
+                // priority: null,
+                private: false,
+                // startDate: null,
+                // checklist: []
+            }
+        })
+
+        if (!newTask) {
+            return {success: false, error: "Could not create task"}
+        }
+
+        // Typesense - if updating typesense, update here...
+
+        return { success: true, data: newTask }
+    } catch (error: any) {
+        logError("Could not create task", error)
+        return { success: false, error: "Internal server error" }
+    }
+}
+
+export async function updateTasks({tasks}: { tasks: Task[] }) {
+    try {
+        let updatedTasks: Task[] = []
+
+        await Promise.all(
+            tasks.map(async (task: any) => {
+                if (!task) return
+
+                let t = await prisma.task.update({
+                    where: {id: task?.id},
+                    include: {milestone: true, checklist: true},
+                    data: {
+                        name: task.name,
+                        // status: task.status,
+                        description: task.description,
+                        orderPosition: task.orderPosition,
+                        kanbanPosition: task.kanbanPosition,
+                        checklist: {
+                            deleteMany: {},
+                            createMany: {
+                                data: (task.checklist || []).map((item: any) => ({
+                                    name: item?.name || "New Item",
+                                    complete: item?.complete || false,
+                                    orderPosition: item?.orderPosition
+                                }))
+                            }
+                        },
+                        stakeholders: {
+                            set: [],
+                            connect: task.stakeholders?.map((stakeholder: User) => ({id: stakeholder?.id})) || []
+                        },
+                        milestone: task.milestoneId
+                            ? {connect: { id: task.milestoneId }} // Connect if milestoneId exists
+                            : {disconnect: true}, // Disconnect if milestoneId is undefined
+                        endDate: task.endDate,
+                        priority: task.priority,
+                        private: task.private,
+                        column: {
+                            connect: {id: task.columnId}
+                        }
+                    }
+                })
+
+                if (!t) {
+                    logError("Could not update task", task)
+                } else {
+                    updatedTasks.push(t)
+                }
+            })
+        )
+
+        // Typesense - if updating typesense, update here...
+
+        return { success: true, data: updatedTasks }
+    } catch (error) {
+        logError("Could not update task", error)
+        return { success: false, error: "Internal server error" }
+    }
+}
+
+export async function deleteTask(taskId: string) {
+    try {
+        const deletedTask = await prisma.task.delete({
+            include: { checklist: true },
+            where: {
+                id: taskId
+            }
+        })
+
+        if (!deletedTask) {
+            return {success: false, error: "failed to delete kanban task"};
+        }
+
+        // Typesense - if updating typesense, update here...
+
+        return {success: true, data: deletedTask};
+    } catch (error: any) {
+        logError("Error deleting kanban task", error);
+        return {success: false, error: "Internal server error"};
     }
 }

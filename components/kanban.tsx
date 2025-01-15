@@ -20,7 +20,6 @@ import {
 } from "@dnd-kit/core"
 import { SortableContext, arrayMove } from "@dnd-kit/sortable"
 import { type Task, TaskCard } from "@/components/task-card"
-import {Column} from "@prisma/client"
 import { hasDraggableData } from "@/lib/utils"
 import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
@@ -29,6 +28,7 @@ import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSession } from "next-auth/react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { Column } from "@/lib/actions"
 
 export type ColumnId = string
 
