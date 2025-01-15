@@ -39,7 +39,7 @@ export type Column = Prisma.ColumnGetPayload<{
 }>
 
 export type Task = Prisma.TaskGetPayload<{
-    include: { checklist: true },
+    include: { checklist: true, stakeholders: true },
 }>
 
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
@@ -1712,7 +1712,7 @@ export async function deleteColumn(columnId: string) {
 export async function createTask(columnId: string) {
     try {
         const newTask: Task = await prisma.task.create({
-            include: { checklist: true },
+            include: { checklist: true, stakeholders: true },
             data: {
                 name: 'New Task',
                 id: nanoid(),
@@ -1756,7 +1756,7 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
 
                 let t = await prisma.task.update({
                     where: {id: task?.id},
-                    include: {milestone: true, checklist: true},
+                    include: {milestone: true, checklist: true, stakeholders: true},
                     data: {
                         name: task.name,
                         // status: task.status,
