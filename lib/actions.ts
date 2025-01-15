@@ -8,7 +8,14 @@ import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
 import {put} from "@vercel/blob";
 import {customAlphabet} from "nanoid";
-import {getBlurDataURL, logError, toKebabCase} from "@/lib/utils";
+import {
+    addTypeSenseDocument,
+    deleteTypeSenseDocument,
+    getBlurDataURL,
+    logError,
+    toKebabCase,
+    updateTypeSenseDocument
+} from "@/lib/utils";
 import {Session} from "next-auth";
 import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
@@ -333,6 +340,9 @@ export const createOrganization = async (formData: FormData) => {
                 organizationId: response.id
             }
         })
+
+        await addTypeSenseDocument(process.env.TYPESENSE_URL!, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'organizations');
+
         await revalidateTag(
             `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
         )
@@ -425,6 +435,8 @@ export const updateOrganization = withOrganizationAuth(
                 },
                 data,
             });
+
+            await updateTypeSenseDocument(process.env.TYPESENSE_URL!, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'organizations');
 
             return response;
         } catch (error: any) {
@@ -575,11 +587,20 @@ export const updateOrganizationAttribute = withOrganizationAttributeAuth(
 export const deleteOrganization = withOrganizationAttributeAuth(
     async (_: FormData, organization: Organization) => {
         try {
-            const response = await prisma.organization.delete({
-                where: {
-                    id: organization.id
-                }
-            })
+            const deleteDatabase = prisma.organization.delete({
+                where: { id: organization.id },
+            });
+
+            const deleteTypeSense = deleteTypeSenseDocument(
+                process.env.TYPESENSE_URL!,
+                process.env.TYPESENSE_ADMIN_API_KEY!,
+                organization.id,
+                'organizations'
+            );
+
+            // Run both deletions concurrently
+            const [response] = await Promise.all([deleteDatabase, deleteTypeSense])
+
             await revalidateTag(
                 `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
