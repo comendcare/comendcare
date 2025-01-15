@@ -379,8 +379,8 @@ const syncToTypesense = async (env: {
         console.error('syncToTypesense job failed:', error);
         throw error;
     } finally {
-        if (orgStream) orgStream.stop();
-        if (milestoneStream) milestoneStream.stop();
+        // if (orgStream) orgStream.stop();
+        // if (milestoneStream) milestoneStream.stop();
     }
 };
 
