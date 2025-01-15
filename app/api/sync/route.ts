@@ -318,15 +318,26 @@ const syncToTypesense = async (env: {
                     switch (event.action) {
                         case 'create':
                             console.log("Syncing created organization to Typesense:", event.created);
-                            await addTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.created, 'organizations');
+                            await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
+                                id: event.after.id, // Ensure the ID from your database is used
+                                ...event.after,     // Include all other fields to update
+                            }, 'organizations')
                             break;
                         case 'update':
                             console.log("Syncing updated organization to Typesense:", event.after);
-                            await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.after, 'organizations');
+                            await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
+                                id: event.after.id, // Ensure the ID from your database is used
+                                ...event.after,     // Include all other fields to update
+                            }, 'organizations')
                             break;
                         case 'delete':
                             console.log("Deleting organization from Typesense:", event.deleted);
-                            await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id, 'organizations');
+                            await deleteTypeSenseDocument(
+                                env.TYPESENSE_URL,
+                                env.TYPESENSE_ADMIN_API_KEY,
+                                event.deleted.id, // Use the correct ID from your database
+                                'organizations'
+                            )
                             break;
                     }
                 } catch (error) {
