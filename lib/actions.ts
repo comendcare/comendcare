@@ -21,6 +21,8 @@ import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from 
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse} from "@/lib/types";
 
+export type Node = Prisma.NodeGetPayload<{}>
+
 export type Milestone = Prisma.MilestoneGetPayload<{
     include: {
         papers: true,
@@ -41,104 +43,6 @@ export type Column = Prisma.ColumnGetPayload<{
 export type Task = Prisma.TaskGetPayload<{
     include: { checklist: true, stakeholders: true },
 }>
-
-export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
-    const roadmap = await prisma.roadmap.create({
-        data: {
-            organization: {
-                connect: {id: organizationId}
-            }
-        }
-    })
-
-    // if a roadmap template was provided, create the relevant nodes, milestones, and edges
-    if (roadmapTemplate?.milestones) {
-        const milestones = roadmapTemplate.milestones
-
-        const nodes = await Promise.all(
-            milestones.map(async (milestone: any, index: number) => {
-                // create Node & associated Milestone
-                const node = await prisma.node.create({
-                    data: {
-                        roadmapId: roadmap.id,
-                        type: 'MILESTONE',
-                        positionX: index * 500,
-                        positionY: 0,
-                        data: {
-                            create: {
-                                roadmapId: roadmap.id,
-                                organizationId,
-                                type: milestone.type || 'NOTYPE',
-                                status: milestone.status || "TODO",
-                                title: milestone.title,
-                                ...(milestone.description ? {description: milestone.description} : undefined),
-                                ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
-                                ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
-                                ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                // papers: milestone.papers || [],
-                                private: milestone.private || false
-                            }
-                        }
-                    }
-                })
-
-                // grab milestone so we can add tasks
-                // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
-                const newMilestone = await prisma.milestone.findUnique({
-                    where: {nodeId: node.id},
-                    include: {
-                        papers: true,
-                        asset: {
-                            include: {contacts: true, attachments: true}
-                        },
-                        RFP: {
-                            include: {contacts: true, attachments: true}
-                        },
-                        tasks: true
-                    }
-                })
-
-                // create tasks for relevant milestone
-                // if (newMilestone) {
-                //     await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
-                //         await prisma.task.create({
-                //             data: {
-                //                 milestoneId: newMilestone?.id,
-                //                 status: task.status || "TODO",
-                //                 name: task.name,
-                //                 orderPosition: index,
-                //                 kanbanPosition: index,
-                //                 checklist: {
-                //                     createMany: {
-                //                         data: (task.checklist || []).map((item: any, index: number) => ({
-                //                             name: item.name,
-                //                             complete: item.complete || false,
-                //                             orderPosition: index
-                //                         }))
-                //                     }
-                //                 }
-                //             }
-                //         })
-                //     )))
-                // }
-
-                return node
-            })
-        )
-
-        for (let i = 0; i < nodes.length - 1; i++) {
-            await prisma.edge.create({
-                data: {
-                    roadmap: {connect: {id: roadmap.id}},
-                    source: nodes[i]?.id,
-                    target: nodes[i + 1]?.id
-                }
-            })
-        }
-    }
-
-    return roadmap
-}
 
 const nanoid = customAlphabet(
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -466,7 +370,6 @@ export const updateOrganization = withOrganizationAuth(
         }
     }
 );
-
 
 export const updateOrganizationAttribute = withOrganizationAttributeAuth(
     async (formData: FormData, organization: Organization, key: string) => {
@@ -1000,332 +903,6 @@ export async function addMemberToOrganization(
     }
 }
 
-/* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
-
-export async function updateDBFlow({roadmapId, nodes, edges}: {
-    roadmapId: string | null,
-    nodes: any[],
-    edges: any[]
-}) {
-    try {
-        if (!roadmapId) throw new Error('No roadmapId provided.')
-        // console.log(`nodes:`, nodes)
-        // console.log(`milestones:`, milestones)
-        // console.log(`edges:`, edges)
-
-        const organizations = await prisma.organization.findMany({
-            include: {
-                roadmaps: true
-            }
-        })
-        const organization = organizations.find(org => org.roadmaps.map(r => r.id).includes(roadmapId))
-
-        if (!organization) throw new Error(`Could not find organization with roadmap id: ${roadmapId}`)
-        const organizationId: string = organization.id
-
-        // Delete any nodes that are not in the request
-        const nodeIds = nodes.map((node: any) => node.id)
-        const nodesInDB = await prisma.node.findMany({select: {id: true}})
-        const nodeIdsInDB = (nodesInDB || []).map((node: any) => node.id)
-        const nodesToDelete = nodeIdsInDB.filter(
-            (id: string) => !nodeIds.includes(id)
-        )
-
-        await prisma.node.deleteMany({
-            where: {
-                id: {in: nodesToDelete}
-            }
-        })
-
-        await prisma.edge.deleteMany()
-
-        // Save or update nodes
-        await Promise.all(
-            nodes.map(async (node: any) => {
-                const n = await prisma.node.upsert({
-                    include: { data: true },
-                    where: {id: node.id},
-                    update: {
-                        positionX: node.position?.x,
-                        positionY: node.position?.y
-                    },
-                    create: {
-                        id: node.id,
-                        roadmap: {
-                            connect: {id: roadmapId}
-                        },
-                        type: node.type,
-                        positionX: node.position?.x,
-                        positionY: node.position?.y,
-                        data: {
-                            create: {
-                                id: node.data?.id,
-                                roadmap: {
-                                    connect: {id: roadmapId}
-                                },
-                                organization: {
-                                    connect: {id: organizationId}
-                                },
-                                title: node.data?.title || "New Milestone",
-                                type: node.data?.type || undefined,
-                                description: node.data?.description,
-                                startDate: node.data?.startDate,
-                                endDate: node.data?.endDate,
-                                budget: node.data?.budget,
-                                papers: {
-                                    createMany: {
-                                        data: (node.data?.papers || []).map((paper: any) => ({
-                                            link: paper.link,
-                                            ...(paper.name ? {name: paper.name} : undefined)
-                                        }))
-                                    }
-                                },
-                                status: node.data?.status || "TODO",
-                                private: node.data?.private || false,
-                            }
-                        }
-                    }
-                })
-            })
-        )
-
-        // Save or update edges
-        await Promise.all(
-            edges.map(async (edge: any) => {
-                await prisma.edge.upsert({
-                    where: {id: edge.id},
-                    update: {
-                        source: edge.source,
-                        target: edge.target
-                    },
-                    create: {
-                        id: edge.id,
-                        roadmap: {
-                            connect: {id: roadmapId}
-                        },
-                        source: edge.source,
-                        target: edge.target,
-                    }
-                })
-            })
-        )
-
-        console.log(`Successfully updated Flow`)
-    } catch (error) {
-        console.error(`Error updating Flow: `, error)
-    }
-}
-
-export async function updateDBMilestones({milestones}: { milestones: any[] }) {
-    try {
-        await Promise.all(
-            milestones.map(async (milestone: any) => {
-                const previousMilestone = await prisma.milestone.findUnique({
-                    where: { nodeId: milestone.nodeId },
-                    // where: {id: milestone.id},
-                    include: {
-                        papers: true,
-                        asset: {
-                            include: {contacts: true, attachments: true}
-                        },
-                        RFP: {
-                            include: {contacts: true, attachments: true}
-                        },
-                        tasks: true
-                    }
-                })
-
-                if (!previousMilestone) {
-                    // milestone doesn't exist, throw error
-                    throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`);
-                }
-
-                await prisma.milestone.update({
-                    where: { nodeId: milestone.nodeId },
-                    // where: {id: milestone.id},
-                    include: {
-                        papers: true,
-                        asset: {
-                            include: {contacts: true, attachments: true}
-                        },
-                        RFP: {
-                            include: {contacts: true, attachments: true}
-                        },
-                    },
-                    data: {
-                        title: milestone.title,
-                        type: milestone.type,
-                        description: milestone.description,
-                        startDate: milestone.startDate,
-                        endDate: milestone.endDate,
-                        budget: milestone.budget,
-                        papers: {
-                            deleteMany: {}, // clear all existing papers
-                            createMany: {
-                                data: milestone.papers.map((paper: any) => ({
-                                    link: paper.link,
-                                    ...(paper.name ? {name: paper.name} : undefined)
-                                }))
-                            }
-                        },
-                        status: milestone.status || "TODO",
-                        private: milestone.private || false,
-                    }
-                })
-
-                updateAssets(previousMilestone, milestone)
-
-                updateRFP(previousMilestone, milestone)
-            })
-        )
-
-        console.log(`Successfully updated Milestone`)
-    } catch (error) {
-        console.error(`Error updating Milestone: `, error)
-    }
-}
-
-async function updateAssets(previousMilestone: Milestone, milestone: Milestone) {
-    if (milestone.asset) {
-        await prisma.milestone.update({
-            where: {id: milestone.id},
-            include: {
-                asset: {include: {contacts: true, attachments: true}}
-            },
-            data: {
-                asset: {
-                    upsert: {
-                        create: {
-                            name: milestone.asset.name
-                        },
-                        update: {
-                            name: milestone.asset.name,
-                            description: milestone.asset.description,
-                            contacts: {
-                                deleteMany: {},  // clear all existing contacts
-                                createMany: {
-                                    data: milestone.asset.contacts.map((contact: any) => ({
-                                        name: contact.name,
-                                        role: contact.role,
-                                        email: contact.email
-                                    }))
-                                }
-                            },
-                            attachments: {
-                                deleteMany: {}, // clear all existing attachments
-                                createMany: {
-                                    data: milestone.asset.attachments.map((attachment: any) => ({
-                                        link: attachment.link,
-                                        name: attachment.name
-                                    }))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        })
-    }
-
-    if (!milestone.asset && previousMilestone.asset) {
-        await prisma.milestone.update({
-            where: {id: milestone.id},
-            include: {
-                asset: {include: {contacts: true, attachments: true}}
-            },
-            data: {
-                asset: {delete: true}
-            }
-        })
-    }
-}
-
-async function updateRFP(previousMilestone: Milestone, milestone: Milestone) {
-    if (milestone.RFP) {
-        await prisma.milestone.update({
-            where: {id: milestone.id},
-            include: {
-                RFP: {include: {contacts: true, attachments: true}},
-            },
-            data: {
-                RFP: {
-                    upsert: {
-                        create: {
-                            name: milestone.RFP.name,
-                            funding: milestone.RFP.funding,
-                            researchFocus: milestone.type,
-                            openTo: milestone.RFP.openTo
-                        },
-                        update: {
-                            name: milestone.RFP.name,
-                            funding: milestone.RFP.funding,
-                            description: milestone.RFP.description,
-                            contacts: {
-                                deleteMany: {}, // clear all existing contacts
-                                createMany: {
-                                    data: milestone.RFP.contacts.map((contact: any) => ({
-                                        name: contact.name,
-                                        role: contact.role,
-                                        email: contact.email
-                                    }))
-                                }
-                            },
-                            attachments: {
-                                deleteMany: {}, // clear all existing attachments
-                                createMany: {
-                                    data: milestone.RFP.attachments.map((attachment: any) => ({
-                                        link: attachment.link,
-                                        name: attachment.name
-                                    }))
-                                }
-                            },
-                            researchFocus: milestone.type,
-                            openTo: milestone.RFP.openTo,
-                            startDate: milestone.RFP.startDate,
-                            endDate: milestone.RFP.endDate
-                        }
-                    }
-                }
-            }
-        })
-    }
-
-    if (!milestone.RFP && previousMilestone.RFP) {
-        await prisma.milestone.update({
-            where: {id: milestone.id},
-            include: {
-                RFP: {include: {contacts: true, attachments: true}},
-            },
-            data: {
-                RFP: {delete: true}
-            }
-        })
-    }
-}
-
-export async function deleteOrgRoadmap(
-    roadmapId: string,
-    organizationId: string
-) {
-    try {
-        const response = await prisma.roadmap.delete({
-            where: {
-                id: roadmapId,
-                organizationId: organizationId
-            }
-        })
-
-        if (!response) {
-            return {success: false, error: 'roadmap not found'}
-        }
-
-        return {success: true, data: response}
-    } catch (error: any) {
-        logError("Error deleting roadmap", error)
-        return {success: false, error: "Internal server error"}
-    }
-}
-
 // Invite user function with updated Organization model
 export async function leaveOrganization(
     session: Session | null,
@@ -1379,37 +956,6 @@ export async function deleteUser(
     } catch (error: any) {
         logError("Error fetching user data", error);
         return {success: false, error: "Internal server error"};
-    }
-}
-
-export async function createKanban(orgId: string) {
-    try {
-        const newKanban = await prisma.kanban.create({
-            data: {
-                organization: { connect: { id: orgId } },
-                columns: {
-                    create: [
-                        {
-                            name: "To Do",
-                            kanbanPosition: 0
-                        },
-                        {
-                            name: 'In Progress',
-                            kanbanPosition: 1
-                        },
-                        {
-                            name: 'Done',
-                            kanbanPosition: 2
-                        }
-                    ]
-                }
-            }
-        })
-
-        return {success: true, data: newKanban}
-    } catch (error: any) {
-        logError(`Error creating kanban task for ${orgId}`, error)
-        return {success: false, error: "Internal server error"}
     }
 }
 
@@ -1623,6 +1169,635 @@ export async function updateCondition(formData: FormData, organizationId: string
     } catch (error: any) {
         console.error("Error updating condition:", error);
         return { success: false, error: error.message || "Failed to update condition." };
+    }
+}
+
+/* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
+export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
+    const roadmap = await prisma.roadmap.create({
+        data: {
+            organization: {
+                connect: {id: organizationId}
+            }
+        }
+    })
+
+    // if a roadmap template was provided, create the relevant nodes, milestones, and edges
+    if (roadmapTemplate?.milestones) {
+        const milestones = roadmapTemplate.milestones
+
+        const nodes = await Promise.all(
+            milestones.map(async (milestone: any, index: number) => {
+                // create Node & associated Milestone
+                const node = await prisma.node.create({
+                    data: {
+                        roadmapId: roadmap.id,
+                        type: 'MILESTONE',
+                        positionX: index * 500,
+                        positionY: 0,
+                        data: {
+                            create: {
+                                roadmapId: roadmap.id,
+                                organizationId,
+                                type: milestone.type || 'NOTYPE',
+                                status: milestone.status || "TODO",
+                                title: milestone.title,
+                                ...(milestone.description ? {description: milestone.description} : undefined),
+                                ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
+                                ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
+                                ...(milestone.budget ? {budget: milestone.budget} : undefined),
+                                // papers: milestone.papers || [],
+                                private: milestone.private || false
+                            }
+                        }
+                    }
+                })
+
+                // grab milestone so we can add tasks
+                // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
+                const newMilestone = await prisma.milestone.findUnique({
+                    where: {nodeId: node.id},
+                    include: {
+                        papers: true,
+                        asset: {
+                            include: {contacts: true, attachments: true}
+                        },
+                        RFP: {
+                            include: {contacts: true, attachments: true}
+                        },
+                        tasks: true
+                    }
+                })
+
+                // create tasks for relevant milestone
+                // if (newMilestone) {
+                //     await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
+                //         await prisma.task.create({
+                //             data: {
+                //                 milestoneId: newMilestone?.id,
+                //                 status: task.status || "TODO",
+                //                 name: task.name,
+                //                 orderPosition: index,
+                //                 kanbanPosition: index,
+                //                 checklist: {
+                //                     createMany: {
+                //                         data: (task.checklist || []).map((item: any, index: number) => ({
+                //                             name: item.name,
+                //                             complete: item.complete || false,
+                //                             orderPosition: index
+                //                         }))
+                //                     }
+                //                 }
+                //             }
+                //         })
+                //     )))
+                // }
+
+                return node
+            })
+        )
+
+        for (let i = 0; i < nodes.length - 1; i++) {
+            await prisma.edge.create({
+                data: {
+                    roadmap: {connect: {id: roadmap.id}},
+                    source: nodes[i]?.id,
+                    target: nodes[i + 1]?.id
+                }
+            })
+        }
+    }
+
+    return roadmap
+}
+
+export async function updateDBFlow({roadmapId, nodes, edges}: {
+    roadmapId: string | null,
+    nodes: any[],
+    edges: any[]
+}) {
+    try {
+        if (!roadmapId) throw new Error('No roadmapId provided.')
+        // console.log(`nodes:`, nodes)
+        // console.log(`milestones:`, milestones)
+        // console.log(`edges:`, edges)
+
+        const organizations = await prisma.organization.findMany({
+            include: {
+                roadmaps: true
+            }
+        })
+        const organization = organizations.find(org => org.roadmaps.map(r => r.id).includes(roadmapId))
+
+        if (!organization) throw new Error(`Could not find organization with roadmap id: ${roadmapId}`)
+        const organizationId: string = organization.id
+
+        // Delete any nodes that are not in the request
+        const nodeIds = nodes.map((node: any) => node.id)
+        const nodesInDB = await prisma.node.findMany({select: {id: true}})
+        const nodeIdsInDB = (nodesInDB || []).map((node: any) => node.id)
+        const nodesToDelete = nodeIdsInDB.filter(
+            (id: string) => !nodeIds.includes(id)
+        )
+
+        await prisma.node.deleteMany({
+            where: {
+                id: {in: nodesToDelete}
+            }
+        })
+
+        await prisma.edge.deleteMany()
+
+        // Save or update nodes
+        await Promise.all(
+            nodes.map(async (node: any) => {
+                const n = await prisma.node.upsert({
+                    include: { data: true },
+                    where: {id: node.id},
+                    update: {
+                        positionX: node.position?.x,
+                        positionY: node.position?.y
+                    },
+                    create: {
+                        id: node.id,
+                        roadmap: {
+                            connect: {id: roadmapId}
+                        },
+                        type: node.type,
+                        positionX: node.position?.x,
+                        positionY: node.position?.y,
+                        data: {
+                            create: {
+                                id: node.data?.id,
+                                roadmap: {
+                                    connect: {id: roadmapId}
+                                },
+                                organization: {
+                                    connect: {id: organizationId}
+                                },
+                                title: node.data?.title || "New Milestone",
+                                type: node.data?.type || undefined,
+                                description: node.data?.description,
+                                startDate: node.data?.startDate,
+                                endDate: node.data?.endDate,
+                                budget: node.data?.budget,
+                                papers: {
+                                    createMany: {
+                                        data: (node.data?.papers || []).map((paper: any) => ({
+                                            link: paper.link,
+                                            ...(paper.name ? {name: paper.name} : undefined)
+                                        }))
+                                    }
+                                },
+                                status: node.data?.status || "TODO",
+                                private: node.data?.private || false,
+                            }
+                        }
+                    }
+                })
+            })
+        )
+
+        // Save or update edges
+        await Promise.all(
+            edges.map(async (edge: any) => {
+                await prisma.edge.upsert({
+                    where: {id: edge.id},
+                    update: {
+                        source: edge.source,
+                        target: edge.target
+                    },
+                    create: {
+                        id: edge.id,
+                        roadmap: {
+                            connect: {id: roadmapId}
+                        },
+                        source: edge.source,
+                        target: edge.target,
+                    }
+                })
+            })
+        )
+
+        console.log(`Successfully updated Flow`)
+    } catch (error) {
+        console.error(`Error updating Flow: `, error)
+    }
+}
+
+export async function createNodes({roadmapId, nodes}: { roadmapId: string | null, nodes: any[]}) {
+    try {
+        const updatedNodes: Node[] = []
+
+        if (!roadmapId) throw new Error('No roadmapId provided.')
+    
+        const organizations = await prisma.organization.findMany({
+            include: {
+                roadmaps: true
+            }
+        })
+        const organization = organizations.find(org => org.roadmaps.map(r => r.id).includes(roadmapId))
+
+        if (!organization) throw new Error(`Could not find organization with roadmap id: ${roadmapId}`)
+        const organizationId: string = organization.id
+
+        await Promise.all(
+            nodes.map(async (node: any) => {
+                const n = await prisma.node.upsert({
+                    include: { data: true },
+                    where: {id: node.id},
+                    update: {
+                        positionX: node.position?.x,
+                        positionY: node.position?.y
+                    },
+                    create: {
+                        id: node.id,
+                        roadmap: {
+                            connect: {id: roadmapId}
+                        },
+                        type: node.type,
+                        positionX: node.position?.x,
+                        positionY: node.position?.y,
+                        data: {
+                            create: {
+                                id: node.data?.id,
+                                roadmap: {
+                                    connect: {id: roadmapId}
+                                },
+                                organization: {
+                                    connect: {id: organizationId}
+                                },
+                                title: node.data?.title || "New Milestone",
+                                type: node.data?.type || undefined,
+                                description: node.data?.description,
+                                startDate: node.data?.startDate,
+                                endDate: node.data?.endDate,
+                                budget: node.data?.budget,
+                                papers: {
+                                    createMany: {
+                                        data: (node.data?.papers || []).map((paper: any) => ({
+                                            link: paper.link,
+                                            ...(paper.name ? {name: paper.name} : undefined)
+                                        }))
+                                    }
+                                },
+                                status: node.data?.status || "TODO",
+                                private: node.data?.private || false,
+                            }
+                        }
+                    }
+                })
+
+                updatedNodes.push(n)
+            })
+        )
+
+        const updatedMilestones = await prisma.milestone.findMany({
+            include: {
+                papers: true,
+                asset: {
+                    include: {contacts: true, attachments: true}
+                },
+                RFP: {
+                    include: {contacts: true, attachments: true}
+                },
+                tasks: true
+            },
+            where: { roadmapId: roadmapId }
+        })
+
+        // Typesense - if updating typesense, update here...
+
+        return { success: true, data: { nodes: updatedNodes, milestones: updatedMilestones} }
+    } catch (error: any) {
+        logError("Could not create nodes", error)
+        return { success: false, error: "Internal server error" }
+    }
+}
+
+export async function deleteNode(nodeId: string | undefined) {
+    try {
+        if (!nodeId) return {success: false, error: "No nodeId provided"}
+
+        const deletedNode = await prisma.node.delete({
+            where: {id: nodeId},
+        })
+
+        if (!deletedNode) {
+            return {success: false, error: "failed to delete node"};
+        }
+
+        // Typesense - if updating typesense, update here...
+
+        return { success: true, data: deletedNode }
+    } catch (error: any) {
+        logError("Could not delete node", error)
+        return { success: false, error: "Internal server error" }
+    }
+}
+
+export async function updateMilestones({milestones}: { milestones: Milestone[] }) {
+    try {
+        let updatedMilestones: Milestone[] = []
+
+        await Promise.all(
+            milestones.map(async (milestone: any) => {
+                const previousMilestone = await prisma.milestone.findUnique({
+                    where: { nodeId: milestone.nodeId },
+                    // where: {id: milestone.id},
+                    include: {
+                        papers: true,
+                        asset: {
+                            include: {contacts: true, attachments: true}
+                        },
+                        RFP: {
+                            include: {contacts: true, attachments: true}
+                        },
+                        tasks: true
+                    }
+                })
+
+                if (!previousMilestone) {
+                    // milestone doesn't exist, throw error
+                    throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`);
+                }
+
+                let m = await prisma.milestone.update({
+                    where: { nodeId: milestone.nodeId },
+                    include: {
+                        papers: true,
+                        asset: {
+                            include: {contacts: true, attachments: true}
+                        },
+                        RFP: {
+                            include: {contacts: true, attachments: true}
+                        },
+                        tasks: true
+                    },
+                    data: {
+                        title: milestone.title,
+                        type: milestone.type,
+                        description: milestone.description,
+                        startDate: milestone.startDate,
+                        endDate: milestone.endDate,
+                        budget: milestone.budget,
+                        papers: {
+                            deleteMany: {}, // clear all existing papers
+                            createMany: {
+                                data: milestone.papers.map((paper: any) => ({
+                                    link: paper.link,
+                                    ...(paper.name ? {name: paper.name} : undefined)
+                                }))
+                            }
+                        },
+                        status: milestone.status || "TODO",
+                        private: milestone.private || false,
+                    }
+                })
+
+                // add updated asset, if necessary
+                let result = await updateAssets(previousMilestone, milestone)
+                if (result) {
+                    m = result
+                }
+
+                // add updated RFP if necessary
+                result = await updateRFP(previousMilestone, milestone)
+                if (result) {
+                    m = result
+                }
+
+                updatedMilestones.push(m)
+            })
+        )
+
+        // Typesense - if updating typesense, update here...
+
+        console.log(`Successfully updated Milestone`)
+        return {success: true, data: updatedMilestones}
+    } catch (error: any) {
+        logError(`Error updating Milestone: `, error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
+async function updateAssets(previousMilestone: Milestone, milestone: Milestone) {
+    if (milestone.asset) {
+        const updatedMilestone: Milestone = await prisma.milestone.update({
+            where: {id: milestone.id},
+            include: {
+                papers: true,
+                asset: {
+                    include: {contacts: true, attachments: true}
+                },
+                RFP: {
+                    include: {contacts: true, attachments: true}
+                },
+                tasks: true
+            },
+            data: {
+                asset: {
+                    upsert: {
+                        create: {
+                            name: milestone.asset.name
+                        },
+                        update: {
+                            name: milestone.asset.name,
+                            description: milestone.asset.description,
+                            contacts: {
+                                deleteMany: {},  // clear all existing contacts
+                                createMany: {
+                                    data: milestone.asset.contacts.map((contact: any) => ({
+                                        name: contact.name,
+                                        role: contact.role,
+                                        email: contact.email
+                                    }))
+                                }
+                            },
+                            attachments: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: milestone.asset.attachments.map((attachment: any) => ({
+                                        link: attachment.link,
+                                        name: attachment.name
+                                    }))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        // Typesense - if updating typesense, update here...
+
+        return updatedMilestone
+    }
+
+    if (!milestone.asset && previousMilestone.asset) {
+        const updatedMilestone: Milestone = await prisma.milestone.update({
+            where: {id: milestone.id},
+            include: {
+                papers: true,
+                asset: {
+                    include: {contacts: true, attachments: true}
+                },
+                RFP: {
+                    include: {contacts: true, attachments: true}
+                },
+                tasks: true
+            },
+            data: {
+                asset: {delete: true}
+            }
+        })
+
+        // Typesense - if updating typesense, update here...
+
+        return updatedMilestone
+    }
+}
+
+async function updateRFP(previousMilestone: Milestone, milestone: Milestone) {
+    if (milestone.RFP) {
+        const updatedMilestone = await prisma.milestone.update({
+            where: {id: milestone.id},
+            include: {
+                papers: true,
+                asset: {
+                    include: {contacts: true, attachments: true}
+                },
+                RFP: {
+                    include: {contacts: true, attachments: true}
+                },
+                tasks: true
+            },
+            data: {
+                RFP: {
+                    upsert: {
+                        create: {
+                            name: milestone.RFP.name,
+                            funding: milestone.RFP.funding,
+                            researchFocus: milestone.type,
+                            openTo: milestone.RFP.openTo
+                        },
+                        update: {
+                            name: milestone.RFP.name,
+                            funding: milestone.RFP.funding,
+                            description: milestone.RFP.description,
+                            contacts: {
+                                deleteMany: {}, // clear all existing contacts
+                                createMany: {
+                                    data: milestone.RFP.contacts.map((contact: any) => ({
+                                        name: contact.name,
+                                        role: contact.role,
+                                        email: contact.email
+                                    }))
+                                }
+                            },
+                            attachments: {
+                                deleteMany: {}, // clear all existing attachments
+                                createMany: {
+                                    data: milestone.RFP.attachments.map((attachment: any) => ({
+                                        link: attachment.link,
+                                        name: attachment.name
+                                    }))
+                                }
+                            },
+                            researchFocus: milestone.type,
+                            openTo: milestone.RFP.openTo,
+                            startDate: milestone.RFP.startDate,
+                            endDate: milestone.RFP.endDate
+                        }
+                    }
+                }
+            }
+        })
+
+        // Typesense - if updating typesense, update here...
+
+        return updatedMilestone
+    }
+
+    if (!milestone.RFP && previousMilestone.RFP) {
+        const updatedMilestone = await prisma.milestone.update({
+            where: {id: milestone.id},
+            include: {
+                papers: true,
+                asset: {
+                    include: {contacts: true, attachments: true}
+                },
+                RFP: {
+                    include: {contacts: true, attachments: true}
+                },
+                tasks: true
+            },
+            data: {
+                RFP: {delete: true}
+            }
+        })
+
+        // Typesense - if updating typesense, update here...
+
+        return updatedMilestone
+    }
+}
+
+export async function deleteOrgRoadmap(
+    roadmapId: string,
+    organizationId: string
+) {
+    try {
+        const response = await prisma.roadmap.delete({
+            where: {
+                id: roadmapId,
+                organizationId: organizationId
+            }
+        })
+
+        if (!response) {
+            return {success: false, error: 'roadmap not found'}
+        }
+
+        // Typesense - if updating typesense, update here...
+        // delete all roadmap milestones from typesense
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        logError("Error deleting roadmap", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
+/* HANDLE KANBAN - create ------------------------------------------------------------------------------------------------ */
+export async function createKanban(orgId: string) {
+    try {
+        const newKanban = await prisma.kanban.create({
+            data: {
+                organization: { connect: { id: orgId } },
+                columns: {
+                    create: [
+                        {
+                            name: "To Do",
+                            kanbanPosition: 0
+                        },
+                        {
+                            name: 'In Progress',
+                            kanbanPosition: 1
+                        },
+                        {
+                            name: 'Done',
+                            kanbanPosition: 2
+                        }
+                    ]
+                }
+            }
+        })
+
+        return {success: true, data: newKanban}
+    } catch (error: any) {
+        logError(`Error creating kanban task for ${orgId}`, error)
+        return {success: false, error: "Internal server error"}
     }
 }
 

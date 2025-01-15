@@ -11,7 +11,8 @@ import {
     EdgeChange
 } from "@xyflow/react"
 import { debounce } from "lodash"
-import { updateDBFlow, updateDBMilestones} from "@/lib/actions"
+import { createNodes, deleteNode, Milestone, updateDBFlow, updateMilestones} from "@/lib/actions"
+import { toast } from "sonner"
 
 export type RoadmapState = {
     onboardingActive: boolean,
@@ -21,8 +22,8 @@ export type RoadmapState = {
     selectedNodeId: string | null
     setSelectedNodeId: (id: string | null) => void
     milestones: any[]
-    setMilestone: (id: string, newProperties: any) => void
-    setMilestones: (milestones: any[]) => void
+    setMilestone: (id: string, newProperties: any) => Promise<Milestone[] | void>
+    setMilestones: (milestones: any[]) => Promise<Milestone[] | void>
     nodes: Node[]
     edges: Edge[]
     onNodesChange: (changes: NodeChange[]) => void
@@ -38,6 +39,19 @@ export type RoadmapState = {
 
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
+        initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
+            const edgesWithMarker = edges.map(edge => ({
+                ...edge,
+                // markerEnd: {
+                //     type: MarkerType.ArrowClosed,
+                //     width: 20,
+                //     height: 20,
+                //     color: 'black'
+                // },
+                style: { stroke: 'black' }
+            }))
+            set({ nodes, edges: edgesWithMarker, milestones, selectedNodeId, roadmapId })
+        },
         onboardingActive: true,
         setOnboardingActive: (active: boolean) => {
             set({ onboardingActive: active })
@@ -51,18 +65,37 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ selectedNodeId: id })
         },
         milestones: [],
-        setMilestone: (nodeId: string, newProperties: any) => {
+        setMilestone: async (nodeId: string, newProperties: any) => {
             const milestones = get().milestones.map(milestone =>
                 milestone.nodeId === nodeId
                     ? { ...milestone, ...newProperties }
                     : milestone
             )
-            set({ milestones })
-            updateDBMilestones({ milestones: milestones.filter(milestone => milestone.nodeId === nodeId) })
+
+            const response = await updateMilestones({ milestones })
+            if (response.success && response.data) {
+                // if task was created successfully, update zustand state
+                set({ milestones: response.data as Milestone[] })
+
+                toast.success("Milestone updated successfully!")
+                return response.data as Milestone[]
+            } else {
+                console.error(`Error updating milestones`, response.error)
+            }
         },
-        setMilestones: (milestones: any[]) => {
-            set({ milestones })
-            updateDBMilestones({ milestones })
+        setMilestones: async (milestones: any[]) => {
+            // set({ milestones })
+            // updateMilestones({ milestones })
+            const response = await updateMilestones({ milestones })
+            if (response.success && response.data) {
+                // if task was created successfully, update zustand state
+                set({ milestones: response.data as Milestone[] })
+
+                toast.success("Milestone updated successfully!")
+                return response.data as Milestone[]
+            } else {
+                console.error(`Error updating milestones`, response.error)
+            }
         },
         nodes: [],
         edges: [],
@@ -105,40 +138,51 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ edges })
             debounceUpdateFlow(get().roadmapId, get().nodes, edges)
         },
-        addNodes: (nodes: Node[]) => {
+        addNodes: async (nodes: Node[]) => {
             const newNodes = [...get().nodes, ...nodes]
-            const milestones = [...get().milestones, ...nodes.map(node => node.data)]
-            set({ nodes: newNodes, milestones })
-            debounceUpdateFlow(get().roadmapId, newNodes, get().edges)
-            // updateDBMilestones({ milestones: milestones })
+            console.log(`new nodes`, newNodes)
+
+            const response = await createNodes({ roadmapId: get().roadmapId, nodes: newNodes })
+            if (response.success && response.data && response.data.nodes && response.data.milestones) {
+                // if task was created successfully, update zustand state
+                set({ 
+                    nodes: response.data.nodes.map(n => ({
+                        id: n.id,
+                        type: n.type,
+                        position: {
+                            x: n.positionX,
+                            y: n.positionY
+                        },
+                    })) as Node[], 
+                    milestones: response.data.milestones as Milestone[] 
+                })
+
+                toast.success("Nodes added successfully!")
+                return response.data
+            } else {
+                console.error(`Error adding nodes`, response.error)
+            }
         },
-        deleteNode: (nodeId: string | undefined) => {
-            const nodes = [...get().nodes].filter(({ id }) => id !== nodeId)
-            const nodeIds = nodes.map(node => node.id)
-            const milestones = get().milestones.filter(milestone =>
-                nodeIds.includes(milestone.nodeId)
-            )
-            set({ nodes, milestones, selectedNodeId: null })
-            debounceUpdateFlow(get().roadmapId, nodes, get().edges)
-        },
-        initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
-            const edgesWithMarker = edges.map(edge => ({
-                ...edge,
-                // markerEnd: {
-                //     type: MarkerType.ArrowClosed,
-                //     width: 20,
-                //     height: 20,
-                //     color: 'black'
-                // },
-                style: { stroke: 'black' }
-            }))
-            set({ nodes, edges: edgesWithMarker, milestones, selectedNodeId, roadmapId })
+        deleteNode: async (nodeId: string | undefined) => {
+            const response = await deleteNode(nodeId)
+            if (response.success && response.data) {
+                // if task was created successfully, update zustand state
+                const nodes = [...get().nodes].filter(({ id }) => id !== response.data.id)
+                const milestones = get().milestones.filter(milestone =>
+                    milestone.nodeId !== response.data.id
+                )
+                set({ nodes, milestones })
+
+                return response.data
+            } else {
+                console.error(`Error deleting nodes`, response.error)
+            }
         },
         saveState: () => {
             const state = get()
             set(state)
             debounceUpdateFlow(state.roadmapId, state.nodes, state.edges)
-            updateDBMilestones({ milestones: state.milestones })
+            updateMilestones({ milestones: state.milestones })
         }
     }),
     {
