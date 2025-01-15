@@ -54,9 +54,9 @@ model Member {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
   organizationId String
-  invitedBy      User?        @relation("invitedBy", fields: [invitedById], references: [id])
+  invitedBy      User?        @relation("invitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, organizationId])
 }
@@ -84,7 +84,7 @@ model MemberRequest {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, organizationId])
 }
@@ -160,7 +160,7 @@ model Roadmap {
   milestones     Milestone[]
   nodes          Node[]
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([slug, organizationId])
   @@index([organizationId])
@@ -344,7 +344,7 @@ model Organization {
   lng                 String?
   createdAt           DateTime                  @default(now())
   updatedAt           DateTime                  @updatedAt
-  user                User?                     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user                User?                     @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   userId              String?
   roadmaps            Roadmap[]
   members             Member[]
@@ -448,7 +448,7 @@ model Reaction {
   updatedAt     DateTime      @default(now()) @updatedAt
   reactableId   String
   reactableType ReactableType
-  author        User          @relation(fields: [authorId], references: [id])
+  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@unique([authorId, reactableType, reactableId])
 }
