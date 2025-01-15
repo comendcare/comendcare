@@ -87,7 +87,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
     const { tasks: stateTasks, columns: stateColumns, setTasks: setDbTasks, setColumns: setDbColumns } = useKanbanStore(useShallow(kanbanSelector))
     const [columns, setColumns] = useState<Column[]>([])
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
-    const columnsId = useMemo(() => columns.map(col => col.id), [columns])
+    const columnsId = useMemo(() => columns?.map(col => col.id), [columns])
 
     const sensors = useSensors(
         useSensor(MouseSensor),
@@ -405,12 +405,12 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
         >
             <BoardContainer>
                 <SortableContext items={columnsId}>
-                    {columns.length > 0 ? columns.map((col, index) => (
+                    {columns.length > 0 ? columns?.map((col, index) => (
                         <BoardColumn
                             key={index}
                             column={col}
                             tasks={tasks?.filter(task => {
-                                if (filter == "personal" && session?.user.id && !task.stakeholders.map(stakeholder => stakeholder.id).includes(session?.user.id)) return false
+                                if (filter == "personal" && session?.user.id && !task.stakeholders?.map(stakeholder => stakeholder.id).includes(session?.user.id)) return false
                                 return task?.columnId === col.id 
                             })}
                         />
