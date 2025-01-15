@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server';
-import {PrismaClient} from '@prisma/client';
-import {withPulse} from '@prisma/extension-pulse/node';
+import { PrismaClient } from '@prisma/client';
+import { withPulse } from '@prisma/extension-pulse/node';
 
-// Initialize Prisma Client with PostgreSQL adapter
-const initPrismaClient = () => {
-    return new PrismaClient()
-};
+const initPrismaClient = () => new PrismaClient();
 
-// Helper function to send requests to TypeSense
 const sendTypeSenseRequest = async (
     url: string,
     method: string,
@@ -18,369 +14,101 @@ const sendTypeSenseRequest = async (
         'Content-Type': 'application/json',
         'X-TYPESENSE-API-KEY': apiKey,
     };
-
     const body = data ? JSON.stringify(data) : undefined;
-    const response = await fetch(url, {method, headers, body});
-    return response?.json() ?? null;
+    const response = await fetch(url, { method, headers, body });
+    return response.json();
 };
 
-// TypeSense collection management
-const createTypeSenseCollection = async (
+const manageCollection = async (
     typesenseUrl: string,
     apiKey: string,
-    data: any,
+    collectionName: string,
+    schema?: any
 ) => {
-    const url = `${typesenseUrl}/collections`;
-    return sendTypeSenseRequest(url, 'POST', apiKey, data);
+    const collectionUrl = `${typesenseUrl}/collections/${collectionName}`;
+    try {
+        // Delete the collection if it exists
+        await sendTypeSenseRequest(collectionUrl, 'DELETE', apiKey);
+        console.log(`Deleted existing collection: ${collectionName}`);
+    } catch (err) {
+        console.log(`Collection ${collectionName} does not exist. Skipping delete.`);
+    }
+    if (schema) {
+        // Recreate the collection
+        await sendTypeSenseRequest(`${typesenseUrl}/collections`, 'POST', apiKey, schema);
+        console.log(`Recreated collection: ${collectionName}`);
+    }
 };
 
-const deleteTypeSenseCollection = async (
+const bulkImportDocuments = async (
     typesenseUrl: string,
     apiKey: string,
-    data: any,
+    collectionName: string,
+    documents: any[]
 ) => {
-    const url = `${typesenseUrl}/collections`;
-    return sendTypeSenseRequest(url, 'POST', apiKey, data);
-}
-
-const addTypeSenseDocument = async (
-    typesenseUrl: string,
-    apiKey: string,
-    data: any,
-    documentType: string
-) => {
-    const url = `${typesenseUrl}/collections/${documentType}/documents`;
-    return sendTypeSenseRequest(url, 'POST', apiKey, data);
+    const importUrl = `${typesenseUrl}/collections/${collectionName}/documents/import`;
+    const documentsString = documents.map((doc) => JSON.stringify(doc)).join('\n');
+    const response = await fetch(importUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain',
+            'X-TYPESENSE-API-KEY': apiKey,
+        },
+        body: documentsString,
+    });
+    const result = await response.text();
+    console.log(`Bulk import result for ${collectionName}:`, result);
 };
 
-const updateTypeSenseDocument = async (
-    typesenseUrl: string,
-    apiKey: string,
-    data: any,
-    documentType: string
-) => {
-    const url = `${typesenseUrl}/collections/${documentType}/documents/${data.id}`;
-    return sendTypeSenseRequest(url, 'PATCH', apiKey, data);
-};
-
-const deleteTypeSenseDocument = async (
-    typesenseUrl: string,
-    apiKey: string,
-    id: string,
-    documentType: string
-) => {
-    const url = `${typesenseUrl}/collections/${documentType}/documents/${id}`;
-    return sendTypeSenseRequest(url, 'DELETE', apiKey);
-};
-
-// Extend Prisma Client with Pulse extension
-const addPulseExtension = (
-    db: PrismaClient,
-    pulseAPIKey: string,
-) => {
-    return db.$extends(
-        withPulse({
-            apiKey: pulseAPIKey,
-        })
-    );
-};
-
-// Main sync function
 const syncToTypesense = async (env: {
-    TYPESENSE_ADMIN_API_KEY: string,
-    TYPESENSE_URL: string,
-    PULSE_API_KEY: string
+    TYPESENSE_ADMIN_API_KEY: string;
+    TYPESENSE_URL: string;
+    PULSE_API_KEY: string;
 }) => {
     console.log('Starting syncToTypesense job...');
-    let orgStream: any
-    let milestoneStream: any
-
     try {
-        // Initialize Prisma and extend with Pulse
-        const prisma = addPulseExtension(initPrismaClient(), env.PULSE_API_KEY);
-        console.log(`Added prisma pulse extension...`)
+        const prisma = initPrismaClient();
 
-        // Stop existing streams (if any)
-        try {
-            const tempOrgStream = await prisma.organization.stream({ name: 'organization-events' });
-            const tempMilestoneStream = await prisma.milestone.stream({ name: 'milestone-events' });
-            tempOrgStream.stop();
-            tempMilestoneStream.stop();
-            console.log('Stopped existing streams.');
-        } catch (err) {
-            console.log('No existing streams to stop or already stopped.');
-        }
-
-        // Ensure TypeSense organization collection exists
-        await createTypeSenseCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
+        // Define schemas
+        const organizationSchema = {
             name: 'organizations',
-            "fields": [
-                {
-                    "name": 'id',
-                    "type": 'string',
-                    "facet": false,
-                    "index": true,
-                    "optional": false, // Ensure it's marked as required, ID is required
-                    "sort": true,
-                    "store": true,
-                },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "description",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
-                },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "yearFounded",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
-                },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "name",
-                    "optional": true,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
-                },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "moneyRaised",
-                    "optional": true,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "int64"
-                },
-                // {
-                //     "facet": false,
-                //     "index": true,
-                //     "infix": false,
-                //     "locale": "",
-                //     "name": "numberOfIdentifiedPatients",
-                //     "optional": true,
-                //     "sort": true,
-                //     "stem": false,
-                //     "store": true,
-                //     "type": "int64"
-                // },
-                // {
-                //     "facet": false,
-                //     "index": true,
-                //     "infix": false,
-                //     "locale": "",
-                //     "name": "prevalenceDenominator",
-                //     "optional": false,
-                //     "sort": true,
-                //     "stem": false,
-                //     "store": true,
-                //     "type": "int64"
-                // },
-                // {
-                //     "facet": false,
-                //     "index": true,
-                //     "infix": false,
-                //     "locale": "",
-                //     "name": "prevalenceNumerator",
-                //     "optional": false,
-                //     "sort": true,
-                //     "stem": false,
-                //     "store": true,
-                //     "type": "int64"
-                // },
-                // {
-                //     "facet": false,
-                //     "index": true,
-                //     "infix": false,
-                //     "locale": "",
-                //     "name": "prevalenceRatio",
-                //     "optional": true,
-                //     "sort": true,
-                //     "stem": false,
-                //     "store": true,
-                //     "type": "float"
-                // },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "moneyDeployed",
-                    "optional": true,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "int64"
-                },
-                // {
-                //     "facet": false,
-                //     "index": true,
-                //     "infix": false,
-                //     "locale": "",
-                //     "name": "interestedModalities",
-                //     "optional": true,
-                //     "sort": false,
-                //     "stem": false,
-                //     "store": true,
-                //     "type": "string[]"
-                // },
-                // {
-                //     "facet": false,
-                //     "index": true,
-                //     "infix": false,
-                //     "locale": "",
-                //     "name": "diseaseCategories",
-                //     "optional": true,
-                //     "sort": false,
-                //     "stem": false,
-                //     "store": true,
-                //     "type": "string[]"
-                // }
-                // add additional fields as needed
+            fields: [
+                { name: 'id', type: 'string', facet: false },
+                { name: 'name', type: 'string', facet: false },
+                { name: 'description', type: 'string', facet: false },
+                { name: 'yearFounded', type: 'string', facet: false },
+                { name: 'moneyRaised', type: 'int64', facet: false },
+                { name: 'moneyDeployed', type: 'int64', facet: false },
             ],
-        });
-        console.log(`Created typesense organizations collection...`)
-
-        await createTypeSenseCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
+        };
+        const milestoneSchema = {
             name: 'milestones',
-            "fields": [
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "title",
-                    "optional": false,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
-                },
-                {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "description",
-                    "optional": false,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
-                },
-                // add additional fields as needed
+            fields: [
+                { name: 'id', type: 'string', facet: false },
+                { name: 'title', type: 'string', facet: false },
+                { name: 'description', type: 'string', facet: false },
             ],
-        });
-        console.log(`Created typesense milestones collection...`)
-
-        // Stream organization changes
-        orgStream = await prisma.organization.stream({name: 'organization-events'});
-        milestoneStream = await prisma.milestone.stream({name: 'milestone-events'});
-
-        process.on('exit', () => {
-            orgStream.stop();
-            milestoneStream.stop();
-        });
-
-        // const FIVE_MINUTES = 5 * 60 * 1000;
-        // let timeoutId: NodeJS.Timeout;
-        //
-        // const resetTimeout = () => {
-        //     if (timeoutId) {
-        //         clearTimeout(timeoutId);
-        //     }
-        //     timeoutId = setTimeout(() => {
-        //         console.log('No events for 5 minutes. Terminating stream.');
-        //         orgStream.stop();
-        //         milestoneStream.stop();
-        //         throw Error('Stream terminated due to inactivity');
-        //     }, FIVE_MINUTES);
-        // };
-        //
-        // resetTimeout();
-
-        const handleOrgStream = async () => {
-            for await (const event of orgStream) {
-                // resetTimeout();
-                console.log(`handle organization event`, event);
-                try {
-                    switch (event.action) {
-                        case 'create':
-                            console.log("Syncing created organization to Typesense:", event.created);
-                            await addTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.created, 'organizations');
-                            break;
-                        case 'update':
-                            console.log("Syncing updated organization to Typesense:", event.after);
-                            await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.after, 'organizations');
-                            break;
-                        case 'delete':
-                            console.log("Deleting organization from Typesense:", event.deleted);
-                            await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id, 'organizations');
-                            break;
-                    }
-                } catch (error) {
-                    console.error("Error processing event for Typesense:", error);
-                }
-            }
         };
 
-        const handleMilestoneStream = async () => {
-            for await (const event of milestoneStream) {
-                // resetTimeout();
-                console.log(`handle milestone event`, event);
-                try {
-                    switch (event.action) {
-                        case 'create':
-                            console.log("Syncing created milestone to Typesense:", event.created);
-                            await addTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.created, 'milestones');
-                            break;
-                        case 'update':
-                            console.log("Syncing updated milestone to Typesense:", event.after);
-                            await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.after, 'milestones');
-                            break;
-                        case 'delete':
-                            console.log("Deleting milestone from Typesense:", event.deleted);
-                            await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id, 'milestones');
-                            break;
-                    }
-                } catch (error) {
-                    console.error("Error processing event for Typesense:", error);
-                }
-            }
-        };
+        // Delete and recreate collections
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
 
-        // Run both streams concurrently
-        Promise.all([handleOrgStream(), handleMilestoneStream()])
-            .catch((err) => console.error('Stream error:', err));
+        // Fetch data from the database
+        const organizations = await prisma.organization.findMany();
+        const milestones = await prisma.milestone.findMany();
+
+        console.log(`Fetched ${organizations.length} organizations and ${milestones.length} milestones from the database.`);
+
+        // Bulk import data to TypeSense
+        await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizations);
+        await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestones);
 
         console.log('Sync job completed successfully.');
         return { status: 'success', message: 'Sync job completed successfully.' };
     } catch (error) {
         console.error('syncToTypesense job failed:', error);
         throw error;
-    } finally {
-        if (orgStream) orgStream.stop();
-        if (milestoneStream) milestoneStream.stop();
     }
 };
 
@@ -398,36 +126,7 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error('Error handling POST request:', error);
 
-        // Narrow down the error type
-        let errorMessage = 'An unexpected error occurred';
-        if (error instanceof Error) {
-            errorMessage = error.message;
-        }
-
-        return NextResponse.json({ error: errorMessage }, { status: 500 });
-    }
-}
-
-// Optionally handle GET requests
-export async function GET() {
-    try {
-        const env = {
-            TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
-            TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-            PULSE_API_KEY: process.env.PULSE_API_KEY!,
-        };
-
-        const result = await syncToTypesense(env);
-        return NextResponse.json(result, { status: 200 });
-    } catch (error) {
-        console.error('Error handling GET request:', error);
-
-        // Narrow down the error type
-        let errorMessage = 'An unexpected error occurred';
-        if (error instanceof Error) {
-            errorMessage = error.message;
-        }
-
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
