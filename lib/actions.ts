@@ -1761,12 +1761,16 @@ export async function updateCondition(formData: FormData, organizationId: string
         }
 
         // Update the condition in Prisma
-        const updatedCondition = await prisma.condition.update({
-            where: { id: conditions[0].conditionId },
-            data,
-        });
+        if (conditions[0].conditionId) {
+            const updatedCondition = await prisma.condition.update({
+                where: { id: conditions[0].conditionId },
+                data,
+            });
+            return { success: true, data: updatedCondition };
+        }
 
-        return { success: true, data: updatedCondition };
+        return { success: false, error: "No condition id found" };
+
     } catch (error: any) {
         console.error("Error updating condition:", error);
         return { success: false, error: error.message || "Failed to update condition." };
