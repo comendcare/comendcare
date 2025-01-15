@@ -396,14 +396,14 @@ model Condition {
 }
 
 model ConditionToOrganization {
-  conditionId    String
-  organizationId String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  condition      Condition    @relation(fields: [conditionId], references: [id], onDelete: Cascade)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  id             String  @id @default(uuid())
+  conditionId    String?
+  organizationId String?
 
-  @@id([conditionId, organizationId])
+  condition    Condition?    @relation(fields: [conditionId], references: [id], onDelete: SetNull)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@unique([conditionId, organizationId])
 }
 
 model Example {
