@@ -1,9 +1,23 @@
 // This seed script is meant to help during development, and not to be used to seed production databases
 import {PrismaClient} from '@prisma/client'
+import {addTypeSenseDocument, createTypeSenseCollection, sendTypeSenseRequest} from "@/lib/utils";
 
 const prisma = new PrismaClient()
 
 async function main() {
+
+    try {
+        // Delete the collection if it exists
+        await sendTypeSenseRequest(
+            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}/collections/organizations`,
+            'DELETE',
+            process.env.TYPESENSE_ADMIN_API_KEY!
+        );
+        console.log(`Deleted existing collection: "organizations"`);
+    } catch (err) {
+        console.log(`Collection organizations does not exist. Skipping delete.`);
+    }
+
     const flawnson = await prisma.user.upsert({
         where: {email: 'flawnsontong1@gmail.com'},
         update: {},
@@ -166,11 +180,6 @@ async function main() {
             }
         },
     })
-
-    // create Celocyn Syndrome Foundation Roadmap
-    const celocynRoadmap = await createRoadmap(
-        celocyn.id, celocynKanban.id, exampleASORoadmap
-    )
 
     const arcadion = await prisma.organization.create({
         data: {
@@ -353,7 +362,10 @@ async function main() {
         },
     })
 
-// Create roadmaps for each foundation
+    // Create roadmaps for each foundation
+    const celocynRoadmap = await createRoadmap(
+        celocyn.id, celocynKanban.id, exampleASORoadmap
+    )
     const lysogeneRoadmap = await createRoadmap(
         lysogeneFoundation.id, lysogeneKanban.id, exampleASORoadmap
     );
@@ -377,22 +389,177 @@ async function main() {
 
     console.log(arcadion)
 
-    // await prisma.member.create({
-    //     data: {
-    //         role: "admin",
-    //         email: "megan@comendcare.com",
-    //         user: {
-    //             connect: {
-    //                 email: "megan@comendcare.com",
-    //             },
-    //         },
-    //         organization: {
-    //             connect: {
-    //                 id: celocyn.id,
-    //             }
-    //         }
-    //     },
-    // })
+    await createTypeSenseCollection(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, {
+        name: 'organizations',
+        "fields": [
+            {
+                "name": 'id',
+                "type": 'string',
+                "facet": false,
+                "index": true,
+                "optional": false, // Ensure it's marked as required, ID is required
+                "sort": true,
+                "store": true,
+            },
+            {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "description",
+                "optional": true,
+                "sort": false,
+                "stem": false,
+                "store": true,
+                "type": "string"
+            },
+            {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "yearFounded",
+                "optional": true,
+                "sort": false,
+                "stem": false,
+                "store": true,
+                "type": "string"
+            },
+            {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "name",
+                "optional": true,
+                "sort": true,
+                "stem": false,
+                "store": true,
+                "type": "string"
+            },
+            {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "moneyRaised",
+                "optional": true,
+                "sort": true,
+                "stem": false,
+                "store": true,
+                "type": "int64"
+            },
+            // {
+            //     "facet": false,
+            //     "index": true,
+            //     "infix": false,
+            //     "locale": "",
+            //     "name": "numberOfIdentifiedPatients",
+            //     "optional": true,
+            //     "sort": true,
+            //     "stem": false,
+            //     "store": true,
+            //     "type": "int64"
+            // },
+            // {
+            //     "facet": false,
+            //     "index": true,
+            //     "infix": false,
+            //     "locale": "",
+            //     "name": "prevalenceDenominator",
+            //     "optional": false,
+            //     "sort": true,
+            //     "stem": false,
+            //     "store": true,
+            //     "type": "int64"
+            // },
+            // {
+            //     "facet": false,
+            //     "index": true,
+            //     "infix": false,
+            //     "locale": "",
+            //     "name": "prevalenceNumerator",
+            //     "optional": false,
+            //     "sort": true,
+            //     "stem": false,
+            //     "store": true,
+            //     "type": "int64"
+            // },
+            // {
+            //     "facet": false,
+            //     "index": true,
+            //     "infix": false,
+            //     "locale": "",
+            //     "name": "prevalenceRatio",
+            //     "optional": true,
+            //     "sort": true,
+            //     "stem": false,
+            //     "store": true,
+            //     "type": "float"
+            // },
+            {
+                "facet": false,
+                "index": true,
+                "infix": false,
+                "locale": "",
+                "name": "moneyDeployed",
+                "optional": true,
+                "sort": true,
+                "stem": false,
+                "store": true,
+                "type": "int64"
+            },
+            // {
+            //     "facet": false,
+            //     "index": true,
+            //     "infix": false,
+            //     "locale": "",
+            //     "name": "interestedModalities",
+            //     "optional": true,
+            //     "sort": false,
+            //     "stem": false,
+            //     "store": true,
+            //     "type": "string[]"
+            // },
+            // {
+            //     "facet": false,
+            //     "index": true,
+            //     "infix": false,
+            //     "locale": "",
+            //     "name": "diseaseCategories",
+            //     "optional": true,
+            //     "sort": false,
+            //     "stem": false,
+            //     "store": true,
+            //     "type": "string[]"
+            // }
+            // add additional fields as needed
+        ],
+    });
+    console.log(`Created typesense organizations collection...`)
+
+    const organizations = await prisma.organization.findMany()
+    for (const organization of organizations) {
+        try {
+            await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, {
+                id: organization.id,
+                name: organization.name,
+                description: organization.description,
+                subdomain: organization.subdomain,
+                customDomain: organization.customDomain,
+                yearFounded: organization.yearFounded,
+                incorporationStatus: organization.incorporationStatus,
+                website: organization.website,
+                moneyRaised: organization.moneyRaised,
+                moneyDeployed: organization.moneyDeployed,
+                researchBudget: organization.researchBudget,
+            }, 'organizations');
+            console.log(`Added organization ${organization.name} to TypeSense`);
+        } catch (error) {
+            console.error(`Failed to add organization ${organization.name} to TypeSense:`, error);
+        }
+    }
+    console.log("Added organizations to typesense...")
 
     await prisma.member.create({
         data: {
