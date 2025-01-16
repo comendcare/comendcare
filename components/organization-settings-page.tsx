@@ -184,7 +184,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
 
                     </div>
 
-                    <DeleteOrganizationForm organization={organization}/>
+                    {/*<DeleteOrganizationForm organization={organization}/>*/}
 
                 </div>
             </main>
