@@ -99,13 +99,9 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
         nodes: [],
         edges: [],
-        onNodesChange: (changes: NodeChange[]) => {
+        onNodesChange: async (changes: NodeChange[]) => {
             const nodes = applyNodeChanges(changes, get().nodes)
-            const nodeIds = nodes.map(node => node.id)
-            const milestones = get().milestones.filter(milestone =>
-                nodeIds.includes(milestone.nodeId)
-            )
-            set({ nodes, milestones })
+            set({ nodes })
             debounceUpdateFlow(get().roadmapId, nodes, get().edges)
         },
         onEdgesChange: (changes: EdgeChange[]) => {
@@ -140,11 +136,9 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
         addNodes: async (nodes: Node[]) => {
             const newNodes = [...get().nodes, ...nodes]
-            console.log(`new nodes`, newNodes)
 
             const response = await createNodes({ roadmapId: get().roadmapId, nodes: newNodes })
             if (response.success && response.data && response.data.nodes && response.data.milestones) {
-                // if task was created successfully, update zustand state
                 set({ 
                     nodes: response.data.nodes.map(n => ({
                         id: n.id,
@@ -153,6 +147,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                             x: n.positionX,
                             y: n.positionY
                         },
+                        data: n.data
                     })) as Node[], 
                     milestones: response.data.milestones as Milestone[] 
                 })
@@ -187,30 +182,12 @@ export const useRoadmapStore = create<RoadmapState>()(
     }),
     {
         limit: 100, // limit the stored history states to 100
-        // this handleSet should be where we're setting our debounce, but for some reason it grabs the previous state
-        // not the current state
-        // handleSet: (handleSet) => (
-        //     debounce((state) => {
-        //         console.log(`Saved State:`, state)
-        //         handleSet(state)
-        //         saveToDatabase(state.nodes, state.edges, state.milestones)
-        //     }, 500)
-        // ),
         onSave: (pastState, currentState) => {
             // console.log(`Saved Roadmap State: `, currentState)
-            // debouncedSaveToDatabase(currentState.nodes, currentState.edges, currentState.milestones)
             return
         },
     })
 )
-
-// Wrap saveToDatabase in a debounce function - to avoid spamming the database
-// export const debouncedSaveToDatabase = debounce(
-//     (nodes: Node[], edges: Edge[], milestones: any[]) => {
-//         saveToDatabase(nodes, edges, milestones)
-//     },
-//     500
-// )
 
 // debounce flow updates, because the flow spams X/Y Position change values when dragging a node
 export const debounceUpdateFlow = debounce(

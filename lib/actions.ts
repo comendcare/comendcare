@@ -1271,6 +1271,33 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
     return roadmap
 }
 
+export async function deleteOrgRoadmap(
+    roadmapId: string,
+    organizationId: string
+) {
+    try {
+        const response = await prisma.roadmap.delete({
+            where: {
+                id: roadmapId,
+                organizationId: organizationId
+            }
+        })
+
+        if (!response) {
+            return {success: false, error: 'roadmap not found'}
+        }
+
+        // Typesense - if updating typesense, update here...
+        // delete all roadmap milestones from typesense
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        logError("Error deleting roadmap", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
+/* HANDLE UPDATING FLOW - roadmap nodes positions and edges, nothing in here is needed for typesense --------------------- */
 export async function updateDBFlow({roadmapId, nodes, edges}: {
     roadmapId: string | null,
     nodes: any[],
@@ -1379,7 +1406,28 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
             })
         )
 
+        // const updatedNodes = prisma.node.findMany({
+        //     where: { roadmapId}
+        // })
+        // const updatedMilestones = prisma.milestone.findMany({
+        //     include: {
+        //         papers: true,
+        //         asset: {
+        //             include: {contacts: true, attachments: true}
+        //         },
+        //         RFP: {
+        //             include: {contacts: true, attachments: true}
+        //         },
+        //         tasks: true
+        //     },
+        //     where: { roadmapId }
+        // })
+        // const updatedEdges = prisma.edge.findMany({
+        //     where: { roadmapId }
+        // })
+
         console.log(`Successfully updated Flow`)
+        // return { success: true, data: { nodes: updatedNodes, milestones: updatedMilestones, edges: updatedEdges } }
     } catch (error) {
         console.error(`Error updating Flow: `, error)
     }
@@ -1387,7 +1435,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
 
 export async function createNodes({roadmapId, nodes}: { roadmapId: string | null, nodes: any[]}) {
     try {
-        const updatedNodes: Node[] = []
+        const updatedNodes: any[] = []
 
         if (!roadmapId) throw new Error('No roadmapId provided.')
     
@@ -1466,7 +1514,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
             where: { roadmapId: roadmapId }
         })
 
-        // Typesense - if updating typesense, update here...
+        // Typesense - create typesense milestone documents here...
 
         return { success: true, data: { nodes: updatedNodes, milestones: updatedMilestones} }
     } catch (error: any) {
@@ -1479,6 +1527,7 @@ export async function deleteNode(nodeId: string | undefined) {
     try {
         if (!nodeId) return {success: false, error: "No nodeId provided"}
 
+        // cascading delete will also delete milestone
         const deletedNode = await prisma.node.delete({
             where: {id: nodeId},
         })
@@ -1487,7 +1536,7 @@ export async function deleteNode(nodeId: string | undefined) {
             return {success: false, error: "failed to delete node"};
         }
 
-        // Typesense - if updating typesense, update here...
+        // Typesense - delete milestone documents here...
 
         return { success: true, data: deletedNode }
     } catch (error: any) {
@@ -1496,6 +1545,7 @@ export async function deleteNode(nodeId: string | undefined) {
     }
 }
 
+/* HANDLE MILESTONES, ASSETS & RFPS - create, update, delete -------------------------------------------------------------- */
 export async function updateMilestones({milestones}: { milestones: Milestone[] }) {
     try {
         let updatedMilestones: Milestone[] = []
@@ -1571,7 +1621,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
             })
         )
 
-        // Typesense - if updating typesense, update here...
+        // Typesense - update milestone documents here...
 
         console.log(`Successfully updated Milestone`)
         return {success: true, data: updatedMilestones}
@@ -1629,7 +1679,7 @@ async function updateAssets(previousMilestone: Milestone, milestone: Milestone) 
             }
         })
 
-        // Typesense - if updating typesense, update here...
+        // Typesense - update asset documents here...
 
         return updatedMilestone
     }
@@ -1714,7 +1764,7 @@ async function updateRFP(previousMilestone: Milestone, milestone: Milestone) {
             }
         })
 
-        // Typesense - if updating typesense, update here...
+        // Typesense - update RFP documents here...
 
         return updatedMilestone
     }
@@ -1740,32 +1790,6 @@ async function updateRFP(previousMilestone: Milestone, milestone: Milestone) {
         // Typesense - if updating typesense, update here...
 
         return updatedMilestone
-    }
-}
-
-export async function deleteOrgRoadmap(
-    roadmapId: string,
-    organizationId: string
-) {
-    try {
-        const response = await prisma.roadmap.delete({
-            where: {
-                id: roadmapId,
-                organizationId: organizationId
-            }
-        })
-
-        if (!response) {
-            return {success: false, error: 'roadmap not found'}
-        }
-
-        // Typesense - if updating typesense, update here...
-        // delete all roadmap milestones from typesense
-
-        return {success: true, data: response}
-    } catch (error: any) {
-        logError("Error deleting roadmap", error)
-        return {success: false, error: "Internal server error"}
     }
 }
 
