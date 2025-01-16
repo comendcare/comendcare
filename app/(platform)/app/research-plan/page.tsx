@@ -29,7 +29,7 @@ export default async function RoadmapPage() {
                     include: { data: true }
                 })
             ).map(async node => {
-                const { id, type, positionX, positionY } = node
+                const { id, type, positionX, positionY, origin } = node
     
                 return {
                     id,
@@ -37,7 +37,8 @@ export default async function RoadmapPage() {
                     position: {
                         x: positionX,
                         y: positionY
-                    }
+                    },
+                    origin,
                 }
             })
         )

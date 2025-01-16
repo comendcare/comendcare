@@ -180,6 +180,7 @@ export const PrivateFlowView = ({
                     x: centerX,
                     y: centerY
                 },
+                origin: [0.0, 0.0],
                 data: {
                     id: nanoid(),
                     nodeId: id,

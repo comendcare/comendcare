@@ -1345,7 +1345,8 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                     where: {id: node.id},
                     update: {
                         positionX: node.position?.x,
-                        positionY: node.position?.y
+                        positionY: node.position?.y,
+                        origin: node.origin
                     },
                     create: {
                         id: node.id,
@@ -1355,6 +1356,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                         type: node.type,
                         positionX: node.position?.x,
                         positionY: node.position?.y,
+                        origin: node.origin,
                         data: {
                             create: {
                                 id: node.data?.id,
@@ -1409,7 +1411,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         )
 
         const updatedNodes = await prisma.node.findMany({
-            where: { roadmapId}
+            where: { roadmapId }
         })
         const updatedMilestones = await prisma.milestone.findMany({
             include: {
@@ -1459,7 +1461,8 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                     where: {id: node.id},
                     update: {
                         positionX: node.position?.x,
-                        positionY: node.position?.y
+                        positionY: node.position?.y,
+                        origin: node.origin,
                     },
                     create: {
                         id: node.id,
@@ -1469,6 +1472,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                         type: node.type,
                         positionX: node.position?.x,
                         positionY: node.position?.y,
+                        origin: node.origin,
                         data: {
                             create: {
                                 id: node.data?.id,
