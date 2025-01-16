@@ -171,6 +171,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                             x: n.positionX,
                             y: n.positionY
                         },
+                        origin: n.origin,
                         data: n.data
                     })) as Node[], 
                     milestones: response.data.milestones as Milestone[] 

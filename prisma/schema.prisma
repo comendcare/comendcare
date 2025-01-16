@@ -172,6 +172,7 @@ model Node {
   type      String
   positionX Int
   positionY Int
+  origin    Float[]    @default([0.0, 0.0])
   roadmapId String
   data      Milestone?
   roadmap   Roadmap    @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
