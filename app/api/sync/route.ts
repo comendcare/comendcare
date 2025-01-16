@@ -1,13 +1,18 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
-const initPrismaClient = () => new PrismaClient();
+const initPrismaClient = () => {
+    console.log('Initializing Prisma client...');
+    const client = new PrismaClient();
+    console.log('Prisma client initialized.');
+    return client;
+};
 
 const sendTypeSenseRequest = async (
     url: string,
     method: string,
     apiKey: string,
-    data?: any,
+    data?: any
 ) => {
     const headers = {
         'Content-Type': 'application/json',
@@ -18,11 +23,15 @@ const sendTypeSenseRequest = async (
     console.log(`Sending TypeSense request: ${method} ${url}`);
     if (data) console.log('Request payload:', JSON.stringify(data, null, 2));
 
-    const response = await fetch(url, { method, headers, body });
-    const responseData = await response.json();
-
-    console.log(`Response from TypeSense (${method} ${url}):`, responseData);
-    return responseData;
+    try {
+        const response = await fetch(url, { method, headers, body });
+        const responseData = await response.json();
+        console.log(`Response from TypeSense (${method} ${url}):`, responseData);
+        return responseData;
+    } catch (error) {
+        console.error(`Error in TypeSense request (${method} ${url}):`, error);
+        throw error;
+    }
 };
 
 const manageCollection = async (
@@ -37,7 +46,11 @@ const manageCollection = async (
         await sendTypeSenseRequest(collectionUrl, 'DELETE', apiKey);
         console.log(`Deleted existing collection: ${collectionName}`);
     } catch (err) {
-        console.log(`Collection ${collectionName} does not exist. Skipping delete.`);
+        if (err instanceof Error) {
+            console.log(`Collection ${collectionName} does not exist or deletion failed:`, err.message);
+        } else {
+            console.log(`Collection ${collectionName} does not exist or deletion failed with unknown error:`, err);
+        }
     }
 
     if (schema) {
@@ -59,17 +72,21 @@ const bulkImportDocuments = async (
     console.log(`Importing ${documents.length} documents to collection: ${collectionName}`);
     console.log('Documents being imported:', documents);
 
-    const response = await fetch(importUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'text/plain',
-            'X-TYPESENSE-API-KEY': apiKey,
-        },
-        body: documentsString,
-    });
-    const result = await response.text();
-
-    console.log(`Bulk import result for ${collectionName}:`, result);
+    try {
+        const response = await fetch(importUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain',
+                'X-TYPESENSE-API-KEY': apiKey,
+            },
+            body: documentsString,
+        });
+        const result = await response.text();
+        console.log(`Bulk import result for ${collectionName}:`, result);
+    } catch (error) {
+        console.error(`Error during bulk import for ${collectionName}:`, error);
+        throw error;
+    }
 };
 
 const syncToTypesense = async (env: {
@@ -100,29 +117,29 @@ const syncToTypesense = async (env: {
             ],
         };
 
-        // Log schemas
         console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
         console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
 
-        // Delete and recreate collections
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
 
-        // Fetch data from the database
         const organizations = await prisma.organization.findMany();
         const milestones = await prisma.milestone.findMany();
 
-        console.log(`Fetched ${organizations.length} organizations:`, JSON.stringify(organizations, null, 2));
-        console.log(`Fetched ${milestones.length} milestones:`, JSON.stringify(milestones, null, 2));
+        console.log('Raw organizations data:', organizations);
+        console.log('Raw milestones data:', milestones);
 
-        // Bulk import data to TypeSense
         if (organizations.length > 0) {
+            console.log('Validating organization data...');
+            organizations.forEach((org, idx) => console.log(`Org ${idx + 1}:`, org));
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizations);
         } else {
             console.log('No organizations to import.');
         }
 
         if (milestones.length > 0) {
+            console.log('Validating milestone data...');
+            milestones.forEach((ms, idx) => console.log(`Milestone ${idx + 1}:`, ms));
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestones);
         } else {
             console.log('No milestones to import.');
@@ -136,7 +153,6 @@ const syncToTypesense = async (env: {
     }
 };
 
-// Handle POST requests
 export async function POST(req: Request) {
     try {
         const env = {
@@ -148,9 +164,12 @@ export async function POST(req: Request) {
         const result = await syncToTypesense(env);
         return NextResponse.json(result, { status: 200 });
     } catch (error) {
-        console.error('Error handling POST request:', error);
-
-        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+        let errorMessage = 'An unexpected error occurred';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else {
+            console.error('Unexpected error type:', error);
+        }
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
@@ -166,9 +185,12 @@ export async function GET() {
         const result = await syncToTypesense(env);
         return NextResponse.json(result, { status: 200 });
     } catch (error) {
-        console.error('Error handling GET request:', error);
-
-        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+        let errorMessage = 'An unexpected error occurred';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else {
+            console.error('Unexpected error type:', error);
+        }
         return NextResponse.json({ error: errorMessage }, { status: 500 });
     }
 }
