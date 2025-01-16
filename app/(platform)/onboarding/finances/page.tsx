@@ -36,7 +36,7 @@ export default function FinancesOnboardingPage() {
                     <FinancesOnboardingForm
                         nextLink={"/app/profile"}
                         previousLink={"/onboarding/research"}
-                        showSkip={true}
+                        showSkip={false}
                     />
                 </div>
             </main>

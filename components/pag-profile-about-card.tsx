@@ -71,7 +71,7 @@ export const PagProfileAboutCard = ({organization}: {
                         <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
                             Website
                         </h3>
-                        {organization?.website &&
+                        {organization?.website ?
                             <Link
                                 href={organization.website}
                                 target="_blank"
@@ -81,6 +81,11 @@ export const PagProfileAboutCard = ({organization}: {
                                 {organization?.website}
                                 <FaArrowUpRightFromSquare/>
                             </Link>
+                            : (
+                                <p className="text-gray-400">
+                                    {`No website.`}
+                                </p>
+                            )
                         }
                     </div>
                 </div>

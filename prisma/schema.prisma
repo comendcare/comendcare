@@ -136,6 +136,7 @@ model Session {
 }
 
 model VerificationToken {
+  id         String   @id @default(cuid()) // PostgreSQL requires a primary key or explicitly defined replica identity for logical replication to track deletions.
   identifier String
   token      String   @unique
   expires    DateTime

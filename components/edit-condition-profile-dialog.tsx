@@ -530,6 +530,7 @@ export default function EditConditionProfileDialog() {
                                     <MultipleSelector
                                         {...field}
                                         defaultOptions={OPTIONS}
+                                        hidePlaceholderWhenSelected={true}
                                         placeholder="Select categories that apply to you..."
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
@@ -568,6 +569,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select modalities you like..."
+                                        hidePlaceholderWhenSelected={true}
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -709,6 +711,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select the associated genes of your disorder..."
+                                        hidePlaceholderWhenSelected={true}
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -733,6 +736,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select the associated biomarkers of your disorder..."
+                                        hidePlaceholderWhenSelected={true}
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -757,6 +761,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select the associated signs and symptoms of your disorder..."
+                                        hidePlaceholderWhenSelected={true}
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -781,6 +786,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select the associated signs and symptoms of your disorder..."
+                                        hidePlaceholderWhenSelected={true}
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -805,6 +811,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select the assets that apply to you..."
+                                        hidePlaceholderWhenSelected={true}
                                         creatable
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
