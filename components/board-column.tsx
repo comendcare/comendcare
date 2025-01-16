@@ -1,5 +1,5 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable"
-import { useDndContext, type UniqueIdentifier } from "@dnd-kit/core"
+import { useDndContext } from "@dnd-kit/core"
 import { CSS } from "@dnd-kit/utilities"
 import { useMemo } from "react"
 import { Task, TaskCard } from "@/components/task-card"
@@ -17,14 +17,9 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {FaEllipsis, FaTrash} from "react-icons/fa6";
-import {toast} from "sonner";
-import {getKanbanFromOrganizationId} from "@/lib/fetchers";
-import {deleteKanbanColumn} from "@/lib/actions";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
 import EditColumnDialog from "./edit-column-dialog"
