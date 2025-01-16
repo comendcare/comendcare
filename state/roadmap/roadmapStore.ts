@@ -26,13 +26,12 @@ export type RoadmapState = {
     setMilestones: (milestones: any[]) => Promise<Milestone[] | void>
     nodes: Node[]
     edges: Edge[]
-    onNodesChange: (changes: NodeChange[]) => void
-    onEdgesChange: (changes: EdgeChange[]) => void
-    onConnect: (connection: any) => void
-    setNodes: (nodes: Node[]) => void
-    setEdges: (edges: Edge[]) => void
+    onEdgesChange: (changes: EdgeChange[]) => Promise<Edge[] | void>
+    onConnect: (connection: any) => Promise<Edge[] | void>
+    setNodes: (nodes: Node[]) => Promise<Node[] | void>
+    setEdges: (edges: Edge[]) => Promise<Edge[] | void>
     addNodes: (node: Node[]) => void
-    deleteNode: (nodeId: string) => void
+    deleteNode: (nodeId: string) => Promise<any | void>
     initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void
     saveState: () => void
 }
@@ -42,12 +41,6 @@ export const useRoadmapStore = create<RoadmapState>()(
         initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
-                // markerEnd: {
-                //     type: MarkerType.ArrowClosed,
-                //     width: 20,
-                //     height: 20,
-                //     color: 'black'
-                // },
                 style: { stroke: 'black' }
             }))
             set({ nodes, edges: edgesWithMarker, milestones, selectedNodeId, roadmapId })
@@ -99,17 +92,13 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
         nodes: [],
         edges: [],
-        onNodesChange: async (changes: NodeChange[]) => {
-            const nodes = applyNodeChanges(changes, get().nodes)
-            set({ nodes })
-            debounceUpdateFlow(get().roadmapId, nodes, get().edges)
-        },
-        onEdgesChange: (changes: EdgeChange[]) => {
+        onEdgesChange: async (changes: EdgeChange[]) => {
             const edges = applyEdgeChanges(changes, get().edges)
-            set({ edges })
-            debounceUpdateFlow(get().roadmapId, get().nodes, edges)
+            // set({ edges })
+            const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes: get().nodes, edges })
+            // debounceUpdateFlow(get().roadmapId, get().nodes, edges)
         },
-        onConnect: (connection: any) => {
+        onConnect: async (connection: any) => {
             const edges = addEdge(
                 {
                     ...connection,
@@ -124,15 +113,32 @@ export const useRoadmapStore = create<RoadmapState>()(
                 get().edges
             )
             set({ edges })
-            debounceUpdateFlow(get().roadmapId, get().nodes, edges)
+            const respnse = await updateDBFlow({ roadmapId: get().roadmapId, nodes: get().nodes, edges })
         },
-        setNodes: (nodes: Node[]) => {
-            set({ nodes })
-            debounceUpdateFlow(get().roadmapId, nodes, get().edges)
+        setNodes: async (nodes: Node[]) => {
+            const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
+            if (response.success && response.data) {
+                const newNodes = response.data.nodes.map(n => ({
+                    id: n.id,
+                    type: n.type,
+                    position: { x: n.positionX, y: n.positionY },
+                })) as Node[]
+
+                // special case here, we set the original nodes, so if nothing has changed zustand doesn't trigger a state change
+                // this keeps us from having an infinite loop when handling the nodes local state in private-flow.tsx
+                // local state is handled within the private-flow.tsx component, and debounced, because
+                // the RaectFlow spams position updates and we don't want to save all of them to the Database..
+                set({ nodes })
+                return newNodes as Node[]
+            } else {
+                console.error(`Error updating database nodes`, response.error)
+                toast.success("Error updating node state... your node may node's position may not have been saved")
+            }
         },
-        setEdges: (edges: Edge[]) => {
+        setEdges: async (edges: Edge[]) => {
             set({ edges })
-            debounceUpdateFlow(get().roadmapId, get().nodes, edges)
+            const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes: get().nodes, edges })
+            // debounceUpdateFlow(get().roadmapId, get().nodes, edges)
         },
         addNodes: async (nodes: Node[]) => {
             const newNodes = [...get().nodes, ...nodes]
@@ -161,7 +167,6 @@ export const useRoadmapStore = create<RoadmapState>()(
         deleteNode: async (nodeId: string | undefined) => {
             const response = await deleteNode(nodeId)
             if (response.success && response.data) {
-                // if task was created successfully, update zustand state
                 const nodes = [...get().nodes].filter(({ id }) => id !== response.data.id)
                 const milestones = get().milestones.filter(milestone =>
                     milestone.nodeId !== response.data.id
@@ -176,7 +181,7 @@ export const useRoadmapStore = create<RoadmapState>()(
         saveState: () => {
             const state = get()
             set(state)
-            debounceUpdateFlow(state.roadmapId, state.nodes, state.edges)
+            updateDBFlow({ roadmapId: state.roadmapId, nodes: state.nodes, edges: state.edges })
             updateMilestones({ milestones: state.milestones })
         }
     }),
@@ -190,9 +195,9 @@ export const useRoadmapStore = create<RoadmapState>()(
 )
 
 // debounce flow updates, because the flow spams X/Y Position change values when dragging a node
-export const debounceUpdateFlow = debounce(
-    (roadmapId: string | null, nodes: Node[], edges: Edge[]) => {
-        updateDBFlow({ roadmapId, nodes, edges })
-    }, 500
-)
+// export const debounceUpdateFlow = debounce(
+//     (roadmapId: string | null, nodes: Node[], edges: Edge[]) => {
+//         updateDBFlow({ roadmapId, nodes, edges })
+//     }, 500
+// )
 
