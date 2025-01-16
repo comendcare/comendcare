@@ -183,7 +183,7 @@ export const useRoadmapStore = create<RoadmapState>()(
     {
         limit: 100, // limit the stored history states to 100
         onSave: (pastState, currentState) => {
-            // console.log(`Saved Roadmap State: `, currentState)
+            console.log(`Saved Roadmap State: `, currentState)
             return
         },
     })
