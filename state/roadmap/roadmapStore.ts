@@ -3,14 +3,10 @@ import { temporal } from 'zundo'
 import {
     addEdge,
     applyEdgeChanges,
-    applyNodeChanges,
-    MarkerType,
     Edge,
     Node,
-    NodeChange,
     EdgeChange
 } from "@xyflow/react"
-import { debounce } from "lodash"
 import { createNodes, deleteNode, Milestone, updateDBFlow, updateEdges, updateMilestones} from "@/lib/actions"
 import { toast } from "sonner"
 
@@ -135,6 +131,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                     id: n.id,
                     type: n.type,
                     position: { x: n.positionX, y: n.positionY },
+                    origin: n.origin
                 })) as Node[]
 
                 // special case here, we set the original nodes, so if nothing has changed zustand doesn't trigger a state change
@@ -212,11 +209,4 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
     })
 )
-
-// debounce flow updates, because the flow spams X/Y Position change values when dragging a node
-// export const debounceUpdateFlow = debounce(
-//     (roadmapId: string | null, nodes: Node[], edges: Edge[]) => {
-//         updateDBFlow({ roadmapId, nodes, edges })
-//     }, 500
-// )
 
