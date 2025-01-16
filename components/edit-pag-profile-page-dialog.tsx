@@ -273,6 +273,7 @@ export default function EditPAGProfileDialog() {
         try {
             await updateOrganization(formData, session.user.organizationId);
             toast.success("Organization profile updated successfully!");
+            setOpen(false)
             router.refresh(); // Refresh the page to reflect changes
         } catch (error) {
             console.error("Error updating organization:", error);
@@ -407,6 +408,7 @@ export default function EditPAGProfileDialog() {
         try {
             await updateOrganization(formData, session.user.organizationId);
             toast.success("Organization updated successfully!");
+            setOpen(false)
             router.refresh(); // Refresh the page to reflect changes
         } catch (error) {
             toast.error("Failed to update organization.");
@@ -511,6 +513,7 @@ export default function EditPAGProfileDialog() {
 
             if (response.success) {
                 toast.success("Condition updated successfully!");
+                setOpen(false)
                 router.refresh(); // Refresh the page to reflect changes
             } else {
                 console.error(response.error);
@@ -740,6 +743,7 @@ export default function EditPAGProfileDialog() {
                                                     <RadioGroup
                                                         onValueChange={field.onChange}
                                                         defaultValue={field.value}
+                                                        value={field.value}
                                                         className="flex flex-col space-y-1"
                                                     >
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
@@ -850,6 +854,7 @@ export default function EditPAGProfileDialog() {
                                                         {...field}
                                                         defaultOptions={OPTIONS}
                                                         placeholder="Select options that appeal to you..."
+                                                        hidePlaceholderWhenSelected={true}
                                                         emptyIndicator={
                                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                                 no results found.
@@ -951,6 +956,7 @@ export default function EditPAGProfileDialog() {
                                                         {...field}
                                                         defaultOptions={MOLECULAR_MECHANISMS}
                                                         placeholder="Select categories that apply to you..."
+                                                        hidePlaceholderWhenSelected={true}
                                                         emptyIndicator={
                                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                                 no results found.
@@ -989,6 +995,7 @@ export default function EditPAGProfileDialog() {
                                                     <MultipleSelector
                                                         {...field}
                                                         defaultOptions={MODALITIES}
+                                                        hidePlaceholderWhenSelected={true}
                                                         placeholder="Select modalities you like..."
                                                         emptyIndicator={
                                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
@@ -1014,6 +1021,7 @@ export default function EditPAGProfileDialog() {
                                                         {...field}
                                                         onSearch={handleAsyncSearch}
                                                         placeholder="Search for genes..."
+                                                        hidePlaceholderWhenSelected={true}
                                                         loadingIndicator={<p>Loading genes...</p>}
                                                         emptyIndicator={<p>No genes found.</p>}
                                                         showHoverCard={false}
@@ -1035,6 +1043,7 @@ export default function EditPAGProfileDialog() {
                                                     <MultipleSelector
                                                         {...field}
                                                         defaultOptions={ASSOCIATED_SYSTEMS}
+                                                        hidePlaceholderWhenSelected={true}
                                                         placeholder="Select the associated systems of your condition..."
                                                         emptyIndicator={
                                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">

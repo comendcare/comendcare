@@ -733,6 +733,7 @@ export default function ResearchOnboardingForm(
                                                 {...field}
                                                 defaultOptions={MOLECULAR_MECHANISMS}
                                                 placeholder="Select categories that apply to you..."
+                                                hidePlaceholderWhenSelected={true}
                                                 emptyIndicator={
                                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                         no results found.
@@ -772,6 +773,7 @@ export default function ResearchOnboardingForm(
                                                 {...field}
                                                 defaultOptions={MODALITIES}
                                                 placeholder="Select modalities you like..."
+                                                hidePlaceholderWhenSelected={true}
                                                 emptyIndicator={
                                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                         no results found.
@@ -828,6 +830,7 @@ export default function ResearchOnboardingForm(
                                                 {...field}
                                                 onSearch={handleAsyncSearch}
                                                 placeholder="Search for genes..."
+                                                hidePlaceholderWhenSelected={true}
                                                 loadingIndicator={<p>Loading genes...</p>}
                                                 emptyIndicator={<p>No genes found.</p>}
                                                 showHoverCard={false}
@@ -850,6 +853,7 @@ export default function ResearchOnboardingForm(
                                                 {...field}
                                                 defaultOptions={ASSOCIATED_SYSTEMS}
                                                 placeholder="Select the associated systems of your condition..."
+                                                hidePlaceholderWhenSelected={true}
                                                 emptyIndicator={
                                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                         no results found.

@@ -27,11 +27,11 @@ import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
-import {cn, createDicebearAvatar, formatMoney, nameToInitials, years} from "@/lib/utils";
+import {cn, createDicebearAvatar, formatMoney, getPublicFile, nameToInitials, years} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
+import {checkSubdomainAvailability, getAllOrganizations, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 
@@ -141,6 +141,8 @@ export default function OrganizationOnboardingForm(
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof newOrgFormSchema> | undefined>(undefined);
+    console.log(defaultOrganizationValues?.incorporationStatus);
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -200,21 +202,27 @@ export default function OrganizationOnboardingForm(
 
     const joinOrgForm = useForm<z.infer<typeof joinOrgFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(joinOrgFormSchema)
+        resolver: zodResolver(joinOrgFormSchema),
     })
 
     const newOrgForm = useForm<z.infer<typeof newOrgFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(newOrgFormSchema),
-        defaultValues: {
-            subdomain: "",
-        }
+        defaultValues: defaultOrganizationValues
     })
 
     const [debouncedNickname] = useDebounce(newOrgForm.watch("subdomain"), 500); // Extract just the debounced value
 
     useEffect(() => {
         // Trigger validation whenever the debounced nickname changes
+        const currentSubdomain = defaultOrganizationValues?.subdomain; // The current subdomain of the organization
+
+        if (debouncedNickname === currentSubdomain) {
+            // Clear errors since it's the same subdomain as before
+            newOrgForm.clearErrors("subdomain");
+            return;
+        }
+
         if (debouncedNickname) {
             checkSubdomainAvailability(debouncedNickname).then((isAvailable) => {
                 if (!isAvailable) {
@@ -303,6 +311,68 @@ export default function OrganizationOnboardingForm(
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        async function fetchOrganizationData() {
+            if (session?.user?.organizationId) {
+                let organizationData
+                const response = await getOrganizationFromOrganizationId(session.user.organizationId);
+                if (response.success) {
+                    organizationData = response.data
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+
+                if (organizationData) {
+                    const fetchedValues = {
+                        id: organizationData.id || "",
+                        description: organizationData.description || "",
+                        orgName: organizationData.name || "", // Map `name` to `orgName`
+                        founded: organizationData.yearFounded ? organizationData.yearFounded.toString() : "",
+                        subdomain: organizationData.subdomain || "",
+                        website: organizationData.website || "",
+                        address1: organizationData.address1 || "",
+                        address2: organizationData.address2 || "",
+                        formattedAddress: organizationData.formattedAddress || "",
+                        city: organizationData.city || "",
+                        region: organizationData.region || "",
+                        postalCode: organizationData.postalCode || "",
+                        country: organizationData.country || "",
+                        lat: parseFloat(organizationData.lat || "0"),
+                        lng: parseFloat(organizationData.lng || "0"),
+                        image: organizationData.image || "",
+                        name: organizationData.name || "",
+                        logo: organizationData.logo || "",
+                        font: organizationData.font || "",
+                        imageBlurhash: organizationData.imageBlurhash || "",
+                        statedGoal: organizationData.statedGoal || null,
+                        incorporationStatus: organizationData.incorporationStatus || undefined
+                    };
+
+                    if (organizationData.image) {
+                        try {
+                            const orgPhoto: File = await getPublicFile(organizationData.image)
+                            if (orgPhoto) {
+                                const fileWithPreview = Object.assign(orgPhoto, {
+                                    preview: URL.createObjectURL(orgPhoto),
+                                })
+                                setSelectedFile(fileWithPreview)
+                            }
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    }
+
+                    setDefaultOrganizationValues(fetchedValues);
+                    // setAddress(fetchedValues); // Set address state as well
+                    newOrgForm.reset(fetchedValues); // Reset form with fetched data
+                }
+            }
+        }
+
+        fetchOrganizationData();
+    }, [session, newOrgForm]);
 
     return (
         <div className="relative grid grid-cols-2 gap-x-8">
@@ -534,6 +604,7 @@ export default function OrganizationOnboardingForm(
                                             <RadioGroup
                                                 onValueChange={field.onChange}
                                                 defaultValue={field.value}
+                                                value={field.value}
                                                 className="flex flex-col space-y-1"
                                             >
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
