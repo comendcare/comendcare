@@ -1456,15 +1456,15 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
 
         await Promise.all(
             nodes.map(async (node: any) => {
-                const n = await prisma.node.upsert({
+                const n = await prisma.node.create({
                     include: { data: true },
-                    where: {id: node.id},
-                    update: {
-                        positionX: node.position?.x,
-                        positionY: node.position?.y,
-                        origin: node.origin,
-                    },
-                    create: {
+                    // where: {id: node.id},
+                    // update: {
+                    //     positionX: node.position?.x,
+                    //     positionY: node.position?.y,
+                    //     origin: node.origin,
+                    // },
+                    data: {
                         id: node.id,
                         roadmap: {
                             connect: {id: roadmapId}
@@ -1507,7 +1507,8 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
             })
         )
 
-        const updatedMilestones = await prisma.milestone.findMany({
+        const nodeIds = updatedNodes.map(node => node.id)
+        let updatedMilestones = await prisma.milestone.findMany({
             include: {
                 papers: true,
                 asset: {
@@ -1518,10 +1519,18 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                 },
                 tasks: true
             },
-            where: { roadmapId: roadmapId }
+            where: { roadmapId }
         })
 
+        updatedMilestones = updatedMilestones.filter(milestone => nodeIds.includes(milestone.nodeId))
+
         // Typesense - create typesense milestone documents here...
+        Promise.all(
+            updatedMilestones.map(async (response: any) => {
+                console.log(`Add typesense document`, response)
+                // await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'milestones')
+            })
+        )
 
         return { success: true, data: { nodes: updatedNodes, milestones: updatedMilestones} }
     } catch (error: any) {
@@ -1537,13 +1546,16 @@ export async function deleteNode(nodeId: string | undefined) {
         // cascading delete will also delete milestone
         const deletedNode = await prisma.node.delete({
             where: {id: nodeId},
+            include: { data: true }
         })
 
-        if (!deletedNode) {
+        if (!deletedNode || !deletedNode.data?.id) {
             return {success: false, error: "failed to delete node"};
         }
 
         // Typesense - delete milestone documents here...
+        console.log(`Delete typesense document`, deletedNode.data.id)
+        // await deleteTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, deletedNode.data.id, 'milestones')
 
         return { success: true, data: deletedNode }
     } catch (error: any) {
@@ -1670,6 +1682,12 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         )
 
         // Typesense - update milestone documents here...
+        Promise.all(
+            updatedMilestones.map(async (response: any) => {
+                console.log(`Update typesense document`, response)
+                // await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'milestones')
+            })
+        )
 
         console.log(`Successfully updated Milestone`)
         return {success: true, data: updatedMilestones}

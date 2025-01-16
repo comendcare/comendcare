@@ -156,12 +156,14 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         addNodes: async (nodes: Node[]) => {
-            const newNodes = [...get().nodes, ...nodes]
+            // const newNodes = [...get().nodes, ...nodes]
+            const newNodes = nodes
 
             const response = await createNodes({ roadmapId: get().roadmapId, nodes: newNodes })
             if (response.success && response.data && response.data.nodes && response.data.milestones) {
-                set({ 
-                    nodes: response.data.nodes.map(n => ({
+                const updatedNodes = [
+                    ...get().nodes, 
+                    ...response.data.nodes.map(n => ({
                         id: n.id,
                         type: n.type,
                         position: {
@@ -170,8 +172,15 @@ export const useRoadmapStore = create<RoadmapState>()(
                         },
                         origin: n.origin,
                         data: n.data
-                    })) as Node[], 
-                    milestones: response.data.milestones as Milestone[] 
+                    })) as Node[]
+                ]
+                const updatedMilestone = [
+                    ...get().milestones,
+                    ...response.data.milestones as Milestone[]
+                ]
+                set({ 
+                    nodes: updatedNodes,
+                    milestones: updatedMilestone
                 })
 
                 toast.success("Nodes added successfully!")
