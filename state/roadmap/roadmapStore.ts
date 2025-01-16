@@ -4,14 +4,14 @@ import {
     addEdge,
     applyEdgeChanges,
     applyNodeChanges,
-    Edge,
     MarkerType,
+    Edge,
     Node,
     NodeChange,
     EdgeChange
 } from "@xyflow/react"
 import { debounce } from "lodash"
-import { createNodes, deleteNode, Milestone, updateDBFlow, updateMilestones} from "@/lib/actions"
+import { createNodes, deleteNode, Milestone, updateDBFlow, updateEdges, updateMilestones} from "@/lib/actions"
 import { toast } from "sonner"
 
 export type RoadmapState = {
@@ -95,8 +95,14 @@ export const useRoadmapStore = create<RoadmapState>()(
         onEdgesChange: async (changes: EdgeChange[]) => {
             const edges = applyEdgeChanges(changes, get().edges)
             // set({ edges })
-            const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes: get().nodes, edges })
-            // debounceUpdateFlow(get().roadmapId, get().nodes, edges)
+
+            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            if (response.success && response.data) {
+                set({ edges })
+                return response.data as Edge[]
+            } else {
+                console.error(`Error updating Flow Edges`, response.error)
+            }
         },
         onConnect: async (connection: any) => {
             const edges = addEdge(
@@ -112,8 +118,15 @@ export const useRoadmapStore = create<RoadmapState>()(
                 },
                 get().edges
             )
-            set({ edges })
-            const respnse = await updateDBFlow({ roadmapId: get().roadmapId, nodes: get().nodes, edges })
+            // set({ edges })
+
+            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            if (response.success && response.data) {
+                set({ edges })
+                return response.data as Edge[]
+            } else {
+                console.error(`Error updating Flow Edges`, response.error)
+            }
         },
         setNodes: async (nodes: Node[]) => {
             const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
@@ -136,9 +149,14 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         setEdges: async (edges: Edge[]) => {
-            set({ edges })
-            const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes: get().nodes, edges })
-            // debounceUpdateFlow(get().roadmapId, get().nodes, edges)
+            // set({ edges })
+            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            if (response.success && response.data) {
+                set({ edges })
+                return response.data as Edge[]
+            } else {
+                console.error(`Error updating Flow Edges`, response.error)
+            }
         },
         addNodes: async (nodes: Node[]) => {
             const newNodes = [...get().nodes, ...nodes]
