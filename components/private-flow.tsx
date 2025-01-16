@@ -7,8 +7,9 @@ import {
     Controls,
     useReactFlow,
     useStoreApi,
+    applyNodeChanges,
 } from "@xyflow/react"
-import type { ConnectionState, Edge, FinalConnectionState, Node } from "@xyflow/react"
+import type { ConnectionState, Edge, FinalConnectionState, Node, NodeChange, OnNodesChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
 
 import "@xyflow/react/dist/base.css"
@@ -35,6 +36,7 @@ import { ScrollArea } from "./ui/scroll-area"
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { CheckBubble } from "./check-bubble"
 import { templateMilestones } from "@/lib/templates"
+import { debounce } from "lodash"
 
 const proOptions = { hideAttribution: true }
 
@@ -43,8 +45,9 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
     nodes: state.nodes,
+    setNodes: state.setNodes,
     edges: state.edges,
-    onNodesChange: state.onNodesChange,
+    // onNodesChange: state.onNodesChange,
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
     addNodes: state.addNodes,
@@ -59,9 +62,10 @@ export const PrivateFlowView = ({
         selectedNodeId,
         setSelectedNodeId,
         milestones,
-        nodes,
+        nodes: dbNodes,
+        setNodes: setDbNodes,
         edges,
-        onNodesChange,
+        // onNodesChange: changeDbNodes,
         onEdgesChange,
         addNodes,
         onConnect,
@@ -79,6 +83,29 @@ export const PrivateFlowView = ({
     const { startOnborda } = useOnborda()
     const { screenToFlowPosition } = useReactFlow()
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+
+    useEffect(() => {
+        setNodes(dbNodes)
+    }, [dbNodes])
+
+    const [nodes, setNodes] = useState(dbNodes)
+
+    const onNodesChange = (changes: NodeChange<Node>[]) => {
+        const newNodes = applyNodeChanges(changes, nodes)
+        setNodes(newNodes)
+
+        debounceUpdateStore(newNodes)
+    }
+
+    const debounceUpdateStore = useCallback(
+        debounce(
+            (nodes: Node[]) => {
+                // updateDBFlow({ roadmapId, nodes, edges })
+                setDbNodes(nodes)
+            }, 500
+        ),
+        []
+    )
 
     const onConnectEnd = useCallback(
         (event: any, connectionState: any) => {
@@ -278,6 +305,7 @@ export const PrivateFlowView = ({
             nodes={updatedNodes}
             edges={edges}
             onNodesChange={onNodesChange}
+            // onNodesChange={(changes) => setNodes(applyNodeChanges(changes, nodes))}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onConnectEnd={onConnectEnd}
