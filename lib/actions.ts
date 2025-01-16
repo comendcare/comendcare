@@ -237,13 +237,13 @@ export const createCondition = async (formData: FormData) => {
 
         if (!condition) {
             console.error("Error creating condition.");
-            return { success: false, error: "Database error. Please try again later." };
+            return {success: false, error: "Database error. Please try again later."};
         }
 
-        return { success: true, data: condition };
+        return {success: true, data: condition};
     } catch (error: any) {
         console.error("Error creating condition:", error);
-        return { success: false, error: "Database error. Please try again later." };
+        return {success: false, error: "Database error. Please try again later."};
     }
 };
 
@@ -277,7 +277,10 @@ export const connectOrganizationToCondition = async (organizationId: string | nu
         return {success: true, data: conditionOrganization}
     } catch (error: any) {
         console.error("Error creating condition connection to organization:", error)
-        return {success: false, error: error.message || "An error occurred while connecting the organization to the condition"}
+        return {
+            success: false,
+            error: error.message || "An error occurred while connecting the organization to the condition"
+        }
     }
 };
 
@@ -584,36 +587,39 @@ export const updateOrganizationAttribute = withOrganizationAttributeAuth(
     }
 )
 
-export const deleteOrganization = withOrganizationAttributeAuth(
-    async (_: FormData, organization: Organization) => {
-        try {
-            const deleteDatabase = prisma.organization.delete({
-                where: { id: organization.id },
-            });
+export async function deleteOrganization(organization: Organization) {
+    try {
+        const deleteOrganization = prisma.organization.delete({
+            where: {id: organization.id},
+        });
 
-            const deleteTypeSense = deleteTypeSenseDocument(
-                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-                process.env.TYPESENSE_ADMIN_API_KEY!,
-                organization.id,
-                'organizations'
-            );
+        const deleteTypeSense = deleteTypeSenseDocument(
+            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+            process.env.TYPESENSE_ADMIN_API_KEY!,
+            organization.id,
+            'organizations'
+        );
 
-            // Run both deletions concurrently
-            const [response] = await Promise.all([deleteDatabase, deleteTypeSense])
+        // Run both deletions concurrently
+        const [response] = await Promise.all([deleteOrganization, deleteTypeSense])
 
-            await revalidateTag(
-                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
-            )
-            response.customDomain &&
-            (await revalidateTag(`${organization.customDomain}-metadata`))
-            return response
-        } catch (error: any) {
-            return {
-                error: error.message
-            }
+        await revalidateTag(
+            `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+        )
+        response.customDomain &&
+        (await revalidateTag(`${organization.customDomain}-metadata`))
+
+        if (!response) {
+            console.error("Error deleting organization.")
+            return {success: false, error: "Database error. please try again later."}
         }
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        console.error("Error deleting organization:", error)
+        return {success: false, error: "Database error. please try again later."}
     }
-)
+}
 
 // export const createRoadmap = withOrganizationAuth(
 //     async (_: FormData, organization: Organization) => {
@@ -1022,7 +1028,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         await Promise.all(
             nodes.map(async (node: any) => {
                 const n = await prisma.node.upsert({
-                    include: { data: true },
+                    include: {data: true},
                     where: {id: node.id},
                     update: {
                         positionX: node.position?.x,
@@ -1113,7 +1119,7 @@ export async function updateDBMilestones({milestones}: { milestones: any[] }) {
         await Promise.all(
             milestones.map(async (milestone: any) => {
                 const previousMilestone = await prisma.milestone.findUnique({
-                    where: { nodeId: milestone.nodeId },
+                    where: {nodeId: milestone.nodeId},
                     // where: {id: milestone.id},
                     include: {
                         papers: true,
@@ -1133,7 +1139,7 @@ export async function updateDBMilestones({milestones}: { milestones: any[] }) {
                 }
 
                 await prisma.milestone.update({
-                    where: { nodeId: milestone.nodeId },
+                    where: {nodeId: milestone.nodeId},
                     // where: {id: milestone.id},
                     include: {
                         papers: true,
@@ -1348,7 +1354,7 @@ export async function updateDBTask({tasks}: { tasks: Task[] }) {
                             connect: task.stakeholders?.map((stakeholder: User) => ({id: stakeholder?.id})) || []
                         },
                         milestone: task.milestoneId
-                            ? {connect: { id: task.milestoneId }} // Connect if milestoneId exists
+                            ? {connect: {id: task.milestoneId}} // Connect if milestoneId exists
                             : {disconnect: true}, // Disconnect if milestoneId is undefined
                         endDate: task.endDate,
                         priority: task.priority,
@@ -1453,7 +1459,7 @@ export async function createKanban(orgId: string) {
     try {
         const newKanban = await prisma.kanban.create({
             data: {
-                organization: { connect: { id: orgId } },
+                organization: {connect: {id: orgId}},
                 columns: {
                     create: [
                         {
@@ -1752,8 +1758,8 @@ export async function updateCondition(formData: FormData, organizationId: string
 
         // Find the first condition associated with the organization
         const conditions = await prisma.conditionToOrganization.findMany({
-            where: { organizationId },
-            include: { condition: true },
+            where: {organizationId},
+            include: {condition: true},
         });
 
         if (!conditions || conditions.length === 0) {
@@ -1763,16 +1769,16 @@ export async function updateCondition(formData: FormData, organizationId: string
         // Update the condition in Prisma
         if (conditions[0].conditionId) {
             const updatedCondition = await prisma.condition.update({
-                where: { id: conditions[0].conditionId },
+                where: {id: conditions[0].conditionId},
                 data,
             });
-            return { success: true, data: updatedCondition };
+            return {success: true, data: updatedCondition};
         }
 
-        return { success: false, error: "No condition id found" };
+        return {success: false, error: "No condition id found"};
 
     } catch (error: any) {
         console.error("Error updating condition:", error);
-        return { success: false, error: error.message || "Failed to update condition." };
+        return {success: false, error: error.message || "Failed to update condition."};
     }
 }

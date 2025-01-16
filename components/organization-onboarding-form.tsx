@@ -392,7 +392,7 @@ export default function OrganizationOnboardingForm(
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                         <div className="w-full flex flex-row justify-between">
                                             <FormDescription>
-                                                {`Enter your organization's abbreviated name, short form, or nickname.`}
+                                                {`Enter your organization’s abbreviated name, short form, or nickname in lowercase.`}
                                                 <br/>
                                                 {newOrgForm.watch("subdomain") &&
                                                     !newOrgForm.formState.errors.subdomain && (

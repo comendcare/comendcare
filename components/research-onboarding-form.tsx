@@ -387,7 +387,7 @@ export const MODALITIES: Option[] = [
 export const ASSOCIATED_SYSTEMS: Option[] = [
     {
         id: '1',
-        label: 'Neuro',
+        label: 'Neurological',
         value: 'NEURO',
         description: 'Associated with neurological systems, including the brain, spinal cord, and peripheral nerves.',
         strengths: 'Focuses on diseases and conditions affecting neural pathways and cognitive functions.',
@@ -978,7 +978,7 @@ export default function ResearchOnboardingForm(
                             <div className="grid grid-cols-3">
                                 <div className="space-y-2">
                                     <h3 className="text-center scroll-m-20 tracking-tight font-semibold">
-                                        Mechanisms of Action
+                                        Mechanisms of action
                                     </h3>
                                     <div className="flex flex-wrap justify-center gap-y-1 gap-x-1">
                                         {form.watch("categories") ? form.watch("categories")?.map((category, index) =>
