@@ -9,7 +9,7 @@ import {
     useStoreApi,
     applyNodeChanges,
 } from "@xyflow/react"
-import type { ConnectionState, Edge, FinalConnectionState, Node, NodeChange, OnNodesChange } from "@xyflow/react"
+import type { ConnectionState, Edge, FinalConnectionState, Node, NodeChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
 
 import "@xyflow/react/dist/base.css"
@@ -47,7 +47,6 @@ const selector = (state: RoadmapState) => ({
     nodes: state.nodes,
     setNodes: state.setNodes,
     edges: state.edges,
-    // onNodesChange: state.onNodesChange,
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
     addNodes: state.addNodes,
@@ -62,10 +61,9 @@ export const PrivateFlowView = ({
         selectedNodeId,
         setSelectedNodeId,
         milestones,
-        nodes: dbNodes,
+        nodes,
         setNodes: setDbNodes,
         edges,
-        // onNodesChange: changeDbNodes,
         onEdgesChange,
         addNodes,
         onConnect,
@@ -85,14 +83,14 @@ export const PrivateFlowView = ({
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
 
     useEffect(() => {
-        setNodes(dbNodes)
-    }, [dbNodes])
+        setLocalNodes(nodes)
+    }, [nodes])
 
-    const [nodes, setNodes] = useState(dbNodes)
+    const [localNodes, setLocalNodes] = useState(nodes)
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {
-        const newNodes = applyNodeChanges(changes, nodes)
-        setNodes(newNodes)
+        const newNodes = applyNodeChanges(changes, localNodes)
+        setLocalNodes(newNodes)
 
         debounceUpdateStore(newNodes)
     }
@@ -217,7 +215,7 @@ export const PrivateFlowView = ({
 
     // add handleEditClick(), handleDelete(), and handleDuplicate() callback functions to nodes in the flow
     // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
-    const updatedNodes = nodes.map((node: Node, index: number) => ({
+    const updatedNodes = localNodes.map((node: Node, index: number) => ({
         ...node,
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
@@ -231,7 +229,7 @@ export const PrivateFlowView = ({
                 router.push(`${pathname}?${params.toString()}`, { scroll: false })
             },
             handleDelete: (nodeId: string) => {
-                const nodesList = nodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
+                const nodesList = localNodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
                 const edgesList = edges.filter((edge: Edge) => edge.source === nodeId || edge.target === nodeId)
 
                 handleDelete({
@@ -290,7 +288,7 @@ export const PrivateFlowView = ({
             // })
             startOnbordaAndRemoveToast()
         }
-    }, [nodes])
+    }, [localNodes])
 
     const startOnbordaAndRemoveToast = () => {
         startOnborda('research-plan-tour')
@@ -305,7 +303,6 @@ export const PrivateFlowView = ({
             nodes={updatedNodes}
             edges={edges}
             onNodesChange={onNodesChange}
-            // onNodesChange={(changes) => setNodes(applyNodeChanges(changes, nodes))}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onConnectEnd={onConnectEnd}

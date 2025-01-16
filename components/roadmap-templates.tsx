@@ -16,14 +16,6 @@ import type { Node } from "@xyflow/react"
 import ComendLoadingSpinner from "./comend-loading-spinner";
 
 const selector = (state: RoadmapState) => ({
-    selectedNodeId: state.selectedNodeId,
-    setSelectedNodeId: state.setSelectedNodeId,
-    milestones: state.milestones,
-    nodes: state.nodes,
-    edges: state.edges,
-    onNodesChange: state.onNodesChange,
-    onEdgesChange: state.onEdgesChange,
-    onConnect: state.onConnect,
     addNodes: state.addNodes,
 })
 

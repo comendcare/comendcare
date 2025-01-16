@@ -1297,7 +1297,7 @@ export async function deleteOrgRoadmap(
     }
 }
 
-/* HANDLE UPDATING FLOW - roadmap nodes positions and edges, nothing in here is needed for typesense --------------------- */
+/* HANDLE UPDATING FLOW NODES - roadmap nodes positions, nothing in here is needed for typesense ------------------------- */
 export async function updateDBFlow({roadmapId, nodes, edges}: {
     roadmapId: string | null,
     nodes: any[],
@@ -1406,30 +1406,31 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
             })
         )
 
-        // const updatedNodes = prisma.node.findMany({
-        //     where: { roadmapId}
-        // })
-        // const updatedMilestones = prisma.milestone.findMany({
-        //     include: {
-        //         papers: true,
-        //         asset: {
-        //             include: {contacts: true, attachments: true}
-        //         },
-        //         RFP: {
-        //             include: {contacts: true, attachments: true}
-        //         },
-        //         tasks: true
-        //     },
-        //     where: { roadmapId }
-        // })
-        // const updatedEdges = prisma.edge.findMany({
-        //     where: { roadmapId }
-        // })
+        const updatedNodes = await prisma.node.findMany({
+            where: { roadmapId}
+        })
+        const updatedMilestones = await prisma.milestone.findMany({
+            include: {
+                papers: true,
+                asset: {
+                    include: {contacts: true, attachments: true}
+                },
+                RFP: {
+                    include: {contacts: true, attachments: true}
+                },
+                tasks: true
+            },
+            where: { roadmapId }
+        })
+        const updatedEdges = await prisma.edge.findMany({
+            where: { roadmapId }
+        })
 
         console.log(`Successfully updated Flow`)
-        // return { success: true, data: { nodes: updatedNodes, milestones: updatedMilestones, edges: updatedEdges } }
+        return { success: true, data: { nodes: updatedNodes, milestones: updatedMilestones, edges: updatedEdges } }
     } catch (error) {
         console.error(`Error updating Flow: `, error)
+        return { success: false, error: "Internal server error" }
     }
 }
 
@@ -1545,7 +1546,7 @@ export async function deleteNode(nodeId: string | undefined) {
     }
 }
 
-/* HANDLE MILESTONES, ASSETS & RFPS - create, update, delete -------------------------------------------------------------- */
+/* HANDLE MILESTONES, ASSETS & RFPS - create, update, delete ------------------------------------------------------------- */
 export async function updateMilestones({milestones}: { milestones: Milestone[] }) {
     try {
         let updatedMilestones: Milestone[] = []

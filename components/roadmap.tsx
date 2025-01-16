@@ -63,13 +63,13 @@ export function Roadmap({
     const urlView = searchParams.get("view")
     const [view, setView] = useState(urlView ? urlView : "flow")
 
-    useEffect(() => {
-        const params = new URLSearchParams(searchParams.toString())
-        const urlMilestone: string | null = params.get("milestone")
-        const urlTask: string | null = params.get("task")
+    // useEffect(() => {
+    //     const params = new URLSearchParams(searchParams.toString())
+    //     const urlMilestone: string | null = params.get("milestone")
+    //     const urlTask: string | null = params.get("task")
 
-        initState(initNodes, initEdges, initMilestones, urlMilestone, urlTask, roadmapId)
-    }, [])
+    //     initState(initNodes, initEdges, initMilestones, urlMilestone, urlTask, roadmapId)
+    // }, [])
 
     const handleMilestonePanelChange = (open: boolean) => {
         if (!open) {
