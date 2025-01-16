@@ -1,7 +1,6 @@
 "use client"
 
-import React, { type SyntheticEvent } from "react"
-
+import React from "react"
 import ReactCrop, {
     centerCrop,
     makeAspectCrop,
@@ -11,7 +10,6 @@ import ReactCrop, {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { FileWithPath, useDropzone } from "react-dropzone"
 import {
     Dialog,
     DialogClose,
@@ -22,10 +20,6 @@ import {
 
 import "react-image-crop/dist/ReactCrop.css"
 import { CropIcon, Trash2Icon } from "lucide-react"
-
-// export type FileWithPreview = FileWithPath & {
-//     preview: string
-// }
 
 export type FileWithPreview = File & { preview: string }
 
@@ -43,14 +37,13 @@ export function ImageCropper({
                                  setSelectedFile,
                              }: ImageCropperProps) {
     const aspect = 1
-
     const imgRef = React.useRef<HTMLImageElement | null>(null)
 
     const [crop, setCrop] = React.useState<Crop>()
     const [croppedImageUrl, setCroppedImageUrl] = React.useState<string>("")
     const [croppedImage, setCroppedImage] = React.useState<string>("")
 
-    function onImageLoad(e: SyntheticEvent<HTMLImageElement>) {
+    function onImageLoad(e: React.SyntheticEvent<HTMLImageElement>) {
         if (aspect) {
             const { width, height } = e.currentTarget
             setCrop(centerAspectCrop(width, height, aspect))
@@ -122,23 +115,17 @@ export function ImageCropper({
                 <div className="p-6 size-full">
                     <ReactCrop
                         crop={crop}
-                        onChange={(_, percentCrop) => setCrop(percentCrop)}
                         onComplete={(c) => onCropComplete(c)}
+                        onChange={(_, percentCrop) => setCrop(percentCrop)}
                         aspect={aspect}
                         className="w-full"
                     >
-                        <Avatar className="size-full rounded-none">
-                            <AvatarImage
-                                ref={imgRef}
-                                className="size-full rounded-none "
-                                alt="Image Cropper Shell"
-                                src={selectedFile?.preview}
-                                onLoad={onImageLoad}
-                            />
-                            <AvatarFallback className="size-full min-h-[460px] rounded-none">
-                                Loading...
-                            </AvatarFallback>
-                        </Avatar>
+                        <img
+                            className="w-full"
+                            ref={imgRef}
+                            src={selectedFile?.preview}
+                            onLoad={onImageLoad}
+                        />
                     </ReactCrop>
                 </div>
                 <DialogFooter className="p-6 pt-0 justify-center ">
