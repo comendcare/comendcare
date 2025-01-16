@@ -502,45 +502,15 @@ export const MOLECULAR_MECHANISMS: Option[] = [
     },
     {
         id: '4',
-        label: 'Epigenetic Dysregulation',
-        value: 'EPIGENETIC_DYSREGULATION',
-        description: 'Changes in DNA methylation, histone modification, or chromatin structure affect gene expression without altering the DNA sequence.',
-        strengths: 'Targets therapies to restore normal gene expression patterns or epigenetic states.',
-    },
-    {
-        id: '5',
-        label: 'Splicing Defects',
-        value: 'SPLICING_DEFECTS',
-        description: 'Mutations disrupt normal RNA splicing, leading to aberrant or truncated protein production.',
-        strengths: 'Targets therapies to correct splicing or bypass splicing errors.',
-    },
-    {
-        id: '6',
-        label: 'Mitochondrial Dysfunction',
-        value: 'MITOCHONDRIAL_DYSFUNCTION',
-        description: 'Mutations in mitochondrial or nuclear DNA affect energy production and cellular signaling.',
-        strengths: 'Focuses on therapies to support mitochondrial function or compensate for energy deficits.',
-    },
-    {
-        id: '7',
-        label: 'Unstable Repeat Expansions',
-        value: 'UNSTABLE_REPEAT_EXPANSIONS',
-        description: 'Nucleotide repeat expansions cause toxicity or disrupt normal gene function.',
-        strengths: 'Focuses on reducing repeats, mitigating toxicity, or bypassing the effects of expansions.',
-    },
-    {
-        id: '8',
-        label: 'Microdeletions or Duplications',
-        value: 'MICRODELETIONS_DUPLICATIONS',
-        description: 'Structural variations that remove or duplicate parts of a gene or regulatory region, affecting expression or function.',
-        strengths: 'Allows for targeted approaches to correct or bypass structural variations.',
-    },
-    {
-        id: '9',
         label: 'Unknown',
         value: 'UNKNOWN',
         description: 'A molecular mechanism where the specific effect of the mutation on the protein\'s function is not yet determined.',
-        strengths: 'Allows exploration and categorization of mechanisms as new insights become available.',
+    },
+    {
+        id: '5',
+        label: 'Other',
+        value: 'OTHER',
+        description: 'None of the above',
     },
 ];
 
@@ -703,7 +673,7 @@ export default function ResearchOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>
-                                            Mechanisms of Action
+                                            Mechanisms of action
                                         </FormLabel>
                                         <FormDescription className="flex items-center">
                                             {`What type of condition is ${'disoder name'}`}

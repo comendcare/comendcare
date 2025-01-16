@@ -930,7 +930,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>
-                                                    Mechanisms of Action
+                                                    Mechanisms of action
                                                 </FormLabel>
                                                 <FormDescription className="flex items-center">
                                                     {`What type of condition is ${'disoder name'}`}
