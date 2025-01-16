@@ -622,7 +622,7 @@ export default function EditPAGProfileDialog() {
                                             <FormItem>
                                                 <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                                 <FormDescription>
-                                                    {`Enter your organization's abbreviated name, short form, or nickname.`}
+                                                    {`Enter your organization’s abbreviated name, short form, or nickname in lowercase.`}
                                                     <br/>
                                                     {editOrgForm.watch("subdomain") &&
                                                         !editOrgForm.formState.errors.subdomain && (

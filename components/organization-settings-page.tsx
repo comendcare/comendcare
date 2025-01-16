@@ -20,9 +20,10 @@ import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
-import {deleteOrgRoadmap} from "@/lib/actions";
+import {deleteOrganization, deleteOrgRoadmap} from "@/lib/actions";
+import DeleteOrganizationForm from "@/components/form/delete-organization-form";
 
-export default function OrganizationSettingsPage({organization}: {organization: Organization}) {
+export default function OrganizationSettingsPage({organization}: { organization: Organization }) {
     const {data: session, update} = useSession()
     const [isDeleting, setIsDeleting] = useState(false); // Track API call state
 
@@ -30,15 +31,19 @@ export default function OrganizationSettingsPage({organization}: {organization: 
         setIsDeleting(true); // Disable the button
 
         try {
-            const response = await fetch("/api/account/delete", {
-                method: "DELETE",
-            });
-
-            if (response.ok) {
-                toast.success("Account deleted successfully.");
-            } else {
-                toast.error("Failed to delete account. Please try again.");
-            }
+            await deleteOrganization(organization)
+                .then(async res => {
+                    if (res.success) {
+                        await update({
+                            ...session,
+                            organizationId: undefined
+                        })
+                        toast.success(`Successfully deleted organization!`)
+                    } else {
+                        toast.error(res.error)
+                    }
+                })
+                .catch((err: Error) => toast.error(err.message))
         } catch (error) {
             toast.error("An error occurred. Please try again later.");
         } finally {
@@ -46,11 +51,11 @@ export default function OrganizationSettingsPage({organization}: {organization: 
         }
     };
 
-    async function handleDeleteRoadmap () {
+    async function handleDeleteRoadmap() {
         try {
             if (!session?.user?.organizationId) throw new Error('Organization id is not defined')
 
-            const { success, data: roadmapId } = await getRoadmapId(session?.user?.organizationId)
+            const {success, data: roadmapId} = await getRoadmapId(session?.user?.organizationId)
 
             if (!success || !roadmapId) throw new Error('Could not find research plan')
 
@@ -68,13 +73,6 @@ export default function OrganizationSettingsPage({organization}: {organization: 
     }
 
     if (organization) {
-        if (!organization.verified) {
-            // Render unverified organization state
-            return (
-                <UnverifiedOrganizationPage organization={organization} />
-            );
-        }
-
         return (
             <main className="flex flex-col items-start w-full h-screen mx-auto p-8 space-y-8">
                 <div className="flex flex-col space-y-8 w-full">
@@ -183,7 +181,10 @@ export default function OrganizationSettingsPage({organization}: {organization: 
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
+
                     </div>
+
+                    <DeleteOrganizationForm organization={organization}/>
 
                 </div>
             </main>
