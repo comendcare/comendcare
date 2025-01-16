@@ -1,5 +1,5 @@
 "use client"
-import {useEffect, useState} from "react"
+import {useState} from "react"
 import {
     Form,
     FormControl,
@@ -23,14 +23,9 @@ import {FaPlus} from "react-icons/fa6"
 import {useForm} from "react-hook-form"
 import * as z from "zod"
 import {zodResolver} from "@hookform/resolvers/zod"
-import {toast} from "sonner"
 import {Input} from "@/components/ui/input"
-import {useRouter} from "next/navigation"
-import {useSession} from "next-auth/react"
 import {getNewColumnFormSchema} from "@/lib/schemas";
 import {cn} from "@/lib/utils";
-import {createKanbanColumn, createNewKanbanTask} from "@/lib/actions";
-import {getKanbanFromOrganizationId} from "@/lib/fetchers";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
 
