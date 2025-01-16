@@ -26,7 +26,7 @@ import {Bold, Italic} from "lucide-react";
 import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
+import {FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
 import {cn, createDicebearAvatar, formatMoney, nameToInitials, years} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
@@ -776,36 +776,34 @@ export default function OrganizationOnboardingForm(
                                         <div
                                             className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
                                         >
-                                            <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
+                                            <div className="mt-6 min-w-0 flex-1 sm:hidden md:block space-y-1">
                                                 <h1 className="mt-6 min-w-0 flex-1 truncate text-xl font-bold text-gray-900">
                                                     {newOrgForm.watch("orgName") || <Skeleton className="h-4 w-full"/>}
                                                 </h1>
-                                                <div
-                                                    className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
-                                                    {/*{newOrgForm.watch("numberOfIdentifiedPatients") &&*/}
-                                                    {/*    <div className="mt-2 flex items-center text-gray-500">*/}
-                                                    {/*        <FaPeopleGroup*/}
-                                                    {/*            className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"*/}
-                                                    {/*            aria-hidden="true"/>*/}
-                                                    {/*        {newOrgForm.watch("numberOfIdentifiedPatients")}+*/}
-                                                    {/*        patients*/}
-                                                    {/*    </div>*/}
-                                                    {/*}*/}
-                                                    {/*{newOrgForm.watch("moneyRaised") &&*/}
-                                                    {/*    <div className="mt-2 flex items-center text-gray-500">*/}
-                                                    {/*        <FaCircleDollarToSlot*/}
-                                                    {/*            className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"*/}
-                                                    {/*            aria-hidden="true"*/}
-                                                    {/*        />*/}
-                                                    {/*        {formatMoney(newOrgForm.watch("moneyRaised"))} raised*/}
-                                                    {/*    </div>*/}
-                                                    {/*}*/}
-                                                    {/*<div className="mt-2 flex items-center text-gray-500">*/}
-                                                    {/*    <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"*/}
-                                                    {/*                aria-hidden="true"/>*/}
-                                                    {/*    Founded*/}
-                                                    {/*    in {new Date(newOrgForm.watch("createdAt") ?? "").getFullYear()}*/}
-                                                    {/*</div>*/}
+                                                <div className="flex flex-row space-x-2">
+                                                    {newOrgForm.watch("founded") ?
+                                                        <div
+                                                            className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
+                                                            <div className="mt-1 flex items-center text-gray-500">
+                                                                <FaCalendar
+                                                                    className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"
+                                                                    aria-hidden="true"/>
+                                                                Founded in {newOrgForm.watch("founded")?.split("-")[0]}
+                                                            </div>
+                                                        </div> :
+                                                        <Skeleton className="h-2 w-1/4"/>
+                                                    }
+                                                    {newOrgForm.watch("incorporationStatus") === "YES" &&
+                                                        <div
+                                                            className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
+                                                            <div className="mt-1 flex items-center text-gray-500">
+                                                                <FaBuildingNgo
+                                                                    className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"
+                                                                    aria-hidden="true"/>
+                                                                {"501c3"}
+                                                            </div>
+                                                        </div>
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
@@ -819,8 +817,8 @@ export default function OrganizationOnboardingForm(
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-6 gap-4">
-                                <div className="col-span-2 space-y-4">
+                            <div className="grid grid-cols-6 gap-2">
+                                <div className="col-span-2 space-y-2">
                                     <Card>
                                         <CardHeader
                                             className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -834,12 +832,19 @@ export default function OrganizationOnboardingForm(
                                                 <div className="flex-shrink-0 space-y-4">
                                                     <div className="flex-grow space-y-4">
                                                         <div className="space-y-2">
-                                                            <h3 className={cn("scroll-m-20 text-md tracking-tight font-semibold")}>
-                                                                Description
-                                                            </h3>
                                                             {newOrgForm.watch("description") ?
-                                                                <p className="text-sm line-clamp-6">
+                                                                <p className="text-xs line-clamp-6">
                                                                     {newOrgForm.watch("description")}
+                                                                </p> : <Skeleton className="h-4 w-full"/>
+                                                            }
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <h3 className={cn("scroll-m-20 text-md tracking-tight font-semibold")}>
+                                                                Website
+                                                            </h3>
+                                                            {newOrgForm.watch("website") ?
+                                                                <p className="text-xs">
+                                                                    {newOrgForm.watch("website")}
                                                                 </p> : <Skeleton className="h-4 w-full"/>
                                                             }
                                                         </div>
@@ -849,18 +854,32 @@ export default function OrganizationOnboardingForm(
 
                                         </CardContent>
                                     </Card>
-                                    {/*<AssetsCard/>*/}
-                                    {/*<OpenRFPsCard/>*/}
                                 </div>
 
-                                <div className="col-span-4 flex flex-col space-y-4">
-                                    {/*<PAGProfileRoadmapCard/>*/}
+                                <div className="col-span-4 flex flex-col space-y-2">
                                     <Card>
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0">
                                             <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>
-                                                Activity
+                                                Milestones
                                             </CardTitle>
-                                            <Skeleton className="w-full"/>
+                                        </CardHeader>
+                                        <CardContent className="grid grid-cols-2 gap-x-2">
+                                            <div className="flex flex-col gap-y-2">
+                                                <Skeleton className="h-4 w-full"/>
+                                                <Skeleton className="h-4 w-1/2"/>
+                                            </div>
+                                            <div className="flex flex-col gap-y-2">
+                                                <Skeleton className="h-4 w-full"/>
+                                                <Skeleton className="h-4 w-1/2"/>
+                                                <Skeleton className="h-4 w-1/2"/>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                    <Card>
+                                        <CardHeader className="w-full flex flex-row items-center justify-between space-y-0">
+                                            <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>
+                                            Research Plan
+                                            </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
                                             <Skeleton className="h-4 w-full"/>
