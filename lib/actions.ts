@@ -23,6 +23,8 @@ import {ApiResponse} from "@/lib/types";
 
 export type Node = Prisma.NodeGetPayload<{}>
 
+export type Edge = Prisma.EdgeGetPayload<{}>
+
 export type Milestone = Prisma.MilestoneGetPayload<{
     include: {
         papers: true,
@@ -1333,7 +1335,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
             }
         })
 
-        await prisma.edge.deleteMany()
+        // await prisma.edge.deleteMany()
 
         // Save or update nodes
         await Promise.all(
@@ -1542,6 +1544,47 @@ export async function deleteNode(nodeId: string | undefined) {
         return { success: true, data: deletedNode }
     } catch (error: any) {
         logError("Could not delete node", error)
+        return { success: false, error: "Internal server error" }
+    }
+}
+
+export async function updateEdges({roadmapId, edges}: {roadmapId: string | null, edges: any[]}) {
+    try {
+        if (!roadmapId) throw new Error('No roadmapId provided.')
+
+        await prisma.edge.deleteMany({
+            where: { roadmapId }
+        })
+
+        // Save or update edges
+        await Promise.all(
+            edges.map(async (edge: any) => {
+                await prisma.edge.upsert({
+                    where: {id: edge.id},
+                    update: {
+                        source: edge.source,
+                        target: edge.target
+                    },
+                    create: {
+                        id: edge.id,
+                        roadmap: {
+                            connect: {id: roadmapId}
+                        },
+                        source: edge.source,
+                        target: edge.target,
+                    }
+                })
+            })
+        )
+
+        const updatedEdges: Edge[] = await prisma.edge.findMany({
+            where: { roadmapId }
+        })
+
+        console.log(`Successfully updated Flow Edges`)
+        return { success: true, data: updatedEdges }
+    } catch (error) {
+        console.error(`Error updating Flow Edges`, error)
         return { success: false, error: "Internal server error" }
     }
 }
