@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "./ui/separator"
 import { FaArrowUpRightFromSquare, FaTrash } from "react-icons/fa6"
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import { cn } from "@/lib/utils"
 
 type AssetType = Prisma.AssetGetPayload<{ 
     include: { 
@@ -50,8 +51,8 @@ export function AssetDetails({ asset }: { asset: AssetType }) {
                                 </h2>
                             </div>
                             {asset?.contacts && asset.contacts.length > 0 ? (
-                                <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 list-disc text-wrap">
-                                    <ul className="list-disc pl-6">
+                                <div className={"mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap"}>
+                                    <ul className={cn(asset.contacts.length > 1 ? "list-disc pl-6": "")}>
                                         {asset.contacts.map((contact) => {
                                             if (contact.name && contact.email) {
                                                 return (<li>{contact.name} &bull; {contact.email}</li>)
