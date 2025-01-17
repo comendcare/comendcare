@@ -31,8 +31,8 @@ export interface InputProps
     extends HTMLInputPropsWithoutSize,
         VariantProps<typeof inputVariants> {}
 
-const formatNumberWithCommas = (value: string) => {
-    const numericValue = value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
+const formatNumberWithCommas = (value: string | undefined) => {
+    const numericValue = (value || "").replace(/[^0-9]/g, ""); // Ensure value is a string
     return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
@@ -51,6 +51,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             }
         };
 
+        // Convert value to a string or undefined
+        const stringValue =
+            value === undefined || value === null
+                ? undefined
+                : typeof value === "string"
+                    ? value
+                    : value.toString();
+
         return (
             <div className={cn(variant === "currency" && "relative mt-2")}>
                 {variant === "currency" && (
@@ -67,7 +75,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     )}
                     ref={ref}
                     onChange={handleChange}
-                    value={variant === "currency" ? formatNumberWithCommas(value as string) : value}
+                    value={variant === "currency" ? formatNumberWithCommas(stringValue) : stringValue}
                     {...props}
                 />
                 {variant === "currency" && (
