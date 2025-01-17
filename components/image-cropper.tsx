@@ -20,6 +20,7 @@ import {
 
 import "react-image-crop/dist/ReactCrop.css"
 import { CropIcon, Trash2Icon } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export type FileWithPreview = File & { preview: string }
 
@@ -27,7 +28,9 @@ interface ImageCropperProps {
     dialogOpen: boolean
     setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
     selectedFile: FileWithPreview | null
-    setSelectedFile: (file: any) => void
+    setSelectedFile: (file: any) => void,
+    aspect: number,
+    className?: string
 }
 
 export function ImageCropper({
@@ -35,8 +38,9 @@ export function ImageCropper({
                                  setDialogOpen,
                                  selectedFile,
                                  setSelectedFile,
+                                 aspect,
+                                 className = ""
                              }: ImageCropperProps) {
-    const aspect = 1
     const imgRef = React.useRef<HTMLImageElement | null>(null)
 
     const [crop, setCrop] = React.useState<Crop>()
@@ -103,10 +107,11 @@ export function ImageCropper({
     return (
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger>
-                <Avatar className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200">
+                <Avatar className={cn("size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200", className)}>
                     <AvatarImage
                         src={croppedImage ? croppedImage : selectedFile?.preview}
                         alt="@shadcn"
+                        className={cn("", className)}
                     />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>

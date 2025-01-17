@@ -2,7 +2,7 @@
 
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {z} from "zod";
-import {useForm} from "react-hook-form";
+import {useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import React, {useCallback, useEffect, useState} from "react";
@@ -34,7 +34,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {formatMoney, getPublicFile, years} from "@/lib/utils";
+import {cn, formatMoney, getPublicFile, years} from "@/lib/utils";
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
@@ -117,15 +117,16 @@ const editOrgFormSchema = z.object({
     lat: z.number().optional(),
     lng: z.number().optional(),
     image: z.string().optional(),
+    headerImage: z.string().optional()
 })
 
 export default function EditPAGProfileDialog() {
     const {data: session, update} = useSession()
     const router = useRouter()
     const [searchInput, setSearchInput] = useState("");
-    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
+    const [selectedFileProfile, setSelectedFileProfile] = useState<FileWithPreview | null>(null);
+    const [selectedFileHeader, setSelectedFileHeader] = useState<FileWithPreview | null>(null);
     const [open, setOpen] = useState(false);
-    const [isDialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [address, setAddress] = useState<AddressType>({
         address1: "",
@@ -194,35 +195,6 @@ export default function EditPAGProfileDialog() {
         editOrgForm.setValue("lng", address.lng);
     }, [address, editOrgForm]);
 
-    const onDrop = useCallback(
-        (acceptedFiles: FileWithPath[]) => {
-            const file = acceptedFiles[0];
-            if (!file) {
-                toast.error("No file selected!");
-                return;
-            }
-
-            // Additional check to exclude SVG
-            if (file.type === "image/svg+xml") {
-                toast.error("SVG files are not allowed. Please select a valid image.");
-                return;
-            }
-
-            const fileWithPreview = Object.assign(file, {
-                preview: URL.createObjectURL(file),
-            });
-
-            setSelectedFile(fileWithPreview);
-            setDialogOpen(true);
-        },
-        []
-    );
-
-    const {getRootProps, getInputProps} = useDropzone({
-        onDrop,
-        accept,
-    });
-
     async function onProfileFormSubmit(values: z.infer<typeof editOrgFormSchema>) {
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
@@ -241,6 +213,7 @@ export default function EditPAGProfileDialog() {
             website: "website",
             incorporationStatus: "incorporationStatus",
             image: "image",
+            headerImage: "headerImage"
         };
 
         // Populate FormData with mapped fields
@@ -256,15 +229,29 @@ export default function EditPAGProfileDialog() {
             }
         });
 
-        // Handle the selected image upload
-        if (selectedFile && values.image) {
+        // Handle the selected profile image upload
+        if (selectedFileProfile && values.image) {
             try {
-                const imgUrl = await handleImageUpload(selectedFile as File, values.image);
+                const imgUrl = await handleImageUpload(selectedFileProfile as File, values.image);
                 if (imgUrl) {
                     formData.set("image", imgUrl); // Update the FormData with the uploaded image URL
                 }
             } catch (error) {
                 console.error("Failed to upload image:", error);
+                toast.error("Image upload failed.");
+                return;
+            }
+        }
+
+        // Handle the selected header image upload
+        if (selectedFileHeader && values.headerImage) {
+            try {
+                const imgUrl = await handleImageUpload(selectedFileHeader as File, values.headerImage);
+                if (imgUrl) {
+                    formData.set("headerImage", imgUrl); // Update the FormData with the uploaded imageHeader URL
+                }
+            } catch (error) {
+                console.error("Failed to upload header image:", error);
                 toast.error("Image upload failed.");
                 return;
             }
@@ -311,6 +298,7 @@ export default function EditPAGProfileDialog() {
                         lat: parseFloat(organizationData.lat || "0"),
                         lng: parseFloat(organizationData.lng || "0"),
                         image: organizationData.image || "",
+                        headerImage: organizationData.headerImage || "",
                         name: organizationData.name || "",
                         logo: organizationData.logo || "",
                         font: organizationData.font || "",
@@ -326,7 +314,21 @@ export default function EditPAGProfileDialog() {
                                 const fileWithPreview = Object.assign(orgPhoto, {
                                     preview: URL.createObjectURL(orgPhoto),
                                 })
-                                setSelectedFile(fileWithPreview)
+                                setSelectedFileProfile(fileWithPreview)
+                            }
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    }
+
+                    if (organizationData.headerImage) {
+                        try {
+                            const orgHeader: File = await getPublicFile(organizationData.headerImage)
+                            if (orgHeader) {
+                                const fileWithPreview = Object.assign(orgHeader, {
+                                    preview: URL.createObjectURL(orgHeader),
+                                })
+                                setSelectedFileHeader(fileWithPreview)
                             }
                         } catch (e) {
                             console.error(e)
@@ -799,47 +801,25 @@ export default function EditPAGProfileDialog() {
                                         )}
                                     />
 
-                                    <FormField
-                                        control={editOrgForm.control}
+                                    <FormImageCropper 
+                                        form={editOrgForm}
                                         name="image"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    Organization Logo
-                                                </FormLabel>
-                                                <FormDescription>
-                                                    {`This will be used as your organization profile's image.`}
-                                                </FormDescription>
-                                                <FormControl>
-                                                    <div className="flex flex-col items-start space-y-4">
-                                                        {selectedFile ? (
-                                                            <ImageCropper
-                                                                dialogOpen={isDialogOpen}
-                                                                setDialogOpen={setDialogOpen}
-                                                                selectedFile={selectedFile}
-                                                                setSelectedFile={(file: any) => {
-                                                                    if (file == null) setSelectedFile(null)
-                                                                    field.onChange(file?.preview); // Update form field value
-                                                                }}
-                                                            />
-                                                        ) : (
-                                                            <Avatar
-                                                                {...getRootProps()}
-                                                                className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
-                                                            >
-                                                                <input {...getInputProps()} />
-                                                                <AvatarFallback
-                                                                    className="text-center flex flex-col justify-center gap-y-4">
-                                                                    <FaUpload/>
-                                                                    Click or drop!
-                                                                </AvatarFallback>
-                                                            </Avatar>
-                                                        )}
-                                                    </div>
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
+                                        title={"Organization Logo"}
+                                        description={"This will be used as your organization profile's image."}
+                                        aspect={1}
+                                        selectedFile={selectedFileProfile}
+                                        setSelectedFile={setSelectedFileProfile}
+                                    />
+
+                                    <FormImageCropper 
+                                        form={editOrgForm}
+                                        name="headerImage"
+                                        title={"Profile Header"}
+                                        description={"This will be used as the header image on your organization's profile."}
+                                        aspect={16/4}
+                                        selectedFile={selectedFileHeader}
+                                        setSelectedFile={setSelectedFileHeader}
+                                        className="rounded h-[100px] w-[400px]"
                                     />
 
                                     <FormField
@@ -1356,5 +1336,86 @@ export default function EditPAGProfileDialog() {
                 </DialogContent>
             </Dialog>
         </TooltipProvider>
+    )
+}
+
+const FormImageCropper = ({ className = "", form, name, title, description, aspect, selectedFile, setSelectedFile }: { className?: string, form: any, name: string, title: string, description: string, aspect: number, selectedFile: FileWithPreview | null, setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>> }) => {
+    const [isDialogOpen, setDialogOpen] = useState(false);
+
+    const onDrop = useCallback(
+        (acceptedFiles: FileWithPath[]) => {
+            const file = acceptedFiles[0];
+            if (!file) {
+                toast.error("No file selected!");
+                return;
+            }
+
+            // Additional check to exclude SVG
+            if (file.type === "image/svg+xml") {
+                toast.error("SVG files are not allowed. Please select a valid image.");
+                return;
+            }
+
+            const fileWithPreview = Object.assign(file, {
+                preview: URL.createObjectURL(file),
+            });
+
+            setSelectedFile(fileWithPreview);
+            setDialogOpen(true);
+        },
+        []
+    );
+
+    const { getRootProps, getInputProps } = useDropzone({
+        onDrop: onDrop,
+        accept,
+    });
+
+
+    return (
+        <FormField
+            control={form.control}
+            name={name}
+            render={({field}) => (
+                <FormItem>
+                    <FormLabel>
+                        {title}
+                    </FormLabel>
+                    <FormDescription>
+                        {description}
+                    </FormDescription>
+                    <FormControl>
+                        <div className="flex flex-col items-start space-y-4">
+                            {selectedFile ? (
+                                <ImageCropper
+                                    aspect={aspect}
+                                    dialogOpen={isDialogOpen}
+                                    setDialogOpen={setDialogOpen}
+                                    selectedFile={selectedFile}
+                                    setSelectedFile={(file: any) => {
+                                        if (file == null) setSelectedFile(null)
+                                        field.onChange(file?.preview); // Update form field value
+                                    }}
+                                    className={className}
+                                />
+                            ) : (
+                                <Avatar
+                                    {...getRootProps()}
+                                    className={cn("size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200", className)}
+                                >
+                                    <input {...getInputProps()} />
+                                    <AvatarFallback
+                                        className={cn("text-center flex flex-col justify-center gap-y-4", className)}>
+                                        <FaUpload/>
+                                        Click or drop!
+                                    </AvatarFallback>
+                                </Avatar>
+                            )}
+                        </div>
+                    </FormControl>
+                    <FormMessage/>
+                </FormItem>
+            )}
+        />
     )
 }
