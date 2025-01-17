@@ -111,7 +111,7 @@ export function ImageCropper({
                     <AvatarImage
                         src={croppedImage ? croppedImage : selectedFile?.preview}
                         alt="@shadcn"
-                        className={cn("", className)}
+                        className={cn("object-cover", className)}
                     />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
