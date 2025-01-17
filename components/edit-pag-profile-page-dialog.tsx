@@ -1339,7 +1339,8 @@ export default function EditPAGProfileDialog() {
     )
 }
 
-const FormImageCropper = ({ className = "", form, name, title, description, aspect, selectedFile, setSelectedFile }: { className?: string, form: any, name: string, title: string, description: string, aspect: number, selectedFile: FileWithPreview | null, setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>> }) => {
+export const FormImageCropper = ({ className = "", form, name, title, description, aspect, selectedFile, setSelectedFile }: { className?: string, form: any, name: string, title: string, description: string, aspect: number, selectedFile: FileWithPreview | null, setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>> }) => {
+    const [previewImg, setPreviewImg] = useState<FileWithPreview | null>(null)
     const [isDialogOpen, setDialogOpen] = useState(false);
 
     const onDrop = useCallback(
@@ -1360,8 +1361,9 @@ const FormImageCropper = ({ className = "", form, name, title, description, aspe
                 preview: URL.createObjectURL(file),
             });
 
-            setSelectedFile(fileWithPreview);
-            setDialogOpen(true);
+            setSelectedFile(fileWithPreview)
+            // setPreviewImg(fileWithPreview)
+            setDialogOpen(true)
         },
         []
     );
@@ -1395,6 +1397,7 @@ const FormImageCropper = ({ className = "", form, name, title, description, aspe
                                     setSelectedFile={(file: any) => {
                                         if (file == null) setSelectedFile(null)
                                         field.onChange(file?.preview); // Update form field value
+                                        setSelectedFile(file)
                                     }}
                                     className={className}
                                 />
