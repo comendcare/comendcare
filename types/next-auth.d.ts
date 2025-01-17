@@ -10,6 +10,7 @@ declare module "next-auth" {
             bio?: string | null | undefined
             organizationId?: string | null | undefined
         } & DefaultSession["user"]
+        terminate?: boolean
     }
     interface User {
         id: string

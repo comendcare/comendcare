@@ -161,6 +161,8 @@ export const authOptions: NextAuthOptions = {
                     organizationId: token.organizationId as string | null, // Ensure type matches
                 };
 
+                // If user cannot be found, assume they've been deleted and forcibly sign them out in the frontend.
+                session.terminate = true
                 session.expires = new Date().toDateString()
 
                 return session
@@ -185,6 +187,7 @@ export const authOptions: NextAuthOptions = {
 
 export function getSession() {
     return getServerSession(authOptions) as Promise<{
+        terminate: boolean;
         user: {
             id: string
             name: string
