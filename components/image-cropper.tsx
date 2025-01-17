@@ -27,7 +27,8 @@ interface ImageCropperProps {
     dialogOpen: boolean
     setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
     selectedFile: FileWithPreview | null
-    setSelectedFile: (file: any) => void
+    setSelectedFile: (file: any) => void,
+    aspect: number
 }
 
 export function ImageCropper({
@@ -35,8 +36,8 @@ export function ImageCropper({
                                  setDialogOpen,
                                  selectedFile,
                                  setSelectedFile,
+                                 aspect
                              }: ImageCropperProps) {
-    const aspect = 1
     const imgRef = React.useRef<HTMLImageElement | null>(null)
 
     const [crop, setCrop] = React.useState<Crop>()

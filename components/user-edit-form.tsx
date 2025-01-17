@@ -271,6 +271,7 @@ export default function UserEditForm() {
                                 <div className="flex flex-col items-start space-y-4">
                                     {selectedFile ? (
                                         <ImageCropper
+                                            aspect={1}
                                             dialogOpen={isDialogOpen}
                                             setDialogOpen={setDialogOpen}
                                             selectedFile={selectedFile}
