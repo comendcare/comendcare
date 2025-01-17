@@ -8,32 +8,32 @@ datasource db {
 }
 
 model User {
-  id                   String          @id @default(cuid())
+  id                   String            @id @default(cuid())
   name                 String?
   username             String?
   gh_username          String?
-  email                String?         @unique
+  email                String?           @unique
   emailVerified        DateTime?
   image                String?
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @updatedAt
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
   deletedAt            DateTime?
   address1             String?
   address2             String?
   city                 String?
   country              String?
   formattedAddress     String?
-  notificationSettings Boolean         @default(false)
+  notificationSettings Boolean           @default(false)
   postalCode           String?
   region               String?
   title                String?
   lat                  Float?
   lng                  Float?
-  consentSettings      Boolean         @default(false)
+  consentSettings      Boolean           @default(false)
   accounts             Account[]
   comments             Comment[]
   follows              Follow[]
-  sentInvitations      Member[]        @relation("invitedBy")
+  sentInvitations      Member[]          @relation("invitedBy")
   memberships          Member[]
   membershipRequests   MemberRequest[]
   organizations        Organization[]
@@ -41,7 +41,7 @@ model User {
   reactions            Reaction[]
   roadmaps             Roadmap[]
   sessions             Session[]
-  tasks                Task[]          @relation("TaskToUser")
+  TaskStakeholder      TaskStakeholder[]
 }
 
 model Member {
@@ -225,25 +225,38 @@ model Column {
 }
 
 model Task {
-  id             String          @id @unique @default(uuid())
-  status         StatusType?
-  name           String          @default("")
-  description    String?         @default("")
-  milestoneId    String?
-  kanbanPosition Int
-  orderPosition  Int
-  columnId       String
-  createdAt      DateTime        @default(now())
-  date           DateTime?       @default(now())
-  updatedAt      DateTime        @updatedAt
-  endDate        DateTime?
-  priority       PriorityType?
-  private        Boolean         @default(false)
-  startDate      DateTime?
-  checklist      ChecklistItem[]
-  column         Column          @relation(fields: [columnId], references: [id], onDelete: Cascade)
-  milestone      Milestone?      @relation(fields: [milestoneId], references: [id])
-  stakeholders   User[]          @relation("TaskToUser")
+  id              String            @id @unique @default(uuid())
+  status          StatusType?
+  name            String            @default("")
+  description     String?           @default("")
+  milestoneId     String?
+  kanbanPosition  Int
+  orderPosition   Int
+  columnId        String
+  createdAt       DateTime          @default(now())
+  date            DateTime?         @default(now())
+  updatedAt       DateTime          @updatedAt
+  endDate         DateTime?
+  priority        PriorityType?
+  private         Boolean           @default(false)
+  startDate       DateTime?
+  checklist       ChecklistItem[]
+  column          Column            @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  milestone       Milestone?        @relation(fields: [milestoneId], references: [id])
+  TaskStakeholder TaskStakeholder[]
+}
+
+model TaskStakeholder {
+  id        String   @id @default(cuid())
+  taskId    String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId]) // Ensure uniqueness of the pair
 }
 
 model ChecklistItem {
