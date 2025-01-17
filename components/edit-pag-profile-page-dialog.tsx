@@ -1346,13 +1346,23 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
         (acceptedFiles: FileWithPath[]) => {
             const file = acceptedFiles[0];
             if (!file) {
-                toast.error("No file selected!");
+                // toast.error("No file selected!")
+                console.error("No file selected!")
                 return;
             }
 
             // Additional check to exclude SVG
-            if (file.type === "image/svg+xml") {
-                toast.error("SVG files are not allowed. Please select a valid image.");
+            if (file.type !== "image/jpg" && file.type !== "image/jpeg" && file.type !== "image/png") {
+                toast.error("Only .jpg, .jpeg, and .png files are allowed. Please select a valid image format.")
+                console.error("Only .jpg, .jpeg, and .png files are allowed. Please select a valid image format.")
+                return;
+            }
+
+            // Check file size (1 MB limit)
+            const maxSizeInBytes = 1 * 1024 * 1024; // 1 MB
+            if (file.size > maxSizeInBytes) {
+                toast.error("File size exceeds 1 MB. Please select a smaller image.")
+                console.error("File size exceeds 1 MB. Please select a smaller image.")
                 return;
             }
 
@@ -1399,7 +1409,7 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
                                         } else {
                                             setSelectedFile(file)
                                         }
-                                        
+
                                         field.onChange(file?.preview) // Update form field value
                                     }}
                                     className={className}
