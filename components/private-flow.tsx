@@ -37,6 +37,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { CheckBubble } from "./check-bubble"
 import { templateMilestones } from "@/lib/templates"
 import { debounce } from "lodash"
+import { CustomEdge } from "./custom-edge"
 
 const proOptions = { hideAttribution: true }
 
@@ -75,6 +76,7 @@ export const PrivateFlowView = ({
     const searchParams = useSearchParams()
     // const { undo, redo, clear } = useRoadmapStore.temporal.getState()
     const nodeTypes = { MILESTONE: PrivateMilestoneNode }
+    const edgeTypes = { DEFAULT: CustomEdge }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
@@ -252,6 +254,11 @@ export const PrivateFlowView = ({
         }
     }))
 
+    const updatedEdges = edges.map((edge: Edge) => ({
+        ...edge,
+        type: 'DEFAULT'
+    }))
+
     // when the handle is adjusted (width changes) or a node is selected (details panel opens), fit the view
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -302,13 +309,14 @@ export const PrivateFlowView = ({
         <ReactFlow
             width={width}
             nodes={updatedNodes}
-            edges={edges}
+            edges={updatedEdges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onConnectEnd={onConnectEnd}
             onBeforeDelete={handleDelete}
             nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             fitView
             fitViewOptions={{ padding: 2 }}
             style={{ width: '100%', height: '100%' }}
