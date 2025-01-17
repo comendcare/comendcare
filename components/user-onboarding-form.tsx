@@ -32,6 +32,7 @@ import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
+import { FormImageCropper } from "./edit-pag-profile-page-dialog";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -60,6 +61,10 @@ export default function UserOnboardingForm() {
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
+
+    useEffect(() => {
+        console.log(`selected file`, selectedFile)
+    }, [selectedFile])
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -249,7 +254,7 @@ export default function UserOnboardingForm() {
                             )}
                         />
 
-                        <FormField
+                        {/* <FormField
                             control={form.control}
                             name="image"
                             render={({field}) => (
@@ -287,6 +292,15 @@ export default function UserOnboardingForm() {
                                     <FormMessage/>
                                 </FormItem>
                             )}
+                        /> */}
+                        <FormImageCropper
+                            form={form}
+                            name="image"
+                            title={"Profile Image"}
+                            description={"Your profile image."}
+                            aspect={1}
+                            selectedFile={selectedFile}
+                            setSelectedFile={setSelectedFile}
                         />
 
                         <div className="space-y-2">
@@ -356,8 +370,8 @@ export default function UserOnboardingForm() {
                             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                                 <div className="flex">
                                     {selectedFile?.preview ?
-                                        <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
-                                             src={selectedFile?.preview}
+                                        <img className="object-cover h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
+                                        src={selectedFile?.preview}
                                              alt=""/>
                                         :
                                         <p

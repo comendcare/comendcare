@@ -26,7 +26,7 @@ export type RoadmapState = {
     onConnect: (connection: any) => Promise<Edge[] | void>
     setNodes: (nodes: Node[]) => Promise<Node[] | void>
     setEdges: (edges: Edge[]) => Promise<Edge[] | void>
-    addNodes: (node: Node[]) => void
+    addNodes: (node: Node[]) => Promise<Node[] | void>
     deleteNode: (nodeId: string) => Promise<any | void>
     initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void
     saveState: () => void
@@ -66,7 +66,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // if task was created successfully, update zustand state
                 set({ milestones: response.data as Milestone[] })
 
-                toast.success("Milestone updated successfully!")
+                // toast.success("Milestone updated successfully!")
                 return response.data as Milestone[]
             } else {
                 console.error(`Error updating milestones`, response.error)
@@ -80,7 +80,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // if task was created successfully, update zustand state
                 set({ milestones: response.data as Milestone[] })
 
-                toast.success("Milestone updated successfully!")
+                // toast.success("Milestone updated successfully!")
                 return response.data as Milestone[]
             } else {
                 console.error(`Error updating milestones`, response.error)
@@ -156,10 +156,11 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         addNodes: async (nodes: Node[]) => {
-            // const newNodes = [...get().nodes, ...nodes]
+            // set({ nodes: [...get().nodes, ...nodes], milestones: [...get().milestones, ...nodes.map(node => node.data)] })
             const newNodes = nodes
 
             const response = await createNodes({ roadmapId: get().roadmapId, nodes: newNodes })
+            // const response = await createNodes({ roadmapId: null, nodes: newNodes })
             if (response.success && response.data && response.data.nodes && response.data.milestones) {
                 const updatedNodes = [
                     ...get().nodes, 
@@ -183,10 +184,11 @@ export const useRoadmapStore = create<RoadmapState>()(
                     milestones: updatedMilestone
                 })
 
-                toast.success("Nodes added successfully!")
-                return response.data
+                toast.success("Milestones added successfully!")
+                return response.data.nodes
             } else {
                 console.error(`Error adding nodes`, response.error)
+                toast.error(`Error adding milestones: ${response.error}`)
             }
         },
         deleteNode: async (nodeId: string | undefined) => {

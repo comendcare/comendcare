@@ -815,7 +815,7 @@ export default function EditPAGProfileDialog() {
                                         form={editOrgForm}
                                         name="headerImage"
                                         title={"Profile Header"}
-                                        description={"This will be used as the header image on your organization's profile."}
+                                        description={"This will be used as the header image on your organization's profile. (16x4)"}
                                         aspect={16/4}
                                         selectedFile={selectedFileHeader}
                                         setSelectedFile={setSelectedFileHeader}
@@ -1339,20 +1339,30 @@ export default function EditPAGProfileDialog() {
     )
 }
 
-const FormImageCropper = ({ className = "", form, name, title, description, aspect, selectedFile, setSelectedFile }: { className?: string, form: any, name: string, title: string, description: string, aspect: number, selectedFile: FileWithPreview | null, setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>> }) => {
+export const FormImageCropper = ({ className = "", form, name, title, description, aspect, selectedFile, setSelectedFile }: { className?: string, form: any, name: string, title: string, description: string, aspect: number, selectedFile: FileWithPreview | null, setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>> }) => {
     const [isDialogOpen, setDialogOpen] = useState(false);
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
             const file = acceptedFiles[0];
             if (!file) {
-                toast.error("No file selected!");
+                // toast.error("No file selected!")
+                console.error("No file selected!")
                 return;
             }
 
             // Additional check to exclude SVG
-            if (file.type === "image/svg+xml") {
-                toast.error("SVG files are not allowed. Please select a valid image.");
+            if (file.type !== "image/jpg" && file.type !== "image/jpeg" && file.type !== "image/png") {
+                toast.error("Only .jpg, .jpeg, and .png files are allowed. Please select a valid image format.")
+                console.error("Only .jpg, .jpeg, and .png files are allowed. Please select a valid image format.")
+                return;
+            }
+
+            // Check file size (1 MB limit)
+            const maxSizeInBytes = 1 * 1024 * 1024; // 1 MB
+            if (file.size > maxSizeInBytes) {
+                toast.error("File size exceeds 1 MB. Please select a smaller image.")
+                console.error("File size exceeds 1 MB. Please select a smaller image.")
                 return;
             }
 
@@ -1360,8 +1370,8 @@ const FormImageCropper = ({ className = "", form, name, title, description, aspe
                 preview: URL.createObjectURL(file),
             });
 
-            setSelectedFile(fileWithPreview);
-            setDialogOpen(true);
+            setSelectedFile(fileWithPreview)
+            setDialogOpen(true)
         },
         []
     );
@@ -1392,9 +1402,15 @@ const FormImageCropper = ({ className = "", form, name, title, description, aspe
                                     dialogOpen={isDialogOpen}
                                     setDialogOpen={setDialogOpen}
                                     selectedFile={selectedFile}
-                                    setSelectedFile={(file: any) => {
-                                        if (file == null) setSelectedFile(null)
-                                        field.onChange(file?.preview); // Update form field value
+                                    setSelectedFile={(file: FileWithPreview | null) => {
+                                        console.log(`set selected file`, file)
+                                        if (!file) {
+                                            setSelectedFile(null)
+                                        } else {
+                                            setSelectedFile(file)
+                                        }
+
+                                        field.onChange(file?.preview) // Update form field value
                                     }}
                                     className={className}
                                 />

@@ -66,7 +66,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     }
 
     return (
-        <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "")}>
+        <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", props.selected ? "border-black border-2" : "")}>
             <CardHeader>
                 <div className="-mt-4 -mr-4 h-fit flex flex-row align-center justify-end gap-4">
                     {props.data?.private && (
