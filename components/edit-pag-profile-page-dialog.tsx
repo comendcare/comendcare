@@ -1394,8 +1394,13 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
                                     selectedFile={selectedFile}
                                     setSelectedFile={(file: FileWithPreview | null) => {
                                         console.log(`set selected file`, file)
-                                        if (!file) setSelectedFile(null)
-                                        field.onChange(file?.preview); // Update form field value
+                                        if (!file) {
+                                            setSelectedFile(null)
+                                        } else {
+                                            setSelectedFile(file)
+                                        }
+                                        
+                                        field.onChange(file?.preview) // Update form field value
                                     }}
                                     className={className}
                                 />

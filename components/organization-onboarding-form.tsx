@@ -139,7 +139,7 @@ export default function OrganizationOnboardingForm(
     });
     const [searchInput, setSearchInput] = useState("");
     const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
-    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
+    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null)
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof newOrgFormSchema> | undefined>(undefined);
@@ -290,8 +290,16 @@ export default function OrganizationOnboardingForm(
             });
 
             if (selectedFile && values.image) {
-                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
-                if (imgUrl) formData.set('image', imgUrl)
+                try {
+                    const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                    if (imgUrl) {
+                        formData.set('image', imgUrl)
+                    }
+                } catch (error) {
+                    console.error("Failed to upload image:", error)
+                    toast.error("Image upload failed")
+                    return 
+                }
             }
 
             createOrganization(formData).then((res: any) => {
