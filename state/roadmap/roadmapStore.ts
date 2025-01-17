@@ -66,7 +66,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // if task was created successfully, update zustand state
                 set({ milestones: response.data as Milestone[] })
 
-                toast.success("Milestone updated successfully!")
+                // toast.success("Milestone updated successfully!")
                 return response.data as Milestone[]
             } else {
                 console.error(`Error updating milestones`, response.error)
@@ -80,7 +80,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // if task was created successfully, update zustand state
                 set({ milestones: response.data as Milestone[] })
 
-                toast.success("Milestone updated successfully!")
+                // toast.success("Milestone updated successfully!")
                 return response.data as Milestone[]
             } else {
                 console.error(`Error updating milestones`, response.error)
