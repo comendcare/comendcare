@@ -34,7 +34,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {formatMoney, getPublicFile, years} from "@/lib/utils";
+import {cn, formatMoney, getPublicFile, years} from "@/lib/utils";
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
@@ -248,7 +248,7 @@ export default function EditPAGProfileDialog() {
             try {
                 const imgUrl = await handleImageUpload(selectedFileHeader as File, values.headerImage);
                 if (imgUrl) {
-                    formData.set("headerImage", imgUrl); // Update the FormData with the uploaded image URL
+                    formData.set("headerImage", imgUrl); // Update the FormData with the uploaded imageHeader URL
                 }
             } catch (error) {
                 console.error("Failed to upload header image:", error);
@@ -819,6 +819,7 @@ export default function EditPAGProfileDialog() {
                                         aspect={16/4}
                                         selectedFile={selectedFileHeader}
                                         setSelectedFile={setSelectedFileHeader}
+                                        className="rounded h-[100px] w-[400px]"
                                     />
 
                                     <FormField
@@ -1338,7 +1339,7 @@ export default function EditPAGProfileDialog() {
     )
 }
 
-const FormImageCropper = ({ form, name, title, description, aspect, selectedFile, setSelectedFile }: { form: any, name: string, title: string, description: string, aspect: number, selectedFile: FileWithPreview | null, setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>> }) => {
+const FormImageCropper = ({ className = "", form, name, title, description, aspect, selectedFile, setSelectedFile }: { className?: string, form: any, name: string, title: string, description: string, aspect: number, selectedFile: FileWithPreview | null, setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>> }) => {
     const [isDialogOpen, setDialogOpen] = useState(false);
 
     const onDrop = useCallback(
@@ -1395,15 +1396,16 @@ const FormImageCropper = ({ form, name, title, description, aspect, selectedFile
                                         if (file == null) setSelectedFile(null)
                                         field.onChange(file?.preview); // Update form field value
                                     }}
+                                    className={className}
                                 />
                             ) : (
                                 <Avatar
                                     {...getRootProps()}
-                                    className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
+                                    className={cn("size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200", className)}
                                 >
                                     <input {...getInputProps()} />
                                     <AvatarFallback
-                                        className="text-center flex flex-col justify-center gap-y-4">
+                                        className={cn("text-center flex flex-col justify-center gap-y-4", className)}>
                                         <FaUpload/>
                                         Click or drop!
                                     </AvatarFallback>
