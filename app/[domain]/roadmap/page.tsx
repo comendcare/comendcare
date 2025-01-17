@@ -243,7 +243,7 @@ export default async function OrganizationRoadmapPage({
                                             <div className="mt-2 flex items-center text-gray-500">
                                                 <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                             aria-hidden="true"/>
-                                                Founded in {new Date(organization?.createdAt ?? "").getFullYear()}
+                                                Founded in {new Date(organization?.yearFounded ?? "").getFullYear()}
                                             </div>
                                             {organization?.incorporationStatus === "YES" &&
                                                 <div className="mt-2 flex items-center text-gray-500">

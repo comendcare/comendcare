@@ -2,14 +2,13 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// Define the input variants using class-variance-authority
 const inputVariants = cva(
     "flex h-10 w-full rounded-md border border-input bg-background text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
     {
         variants: {
             variant: {
-                default: "px-3 py-2", // Standard padding for default variant
-                currency: "pr-20 py-2", // Only right padding for currency input (left will be handled separately)
+                default: "px-3 py-2",
+                currency: "pr-20 py-2",
             },
             size: {
                 sm: "h-8 px-2",
@@ -23,19 +22,35 @@ const inputVariants = cva(
     }
 );
 
-// Exclude the conflicting `size` prop from native input attributes
 type HTMLInputPropsWithoutSize = Omit<
     React.InputHTMLAttributes<HTMLInputElement>,
     "size"
 >;
 
-// Define the InputProps interface with VariantProps and adjusted HTML input props
 export interface InputProps
     extends HTMLInputPropsWithoutSize,
         VariantProps<typeof inputVariants> {}
 
+const formatNumberWithCommas = (value: string) => {
+    const numericValue = value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
+    return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, variant, size, ...props }, ref) => {
+    ({ className, variant, size, onChange, value, ...props }, ref) => {
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (variant === "currency") {
+                const formattedValue = formatNumberWithCommas(e.target.value);
+                // Trigger the external onChange if provided
+                onChange?.({
+                    ...e,
+                    target: { ...e.target, value: formattedValue },
+                } as React.ChangeEvent<HTMLInputElement>);
+            } else {
+                onChange?.(e);
+            }
+        };
+
         return (
             <div className={cn(variant === "currency" && "relative mt-2")}>
                 {variant === "currency" && (
@@ -47,10 +62,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     className={cn(
                         inputVariants({ variant, size, className }),
                         "w-full",
-                        variant === "currency" && "pl-6", // Apply left padding only for currency variant
+                        variant === "currency" && "pl-6",
                         className
                     )}
                     ref={ref}
+                    onChange={handleChange}
+                    value={variant === "currency" ? formatNumberWithCommas(value as string) : value}
                     {...props}
                 />
                 {variant === "currency" && (
