@@ -41,7 +41,7 @@ model User {
   reactions            Reaction[]
   roadmaps             Roadmap[]
   sessions             Session[]
-  TaskStakeholder      TaskStakeholder[]
+  stakeholders         TaskStakeholder[]
 }
 
 model Member {
@@ -225,33 +225,34 @@ model Column {
 }
 
 model Task {
-  id              String            @id @unique @default(uuid())
-  status          StatusType?
-  name            String            @default("")
-  description     String?           @default("")
-  milestoneId     String?
-  kanbanPosition  Int
-  orderPosition   Int
-  columnId        String
-  createdAt       DateTime          @default(now())
-  date            DateTime?         @default(now())
-  updatedAt       DateTime          @updatedAt
-  endDate         DateTime?
-  priority        PriorityType?
-  private         Boolean           @default(false)
-  startDate       DateTime?
-  checklist       ChecklistItem[]
-  column          Column            @relation(fields: [columnId], references: [id], onDelete: Cascade)
-  milestone       Milestone?        @relation(fields: [milestoneId], references: [id])
-  TaskStakeholder TaskStakeholder[]
+  id             String            @id @unique @default(uuid())
+  status         StatusType?
+  name           String            @default("")
+  description    String?           @default("")
+  milestoneId    String?
+  kanbanPosition Int
+  orderPosition  Int
+  columnId       String
+  createdAt      DateTime          @default(now())
+  date           DateTime?         @default(now())
+  updatedAt      DateTime          @updatedAt
+  endDate        DateTime?
+  priority       PriorityType?
+  private        Boolean           @default(false)
+  startDate      DateTime?
+  checklist      ChecklistItem[]
+  column         Column            @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  milestone      Milestone?        @relation(fields: [milestoneId], references: [id])
+  stakeholders   TaskStakeholder[]
 }
 
 model TaskStakeholder {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   taskId    String
   userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
