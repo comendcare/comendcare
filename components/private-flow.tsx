@@ -157,7 +157,7 @@ export const PrivateFlowView = ({
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
     // if a position is not provided, place in the center
-    const addMilestones = (newMilestones: any[]) => {
+    const addMilestones = async (newMilestones: any[]) => {
         const newNodes: any[] = []
 
         // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
@@ -201,8 +201,8 @@ export const PrivateFlowView = ({
             newNodes.push(newNode)
         })
 
-        addNodes(newNodes)
-        return newNodes
+        const nodes = await addNodes(newNodes)
+        return nodes
     }
 
     const handleDelete = async ({nodes, edges}: {nodes: Node[], edges: Edge[]}) => {
