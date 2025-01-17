@@ -30,7 +30,7 @@ export default function NewRoadmapForm() {
         setIsLoading(true)
         if (session?.user?.organizationId) {
             const roadmap = await createRoadmap(session.user.organizationId, roadmapData)
-            setRoadmapId(roadmap.id)
+            setRoadmapId(roadmap.id) // manually set roadmap ID
             router.refresh()
         } else {
             console.error(`organization id is not defined in the session:`, session)
