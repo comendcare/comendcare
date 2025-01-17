@@ -37,7 +37,7 @@ export default async function Roadmaps({
         </div>
     ) : (
         <div className="flex flex-col items-center justify-center space-x-4">
-            <h1 className="font-cal text-4xl">No Roadmaps Yet</h1>
+            <h1 className="font-cal text-4xl">No research plan yet</h1>
             <Image
                 alt="missing roadmap"
                 src="https://illustrations.popsy.co/gray/graphic-design.svg"

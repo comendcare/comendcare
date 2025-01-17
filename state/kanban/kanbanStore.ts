@@ -127,7 +127,7 @@ export const useKanbanStore = create<KanbanState>()(
                     // if task was created successfully, update zustand state
                     set({ tasks: response.data as Task[] })
 
-                    toast.success("Tasks updated successfully!")
+                    // toast.success("Tasks updated successfully!")
                     return response.data as Task[]
                 } else {
                     console.error("Error adding task", response.error)

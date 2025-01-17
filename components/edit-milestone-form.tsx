@@ -646,7 +646,7 @@ export function EditMilestoneForm({
                                     )
                                 }}
                             />
-                            <Button 
+                            {/* <Button 
                                 variant={'secondary'}
                                 onClick={async () => {
                                     const columnId = kanbanColumns[0].id
@@ -667,7 +667,7 @@ export function EditMilestoneForm({
                                 }}
                             >
                                 {`Add a new kanban task`}
-                            </Button>
+                            </Button> */}
                             </>
                         </FormControl>
                         <FormMessage />

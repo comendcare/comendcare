@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "./ui/separator"
 import { FaArrowUpRightFromSquare, FaTrash } from "react-icons/fa6"
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import { cn } from "@/lib/utils"
 
 type AssetType = Prisma.AssetGetPayload<{ 
     include: { 
@@ -49,11 +50,25 @@ export function AssetDetails({ asset }: { asset: AssetType }) {
                                     <span className="truncate">{asset?.name}</span>
                                 </h2>
                             </div>
-                            <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
-                                <p className="whitespace-nowrap">
-                                    {asset?.createdAt?.getFullYear()} &bull; {asset?.contacts?.map((contact: any) => contact.name).join(', ')}
-                                </p>
-                            </div>
+                            {asset?.contacts && asset.contacts.length > 0 ? (
+                                <div className={"mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap"}>
+                                    <ul className={cn(asset.contacts.length > 1 ? "list-disc pl-6": "")}>
+                                        {asset.contacts.map((contact, index) => {
+                                            if (contact.name && contact.email) {
+                                                return (<li key={index}>{contact.name} &bull; {contact.email}</li>)
+                                            } else if (contact.name) {
+                                                return (<li key={index}>{contact.name}</li>)
+                                            } else if (contact.email) {
+                                                return (<li key={index}>{contact.email}</li>)
+                                            }
+                                        })}
+                                    </ul>
+                                </div>
+                            ): (
+                                <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
+                                    <p>No contacts provided for this asset</p>
+                                </div>
+                            )}
                         </div>
                     </li>
                 </a>
