@@ -17,20 +17,29 @@ import { Separator } from "./ui/separator"
 import { FaArrowUpRightFromSquare, FaTrash } from "react-icons/fa6"
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 
-type AssetType = Prisma.AssetGetPayload<{ 
-    include: { 
-        contacts: { 
-            select: { name: true, role: true, email: true } 
-        }, 
-        attachments: {
-            select: { name: true, link: true }
-        }
-    } 
-}>
-type ContactType = AssetType['contacts'][0]
-type AttachmentType = AssetType['attachments'][0]
+type RFPType = Prisma.RFPGetPayload<{}>
 
-export function RFPDetails({ rfp }: { rfp: AssetType }) {
+const Details = ({ rfp }: { rfp: RFPType }) => {
+    if (rfp.startDate && rfp.funding) {
+        return (
+            <p>{rfp.startDate.toDateString()}  &bull; {`$ ${rfp.funding.toLocaleString()} USD`}</p>
+        )
+    } else if (rfp.funding) {
+        return (
+            <p>{`$ ${rfp.funding.toLocaleString()} USD`}</p>
+        )
+    } else if (rfp.startDate) {
+        return (
+            <p>{rfp.startDate.toDateString()}</p>
+        )
+    }
+
+    return (
+        <p>No details provided for this project</p>
+    )
+}
+
+export function RFPDetails({ rfp }: { rfp: RFPType }) {
     return (
         <HoverCard
             key={rfp?.id}
@@ -49,10 +58,8 @@ export function RFPDetails({ rfp }: { rfp: AssetType }) {
                                     <span className="truncate">{rfp?.name}</span>
                                 </h2>
                             </div>
-                            <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
-                                <p className="whitespace-nowrap">
-                                    {rfp?.createdAt?.getFullYear()} &bull; {rfp?.contacts?.map((contact: any) => contact.name).join(', ')}
-                                </p>
+                            <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap">
+                                <Details rfp={rfp} />
                             </div>
                         </div>
                     </li>
