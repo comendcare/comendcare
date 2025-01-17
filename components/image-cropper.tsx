@@ -21,6 +21,7 @@ import {
 import "react-image-crop/dist/ReactCrop.css"
 import { CropIcon, Trash2Icon } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 export type FileWithPreview = File & { preview: string }
 
