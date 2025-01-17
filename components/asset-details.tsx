@@ -49,11 +49,25 @@ export function AssetDetails({ asset }: { asset: AssetType }) {
                                     <span className="truncate">{asset?.name}</span>
                                 </h2>
                             </div>
-                            <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
-                                <p className="whitespace-nowrap">
-                                    {asset?.createdAt?.getFullYear()} &bull; {asset?.contacts?.map((contact: any) => contact.name).join(', ')}
-                                </p>
-                            </div>
+                            {asset?.contacts && asset.contacts.length > 0 ? (
+                                <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 list-disc text-wrap">
+                                    <ul className="list-disc pl-6">
+                                        {asset.contacts.map((contact) => {
+                                            if (contact.name && contact.email) {
+                                                return (<li>{contact.name} &bull; {contact.email}</li>)
+                                            } else if (contact.name) {
+                                                return (<li>{contact.name}</li>)
+                                            } else if (contact.email) {
+                                                return (<li>{contact.email}</li>)
+                                            }
+                                        })}
+                                    </ul>
+                                </div>
+                            ): (
+                                <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400">
+                                    <p>No contacts provided for this asset</p>
+                                </div>
+                            )}
                         </div>
                     </li>
                 </a>
