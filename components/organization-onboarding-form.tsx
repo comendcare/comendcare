@@ -34,6 +34,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {checkSubdomainAvailability, getAllOrganizations, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
+import { FormImageCropper } from "./edit-pag-profile-page-dialog";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -660,48 +661,14 @@ export default function OrganizationOnboardingForm(
                                 )}
                             />
 
-                            <FormField
-                                control={newOrgForm.control}
+                            <FormImageCropper 
+                                form={newOrgForm}
                                 name="image"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Organization Logo
-                                        </FormLabel>
-                                        <FormDescription>
-                                            {`This will be used as your organization profile's image.`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <div className="flex flex-col items-start space-y-4">
-                                                {selectedFile ? (
-                                                    <ImageCropper
-                                                        aspect={1}
-                                                        dialogOpen={isDialogOpen}
-                                                        setDialogOpen={setDialogOpen}
-                                                        selectedFile={selectedFile}
-                                                        setSelectedFile={(file: any) => {
-                                                            if (file == null) setSelectedFile(null)
-                                                            field.onChange(file?.preview); // Update form field value
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <Avatar
-                                                        {...getRootProps()}
-                                                        className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
-                                                    >
-                                                        <input {...getInputProps()} />
-                                                        <AvatarFallback
-                                                            className="text-center flex flex-col justify-center gap-y-4">
-                                                            <FaUpload/>
-                                                            Click or drop!
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                )}
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
+                                title={"Organization Logo"}
+                                description={"This will be used as your organization profile's image."}
+                                aspect={1}
+                                selectedFile={selectedFile}
+                                setSelectedFile={setSelectedFile}
                             />
 
                             <FormField
@@ -822,7 +789,7 @@ export default function OrganizationOnboardingForm(
                         <div className="w-full flex flex-col space-y-8 my-8">
                             <div>
                                 <div>
-                                    <img className="h-24 w-full object-cover lg:h-36"
+                                    <img className="object-cover h-24 w-full lg:h-36"
                                          src={'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'}
                                          alt=""/>
                                 </div>
@@ -833,7 +800,7 @@ export default function OrganizationOnboardingForm(
                                         <div className="flex">
                                             {selectedFile?.preview ?
                                                 <img
-                                                    className="h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
+                                                    className="object-cover h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
                                                     src={selectedFile?.preview}
                                                     alt=""/>
                                                 :

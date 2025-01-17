@@ -815,7 +815,7 @@ export default function EditPAGProfileDialog() {
                                         form={editOrgForm}
                                         name="headerImage"
                                         title={"Profile Header"}
-                                        description={"This will be used as the header image on your organization's profile."}
+                                        description={"This will be used as the header image on your organization's profile. (16x4)"}
                                         aspect={16/4}
                                         selectedFile={selectedFileHeader}
                                         setSelectedFile={setSelectedFileHeader}
@@ -1340,7 +1340,6 @@ export default function EditPAGProfileDialog() {
 }
 
 export const FormImageCropper = ({ className = "", form, name, title, description, aspect, selectedFile, setSelectedFile }: { className?: string, form: any, name: string, title: string, description: string, aspect: number, selectedFile: FileWithPreview | null, setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>> }) => {
-    const [previewImg, setPreviewImg] = useState<FileWithPreview | null>(null)
     const [isDialogOpen, setDialogOpen] = useState(false);
 
     const onDrop = useCallback(
@@ -1362,7 +1361,6 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
             });
 
             setSelectedFile(fileWithPreview)
-            // setPreviewImg(fileWithPreview)
             setDialogOpen(true)
         },
         []
@@ -1394,10 +1392,10 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
                                     dialogOpen={isDialogOpen}
                                     setDialogOpen={setDialogOpen}
                                     selectedFile={selectedFile}
-                                    setSelectedFile={(file: any) => {
-                                        if (file == null) setSelectedFile(null)
+                                    setSelectedFile={(file: FileWithPreview | null) => {
+                                        console.log(`set selected file`, file)
+                                        if (!file) setSelectedFile(null)
                                         field.onChange(file?.preview); // Update form field value
-                                        setSelectedFile(file)
                                     }}
                                     className={className}
                                 />
