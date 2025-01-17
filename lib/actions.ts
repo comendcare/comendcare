@@ -2019,9 +2019,7 @@ export async function deleteColumn(columnId: string) {
 /* HANDLE KANBAN TASKS - create, update, delete -------------------------------------------------------------------------- */
 export async function createTask(columnId: string) {
     try {
-        const newTask: Prisma.TaskGetPayload<{
-            include: { checklist: true; stakeholders: true };
-        }> = await prisma.task.create({
+        const newTask: Task = await prisma.task.create({
             include: { checklist: true, stakeholders: true },
             data: {
                 name: 'New Task',
@@ -2058,9 +2056,7 @@ export async function createTask(columnId: string) {
 
 export async function updateTasks({tasks}: { tasks: Task[] }) {
     try {
-        let updatedTasks: Prisma.TaskGetPayload<{
-            include: { milestone: true; checklist: true; stakeholders: true };
-        }>[] = []
+        let updatedTasks: Task[] = []
 
         await Promise.all(
             tasks.map(async (task: any) => {
@@ -2120,9 +2116,7 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
 
 export async function deleteTask(taskId: string) {
     try {
-        const deletedTask: Prisma.TaskGetPayload<{
-            include: { checklist: true };
-        }> = await prisma.task.delete({
+        const deletedTask = await prisma.task.delete({
             include: { checklist: true },
             where: {
                 id: taskId
