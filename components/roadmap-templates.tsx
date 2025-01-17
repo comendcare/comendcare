@@ -29,7 +29,7 @@ export default function RoadmapTemplates() {
         addNodes,
     } = useRoadmapStore(useShallow(selector))
 
-    const addMilestones = (newMilestones: any[]) => {
+    const addMilestones = async (newMilestones: any[]) => {
         const newNodes: any[] = []
         let centerX = 0
         let centerY = 0
@@ -61,8 +61,8 @@ export default function RoadmapTemplates() {
             newNodes.push(newNode)
         })
 
-        addNodes(newNodes)
-        return newNodes
+        const nodes = await addNodes(newNodes)
+        return nodes
     }
 
     if (isLoading) {
@@ -126,12 +126,10 @@ export default function RoadmapTemplates() {
                 <div className="flex flex-row space-x-2">
                     <Button
                         disabled={selectedMilestones.length === 0}
-                        onClick={() => {
+                        onClick={async () => {
                             setIsLoading(true)
-                            const newNodes = addMilestones(selectedMilestones)
-                            setTimeout(() => {
-                                router.push('/app/research-plan')
-                            }, 1000)
+                            await addMilestones(selectedMilestones)
+                            router.push('/app/research-plan')
                         }}
                     >
                         Add selected milestones
@@ -140,12 +138,10 @@ export default function RoadmapTemplates() {
                 <div className="flex flex-row space-x-2">
                     <Button 
                         variant="secondary"
-                        onClick={() => {
+                        onClick={async () => {
                             setIsLoading(true)
-                            const newNode = addMilestones([{name: 'New Milestone'}])
-                            setTimeout(() => {
-                                router.push('/app/research-plan')
-                            }, 1000)
+                            await addMilestones([{name: 'New Milestone'}])
+                            router.push('/app/research-plan')
                         }}
                     >
                         Add an empty milestone
