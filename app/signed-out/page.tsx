@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 
 export default function SignOutPage() {
@@ -9,8 +10,16 @@ export default function SignOutPage() {
     const router = useRouter()
 
     useEffect(() => {
+
+        signOut({ redirect: false }) // Prevent automatic redirect from NextAuth
+
         const timer = setInterval(() => {
-            setCountdown((prevCount) => prevCount - 1)
+            setCountdown((prevCount) => {
+                if (prevCount > 0) {
+                    return prevCount - 1
+                }
+                return prevCount
+            })
         }, 1000)
 
         const redirect = setTimeout(() => {
