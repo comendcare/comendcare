@@ -20,9 +20,17 @@ import {redirect} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {FaPlus} from "react-icons/fa6";
 import Loading from "@/app/loading";
-import {getAllOrganizationsFromUserId, getColumns, getKanbanFromOrganizationId, getNodesEdgesAndMilestones, getRoadmapId} from "@/lib/fetchers";
+import {
+    getAllOrganizationsFromUserId,
+    getColumns,
+    getKanbanFromOrganizationId,
+    getNodesEdgesAndMilestones,
+    getRoadmapId
+} from "@/lib/fetchers";
 import {toast} from "sonner";
 import {initializeKanbanState, initializeRoadmapState} from "@/lib/initialize-client-state";
+import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
+import {AppSidebar} from "@/components/app-sidebar";
 
 
 export type MemberWithOrganization = Member & {
@@ -117,11 +125,6 @@ export default function AppLayout({children}: AppLayoutProps) {
         }
     }
 
-    useEffect(() => {
-        fetchOrganizations()
-        handleSessionUpdate()
-    }, [session])
-
     const fetchOrganizations = async () => {
         if (session) {
             const response = await getAllOrganizationsFromUserId(session.user.id);
@@ -135,95 +138,107 @@ export default function AppLayout({children}: AppLayoutProps) {
         }
     };
 
+    useEffect(() => {
+        fetchOrganizations()
+        handleSessionUpdate()
+    }, [session])
+
     if (isLoading) {
         return <Loading/>
     }
 
     if (status === "authenticated" && session) {
         return (
-            <div className="flex h-screen max-h-screen w-full">
-                <ResizablePanelGroup
-                    direction="horizontal"
-                    onLayout={(sizes: number[]) => {
-                        setLayout(sizes) // Use Zustand's setLayout to save panel sizes
-                    }}
-                    className="w-full items-stretch"
-                >
-                    {/* Navigation Panel */}
-                    <ResizablePanel
-                        defaultSize={defaultLayout[0]}
-                        collapsedSize={4}
-                        collapsible={true}
-                        minSize={15}
-                        maxSize={20}
-                        onCollapse={() => setIsCollapsed(true)}
-                        onResize={() => setIsCollapsed(false)}
-                        className={isCollapsed ? "min-w-[50px] transition-all duration-300 ease-in-out" : ""}
-                    >
-                        <div
-                            className={cn(
-                                "relative flex h-[52px] items-center justify-around space-x-4 mx-2",
-                                isCollapsed ? "h-[102px] flex-col space-x-0" : "px-2"
-                            )}
-                        >
-                            <Image priority src={logo} alt="Librarey logo" className="size-6"/>
-                            <OrganizationSelector
-                                isCollapsed={isCollapsed}
-                                organizations={organizations}
-                            />
-                        </div>
-                        <Separator/>
-                        <AppNav
-                            isCollapsed={isCollapsed}
-                            links={[
-                                {title: "Profile", icon: User, variant: "ghost", href: "/app/profile"},
-                                {title: "Kanban", icon: Pin, variant: "ghost", href: "/app/kanban"},
-                                {
-                                    title: "Feed",
-                                    // label: "128",
-                                    icon: Newspaper,
-                                    variant: "ghost",
-                                    href: "/app/feed"
-                                },
-                                {
-                                    title: "Dashboard",
-                                    // label: "128",
-                                    icon: LayoutDashboard,
-                                    variant: "ghost",
-                                    href: "/app/dashboard"
-                                },
-                                {
-                                    title: "Research Plan",
-                                    // label: "128",
-                                    icon: Workflow,
-                                    variant: "ghost",
-                                    href: `/app/research-plan`
-                                },
-                                {
-                                    title: "Marketplace",
-                                    // label: "9",
-                                    icon: Store,
-                                    variant: "ghost",
-                                    href: "/app/marketplace/patient-groups"
-                                },
-                                {title: "Settings", icon: Cog, variant: "ghost", href: "/app/settings"},
-                            ]}
-                        >
-                            <Suspense fallback={<Loading/>}>
-                                <Profile isCollapsed={isCollapsed}/>
-                            </Suspense>
-                        </AppNav>
-                    </ResizablePanel>
+            <SidebarProvider>
+                <AppSidebar/>
+                <SidebarInset>
+                    <div className="flex h-screen max-h-screen w-full">
+                        {/*<SidebarTrigger className="h-10 w-10 size-10"/>*/}
 
-                    {/*Resizable Handle between panels */}
-                    <ResizableHandle withHandle/>
+                        {/*<ResizablePanelGroup*/}
+                        {/*    direction="horizontal"*/}
+                        {/*    onLayout={(sizes: number[]) => {*/}
+                        {/*        setLayout(sizes) // Use Zustand's setLayout to save panel sizes*/}
+                        {/*    }}*/}
+                        {/*    className="w-full items-stretch"*/}
+                        {/*>*/}
+                            {/* Navigation Panel */}
+                            {/*<ResizablePanel*/}
+                            {/*    defaultSize={defaultLayout[0]}*/}
+                            {/*    collapsedSize={4}*/}
+                            {/*    collapsible={true}*/}
+                            {/*    minSize={15}*/}
+                            {/*    maxSize={20}*/}
+                            {/*    onCollapse={() => setIsCollapsed(true)}*/}
+                            {/*    onResize={() => setIsCollapsed(false)}*/}
+                            {/*    className={isCollapsed ? "min-w-[50px] transition-all duration-300 ease-in-out" : ""}*/}
+                            {/*>*/}
+                            {/*    <div*/}
+                            {/*        className={cn(*/}
+                            {/*            "relative flex h-[52px] items-center justify-around space-x-4 mx-2",*/}
+                            {/*            isCollapsed ? "h-[102px] flex-col space-x-0" : "px-2"*/}
+                            {/*        )}*/}
+                            {/*    >*/}
+                            {/*        <Image priority src={logo} alt="Librarey logo" className="size-6"/>*/}
+                            {/*        <OrganizationSelector*/}
+                            {/*            isCollapsed={isCollapsed}*/}
+                            {/*            organizations={organizations}*/}
+                            {/*        />*/}
+                            {/*    </div>*/}
+                            {/*    <Separator/>*/}
+                            {/*    <AppNav*/}
+                            {/*        isCollapsed={isCollapsed}*/}
+                            {/*        links={[*/}
+                            {/*            {title: "Profile", icon: User, variant: "ghost", href: "/app/profile"},*/}
+                            {/*            {title: "Kanban", icon: Pin, variant: "ghost", href: "/app/kanban"},*/}
+                            {/*            {*/}
+                            {/*                title: "Feed",*/}
+                            {/*                // label: "128",*/}
+                            {/*                icon: Newspaper,*/}
+                            {/*                variant: "ghost",*/}
+                            {/*                href: "/app/feed"*/}
+                            {/*            },*/}
+                            {/*            {*/}
+                            {/*                title: "Dashboard",*/}
+                            {/*                // label: "128",*/}
+                            {/*                icon: LayoutDashboard,*/}
+                            {/*                variant: "ghost",*/}
+                            {/*                href: "/app/dashboard"*/}
+                            {/*            },*/}
+                            {/*            {*/}
+                            {/*                title: "Research Plan",*/}
+                            {/*                // label: "128",*/}
+                            {/*                icon: Workflow,*/}
+                            {/*                variant: "ghost",*/}
+                            {/*                href: `/app/research-plan`*/}
+                            {/*            },*/}
+                            {/*            {*/}
+                            {/*                title: "Marketplace",*/}
+                            {/*                // label: "9",*/}
+                            {/*                icon: Store,*/}
+                            {/*                variant: "ghost",*/}
+                            {/*                href: "/app/marketplace/patient-groups"*/}
+                            {/*            },*/}
+                            {/*            {title: "Settings", icon: Cog, variant: "ghost", href: "/app/settings"},*/}
+                            {/*        ]}*/}
+                            {/*    >*/}
+                            {/*        <Suspense fallback={<Loading/>}>*/}
+                            {/*            <Profile isCollapsed={isCollapsed}/>*/}
+                            {/*        </Suspense>*/}
+                            {/*    </AppNav>*/}
+                            {/*</ResizablePanel>*/}
 
-                    {/* Main Content Panel */}
-                    <ResizablePanel defaultSize={defaultLayout[1]} minSize={30} className="overflow-y-auto">
-                        {children}
-                    </ResizablePanel>
-                </ResizablePanelGroup>
-            </div>
+                            {/*/!*Resizable Handle between panels *!/*/}
+                            {/*<ResizableHandle withHandle/>*/}
+
+                            {/* Main Content Panel */}
+                            {/*<ResizablePanel defaultSize={defaultLayout[1]} minSize={30} className="overflow-y-auto">*/}
+                                {children}
+                            {/*</ResizablePanel>*/}
+                        {/*</ResizablePanelGroup>*/}
+                    </div>
+                </SidebarInset>
+            </SidebarProvider>
         )
     }
 }
