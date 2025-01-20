@@ -132,7 +132,7 @@ export function Roadmap({
             >
                 <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
                     <Tabs defaultValue={urlView ? urlView : "flow"} onValueChange={handleTabChange}>
-                        <div className="flex flex-row items-center p-1 gap-x-1">
+                        <div className="flex flex-row items-center m-1 p-1 gap-x-1">
                             <TabsList>
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
                                 {/* <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger> */}
@@ -160,7 +160,7 @@ export function Roadmap({
                         {/* Flow View */}
                         <TabsContent
                             value="flow"
-                            className="m-0 h-[calc(100vh-3.5rem)]"
+                            className="m-0 h-[calc(100vh-6rem)]"
                         >
                             <PrivateFlowView
                                 width={defaultLayout[0]}
@@ -184,7 +184,7 @@ export function Roadmap({
                         <ResizablePanel
                             defaultSize={defaultLayout[1]}
                             minSize={30}
-                            className="p-10 h-full flex flex-col gap-4"
+                            className="h-full flex flex-col"
                         >
                             <MilestoneDetailsPanel
                                 milestone={milestones.find(
