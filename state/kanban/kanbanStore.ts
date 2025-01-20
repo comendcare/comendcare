@@ -23,9 +23,11 @@ export const useKanbanStore = create<KanbanState>()(
             columns: [],
             tasks: [],
             initState: (columns: Column[], tasks: any[]) => {
+                console.log(`init kanban state`)
                 set({ columns, tasks })
             },
             addColumn: async (column: Partial<Column>) => {
+                console.log(`add column`)
                 // create column in the database
                 const response = await createColumn(column)
                 if (response.success && response.data) {
@@ -39,6 +41,7 @@ export const useKanbanStore = create<KanbanState>()(
                 }
             },
             deleteColumn: async (columnId: string) => {
+                console.log(`delete column`)
                 const response = await deleteColumn(columnId)
                 if (response.success && response.data) {
                     // if task was successfully deleted, update zustand state
@@ -51,6 +54,7 @@ export const useKanbanStore = create<KanbanState>()(
                 }
             },
             updateColumn: async (columnId: string, newProperties: any) => {
+                console.log(`update column`)
                 const updatedColumns = get().columns.map(column => {
                     if (column.id === columnId) {
                         return ({
@@ -73,6 +77,7 @@ export const useKanbanStore = create<KanbanState>()(
                 }
             },
             setColumns: async (columns: Column[]) => {
+                console.log(`set columns`)
                 const response = await updateColumns({ columns })
                 if (response.success && response.data) {
                     // if task was created successfully, update zustand state
@@ -85,6 +90,7 @@ export const useKanbanStore = create<KanbanState>()(
                 }
             },
             addTask: async (columnId: string) => {
+                console.log(`add task`)
                 // create task in the database
                 const response = await createTask(columnId)
 
@@ -99,6 +105,7 @@ export const useKanbanStore = create<KanbanState>()(
                 }
             },
             updateTask: async (taskId: string, newProperties: Partial<Task>) => {
+                console.log(`update task`)
                 const updatedTasks = get().tasks.map(task => {
                     if (task.id === taskId) {
                         return ({
@@ -122,6 +129,7 @@ export const useKanbanStore = create<KanbanState>()(
                 }
             },
             setTasks: async (tasks: Task[]) => {
+                console.log(`set tasks`)
                 const response = await updateTasks({ tasks })
                 if (response.success && response.data) {
                     // if task was created successfully, update zustand state
@@ -134,6 +142,7 @@ export const useKanbanStore = create<KanbanState>()(
                 }
             },
             deleteTask: async (taskId: string) => {
+                console.log(`delete task`)
                 const response = await deleteTask(taskId)
                 if (response.success && response.data) {
                     // if task was successfully deleted, update zustand state
