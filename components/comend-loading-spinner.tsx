@@ -6,7 +6,7 @@ export default function ComendLoadingSpinner() {
     return (
         <div className="flex flex-col space-y-8 min-h-screen items-center justify-center">
             <Spinner className="scale-150" />
-            <div className="w-1/6">
+            <div className="w-1/6 min-w-40">
                 <Image priority src={logo} alt="Comend logo" />
             </div>
         </div>
