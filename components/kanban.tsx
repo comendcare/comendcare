@@ -422,7 +422,7 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
                             key={index}
                             column={col}
                             tasks={tasks?.filter(task => {
-                                if (filter == "personal" && session?.user.id && !task.stakeholders?.map(stakeholder => stakeholder.id).includes(session?.user.id)) return false
+                                if (filter == "personal" && session?.user.id && !task.stakeholders?.map(stakeholder => stakeholder.userId).includes(session?.user.id)) return false
                                 return task?.columnId === col.id
                             })}
                         />
