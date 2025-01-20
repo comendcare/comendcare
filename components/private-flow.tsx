@@ -195,8 +195,8 @@ export const PrivateFlowView = ({
                 }
             }
 
-            centerX += 200
-            centerY += 200
+            centerX += 500
+            // centerY += 200
 
             newNodes.push(newNode)
         })
