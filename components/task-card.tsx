@@ -40,7 +40,7 @@ export interface Task {
     checklist?: any[],
     orderPosition: number,
     kanbanPosition: number,
-    stakeholders: User[],
+    stakeholders?: any[],
     endDate: Date,
     priority: PriorityType
 }
@@ -158,7 +158,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                     <CardFooter>
                         {task?.stakeholders && task?.stakeholders.length > 0 && (
                             task.stakeholders.map((stakeholder, index) => (
-                                <ProfilePhoto key={index} img={stakeholder.image} name={stakeholder.name}/>
+                                <ProfilePhoto key={index} img={stakeholder.user?.image} name={stakeholder.user?.name}/>
                             ))
                         )}
                     </CardFooter>
