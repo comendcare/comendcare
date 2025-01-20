@@ -47,7 +47,7 @@ export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { ass
 
             <CardContent className="grid grid-rows-2 md:grid-cols-2 gap-4">
                 <div className="flex flex-col space-y-4">
-                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                    <h3 className="text-xl tracking-tight font-semibold">
                         Assets
                     </h3>
                     {assets.length > 0 ? (
@@ -65,7 +65,7 @@ export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { ass
                 </div>
 
                 <div className="flex flex-col space-y-4">
-                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                    <h3 className="text-xl tracking-tight font-semibold">
                         Projects
                     </h3>
                     {rfps.length > 0 ? (
