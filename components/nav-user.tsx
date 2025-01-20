@@ -8,7 +8,6 @@ import {
     LogOut,
     User,
 } from "lucide-react";
-
 import {
     Avatar,
     AvatarFallback,
@@ -92,7 +91,6 @@ export function NavUser() {
                                     <span className="truncate text-xs">{email}</span>
                                 </div>
                             )}
-                            {!isMobile && <ChevronsUpDown className="ml-auto size-4" />}
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent

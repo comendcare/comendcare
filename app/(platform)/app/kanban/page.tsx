@@ -21,10 +21,7 @@ export default async function KanbanPage({ params }: {
     const response = await getKanbanFromOrganizationId()
     if (response.success && response.data) {
         return (
-            <main className="flex flex-col space-y-4 p-8">
-                <h1 className="text-3xl font-bold tracking-tight">
-                    Kanban
-                </h1>
+            <main className="flex flex-col p-4">
                 <KanbanView />
             </main>
         )
