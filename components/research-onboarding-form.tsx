@@ -945,7 +945,7 @@ export default function ResearchOnboardingForm(
                     </Form>
                 </div>
 
-                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-280px)]">
+                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">
                     <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
                         <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
                             Organization profile preview
@@ -1052,7 +1052,7 @@ export default function ResearchOnboardingForm(
                                                                 Website
                                                             </h3>
                                                             {organization?.website ?
-                                                                <p className="text-xs">
+                                                                <p className="text-xs truncate">
                                                                     {organization?.website}
                                                                 </p> : <Skeleton className="h-4 w-full"/>
                                                             }
