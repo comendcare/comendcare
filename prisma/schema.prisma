@@ -8,32 +8,32 @@ datasource db {
 }
 
 model User {
-  id                   String          @id @default(cuid())
+  id                   String            @id @default(cuid())
   name                 String?
   username             String?
   gh_username          String?
-  email                String?         @unique
+  email                String?           @unique
   emailVerified        DateTime?
   image                String?
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @updatedAt
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
   deletedAt            DateTime?
   address1             String?
   address2             String?
   city                 String?
   country              String?
   formattedAddress     String?
-  notificationSettings Boolean         @default(false)
+  notificationSettings Boolean           @default(false)
   postalCode           String?
   region               String?
   title                String?
   lat                  Float?
   lng                  Float?
-  consentSettings      Boolean         @default(false)
+  consentSettings      Boolean           @default(false)
   accounts             Account[]
   comments             Comment[]
   follows              Follow[]
-  sentInvitations      Member[]        @relation("invitedBy")
+  sentInvitations      Member[]          @relation("invitedBy")
   memberships          Member[]
   membershipRequests   MemberRequest[]
   organizations        Organization[]
@@ -41,7 +41,7 @@ model User {
   reactions            Reaction[]
   roadmaps             Roadmap[]
   sessions             Session[]
-  tasks                Task[]          @relation("TaskToUser")
+  stakeholders         TaskStakeholder[]
 }
 
 model Member {
@@ -54,9 +54,9 @@ model Member {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
   organizationId String
-  invitedBy      User?        @relation("invitedBy", fields: [invitedById], references: [id])
+  invitedBy      User?        @relation("invitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, organizationId])
 }
@@ -84,7 +84,7 @@ model MemberRequest {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id])
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, organizationId])
 }
@@ -136,6 +136,7 @@ model Session {
 }
 
 model VerificationToken {
+  id         String   @id @default(cuid()) // PostgreSQL requires a primary key or explicitly defined replica identity for logical replication to track deletions.
   identifier String
   token      String   @unique
   expires    DateTime
@@ -160,7 +161,7 @@ model Roadmap {
   milestones     Milestone[]
   nodes          Node[]
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([slug, organizationId])
   @@index([organizationId])
@@ -172,6 +173,7 @@ model Node {
   type      String
   positionX Int
   positionY Int
+  origin    Float[]    @default([0.0, 0.0])
   roadmapId String
   data      Milestone?
   roadmap   Roadmap    @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
@@ -223,25 +225,39 @@ model Column {
 }
 
 model Task {
-  id             String          @id @unique @default(uuid())
+  id             String            @id @unique @default(uuid())
   status         StatusType?
-  name           String          @default("")
-  description    String?         @default("")
+  name           String            @default("")
+  description    String?           @default("")
   milestoneId    String?
   kanbanPosition Int
   orderPosition  Int
   columnId       String
-  createdAt      DateTime        @default(now())
-  date           DateTime?       @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime          @default(now())
+  date           DateTime?         @default(now())
+  updatedAt      DateTime          @updatedAt
   endDate        DateTime?
   priority       PriorityType?
-  private        Boolean         @default(false)
+  private        Boolean           @default(false)
   startDate      DateTime?
   checklist      ChecklistItem[]
-  column         Column          @relation(fields: [columnId], references: [id], onDelete: Cascade)
-  milestone      Milestone?      @relation(fields: [milestoneId], references: [id])
-  stakeholders   User[]          @relation("TaskToUser")
+  column         Column            @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  milestone      Milestone?        @relation(fields: [milestoneId], references: [id])
+  stakeholders   TaskStakeholder[]
+}
+
+model TaskStakeholder {
+  id        String    @id @default(cuid())
+  taskId    String
+  userId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId]) // Ensure uniqueness of the pair
 }
 
 model ChecklistItem {
@@ -323,6 +339,7 @@ model Organization {
   font                String                    @default("font-cal")
   image               String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png") @db.Text
   imageBlurhash       String?                   @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
+  headerImage         String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png") @db.Text
   subdomain           String?                   @unique
   customDomain        String?                   @unique
   message404          String?                   @default("Blimey! You've found a page that doesn't exist.") @db.Text
@@ -344,7 +361,7 @@ model Organization {
   lng                 String?
   createdAt           DateTime                  @default(now())
   updatedAt           DateTime                  @updatedAt
-  user                User?                     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user                User?                     @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   userId              String?
   roadmaps            Roadmap[]
   members             Member[]
@@ -396,14 +413,14 @@ model Condition {
 }
 
 model ConditionToOrganization {
-  conditionId    String
-  organizationId String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  condition      Condition    @relation(fields: [conditionId], references: [id], onDelete: Cascade)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  id             String  @id @default(uuid())
+  conditionId    String?
+  organizationId String?
 
-  @@id([conditionId, organizationId])
+  condition    Condition?    @relation(fields: [conditionId], references: [id], onDelete: SetNull)
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+
+  @@unique([conditionId, organizationId])
 }
 
 model Example {
@@ -448,7 +465,7 @@ model Reaction {
   updatedAt     DateTime      @default(now()) @updatedAt
   reactableId   String
   reactableType ReactableType
-  author        User          @relation(fields: [authorId], references: [id])
+  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@unique([authorId, reactableType, reactableId])
 }

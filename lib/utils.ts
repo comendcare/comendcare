@@ -7,6 +7,71 @@ import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
 
+export const sendTypeSenseRequest = async (
+    url: string,
+    method: string,
+    apiKey: string,
+    data?: any,
+) => {
+    const headers = {
+        'Content-Type': 'application/json',
+        'X-TYPESENSE-API-KEY': apiKey,
+    };
+
+    const body = data ? JSON.stringify(data) : undefined;
+    const response = await fetch(url, {method, headers, body});
+    return response?.json() ?? null;
+};
+
+// TypeSense collection management
+export const createTypeSenseCollection = async (
+    typesenseUrl: string,
+    apiKey: string,
+    data: any,
+) => {
+    const url = `${typesenseUrl}/collections`;
+    return sendTypeSenseRequest(url, 'POST', apiKey, data);
+};
+
+export const deleteTypeSenseCollection = async (
+    typesenseUrl: string,
+    apiKey: string,
+    data: any,
+) => {
+    const url = `${typesenseUrl}/collections`;
+    return sendTypeSenseRequest(url, 'POST', apiKey, data);
+}
+
+export const addTypeSenseDocument = async (
+    typesenseUrl: string,
+    apiKey: string,
+    data: any,
+    documentType: string
+) => {
+    const url = `${typesenseUrl}/collections/${documentType}/documents`;
+    return sendTypeSenseRequest(url, 'POST', apiKey, data);
+};
+
+export const updateTypeSenseDocument = async (
+    typesenseUrl: string,
+    apiKey: string,
+    data: any,
+    documentType: string
+) => {
+    const url = `${typesenseUrl}/collections/${documentType}/documents/${data.id}`;
+    return sendTypeSenseRequest(url, 'PATCH', apiKey, data);
+};
+
+export const deleteTypeSenseDocument = async (
+    typesenseUrl: string,
+    apiKey: string,
+    id: string,
+    documentType: string
+) => {
+    const url = `${typesenseUrl}/collections/${documentType}/documents/${id}`;
+    return sendTypeSenseRequest(url, 'DELETE', apiKey);
+};
+
 export function toKebabCase(name: string) {
     return name
         .toLowerCase()

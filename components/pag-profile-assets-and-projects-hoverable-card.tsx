@@ -75,7 +75,9 @@ export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { ass
                             )}
                         </ul>
                     ): (
-                        <p className="text-gray-400">No projects to show.</p>
+                        <p className="text-gray-400">
+                            No projects to show.
+                        </p>
                     )}
                 </div>
             </CardContent>

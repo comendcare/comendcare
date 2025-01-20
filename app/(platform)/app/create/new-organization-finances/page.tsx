@@ -16,7 +16,7 @@ export default function CreateOrganizationFinancesPage() {
                                 </h1>
                             </div>
                             <p className="font-semibold">
-                                {`A reminder that we won't share what you provide with anyone, and you have complete control of what info is made public on your organization profile and research plan.`}
+                                {`You choose what information is shared publicly. And, we will never share your data externally without your consent.`}
                             </p>
                         </div>
 

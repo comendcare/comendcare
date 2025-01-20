@@ -26,14 +26,15 @@ import {Bold, Italic} from "lucide-react";
 import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
-import {cn, createDicebearAvatar, formatMoney, nameToInitials, years} from "@/lib/utils";
+import {FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
+import {cn, createDicebearAvatar, formatMoney, getPublicFile, nameToInitials, years} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {checkSubdomainAvailability, getAllOrganizations} from "@/lib/fetchers";
+import {checkSubdomainAvailability, getAllOrganizations, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
+import { FormImageCropper } from "./edit-pag-profile-page-dialog";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -138,9 +139,11 @@ export default function OrganizationOnboardingForm(
     });
     const [searchInput, setSearchInput] = useState("");
     const {isNewOrganization, toggleIsNewOrganization} = useOnboardingStore();
-    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
+    const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null)
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof newOrgFormSchema> | undefined>(undefined);
+    console.log(defaultOrganizationValues?.incorporationStatus);
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -200,21 +203,27 @@ export default function OrganizationOnboardingForm(
 
     const joinOrgForm = useForm<z.infer<typeof joinOrgFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(joinOrgFormSchema)
+        resolver: zodResolver(joinOrgFormSchema),
     })
 
     const newOrgForm = useForm<z.infer<typeof newOrgFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(newOrgFormSchema),
-        defaultValues: {
-            subdomain: "",
-        }
+        defaultValues: defaultOrganizationValues
     })
 
     const [debouncedNickname] = useDebounce(newOrgForm.watch("subdomain"), 500); // Extract just the debounced value
 
     useEffect(() => {
         // Trigger validation whenever the debounced nickname changes
+        const currentSubdomain = defaultOrganizationValues?.subdomain; // The current subdomain of the organization
+
+        if (debouncedNickname === currentSubdomain) {
+            // Clear errors since it's the same subdomain as before
+            newOrgForm.clearErrors("subdomain");
+            return;
+        }
+
         if (debouncedNickname) {
             checkSubdomainAvailability(debouncedNickname).then((isAvailable) => {
                 if (!isAvailable) {
@@ -281,8 +290,16 @@ export default function OrganizationOnboardingForm(
             });
 
             if (selectedFile && values.image) {
-                const imgUrl = await handleImageUpload(selectedFile as File, values.image)
-                if (imgUrl) formData.set('image', imgUrl)
+                try {
+                    const imgUrl = await handleImageUpload(selectedFile as File, values.image)
+                    if (imgUrl) {
+                        formData.set('image', imgUrl)
+                    }
+                } catch (error) {
+                    console.error("Failed to upload image:", error)
+                    toast.error("Image upload failed")
+                    return 
+                }
             }
 
             createOrganization(formData).then((res: any) => {
@@ -303,6 +320,68 @@ export default function OrganizationOnboardingForm(
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        async function fetchOrganizationData() {
+            if (session?.user?.organizationId) {
+                let organizationData
+                const response = await getOrganizationFromOrganizationId(session.user.organizationId);
+                if (response.success) {
+                    organizationData = response.data
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+
+                if (organizationData) {
+                    const fetchedValues = {
+                        id: organizationData.id || "",
+                        description: organizationData.description || "",
+                        orgName: organizationData.name || "", // Map `name` to `orgName`
+                        founded: organizationData.yearFounded ? organizationData.yearFounded.toString() : "",
+                        subdomain: organizationData.subdomain || "",
+                        website: organizationData.website || "",
+                        address1: organizationData.address1 || "",
+                        address2: organizationData.address2 || "",
+                        formattedAddress: organizationData.formattedAddress || "",
+                        city: organizationData.city || "",
+                        region: organizationData.region || "",
+                        postalCode: organizationData.postalCode || "",
+                        country: organizationData.country || "",
+                        lat: parseFloat(organizationData.lat || "0"),
+                        lng: parseFloat(organizationData.lng || "0"),
+                        image: organizationData.image || "",
+                        name: organizationData.name || "",
+                        logo: organizationData.logo || "",
+                        font: organizationData.font || "",
+                        imageBlurhash: organizationData.imageBlurhash || "",
+                        statedGoal: organizationData.statedGoal || null,
+                        incorporationStatus: organizationData.incorporationStatus || undefined
+                    };
+
+                    if (organizationData.image) {
+                        try {
+                            const orgPhoto: File = await getPublicFile(organizationData.image)
+                            if (orgPhoto) {
+                                const fileWithPreview = Object.assign(orgPhoto, {
+                                    preview: URL.createObjectURL(orgPhoto),
+                                })
+                                setSelectedFile(fileWithPreview)
+                            }
+                        } catch (e) {
+                            console.error(e)
+                        }
+                    }
+
+                    setDefaultOrganizationValues(fetchedValues);
+                    // setAddress(fetchedValues); // Set address state as well
+                    newOrgForm.reset(fetchedValues); // Reset form with fetched data
+                }
+            }
+        }
+
+        fetchOrganizationData();
+    }, [session, newOrgForm]);
 
     return (
         <div className="relative grid grid-cols-2 gap-x-8">
@@ -392,7 +471,7 @@ export default function OrganizationOnboardingForm(
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                         <div className="w-full flex flex-row justify-between">
                                             <FormDescription>
-                                                {`Enter your organization's abbreviated name, short form, or nickname.`}
+                                                {`Enter your organization’s abbreviated name, short form, or nickname in lowercase.`}
                                                 <br/>
                                                 {newOrgForm.watch("subdomain") &&
                                                     !newOrgForm.formState.errors.subdomain && (
@@ -534,6 +613,7 @@ export default function OrganizationOnboardingForm(
                                             <RadioGroup
                                                 onValueChange={field.onChange}
                                                 defaultValue={field.value}
+                                                value={field.value}
                                                 className="flex flex-col space-y-1"
                                             >
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
@@ -589,47 +669,14 @@ export default function OrganizationOnboardingForm(
                                 )}
                             />
 
-                            <FormField
-                                control={newOrgForm.control}
+                            <FormImageCropper 
+                                form={newOrgForm}
                                 name="image"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            Organization Logo
-                                        </FormLabel>
-                                        <FormDescription>
-                                            {`This will be used as your organization profile's image.`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <div className="flex flex-col items-start space-y-4">
-                                                {selectedFile ? (
-                                                    <ImageCropper
-                                                        dialogOpen={isDialogOpen}
-                                                        setDialogOpen={setDialogOpen}
-                                                        selectedFile={selectedFile}
-                                                        setSelectedFile={(file: any) => {
-                                                            if (file == null) setSelectedFile(null)
-                                                            field.onChange(file?.preview); // Update form field value
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <Avatar
-                                                        {...getRootProps()}
-                                                        className="size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200"
-                                                    >
-                                                        <input {...getInputProps()} />
-                                                        <AvatarFallback
-                                                            className="text-center flex flex-col justify-center gap-y-4">
-                                                            <FaUpload/>
-                                                            Click or drop!
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                )}
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
+                                title={"Organization Logo"}
+                                description={"This will be used as your organization profile's image."}
+                                aspect={1}
+                                selectedFile={selectedFile}
+                                setSelectedFile={setSelectedFile}
                             />
 
                             <FormField
@@ -750,7 +797,7 @@ export default function OrganizationOnboardingForm(
                         <div className="w-full flex flex-col space-y-8 my-8">
                             <div>
                                 <div>
-                                    <img className="h-24 w-full object-cover lg:h-36"
+                                    <img className="object-cover h-24 w-full lg:h-36"
                                          src={'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'}
                                          alt=""/>
                                 </div>
@@ -761,7 +808,7 @@ export default function OrganizationOnboardingForm(
                                         <div className="flex">
                                             {selectedFile?.preview ?
                                                 <img
-                                                    className="h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
+                                                    className="object-cover h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
                                                     src={selectedFile?.preview}
                                                     alt=""/>
                                                 :
@@ -776,36 +823,34 @@ export default function OrganizationOnboardingForm(
                                         <div
                                             className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
                                         >
-                                            <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
+                                            <div className="mt-6 min-w-0 flex-1 sm:hidden md:block space-y-1">
                                                 <h1 className="mt-6 min-w-0 flex-1 truncate text-xl font-bold text-gray-900">
                                                     {newOrgForm.watch("orgName") || <Skeleton className="h-4 w-full"/>}
                                                 </h1>
-                                                <div
-                                                    className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
-                                                    {/*{newOrgForm.watch("numberOfIdentifiedPatients") &&*/}
-                                                    {/*    <div className="mt-2 flex items-center text-gray-500">*/}
-                                                    {/*        <FaPeopleGroup*/}
-                                                    {/*            className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"*/}
-                                                    {/*            aria-hidden="true"/>*/}
-                                                    {/*        {newOrgForm.watch("numberOfIdentifiedPatients")}+*/}
-                                                    {/*        patients*/}
-                                                    {/*    </div>*/}
-                                                    {/*}*/}
-                                                    {/*{newOrgForm.watch("moneyRaised") &&*/}
-                                                    {/*    <div className="mt-2 flex items-center text-gray-500">*/}
-                                                    {/*        <FaCircleDollarToSlot*/}
-                                                    {/*            className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"*/}
-                                                    {/*            aria-hidden="true"*/}
-                                                    {/*        />*/}
-                                                    {/*        {formatMoney(newOrgForm.watch("moneyRaised"))} raised*/}
-                                                    {/*    </div>*/}
-                                                    {/*}*/}
-                                                    {/*<div className="mt-2 flex items-center text-gray-500">*/}
-                                                    {/*    <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"*/}
-                                                    {/*                aria-hidden="true"/>*/}
-                                                    {/*    Founded*/}
-                                                    {/*    in {new Date(newOrgForm.watch("createdAt") ?? "").getFullYear()}*/}
-                                                    {/*</div>*/}
+                                                <div className="flex flex-row space-x-2">
+                                                    {newOrgForm.watch("founded") ?
+                                                        <div
+                                                            className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
+                                                            <div className="mt-1 flex items-center text-gray-500">
+                                                                <FaCalendar
+                                                                    className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"
+                                                                    aria-hidden="true"/>
+                                                                Founded in {newOrgForm.watch("founded")?.split("-")[0]}
+                                                            </div>
+                                                        </div> :
+                                                        <Skeleton className="h-2 w-1/4"/>
+                                                    }
+                                                    {newOrgForm.watch("incorporationStatus") === "YES" &&
+                                                        <div
+                                                            className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
+                                                            <div className="mt-1 flex items-center text-gray-500">
+                                                                <FaBuildingNgo
+                                                                    className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"
+                                                                    aria-hidden="true"/>
+                                                                {"501c3"}
+                                                            </div>
+                                                        </div>
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
@@ -819,8 +864,8 @@ export default function OrganizationOnboardingForm(
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-6 gap-4">
-                                <div className="col-span-2 space-y-4">
+                            <div className="grid grid-cols-6 gap-2">
+                                <div className="col-span-2 space-y-2">
                                     <Card>
                                         <CardHeader
                                             className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -834,12 +879,19 @@ export default function OrganizationOnboardingForm(
                                                 <div className="flex-shrink-0 space-y-4">
                                                     <div className="flex-grow space-y-4">
                                                         <div className="space-y-2">
-                                                            <h3 className={cn("scroll-m-20 text-md tracking-tight font-semibold")}>
-                                                                Description
-                                                            </h3>
                                                             {newOrgForm.watch("description") ?
-                                                                <p className="text-sm line-clamp-6">
+                                                                <p className="text-xs line-clamp-6">
                                                                     {newOrgForm.watch("description")}
+                                                                </p> : <Skeleton className="h-4 w-full"/>
+                                                            }
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <h3 className={cn("scroll-m-20 text-md tracking-tight font-semibold")}>
+                                                                Website
+                                                            </h3>
+                                                            {newOrgForm.watch("website") ?
+                                                                <p className="text-xs">
+                                                                    {newOrgForm.watch("website")}
                                                                 </p> : <Skeleton className="h-4 w-full"/>
                                                             }
                                                         </div>
@@ -849,18 +901,32 @@ export default function OrganizationOnboardingForm(
 
                                         </CardContent>
                                     </Card>
-                                    {/*<AssetsCard/>*/}
-                                    {/*<OpenRFPsCard/>*/}
                                 </div>
 
-                                <div className="col-span-4 flex flex-col space-y-4">
-                                    {/*<PAGProfileRoadmapCard/>*/}
+                                <div className="col-span-4 flex flex-col space-y-2">
                                     <Card>
                                         <CardHeader className="flex flex-row items-center justify-between space-y-0">
                                             <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>
-                                                Activity
+                                                Milestones
                                             </CardTitle>
-                                            <Skeleton className="w-full"/>
+                                        </CardHeader>
+                                        <CardContent className="grid grid-cols-2 gap-x-2">
+                                            <div className="flex flex-col gap-y-2">
+                                                <Skeleton className="h-4 w-full"/>
+                                                <Skeleton className="h-4 w-1/2"/>
+                                            </div>
+                                            <div className="flex flex-col gap-y-2">
+                                                <Skeleton className="h-4 w-full"/>
+                                                <Skeleton className="h-4 w-1/2"/>
+                                                <Skeleton className="h-4 w-1/2"/>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                    <Card>
+                                        <CardHeader className="w-full flex flex-row items-center justify-between space-y-0">
+                                            <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>
+                                            Research Plan
+                                            </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
                                             <Skeleton className="h-4 w-full"/>

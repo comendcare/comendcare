@@ -1,7 +1,6 @@
 import {create} from "zustand"
 import {temporal} from 'zundo'
-import {Column, Task} from "@prisma/client";
-import { createKanbanColumn, createNewKanbanTask, deleteKanbanColumn, updateDBColumns, updateDBTask } from "@/lib/actions";
+import { Column, createColumn, createTask, deleteColumn, deleteTask, Task, updateColumns, updateTasks } from "@/lib/actions";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
 
@@ -9,13 +8,14 @@ export type KanbanState = {
     columns: any[],
     tasks: any[],
     initState: (columns: Column[], tasks: any[]) => void,
-    addColumn: (column: any) => void,
-    deleteColumn: (columnId: string) => void,
-    setColumn: (columnId: string, newProperties: any) => void,
-    setColumns: (columns: Column[]) => void,
-    addTask: (columnId: string) => void,
-    setTask: (taskId: string, newProperties: any) => void,
-    setTasks: (tasks: any[]) => void
+    addColumn: (column: any) => Promise<Column | void>,
+    deleteColumn: (columnId: string) => Promise<Column | void>
+    updateColumn: (columnId: string, newProperties: any) => Promise<Column[] | void>,
+    setColumns: (columns: Column[]) => Promise<Column[] | void>,
+    addTask: (columnId: string) => Promise<Task | void>,
+    updateTask: (taskId: string, newProperties: any) => Promise<Task[] | void>,
+    setTasks: (tasks: any[]) => Promise<Task[] | void>,
+    deleteTask: (taskId: string) => Promise<Task | void>,
 }
 
 export const useKanbanStore = create<KanbanState>()(
@@ -23,36 +23,38 @@ export const useKanbanStore = create<KanbanState>()(
             columns: [],
             tasks: [],
             initState: (columns: Column[], tasks: any[]) => {
+                console.log(`init kanban state`)
                 set({ columns, tasks })
             },
-            addColumn: (column: Column) => {
-                column = {
-                    ...column,
-                    id: nanoid()
-                }
+            addColumn: async (column: Partial<Column>) => {
+                console.log(`add column`)
+                // create column in the database
+                const response = await createColumn(column)
+                if (response.success && response.data) {
+                    // if column was created successfully, update zustand state
+                    set({ columns: [...get().columns, response.data as Column] })
 
-                set({ columns: [...get().columns, column] })
-                createKanbanColumn(column).then((response) => {
-                    if (response.success && response.data) {
-                        toast.success("Column created successfully!")
-                    } else {
-                        console.error(response.error)
-                        toast.error(response.error)
-                    }
-                })
+                    toast.success("Column added successfully!")
+                    return response.data as Column
+                } else {
+                    console.error("Error adding column", response.error)
+                }
             },
-            deleteColumn: (columnId: string) => {
-                set({ columns: get().columns.filter(col => col.id !== columnId) })
-                deleteKanbanColumn(columnId).then((response) => {
-                    if (response.success && response.data) {
-                        toast.success("Column deleted successfully!");
-                    } else {
-                        console.error(response.error)
-                        toast.error(response.error)
-                    }
-                })
+            deleteColumn: async (columnId: string) => {
+                console.log(`delete column`)
+                const response = await deleteColumn(columnId)
+                if (response.success && response.data) {
+                    // if task was successfully deleted, update zustand state
+                    set({ columns: get().columns.filter(col => col.id !== response.data.id)})
+
+                    toast.success("Column deleted successfully!")
+                    return response.data as Column
+                } else {
+                    console.error("Error deleting column", response.error)
+                }
             },
-            setColumn: (columnId: string, newProperties: any) => {
+            updateColumn: async (columnId: string, newProperties: any) => {
+                console.log(`update column`)
                 const updatedColumns = get().columns.map(column => {
                     if (column.id === columnId) {
                         return ({
@@ -63,32 +65,47 @@ export const useKanbanStore = create<KanbanState>()(
 
                     return column
                 })
-                set({ columns: updatedColumns })
-                updateDBColumns({ columns: updatedColumns })
-            },
-            setColumns: (columns: Column[]) => {
-                set({ columns })
-                updateDBColumns({ columns })
-            },
-            addTask: (columnId: string) => {
-                const task = {
-                    id: nanoid(),
-                    name: "New Task",
-                    columnId,
-                    orderPosition: 0,
-                    kanbanPosition: 0
+                const response = await updateColumns({ columns: updatedColumns })
+                if (response.success && response.data) {
+                    // if task was created successfully, update zustand state
+                    set({ columns: response.data as Column[] })
+
+                    toast.success("Column updated successfully!")
+                    return response.data as Column[]
+                } else {
+                    console.error("Error updating column", response.error)
                 }
-
-                set({ tasks: [...get().tasks, task] })
-                createNewKanbanTask(task).then((response) => {
-                    if (response.success && response.data) {
-                        toast.success("Task added successfully!")
-                    } else {
-
-                    }
-                })
             },
-            setTask: (taskId: string, newProperties: any) => {
+            setColumns: async (columns: Column[]) => {
+                console.log(`set columns`)
+                const response = await updateColumns({ columns })
+                if (response.success && response.data) {
+                    // if task was created successfully, update zustand state
+                    set({ columns: response.data as Column[] })
+
+                    toast.success("Column updated successfully!")
+                    return response.data as Column[]
+                } else {
+                    console.error("Error updating column", response.error)
+                }
+            },
+            addTask: async (columnId: string) => {
+                console.log(`add task`)
+                // create task in the database
+                const response = await createTask(columnId)
+
+                if (response.success && response.data) {
+                    // if task was created successfully, update zustand state
+                    set({ tasks: [...get().tasks, response.data] })
+
+                    toast.success("Task added successfully!")
+                    return response.data as Task
+                } else {
+                    console.error("Error adding task", response.error)
+                }
+            },
+            updateTask: async (taskId: string, newProperties: Partial<Task>) => {
+                console.log(`update task`)
                 const updatedTasks = get().tasks.map(task => {
                     if (task.id === taskId) {
                         return ({
@@ -99,18 +116,49 @@ export const useKanbanStore = create<KanbanState>()(
 
                     return task
                 })
-                updateDBTask({ tasks: updatedTasks })
-                set({ tasks: updatedTasks })
+
+                const response = await updateTasks({ tasks: updatedTasks })
+                if (response.success && response.data) {
+                    // if task was created successfully, update zustand state
+                    set({ tasks: response.data as Task[] })
+
+                    toast.success("Task updated successfully!")
+                    return response.data as Task[]
+                } else {
+                    console.error("Error adding task", response.error)
+                }
             },
-            setTasks: (tasks: any[]) => {
-                updateDBTask({ tasks })
-                set({ tasks: tasks })
+            setTasks: async (tasks: Task[]) => {
+                console.log(`set tasks`)
+                const response = await updateTasks({ tasks })
+                if (response.success && response.data) {
+                    // if task was created successfully, update zustand state
+                    set({ tasks: response.data as Task[] })
+
+                    // toast.success("Tasks updated successfully!")
+                    return response.data as Task[]
+                } else {
+                    console.error("Error adding task", response.error)
+                }
+            },
+            deleteTask: async (taskId: string) => {
+                console.log(`delete task`)
+                const response = await deleteTask(taskId)
+                if (response.success && response.data) {
+                    // if task was successfully deleted, update zustand state
+                    set({ tasks: get().tasks.filter(task => task.id !== response.data.id)})
+
+                    toast.success("Task deleted successfully!")
+                    return response.data as Task
+                } else {
+                    console.error("Error deleting task", response.error)
+                }
             },
         }),
         {
             limit: 100, // limit the stored history states to 100
             onSave: (pastState, currentState) => {
-                // console.log(`Saved Kanban State: `, currentState)
+                console.log(`Saved Kanban State: `, currentState)
                 return
             },
         })

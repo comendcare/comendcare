@@ -13,16 +13,9 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { nanoid } from "nanoid";
 import type { Node } from "@xyflow/react"
+import ComendLoadingSpinner from "./comend-loading-spinner";
 
 const selector = (state: RoadmapState) => ({
-    selectedNodeId: state.selectedNodeId,
-    setSelectedNodeId: state.setSelectedNodeId,
-    milestones: state.milestones,
-    nodes: state.nodes,
-    edges: state.edges,
-    onNodesChange: state.onNodesChange,
-    onEdgesChange: state.onEdgesChange,
-    onConnect: state.onConnect,
     addNodes: state.addNodes,
 })
 
@@ -30,12 +23,13 @@ export default function RoadmapTemplates() {
     const router = useRouter()
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const [selectedRoadmap, setSelectedRoadmap] = useState<any>(undefined)
+    const [isLoading, setIsLoading] = useState(false)
 
     const {
         addNodes,
     } = useRoadmapStore(useShallow(selector))
 
-    const addMilestones = (newMilestones: any[]) => {
+    const addMilestones = async (newMilestones: any[]) => {
         const newNodes: any[] = []
         let centerX = 0
         let centerY = 0
@@ -61,14 +55,20 @@ export default function RoadmapTemplates() {
                 }
             }
 
-            centerX += 200
-            centerY += 200
+            centerX += 500
+            // centerY += 200
 
             newNodes.push(newNode)
         })
 
-        addNodes(newNodes)
-        return newNodes
+        const nodes = await addNodes(newNodes)
+        return nodes
+    }
+
+    if (isLoading) {
+        return (
+            <ComendLoadingSpinner />
+        )
     }
 
     return (
@@ -126,11 +126,10 @@ export default function RoadmapTemplates() {
                 <div className="flex flex-row space-x-2">
                     <Button
                         disabled={selectedMilestones.length === 0}
-                        onClick={() => {
-                            const newNodes = addMilestones(selectedMilestones)
-                            setTimeout(() => {
-                                router.push('/app/research-plan')
-                            }, 1000)
+                        onClick={async () => {
+                            setIsLoading(true)
+                            await addMilestones(selectedMilestones)
+                            router.push('/app/research-plan')
                         }}
                     >
                         Add selected milestones
@@ -139,11 +138,10 @@ export default function RoadmapTemplates() {
                 <div className="flex flex-row space-x-2">
                     <Button 
                         variant="secondary"
-                        onClick={() => {
-                            const newNode = addMilestones([{name: 'New Milestone'}])
-                            setTimeout(() => {
-                                router.push('/app/research-plan')
-                            }, 1000)
+                        onClick={async () => {
+                            setIsLoading(true)
+                            await addMilestones([{name: 'New Milestone'}])
+                            router.push('/app/research-plan')
                         }}
                     >
                         Add an empty milestone
@@ -203,6 +201,7 @@ export default function RoadmapTemplates() {
                         <Button 
                             disabled={!selectedRoadmap}
                             onClick={() => {
+                                setIsLoading(true)
                                 const newNodes = addMilestones(selectedRoadmap.milestones)
                                 setTimeout(() => {
                                     router.push('/app/research-plan')

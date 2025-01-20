@@ -106,7 +106,7 @@ const editTaskForm = z.object({
 })
 
 const selector = (state: KanbanState) => ({
-    setTask: state.setTask
+    updateTask: state.updateTask
 })
 
 export function EditTaskForm({
@@ -117,7 +117,7 @@ export function EditTaskForm({
     onClose: () => void
 }) {
     const { data: session } = useSession()
-    const { setTask } = useKanbanStore(useShallow(selector))
+    const { updateTask } = useKanbanStore(useShallow(selector))
     const form = useForm<z.infer<typeof editTaskForm>>({
         mode: "onChange",
         resolver: zodResolver(editTaskForm),
@@ -170,7 +170,7 @@ export function EditTaskForm({
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
         const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
 
-        setTask(
+        updateTask(
             taskData?.id,
             {
                 name,
