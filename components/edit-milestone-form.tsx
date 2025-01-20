@@ -340,7 +340,7 @@ export function EditMilestoneForm({
 
     return (
         <Form {...form}>
-        <ScrollArea className="research-plan-tour-step3">
+        <ScrollArea className="research-plan-tour-step3 px-8">
             <form
                 onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                 onChange={() => console.log(`CHANGE`)}

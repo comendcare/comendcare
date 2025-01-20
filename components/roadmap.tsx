@@ -160,7 +160,7 @@ export function Roadmap({
                         {/* Flow View */}
                         <TabsContent
                             value="flow"
-                            className="m-0 h-[calc(100vh-3.5rem)]"
+                            className="m-0 h-[calc(100vh-6rem)]"
                         >
                             <PrivateFlowView
                                 width={defaultLayout[0]}
@@ -184,7 +184,7 @@ export function Roadmap({
                         <ResizablePanel
                             defaultSize={defaultLayout[1]}
                             minSize={30}
-                            className="p-10 h-full flex flex-col gap-4"
+                            className="h-full flex flex-col gap-4"
                         >
                             <MilestoneDetailsPanel
                                 milestone={milestones.find(

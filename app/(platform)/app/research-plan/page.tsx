@@ -11,7 +11,7 @@ export default async function RoadmapPage() {
     
     if (!orgId) {
         return (
-            <main className="flex gap-8 flex-col w-full h-screen justify-center items-center mx-auto">
+            <main className="flex gap-8 flex-col w-full h-full justify-center items-center mx-auto">
                 <NoOrganization />
             </main>
         )
@@ -77,7 +77,7 @@ export default async function RoadmapPage() {
         })
 
         return (
-            <main className="flex flex-col items-center h-screen mx-auto">
+            <main className="flex flex-col items-center h-full mx-auto">
                 <Roadmap
                     roadmapId={roadmapId}
                     initNodes={dbNodes || []}
@@ -89,7 +89,7 @@ export default async function RoadmapPage() {
     }
 
     return (
-        <main className="flex gap-8 flex-col w-full h-screen justify-center items-center mx-auto">
+        <main className="flex gap-8 flex-col w-full h-full justify-center items-center mx-auto">
             <NewRoadmapForm />
         </main>
     )
