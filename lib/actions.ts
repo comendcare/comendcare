@@ -1366,8 +1366,13 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         const organizationId: string = organization.id
 
         // Delete any nodes that are not in the request
+        // node ids in this request
         const nodeIds = nodes.map((node: any) => node.id)
-        const nodesInDB = await prisma.node.findMany({select: {id: true}})
+        // nodes in this roadmap
+        const nodesInDB = await prisma.node.findMany({
+            select: { id: true },
+            where: { roadmapId }
+        })
         const nodeIdsInDB = (nodesInDB || []).map((node: any) => node.id)
         const nodesToDelete = nodeIdsInDB.filter(
             (id: string) => !nodeIds.includes(id)
@@ -1375,7 +1380,8 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
 
         await prisma.node.deleteMany({
             where: {
-                id: {in: nodesToDelete}
+                id: {in: nodesToDelete},
+                roadmapId: roadmapId
             }
         })
 
