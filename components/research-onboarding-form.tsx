@@ -59,7 +59,7 @@ export const researchFormSchema = z.object({
     prevalenceNumerator: z.string().min(1, {
         message: "Your organization's prevalence.",
     }).optional(),
-    prevalenceDenominator: z.string().min(1, {
+    prevalenceDenominator: z.number().min(1, {
         message: "Your organization's prevalence.",
     }).optional(),
     population: z.string().min(1, {
@@ -538,7 +538,10 @@ export default function ResearchOnboardingForm(
 
     const form = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(researchFormSchema)
+        resolver: zodResolver(researchFormSchema),
+        defaultValues: {
+            prevalenceDenominator: 1000000
+        }
     })
 
     async function onSubmit(values: z.infer<typeof researchFormSchema>) {
@@ -708,6 +711,54 @@ export default function ResearchOnboardingForm(
 
                             <FormField
                                 control={form.control}
+                                name="genes"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Associated genes</FormLabel>
+                                        <FormDescription>{`The genes associated with your condition.`}</FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                onSearch={handleAsyncSearch}
+                                                placeholder="Search for genes..."
+                                                hidePlaceholderWhenSelected={true}
+                                                loadingIndicator={<p>Loading genes...</p>}
+                                                emptyIndicator={<p>No genes found.</p>}
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="systems"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Associated systems</FormLabel>
+                                        <FormDescription>{`The systems affected by your condition.`}</FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={ASSOCIATED_SYSTEMS}
+                                                placeholder="Select the associated systems of your condition..."
+                                                hidePlaceholderWhenSelected={true}
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
                                 name="categories"
                                 render={({field}) => (
                                     <FormItem>
@@ -820,54 +871,6 @@ export default function ResearchOnboardingForm(
 
                             <FormField
                                 control={form.control}
-                                name="genes"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Associated genes</FormLabel>
-                                        <FormDescription>{`The genes associated with your condition.`}</FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                onSearch={handleAsyncSearch}
-                                                placeholder="Search for genes..."
-                                                hidePlaceholderWhenSelected={true}
-                                                loadingIndicator={<p>Loading genes...</p>}
-                                                emptyIndicator={<p>No genes found.</p>}
-                                                showHoverCard={false}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="systems"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Associated systems</FormLabel>
-                                        <FormDescription>{`The systems affected by your condition.`}</FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={ASSOCIATED_SYSTEMS}
-                                                placeholder="Select the associated systems of your condition..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
                                 name="prevalenceNumerator"
                                 render={({field: numeratorField}) => (
                                     <FormItem>
@@ -894,8 +897,10 @@ export default function ResearchOnboardingForm(
                                                                 type="number"
                                                                 id="prevalenceDenominator"
                                                                 {...denominatorField}
+                                                                value={1000000}
                                                                 className="w-32"
                                                                 min={0}
+                                                                disabled
                                                             />
                                                         </FormControl>
                                                     )}
@@ -945,7 +950,7 @@ export default function ResearchOnboardingForm(
                     </Form>
                 </div>
 
-                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-280px)]">
+                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">
                     <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
                         <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
                             Organization profile preview
@@ -1052,7 +1057,7 @@ export default function ResearchOnboardingForm(
                                                                 Website
                                                             </h3>
                                                             {organization?.website ?
-                                                                <p className="text-xs">
+                                                                <p className="text-xs truncate">
                                                                     {organization?.website}
                                                                 </p> : <Skeleton className="h-4 w-full"/>
                                                             }

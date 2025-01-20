@@ -23,7 +23,7 @@ import PublicProfileDropdown from "@/components/public-profile-dropdown";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
 import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
 import {Post} from "@/app/condition/[slug]/page";
-import { FloatingDock } from "@/components/floating-dock";
+import {FloatingDock} from "@/components/floating-dock";
 import {IconFlag, IconShare, IconShare2} from "@tabler/icons-react";
 import {
     DialogDescription,
@@ -184,7 +184,7 @@ export default async function OrganizationRoadmapPage({
             {roadmaps.length > 0 ? (
                     <>
                         <div
-                            className="flex flex-col items-start justify-center my-24 gap-8 max-w-7xl m-auto w-full text-left"
+                            className="flex flex-col items-start justify-center my-24 gap-8 max-w-7xl m-auto w-full text-left p-2"
                         >
                             <PAGPublicRoadmapBreadcrumb
                                 organization={organization}
@@ -195,25 +195,23 @@ export default async function OrganizationRoadmapPage({
                             {/*    {roadmaps[0].title}*/}
                             {/*</h1>*/}
 
-                            <div className="w-full flex items-center justify-between space-x-5">
+                            <div className="w-full flex flex-col md:flex-row items-center justify-between space-y-4 md:space-x-4">
 
-                                <div className="flex">
-                                    <ProfilePhoto
-                                        img={organization?.image}
-                                        name={organization?.name}
-                                        className="h-8 w-8 rounded-full ring-4 ring-white sm:h-16 sm:w-16"
-                                        textSize="medium"
-                                    />
-                                </div>
+                                <ProfilePhoto
+                                    img={organization?.image}
+                                    name={organization?.name}
+                                    className="rounded-full ring-4 ring-white h-16 w-16"
+                                    textSize="medium"
+                                />
 
                                 <div
                                     className="flex min-w-0 flex-1 items-center justify-center space-x-6 pb-1"
                                 >
                                     <div className="min-w-0 flex-1 sm:hidden md:block">
-                                        <div className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">
+                                        <div className="min-w-0 flex-1 text-4xl font-bold text-gray-900">
                                             <HoverCard>
                                                 <HoverCardTrigger asChild>
-                                                    <h1 className="truncate cursor-pointer">
+                                                    <h1 className="text-wrap md:truncate  cursor-pointer">
                                                         {`${organization?.name}'s ${roadmaps[0].title}`}
                                                     </h1>
                                                 </HoverCardTrigger>
@@ -256,17 +254,17 @@ export default async function OrganizationRoadmapPage({
                                     </div>
                                 </div>
 
-                                <div
-                                    className="flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
-                                    <div className="flex flex-row space-x-2">
-                                        <Button
-                                            className="gap-x-2"
-                                        >
-                                            <FaPlus/>
-                                            Follow
-                                        </Button>
-                                    </div>
-                                </div>
+                                {/*<div*/}
+                                {/*    className="flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">*/}
+                                {/*    <div className="flex flex-row space-x-2">*/}
+                                {/*        <Button*/}
+                                {/*            className="gap-x-2"*/}
+                                {/*        >*/}
+                                {/*            <FaPlus/>*/}
+                                {/*            Follow*/}
+                                {/*        </Button>*/}
+                                {/*    </div>*/}
+                                {/*</div>*/}
 
                             </div>
 
@@ -275,8 +273,8 @@ export default async function OrganizationRoadmapPage({
                             </p>
 
                             {/*<div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">*/}
-                            <div className="grid grid-cols-3 m-auto w-full gap-4">
-                                <div className="col-span-2">
+                            <div className="flex flex-col-reverse md:grid md:grid-cols-3 m-auto w-full gap-4">
+                                <div className="md:col-span-2">
                                     <PublicRoadmapCard
                                         roadmap={roadmaps[0]}
                                         subdomain={organization?.subdomain || undefined}
@@ -287,20 +285,20 @@ export default async function OrganizationRoadmapPage({
                                 </div>
                             </div>
 
-                            <div className="mt-8 w-full space-y-8">
-                                <h2 className="text-center text-3xl md:text-4xl font-bold">
-                                    Recent activity
-                                </h2>
-                                <Carousel>
-                                    <CarouselContent className="p-4 gap-4">
-                                        {posts.map((post, index) => (
-                                            <ConditionProfileRecentActivityCard post={post} key={index}/>
-                                        ))}
-                                    </CarouselContent>
-                                    <CarouselPrevious/>
-                                    <CarouselNext/>
-                                </Carousel>
-                            </div>
+                            {/*<div className="mt-8 w-full space-y-8">*/}
+                            {/*    <h2 className="text-center text-3xl md:text-4xl font-bold">*/}
+                            {/*        Recent activity*/}
+                            {/*    </h2>*/}
+                            {/*    <Carousel>*/}
+                            {/*        <CarouselContent className="p-4 gap-4">*/}
+                            {/*            {posts.map((post, index) => (*/}
+                            {/*                <ConditionProfileRecentActivityCard post={post} key={index}/>*/}
+                            {/*            ))}*/}
+                            {/*        </CarouselContent>*/}
+                            {/*        <CarouselPrevious/>*/}
+                            {/*        <CarouselNext/>*/}
+                            {/*    </Carousel>*/}
+                            {/*</div>*/}
                         </div>
 
                         <FloatingDock
@@ -313,7 +311,8 @@ export default async function OrganizationRoadmapPage({
                                 {
                                     title: "Share on social media",
                                     icon: <IconShare/>,
-                                    dialog: <ShareDialog url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`} />
+                                    dialog: <ShareDialog
+                                        url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}/>
                                 },
                                 {
                                     title: "Report an issue",

@@ -34,10 +34,11 @@ export const useKanbanStore = create<KanbanState>()(
                     // if column was created successfully, update zustand state
                     set({ columns: [...get().columns, response.data as Column] })
 
-                    toast.success("Column added successfully!")
+                    // toast.success("Column added successfully!")
                     return response.data as Column
                 } else {
                     console.error("Error adding column", response.error)
+                    toast.error('There was an error adding your column')
                 }
             },
             deleteColumn: async (columnId: string) => {
@@ -47,10 +48,11 @@ export const useKanbanStore = create<KanbanState>()(
                     // if task was successfully deleted, update zustand state
                     set({ columns: get().columns.filter(col => col.id !== response.data.id)})
 
-                    toast.success("Column deleted successfully!")
+                    // toast.success("Column deleted successfully!")
                     return response.data as Column
                 } else {
                     console.error("Error deleting column", response.error)
+                    toast.error('There was an error deleting your column')
                 }
             },
             updateColumn: async (columnId: string, newProperties: any) => {
@@ -70,10 +72,11 @@ export const useKanbanStore = create<KanbanState>()(
                     // if task was created successfully, update zustand state
                     set({ columns: response.data as Column[] })
 
-                    toast.success("Column updated successfully!")
+                    // toast.success("Column updated successfully!")
                     return response.data as Column[]
                 } else {
                     console.error("Error updating column", response.error)
+                    toast.error('There was an error updating your column')
                 }
             },
             setColumns: async (columns: Column[]) => {
@@ -83,10 +86,11 @@ export const useKanbanStore = create<KanbanState>()(
                     // if task was created successfully, update zustand state
                     set({ columns: response.data as Column[] })
 
-                    toast.success("Column updated successfully!")
+                    // toast.success("Column updated successfully!")
                     return response.data as Column[]
                 } else {
                     console.error("Error updating column", response.error)
+                    toast.error('There was an error updating your column')
                 }
             },
             addTask: async (columnId: string) => {
@@ -98,10 +102,11 @@ export const useKanbanStore = create<KanbanState>()(
                     // if task was created successfully, update zustand state
                     set({ tasks: [...get().tasks, response.data] })
 
-                    toast.success("Task added successfully!")
+                    // toast.success("Task added successfully!")
                     return response.data as Task
                 } else {
                     console.error("Error adding task", response.error)
+                    toast.error('There was an error adding your task')
                 }
             },
             updateTask: async (taskId: string, newProperties: Partial<Task>) => {
@@ -122,10 +127,11 @@ export const useKanbanStore = create<KanbanState>()(
                     // if task was created successfully, update zustand state
                     set({ tasks: response.data as Task[] })
 
-                    toast.success("Task updated successfully!")
+                    // toast.success("Task updated successfully!")
                     return response.data as Task[]
                 } else {
                     console.error("Error adding task", response.error)
+                    toast.error('There was an error updating your task')
                 }
             },
             setTasks: async (tasks: Task[]) => {
@@ -139,6 +145,7 @@ export const useKanbanStore = create<KanbanState>()(
                     return response.data as Task[]
                 } else {
                     console.error("Error adding task", response.error)
+                    toast.error('There was an error updating your task')
                 }
             },
             deleteTask: async (taskId: string) => {
@@ -148,10 +155,11 @@ export const useKanbanStore = create<KanbanState>()(
                     // if task was successfully deleted, update zustand state
                     set({ tasks: get().tasks.filter(task => task.id !== response.data.id)})
 
-                    toast.success("Task deleted successfully!")
+                    // toast.success("Task deleted successfully!")
                     return response.data as Task
                 } else {
                     console.error("Error deleting task", response.error)
+                    toast.error('There was an error deleting your task')
                 }
             },
         }),

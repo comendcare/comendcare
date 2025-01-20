@@ -225,6 +225,19 @@ export function EditMilestoneForm({
         return () => subscription.unsubscribe();
     }, [form.watch])
 
+    const unionById = (arr1: any[], arr2: any[]) => {
+        const map = new Map();
+      
+        // Add elements from the first array
+        arr1.forEach((item) => map.set(item.id, item));
+      
+        // Add elements from the second array (overwriting duplicates)
+        arr2.forEach((item) => map.set(item.id, item));
+      
+        // Convert the Map back to an array
+        return Array.from(map.values());
+      };
+
     const handleMilestoneFormSubmit = (values: z.infer<typeof editMilestoneForm>) => {
         const {
             title,
@@ -276,7 +289,7 @@ export function EditMilestoneForm({
             RFP
         })
 
-        setTasks(kanbanTasks.map(task => {
+        setTasks(unionById(tasks || [], kanbanTasks).map(task => {
             const newTask = tasks?.find(t => t.id === task.id)
 
             // link relevant tasks to this milestone
@@ -372,7 +385,7 @@ export function EditMilestoneForm({
             <ScrollArea className="research-plan-tour-step3 px-8 py-4">
                 <form
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                    onChange={() => console.log(`CHANGE`)}
+                    // onChange={() => console.log(`CHANGE`)}
                     className="flex flex-col gap-8"
                 >
                     <span className="flex justify-between">
@@ -682,28 +695,25 @@ export function EditMilestoneForm({
                                                 )
                                             }}
                                         />
-                                        {/* <Button
-                                variant={'secondary'}
-                                onClick={async () => {
-                                    const columnId = kanbanColumns[0].id
+                                    <Button
+                                        variant={'secondary'}
+                                        onClick={async (e) => {
+                                            e.preventDefault()
+                                            const columnId = kanbanColumns[0].id
 
-                                    // form.setValue(
-                                    //     'tasks', 
-                                    //     [...field?.value || [], {
-                                    //         id: nanoid(),
-                                    //         name: "New Task",
-                                    //         description: null,
-                                    //         columnId,
-                                    //         orderPosition: 0,
-                                    //         kanbanPosition: 0,
-                                    //         milestoneId: milestoneData?.id,
-                                    //         // milestone: { id: milestoneData?.id }
-                                    //     }] 
-                                    // )
-                                }}
-                            >
-                                {`Add a new kanban task`}
-                            </Button> */}
+                                            const newTask = await addTask(columnId)
+                                            if (newTask) {
+                                                const updatedTasks = [...form.getValues().tasks || [], {
+                                                    ...newTask,
+                                                    milestoneId: milestoneData?.id,
+                                                    milestone: {id: milestoneData?.id}
+                                                }]
+                                                form.setValue('tasks', updatedTasks)
+                                            }
+                                        }}
+                                    >
+                                        {`Add a new kanban task`}
+                                    </Button>
                                     </>
                                 </FormControl>
                                 <FormMessage/>
