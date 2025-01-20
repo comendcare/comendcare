@@ -63,7 +63,7 @@ import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { getMembers, getMilestones, getOrganizationData } from "@/lib/fetchers"
 import MultiSelect from "./multi-select"
 import MultipleSelector from "./ui/multiple-selector"
-import { Member, Milestone, User } from "@prisma/client"
+import { Member, Milestone, TaskStakeholder, User } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "./ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
@@ -126,7 +126,7 @@ export function EditTaskForm({
             status: taskData?.status || 'TODO',
             description: JSON.parse(taskData?.description || "[]") || [],
             checklist: taskData?.checklist || undefined,
-            stakeholders: taskData?.stakeholders?.map((stakeholder: User) => ({ value: stakeholder.id, label: stakeholder.name })) || [],
+            stakeholders: taskData?.stakeholders?.map((stakeholder: any) => ({ value: stakeholder.userId, label: stakeholder.user?.name })) || [],
             milestone: taskData?.milestone?.id || undefined,
             targetDate: taskData?.endDate || undefined,
             priority: taskData?.priority || undefined,
@@ -179,7 +179,16 @@ export function EditTaskForm({
                 ...(checklist
                     ? {checklist: checklist.map((item, index) => ({...item, orderPosition: index}))}
                     : undefined),
-                ...(stakeholders ? { stakeholders: fetchedMembers?.filter(member => stakeholderIds?.includes(member.id)) }: undefined),
+                ...(stakeholders ? 
+                    { 
+                        stakeholders: 
+                            fetchedMembers?.filter(member => stakeholderIds?.includes(member.id)).map(member => ({
+                                userId: member.id,
+                                user: member
+                            }))
+                    } : 
+                    undefined
+                ),
                 milestone: { id: milestone },
                 milestoneId: milestone,
                 ...(targetDate ? { endDate: targetDate } : undefined),

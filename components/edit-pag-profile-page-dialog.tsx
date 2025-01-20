@@ -419,7 +419,10 @@ export default function EditPAGProfileDialog() {
 
     const editResearchForm = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(researchFormSchema)
+        resolver: zodResolver(researchFormSchema),
+        defaultValues: {
+            prevalenceDenominator: 1000000
+        }
     })
 
     useEffect(() => {
@@ -445,7 +448,7 @@ export default function EditPAGProfileDialog() {
                             genes: condition.associatedGenes.map((gene) => ({ label: gene, value: gene })) || [],
                             systems: condition.associatedSystems.map((system) => ({ label: system, value: system })) || [],
                             prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
-                            prevalenceDenominator: condition.prevalenceDenominator?.toString() || "",
+                            prevalenceDenominator: condition.prevalenceDenominator || undefined,
                             population: condition.numberOfIdentifiedPatients?.toString() || "",
                         }));
 
@@ -488,8 +491,8 @@ export default function EditPAGProfileDialog() {
                 summary: values.summary || "",
                 interestedModalities: values.modalities?.map((item) => item.label) || [],
                 diseaseCategories: values.categories?.map((item) => item.label) || [],
-                prevalenceNumerator: values.prevalenceNumerator ? parseInt(values.prevalenceNumerator, 10) : null,
-                prevalenceDenominator: values.prevalenceDenominator ? parseInt(values.prevalenceDenominator, 10) : null,
+                prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
+                prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
                 numberOfIdentifiedPatients: values.population ? parseInt(values.population, 10) : null,
                 relevantDiseaseMechanisms: values.mechanisms || [],
                 associatedGenes: values.genes?.map((item) => item.label) || [],
@@ -662,7 +665,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Website`}</FormLabel>
-                                                <FormDescription>{`Your patient group's website URL.`}</FormDescription>
+                                                <FormDescription>{`Your patient group's website URL (with the URL extension like http or https.`}</FormDescription>
                                                 <FormControl>
                                                     <Input
                                                         id="website"
@@ -911,6 +914,54 @@ export default function EditPAGProfileDialog() {
 
                                     <FormField
                                         control={editResearchForm.control}
+                                        name="genes"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Associated genes</FormLabel>
+                                                <FormDescription>{`The genes associated with your condition.`}</FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        onSearch={handleAsyncSearch}
+                                                        placeholder="Search for genes..."
+                                                        hidePlaceholderWhenSelected={true}
+                                                        loadingIndicator={<p>Loading genes...</p>}
+                                                        emptyIndicator={<p>No genes found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="systems"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Associated systems</FormLabel>
+                                                <FormDescription>{`The systems affected by your condition.`}</FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        defaultOptions={ASSOCIATED_SYSTEMS}
+                                                        hidePlaceholderWhenSelected={true}
+                                                        placeholder="Select the associated systems of your condition..."
+                                                        emptyIndicator={
+                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                no results found.
+                                                            </p>
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
                                         name="categories"
                                         render={({field}) => (
                                             <FormItem>
@@ -991,54 +1042,6 @@ export default function EditPAGProfileDialog() {
 
                                     <FormField
                                         control={editResearchForm.control}
-                                        name="genes"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Associated genes</FormLabel>
-                                                <FormDescription>{`The genes associated with your condition.`}</FormDescription>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        onSearch={handleAsyncSearch}
-                                                        placeholder="Search for genes..."
-                                                        hidePlaceholderWhenSelected={true}
-                                                        loadingIndicator={<p>Loading genes...</p>}
-                                                        emptyIndicator={<p>No genes found.</p>}
-                                                        showHoverCard={false}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={editResearchForm.control}
-                                        name="systems"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Associated systems</FormLabel>
-                                                <FormDescription>{`The systems affected by your condition.`}</FormDescription>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        defaultOptions={ASSOCIATED_SYSTEMS}
-                                                        hidePlaceholderWhenSelected={true}
-                                                        placeholder="Select the associated systems of your condition..."
-                                                        emptyIndicator={
-                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                                no results found.
-                                                            </p>
-                                                        }
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={editResearchForm.control}
                                         name="prevalenceNumerator"
                                         render={({field: numeratorField}) => (
                                             <FormItem>
@@ -1066,7 +1069,9 @@ export default function EditPAGProfileDialog() {
                                                                         id="prevalenceDenominator"
                                                                         {...denominatorField}
                                                                         className="w-32"
+                                                                        value={1000000}
                                                                         min={0}
+                                                                        disabled
                                                                     />
                                                                 </FormControl>
                                                             )}
