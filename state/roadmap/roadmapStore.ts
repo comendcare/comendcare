@@ -134,6 +134,7 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
         setNodes: async (nodes: Node[]) => {
             console.log(`set nodes`)
+            set({ nodes })
             const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
             if (response.success && response.data) {
                 const newNodes = response.data.nodes.map(n => ({
@@ -147,7 +148,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // this keeps us from having an infinite loop when handling the nodes local state in private-flow.tsx
                 // local state is handled within the private-flow.tsx component, and debounced, because
                 // the RaectFlow spams position updates and we don't want to save all of them to the Database..
-                set({ nodes })
+                // set({ nodes })
                 return newNodes as Node[]
             } else {
                 console.error(`Error updating database nodes`, response.error)
