@@ -1,8 +1,8 @@
 "use client"
-import { useEffect, useMemo, useRef, useState } from "react"
-import { createPortal } from "react-dom"
+import {useEffect, useMemo, useRef, useState} from "react"
+import {createPortal} from "react-dom"
 
-import { BoardColumn, BoardContainer } from "@/components/board-column"
+import {BoardColumn, BoardContainer} from "@/components/board-column"
 import {
     DndContext,
     type DragEndEvent,
@@ -18,17 +18,17 @@ import {
     MouseSensor,
     closestCorners
 } from "@dnd-kit/core"
-import { SortableContext, arrayMove } from "@dnd-kit/sortable"
-import { type Task, TaskCard } from "@/components/task-card"
-import { hasDraggableData } from "@/lib/utils"
-import { coordinateGetter } from "@/lib/multiple-containers-keyboard-preset"
-import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
-import { useShallow } from "zustand/react/shallow"
+import {SortableContext, arrayMove} from "@dnd-kit/sortable"
+import {type Task, TaskCard} from "@/components/task-card"
+import {hasDraggableData} from "@/lib/utils"
+import {coordinateGetter} from "@/lib/multiple-containers-keyboard-preset"
+import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
+import {useShallow} from "zustand/react/shallow"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSession } from "next-auth/react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
-import { Column } from "@/lib/actions"
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {useSession} from "next-auth/react"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "./ui/select"
+import {Column} from "@/lib/actions"
 
 export type ColumnId = string
 
@@ -40,27 +40,29 @@ const kanbanSelector = (state: KanbanState) => ({
 })
 
 export function KanbanView() {
-    const { columns, tasks } = useKanbanStore(useShallow(kanbanSelector))
+    const {columns, tasks} = useKanbanStore(useShallow(kanbanSelector))
     const [sortBy, setSortBy] = useState<string>('default')
 
     return (
         <Tabs defaultValue="team" className="w-full">
-            <div className="flex flex-row gap-8 items-center">
+            <div className="flex flex-row gap-4 items-center justify-between">
                 <TabsList className="grid w-[400px] grid-cols-2">
                     <TabsTrigger value="team">Team Tasks</TabsTrigger>
                     <TabsTrigger value="personal">My Tasks</TabsTrigger>
                 </TabsList>
-                <h2>Sort By:</h2>
-                <Select onValueChange={(value: string) => setSortBy(value)}>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue defaultValue={'default'} placeholder={"Default"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="default">{`Default`}</SelectItem>
-                        <SelectItem value="priority">{`Priority (High - Low)`}</SelectItem>
-                        <SelectItem value="date">{`Date (Earliest - Latest)`}</SelectItem>
-                    </SelectContent>
-                </Select>
+                <div className="flex flex-row gap-4 items-center">
+                    <p>Sort by:</p>
+                    <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue defaultValue={'default'} placeholder={"Sort by"}/>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="default">{`Default`}</SelectItem>
+                            <SelectItem value="priority">{`Priority (High - Low)`}</SelectItem>
+                            <SelectItem value="date">{`Date (Earliest - Latest)`}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
             <TabsContent value="team">
                 <Kanban
@@ -82,9 +84,19 @@ export function KanbanView() {
     )
 }
 
-function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Column[], initTasks: Task[], filter: 'team' | 'personal' | undefined, sortBy?: string | undefined }) {
+function Kanban({initColumns, initTasks, filter, sortBy}: {
+    initColumns: Column[],
+    initTasks: Task[],
+    filter: 'team' | 'personal' | undefined,
+    sortBy?: string | undefined
+}) {
     const {data: session} = useSession()
-    const { tasks: stateTasks, columns: stateColumns, setTasks: setDbTasks, setColumns: setDbColumns } = useKanbanStore(useShallow(kanbanSelector))
+    const {
+        tasks: stateTasks,
+        columns: stateColumns,
+        setTasks: setDbTasks,
+        setColumns: setDbColumns
+    } = useKanbanStore(useShallow(kanbanSelector))
     const [columns, setColumns] = useState<Column[]>([])
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
     const columnsId = useMemo(() => columns?.map(col => col.id), [columns])
@@ -97,7 +109,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
         })
     )
 
-    const sortKanbanTasks = (taskList: Task[]) => {    
+    const sortKanbanTasks = (taskList: Task[]) => {
         const priorities = ['HIGH', 'MEDIUM', 'LOW']
 
         // sort default (kanban & order position)
@@ -160,7 +172,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
     }
 
     const announcements: Announcements = {
-        onDragStart({ active }) {
+        onDragStart({active}) {
             if (!hasDraggableData(active)) return
             if (active.data.current?.type === "Column") {
                 const startColumnIdx = columnsId.findIndex(
@@ -172,7 +184,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
                 } of ${columnsId.length}`
             } else if (active.data.current?.type === "Task") {
                 pickedUpTaskColumn.current = active.data.current.task.columnId
-                const { tasksInColumn, taskPosition, column } =
+                const {tasksInColumn, taskPosition, column} =
                     getDraggingTaskData(active.id, pickedUpTaskColumn.current)
                 return `Picked up Task ${
                     active.data.current.task.name
@@ -181,7 +193,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
                 } in column ${column?.name}`
             }
         },
-        onDragOver({ active, over }) {
+        onDragOver({active, over}) {
             if (!hasDraggableData(active) || !hasDraggableData(over)) return
 
             if (
@@ -196,7 +208,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
                 active.data.current?.type === "Task" &&
                 over.data.current?.type === "Task"
             ) {
-                const { tasksInColumn, taskPosition, column } =
+                const {tasksInColumn, taskPosition, column} =
                     getDraggingTaskData(
                         over.id,
                         over.data.current.task.columnId
@@ -216,7 +228,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
                 } in column ${column?.name}`
             }
         },
-        onDragEnd({ active, over }) {
+        onDragEnd({active, over}) {
             if (!hasDraggableData(active) || !hasDraggableData(over)) {
                 pickedUpTaskColumn.current = null
                 return
@@ -238,7 +250,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
                 active.data.current?.type === "Task" &&
                 over.data.current?.type === "Task"
             ) {
-                const { tasksInColumn, taskPosition, column } =
+                const {tasksInColumn, taskPosition, column} =
                     getDraggingTaskData(
                         over.id,
                         over.data.current.task.columnId
@@ -257,7 +269,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
             }
             pickedUpTaskColumn.current = null
         },
-        onDragCancel({ active }) {
+        onDragCancel({active}) {
             pickedUpTaskColumn.current = null
             if (!hasDraggableData(active)) return
             return `Dragging ${active.data.current?.type} cancelled.`
@@ -265,7 +277,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
     }
 
     const isBrowser = typeof window !== "undefined"
-    
+
     function onDragStart(event: DragStartEvent) {
         if (!hasDraggableData(event.active)) return
         const data = event.active.data.current
@@ -284,11 +296,11 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
         setActiveColumn(null)
         setActiveTask(null)
 
-        setDbTasks(tasks.map((task, index)=> (
+        setDbTasks(tasks.map((task, index) => (
             {...task, kanbanPosition: index}
         )))
 
-        const { active, over } = event
+        const {active, over} = event
         if (!over) return
 
         const activeId = active.id
@@ -316,7 +328,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
     }
 
     function onDragOver(event: DragOverEvent) {
-        const { active, over } = event
+        const {active, over} = event
         if (!over) return
 
         const activeId = active.id
@@ -411,7 +423,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
                             column={col}
                             tasks={tasks?.filter(task => {
                                 if (filter == "personal" && session?.user.id && !task.stakeholders?.map(stakeholder => stakeholder.id).includes(session?.user.id)) return false
-                                return task?.columnId === col.id 
+                                return task?.columnId === col.id
                             })}
                         />
                     )) : <div>{`You don't have any columns`}</div>}
@@ -428,7 +440,7 @@ function Kanban({ initColumns, initTasks, filter, sortBy }: { initColumns: Colum
                                 tasks={tasks?.filter(task => task?.columnId === activeColumn.id)}
                             />
                         )}
-                        {activeTask && <TaskCard task={activeTask} isOverlay />}
+                        {activeTask && <TaskCard task={activeTask} isOverlay/>}
                     </DragOverlay>,
                     document.body
                 )}
