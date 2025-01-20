@@ -181,7 +181,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                                 maxSize={20}
                                 onCollapse={() => setIsCollapsed(true)}
                                 onResize={() => setIsCollapsed(false)}
-                                className={isCollapsed ? "min-w-[50px] transition-all duration-300 ease-in-out" : ""}
+                                className={isCollapsed ? "overflow-y-auto min-w-[50px] transition-all duration-300 ease-in-out" : "overflow-y-auto "}
                             >
                                 {children}
                             </ResizablePanel>
