@@ -35,6 +35,7 @@ export type RoadmapState = {
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
         initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
+            console.log(`init roadmap state`)
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
                 style: { stroke: 'black' }
@@ -43,18 +44,22 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
         onboardingActive: true,
         setOnboardingActive: (active: boolean) => {
+            console.log(`set onboarding active`)
             set({ onboardingActive: active })
         },
         roadmapId: null,
         setRoadmapId: (id: string) => {
+            console.log(`set roadmap id`)
             set({ roadmapId: id })
         },
         selectedNodeId: null,
         setSelectedNodeId: (id: string | null) => {
+            console.log(`set selected node id`)
             set({ selectedNodeId: id })
         },
         milestones: [],
         setMilestone: async (nodeId: string, newProperties: any) => {
+            console.log(`set milestone`)
             const milestones = get().milestones.map(milestone =>
                 milestone.nodeId === nodeId
                     ? { ...milestone, ...newProperties }
@@ -73,6 +78,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         setMilestones: async (milestones: any[]) => {
+            console.log(`set milestones`)
             // set({ milestones })
             // updateMilestones({ milestones })
             const response = await updateMilestones({ milestones })
@@ -89,6 +95,7 @@ export const useRoadmapStore = create<RoadmapState>()(
         nodes: [],
         edges: [],
         onEdgesChange: async (changes: EdgeChange[]) => {
+            console.log(`on edges change`)
             const edges = applyEdgeChanges(changes, get().edges)
             // set({ edges })
 
@@ -101,6 +108,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         onConnect: async (connection: any) => {
+            console.log(`on connect`)
             const edges = addEdge(
                 {
                     ...connection,
@@ -125,6 +133,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         setNodes: async (nodes: Node[]) => {
+            console.log(`set nodes`)
             const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
             if (response.success && response.data) {
                 const newNodes = response.data.nodes.map(n => ({
@@ -146,6 +155,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         setEdges: async (edges: Edge[]) => {
+            console.log(`set edges`)
             // set({ edges })
             const response = await updateEdges({ roadmapId: get().roadmapId, edges })
             if (response.success && response.data) {
@@ -156,6 +166,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         addNodes: async (nodes: Node[]) => {
+            console.log(`add nodes`)
             // set({ nodes: [...get().nodes, ...nodes], milestones: [...get().milestones, ...nodes.map(node => node.data)] })
             const newNodes = nodes
 
@@ -192,6 +203,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         deleteNode: async (nodeId: string | undefined) => {
+            console.log(`delete nodes`)
             const response = await deleteNode(nodeId)
             if (response.success && response.data) {
                 const nodes = [...get().nodes].filter(({ id }) => id !== response.data.id)
@@ -206,6 +218,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         saveState: () => {
+            console.log(`save state`)
             const state = get()
             set(state)
             updateDBFlow({ roadmapId: state.roadmapId, nodes: state.nodes, edges: state.edges })
