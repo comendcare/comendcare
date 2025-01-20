@@ -5,20 +5,21 @@ import {useNavStore} from "@/state/nav/navStore"; // Zustand store
 import {TooltipProvider} from "@/components/ui/tooltip";
 import {ResizablePanel, ResizablePanelGroup, ResizableHandle} from "@/components/ui/resizable";
 import {Separator} from "@/components/ui/separator";
-import {AppNav} from "@/components/app-nav";
-import {Cog, LayoutDashboard, Newspaper, Store, User, Workflow, Pin} from "lucide-react";
-import {cn} from "@/lib/utils";
-import Image from "next/image";
-import logo from "@/public/logos/comend-logo.png";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import {useSession} from "next-auth/react";
-import {Suspense, useEffect} from "react";
-import Profile from "@/components/profile";
+import {useEffect} from "react";
+import Image from "next/image"
+import logo from "@/public/Full logo.png"
 import {useState} from "react";
 import {Member, Organization} from "@prisma/client";
-import OrganizationSelector from "@/components/organization-selector";
 import {redirect} from "next/navigation";
-import {Button} from "@/components/ui/button";
-import {FaPlus} from "react-icons/fa6";
 import Loading from "@/app/loading";
 import {
     getAllOrganizationsFromUserId,
@@ -152,90 +153,39 @@ export default function AppLayout({children}: AppLayoutProps) {
             <SidebarProvider>
                 <AppSidebar/>
                 <SidebarInset>
-                    <div className="flex h-screen max-h-screen w-full">
-                        {/*<SidebarTrigger className="h-10 w-10 size-10"/>*/}
+                    <header className="sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background">
+                        <div className="flex items-center justify-between gap-2 px-4">
+                            <SidebarTrigger className="-ml-1" />
+                            <div className="w-1/12 h-auto">
+                                <Image priority src={logo} alt="Comend logo" />
+                            </div>
+                        </div>
+                    </header>
+                    <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full">
 
-                        {/*<ResizablePanelGroup*/}
-                        {/*    direction="horizontal"*/}
-                        {/*    onLayout={(sizes: number[]) => {*/}
-                        {/*        setLayout(sizes) // Use Zustand's setLayout to save panel sizes*/}
-                        {/*    }}*/}
-                        {/*    className="w-full items-stretch"*/}
-                        {/*>*/}
-                            {/* Navigation Panel */}
-                            {/*<ResizablePanel*/}
-                            {/*    defaultSize={defaultLayout[0]}*/}
-                            {/*    collapsedSize={4}*/}
-                            {/*    collapsible={true}*/}
-                            {/*    minSize={15}*/}
-                            {/*    maxSize={20}*/}
-                            {/*    onCollapse={() => setIsCollapsed(true)}*/}
-                            {/*    onResize={() => setIsCollapsed(false)}*/}
-                            {/*    className={isCollapsed ? "min-w-[50px] transition-all duration-300 ease-in-out" : ""}*/}
-                            {/*>*/}
-                            {/*    <div*/}
-                            {/*        className={cn(*/}
-                            {/*            "relative flex h-[52px] items-center justify-around space-x-4 mx-2",*/}
-                            {/*            isCollapsed ? "h-[102px] flex-col space-x-0" : "px-2"*/}
-                            {/*        )}*/}
-                            {/*    >*/}
-                            {/*        <Image priority src={logo} alt="Librarey logo" className="size-6"/>*/}
-                            {/*        <OrganizationSelector*/}
-                            {/*            isCollapsed={isCollapsed}*/}
-                            {/*            organizations={organizations}*/}
-                            {/*        />*/}
-                            {/*    </div>*/}
-                            {/*    <Separator/>*/}
-                            {/*    <AppNav*/}
-                            {/*        isCollapsed={isCollapsed}*/}
-                            {/*        links={[*/}
-                            {/*            {title: "Profile", icon: User, variant: "ghost", href: "/app/profile"},*/}
-                            {/*            {title: "Kanban", icon: Pin, variant: "ghost", href: "/app/kanban"},*/}
-                            {/*            {*/}
-                            {/*                title: "Feed",*/}
-                            {/*                // label: "128",*/}
-                            {/*                icon: Newspaper,*/}
-                            {/*                variant: "ghost",*/}
-                            {/*                href: "/app/feed"*/}
-                            {/*            },*/}
-                            {/*            {*/}
-                            {/*                title: "Dashboard",*/}
-                            {/*                // label: "128",*/}
-                            {/*                icon: LayoutDashboard,*/}
-                            {/*                variant: "ghost",*/}
-                            {/*                href: "/app/dashboard"*/}
-                            {/*            },*/}
-                            {/*            {*/}
-                            {/*                title: "Research Plan",*/}
-                            {/*                // label: "128",*/}
-                            {/*                icon: Workflow,*/}
-                            {/*                variant: "ghost",*/}
-                            {/*                href: `/app/research-plan`*/}
-                            {/*            },*/}
-                            {/*            {*/}
-                            {/*                title: "Marketplace",*/}
-                            {/*                // label: "9",*/}
-                            {/*                icon: Store,*/}
-                            {/*                variant: "ghost",*/}
-                            {/*                href: "/app/marketplace/patient-groups"*/}
-                            {/*            },*/}
-                            {/*            {title: "Settings", icon: Cog, variant: "ghost", href: "/app/settings"},*/}
-                            {/*        ]}*/}
-                            {/*    >*/}
-                            {/*        <Suspense fallback={<Loading/>}>*/}
-                            {/*            <Profile isCollapsed={isCollapsed}/>*/}
-                            {/*        </Suspense>*/}
-                            {/*    </AppNav>*/}
-                            {/*</ResizablePanel>*/}
-
-                            {/*/!*Resizable Handle between panels *!/*/}
-                            {/*<ResizableHandle withHandle/>*/}
+                        <ResizablePanelGroup
+                            direction="horizontal"
+                            onLayout={(sizes: number[]) => {
+                                setLayout(sizes) // Use Zustand's setLayout to save panel sizes
+                            }}
+                            className="w-full items-stretch"
+                        >
 
                             {/* Main Content Panel */}
                             {/*<ResizablePanel defaultSize={defaultLayout[1]} minSize={30} className="overflow-y-auto">*/}
+                            <ResizablePanel
+                                defaultSize={defaultLayout[0]}
+                                collapsedSize={4}
+                                collapsible={true}
+                                minSize={15}
+                                maxSize={20}
+                                onCollapse={() => setIsCollapsed(true)}
+                                onResize={() => setIsCollapsed(false)}
+                                className={isCollapsed ? "min-w-[50px] transition-all duration-300 ease-in-out" : ""}
+                            >
                                 {children}
-                            {/*</ResizablePanel>*/}
-                        {/*</ResizablePanelGroup>*/}
+                            </ResizablePanel>
+                        </ResizablePanelGroup>
                     </div>
                 </SidebarInset>
             </SidebarProvider>
