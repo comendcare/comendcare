@@ -68,11 +68,11 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
 
                             <div className="space-y-2">
                                 <div className="flex flex-row items-center justify-between w-full">
-                                <h4 className="scroll-m-20 text-base font-semibold">
+                                    <h4 className="scroll-m-20 text-base font-semibold">
                                         Relevant topics
                                     </h4>
                                 </div>
-                                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-1">
+                                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-2">
                                     {(() => {
                                         const filteredItems = concat(
                                             condition?.diseaseCategories,
@@ -89,14 +89,21 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                                             );
                                         }
 
-                                        return filteredItems.map((item, index) => (
-                                            <Badge key={index} className="flex text-sm">
-                                                {item.charAt(0).toUpperCase() + item.slice(1)}
-                                            </Badge>
-                                        ));
+                                        return (
+                                            <div className="flex flex-wrap gap-1">
+                                                {filteredItems.map((item, index) => (
+                                                    <span key={index}>
+                                                        <Badge className="text-sm inline">
+                                                            {item.charAt(0).toUpperCase() + item.slice(1)}
+                                                        </Badge>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        );
                                     })()}
                                 </div>
                             </div>
+
                         </div>
                     ) : <div className="flex flex-col space-y-2 text-left">
                         <h3 className="scroll-m-20 text-md tracking-tight font-semibold">

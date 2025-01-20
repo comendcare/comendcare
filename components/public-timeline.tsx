@@ -34,12 +34,10 @@ export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
                             </svg>
                         </span>
                         <div className="flex flex-row items-center justify-between gap-8">
-                            <div className="flex flex-row justify-center items-baseline gap-2">
-                                <h3 className="group-hover:underline mb-1 text-lg font-semibold text-gray-900 dark:text-white ">
-                                    {item.title}
-                                </h3>
-                                <FaArrowUpRightFromSquare size={15}/>
-                            </div>
+                            <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline mb-1 text-lg font-semibold text-gray-900 dark:text-white ">
+                                {item.title}
+                                <FaArrowUpRightFromSquare size={12}/>
+                            </h3>
                             {item.label && (
                                 <span
                                     className="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300 ms-3">

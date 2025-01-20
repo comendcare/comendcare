@@ -54,7 +54,7 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
         >
             <Card>
                 <CardHeader className="w-full pt-6 pb-2 space-y-4">
-                    <div className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
                         <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                             Research Plan
                         </CardTitle>
