@@ -468,6 +468,31 @@ export function EditMilestoneForm({
                                 </FormItem>
                             )}
                         />
+
+                        <FormLabel className="text-md">{`Budget`}</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="budget"
+                            render={({field}) => (
+                                <FormItem className="h-full flex items-center justify-end gap-4">
+                                    <FormControl className="grow w-full h-full">
+                                        <Input
+                                            className="h-full"
+                                            id="budget"
+                                            type="number"
+                                            defaultValue={field.value}
+                                            onChange={e =>
+                                                field.onChange(
+                                                    Number(e.target.value)
+                                                )
+                                            }
+                                            variant={"currency"}
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
                     </FormItem>
 
                     <Separator/>
@@ -579,36 +604,6 @@ export function EditMilestoneForm({
                             <FormMessage/>
                         </FormItem>
                     </span>
-
-                    <Separator/>
-
-                    <FormField
-                        control={form.control}
-                        name="budget"
-                        render={({field}) => (
-                            <FormItem>
-                                <span className="w-full h-full flex flex-row items-center justify-between">
-                                    <FormLabel
-                                        className="text-2xl font-semibold leading-none tracking-tight">{`Budget`}</FormLabel>
-                                    <FormControl className="grow w-full h-full">
-                                        <Input
-                                            className="h-full"
-                                            id="budget"
-                                            type="number"
-                                            defaultValue={field.value}
-                                            onChange={e =>
-                                                field.onChange(
-                                                    Number(e.target.value)
-                                                )
-                                            }
-                                            variant={"currency"}
-                                        />
-                                    </FormControl>
-                                </span>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
 
                     <Separator/>
 
@@ -755,7 +750,7 @@ export function EditMilestoneForm({
     )
 }
 
-const EditTitle = ({ form }: { form: any }) => {
+const EditTitle = ({form}: { form: any }) => {
     const contentRef = useRef<HTMLHeadingElement>(null);
 
     const handleInput = (e: React.FormEvent<HTMLHeadingElement>) => {
@@ -782,7 +777,7 @@ const EditTitle = ({ form }: { form: any }) => {
         <FormField
             control={form.control}
             name="title"
-            render={({ field }) => (
+            render={({field}) => (
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <span className="flex flex-row gap-2 items-center">
@@ -798,7 +793,7 @@ const EditTitle = ({ form }: { form: any }) => {
                             </h1>
                         </span>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage/>
                 </FormItem>
             )}
         />
