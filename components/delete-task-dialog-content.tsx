@@ -1,52 +1,31 @@
 "use client"
 import React from "react"
 import { Button } from "./ui/button"
-import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import {
-    Dialog,
     DialogContent,
     DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger
 } from "./ui/dialog"
 import { DialogClose } from "@radix-ui/react-dialog"
-import { toast } from "sonner"
+import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 
-// const selector = (state: RoadmapState) => ({
-//     deleteNode: state.deleteNode,
-//     saveState: state.saveState
-// })
+const selector = (state: KanbanState) => ({
+    deleteTask: state.deleteTask
+})
 
 export function DeleteTaskDialogContent({
     taskData,
 }: {
     taskData: any
 }) {
-    // const { deleteNode, saveState } = useRoadmapStore(useShallow(selector))
-    // const { undo } = useRoadmapStore.temporal.getState()
-
-    const handleUndo = () => {
-        // undo()
-        // saveState()
-    }
+    const { deleteTask } = useKanbanStore(useShallow(selector))
 
     const handleDeleteTask = (e: React.MouseEvent<HTMLElement>) => {
         console.log(`Handle Task Delete...`)
-        // deleteNode(milestoneData?.nodeId)
-        toast(
-            <div className="relative p-2 flex flex-col w-full">
-                <p className="font-semibold text-gray-900">
-                    {`Task Deleted`}
-                </p>
-                <p className="mt-1 text-sm text-gray-500">
-                    {`Your task had been deleted successfully.`}
-                </p>
-                <Button className="self-end mt-4" onClick={handleUndo}>Undo Delete</Button>
-            </div>
-        )
+        deleteTask(taskData?.id)
     }
 
     return (

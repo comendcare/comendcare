@@ -7,8 +7,9 @@ import {
     Controls,
     useReactFlow,
     useStoreApi,
+    applyNodeChanges,
 } from "@xyflow/react"
-import type { ConnectionState, Edge, FinalConnectionState, Node } from "@xyflow/react"
+import type { ConnectionState, Edge, FinalConnectionState, Node, NodeChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
 
 import "@xyflow/react/dist/base.css"
@@ -35,6 +36,8 @@ import { ScrollArea } from "./ui/scroll-area"
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { CheckBubble } from "./check-bubble"
 import { templateMilestones } from "@/lib/templates"
+import { debounce } from "lodash"
+import { CustomEdge } from "./custom-edge"
 
 const proOptions = { hideAttribution: true }
 
@@ -43,8 +46,8 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
     nodes: state.nodes,
+    setNodes: state.setNodes,
     edges: state.edges,
-    onNodesChange: state.onNodesChange,
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
     addNodes: state.addNodes,
@@ -60,8 +63,8 @@ export const PrivateFlowView = ({
         setSelectedNodeId,
         milestones,
         nodes,
+        setNodes: setDbNodes,
         edges,
-        onNodesChange,
         onEdgesChange,
         addNodes,
         onConnect,
@@ -73,12 +76,36 @@ export const PrivateFlowView = ({
     const searchParams = useSearchParams()
     // const { undo, redo, clear } = useRoadmapStore.temporal.getState()
     const nodeTypes = { MILESTONE: PrivateMilestoneNode }
+    const edgeTypes = { DEFAULT: CustomEdge }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     const { startOnborda } = useOnborda()
     const { screenToFlowPosition } = useReactFlow()
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+
+    useEffect(() => {
+        setLocalNodes(nodes)
+    }, [nodes])
+
+    const [localNodes, setLocalNodes] = useState(nodes)
+
+    const onNodesChange = (changes: NodeChange<Node>[]) => {
+        const newNodes = applyNodeChanges(changes, localNodes)
+        setLocalNodes(newNodes)
+
+        debounceUpdateStore(newNodes)
+    }
+
+    const debounceUpdateStore = useCallback(
+        debounce(
+            (nodes: Node[]) => {
+                // updateDBFlow({ roadmapId, nodes, edges })
+                setDbNodes(nodes)
+            }, 500
+        ),
+        []
+    )
 
     const onConnectEnd = useCallback(
         (event: any, connectionState: any) => {
@@ -130,7 +157,7 @@ export const PrivateFlowView = ({
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
     // if a position is not provided, place in the center
-    const addMilestones = (newMilestones: any[]) => {
+    const addMilestones = async (newMilestones: any[]) => {
         const newNodes: any[] = []
 
         // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
@@ -155,6 +182,7 @@ export const PrivateFlowView = ({
                     x: centerX,
                     y: centerY
                 },
+                origin: [0.0, 0.0],
                 data: {
                     id: nanoid(),
                     nodeId: id,
@@ -167,14 +195,14 @@ export const PrivateFlowView = ({
                 }
             }
 
-            centerX += 200
-            centerY += 200
+            centerX += 500
+            // centerY += 200
 
             newNodes.push(newNode)
         })
 
-        addNodes(newNodes)
-        return newNodes
+        const nodes = await addNodes(newNodes)
+        return nodes
     }
 
     const handleDelete = async ({nodes, edges}: {nodes: Node[], edges: Edge[]}) => {
@@ -190,7 +218,7 @@ export const PrivateFlowView = ({
 
     // add handleEditClick(), handleDelete(), and handleDuplicate() callback functions to nodes in the flow
     // this callback is needed to notify us when the 'Edit Details' button in a node has been clicked, so we can open the sidebar
-    const updatedNodes = nodes.map((node: Node, index: number) => ({
+    const updatedNodes = localNodes.map((node: Node, index: number) => ({
         ...node,
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
@@ -204,7 +232,7 @@ export const PrivateFlowView = ({
                 router.push(`${pathname}?${params.toString()}`, { scroll: false })
             },
             handleDelete: (nodeId: string) => {
-                const nodesList = nodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
+                const nodesList = localNodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
                 const edgesList = edges.filter((edge: Edge) => edge.source === nodeId || edge.target === nodeId)
 
                 handleDelete({
@@ -224,6 +252,11 @@ export const PrivateFlowView = ({
             // first node is the onboarding node
             onboardingMilestone: index === 0
         }
+    }))
+
+    const updatedEdges = edges.map((edge: Edge) => ({
+        ...edge,
+        type: 'DEFAULT'
     }))
 
     // when the handle is adjusted (width changes) or a node is selected (details panel opens), fit the view
@@ -263,7 +296,7 @@ export const PrivateFlowView = ({
             // })
             startOnbordaAndRemoveToast()
         }
-    }, [nodes])
+    }, [localNodes])
 
     const startOnbordaAndRemoveToast = () => {
         startOnborda('research-plan-tour')
@@ -276,13 +309,14 @@ export const PrivateFlowView = ({
         <ReactFlow
             width={width}
             nodes={updatedNodes}
-            edges={edges}
+            edges={updatedEdges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onConnectEnd={onConnectEnd}
             onBeforeDelete={handleDelete}
             nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             fitView
             fitViewOptions={{ padding: 2 }}
             style={{ width: '100%', height: '100%' }}

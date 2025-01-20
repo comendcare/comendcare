@@ -25,6 +25,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import {FaQuestionCircle} from "react-icons/fa";
 import React from "react";
 import LoadingDots from "@/components/icons/loading-dots";
+import {researchFormSchema} from "@/components/research-onboarding-form";
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -32,34 +33,34 @@ export const optionSchema = z.object({
     disable: z.boolean().optional(),
 });
 
-const researchOnboardingFormSchema = z.object({
-    modalities: z.array(optionSchema).min(0).optional(),
-    disorder: z.string()
-        .min(2, {
-            message: "The name of your disorder needs to be longer than 2 characters",
-        })
-        .max(60, {
-            message: "The name of your disorder needs to be shorter than 60 characters",
-        })
-        .optional(),
-    categories: z.array(optionSchema).optional(),
-    prevalenceNumerator: z.string().min(1, {
-        message: "Your organization's prevalence.",
-    }).optional(),
-    prevalenceDenominator: z.string().min(1, {
-        message: "Your organization's prevalence.",
-    }).optional(),
-    population: z.string().min(1, {
-        message: "Your organization's description.",
-    }).optional(),
-    // mechanisms: z.array(optionSchema).min(0),
-    mechanisms: z.array(z.string()).optional(),
-    genes: z.array(optionSchema).optional(),
-    biomarkers: z.array(optionSchema).optional(),
-    symptoms: z.array(optionSchema).optional(),
-    studies: z.array(optionSchema).optional(),
-    assets: z.array(optionSchema).optional(),
-})
+// const researchOnboardingFormSchema = z.object({
+//     modalities: z.array(optionSchema).min(0).optional(),
+//     disorder: z.string()
+//         .min(2, {
+//             message: "The name of your disorder needs to be longer than 2 characters",
+//         })
+//         .max(60, {
+//             message: "The name of your disorder needs to be shorter than 60 characters",
+//         })
+//         .optional(),
+//     categories: z.array(optionSchema).optional(),
+//     prevalenceNumerator: z.string().min(1, {
+//         message: "Your organization's prevalence.",
+//     }).optional(),
+//     prevalenceDenominator: z.string().min(1, {
+//         message: "Your organization's prevalence.",
+//     }).optional(),
+//     population: z.string().min(1, {
+//         message: "Your organization's description.",
+//     }).optional(),
+//     // mechanisms: z.array(optionSchema).min(0),
+//     mechanisms: z.array(z.string()).optional(),
+//     genes: z.array(optionSchema).optional(),
+//     biomarkers: z.array(optionSchema).optional(),
+//     symptoms: z.array(optionSchema).optional(),
+//     studies: z.array(optionSchema).optional(),
+//     assets: z.array(optionSchema).optional(),
+// })
 
 export const CONDITION_MECHANISM_OPTIONS: Option[] = [
     {
@@ -384,12 +385,12 @@ export default function EditConditionProfileDialog() {
     const {data: session, update} = useSession()
     const [loading, setLoading] = useState(false);
 
-    const conditionProfileForm = useForm<z.infer<typeof researchOnboardingFormSchema>>({
+    const conditionProfileForm = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
-        resolver: zodResolver(researchOnboardingFormSchema)
+        resolver: zodResolver(researchFormSchema)
     })
 
-    async function onConditionFormSubmit(values: z.infer<typeof researchOnboardingFormSchema>) {
+    async function onConditionFormSubmit(values: z.infer<typeof researchFormSchema>) {
         setLoading(true)
         try {
             if (!session?.user?.organizationId) {
@@ -529,6 +530,7 @@ export default function EditConditionProfileDialog() {
                                     <MultipleSelector
                                         {...field}
                                         defaultOptions={OPTIONS}
+                                        hidePlaceholderWhenSelected={true}
                                         placeholder="Select categories that apply to you..."
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
@@ -567,6 +569,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select modalities you like..."
+                                        hidePlaceholderWhenSelected={true}
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -708,6 +711,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select the associated genes of your disorder..."
+                                        hidePlaceholderWhenSelected={true}
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -732,6 +736,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select the associated biomarkers of your disorder..."
+                                        hidePlaceholderWhenSelected={true}
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -756,6 +761,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select the associated signs and symptoms of your disorder..."
+                                        hidePlaceholderWhenSelected={true}
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -780,6 +786,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select the associated signs and symptoms of your disorder..."
+                                        hidePlaceholderWhenSelected={true}
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -804,6 +811,7 @@ export default function EditConditionProfileDialog() {
                                         {...field}
                                         defaultOptions={OPTIONS}
                                         placeholder="Select the assets that apply to you..."
+                                        hidePlaceholderWhenSelected={true}
                                         creatable
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">

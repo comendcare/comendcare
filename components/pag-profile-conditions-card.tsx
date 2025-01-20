@@ -46,14 +46,24 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                                         Statistics
                                     </h4>
                                 </div>
-                                <ul className="flex flex-col list-disc list-inside">
-                                    <li>
-                                        {`${condition.prevalenceNumerator} in ${condition.prevalenceDenominator} prevalence`}
-                                    </li>
-                                    <li>
-                                        {`${condition.numberOfIdentifiedPatients} patients identified`}
-                                    </li>
-                                </ul>
+                                {(condition.prevalenceNumerator && condition.prevalenceDenominator && condition.numberOfIdentifiedPatients) ? (
+                                    <ul className="flex flex-col list-disc list-inside">
+                                        {condition.prevalenceNumerator && condition.prevalenceDenominator && (
+                                            <li>
+                                                {`${condition.prevalenceNumerator} in ${condition.prevalenceDenominator} prevalence`}
+                                            </li>
+                                        )}
+                                        {condition.numberOfIdentifiedPatients && (
+                                            <li>
+                                                {`${condition.numberOfIdentifiedPatients} patients identified`}
+                                            </li>
+                                        )}
+                                    </ul>
+                                ) : (
+                                    <p className="text-gray-400">
+                                        {`No data available.`}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="space-y-2">
@@ -63,11 +73,28 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                                     </h4>
                                 </div>
                                 <div className="flex flex-col sm:flex-row sm:flex-wrap sm:gap-1">
-                                    {concat(condition?.diseaseCategories, condition?.interestedModalities, condition?.relevantDiseaseMechanisms, condition?.associatedGenes).map((item, index) =>
-                                        <Badge key={index} className="flex text-sm">
-                                            {item.charAt(0).toUpperCase() + item.slice(1)}
-                                        </Badge>
-                                    )}
+                                    {(() => {
+                                        const filteredItems = concat(
+                                            condition?.diseaseCategories,
+                                            condition?.interestedModalities,
+                                            condition?.relevantDiseaseMechanisms,
+                                            condition?.associatedGenes
+                                        ).filter((item) => item && item.trim() !== ""); // Filter out empty strings
+
+                                        if (filteredItems.length === 0) {
+                                            return (
+                                                <p className="text-gray-400">
+                                                    {`No relevant topics.`}
+                                                </p>
+                                            );
+                                        }
+
+                                        return filteredItems.map((item, index) => (
+                                            <Badge key={index} className="flex text-sm">
+                                                {item.charAt(0).toUpperCase() + item.slice(1)}
+                                            </Badge>
+                                        ));
+                                    })()}
                                 </div>
                             </div>
                         </div>
@@ -88,7 +115,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
-                        Conditions
+                    Conditions
                     </CardTitle>
                 </CardHeader>
 

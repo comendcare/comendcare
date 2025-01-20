@@ -43,7 +43,7 @@ export default async function SiteSettingsIndex({
                 handleSubmit={updateOrganizationAttribute}
             />
 
-            <DeleteOrganizationForm organizationName={data?.name!} />
+            <DeleteOrganizationForm organization={data!} />
         </div>
     )
 }

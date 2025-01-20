@@ -150,7 +150,6 @@ export const authOptions: NextAuthOptions = {
                 where: {id: token.sub},
             });
 
-            // If the user does not exist, return null to terminate the session
             if (!dbUser) {
                 // Continue with your existing session logic
                 session.user = {
@@ -161,6 +160,10 @@ export const authOptions: NextAuthOptions = {
                     username: token?.user?.username || token?.user?.gh_username,
                     organizationId: token.organizationId as string | null, // Ensure type matches
                 };
+
+                // If user cannot be found, assume they've been deleted and forcibly sign them out in the frontend.
+                session.terminate = true
+                session.expires = new Date().toDateString()
 
                 return session
             }
@@ -184,6 +187,7 @@ export const authOptions: NextAuthOptions = {
 
 export function getSession() {
     return getServerSession(authOptions) as Promise<{
+        terminate: boolean;
         user: {
             id: string
             name: string

@@ -1,8 +1,6 @@
 import {FaPlus} from "react-icons/fa6";
 import {Button} from "@/components/ui/button";
 import {Column} from "@prisma/client";
-import {createNewKanbanTask} from "@/lib/actions";
-import {toast} from "sonner";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore";
 import { useShallow } from "zustand/react/shallow";
 
@@ -15,7 +13,7 @@ export default function NewKanbanTaskButton({column}: { column: Column }) {
 
     async function createTask() {
         try {
-            addTask(column.id)
+            await addTask(column.id)
         } catch (error) {
             console.error(error);
         }

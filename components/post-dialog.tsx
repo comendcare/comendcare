@@ -171,7 +171,7 @@ export function PostDialog(
                     className="col-span-2 order-1 flex flex-col sm:flex-col items-center justify-center space-x-4"
                 >
                     <h1 className="font-cal text-4xl">
-                        No Roadmaps Yet
+                        No research plan yet
                     </h1>
                     <Image
                         alt="missing roadmap"
