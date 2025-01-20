@@ -715,7 +715,7 @@ export async function getColumns(orgId: string | null | undefined): Promise<ApiR
                         orderBy: [ { kanbanPosition: 'asc' } ],
                         include: {
                             checklist: true,
-                            stakeholders: true,
+                            stakeholders: { include: {user: true} },
                             milestone: true
                         }
                     }

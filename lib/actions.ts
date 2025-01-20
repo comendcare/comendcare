@@ -1,7 +1,7 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma, Kanban, Post, User, Condition} from "@prisma/client"
+import {Roadmap, Organization, Prisma, Kanban, Post, User, Condition, TaskStakeholder} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
@@ -43,7 +43,7 @@ export type Column = Prisma.ColumnGetPayload<{
 }>
 
 export type Task = Prisma.TaskGetPayload<{
-    include: { checklist: true, stakeholders: true },
+    include: { checklist: true, stakeholders: { include: {user: true} } },
 }>
 
 const nanoid = customAlphabet(
@@ -2021,7 +2021,7 @@ export async function deleteColumn(columnId: string) {
 export async function createTask(columnId: string) {
     try {
         const newTask: Task = await prisma.task.create({
-            include: { checklist: true, stakeholders: true },
+            include: { checklist: true, stakeholders: { include: {user: true} } },
             data: {
                 name: 'New Task',
                 id: nanoid(),
@@ -2065,7 +2065,7 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
 
                 let t = await prisma.task.update({
                     where: {id: task?.id},
-                    include: {milestone: true, checklist: true, stakeholders: true},
+                    include: {milestone: true, checklist: true, stakeholders: { include: {user: true} }},
                     data: {
                         name: task.name,
                         // status: task.status,
@@ -2083,9 +2083,18 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                             }
                         },
                         stakeholders: {
-                            set: [],
-                            connect: task.stakeholders?.map((stakeholder: User) => ({id: stakeholder?.id})) || []
+                            deleteMany: {},
+                            createMany: {
+                                data: (task.stakeholders || []).map((stakeholder: any) => ({
+                                    userId: stakeholder.user.id || stakeholder.userId,
+                                    // user: { connect: { id: stakeholder.id }},
+                                }))
+                            }
                         },
+                        // stakeholders: {
+                        //     set: [],
+                        //     connect: task.stakeholders?.map((stakeholder: User) => ({id: stakeholder?.id})) || []
+                        // },
                         milestone: task.milestoneId
                             ? {connect: {id: task.milestoneId}} // Connect if milestoneId exists
                             : {disconnect: true}, // Disconnect if milestoneId is undefined
@@ -2118,7 +2127,7 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
 export async function deleteTask(taskId: string) {
     try {
         const deletedTask = await prisma.task.delete({
-            include: { checklist: true },
+            include: { checklist: true, stakeholders: { include: {user: true} }},
             where: {
                 id: taskId
             }
