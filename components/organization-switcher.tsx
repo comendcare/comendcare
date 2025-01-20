@@ -24,37 +24,30 @@ import {Organization} from "@prisma/client";
 import {MemberWithOrganization} from "@/app/(platform)/app/layout";
 import {ProfilePhoto} from "@/components/profile-photo";
 
-interface Team {
-    id: string;
-    name: string;
-    logo: React.ElementType;
-    plan: string;
-}
-
-export function TeamSwitcher({
-                                 teams,
+export function OrganizationSwitcher({
+                                 organizations,
                              }: {
-    teams: MemberWithOrganization[];
+    organizations: MemberWithOrganization[];
 }) {
     const {isMobile} = useSidebar();
     const router = useRouter();
     const {data: session, update} = useSession();
-    const [activeTeam, setActiveTeam] = React.useState<MemberWithOrganization | null>(null);
+    const [activeOrganization, setActiveOrganization] = React.useState<MemberWithOrganization | null>(null);
 
     React.useEffect(() => {
-        if (!teams || teams.length === 0) return;
+        if (!organizations || organizations.length === 0) return;
 
-        const matchingTeam = teams.find(
-            (team) => team.id === session?.user?.organizationId
+        const matchingOrganization = organizations.find(
+            (organization) => organization.id === session?.user?.organizationId
         );
-        setActiveTeam(matchingTeam || teams[0]);
-    }, [teams, session?.user?.organizationId]);
+        setActiveOrganization(matchingOrganization || organizations[0]);
+    }, [organizations, session?.user?.organizationId]);
 
-    const handleTeamChange = async (team: MemberWithOrganization) => {
-        setActiveTeam(team);
+    const handleOrganizationChange = async (organization: MemberWithOrganization) => {
+        setActiveOrganization(organization);
         await update({
             ...session,
-            organizationId: team.id,
+            organizationId: organization.id,
         });
         router.refresh();
     };
@@ -69,17 +62,17 @@ export function TeamSwitcher({
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
                             <div className="flex size-8 items-center justify-center">
-                                {activeTeam &&
+                                {activeOrganization &&
                                     <ProfilePhoto
-                                        img={activeTeam?.organization?.image}
-                                        name={activeTeam?.organization?.name}
+                                        img={activeOrganization?.organization?.image}
+                                        name={activeOrganization?.organization?.name}
                                         className="size-6"
                                     />
                                 }
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold">
-                                    {activeTeam ? activeTeam.organization.name : "Select a team"}
+                                    {activeOrganization ? activeOrganization.organization.name : "Select an organization"}
                                 </span>
                             </div>
                             <ChevronsUpDown className="ml-auto"/>
@@ -94,23 +87,23 @@ export function TeamSwitcher({
                         <DropdownMenuLabel className="text-xs text-muted-foreground">
                             Organizations
                         </DropdownMenuLabel>
-                        {teams.map((team, index) => (
+                        {organizations.map((organization, index) => (
                             <DropdownMenuItem
-                                key={team.id}
-                                onClick={() => handleTeamChange(team)}
+                                key={organization.id}
+                                onClick={() => handleOrganizationChange(organization)}
                                 className="gap-2 p-2"
                             >
                                 <div className="flex size-6 items-center justify-center">
-                                    {activeTeam &&
+                                    {activeOrganization &&
                                         <ProfilePhoto
-                                            img={activeTeam?.organization?.image}
-                                            name={activeTeam?.organization?.name}
+                                            img={activeOrganization?.organization?.image}
+                                            name={activeOrganization?.organization?.name}
                                             className="size-4 shrink-0"
                                         />
                                     }
                                 </div>
-                                {team.organization.name}
-                                {activeTeam?.id === team.id && (
+                                {organization.organization.name}
+                                {activeOrganization?.id === organization.id && (
                                     <Check className="ml-auto opacity-100"/>
                                 )}
                             </DropdownMenuItem>
