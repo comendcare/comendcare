@@ -2,27 +2,16 @@
 
 import * as React from "react";
 import {useNavStore} from "@/state/nav/navStore"; // Zustand store
-import {TooltipProvider} from "@/components/ui/tooltip";
-import {ResizablePanel, ResizablePanelGroup, ResizableHandle} from "@/components/ui/resizable";
-import {Separator} from "@/components/ui/separator";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+import {ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
 import {useSession} from "next-auth/react";
 import {useEffect} from "react";
 import Image from "next/image"
 import logo from "@/public/Full logo.png"
 import {useState} from "react";
 import {Member, Organization} from "@prisma/client";
-import {redirect} from "next/navigation";
+import {redirect, usePathname, useRouter, useSearchParams} from "next/navigation";
 import Loading from "@/app/loading";
 import {
-    getAllOrganizationsFromUserId,
     getColumns,
     getKanbanFromOrganizationId,
     getNodesEdgesAndMilestones,
@@ -43,9 +32,11 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({children}: AppLayoutProps) {
-    const {data: session, status, update} = useSession()
+    const {data: session, status} = useSession()
     const [isLoading, setIsLoading] = useState(true)
-    const [organizations, setOrganizations] = useState<MemberWithOrganization[]>([]);
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
 
     useEffect(() => {
         // Handle loading state for the session
@@ -62,12 +53,11 @@ export default function AppLayout({children}: AppLayoutProps) {
     }, [status])
 
     // Zustand state management
-    const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} =
-        useNavStore()
-    const [roadmapId, setRoadmapId] = useState<string | undefined>(undefined)
+    const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} = useNavStore()
 
     const handleSessionUpdate = async () => {
         if (session) {
+            setIsLoading(true)
             let orgId = undefined
 
             if (session.user.organizationId) {
@@ -92,19 +82,22 @@ export default function AppLayout({children}: AppLayoutProps) {
                 // })
             }
 
+            // await new Promise(resolve => setTimeout(resolve, 5000))
+
             const response = await getRoadmapId(orgId)
             if (response.success) {
-                setRoadmapId(response.data)
+                // setRoadmapId(response.data)
                 const nodesResponse = await getNodesEdgesAndMilestones(response.data)
+                const urlNode = searchParams.get("milestone")
                 if (nodesResponse.success) {
                     initializeRoadmapState({
                         roadmapId: response.data,
                         nodes: nodesResponse.data.nodes,
                         edges: nodesResponse.data.edges,
-                        milestones: nodesResponse.data.milestones
+                        milestones: nodesResponse.data.milestones,
+                        selectedNodeId: urlNode
                     })
                 }
-                setIsLoading(false)
             } else {
                 console.error(response.error)
                 toast.error(response.error)
@@ -118,40 +111,28 @@ export default function AppLayout({children}: AppLayoutProps) {
                         columns: kanbanResponse.data.columns
                     })
                 }
-                setIsLoading(false)
             } else {
                 console.error(kanban.error)
                 toast.error(kanban.error)
             }
+
+            console.log(`Research plan and kanban zustand states initialized successfully!`)
+            setIsLoading(false)
         }
     }
 
-    const fetchOrganizations = async () => {
-        if (session) {
-            const response = await getAllOrganizationsFromUserId(session.user.id);
-            if (response.success) {
-                const orgs = response.data ?? []
-                setOrganizations(orgs)
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
-        }
-    };
-
     useEffect(() => {
-        fetchOrganizations()
         handleSessionUpdate()
     }, [session])
 
-    if (isLoading) {
-        return <Loading/>
-    }
+    // if (isLoading) {
+    //     return <Loading/>
+    // }
 
     if (status === "authenticated" && session) {
         return (
             <SidebarProvider>
-                <AppSidebar/>
+                <AppSidebar />
                 <SidebarInset>
                     <header className="sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background">
                         <div className="flex items-center justify-between gap-2 px-4">
@@ -183,7 +164,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                                 onResize={() => setIsCollapsed(false)}
                                 className={isCollapsed ? "overflow-y-auto min-w-[50px] transition-all duration-300 ease-in-out" : "overflow-y-auto "}
                             >
-                                {children}
+                                {isLoading ? (<Loading />): (children)}
                             </ResizablePanel>
                         </ResizablePanelGroup>
                     </div>
