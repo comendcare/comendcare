@@ -15,7 +15,7 @@ import {
 import {Input} from "./ui/input"
 import {Textarea} from "./ui/textarea"
 import {Button} from "./ui/button"
-import {ScrollArea} from "./ui/scroll-area"
+import {ScrollArea, ScrollBar} from "./ui/scroll-area"
 import type {StatusType} from "./milestone-status-button"
 import {
     Dialog,
@@ -265,6 +265,7 @@ export function EditTaskForm({
     return (
         <Form {...form}>
             <ScrollArea className={"max-h-[600px]"}>
+                <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="flex flex-col gap-8 p-4"
@@ -274,7 +275,7 @@ export function EditTaskForm({
                         name="name"
                         render={({field}) => (
                             <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Name:`}</FormLabel>
+                                <FormLabel className="text-xl">{`Name`}</FormLabel>
                                 <FormControl>
                                     <Input
                                         id="name"
@@ -287,6 +288,147 @@ export function EditTaskForm({
                             </FormItem>
                         )}
                     />
+
+                    <FormField
+                        control={form.control}
+                        name="private"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow flex flex-row align-center justify-between gap-4">
+                                <FormLabel className="text-xl">{`Private`}</FormLabel>
+                                {field.value && (
+                                    <PrivateBadge />
+                                )}
+                                <FormControl>
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField 
+                        control={form.control}
+                        name="priority"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow">
+                                <FormLabel className="text-xl">{`Priority`}</FormLabel>
+                                <Select
+                                    defaultValue={field.value}
+                                    onValueChange={field.onChange}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a priority" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="LOW">
+                                            Low
+                                        </SelectItem>
+                                        <SelectItem value="MEDIUM">
+                                            Medium
+                                        </SelectItem>
+                                        <SelectItem value="HIGH">
+                                            High
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormItem>
+                        )}
+                    />   
+
+
+                    <FormField 
+                        control={form.control}
+                        name="targetDate"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow">
+                                <FormLabel className="text-xl">{`Target Date`}</FormLabel>
+                                <Popover >
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                        )}
+                                        >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value || new Date()}
+                                            onSelect={field.onChange}
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField 
+                        control={form.control}
+                        name="milestone"
+                        render={({ field }) => (
+                            <FormItem className="h-full grow">
+                                <FormLabel className="text-xl">{`Associated Milestone`}</FormLabel>
+                                <div className="flex flex-row gap-4">
+                                    <Select
+                                        value={milestone || ''}
+                                        onValueChange={field.onChange}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Link to a milestone" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {fetchedMilestones.map((m: Milestone, index: number) => (
+                                                <SelectItem value={m.id} key={index}>
+                                                    {m.title}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <Button variant="secondary" size="icon" onClick={(e) => {
+                                        e.preventDefault()
+                                        form.setValue('milestone', undefined)
+                                    }}>
+                                        <FaLinkSlash />
+                                    </Button>
+                                </div>
+                            </FormItem>
+                        )}
+                    /> 
+
+                    <FormField
+                        control={form.control}
+                        name="stakeholders"
+                        render={({field}) => (
+                            <FormItem className="flex flex-col grow">
+                                <FormLabel className="text-xl">{`Assignees`}</FormLabel>
+                                <FormControl>
+                                    <MultipleSelector 
+                                        {...field}
+                                        showHoverCard={false}
+                                        placeholder="Select stakeholders..."
+                                        options={fetchedMembers ? fetchedMembers?.map((member: User) => ({
+                                            value: member.id || "",
+                                            label: member.name || ""
+                                        })): []}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />  
 
                     <FormField
                         control={form.control}
@@ -375,146 +517,6 @@ export function EditTaskForm({
                                     </>
                                 </FormControl>
                                 <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="stakeholders"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Stakeholders`}</FormLabel>
-                                <FormControl>
-                                    <MultipleSelector 
-                                        {...field}
-                                        showHoverCard={false}
-                                        placeholder="Select stakeholders..."
-                                        options={fetchedMembers ? fetchedMembers?.map((member: User) => ({
-                                            value: member.id || "",
-                                            label: member.name || ""
-                                        })): []}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField 
-                        control={form.control}
-                        name="milestone"
-                        render={({ field }) => (
-                            <FormItem className="h-full grow">
-                                <FormLabel className="text-xl">{`Milestone`}</FormLabel>
-                                <div className="flex flex-row gap-4">
-                                    <Select
-                                        value={milestone || ''}
-                                        onValueChange={field.onChange}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Link to a milestone" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {fetchedMilestones.map((m: Milestone, index: number) => (
-                                                <SelectItem value={m.id} key={index}>
-                                                    {m.title}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <Button variant="secondary" size="icon" onClick={(e) => {
-                                        e.preventDefault()
-                                        form.setValue('milestone', undefined)
-                                    }}>
-                                        <FaLinkSlash />
-                                    </Button>
-                                </div>
-                            </FormItem>
-                        )}
-                    />   
-
-                    <FormField 
-                        control={form.control}
-                        name="targetDate"
-                        render={({ field }) => (
-                            <FormItem className="h-full grow">
-                                <FormLabel className="text-xl">{`Target Date`}</FormLabel>
-                                <Popover >
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-full justify-start text-left font-normal",
-                                            !field.value && "text-muted-foreground"
-                                        )}
-                                        >
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0">
-                                        <Calendar
-                                            mode="single"
-                                            selected={field.value || new Date()}
-                                            onSelect={field.onChange}
-                                            initialFocus
-                                        />
-                                    </PopoverContent>
-                                </Popover>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField 
-                        control={form.control}
-                        name="priority"
-                        render={({ field }) => (
-                            <FormItem className="h-full grow">
-                                <FormLabel className="text-xl">{`Priority`}</FormLabel>
-                                <Select
-                                    defaultValue={field.value}
-                                    onValueChange={field.onChange}
-                                >
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a priority" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="LOW">
-                                            Low
-                                        </SelectItem>
-                                        <SelectItem value="MEDIUM">
-                                            Medium
-                                        </SelectItem>
-                                        <SelectItem value="HIGH">
-                                            High
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </FormItem>
-                        )}
-                    />   
-
-                    <FormField
-                        control={form.control}
-                        name="private"
-                        render={({ field }) => (
-                            <FormItem className="h-full grow flex flex-row align-center justify-between gap-4">
-                                <FormLabel className="text-xl">{`Private`}</FormLabel>
-                                {field.value && (
-                                    <PrivateBadge />
-                                )}
-                                <FormControl>
-                                    <Switch
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
-                                </FormControl>
-                                <FormMessage />
                             </FormItem>
                         )}
                     />
