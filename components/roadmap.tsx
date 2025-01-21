@@ -88,22 +88,22 @@ export function Roadmap({
         }
     }
 
-    const handleTaskPanelChange = (open: boolean) => {
-        if (!open) {
-            // setSelectedTaskId(null)
+    // const handleTaskPanelChange = (open: boolean) => {
+    //     if (!open) {
+    //         // setSelectedTaskId(null)
 
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete("task")
-            router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        }
-        if (open) {
-            setSelectedNodeId(null)
+    //         const params = new URLSearchParams(searchParams.toString())
+    //         params.delete("task")
+    //         router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    //     }
+    //     if (open) {
+    //         setSelectedNodeId(null)
 
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete("milestone")
-            router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        }
-    }
+    //         const params = new URLSearchParams(searchParams.toString())
+    //         params.delete("milestone")
+    //         router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    //     }
+    // }
 
     const handleTabChange = (value: string) => {
         setView(value) // for the onboarding tutorial

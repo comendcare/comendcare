@@ -34,8 +34,8 @@ interface AppLayoutProps {
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
     const [isLoading, setIsLoading] = useState(true)
-    const router = useRouter()
-    const pathname = usePathname()
+    // const router = useRouter()
+    // const pathname = usePathname()
     const searchParams = useSearchParams()
 
     useEffect(() => {
@@ -56,6 +56,7 @@ export default function AppLayout({children}: AppLayoutProps) {
     const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} = useNavStore()
 
     const handleSessionUpdate = async () => {
+        console.log(`session changed`, session)
         if (session) {
             setIsLoading(true)
             let orgId = undefined
@@ -123,7 +124,7 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     useEffect(() => {
         handleSessionUpdate()
-    }, [session])
+    }, [session?.user.organizationId])
 
     // if (isLoading) {
     //     return <Loading/>
