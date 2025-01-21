@@ -27,7 +27,7 @@ import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import StatusButton from "./milestone-status-button"
 import {nanoid} from "nanoid"
-import {FaLinkSlash, FaTrash} from "react-icons/fa6"
+import {FaLinkSlash, FaPlus, FaTrash} from "react-icons/fa6"
 import {Checkbox} from "./ui/checkbox"
 import {toast} from "sonner"
 import {
@@ -73,6 +73,7 @@ import { Calendar } from "./ui/calendar"
 import { PrivateBadge } from "./private-badge"
 import { Switch } from "./ui/switch"
 import {Separator} from "./ui/separator"
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -462,10 +463,10 @@ export function EditTaskForm({
                         control={form.control}
                         name="checklist"
                         render={({field}) => (
-                            <FormItem className="flex flex-col">
-                                <FormLabel className="text-xl">{`Checklist`}</FormLabel>
+                            <FormItem className="grid grid-cols-[132px_auto] gap-8 items-start w-full">
+                                <FormLabel className="text-xl mt-2">{`Checklist`}</FormLabel>
                                 <FormControl>
-                                    <>
+                                    <div className="flex flex-col gap-2 items-end">
                                         <DndContext
                                             accessibility={{
                                                 announcements
@@ -483,7 +484,7 @@ export function EditTaskForm({
                                                 form.setValue('checklist', arrayMove(field?.value || [], originalPosition, newPosition))
                                             }}
                                         >
-                                            <ol className="flex flex-col gap-2">
+                                            <ol className="flex flex-col gap-2 w-full">
                                                 <SortableContext items={field?.value?.map(item => item.id) || []}
                                                                  strategy={verticalListSortingStrategy}>
                                                     {field?.value?.map((checklistItem, index) => (
@@ -511,18 +512,27 @@ export function EditTaskForm({
                                                 </SortableContext>
                                             </ol>
                                         </DndContext>
-                                        <Button variant="secondary" onClick={(e: any) => {
-                                            e.preventDefault()
-                                            form.setValue(
-                                                'checklist',
-                                                [...field?.value || [], {
-                                                    name: 'New Item',
-                                                    complete: false,
-                                                    id: nanoid()
-                                                }]
-                                            )
-                                        }}>Add a checklist item</Button>
-                                    </>
+                                        <Tooltip delayDuration={0}>
+                                            <TooltipTrigger asChild>
+                                                <Button variant="secondary" size="icon" onClick={(e: any) => {
+                                                        e.preventDefault()
+                                                        form.setValue(
+                                                            'checklist',
+                                                            [...field?.value || [], {
+                                                                name: 'New Item',
+                                                                complete: false,
+                                                                id: nanoid()
+                                                            }]
+                                                        )
+                                                    }}>
+                                                    <FaPlus />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Add a new checklist item</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </div>
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>
