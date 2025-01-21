@@ -269,7 +269,7 @@ export function EditTaskForm({
                 <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="flex flex-col gap-4 p-4 pt-0"
+                    className="flex flex-col gap-2 p-4 pt-0"
                 >
 
                     <FormField
@@ -297,7 +297,7 @@ export function EditTaskForm({
                         name="name"
                         render={({field}) => (
                             <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
-                                <FormLabel className="text-lg mt-2">{`Name`}</FormLabel>
+                                <FormLabel className="text-md mt-2">{`Name`}</FormLabel>
                                 <FormControl>
                                     <Input
                                         className="h-10"
@@ -317,7 +317,7 @@ export function EditTaskForm({
                         name="priority"
                         render={({ field }) => (
                             <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
-                                <FormLabel className="text-lg mt-2">{`Priority`}</FormLabel>
+                                <FormLabel className="text-md mt-2">{`Priority`}</FormLabel>
                                 <Select
                                     defaultValue={field.value}
                                     onValueChange={field.onChange}
@@ -349,7 +349,7 @@ export function EditTaskForm({
                         name="targetDate"
                         render={({ field }) => (
                             <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
-                                <FormLabel className="text-lg mt-2">{`Target Date`}</FormLabel>
+                                <FormLabel className="text-md mt-2">{`Target Date`}</FormLabel>
                                 <Popover >
                                     <PopoverTrigger asChild>
                                         <Button
@@ -381,7 +381,7 @@ export function EditTaskForm({
                         name="milestone"
                         render={({ field }) => (
                             <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
-                                <FormLabel className="text-lg mt-2">{`Associated Milestone`}</FormLabel>
+                                <FormLabel className="text-md mt-2">{`Associated Milestone`}</FormLabel>
                                 <div className="flex flex-row gap-4">
                                     <Select
                                         value={milestone || ''}
@@ -416,7 +416,7 @@ export function EditTaskForm({
                         name="stakeholders"
                         render={({field}) => (
                             <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
-                                <FormLabel className="text-lg mt-2">{`Assignees`}</FormLabel>
+                                <FormLabel className="text-md mt-2">{`Assignees`}</FormLabel>
                                 <FormControl>
                                     <MultipleSelector 
                                         {...field}
@@ -440,7 +440,7 @@ export function EditTaskForm({
                         name="description"
                         render={({field}) => (
                             <FormItem className="flex flex-col">
-                                <FormLabel className="text-lg">{`Description`}</FormLabel>
+                                <FormLabel className="text-xl">{`Description`}</FormLabel>
                                 <FormControl>
                                     <div className="w-full" data-registry="plate">
                                         <SettingsProvider>
@@ -463,7 +463,7 @@ export function EditTaskForm({
                         name="checklist"
                         render={({field}) => (
                             <FormItem className="flex flex-col">
-                                <FormLabel className="text-lg">{`Checklist`}</FormLabel>
+                                <FormLabel className="text-xl">{`Checklist`}</FormLabel>
                                 <FormControl>
                                     <>
                                         <DndContext
@@ -529,7 +529,7 @@ export function EditTaskForm({
                         )}
                     />
 
-                    <span className="flex justify-end gap-4 flex-wrap mt-6">
+                    <span className="flex justify-end gap-4 flex-wrap mt-4">
                         <Dialog>
                             <DialogTrigger>
                                 <Button type="button" variant={"destructive"}>
