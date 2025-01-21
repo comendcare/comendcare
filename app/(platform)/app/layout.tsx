@@ -4,7 +4,7 @@ import * as React from "react";
 import {useNavStore} from "@/state/nav/navStore"; // Zustand store
 import {ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
 import {useSession} from "next-auth/react";
-import {useEffect} from "react";
+import {useEffect, useRef} from "react";
 import Image from "next/image"
 import logo from "@/public/Full logo.png"
 import {useState} from "react";
@@ -34,9 +34,8 @@ interface AppLayoutProps {
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
     const [isLoading, setIsLoading] = useState(true)
-    // const router = useRouter()
-    // const pathname = usePathname()
     const searchParams = useSearchParams()
+    const prevSessionRef: any = useRef()
 
     useEffect(() => {
         // Handle loading state for the session
@@ -123,8 +122,18 @@ export default function AppLayout({children}: AppLayoutProps) {
     }
 
     useEffect(() => {
-        handleSessionUpdate()
-    }, [session?.user.organizationId])
+        // Only run if the session has changed
+        if (JSON.stringify(prevSessionRef.current) !== JSON.stringify(session)) {
+            handleSessionUpdate()
+        }
+
+        // Update the ref to the latest session
+        prevSessionRef.current = session
+    }, [session]);
+
+    // useEffect(() => {
+    //     handleSessionUpdate()
+    // }, [session])
 
     // if (isLoading) {
     //     return <Loading/>
