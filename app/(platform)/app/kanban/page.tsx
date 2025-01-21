@@ -3,6 +3,7 @@ import { KanbanView } from "@/components/kanban";
 import { getKanbanFromOrganizationId } from "@/lib/fetchers";
 import NoOrganization from "@/components/no-organization";
 import NewKanbanForm from "@/components/new-kanban";
+import { createKanban } from "@/lib/actions";
 
 export default async function KanbanPage({ params }: {
     params: { id: string }
@@ -18,7 +19,13 @@ export default async function KanbanPage({ params }: {
         )
     }
 
-    const response = await getKanbanFromOrganizationId()
+    let response = await getKanbanFromOrganizationId()
+
+    if (response.success && !response.data) {
+        // kanban doesn't exist, automatically create it
+        response = await createKanban(orgId)
+    }
+
     if (response.success && response.data) {
         return (
             <main className="flex flex-col p-4">
@@ -27,6 +34,7 @@ export default async function KanbanPage({ params }: {
         )
     }
 
+    // fallback, if creating the kanban automatically was unsuccessful allow the user to manually create a kanban
     return (
         <main className="flex gap-8 flex-col w-full h-screen justify-center items-center mx-auto">
             <NewKanbanForm />
