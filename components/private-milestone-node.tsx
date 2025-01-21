@@ -18,6 +18,8 @@ import {monthsList} from "@/lib/data";
 import { Badge } from "./ui/badge"
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
+import { Popover } from "./plate-ui/popover"
 
 export type PrivateMilestoneNode = Node<
     {
@@ -72,26 +74,39 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                     {props.data?.private && (
                         <PrivateBadge className="justify-start" />
                     )}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild className="justify-end h-full">
+                    <Popover>
+                        <PopoverTrigger asChild>
                             <Button
                                 variant="ghost"
                                 className="p-2 h-auto justify-end h-full"
                             >
                                 <FaEllipsis />
                             </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuGroup>
-                                <DropdownMenuItem onClick={handleDeleteClick}>
-                                    Delete
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={handleDuplicate}>
-                                    Duplicate
-                                </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-40">
+                            <Card className="p-0 m-0">
+                                <CardContent className="p-2 m-0 flex flex-col gap-0">
+                                    <Button 
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            handleDeleteClick()
+                                        }}
+                                        variant="ghost"
+                                        className="w-full h-full justify-start text-xl"
+                                    >
+                                        Delete
+                                    </Button>
+                                    <Button 
+                                        onClick={handleDuplicate}
+                                        variant="ghost"
+                                        className="w-full h-full justify-start text-xl"
+                                    >
+                                        Duplicate
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        </PopoverContent>
+                    </Popover>
                 </div>
                 <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
                 {/* Description length in node is truncated to 200 characters. */}
