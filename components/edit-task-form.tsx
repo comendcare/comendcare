@@ -15,7 +15,7 @@ import {
 import {Input} from "./ui/input"
 import {Textarea} from "./ui/textarea"
 import {Button} from "./ui/button"
-import {ScrollArea} from "./ui/scroll-area"
+import {ScrollArea, ScrollBar} from "./ui/scroll-area"
 import type {StatusType} from "./milestone-status-button"
 import {
     Dialog,
@@ -27,7 +27,7 @@ import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import StatusButton from "./milestone-status-button"
 import {nanoid} from "nanoid"
-import {FaLinkSlash, FaTrash} from "react-icons/fa6"
+import {FaLinkSlash, FaPlus, FaTrash} from "react-icons/fa6"
 import {Checkbox} from "./ui/checkbox"
 import {toast} from "sonner"
 import {
@@ -72,6 +72,8 @@ import { cn } from "@/lib/utils"
 import { Calendar } from "./ui/calendar"
 import { PrivateBadge } from "./private-badge"
 import { Switch } from "./ui/switch"
+import {Separator} from "./ui/separator"
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -265,18 +267,41 @@ export function EditTaskForm({
     return (
         <Form {...form}>
             <ScrollArea className={"max-h-[600px]"}>
+                <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="flex flex-col gap-8 p-4"
+                    className="flex flex-col gap-2 p-4 pt-0"
                 >
+
+                    <FormField
+                        control={form.control}
+                        name="private"
+                        render={({ field }) => (
+                            <FormItem className="h-full flex items-end justify-end gap-2 -mt-2 h-8">
+                                {field.value && (
+                                    <PrivateBadge className="self-center mt-2"/>
+                                )}
+                                <FormControl>
+                                    <Switch
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <FormLabel className="pb-1">{`Private`}</FormLabel>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
                     <FormField
                         control={form.control}
                         name="name"
                         render={({field}) => (
-                            <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Name:`}</FormLabel>
+                            <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
+                                <FormLabel className="text-md mt-2">{`Name`}</FormLabel>
                                 <FormControl>
                                     <Input
+                                        className="h-10"
                                         id="name"
                                         placeholder={`Enter a name`}
                                         defaultValue={field.value}
@@ -288,160 +313,44 @@ export function EditTaskForm({
                         )}
                     />
 
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col grow">
-                                <FormControl>
-                                    <div className="w-full" data-registry="plate">
-                                        <SettingsProvider>
-                                            <PlateEditor 
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                            />
-                                        </SettingsProvider>
-                                    </div>
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="checklist"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Checklist`}</FormLabel>
-                                <FormControl>
-                                    <>
-                                        <DndContext
-                                            accessibility={{
-                                                announcements
-                                            }}
-                                            collisionDetection={closestCorners}
-                                            sensors={sensors}
-                                            onDragEnd={(event) => {
-                                                const {active, over} = event
-
-                                                if (active.id === over?.id) return
-
-                                                const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
-                                                const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
-
-                                                form.setValue('checklist', arrayMove(field?.value || [], originalPosition, newPosition))
-                                            }}
-                                        >
-                                            <ol className="flex flex-col gap-2">
-                                                <SortableContext items={field?.value?.map(item => item.id) || []}
-                                                                 strategy={verticalListSortingStrategy}>
-                                                    {field?.value?.map((checklistItem, index) => (
-                                                        <ChecklistField
-                                                            key={checklistItem.id}
-                                                            index={index}
-                                                            item={checklistItem}
-                                                            onDelete={() => (
-                                                                form.setValue('checklist', field?.value?.filter((t, i) => i !== index))
-                                                            )}
-                                                            onNameChange={(name) => {
-                                                                form.setValue('checklist', field?.value?.map((t, i) => i === index ? {
-                                                                    ...t,
-                                                                    name
-                                                                } : t))
-                                                            }}
-                                                            onCompleteChange={(complete) => {
-                                                                form.setValue('checklist', field?.value?.map((t, i) => i === index ? {
-                                                                    ...t,
-                                                                    complete
-                                                                } : t))
-                                                            }}
-                                                        />
-                                                    ))}
-                                                </SortableContext>
-                                            </ol>
-                                        </DndContext>
-                                        <Button variant="secondary" onClick={(e: any) => {
-                                            e.preventDefault()
-                                            form.setValue(
-                                                'checklist',
-                                                [...field?.value || [], {
-                                                    name: 'New Item',
-                                                    complete: false,
-                                                    id: nanoid()
-                                                }]
-                                            )
-                                        }}>Add a checklist item</Button>
-                                    </>
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="stakeholders"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col grow">
-                                <FormLabel className="text-xl">{`Stakeholders`}</FormLabel>
-                                <FormControl>
-                                    <MultipleSelector 
-                                        {...field}
-                                        showHoverCard={false}
-                                        placeholder="Select stakeholders..."
-                                        options={fetchedMembers ? fetchedMembers?.map((member: User) => ({
-                                            value: member.id || "",
-                                            label: member.name || ""
-                                        })): []}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
                     <FormField 
                         control={form.control}
-                        name="milestone"
+                        name="priority"
                         render={({ field }) => (
-                            <FormItem className="h-full grow">
-                                <FormLabel className="text-xl">{`Milestone`}</FormLabel>
-                                <div className="flex flex-row gap-4">
-                                    <Select
-                                        value={milestone || ''}
-                                        onValueChange={field.onChange}
-                                    >
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Link to a milestone" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {fetchedMilestones.map((m: Milestone, index: number) => (
-                                                <SelectItem value={m.id} key={index}>
-                                                    {m.title}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <Button variant="secondary" size="icon" onClick={(e) => {
-                                        e.preventDefault()
-                                        form.setValue('milestone', undefined)
-                                    }}>
-                                        <FaLinkSlash />
-                                    </Button>
-                                </div>
+                            <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
+                                <FormLabel className="text-md mt-2">{`Priority`}</FormLabel>
+                                <Select
+                                    defaultValue={field.value}
+                                    onValueChange={field.onChange}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a priority" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        <SelectItem value="LOW">
+                                            Low
+                                        </SelectItem>
+                                        <SelectItem value="MEDIUM">
+                                            Medium
+                                        </SelectItem>
+                                        <SelectItem value="HIGH">
+                                            High
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </FormItem>
                         )}
                     />   
+
 
                     <FormField 
                         control={form.control}
                         name="targetDate"
                         render={({ field }) => (
-                            <FormItem className="h-full grow">
-                                <FormLabel className="text-xl">{`Target Date`}</FormLabel>
+                            <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
+                                <FormLabel className="text-md mt-2">{`Target Date`}</FormLabel>
                                 <Popover >
                                     <PopoverTrigger asChild>
                                         <Button
@@ -470,56 +379,167 @@ export function EditTaskForm({
 
                     <FormField 
                         control={form.control}
-                        name="priority"
+                        name="milestone"
                         render={({ field }) => (
-                            <FormItem className="h-full grow">
-                                <FormLabel className="text-xl">{`Priority`}</FormLabel>
-                                <Select
-                                    defaultValue={field.value}
-                                    onValueChange={field.onChange}
-                                >
-                                    <FormControl>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select a priority" />
-                                        </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                        <SelectItem value="LOW">
-                                            Low
-                                        </SelectItem>
-                                        <SelectItem value="MEDIUM">
-                                            Medium
-                                        </SelectItem>
-                                        <SelectItem value="HIGH">
-                                            High
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
+                            <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
+                                <FormLabel className="text-md mt-2">{`Associated Milestone`}</FormLabel>
+                                <div className="flex flex-row gap-4">
+                                    <Select
+                                        value={milestone || ''}
+                                        onValueChange={field.onChange}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Link to a milestone" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {fetchedMilestones.map((m: Milestone, index: number) => (
+                                                <SelectItem value={m.id} key={index}>
+                                                    {m.title}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <Button variant="secondary" size="icon" onClick={(e) => {
+                                        e.preventDefault()
+                                        form.setValue('milestone', undefined)
+                                    }}>
+                                        <FaLinkSlash />
+                                    </Button>
+                                </div>
                             </FormItem>
                         )}
-                    />   
+                    /> 
 
                     <FormField
                         control={form.control}
-                        name="private"
-                        render={({ field }) => (
-                            <FormItem className="h-full grow flex flex-row align-center justify-between gap-4">
-                                <FormLabel className="text-xl">{`Private`}</FormLabel>
-                                {field.value && (
-                                    <PrivateBadge />
-                                )}
+                        name="stakeholders"
+                        render={({field}) => (
+                            <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
+                                <FormLabel className="text-md mt-2">{`Assignees`}</FormLabel>
                                 <FormControl>
-                                    <Switch
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
+                                    <MultipleSelector 
+                                        {...field}
+                                        showHoverCard={false}
+                                        placeholder="Select assignees..."
+                                        options={fetchedMembers ? fetchedMembers?.map((member: User) => ({
+                                            value: member.id || "",
+                                            label: member.name || ""
+                                        })): []}
                                     />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />  
+
+                    <Separator className="my-6" />
+
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem className="flex flex-col">
+                                <FormLabel className="text-xl">{`Description`}</FormLabel>
+                                <FormControl>
+                                    <div className="w-full" data-registry="plate">
+                                        <SettingsProvider>
+                                            <PlateEditor
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                            />
+                                        </SettingsProvider>
+                                    </div>
+                                </FormControl>
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
 
-                    <span className="flex justify-end gap-4 flex-wrap">
+                    <Separator className="my-6" />
+
+                    <FormField
+                        control={form.control}
+                        name="checklist"
+                        render={({field}) => (
+                            <FormItem className="grid grid-cols-[132px_auto] gap-8 items-start w-full">
+                                <FormLabel className="text-xl mt-2">{`Checklist`}</FormLabel>
+                                <FormControl>
+                                    <div className="flex flex-col gap-2 items-end">
+                                        <DndContext
+                                            accessibility={{
+                                                announcements
+                                            }}
+                                            collisionDetection={closestCorners}
+                                            sensors={sensors}
+                                            onDragEnd={(event) => {
+                                                const {active, over} = event
+
+                                                if (active.id === over?.id) return
+
+                                                const originalPosition = field?.value?.findIndex(item => item.id === active.id) || 0
+                                                const newPosition = field?.value?.findIndex(item => item.id === over?.id) || 0
+
+                                                form.setValue('checklist', arrayMove(field?.value || [], originalPosition, newPosition))
+                                            }}
+                                        >
+                                            <ol className="flex flex-col gap-2 w-full">
+                                                <SortableContext items={field?.value?.map(item => item.id) || []}
+                                                                 strategy={verticalListSortingStrategy}>
+                                                    {field?.value?.map((checklistItem, index) => (
+                                                        <ChecklistField
+                                                            key={checklistItem.id}
+                                                            index={index}
+                                                            item={checklistItem}
+                                                            onDelete={() => (
+                                                                form.setValue('checklist', field?.value?.filter((t, i) => i !== index))
+                                                            )}
+                                                            onNameChange={(name) => {
+                                                                form.setValue('checklist', field?.value?.map((t, i) => i === index ? {
+                                                                    ...t,
+                                                                    name
+                                                                } : t))
+                                                            }}
+                                                            onCompleteChange={(complete) => {
+                                                                form.setValue('checklist', field?.value?.map((t, i) => i === index ? {
+                                                                    ...t,
+                                                                    complete
+                                                                } : t))
+                                                            }}
+                                                        />
+                                                    ))}
+                                                </SortableContext>
+                                            </ol>
+                                        </DndContext>
+                                        <Tooltip delayDuration={0}>
+                                            <TooltipTrigger asChild>
+                                                <Button variant="secondary" size="icon" onClick={(e: any) => {
+                                                        e.preventDefault()
+                                                        form.setValue(
+                                                            'checklist',
+                                                            [...field?.value || [], {
+                                                                name: 'New Item',
+                                                                complete: false,
+                                                                id: nanoid()
+                                                            }]
+                                                        )
+                                                    }}>
+                                                    <FaPlus />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Add a new checklist item</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </div>
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <span className="flex justify-end gap-4 flex-wrap mt-4">
                         <Dialog>
                             <DialogTrigger>
                                 <Button type="button" variant={"destructive"}>

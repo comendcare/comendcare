@@ -229,7 +229,8 @@ export const PrivateFlowView = ({
                 params.delete("milestone")
                 params.set("milestone", nodeId)
         
-                router.push(`${pathname}?${params.toString()}`, { scroll: false })
+                // router.push(`${pathname}?${params.toString()}`, { scroll: false })
+                router.replace(`${pathname}?${params.toString()}`)
             },
             handleDelete: (nodeId: string) => {
                 const nodesList = localNodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
