@@ -14,14 +14,15 @@ export function initializeRoadmapState(initData: {
     roadmapId: string | null | undefined
     nodes: any[]
     edges: any[]
-    milestones: any[]
+    milestones: any[],
+    selectedNodeId: string | null
 }) {
     if (typeof window !== "undefined") {
         const initRoadmapState = useRoadmapStore.getState().initState;
-        const { roadmapId, nodes, edges, milestones } = initData;
+        const { roadmapId, nodes, edges, milestones, selectedNodeId } = initData;
 
         // Call Zustand's initState directly
-        initRoadmapState(nodes, edges, milestones, null, null, roadmapId || "");
+        initRoadmapState(nodes, edges, milestones, selectedNodeId, null, roadmapId || "");
     }
 }
 
