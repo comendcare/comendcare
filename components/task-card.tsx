@@ -30,6 +30,7 @@ import { ProfilePhoto } from "./profile-photo"
 import { FaCheckSquare } from "react-icons/fa"
 import { FaCalendar } from "react-icons/fa6"
 import { truncate } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
 
 type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 
@@ -134,24 +135,49 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                     </CardHeader>
                     <CardContent className="p-7 py-4 text-left whitespace-pre-wrap flex flex-col gap-4">
                         <div className="flex gap-4 flex-wrap">
-                            {task?.priority && <PriorityBadge value={task.priority}/>}
-                            {task?.milestone && (
-                                <Badge className="w-fit h-8 rounded-sm truncate">
-                                    {truncate(task.milestone.title, 30)}
-                                </Badge>
-                            )}
-                            {task?.endDate && (
-                                <span className="flex gap-2 items-center text-muted-foreground">
-                                    <FaCalendar className="mb-1"/>
-                                    <p className="text-md">{task.endDate.toDateString().split(" ").slice(1).join(" ")}</p>
-                                </span>
-                            )}
-                            {task?.checklist && task.checklist.length > 0 && (
-                                <span className="flex gap-2 items-center text-muted-foreground">
-                                    <FaCheckSquare />
-                                    <p className="text-md">{`${task.checklist.filter(item => item.complete).length}/${task.checklist.length}`}</p>
-                                </span>
-                            )}
+                            <TooltipProvider>
+                                {task?.priority && <PriorityBadge value={task.priority}/>}
+                                {task?.milestone && (
+                                    <Badge className="w-fit h-8 rounded-sm truncate">
+                                        {truncate(task.milestone.title, 30)}
+                                    </Badge>
+                                )}
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-64">
+                                        <p>{`Sensitive information includes any information that should be protected. For example, don't include passwords, credit card information, or personal details.`}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                {task?.endDate && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                        <span className="flex gap-2 items-center text-muted-foreground">
+                                            <FaCalendar className="mb-1"/>
+                                            <p className="text-md">{task.endDate.toDateString().split(" ").slice(1).join(" ")}</p>
+                                        </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-64">
+                                            <p>{`Target date`}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                                {task?.checklist && task.checklist.length > 0 && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                        <span className="flex gap-2 items-center text-muted-foreground">
+                                            <FaCheckSquare />
+                                            <p className="text-md">{`${task.checklist.filter(item => item.complete).length}/${task.checklist.length}`}</p>
+                                        </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-64">
+                                            <p>{`Checklist items`}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </TooltipProvider>
                         </div>
                     </CardContent>
                     <CardFooter className="flex justify-end mr-2">
