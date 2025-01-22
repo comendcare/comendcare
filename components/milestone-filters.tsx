@@ -2,12 +2,24 @@ import { useShallow } from "zustand/react/shallow"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
-    Form
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage
 } from "@/components/ui/form"
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import { useForm } from "react-hook-form"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
 import { defaultFilters, MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore"
+import { MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import type { Option } from "./ui/multiple-selector"
+import MultipleSelector from "./ui/multiple-selector"
+import { Checkbox } from "./ui/checkbox"
+
 
 const selector = (state: MilestoneSearchState) => ({
     filters: state.filters,
@@ -23,14 +35,10 @@ const optionSchema = z.object({
 });
 
 const filtersFormSchema = z.object({
-    mechanisms: z.array(optionSchema),
-    systemsAffected: z.array(optionSchema),
-    modalities: z.array(optionSchema),
-    moneyDeployed: z.array(z.number()),
-    milestoneTypes: z.array(z.string()),
+    milestoneTypes: z.array(optionSchema),
     milestoneStatus: z.array(z.string()),
-    milestoneOutcomes: z.array(z.string()),
-    genes: z.array(optionSchema)
+    hasProject: z.boolean(),
+    hasAsset: z.boolean()
 })
 
 export function MilestoneFilters() {
@@ -55,6 +63,110 @@ export function MilestoneFilters() {
                 <h1 className={"scroll-m-20 text-3xl font-bold tracking-tight"}>
                     Filters
                 </h1>
+
+                <FormField
+                    control={form.control}
+                    name="milestoneTypes"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel className="font-semibold text-base">Milestone Types</FormLabel>
+                            <FormDescription>{`Types of milestones an organization may have in their research plan`}</FormDescription>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={MILESTONE_TYPE_OPTIONS}
+                                    placeholder="Select milestone types..."
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                    showHoverCard={false}
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="milestoneStatus"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel className="font-semibold text-base">Milestone Status</FormLabel>
+                            <FormControl>
+                                <ToggleGroup
+                                    type="multiple"
+                                    variant="outline"
+                                    value={field.value}
+                                    onValueChange={
+                                        field.onChange
+                                    }
+                                    className="w-fit flex flex-wrap gap-2 justify-start"
+                                >
+                                    {MILESTONE_STATUS_OPTIONS.map(({label, value}) => (
+                                        <ToggleGroupItem
+                                            key={value}
+                                            value={value}
+                                        >
+                                            {label}
+                                        </ToggleGroupItem>
+                                    ))}
+                                </ToggleGroup>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormItem>
+                    <FormLabel className="font-semibold text-base">Projects and Assets</FormLabel>
+                    <FormField
+                        control={form.control}
+                        name="hasProject"
+                        render={({field}) => (
+                            <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                <FormControl>
+                                    <Checkbox
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <div className="space-y-1 leading-none">
+                                    <FormLabel>
+                                        {`Associated Project`}
+                                    </FormLabel>
+                                    <FormDescription>
+                                        {`Include milestones that are associated with a project.`}
+                                    </FormDescription>
+                                </div>
+                            </div>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="hasAsset"
+                        render={({field}) => (
+                            <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                <FormControl>
+                                    <Checkbox
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <div className="space-y-1 leading-none">
+                                    <FormLabel>
+                                        {`Associated Asset`}
+                                    </FormLabel>
+                                    <FormDescription>
+                                        {`Include milestones that are associated with an asset.`}
+                                    </FormDescription>
+                                </div>
+                            </div>
+                        )}
+                    />
+                </FormItem>
 
                 <span className="flex justify-end gap-4 flex-wrap">
                     <Button type="submit" variant="destructive" onClick={() => {

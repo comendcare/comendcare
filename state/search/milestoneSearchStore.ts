@@ -5,15 +5,21 @@ import { create } from 'zustand';
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    milestoneTypes: string[],
+    milestoneTypes: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     milestoneStatus: string[],
-    milestoneOutcomes: string[],
+    hasProject: boolean,
+    hasAsset: boolean
 }
 
 export const defaultFilters = {
     milestoneTypes: [],
     milestoneStatus: [],
-    milestoneOutcomes: [],
+    hasProject: false,
+    hasAsset: false
 }
 
 function generateFiltersString(filters: FiltersType) {

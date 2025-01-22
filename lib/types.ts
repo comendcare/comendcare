@@ -67,7 +67,13 @@ export const MILESTONE_TYPE_OPTIONS: Option[] = [
     { label: 'IND submission', value: 'INDSUBMISSION' },
     { label: 'IND approval', value: 'INDAPPROVAL' },
     { label: 'No type', value: 'NOTYPE'}
-];
+]
+
+export const MILESTONE_STATUS_OPTIONS: Option[] = [
+    { label: 'Planned', value: 'PLANNED' },
+    { label: 'In-Progress', value: 'INPROGRESS' },
+    { label: 'Completed', value: 'COMPLETED' }
+]
 
 export interface AddressType {
     address1: string;

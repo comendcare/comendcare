@@ -285,21 +285,6 @@ export const MODALITIES_OF_INTEREST_OPTIONS: Option[] = [
     },
 ]
 
-export const MILESTONE_STATUS_OPTIONS: string[] = [
-    'Planned',
-    'Fundraising',
-    'RFP',
-    'In-progress',
-    'Completed',
-]
-
-export const MILESTONE_OUTCOME_OPTIONS: string[] = [
-    'Publication',
-    'Asset',
-    'Data',
-    'Decision',
-]
-
 export const MODALITIES: Option[] = [
     {
         id: '1',
