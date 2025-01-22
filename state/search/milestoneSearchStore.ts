@@ -82,7 +82,8 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
         return [...state.searchResults, ...(results.hits || [])]    // update search - keep previous results
 
     } catch (error) {
-        console.error("Search error:", error);
+        console.error("Search error:", error)
+        return []
     }
 }
 
