@@ -1,4 +1,3 @@
-import {cookies} from "next/headers"
 import {
     FaCalendar, FaCircleDollarToSlot, FaCity, FaEllipsis, FaPen,
     FaPencil, FaPeopleGroup, FaPhone, FaPlus,
@@ -9,7 +8,7 @@ import {DonutChartCard} from "@/components/donut-chart-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
-import {cn, formatMoney} from "@/lib/utils";
+import {cn, formatMoney, isNewUser, setUserAsReturning} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {PAGProfileResearchPlanCard} from "@/components/pag-profile-research-plan-card";
@@ -36,11 +35,6 @@ import ComendVerifiedBadge from "@/components/comend-verified-badge";
 
 export default async function ProfilePage() {
     const session = await getSession()
-    const layout = cookies().get("react-resizable-panels:layout:platform")
-    const collapsed = cookies().get("react-resizable-panels:collapsed")
-
-    const defaultLayout = layout ? JSON.parse(layout.value) : undefined
-    const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
 
     let organization = null
     // let dbMilestones = []
@@ -210,12 +204,12 @@ export default async function ProfilePage() {
                             {/*        </TabsTrigger>*/}
                             {/*    </TabsList>*/}
                             {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
-                                    <PAGProfileAssetsAndProjectsHoverableCard
-                                        assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
-                                        rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
-                                    />
-                                    <PublicRoadmapCard roadmap={roadmaps[0]}
-                                                       subdomain={organization?.subdomain || undefined}/>
+                            <PAGProfileAssetsAndProjectsHoverableCard
+                                assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
+                                rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
+                            />
+                            <PublicRoadmapCard roadmap={roadmaps[0]}
+                                               subdomain={organization?.subdomain || undefined}/>
                             {/*    </TabsContent>*/}
                             {/*    <TabsContent value="activity" className="mt-0">*/}
                             {/*        <PAGProfileActivityCard/>*/}
