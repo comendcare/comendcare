@@ -38,26 +38,26 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
-    moneyDeployed: number[],
-    milestoneTypes: string[],
-    milestoneStatus: string[],
-    milestoneOutcomes: string[],
-    genes: {
-        label: string,
-        value: string,
-        disable?: boolean,
-    }[]
+    // moneyDeployed: number[],
+    // milestoneTypes: string[],
+    // milestoneStatus: string[],
+    // milestoneOutcomes: string[],
+    // genes: {
+    //     label: string,
+    //     value: string,
+    //     disable?: boolean,
+    // }[]
 }
 
 export const defaultFilters = {
     mechanisms: [],
     systemsAffected: [],
     modalities: [],
-    moneyDeployed: [0, 10000000],
-    milestoneTypes: [],
-    milestoneStatus: [],
-    milestoneOutcomes: [],
-    genes: []
+    // moneyDeployed: [0, 10000000],
+    // milestoneTypes: [],
+    // milestoneStatus: [],
+    // milestoneOutcomes: [],
+    // genes: []
 }
 
 function generateFiltersString(filters: FiltersType) {
@@ -96,12 +96,12 @@ function generateFiltersString(filters: FiltersType) {
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
 
     // subtractive filters
-    if (filters.moneyDeployed) {
-        filtersList.push(`moneyDeployed:>=${filters.moneyDeployed[0]}`)
-        filtersList.push(`moneyDeployed:<${filters.moneyDeployed[1]}`)
-        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:>=${filters.moneyDeployed[0]}`)
-        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:<${filters.moneyDeployed[1]}`)
-    }
+    // if (filters.moneyDeployed) {
+    //     filtersList.push(`moneyDeployed:>=${filters.moneyDeployed[0]}`)
+    //     filtersList.push(`moneyDeployed:<${filters.moneyDeployed[1]}`)
+    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:>=${filters.moneyDeployed[0]}`)
+    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:<${filters.moneyDeployed[1]}`)
+    // }
 
     console.log(`typesense filters: `, typesenseFilters)
     return typesenseFilters

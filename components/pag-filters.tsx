@@ -17,7 +17,7 @@ import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
 import MultipleSelector from "./ui/multiple-selector"
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
-import { CONDITION_MECHANISM_OPTIONS, MILESTONE_OUTCOME_OPTIONS, MILESTONE_STATUS_OPTIONS, MODALITIES_OF_INTEREST_OPTIONS, SYSTEMS_AFFECTED_OPTIONS } from "./research-onboarding-form"
+import { CONDITION_MECHANISM_OPTIONS, MODALITIES_OF_INTEREST_OPTIONS, SYSTEMS_AFFECTED_OPTIONS } from "./research-onboarding-form"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import type { Option } from "./ui/multiple-selector"
 
@@ -39,8 +39,8 @@ const filtersFormSchema = z.object({
     modalities: z.array(optionSchema),
     moneyDeployed: z.array(z.number()),
     milestoneTypes: z.array(z.string()),
-    milestoneStatus: z.array(z.string()),
-    milestoneOutcomes: z.array(z.string()),
+    // milestoneStatus: z.array(z.string()),
+    // milestoneOutcomes: z.array(z.string()),
     genes: z.array(optionSchema)
 })
 
@@ -160,143 +160,6 @@ export function PAGFilters() {
                                 />
                             </FormControl>
                             <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="milestoneTypes"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel className="font-semibold text-base">Milestone Types</FormLabel>
-                            <FormDescription>{`Types of milestones an organization may have in their research plan`}</FormDescription>
-                            <FormControl>
-                                <ToggleGroup
-                                    type="multiple"
-                                    variant="outline"
-                                    value={field.value}
-                                    onValueChange={
-                                        field.onChange
-                                    }
-                                    className="w-fit flex flex-wrap gap-2 justify-start"
-                                >
-                                    {MILESTONE_TYPE_OPTIONS.map((type: Option) => (
-                                        <ToggleGroupItem
-                                            key={type.value}
-                                            value={type.value}
-                                        >
-                                            {type.label}
-                                        </ToggleGroupItem>
-                                    ))}
-                                </ToggleGroup>
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="milestoneStatus"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel className="font-semibold text-base">Milestone Status</FormLabel>
-                            <FormControl>
-                                <ToggleGroup
-                                    type="multiple"
-                                    variant="outline"
-                                    value={field.value}
-                                    onValueChange={
-                                        field.onChange
-                                    }
-                                    className="w-fit flex flex-wrap gap-2 justify-start"
-                                >
-                                    {MILESTONE_STATUS_OPTIONS.map((type: string) => (
-                                        <ToggleGroupItem
-                                            key={type}
-                                            value={type}
-                                        >
-                                            {type}
-                                        </ToggleGroupItem>
-                                    ))}
-                                </ToggleGroup>
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="milestoneOutcomes"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel className="font-semibold text-base">Milestone Outcomes</FormLabel>
-                            <FormControl>
-                                <ToggleGroup
-                                    type="multiple"
-                                    variant="outline"
-                                    value={field.value}
-                                    onValueChange={
-                                        field.onChange
-                                    }
-                                    className="w-fit flex flex-wrap gap-2 justify-start"
-                                >
-                                    {MILESTONE_OUTCOME_OPTIONS.map((type: string) => (
-                                        <ToggleGroupItem
-                                            key={type}
-                                            value={type}
-                                        >
-                                            {type}
-                                        </ToggleGroupItem>
-                                    ))}
-                                </ToggleGroup>
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                {/* <FormField
-                    control={form.control}
-                    name="genes"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Genes</FormLabel>
-                            <FormControl>
-                                <MultipleSelector
-                                    {...field}
-                                    defaultOptions={genesList.map((name: string, index: number) => ({ id: index.toString(), label: name, value: name, description: '', strengths: '' }))}
-                                    placeholder="Select genes..."
-                                    emptyIndicator={
-                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
-                                    }
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                /> */}
-
-                <FormField
-                    control={form.control}
-                    name="moneyDeployed"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-col grow">
-                            <FormLabel className="font-semibold text-base">$ Deployed for Research</FormLabel>
-                            <FormControl>
-                                <DoubleSliderBarChart 
-                                    chartData={moneyDeployedChartData}
-                                    range={moneyDeployedRange}
-                                    onChange={field.onChange}
-                                    value={field.value}
-                                    step={moneyDeployedStep}
-                                />
-                            </FormControl>
-                            <FormMessage />
                         </FormItem>
                     )}
                 />
