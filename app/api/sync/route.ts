@@ -105,6 +105,7 @@ const syncToTypesense = async (env: {
             fields: [
                 { name: 'id', type: 'string', facet: false },
                 { name: 'name', type: 'string', facet: false },
+                { name: 'moneyDeployed', type: 'float', facet: true },
             ],
         };
         const milestoneSchema = {

@@ -11,11 +11,13 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {CalendarDays} from "lucide-react";
 import {ProfilePhoto} from "./profile-photo";
 import {toast} from "sonner";
+import {useOnborda} from "@/components/onborda/OnbordaContext";
 
 export const PagProfileAboutCard = ({organization}: {
     organization: Organization & { members: (Member & { user: User })[] } | null
 }) => {
     faker.seed(235)
+    const { startOnborda } = useOnborda()
 
     useEffect(() => {
         if (isNewUser()) {
