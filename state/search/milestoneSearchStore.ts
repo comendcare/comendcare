@@ -29,18 +29,30 @@ function generateFiltersString(filters: FiltersType) {
     console.log(`form filters`, filtersList)
 
     // addative filters
-    // if (filters.mechanisms.length > 0) {
-    //     filters.mechanisms.forEach(mechanism => {
-    //         filtersList.push(`diseaseMechanisms:=[${mechanism.value}]`)
-    //         typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}diseaseMechanisms:=[${mechanism.value}]`)
-    //     })
-    // }
-
     if (filters.milestoneTypes.length > 0) {
         filters.milestoneTypes.forEach(type => {
             filtersList.push(`type:=${type.value}`)
             typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}type:=${type.value}`)
         })
+    }
+
+    if (filters.milestoneStatus.length > 0) {
+        filters.milestoneStatus.forEach(status => {
+            filtersList.push(`status:=${status}`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}status:=${status}`)
+        })
+    }
+
+    if (filters.hasProject) {
+        // filters.milestoneStatus.forEach(status => {
+        //     filtersList.push(`status:=${status}`)
+        //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}status:=${status}`)
+        // })
+        // filtersList.push(`projectId!=""`)
+    }
+
+    if (filters.hasAsset) {
+
     }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
