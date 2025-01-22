@@ -104,7 +104,7 @@ const syncToTypesense = async (env: {
             name: 'organizations',
             fields: [
                 { name: 'id', type: 'string', facet: false },
-                { name: 'name', type: 'string', facet: false },
+                { name: 'name', type: 'string', facet: true, index: true },
                 {
                     name: "description",
                     facet: false,
@@ -232,7 +232,7 @@ const syncToTypesense = async (env: {
             fields: [
                 { name: 'id', type: 'string', facet: false },
                 { name: 'title', type: 'string', facet: false },
-                { name: 'description', type: 'string', facet: false },
+                { name: 'description', type: 'string', facet: false, optional: true },
             ],
         };
 
