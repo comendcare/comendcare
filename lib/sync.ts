@@ -308,12 +308,36 @@ export const syncToTypesense = async (env: {
                     "index": true,
                     "infix": false,
                     "locale": "",
+                    "name": "RFPId_exists",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "bool"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
                     "name": "assetId",
                     "optional": true,
                     "sort": false,
                     "stem": false,
                     "store": true,
                     "type": "string"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "assetId_exits",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "bool"
                 },
                 // add additional fields as needed
             ],
