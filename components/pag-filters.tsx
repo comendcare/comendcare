@@ -16,8 +16,7 @@ import { DoubleSliderBarChart } from "./ui/slider-double"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
 import MultipleSelector from "./ui/multiple-selector"
-import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
-import { CONDITION_MECHANISM_OPTIONS, MODALITIES_OF_INTEREST_OPTIONS, SYSTEMS_AFFECTED_OPTIONS } from "./research-onboarding-form"
+import { ASSOCIATED_SYSTEMS, MILESTONE_TYPE_OPTIONS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import type { Option } from "./ui/multiple-selector"
 
@@ -35,7 +34,7 @@ const optionSchema = z.object({
 
 const filtersFormSchema = z.object({
     mechanisms: z.array(optionSchema),
-    systemsAffected: z.array(optionSchema),
+    systems: z.array(optionSchema),
     modalities: z.array(optionSchema),
     moneyDeployed: z.array(z.number()),
     milestoneTypes: z.array(z.string()),
@@ -90,7 +89,7 @@ export function PAGFilters() {
                 <h1 className={"scroll-m-20 text-3xl font-bold tracking-tight"}>
                     Filters
                 </h1>
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name="mechanisms"
                     render={({field}) => (
@@ -157,6 +156,89 @@ export function PAGFilters() {
                                     }
                                     groupBy="group"
                                     showHoverCard={false}
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                /> */}
+
+                <FormField
+                    control={form.control}
+                    name="systems"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel className="font-semibold text-base">Associated systems</FormLabel>
+                            <FormDescription>{`The systems affected by a condition.`}</FormDescription>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={ASSOCIATED_SYSTEMS}
+                                    hidePlaceholderWhenSelected={true}
+                                    placeholder="Select associated systems..."
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="mechanisms"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel className="font-semibold text-base">
+                                Mechanisms of action
+                            </FormLabel>
+                            <FormDescription className="flex items-center">
+                                {`The type of condition a patient advocacy group focuses on.`}
+                            </FormDescription>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={MOLECULAR_MECHANISMS}
+                                    placeholder="Select categories that apply to you..."
+                                    hidePlaceholderWhenSelected={true}
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="modalities"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel className="font-semibold text-base">
+                                Modalities of interest
+                            </FormLabel>
+                            <FormDescription className="flex items-center">
+                                {`The treatment modalities of interest of your organization.`}
+                            </FormDescription>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={MODALITIES}
+                                    hidePlaceholderWhenSelected={true}
+                                    placeholder="Select modalities you like..."
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
                                 />
                             </FormControl>
                             <FormMessage/>
