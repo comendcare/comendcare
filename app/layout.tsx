@@ -159,7 +159,7 @@ const steps: Tour[] = [
             {
                 icon: <>👋</>,
                 title: "Updating your organization",
-                content: <>{`If you'd like to update your organization's information, visit the settings page.`}</>,
+                content: <>{`If you'd like to update your organization's information, click the Edit profile button.`}</>,
                 selector: ".organization-profile-tour-step2",
                 side: "right" as any,
                 showControls: true,
@@ -169,7 +169,7 @@ const steps: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "About your condition",
-                content: <>{`Information about your condition will appear here. To edit it, visit the condition page.`}</>,
+                content: <>{`Information about your condition will appear here.`}</>,
                 selector: ".organization-profile-tour-step3",
                 side: "top" as any,
                 showControls: true,
@@ -189,23 +189,23 @@ const steps: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Your roadmap",
-                content: <>{`A timeline view of your roadmap will be found here. To see the entire roadmap and to edit details, visit the research planner.`}</>,
+                content: <>{`A timeline view of your roadmap will be found here. To see the entire research plan and to edit details, visit the research planner.`}</>,
                 selector: ".organization-profile-tour-step5",
                 side: "top-right" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10
             },
-            {
-                icon: <>⭐</>,
-                title: "Your organization's activity",
-                content: <>{`All posts related to your organization will appear in this tab.`}</>,
-                selector: ".organization-profile-tour-step6",
-                side: "left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
+            // {
+            //     icon: <>⭐</>,
+            //     title: "Your organization's activity",
+            //     content: <>{`All posts related to your organization will appear in this tab.`}</>,
+            //     selector: ".organization-profile-tour-step6",
+            //     side: "left" as any,
+            //     showControls: true,
+            //     pointerPadding: 10,
+            //     pointerRadius: 10
+            // },
         ]
     }
 ]
