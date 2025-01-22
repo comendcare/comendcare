@@ -7,7 +7,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import React, {useCallback, useEffect, useState} from "react";
 import {updateOrganization, updateCondition} from "@/lib/actions";
-import {AddressType} from "@/lib/types";
+import {AddressType, ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
@@ -42,12 +42,7 @@ import {Slider} from "@/components/ui/slider";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {FaQuestionCircle} from "react-icons/fa";
 import {financesFormSchema} from "@/components/finances-onboarding-form";
-import {
-    ASSOCIATED_SYSTEMS,
-    MODALITIES,
-    MOLECULAR_MECHANISMS,
-    researchFormSchema
-} from "@/components/research-onboarding-form";
+import { researchFormSchema } from "@/components/research-onboarding-form";
 
 const OPTIONS: Option[] = [
     {

@@ -28,7 +28,7 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
-    systemsAffected: {
+    systems: {
         label: string,
         value: string,
         disable?: boolean,
@@ -51,7 +51,7 @@ export type FiltersType = {
 
 export const defaultFilters = {
     mechanisms: [],
-    systemsAffected: [],
+    systems: [],
     modalities: [],
     // moneyDeployed: [0, 10000000],
     // milestoneTypes: [],
