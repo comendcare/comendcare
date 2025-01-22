@@ -26,6 +26,8 @@ function generateFiltersString(filters: FiltersType) {
     let filtersList: string[] = []
     let typesenseFilters = ""
 
+    console.log(`form filters`, filtersList)
+
     // addative filters
     // if (filters.mechanisms.length > 0) {
     //     filters.mechanisms.forEach(mechanism => {
@@ -33,6 +35,13 @@ function generateFiltersString(filters: FiltersType) {
     //         typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}diseaseMechanisms:=[${mechanism.value}]`)
     //     })
     // }
+
+    if (filters.milestoneTypes.length > 0) {
+        filters.milestoneTypes.forEach(type => {
+            filtersList.push(`type:=${type.value}`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}type:=${type.value}`)
+        })
+    }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
 
