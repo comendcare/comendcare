@@ -7,6 +7,9 @@
 import Typesense from "typesense";
 // const Typesense = require('typesense')
 
+console.log(process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY)
+console.log(process.env.NEXT_PUBLIC_TYPESENSE_NODE)
+console.log(process.env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY)
 export const typesense = new Typesense.Client({
     'nodes': [{
         'host': process.env.NEXT_PUBLIC_TYPESENSE_NODE || "", // For self-hosting locally use "localhost"
