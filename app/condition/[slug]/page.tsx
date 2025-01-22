@@ -540,11 +540,11 @@ export default async function ConditionPage({
                             </>
                         ),
                     },
-                    {
-                        title: "Post on feed",
-                        icon: <IconShare2 />,
-                        href: "/app/feed",
-                    },
+                    // {
+                    //     title: "Post on feed",
+                    //     icon: <IconShare2 />,
+                    //     href: "/app/feed",
+                    // },
                     {
                         title: "Share on social media",
                         icon: <IconShare />,
