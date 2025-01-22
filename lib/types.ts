@@ -10,29 +10,6 @@ export type PostWithAuthorAndComments = Post & {
     comments: Comment[]
 }
 
-// export type MilestoneTypes =
-//   BASICSCIENCE
-//   LITERATUREREVIEW
-//   CELLLINE
-//   ORGANOID
-//   ANIMALMODEL
-//   NATURALHISTORYSTUDY
-//   PATIENTREGISTRY
-//   BIOBANK
-//   BIOMARKERANALYSIS
-//   CONSTRUCTDESIGN
-//   PLASMIDPRODUCTION
-//   AAVPRODUCTION
-//   TARGETIDENTIFICATION
-//   DRUGSCREENING
-//   INVITROVERIFICATION
-//   INVIVOVERIFICATION
-//   PROOFOFCONCEPTSTUDY
-//   DOSINGSTUDY
-//   TOXICOLOGYSTUDY
-//   PREINDMEETING
-//   INDSUBMISSION
-
 export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     {
         label: 'All',
@@ -53,95 +30,44 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
 ]
 
 export const MILESTONE_TYPE_OPTIONS: Option[] = [
-    {
-        label: 'Basic science',
-        value: 'BASICSCIENCE',
-    },
-    {
-        label: 'Literature review',
-        value: 'LITERATUREREVIEW',
-    },
-    {
-        label: 'Cell line',
-        value: 'CELLLINE',
-    },
-    {
-        label: 'Organoid',
-        value: 'ORGANOID',
-    },
-    {
-        label: 'Animal model',
-        value: 'ANIMALMODEL',
-    },
-    {
-        label: 'Natural history study',
-        value: 'NATURALHISTORYSTUDY',
-    },
-    {
-        label: 'Patient registry',
-        value: 'PATIENTREGISTRY',
-    },
-    {
-        label: 'Biobank',
-        value: 'BIOBANK',
-    },
-    {
-        label: 'Biomarker analysis',
-        value: 'BIOMARKERANALYSIS',
-    },
-    {
-        label: 'Construct design',
-        value: 'CONSTRUCTDESIGN',
-    },
-    {
-        label: 'Plasmid production',
-        value: 'PLASMIDPRODUCTION',
-    },
-    {
-        label: 'AAV production',
-        value: 'AAVPRODUCTION',
-    },
-    {
-        label: 'Target identification',
-        value: 'TARGETIDENTIFICATION',
-    },
-    {
-        label: 'Drug screening',
-        value: 'DRUGSCREENING',
-    },
-    {
-        label: 'In-vitro verification',
-        value: 'INVITROVERIFICATION',
-    },
-    {
-        label: 'In-vivo verification',
-        value: 'INVIVOVERIFICATION',
-    },
-    {
-        label: 'Proof-of-concept study',
-        value: 'PROOFOFCONCEPTSTUDY',
-    },
-    {
-        label: 'Dosing study',
-        value: 'DOSINGSTUDY',
-    },
-    {
-        label: 'Toxicology study',
-        value: 'TOXICOLOGYSTUDY',
-    },
-    {
-        label: 'Pre-IND meeting',
-        value: 'PREINDMEETING',
-    },
-    {
-        label: 'IND submission',
-        value: 'INDSUBMISSION',
-    },
-    {
-        label: 'No type',
-        value: 'NOTYPE',
-    }
-]
+    { label: 'Basic science', value: 'BASICSCIENCE' },
+    { label: 'Functional study', value: 'FUNCTIONALSTUDY' },
+    { label: 'Patient-derived cell line', value: 'PATIENTDERIVEDCELLLINE' },
+    { label: 'Engineered cell line', value: 'ENGINEEREDCELLLINE' },
+    { label: 'Other cell line', value: 'OTHERCELLLINE' },
+    { label: 'Zebrafish model', value: 'ZEBRAFISHMODEL' },
+    { label: 'Yeast model', value: 'YEASTMODEL' },
+    { label: 'Mouse model', value: 'MOUSEMODEL' },
+    { label: 'Other animal model', value: 'OTHERANIMALMODEL' },
+    { label: 'Organoid', value: 'ORGANOID' },
+    { label: 'Patient registry', value: 'PATIENTREGISTRY' },
+    { label: 'Natural history study', value: 'NATURALHISTORYSTUDY' },
+    { label: 'Biobank', value: 'BIOBANK' },
+    { label: 'Natural history', value: 'NATURALHISTORY' },
+    { label: 'Literature review', value: 'LITERATUREREVIEW' },
+    { label: 'Assay', value: 'ASSAY' },
+    { label: 'Construct design', value: 'CONSTRUCTDESIGN' },
+    { label: 'Plasmid production', value: 'PLASMIDPRODUCTION' },
+    { label: 'AAV production', value: 'AAVPRODUCTION' },
+    { label: 'Target identification', value: 'TARGETIDENTIFICATION' },
+    { label: 'Drug screen', value: 'DRUGSCREEN' },
+    { label: 'In-vitro verification', value: 'INVITROVERIFICATION' },
+    { label: 'In-vivo verification', value: 'INVIVOVERIFICATION' },
+    { label: 'Proof-of-concept', value: 'PROOFOFCONCEPT' },
+    { label: 'GMP manufacturing', value: 'GMPMANUFACTURING' },
+    { label: 'Dosing', value: 'DOSING' },
+    { label: 'Efficacy', value: 'EFFICACY' },
+    { label: 'Pharmacology', value: 'PHARMACOLOGY' },
+    { label: 'Toxicology', value: 'TOXICOLOGY' },
+    { label: 'Biomarker', value: 'BIOMARKER' },
+    { label: 'Outcome measure', value: 'OUTCOMEMEASURE' },
+    { label: 'Orphan drug designation', value: 'ORPHANDRUGDESIGNATION' },
+    { label: 'INTERACT meeting', value: 'INTERACTMEETING' },
+    { label: 'FDA listening session', value: 'FDALISTENINGSESSION' },
+    { label: 'IND submission', value: 'INDSUBMISSION' },
+    { label: 'IND approval', value: 'INDAPPROVAL' },
+    { label: 'No type', value: 'NOTYPE'}
+];
 
 export interface AddressType {
     address1: string;
