@@ -16,7 +16,6 @@ import {Input} from "./ui/input"
 import {Textarea} from "./ui/textarea"
 import {Button} from "./ui/button"
 import {ScrollArea, ScrollBar} from "./ui/scroll-area"
-import type {StatusType} from "./milestone-status-button"
 import {
     Dialog,
     DialogClose,
@@ -63,7 +62,7 @@ import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { getMembers, getMilestones, getOrganizationData } from "@/lib/fetchers"
 import MultiSelect from "./multi-select"
 import MultipleSelector from "./ui/multiple-selector"
-import { Member, Milestone, TaskStakeholder, User } from "@prisma/client"
+import { Member, Milestone, StatusType, TaskStakeholder, User } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "./ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"

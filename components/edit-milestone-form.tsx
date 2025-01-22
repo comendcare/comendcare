@@ -19,7 +19,6 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import type {StatusType} from "./milestone-status-button"
 import {FaLinkSlash, FaX} from "react-icons/fa6"
 import {
     Select,
@@ -59,7 +58,7 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {MILESTONE_TYPE_OPTIONS} from "@/lib/types"
-import {Prisma} from "@prisma/client"
+import {Prisma, StatusType} from "@prisma/client"
 import {Separator} from "./ui/separator"
 import {AssetEditForm} from "./asset-edit-form"
 import {RFPEditForm} from "./rfp-edit-form"
