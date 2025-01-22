@@ -145,11 +145,11 @@ export default async function OrganizationHomePage({
 
             <FloatingDock
                 items={[
-                    {
-                        title: "Post on feed",
-                        icon: <IconShare2/>,
-                        href: "/app/feed",
-                    },
+                    // {
+                    //     title: "Post on feed",
+                    //     icon: <IconShare2/>,
+                    //     href: "/app/feed",
+                    // },
                     {
                         title: "Share on social media",
                         icon: <IconShare/>,
