@@ -185,7 +185,7 @@ model Milestone {
   title          String
   description    String?
   notes          String?
-  status         StatusType
+  status         StatusType           @default(PLANNED)
   budget         Int?
   roadmapId      String
   endDate        DateTime?
@@ -226,7 +226,7 @@ model Column {
 
 model Task {
   id             String            @id @unique @default(uuid())
-  status         StatusType?
+  status         StatusType?       @default(PLANNED)
   name           String            @default("")
   description    String?           @default("")
   milestoneId    String?
