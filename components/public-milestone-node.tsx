@@ -47,7 +47,7 @@ export interface TaskType {
     status: StatusType
 }
 
-type StatusType = "TODO" | "INPROGRESS" | "DONE"
+type StatusType = "PLANNED" | "INPROGRESS" | "COMPLETED"
 
 function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
     return (

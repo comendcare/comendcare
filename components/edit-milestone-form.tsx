@@ -93,7 +93,7 @@ type RFPType = Prisma.RFPGetPayload<{
 type AttachmentType = AssetType['attachments'][0]
 type TaskType = Prisma.TaskGetPayload<{}>
 
-const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
+const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
 // const today = new Date()
@@ -187,7 +187,7 @@ export function EditMilestoneForm({
             budget: milestoneData?.budget || undefined,
             papers: milestoneData?.papers || undefined,
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
-            status: milestoneData?.status || "TODO",
+            status: milestoneData?.status || "PLANNED",
             private: milestoneData?.private || false,
             asset: milestoneData?.asset || undefined,
             RFP: milestoneData?.RFP || undefined
