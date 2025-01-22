@@ -20,6 +20,7 @@ import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { Popover } from "./plate-ui/popover"
+import { StatusType } from "@prisma/client"
 
 export type PrivateMilestoneNode = Node<
     {
@@ -51,8 +52,6 @@ export interface TaskType {
     name: string
     status: StatusType
 }
-
-type StatusType = "PLANNED" | "INPROGRESS" | "COMPLETED"
 
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     const handleEditClick = () => {

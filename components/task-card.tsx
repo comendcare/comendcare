@@ -6,7 +6,6 @@ import {Button} from "@/components/ui/button"
 import {cva} from "class-variance-authority"
 import {GripVertical} from "lucide-react"
 import {Badge} from "@/components/ui/badge"
-import {StatusType} from "./milestone-status-button"
 import {
     Dialog,
     DialogContent,
@@ -26,7 +25,7 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import { DisplayPlateEditor } from "./editor/display-plate-editor"
 import { ScrollArea } from "./ui/scroll-area"
-import { User } from "@prisma/client"
+import { StatusType, User } from "@prisma/client"
 import { ProfilePhoto } from "./profile-photo"
 
 type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'

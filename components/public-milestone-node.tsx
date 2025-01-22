@@ -14,6 +14,7 @@ import { truncate, cn } from "@/lib/utils"
 import { PrivateBadge } from "./private-badge"
 import { Badge } from "./ui/badge"
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { StatusType } from "@prisma/client"
 
 export type PublicMilestoneNode = Node<
     {
@@ -46,8 +47,6 @@ export interface TaskType {
     name: string
     status: StatusType
 }
-
-type StatusType = "PLANNED" | "INPROGRESS" | "COMPLETED"
 
 function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
     return (
