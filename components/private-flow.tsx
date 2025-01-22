@@ -86,9 +86,11 @@ export const PrivateFlowView = ({
 
     useEffect(() => {
         setLocalNodes(nodes)
-    }, [nodes])
+        setLocalEdges(edges)
+    }, [nodes, edges])
 
     const [localNodes, setLocalNodes] = useState(nodes)
+    const [localEdges, setLocalEdges] = useState(edges)
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes)
@@ -255,7 +257,7 @@ export const PrivateFlowView = ({
         }
     }))
 
-    const updatedEdges = edges.map((edge: Edge) => ({
+    const updatedEdges = localEdges.map((edge: Edge) => ({
         ...edge,
         type: 'DEFAULT'
     }))
