@@ -44,15 +44,13 @@ function generateFiltersString(filters: FiltersType) {
     }
 
     if (filters.hasProject) {
-        // filters.milestoneStatus.forEach(status => {
-        //     filtersList.push(`status:=${status}`)
-        //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}status:=${status}`)
-        // })
-        // filtersList.push(`projectId!=""`)
+        filtersList.push(`RFPId_exist:=true`)
+        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}RFPId_exists!=true`)
     }
 
     if (filters.hasAsset) {
-
+        filtersList.push(`assetId_exist:=true`)
+        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}assetId_exists!=true`)
     }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
