@@ -121,24 +121,24 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                                 : undefined
                     })}
                 >
-                    <CardHeader className="px-3 py-3 space-between flex flex-row border-b-2 border-secondary relative">
+                    <CardHeader className="px-3 items-center py-3 space-between flex flex-row border-b-2 border-secondary relative">
                         <Button
                             variant={"ghost"}
                             {...attributes}
                             {...listeners}
-                            className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
+                            className="p-1 mt-1 -ml-2 h-auto cursor-grab"
                         >
                             <span className="sr-only">Move task</span>
                             <GripVertical/>
                         </Button>
-                            <CardTitle className="text-lg">{task?.name}</CardTitle>
+                        <CardTitle className="text-lg">{task?.name}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-7 py-4 text-left whitespace-pre-wrap flex flex-col gap-4">
                         <div className="flex gap-4 flex-wrap">
                             <TooltipProvider>
                                 {task?.priority && <PriorityBadge value={task.priority}/>}
                                 {task?.milestone && (
-                                    <Badge className="w-fit h-8 rounded-sm truncate">
+                                    <Badge className="w-fit h-8 rounded-sm truncate bg-[#3B3C40]">
                                         {truncate(task.milestone.title, 30)}
                                     </Badge>
                                 )}
