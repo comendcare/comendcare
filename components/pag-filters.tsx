@@ -36,27 +36,9 @@ const filtersFormSchema = z.object({
     mechanisms: z.array(optionSchema),
     systems: z.array(optionSchema),
     modalities: z.array(optionSchema),
-    moneyDeployed: z.array(z.number()),
-    milestoneTypes: z.array(z.string()),
-    // milestoneStatus: z.array(z.string()),
-    // milestoneOutcomes: z.array(z.string()),
-    genes: z.array(optionSchema)
+    // moneyDeployed: z.array(z.number()),
+    // genes: z.array(optionSchema)
 })
-
-// const genesList = [
-//     'CRN1',
-//     'MYOP1',
-//     'MSU2',
-//     'NEUA',
-//     'NF4B',
-//     'LYSO1',
-//     'ARC1',
-//     'NEU4',
-//     'GEL3',
-//     'M4SF',
-//     'NEP1',
-//     'REN1'
-// ]
 
 export function PAGFilters() {
     const { filters, allResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
@@ -84,84 +66,11 @@ export function PAGFilters() {
             <ScrollArea className="w-full h-full">
             <form
                 onSubmit={form.handleSubmit(handleSubmit)}
-                className="flex flex-col gap-4 pr-4"
+                className="flex flex-col gap-8 px-1"
             >
                 <h1 className={"scroll-m-20 text-3xl font-bold tracking-tight"}>
                     Filters
                 </h1>
-                {/* <FormField
-                    control={form.control}
-                    name="mechanisms"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel className="font-semibold text-base">Disease Mechanisms</FormLabel>
-                            <FormControl>
-                                <MultipleSelector
-                                    {...field}
-                                    defaultOptions={CONDITION_MECHANISM_OPTIONS}
-                                    placeholder="Select disease mechanisms..."
-                                    emptyIndicator={
-                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
-                                    }
-                                    groupBy="group"
-                                    showHoverCard={false}
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="systemsAffected"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel className="font-semibold text-base">Systems Affected</FormLabel>
-                            <FormControl>
-                                <MultipleSelector
-                                    {...field}
-                                    defaultOptions={SYSTEMS_AFFECTED_OPTIONS}
-                                    placeholder="Select affected systems..."
-                                    emptyIndicator={
-                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
-                                    }
-                                    showHoverCard={false}
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="modalities"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel className="font-semibold text-base">Modalities</FormLabel>
-                            <FormControl>
-                                <MultipleSelector
-                                    {...field}
-                                    defaultOptions={MODALITIES_OF_INTEREST_OPTIONS}
-                                    placeholder="Select modalities..."
-                                    emptyIndicator={
-                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
-                                    }
-                                    groupBy="group"
-                                    showHoverCard={false}
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                /> */}
 
                 <FormField
                     control={form.control}
@@ -203,7 +112,7 @@ export function PAGFilters() {
                                 <MultipleSelector
                                     {...field}
                                     defaultOptions={MOLECULAR_MECHANISMS}
-                                    placeholder="Select categories that apply to you..."
+                                    placeholder="Select mechanisms..."
                                     hidePlaceholderWhenSelected={true}
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
@@ -226,14 +135,14 @@ export function PAGFilters() {
                                 Modalities of interest
                             </FormLabel>
                             <FormDescription className="flex items-center">
-                                {`The treatment modalities of interest of your organization.`}
+                                {`The treatment modalities of interest to an organization.`}
                             </FormDescription>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
                                     defaultOptions={MODALITIES}
                                     hidePlaceholderWhenSelected={true}
-                                    placeholder="Select modalities you like..."
+                                    placeholder="Select modalities..."
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                             no results found.

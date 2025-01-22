@@ -191,7 +191,7 @@ model Milestone {
   endDate        DateTime?
   startDate      DateTime?
   private        Boolean              @default(false)
-  type           MilestoneType        @default(NOTYPE)
+  type           String        @default("NOTYPE")
   RFPId          String?
   assetId        String?
   organizationId String
@@ -276,7 +276,7 @@ model RFP {
   name          String
   funding       Int
   description   String?
-  researchFocus MilestoneType        @default(NOTYPE)
+  researchFocus String        @default("NOTYPE")
   openTo        RFPOpenToType        @default(ALL)
   startDate     DateTime?
   endDate       DateTime?
@@ -502,46 +502,6 @@ enum PriorityType {
   LOW
   MEDIUM
   HIGH
-}
-
-enum MilestoneType {
-  BASICSCIENCE
-  FUNCTIONALSTUDY
-  PATIENTDERIVEDCELLLINE
-  ENGINEEREDCELLLINE
-  OTHERCELLLINE
-  ZEBRAFISHMODEL
-  YEASTMODEL
-  MOUSEMODEL
-  OTHERANIMALMODEL
-  ORGANOID
-  PATIENTREGISTRY
-  NATURALHISTORYSTUDY
-  BIOBANK
-  NATURALHISTORY
-  LITERATUREREVIEW
-  ASSAY
-  CONSTRUCTDESIGN
-  PLASMIDPRODUCTION
-  AAVPRODUCTION
-  TARGETIDENTIFICATION
-  DRUGSCREEN
-  INVITROVERIFICATION
-  INVIVOVERIFICATION
-  PROOFOFCONCEPT
-  GMPMANUFACTURING
-  DOSING
-  EFFICACY
-  PHARMACOLOGY
-  TOXICOLOGY
-  BIOMARKER
-  OUTCOMEMEASURE
-  ORPHANDRUGDESIGNATION
-  INTERACTMEETING
-  FDALISTENINGSESSION
-  INDSUBMISSION
-  INDAPPROVAL
-  NOTYPE
 }
 
 enum RFPOpenToType {
