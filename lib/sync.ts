@@ -403,15 +403,38 @@ export const syncToTypesense = async (env: {
                     switch (event.action) {
                         case 'create':
                             console.log("Syncing created milestone to Typesense:", event.created);
-                            await addTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.created, 'milestones');
+                            await addTypeSenseDocument(
+                                env.TYPESENSE_URL, 
+                                env.TYPESENSE_ADMIN_API_KEY, 
+                                {
+                                    ...event.created,
+                                    RFPId_exists: event.created.RFPId ? true : false,
+                                    assetId_exists: event.created.assetId ? true : false
+                                }, 
+                                'milestones'
+                            );
                             break;
                         case 'update':
                             console.log("Syncing updated milestone to Typesense:", event.after);
-                            await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.after, 'milestones');
+                            await updateTypeSenseDocument(
+                                env.TYPESENSE_URL, 
+                                env.TYPESENSE_ADMIN_API_KEY, 
+                                {
+                                    ...event.after,
+                                    RFPId_exists: event.after.RFPId ? true : false,
+                                    assetId_exists: event.after.assetId ? true : false
+                                },
+                                'milestones'
+                            );
                             break;
                         case 'delete':
                             console.log("Deleting milestone from Typesense:", event.deleted);
-                            await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id, 'milestones');
+                            await deleteTypeSenseDocument(
+                                env.TYPESENSE_URL, 
+                                env.TYPESENSE_ADMIN_API_KEY, 
+                                event.deleted.id, 
+                                'milestones'
+                            );
                             break;
                     }
                 } catch (error) {
