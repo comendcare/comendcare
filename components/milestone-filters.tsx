@@ -58,7 +58,7 @@ export function MilestoneFilters() {
             <ScrollArea className="w-full h-full">
             <form
                 onSubmit={form.handleSubmit(handleSubmit)}
-                className="flex flex-col gap-8 p-1 pr-4"
+                className="flex flex-col gap-8 px-1"
             >
                 <h1 className={"scroll-m-20 text-3xl font-bold tracking-tight"}>
                     Filters
@@ -69,7 +69,7 @@ export function MilestoneFilters() {
                     name="milestoneTypes"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">Milestone Types</FormLabel>
+                            <FormLabel className="font-semibold text-base">Milestone types</FormLabel>
                             <FormDescription>{`Types of milestones an organization may have in their research plan`}</FormDescription>
                             <FormControl>
                                 <MultipleSelector
@@ -94,7 +94,7 @@ export function MilestoneFilters() {
                     name="milestoneStatus"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">Milestone Status</FormLabel>
+                            <FormLabel className="font-semibold text-base">Milestone status</FormLabel>
                             <FormControl>
                                 <ToggleGroup
                                     type="multiple"
@@ -121,7 +121,7 @@ export function MilestoneFilters() {
                 />
 
                 <FormItem>
-                    <FormLabel className="font-semibold text-base">Projects and Assets</FormLabel>
+                    <FormLabel className="font-semibold text-base">Projects and assets</FormLabel>
                     <FormField
                         control={form.control}
                         name="hasProject"
