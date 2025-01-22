@@ -3,24 +3,24 @@ import {useEffect} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {cn, isNewUser, nameToInitials, setUserAsReturning} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
-import {Badge} from "@/components/ui/badge";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";
 import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {CalendarDays} from "lucide-react";
-import {ProfilePhoto} from "./profile-photo";
 import {toast} from "sonner";
 import {useOnborda} from "@/components/onborda/OnbordaContext";
+import {usePathname} from "next/navigation";
 
 export const PagProfileAboutCard = ({organization}: {
     organization: Organization & { members: (Member & { user: User })[] } | null
 }) => {
     faker.seed(235)
     const { startOnborda } = useOnborda()
+    const pathname = usePathname();
 
     useEffect(() => {
-        if (isNewUser()) {
+        // Only start tour if user is new and is on the /app/profile page
+        if (pathname === "/app/profile" && isNewUser()) {
             startOnbordaAndRemoveToast()
         }
     }, [])

@@ -21,6 +21,7 @@ import { encode } from "qss"
 import { imgHeight, imgWidth } from "@/components/layout/sections/tabs-features"
 import {PulsatingButton} from "@/components/ui/pulsating-button";
 import {useRouter} from "next/navigation";
+import {useSession} from "next-auth/react";
 
 interface NavbarItem {
     name: string
@@ -103,6 +104,7 @@ export const LandingNavbar: React.FC = () => {
 }
 
 const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
+    const session = useSession()
     const router = useRouter()
     const [hovered, setHovered] = useState<number | null>(null)
     const [active, setActive] = useState<string | null>(null)
@@ -183,16 +185,18 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
             {/*    </Link>*/}
             {/*</div>*/}
 
-            <div
-                className="flex justify-end"
-            >
-                <PulsatingButton
-                    className="w-fit"
-                    onClick={() => router.push("/login")}
+            {session &&
+                <div
+                    className="flex justify-end"
                 >
-                    Sign in
-                </PulsatingButton>
-            </div>
+                    <PulsatingButton
+                        className="w-fit"
+                        onClick={() => router.push("/login")}
+                    >
+                        Sign in
+                    </PulsatingButton>
+                </div>
+            }
 
         </motion.div>
     )
