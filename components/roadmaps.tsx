@@ -45,7 +45,7 @@ export default async function Roadmaps({
                 height={400}
             />
             <p className="text-lg text-stone-500">
-                You do not have any roadmaps yet. Create one to get started.
+                You do not have any research plans yet. Create one to get started.
             </p>
         </div>
     )
