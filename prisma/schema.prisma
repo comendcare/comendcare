@@ -493,9 +493,9 @@ enum NodeType {
 }
 
 enum StatusType {
-  TODO
+  PLANNED
   INPROGRESS
-  DONE
+  COMPLETED
 }
 
 enum PriorityType {

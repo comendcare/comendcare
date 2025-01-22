@@ -127,7 +127,7 @@ export const PrivateFlowView = ({
                         nodeId: id,
                         type: 'NOTYPE',
                         title: `New Milestone`,
-                        status: "TODO"
+                        status: "PLANNED"
                     },
                     origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.5] : [0.0, 0.5],
                 }
@@ -191,7 +191,7 @@ export const PrivateFlowView = ({
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     // papers: defaultData?.papers || [],
                     // tasks: defaultData?.tasks || [],
-                    status: defaultData?.status || "TODO"
+                    status: defaultData?.status || "PLANNED"
                 }
             }
 

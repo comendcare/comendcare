@@ -52,7 +52,7 @@ export interface TaskType {
     status: StatusType
 }
 
-type StatusType = "TODO" | "INPROGRESS" | "DONE"
+type StatusType = "PLANNED" | "INPROGRESS" | "COMPLETED"
 
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     const handleEditClick = () => {

@@ -1246,7 +1246,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                                 roadmapId: roadmap.id,
                                 organizationId,
                                 type: milestone.type || 'NOTYPE',
-                                status: milestone.status || "TODO",
+                                status: milestone.status || "PLANNED",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
@@ -1281,7 +1281,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 //         await prisma.task.create({
                 //             data: {
                 //                 milestoneId: newMilestone?.id,
-                //                 status: task.status || "TODO",
+                //                 status: task.status || "PLANNED",
                 //                 name: task.name,
                 //                 orderPosition: index,
                 //                 kanbanPosition: index,
@@ -1430,7 +1430,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                                         }))
                                     }
                                 },
-                                status: node.data?.status || "TODO",
+                                status: node.data?.status || "PLANNED",
                                 private: node.data?.private || false,
                             }
                         }
@@ -1546,7 +1546,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                         }))
                                     }
                                 },
-                                status: node.data?.status || "TODO",
+                                status: node.data?.status || "PLANNED",
                                 private: node.data?.private || false,
                             }
                         }
@@ -1710,7 +1710,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                                 }))
                             }
                         },
-                        status: milestone.status || "TODO",
+                        status: milestone.status || "PLANNED",
                         private: milestone.private || false,
                     }
                 })
