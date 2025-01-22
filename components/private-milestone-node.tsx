@@ -156,7 +156,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                 position={Position.Left}
                 className="z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2"
             >
-                <FaPlus className="pointer-events-none" />
+                <FaPlus className="pointer-events-none hover:w-[200px]" />
             </Handle>
             <Handle
                 type="source"
