@@ -65,7 +65,6 @@ import {RFPEditForm} from "./rfp-edit-form"
 import {PapersEditForm} from "./papers-edit-form"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
-import {nanoid} from "nanoid"
 
 type AssetType = Prisma.AssetGetPayload<{
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -750,8 +749,16 @@ export function EditMilestoneForm({
                             </DialogTrigger>
                             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
                         </Dialog>
-                        <Button type="submit" id="edit-milestone-scroll-area" className="research-plan-tour-step4">Save
-                            Changes</Button>
+                        <Button 
+                            id="edit-milestone-scroll-area" 
+                            className="research-plan-tour-step4"
+                            onClick={() => {
+                                handleMilestoneFormSubmit(form.getValues())
+                                onClose()
+                            }}
+                        >
+                            Save Changes
+                        </Button>
                     </span>
                 </form>
             </ScrollArea>
