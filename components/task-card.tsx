@@ -139,7 +139,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                                 {task?.priority && <PriorityBadge value={task.priority}/>}
                                 {task?.milestone && (
                                     <Badge className="w-fit h-8 rounded-sm truncate bg-[#3B3C40]">
-                                        {truncate(task.milestone.title, 30)}
+                                        {truncate(task.milestone.title, 25)}
                                     </Badge>
                                 )}
 
