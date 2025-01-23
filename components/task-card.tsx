@@ -25,14 +25,13 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import { DisplayPlateEditor } from "./editor/display-plate-editor"
 import { ScrollArea } from "./ui/scroll-area"
-import { Milestone, StatusType, User } from "@prisma/client"
+import { Milestone } from "@prisma/client"
 import { ProfilePhoto } from "./profile-photo"
 import { FaCheckSquare } from "react-icons/fa"
 import { FaCalendar } from "react-icons/fa6"
 import { truncate } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
-
-type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
+import { PriorityType, StatusType } from "@/lib/types"
 
 export interface Task {
     columnId: string;
