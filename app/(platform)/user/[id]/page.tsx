@@ -21,6 +21,7 @@ import {
 import {ProfilePhoto} from "@/components/profile-photo";
 import {Button} from "@/components/ui/button"
 import {acceptInvitation} from "@/lib/actions";
+import Image from "next/image"
 
 type InvitationWithOrganization = Invitation & {
     organization?: Organization | null; // Optional because the organization might be null if not fetched
@@ -264,10 +265,51 @@ export default function UserProfilePage() {
                             </TabsTrigger>
                         </TabsList>
                         <TabsContent value="feed">
-
+                            <div className="h-full flex flex-col items-center justify-center py-20">
+                                <Image
+                                    alt="No organization"
+                                    src="https://illustrations.popsy.co/gray/success.svg"
+                                    width={400}
+                                    height={400}
+                                    className="dark:hidden"
+                                />
+                                <Image
+                                    alt="No organization"
+                                    src="https://illustrations.popsy.co/white/success.svg"
+                                    width={400}
+                                    height={400}
+                                    className="hidden dark:block"
+                                />
+                                <div className="flex flex-col justify-center items-center space-y-8">
+                                    <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                                        {`Coming soon!`}
+                                    </p>
+                                </div>
+                            </div>
                         </TabsContent>
                         <TabsContent value="activity">
-                            <PAGProfileActivityCard/>
+                            <div className="h-full flex flex-col items-center justify-center py-20">
+                                <Image
+                                    alt="No organization"
+                                    src="https://illustrations.popsy.co/gray/success.svg"
+                                    width={400}
+                                    height={400}
+                                    className="dark:hidden"
+                                />
+                                <Image
+                                    alt="No organization"
+                                    src="https://illustrations.popsy.co/white/success.svg"
+                                    width={400}
+                                    height={400}
+                                    className="hidden dark:block"
+                                />
+                                <div className="flex flex-col justify-center items-center space-y-8">
+                                    <p className="font-title text-2xl text-stone-600 dark:text-stone-400">
+                                        {`Coming soon!`}
+                                    </p>
+                                </div>
+                            </div>
+                            {/*<PAGProfileActivityCard/>*/}
                         </TabsContent>
                     </Tabs>
                 </div>
