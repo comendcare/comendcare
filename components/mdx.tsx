@@ -56,7 +56,7 @@ function ExamplesCard({ data }: { data: ExampleCardProps }) {
                         className="h-64 w-full object-cover"
                         src={data.image ?? "/placeholder.png"}
                         placeholder="blur"
-                        blurDataURL={data.imageBlurhash ?? undefined}
+                        blurDataURL={undefined}
                     />
                 </div>
                 <div className="h-36 px-5 py-6">
@@ -77,7 +77,7 @@ function ExamplesCard({ data }: { data: ExampleCardProps }) {
                         className="h-full object-cover"
                         src={`/examples/${data.image}`}
                         placeholder="blur"
-                        blurDataURL={data.imageBlurhash ?? undefined}
+                        blurDataURL={undefined}
                     />
                 </div>
                 <div className="w-3/5 px-5 py-6">
