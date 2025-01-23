@@ -31,13 +31,13 @@ import {MemberWithOrganization} from "@/app/(platform)/app/layout";
 const data = {
     navMain: [
         {
-            title: "Profile",
+            title: "Organization Profile",
             icon: User,
             variant: "ghost",
             url: "/app/profile"
         },
         {
-            title: "Research Plan",
+            title: "Research Planner",
             icon: Workflow,
             variant: "ghost",
             url: `/app/research-plan`
@@ -47,6 +47,12 @@ const data = {
             icon: Pin,
             variant: "ghost",
             url: "/app/kanban"
+        },
+        {
+            title: "Marketplace",
+            icon: Store,
+            variant: "ghost",
+            url: "/app/marketplace/patient-groups",
         },
         {
             title: "Feed",
@@ -60,13 +66,6 @@ const data = {
             icon: LayoutDashboard,
             variant: "ghost",
             url: "/app/dashboard",
-            comingSoon: true
-        },
-        {
-            title: "Marketplace",
-            icon: Store,
-            variant: "ghost",
-            url: "/app/marketplace/patient-groups",
             comingSoon: true
         },
         {

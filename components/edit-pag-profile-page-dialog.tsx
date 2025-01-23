@@ -660,7 +660,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Website`}</FormLabel>
-                                                <FormDescription>{`Your patient group's website URL (with the URL extension like http or https.`}</FormDescription>
+                                                <FormDescription>{`Your patient group's website URL (with the URL extension like http or https).`}</FormDescription>
                                                 <FormControl>
                                                     <Input
                                                         id="website"

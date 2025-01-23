@@ -30,7 +30,7 @@ export default function OnboardingWelcomePage() {
                         {`Anything you add here is editable after you've completed onboarding.`}
                     </p>
                     <p className="font-semibold">
-                        {`Nothing that you share here will be shared with others, and you have complete control of what info is made public on your organization profile and research plan.`}
+                        {`You choose what information is shared publicly, and we will never share your data externally without your consent.`}
                     </p>
                 </div>
 
