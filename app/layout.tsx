@@ -179,7 +179,7 @@ const steps: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Your miletones",
-                content: <>{`Your milestones include assets (the results of completed milestones) and projects (ongoing or proposal-stage milestones. To update them, visit the research planner.`}</>,
+                content: <>{`Your milestones include assets (the results of completed milestones) and projects (ongoing or proposal-stage milestones). To update them, visit the research planner.`}</>,
                 selector: ".organization-profile-tour-step4",
                 side: "left" as any,
                 showControls: true,
@@ -188,8 +188,8 @@ const steps: Tour[] = [
             },
             {
                 icon: <>⭐</>,
-                title: "Your roadmap",
-                content: <>{`A timeline view of your roadmap will be found here. To see the entire research plan and to edit details, visit the research planner.`}</>,
+                title: "Your research plan",
+                content: <>{`A timeline view of your research plan will be found here. To see the entire research plan and to edit details, visit the research planner.`}</>,
                 selector: ".organization-profile-tour-step5",
                 side: "top-right" as any,
                 showControls: true,
