@@ -690,7 +690,6 @@ const exampleASORoadmap = {
         {
             title: 'Natural History Study',
             description: 'Our observational research effort that follows individuals with a specific disease over time, collecting data on how the disease develops and progresses without intervention.',
-            status: 'INPROGRESS',
             startDate: new Date(2019, 1, 1),
             papers: [],
             tasks: []
@@ -698,7 +697,6 @@ const exampleASORoadmap = {
         {
             title: 'Literature Review',
             description: 'Examine existing research to better understand the disease, identify gaps in knowledge, and assess the latest findings on potential treatments.',
-            status: 'DONE',
             startDate: new Date(2020, 5, 12),
             endDate: new Date(2021, 1, 3),
             papers: [],
@@ -707,7 +705,6 @@ const exampleASORoadmap = {
         {
             title: 'Identify Existing Disease Models',
             description: 'Research and evaluate lab models.',
-            status: 'INPROGRESS',
             startDate: new Date(2023, 3, 3),
             endDate: new Date(2025, 1, 1),
             papers: [],
@@ -716,31 +713,16 @@ const exampleASORoadmap = {
         {
             title: 'Construct Mouse Models',
             description: '',
-            status: 'INPROGRESS',
             startDate: new Date(2024, 5, 5),
             papers: [],
-            tasks: [
-                {name: 'Secure Funding', status: 'INPROGRESS'},
-                {name: 'Ethical Standards Advocacy', status: 'INPROGRESS'},
-                {
-                    name: 'Prioritize Model Features',
-                    description: 'Work with researchers to prioritize features in the model that most directly address patient needs and research goals.'
-                }
-            ]
+            tasks: []
         },
         {
             title: 'Construct Patient-Derived Cells',
             description: 'Work with researchers to create cell lines that replicate disease characteristics.',
             papers: [],
             startDate: new Date(2026, 1, 1),
-            tasks: [
-                {name: 'Coordinate Patient Participation'},
-                {name: 'Secure Funding'},
-                {
-                    name: 'Determine Cell Model Relevancy',
-                    description: 'Determine if each cell model is relevant for testing therapies and studying disease mechanisms that refect our patients real experiences.'
-                }
-            ]
+            tasks: []
         },
         {
             title: 'Design ASO Construct',
@@ -891,7 +873,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                             create: {
                                 roadmapId: roadmap.id,
                                 organizationId,
-                                status: milestone.status || "TODO",
+                                status: milestone.status || "PLANNED",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
@@ -926,7 +908,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                         await prisma.task.create({
                             data: {
                                 milestoneId: newMilestone?.id,
-                                status: task.status || "TODO",
+                                status: task.status || "PLANNED",
                                 name: task.name,
                                 columnId: createdColumns[0]?.id,
                                 orderPosition: index,

@@ -185,13 +185,13 @@ model Milestone {
   title          String
   description    String?
   notes          String?
-  status         StatusType
+  status         StatusType           @default(PLANNED)
   budget         Int?
   roadmapId      String
   endDate        DateTime?
   startDate      DateTime?
   private        Boolean              @default(false)
-  type           MilestoneType        @default(NOTYPE)
+  type           String        @default("NOTYPE")
   RFPId          String?
   assetId        String?
   organizationId String
@@ -226,7 +226,7 @@ model Column {
 
 model Task {
   id             String            @id @unique @default(uuid())
-  status         StatusType?
+  status         StatusType?       @default(PLANNED)
   name           String            @default("")
   description    String?           @default("")
   milestoneId    String?
@@ -276,7 +276,7 @@ model RFP {
   name          String
   funding       Int
   description   String?
-  researchFocus MilestoneType        @default(NOTYPE)
+  researchFocus String        @default("NOTYPE")
   openTo        RFPOpenToType        @default(ALL)
   startDate     DateTime?
   endDate       DateTime?
@@ -493,40 +493,15 @@ enum NodeType {
 }
 
 enum StatusType {
-  TODO
+  PLANNED
   INPROGRESS
-  DONE
+  COMPLETED
 }
 
 enum PriorityType {
   LOW
   MEDIUM
   HIGH
-}
-
-enum MilestoneType {
-  BASICSCIENCE
-  LITERATUREREVIEW
-  CELLLINE
-  ORGANOID
-  ANIMALMODEL
-  NATURALHISTORYSTUDY
-  PATIENTREGISTRY
-  BIOBANK
-  BIOMARKERANALYSIS
-  CONSTRUCTDESIGN
-  PLASMIDPRODUCTION
-  AAVPRODUCTION
-  TARGETIDENTIFICATION
-  DRUGSCREENING
-  INVITROVERIFICATION
-  INVIVOVERIFICATION
-  PROOFOFCONCEPTSTUDY
-  DOSINGSTUDY
-  TOXICOLOGYSTUDY
-  PREINDMEETING
-  INDSUBMISSION
-  NOTYPE
 }
 
 enum RFPOpenToType {

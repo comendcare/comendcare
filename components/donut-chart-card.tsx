@@ -10,9 +10,9 @@ import Link from "next/link";
 import {buttonVariants} from "@/components/ui/button";
 
 const statusLabels: Record<string, string> = {
-    TODO: "To Do",
+    PLANNED: "Planned",
     INPROGRESS: "In Progress",
-    DONE: "Done",
+    COMPLETED: "Completed",
 };
 
 const selector = (state: RoadmapState) => ({
@@ -32,10 +32,10 @@ export const DonutChartCard = () => {
     );
 
     // Define colors for known statuses
-    const colors: Record<"TODO" | "INPROGRESS" | "DONE", string> = {
-        TODO: "#9D82CA",
+    const colors: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", string> = {
+        PLANNED: "#9D82CA",
         INPROGRESS: "#CA9D82",
-        DONE: "#82CA9D",
+        COMPLETED: "#82CA9D",
     };
 
     // Prepare data for the chart
