@@ -185,7 +185,8 @@ export default function UserOnboardingForm() {
         setLoading(true);
 
         try {
-            if (selectedFile && values.image) {
+            // handle image upload, only upload if the current image is not the same as the previous image
+            if (selectedFile && values.image && values.image !== defaultValues?.image) {
                 console.log(`selectedFile`, selectedFile)
                 const imgUrl = await handleImageUpload(selectedFile as File, values.image)
                 values.image = imgUrl || undefined

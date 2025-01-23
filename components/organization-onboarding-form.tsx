@@ -289,7 +289,8 @@ export default function OrganizationOnboardingForm(
                 }
             });
 
-            if (selectedFile && values.image) {
+            // only upload image if it is not the same as the previous one
+            if (selectedFile && values.image && values.image !== defaultOrganizationValues?.image) {
                 try {
                     const imgUrl = await handleImageUpload(selectedFile as File, values.image)
                     if (imgUrl) {

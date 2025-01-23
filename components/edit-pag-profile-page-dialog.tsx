@@ -225,7 +225,8 @@ export default function EditPAGProfileDialog() {
         });
 
         // Handle the selected profile image upload
-        if (selectedFileProfile && values.image) {
+        // only upload if the image has changed
+        if (selectedFileProfile && values.image && values.image !== defaultOrganizationValues?.image) {
             try {
                 const imgUrl = await handleImageUpload(selectedFileProfile as File, values.image);
                 if (imgUrl) {
@@ -239,7 +240,8 @@ export default function EditPAGProfileDialog() {
         }
 
         // Handle the selected header image upload
-        if (selectedFileHeader && values.headerImage) {
+        // only upload if the image has changed
+        if (selectedFileHeader && values.headerImage && values.headerImage !== defaultOrganizationValues?.headerImage) {
             try {
                 const imgUrl = await handleImageUpload(selectedFileHeader as File, values.headerImage);
                 if (imgUrl) {
@@ -302,33 +304,34 @@ export default function EditPAGProfileDialog() {
                         incorporationStatus: organizationData.incorporationStatus || undefined
                     };
 
-                    if (organizationData.image) {
-                        try {
-                            const orgPhoto: File = await getPublicFile(organizationData.image)
-                            if (orgPhoto) {
-                                const fileWithPreview = Object.assign(orgPhoto, {
-                                    preview: URL.createObjectURL(orgPhoto),
-                                })
-                                setSelectedFileProfile(fileWithPreview)
-                            }
-                        } catch (e) {
-                            console.error(e)
-                        }
-                    }
+                    // if (organizationData.image) {
+                    //     try {
+                    //         const orgPhoto: File = await getPublicFile(organizationData.image)
+                    //         console.log(`org photo`, orgPhoto)
+                    //         if (orgPhoto) {
+                    //             const fileWithPreview = Object.assign(orgPhoto, {
+                    //                 preview: URL.createObjectURL(orgPhoto),
+                    //             })
+                    //             setSelectedFileProfile(fileWithPreview)
+                    //         }
+                    //     } catch (e) {
+                    //         console.error(e)
+                    //     }
+                    // }
 
-                    if (organizationData.headerImage) {
-                        try {
-                            const orgHeader: File = await getPublicFile(organizationData.headerImage)
-                            if (orgHeader) {
-                                const fileWithPreview = Object.assign(orgHeader, {
-                                    preview: URL.createObjectURL(orgHeader),
-                                })
-                                setSelectedFileHeader(fileWithPreview)
-                            }
-                        } catch (e) {
-                            console.error(e)
-                        }
-                    }
+                    // if (organizationData.headerImage) {
+                    //     try {
+                    //         const orgHeader: File = await getPublicFile(organizationData.headerImage)
+                    //         if (orgHeader) {
+                    //             const fileWithPreview = Object.assign(orgHeader, {
+                    //                 preview: URL.createObjectURL(orgHeader),
+                    //             })
+                    //             setSelectedFileHeader(fileWithPreview)
+                    //         }
+                    //     } catch (e) {
+                    //         console.error(e)
+                    //     }
+                    // }
 
                     setDefaultOrganizationValues(fetchedValues);
                     // setAddress(fetchedValues); // Set address state as well
