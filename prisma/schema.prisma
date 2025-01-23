@@ -491,25 +491,6 @@ enum NodeType {
   MILESTONE
 }
 
-enum StatusType {
-  PLANNED
-  INPROGRESS
-  COMPLETED
-}
-
-enum PriorityType {
-  LOW
-  MEDIUM
-  HIGH
-}
-
-enum RFPOpenToType {
-  CRO
-  ACADEMIC
-  ALL
-  NONE
-}
-
 enum FollowedType {
   ORGANIZATION
 }

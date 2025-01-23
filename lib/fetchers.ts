@@ -232,7 +232,7 @@ export async function getRoadmapData(domain: string, slug: string) {
                         createdAt: true,
                         description: true,
                         image: true,
-                        imageBlurhash: true
+                        // imageBlurhash: true
                     }
                 })
             ])
