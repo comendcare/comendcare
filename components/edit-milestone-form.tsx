@@ -91,7 +91,7 @@ type RFPType = Prisma.RFPGetPayload<{
 type AttachmentType = AssetType['attachments'][0]
 type TaskType = Prisma.TaskGetPayload<{}>
 
-const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
+// const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
 // const today = new Date()
