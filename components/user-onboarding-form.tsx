@@ -66,34 +66,34 @@ export default function UserOnboardingForm() {
         console.log(`selected file`, selectedFile)
     }, [selectedFile])
 
-    const onDrop = useCallback(
-        (acceptedFiles: FileWithPath[]) => {
-            const file = acceptedFiles[0];
-            if (!file) {
-                toast.error("No file selected!");
-                return;
-            }
+    // const onDrop = useCallback(
+    //     (acceptedFiles: FileWithPath[]) => {
+    //         const file = acceptedFiles[0];
+    //         if (!file) {
+    //             toast.error("No file selected!");
+    //             return;
+    //         }
 
-            // Additional check to exclude SVG
-            if (file.type === "image/svg+xml") {
-                toast.error("SVG files are not allowed. Please select a valid image.");
-                return;
-            }
+    //         // Additional check to exclude SVG
+    //         if (file.type === "image/svg+xml") {
+    //             toast.error("SVG files are not allowed. Please select a valid image.");
+    //             return;
+    //         }
 
-            const fileWithPreview = Object.assign(file, {
-                preview: URL.createObjectURL(file),
-            });
+    //         const fileWithPreview = Object.assign(file, {
+    //             preview: URL.createObjectURL(file),
+    //         });
 
-            setSelectedFile(fileWithPreview);
-            setDialogOpen(true);
-        },
-        []
-    );
+    //         setSelectedFile(fileWithPreview);
+    //         setDialogOpen(true);
+    //     },
+    //     []
+    // );
 
-    const {getRootProps, getInputProps} = useDropzone({
-        onDrop,
-        accept,
-    });
+    // const {getRootProps, getInputProps} = useDropzone({
+    //     onDrop,
+    //     accept,
+    // });
 
     const [address, setAddress] = useState<AddressType>({
         address1: "",
@@ -186,6 +186,7 @@ export default function UserOnboardingForm() {
 
         try {
             if (selectedFile && values.image) {
+                console.log(`selectedFile`, selectedFile)
                 const imgUrl = await handleImageUpload(selectedFile as File, values.image)
                 values.image = imgUrl || undefined
             }
