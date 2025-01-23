@@ -27,7 +27,7 @@ export default function MDX({ source }: { source: MDXRemoteProps }) {
 }
 
 interface ExampleCardProps
-    extends Pick<Roadmap, "description" | "image" | "imageBlurhash"> {
+    extends Pick<Roadmap, "description" | "image"> {
     name: string | null
     url: string | null
 }
