@@ -33,14 +33,14 @@ export default function PrivateProfileDropdown({subdomain}: { subdomain: string 
                         <span>Public view</span>
                     </a>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <FaGlasses/>
-                    <span>Edit visibility</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <FaRegCircleCheck/>
-                    <span>Comend verified</span>
-                </DropdownMenuItem>
+                {/*<DropdownMenuItem>*/}
+                {/*    <FaGlasses/>*/}
+                {/*    <span>Edit visibility</span>*/}
+                {/*</DropdownMenuItem>*/}
+                {/*<DropdownMenuItem>*/}
+                {/*    <FaRegCircleCheck/>*/}
+                {/*    <span>Comend verified</span>*/}
+                {/*</DropdownMenuItem>*/}
                 <DropdownMenuItem
                     onClick={() => {
                         startOnborda('organization-profile-tour')
