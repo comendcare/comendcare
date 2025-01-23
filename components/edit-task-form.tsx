@@ -62,7 +62,7 @@ import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { getMembers, getMilestones, getOrganizationData } from "@/lib/fetchers"
 import MultiSelect from "./multi-select"
 import MultipleSelector from "./ui/multiple-selector"
-import { Member, Milestone, StatusType, TaskStakeholder, User } from "@prisma/client"
+import { Member, Milestone, TaskStakeholder, User } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "./ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
@@ -73,6 +73,7 @@ import { PrivateBadge } from "./private-badge"
 import { Switch } from "./ui/switch"
 import {Separator} from "./ui/separator"
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import { StatusType } from "@/lib/types"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
