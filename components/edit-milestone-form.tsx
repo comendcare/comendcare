@@ -19,7 +19,6 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import type {StatusType} from "./milestone-status-button"
 import {FaLinkSlash, FaX} from "react-icons/fa6"
 import {
     Select,
@@ -59,14 +58,13 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {MILESTONE_TYPE_OPTIONS} from "@/lib/types"
-import {Prisma} from "@prisma/client"
+import {Prisma, StatusType} from "@prisma/client"
 import {Separator} from "./ui/separator"
 import {AssetEditForm} from "./asset-edit-form"
 import {RFPEditForm} from "./rfp-edit-form"
 import {PapersEditForm} from "./papers-edit-form"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
-import {nanoid} from "nanoid"
 
 type AssetType = Prisma.AssetGetPayload<{
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -93,7 +91,7 @@ type RFPType = Prisma.RFPGetPayload<{
 type AttachmentType = AssetType['attachments'][0]
 type TaskType = Prisma.TaskGetPayload<{}>
 
-const statusTypeSchema: z.ZodType<StatusType> = z.enum(['TODO', 'INPROGRESS', 'DONE'])
+const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
 // const today = new Date()
@@ -187,7 +185,7 @@ export function EditMilestoneForm({
             budget: milestoneData?.budget || undefined,
             papers: milestoneData?.papers || undefined,
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
-            status: milestoneData?.status || "TODO",
+            status: milestoneData?.status || "PLANNED",
             private: milestoneData?.private || false,
             asset: milestoneData?.asset || undefined,
             RFP: milestoneData?.RFP || undefined
@@ -751,8 +749,16 @@ export function EditMilestoneForm({
                             </DialogTrigger>
                             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
                         </Dialog>
-                        <Button type="submit" id="edit-milestone-scroll-area" className="research-plan-tour-step4">Save
-                            Changes</Button>
+                        <Button 
+                            id="edit-milestone-scroll-area" 
+                            className="research-plan-tour-step4"
+                            onClick={() => {
+                                handleMilestoneFormSubmit(form.getValues())
+                                onClose()
+                            }}
+                        >
+                            Save Changes
+                        </Button>
                     </span>
                 </form>
             </ScrollArea>

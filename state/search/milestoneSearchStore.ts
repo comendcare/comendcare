@@ -5,28 +5,53 @@ import { create } from 'zustand';
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    milestoneTypes: string[],
+    milestoneTypes: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     milestoneStatus: string[],
-    milestoneOutcomes: string[],
+    hasProject: boolean,
+    hasAsset: boolean
 }
 
 export const defaultFilters = {
     milestoneTypes: [],
     milestoneStatus: [],
-    milestoneOutcomes: [],
+    hasProject: false,
+    hasAsset: false
 }
 
 function generateFiltersString(filters: FiltersType) {
     let filtersList: string[] = []
     let typesenseFilters = ""
 
+    console.log(`form filters`, filtersList)
+
     // addative filters
-    // if (filters.mechanisms.length > 0) {
-    //     filters.mechanisms.forEach(mechanism => {
-    //         filtersList.push(`diseaseMechanisms:=[${mechanism.value}]`)
-    //         typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}diseaseMechanisms:=[${mechanism.value}]`)
-    //     })
-    // }
+    if (filters.milestoneTypes.length > 0) {
+        filters.milestoneTypes.forEach(type => {
+            filtersList.push(`type:=${type.value}`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}type:=${type.value}`)
+        })
+    }
+
+    if (filters.milestoneStatus.length > 0) {
+        filters.milestoneStatus.forEach(status => {
+            filtersList.push(`status:=${status}`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}status:=${status}`)
+        })
+    }
+
+    if (filters.hasProject) {
+        filtersList.push(`RFPId_exist:=true`)
+        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}RFPId_exists!=true`)
+    }
+
+    if (filters.hasAsset) {
+        filtersList.push(`assetId_exist:=true`)
+        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}assetId_exists!=true`)
+    }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
 
@@ -67,7 +92,8 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
         return [...state.searchResults, ...(results.hits || [])]    // update search - keep previous results
 
     } catch (error) {
-        console.error("Search error:", error);
+        console.error("Search error:", error)
+        return []
     }
 }
 

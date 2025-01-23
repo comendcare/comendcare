@@ -90,7 +90,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
                 title: `New Milestone`,
                 // papers: [],
                 // tasks: [],
-                status: "TODO"
+                status: "PLANNED"
             }
         }
 

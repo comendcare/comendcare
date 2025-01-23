@@ -216,6 +216,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 return response.data
             } else {
                 console.error(`Error deleting nodes`, response.error)
+                toast.error(`Error deleting your milestone: ${response.error}`)
             }
         },
         saveState: () => {

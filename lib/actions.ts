@@ -1246,7 +1246,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                                 roadmapId: roadmap.id,
                                 organizationId,
                                 type: milestone.type || 'NOTYPE',
-                                status: milestone.status || "TODO",
+                                status: milestone.status || "PLANNED",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
@@ -1281,7 +1281,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 //         await prisma.task.create({
                 //             data: {
                 //                 milestoneId: newMilestone?.id,
-                //                 status: task.status || "TODO",
+                //                 status: task.status || "PLANNED",
                 //                 name: task.name,
                 //                 orderPosition: index,
                 //                 kanbanPosition: index,
@@ -1430,7 +1430,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                                         }))
                                     }
                                 },
-                                status: node.data?.status || "TODO",
+                                status: node.data?.status || "PLANNED",
                                 private: node.data?.private || false,
                             }
                         }
@@ -1546,7 +1546,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                         }))
                                     }
                                 },
-                                status: node.data?.status || "TODO",
+                                status: node.data?.status || "PLANNED",
                                 private: node.data?.private || false,
                             }
                         }
@@ -1577,8 +1577,13 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         // Typesense - create typesense milestone documents here...
         Promise.all(
             updatedMilestones.map(async (response: any) => {
-                console.log(`Add typesense document`, response)
-                // await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'milestones')
+                const document = response.map((r: any) => ({
+                    ...r,
+                    RFPId_exists: response.RFP ? true : false,
+                    assetId_exists: response.asset ? true : false
+                }))
+                console.log(`Add typesense document`, document)
+                // await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
             })
         )
 
@@ -1710,7 +1715,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                                 }))
                             }
                         },
-                        status: milestone.status || "TODO",
+                        status: milestone.status || "PLANNED",
                         private: milestone.private || false,
                     }
                 })
@@ -1734,8 +1739,13 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         // Typesense - update milestone documents here...
         Promise.all(
             updatedMilestones.map(async (response: any) => {
-                console.log(`Update typesense document`, response)
-                // await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'milestones')
+                const document = response.map((r: any) => ({
+                    ...r,
+                    RFPId_exists: response.RFP ? true : false,
+                    assetId_exists: response.asset ? true : false
+                }))
+                console.log(`Update typesense document`, document)
+                // await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
             })
         )
 

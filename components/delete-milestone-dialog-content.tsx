@@ -17,7 +17,8 @@ import { toast } from "sonner"
 
 const selector = (state: RoadmapState) => ({
     deleteNode: state.deleteNode,
-    saveState: state.saveState
+    saveState: state.saveState,
+    setSelectedNodeId: state.setSelectedNodeId
 })
 
 export function DeleteMilestoneDialogContent({
@@ -25,17 +26,20 @@ export function DeleteMilestoneDialogContent({
 }: {
     milestoneData: any
 }) {
-    const { deleteNode, saveState } = useRoadmapStore(useShallow(selector))
+    const { deleteNode, saveState, setSelectedNodeId } = useRoadmapStore(useShallow(selector))
     const { undo } = useRoadmapStore.temporal.getState()
 
     const handleUndo = () => {
+        // undo twice to open up milestone panel if it was open previously
+        undo()
         undo()
         saveState()
     }
 
-    const handleDeleteMilestone = (e: React.MouseEvent<HTMLElement>) => {
+    const handleDeleteMilestone = async (e: React.MouseEvent<HTMLElement>) => {
         console.log(`handle Milestone delete...`, milestoneData?.nodeId)
-        deleteNode(milestoneData?.nodeId)
+        await deleteNode(milestoneData?.nodeId)
+        await setSelectedNodeId(null)
         toast(
             <div className="relative p-2 flex flex-col">
                 <p className="font-semibold text-gray-900">
