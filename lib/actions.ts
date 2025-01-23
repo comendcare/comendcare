@@ -260,6 +260,7 @@ export const createOrganization = async (formData: FormData) => {
             update: {
                 name,
                 description,
+                subdomain,
                 yearFounded: founded?.toString(),
                 website,
                 incorporationStatus,
