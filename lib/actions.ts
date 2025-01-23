@@ -2133,6 +2133,7 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
 
         // Typesense - if updating typesense, update here...
 
+        console.log(`Successfully updated tasks`)
         return { success: true, data: updatedTasks }
     } catch (error) {
         logError("Could not update task", error)
