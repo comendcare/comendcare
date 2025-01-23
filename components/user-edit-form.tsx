@@ -29,6 +29,7 @@ import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
 import { getPublicFile } from "@/lib/utils";
 import { handleImageUpload } from "@/lib/upload";
+import { FormImageCropper } from "./edit-pag-profile-page-dialog";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
@@ -262,7 +263,7 @@ export default function UserEditForm() {
                 {/*    )}*/}
                 {/*/>*/}
 
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name="image"
                     render={({field}) => (
@@ -300,6 +301,16 @@ export default function UserEditForm() {
                             <FormMessage/>
                         </FormItem>
                     )}
+                /> */}
+
+                <FormImageCropper 
+                    form={form}
+                    name="image"
+                    title="Profile Image"
+                    description=""
+                    aspect={1}
+                    selectedFile={selectedFile}
+                    setSelectedFile={setSelectedFile}
                 />
 
                 <div className="space-y-2">
