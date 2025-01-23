@@ -175,7 +175,8 @@ export default function UserEditForm() {
 
     async function onSubmit(values: z.infer<typeof userFormSchema>) {
         try {
-            if (selectedFile && values.image) {
+            // only upload image if it is not the same as the previous one
+            if (selectedFile && values.image && values.image !== defaultValues?.image) {
                 const imgUrl = await handleImageUpload(selectedFile as File, values.image)
                 values.image = imgUrl || undefined
             }
