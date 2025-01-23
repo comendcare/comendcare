@@ -695,7 +695,7 @@ export const updateRoadmapMetadata = withRoadmapAuth(
                     },
                     data: {
                         image: url,
-                        imageBlurhash: blurhash
+                        // imageBlurhash: blurhash
                     }
                 })
             } else {
