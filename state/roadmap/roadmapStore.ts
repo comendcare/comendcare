@@ -69,7 +69,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             const response = await updateMilestones({ milestones })
             if (response?.success && response?.data) {
                 // if task was created successfully, update zustand state
-                // set({ milestones: response.data as Milestone[] })
+                set({ milestones: response.data as Milestone[] })
 
                 // toast.success("Milestone updated successfully!")
                 return response.data as Milestone[]
@@ -84,7 +84,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             const response = await updateMilestones({ milestones })
             if (response?.success && response?.data) {
                 // if task was created successfully, update zustand state
-                // set({ milestones: response.data as Milestone[] })
+                set({ milestones: response.data as Milestone[] })
 
                 // toast.success("Milestone updated successfully!")
                 return response.data as Milestone[]

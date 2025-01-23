@@ -1575,17 +1575,17 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         updatedMilestones = updatedMilestones.filter(milestone => nodeIds.includes(milestone.nodeId))
 
         // Typesense - create typesense milestone documents here...
-        Promise.all(
-            updatedMilestones.map(async (response: any) => {
-                const document = response.map((r: any) => ({
-                    ...r,
-                    RFPId_exists: response.RFP ? true : false,
-                    assetId_exists: response.asset ? true : false
-                }))
-                console.log(`Add typesense document`, document)
-                // await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
-            })
-        )
+        // Promise.all(
+        //     updatedMilestones.map(async (response: any) => {
+        //         const document = response.map((r: any) => ({
+        //             ...r,
+        //             RFPId_exists: response.RFP ? true : false,
+        //             assetId_exists: response.asset ? true : false
+        //         }))
+        //         console.log(`Add typesense document`, document)
+        //         // await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
+        //     })
+        // )
 
         return { success: true, data: { nodes: updatedNodes, milestones: updatedMilestones} }
     } catch (error: any) {
@@ -1609,7 +1609,7 @@ export async function deleteNode(nodeId: string | undefined) {
         }
 
         // Typesense - delete milestone documents here...
-        console.log(`Delete typesense document`, deletedNode.data.id)
+        // console.log(`Delete typesense document`, deletedNode.data.id)
         // await deleteTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, deletedNode.data.id, 'milestones')
 
         return { success: true, data: deletedNode }
@@ -1737,17 +1737,17 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         )
 
         // Typesense - update milestone documents here...
-        Promise.all(
-            updatedMilestones.map(async (response: any) => {
-                const document = response.map((r: any) => ({
-                    ...r,
-                    RFPId_exists: response.RFP ? true : false,
-                    assetId_exists: response.asset ? true : false
-                }))
-                console.log(`Update typesense document`, document)
-                // await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
-            })
-        )
+        // Promise.all(
+        //     updatedMilestones.map(async (response: any) => {
+        //         const document = response.map((r: any) => ({
+        //             ...r,
+        //             RFPId_exists: response.RFP ? true : false,
+        //             assetId_exists: response.asset ? true : false
+        //         }))
+        //         console.log(`Update typesense document`, document)
+        //         // await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
+        //     })
+        // )
 
         console.log(`Successfully updated Milestone`)
         return {success: true, data: updatedMilestones}
