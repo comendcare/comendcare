@@ -289,6 +289,19 @@ export default function OrganizationOnboardingForm(
                 }
             });
 
+            // Append address fields from state
+            if (address) {
+                formData.append("address1", address.address1 || "");
+                formData.append("address2", address.address2 || "");
+                formData.append("formattedAddress", address.formattedAddress || "");
+                formData.append("city", address.city || "");
+                formData.append("region", address.region || "");
+                formData.append("postalCode", address.postalCode || "");
+                formData.append("country", address.country || "");
+                formData.append("lat", address.lat.toString());
+                formData.append("lng", address.lng.toString());
+            }
+
             if (selectedFile && values.image) {
                 try {
                     const imgUrl = await handleImageUpload(selectedFile as File, values.image)
@@ -298,7 +311,7 @@ export default function OrganizationOnboardingForm(
                 } catch (error) {
                     console.error("Failed to upload image:", error)
                     toast.error("Image upload failed")
-                    return 
+                    return
                 }
             }
 

@@ -330,6 +330,18 @@ export default function EditPAGProfileDialog() {
                         }
                     }
 
+                    setAddress({
+                        address1: fetchedValues.address1,
+                        address2: fetchedValues.address2,
+                        formattedAddress: fetchedValues.formattedAddress,
+                        city: fetchedValues.city,
+                        region: fetchedValues.region,
+                        postalCode: fetchedValues.postalCode,
+                        country: fetchedValues.country,
+                        lat: fetchedValues.lat,
+                        lng: fetchedValues.lng,
+                    });
+
                     setDefaultOrganizationValues(fetchedValues);
                     // setAddress(fetchedValues); // Set address state as well
                     editOrgForm.reset(fetchedValues); // Reset form with fetched data
