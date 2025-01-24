@@ -19,10 +19,6 @@ export default function UserOnboardingPage() {
                             {`< 1 min`}
                         </p>
                     </div>
-
-                    <p>
-                        {`This section is all about you and your profile.`}
-                    </p>
                 </div>
 
                 <Separator/>

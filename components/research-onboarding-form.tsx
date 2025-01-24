@@ -292,31 +292,6 @@ export default function ResearchOnboardingForm(
 
                             <FormField
                                 control={form.control}
-                                name="systems"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Associated systems</FormLabel>
-                                        <FormDescription>{`The systems affected by your condition.`}</FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={ASSOCIATED_SYSTEMS}
-                                                placeholder="Select the associated systems of your condition..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
                                 name="categories"
                                 render={({field}) => (
                                     <FormItem>
@@ -342,6 +317,31 @@ export default function ResearchOnboardingForm(
                                                 {...field}
                                                 defaultOptions={MOLECULAR_MECHANISMS}
                                                 placeholder="Select categories that apply to you..."
+                                                hidePlaceholderWhenSelected={true}
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="systems"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Associated systems</FormLabel>
+                                        <FormDescription>{`The systems affected by your condition.`}</FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={ASSOCIATED_SYSTEMS}
+                                                placeholder="Select the associated systems of your condition..."
                                                 hidePlaceholderWhenSelected={true}
                                                 emptyIndicator={
                                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">

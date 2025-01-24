@@ -22,7 +22,7 @@ function classNames(...classes: any[]) {
 const allSteps: Step[] = [
     {
         name: 'Welcome to Comend',
-        description: "We're glad to have you",
+        description: "We're glad to have you.",
         href: '/onboarding/welcome',
     },
     {
