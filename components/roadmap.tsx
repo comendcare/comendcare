@@ -137,7 +137,7 @@ export function Roadmap({
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
                                 {/* <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger> */}
                             </TabsList>
-                            {view === 'flow' && (
+                            {/* {view === 'flow' && (
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
@@ -154,7 +154,7 @@ export function Roadmap({
                                         <p>Click to view the research plan onboarding tutorial</p>
                                     </TooltipContent>
                                 </Tooltip>
-                            )}
+                            )} */}
                         </div>
 
                         {/* Flow View */}

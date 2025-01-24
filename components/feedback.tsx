@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { FaCircleInfo } from "react-icons/fa6"
+import { FaCircleInfo, FaComment } from "react-icons/fa6"
 import {
     TooltipProvider,
     Tooltip,
@@ -33,9 +33,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { FaComment } from "react-icons/fa6"
-import { customerIOTrack, sendCustomerIOFeedbackEmail } from "@/lib/customer-io"
+// import { customerIOTrack, sendCustomerIOFeedbackEmail } from "@/lib/customer-io"
 import { useMixpanelContext } from "@/app/mixpanel"
+import { uploadFeedbackImg } from "@/lib/g-cloud"
+import { createFeedbackTicket } from "@/lib/notion"
 
 async function getBase64(file: File) {
     return new Promise((resolve, reject) => {
@@ -81,43 +82,53 @@ export const FeedbackForm: React.FC<FeedbackProps> = () => {
 
     const handleSubmitClick = async (data: any) => {
         try {
-            let attachments = []
+            // let attachments = []
+            let urls = []
             
             for (let i = 0; i < data.images.length; i++) {
-                attachments.push({
-                    filename: data.images[i].name,
-                    content: await getBase64(data.images[i])
-                })
+                // attachments.push({
+                //     filename: data.images[i].name,
+                //     content: await getBase64(data.images[i])
+                // })
+                const url = await handleImageUpload(data.images[i])
+                if (url) urls.push(url)
             }
 
             // edit this for testing purposes, if you want to test sending this to a different email address
-            const toEmail = 'support@comendcare.com'
-            const emailPayload = {
-                transactional_message_id: '2',
-                to: toEmail,
-                identifiers: { 
-                    id: mixpanelContext?.distinctId
-                },
-                message_data: {
-                    subject: 'Feedback Form Submitted',
-                    body: {
-                        name: data.name,
-                        email: data.email,
-                        description: data.description
-                    },
-                }
-            }
-            await sendCustomerIOFeedbackEmail(emailPayload, attachments)
+            // const toEmail = 'support@comendcare.com'
+            // const emailPayload = {
+            //     transactional_message_id: '2',
+            //     to: toEmail,
+            //     identifiers: { 
+            //         id: mixpanelContext?.distinctId
+            //     },
+            //     message_data: {
+            //         subject: 'Feedback Form Submitted',
+            //         body: {
+            //             name: data.name,
+            //             email: data.email,
+            //             description: data.description
+            //         },
+            //     }
+            // }
+            // await sendCustomerIOFeedbackEmail(emailPayload, attachments)
 
-            await customerIOTrack({
-                userId: mixpanelContext?.distinctId,
-                event: 'feedback_submitted',
-                properties: {
-                    name: data.name,
-                    email: data.email,
-                    description: data.description,
-                    photo_included: attachments.length > 0
-                }
+            // await customerIOTrack({
+            //     userId: mixpanelContext?.distinctId,
+            //     event: 'feedback_submitted',
+            //     properties: {
+            //         name: data.name,
+            //         email: data.email,
+            //         description: data.description,
+            //         photo_included: attachments.length > 0
+            //     }
+            // })
+
+            await createFeedbackTicket({
+                name: data.name,
+                email: data.email,
+                feedback: data.description,
+                imgUrls: urls
             })
 
             toast(`Success!`, {
@@ -138,8 +149,9 @@ export const FeedbackForm: React.FC<FeedbackProps> = () => {
     return (
         <Sheet>
             <SheetTrigger asChild>
-                <Button className="text-primary-foreground text-xs text-right fixed bottom-0 right-0 m-4 rounded-full" size="icon">
+                <Button variant="ghost">
                     <FaComment />
+                    <span>Submit feedback</span>
                 </Button>
             </SheetTrigger>
             <SheetContent onOpenAutoFocus={event => event.preventDefault()}>
@@ -262,4 +274,29 @@ export const FeedbackForm: React.FC<FeedbackProps> = () => {
             </SheetContent>
         </Sheet>
     )
+}
+
+async function handleImageUpload(file: File): Promise<string | undefined> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+
+        reader.onloadend = async () => {
+            const base64data = reader.result
+                ?.toString()
+                .replace(/^data:image\/\w+;base64,/, "")
+
+            const imageUrl = await uploadFeedbackImg({
+                name: file.name,
+                type: file.type,
+                data: base64data || ""
+            })
+
+            resolve(imageUrl)
+        }
+
+        reader.onerror = error => {
+            reject(error)
+        }
+    })
 }
