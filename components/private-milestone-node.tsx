@@ -211,7 +211,7 @@ const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilestoneNode>
             onMouseOver={() => setIsHovering(true)}
             onMouseOut={() => setIsHovering(false)}
             className={cn(
-                "z-10 bg-white transition-all rounded-full border-solid border-black border-2",
+                "research-plan-tour-step5 z-10 bg-white transition-all rounded-full border-solid border-black border-2",
                 isHovering ? "p-1 flex flex-col gap-1" : ""
             )}
         >

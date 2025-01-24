@@ -22,6 +22,10 @@ import {initializeKanbanState, initializeRoadmapState} from "@/lib/initialize-cl
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import { createKanban } from "@/lib/actions";
+import { FeedbackForm } from "@/components/feedback";
+import { FaWandMagicSparkles } from "react-icons/fa6";
+import { useOnborda } from "@/components/onborda/OnbordaContext";
+import { Button } from "@/components/ui/button";
 
 
 export type MemberWithOrganization = Member & {
@@ -37,6 +41,8 @@ export default function AppLayout({children}: AppLayoutProps) {
     const [isLoading, setIsLoading] = useState(true)
     const searchParams = useSearchParams()
     const prevSessionRef: any = useRef()
+    const { startOnborda } = useOnborda()
+    const pathname = usePathname()
 
     useEffect(() => {
         // Handle loading state for the session
@@ -151,10 +157,31 @@ export default function AppLayout({children}: AppLayoutProps) {
                 <AppSidebar />
                 <SidebarInset>
                     <header className="sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full">
-                        <div className="w-full flex items-center justify-between gap-2 px-4">
+                        <div className="w-full flex items-center justify-between gap-4 px-4">
                             <SidebarTrigger className="-ml-1" />
-                            <div className="w-8 h-8 p-1">
-                                <Image priority src={logo} alt="Comend logo" />
+                            <div className="flex items-center">
+                                <Button 
+                                    disabled={!pathname.includes('app/profile') && !pathname.includes('app/research-plan')}
+                                    variant="ghost"
+                                    onClick={() => {
+                                        console.log(`pathname`, pathname)
+                                        if (pathname.includes('app/profile')) {
+                                            startOnborda('organization-profile-tour')
+                                        } else if (pathname.includes('app/research-plan')) {
+                                            startOnborda('research-plan-tour')
+                                        }
+                                    }}>
+                                    <FaWandMagicSparkles/>
+                                    <span>Take a tour</span>
+                                </Button>
+                                <FeedbackForm />
+                                <Button
+                                    variant="ghost"
+                                    // disabled={true}
+                                    className="pointer-events-none"
+                                >
+                                    <Image className="h-8 w-8 p-1" priority src={logo} alt="Comend logo" />
+                                </Button>
                             </div>
                         </div>
                     </header>
