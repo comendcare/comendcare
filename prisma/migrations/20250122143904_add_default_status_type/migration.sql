@@ -1,5 +1,0 @@
--- AlterTable
-ALTER TABLE "Milestone" ALTER COLUMN "status" SET DEFAULT 'PLANNED';
-
--- AlterTable
-ALTER TABLE "Task" ALTER COLUMN "status" SET DEFAULT 'PLANNED';
