@@ -10,7 +10,7 @@ import {createMemberRequest, createOrganization} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
 import {useCallback, useEffect, useState} from "react";
@@ -124,6 +124,7 @@ export default function OrganizationOnboardingForm(
 ) {
     const {data: session, update} = useSession()
     const router = useRouter()
+    const pathname = usePathname()
     // const [isNewOrganization, setIsNewOrganization] = useState(true)
     const [organizations, setOrganizations] = useState<Option[]>([])
     const [address, setAddress] = useState<AddressType>({
@@ -143,7 +144,6 @@ export default function OrganizationOnboardingForm(
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof newOrgFormSchema> | undefined>(undefined);
-    console.log(defaultOrganizationValues?.incorporationStatus);
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -289,6 +289,19 @@ export default function OrganizationOnboardingForm(
                 }
             });
 
+            // Append address fields from state
+            if (address) {
+                formData.append("address1", address.address1 || "");
+                formData.append("address2", address.address2 || "");
+                formData.append("formattedAddress", address.formattedAddress || "");
+                formData.append("city", address.city || "");
+                formData.append("region", address.region || "");
+                formData.append("postalCode", address.postalCode || "");
+                formData.append("country", address.country || "");
+                formData.append("lat", address.lat.toString());
+                formData.append("lng", address.lng.toString());
+            }
+
             // only upload image if it is not the same as the previous one
             if (selectedFile && values.image && values.image !== defaultOrganizationValues?.image) {
                 try {
@@ -299,7 +312,7 @@ export default function OrganizationOnboardingForm(
                 } catch (error) {
                     console.error("Failed to upload image:", error)
                     toast.error("Image upload failed")
-                    return 
+                    return
                 }
             }
 
@@ -316,7 +329,7 @@ export default function OrganizationOnboardingForm(
                 }
             })
         } catch (error) {
-            toast.error("An error occurred while updating your profile.");
+            toast.error("An error occurred while creating your organization.");
         } finally {
             setLoading(false);
         }
@@ -324,7 +337,7 @@ export default function OrganizationOnboardingForm(
 
     useEffect(() => {
         async function fetchOrganizationData() {
-            if (session?.user?.organizationId) {
+            if (session?.user?.organizationId && pathname === "/onboarding/organization") {
                 let organizationData
                 const response = await getOrganizationFromOrganizationId(session.user.organizationId);
                 if (response.success) {
@@ -511,7 +524,7 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Website`}</FormLabel>
-                                        <FormDescription>{`Your patient group's website URL (with the URL extension like http or https.`}</FormDescription>
+                                        <FormDescription>{`Your patient group's website URL (with the URL extension like http or https).`}</FormDescription>
                                         <FormControl>
                                             <Input
                                                 id="website"

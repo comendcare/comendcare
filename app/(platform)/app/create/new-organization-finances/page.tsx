@@ -15,9 +15,6 @@ export default function CreateOrganizationFinancesPage() {
                                     Finances onboarding
                                 </h1>
                             </div>
-                            <p className="font-semibold">
-                                {`You choose what information is shared publicly. And, we will never share your data externally without your consent.`}
-                            </p>
                         </div>
 
                         <Separator/>

@@ -89,13 +89,15 @@ export const PagProfileAboutCard = ({organization}: {
                         </h3>
                         {organization?.website ?
                             <Link
-                                href={organization.website}
+                                href={organization.website.startsWith("http")
+                                    ? organization.website
+                                    : `https://${organization.website}`}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
                             >
                                 {organization?.website}
-                                <FaArrowUpRightFromSquare/>
+                                <FaArrowUpRightFromSquare />
                             </Link>
                             : (
                                 <p className="text-gray-400">

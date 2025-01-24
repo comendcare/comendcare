@@ -260,6 +260,7 @@ export const createOrganization = async (formData: FormData) => {
             update: {
                 name,
                 description,
+                subdomain,
                 yearFounded: founded?.toString(),
                 website,
                 incorporationStatus,
@@ -273,6 +274,7 @@ export const createOrganization = async (formData: FormData) => {
                 lat,
                 lng,
                 image,
+                verified: true,  // Default verified to true for beta testing
             },
             create: {
                 name,
@@ -296,6 +298,7 @@ export const createOrganization = async (formData: FormData) => {
                         id: session.user.id,
                     },
                 },
+                verified: true,  // Default verified to true for beta testing
             },
         });
 
