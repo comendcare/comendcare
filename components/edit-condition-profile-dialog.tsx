@@ -13,7 +13,6 @@ import {handleImageUpload} from "@/lib/upload";
 import {updateOrganization} from "@/lib/actions";
 import {useEffect, useState} from "react";
 import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
-import {getPublicFile} from "@/lib/utils";
 import {useSession} from "next-auth/react";
 import Link from "next/link"
 import {useForm} from "react-hook-form";

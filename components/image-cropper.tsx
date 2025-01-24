@@ -62,19 +62,27 @@ export function ImageCropper({
         }
     }
 
-    function getCroppedImg(image: HTMLImageElement, crop: PixelCrop): string {
-        const canvas = document.createElement("canvas")
-        const scaleX = image.naturalWidth / image.width
-        const scaleY = image.naturalHeight / image.height
-
-        canvas.width = crop.width * scaleX
-        canvas.height = crop.height * scaleY
-
-        const ctx = canvas.getContext("2d")
-
+    function getCroppedImg(
+        image: HTMLImageElement,
+        crop: PixelCrop,
+        format: "image/jpeg" | "image/jpg" | "image/png" = "image/jpeg", // Use JPEG by default
+        quality: number = 0.8 // Set a lower quality for lossy formats
+    ): string {
+        const canvas = document.createElement("canvas");
+        const scaleX = image.naturalWidth / image.width;
+        const scaleY = image.naturalHeight / image.height;
+    
+        // Set canvas dimensions based on the crop size and image scaling
+        canvas.width = crop.width * scaleX;
+        canvas.height = crop.height * scaleY;
+    
+        const ctx = canvas.getContext("2d");
+    
         if (ctx) {
-            ctx.imageSmoothingEnabled = false
-
+            // Disable image smoothing for pixel-perfect results (optional)
+            ctx.imageSmoothingEnabled = false;
+    
+            // Draw the cropped image onto the canvas
             ctx.drawImage(
                 image,
                 crop.x * scaleX,
@@ -84,23 +92,57 @@ export function ImageCropper({
                 0,
                 0,
                 crop.width * scaleX,
-                crop.height * scaleY,
-            )
+                crop.height * scaleY
+            );
         }
-
-        return canvas.toDataURL("image/png", 1.0)
+    
+        // Return the cropped image as a data URL with the specified format and quality
+        return canvas.toDataURL(format, quality);
     }
+
+    // function getCroppedImg(image: HTMLImageElement, crop: PixelCrop): string {
+    //     const canvas = document.createElement("canvas")
+    //     const scaleX = image.naturalWidth / image.width
+    //     const scaleY = image.naturalHeight / image.height
+
+    //     canvas.width = crop.width * scaleX
+    //     canvas.height = crop.height * scaleY
+
+    //     const ctx = canvas.getContext("2d")
+
+    //     if (ctx) {
+    //         ctx.imageSmoothingEnabled = false
+
+    //         ctx.drawImage(
+    //             image,
+    //             crop.x * scaleX,
+    //             crop.y * scaleY,
+    //             crop.width * scaleX,
+    //             crop.height * scaleY,
+    //             0,
+    //             0,
+    //             crop.width * scaleX,
+    //             crop.height * scaleY,
+    //         )
+    //     }
+
+    //     return canvas.toDataURL("image/png", 1.0)
+    // }
 
     async function onCrop() {
         try {
             setCroppedImage(croppedImageUrl)
             setDialogOpen(false)
 
-            setSelectedFile({
-                ...selectedFile,
+            if (!selectedFile) throw Error('No selected file')
+ 
+            const newSelectedFile = Object.assign(selectedFile, {
                 preview: croppedImageUrl
-            } as FileWithPreview)
+            })
+
+            setSelectedFile(newSelectedFile)
         } catch (error) {
+            console.error(`Error`, error)
             alert("Something went wrong!")
         }
     }

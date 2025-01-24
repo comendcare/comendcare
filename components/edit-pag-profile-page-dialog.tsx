@@ -225,7 +225,8 @@ export default function EditPAGProfileDialog() {
         });
 
         // Handle the selected profile image upload
-        if (selectedFileProfile && values.image) {
+        // only upload if the image has changed
+        if (selectedFileProfile && values.image && values.image !== defaultOrganizationValues?.image) {
             try {
                 const imgUrl = await handleImageUpload(selectedFileProfile as File, values.image);
                 if (imgUrl) {
@@ -239,7 +240,8 @@ export default function EditPAGProfileDialog() {
         }
 
         // Handle the selected header image upload
-        if (selectedFileHeader && values.headerImage) {
+        // only upload if the image has changed
+        if (selectedFileHeader && values.headerImage && values.headerImage !== defaultOrganizationValues?.headerImage) {
             try {
                 const imgUrl = await handleImageUpload(selectedFileHeader as File, values.headerImage);
                 if (imgUrl) {
@@ -1360,27 +1362,28 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
             if (!file) {
                 // toast.error("No file selected!")
                 console.error("No file selected!")
-                return;
+                return
             }
 
             // Additional check to exclude SVG
             if (file.type !== "image/jpg" && file.type !== "image/jpeg" && file.type !== "image/png") {
                 toast.error("Only .jpg, .jpeg, and .png files are allowed. Please select a valid image format.")
                 console.error("Only .jpg, .jpeg, and .png files are allowed. Please select a valid image format.")
-                return;
+                return
             }
 
-            // Check file size (1 MB limit)
-            const maxSizeInBytes = 1 * 1024 * 1024; // 1 MB
+            // Check file size (5 MB limit), image upload size is limited by the next server actions bodySizeLimit
+            // defined in next.config.js
+            const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
             if (file.size > maxSizeInBytes) {
-                toast.error("File size exceeds 1 MB. Please select a smaller image.")
-                console.error("File size exceeds 1 MB. Please select a smaller image.")
-                return;
+                toast.error("File size exceeds 5 MB. Please select a smaller image.")
+                console.error("File size exceeds 5 MB. Please select a smaller image.")
+                return
             }
 
             const fileWithPreview = Object.assign(file, {
                 preview: URL.createObjectURL(file),
-            });
+            })
 
             setSelectedFile(fileWithPreview)
             setDialogOpen(true)

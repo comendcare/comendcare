@@ -698,7 +698,7 @@ export const updateRoadmapMetadata = withRoadmapAuth(
                     },
                     data: {
                         image: url,
-                        imageBlurhash: blurhash
+                        // imageBlurhash: blurhash
                     }
                 })
             } else {
@@ -1926,6 +1926,7 @@ async function updateRFP(previousMilestone: Milestone, milestone: Milestone) {
 export async function createKanban(orgId: string) {
     try {
         const newKanban = await prisma.kanban.create({
+            include: { columns: true },
             data: {
                 organization: { connect: { id: orgId } },
                 columns: {

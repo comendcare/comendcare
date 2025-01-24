@@ -13,8 +13,7 @@ import StatusButton from "./milestone-status-button"
 import { truncate, cn } from "@/lib/utils"
 import { PrivateBadge } from "./private-badge"
 import { Badge } from "./ui/badge"
-import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
-import { StatusType } from "@prisma/client"
+import { MILESTONE_TYPE_OPTIONS, StatusType } from "@/lib/types"
 
 export type PublicMilestoneNode = Node<
     {
