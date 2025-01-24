@@ -491,7 +491,7 @@ export default function ResearchOnboardingForm(
 
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
-                                    <Button onClick={() => router.push(previousLink)}>
+                                    <Button type="button" onClick={() => router.push(previousLink)}>
                                         Previous
                                     </Button>
                                     <Button type="submit" disabled={loading}>
@@ -651,7 +651,7 @@ export default function ResearchOnboardingForm(
                                                             <div
                                                                 className="flex flex-row items-center justify-between w-full">
                                                                 <h4 className="scroll-m-20 text-base font-semibold">
-                                                                    Statistics
+                                                                    Epidemiology
                                                                 </h4>
                                                             </div>
                                                             {(form.watch("prevalenceNumerator") && form.watch("prevalenceDenominator") && form.watch("population")) ? (

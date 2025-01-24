@@ -218,21 +218,18 @@ export const MOLECULAR_MECHANISMS: Option[] = [
         label: 'Loss-of-Function',
         value: 'LOSS_OF_FUNCTION',
         description: 'A molecular mechanism where a mutation results in the reduced or complete loss of a protein\'s normal activity.',
-        strengths: 'Enables targeted therapies to restore or compensate for the lost function.',
     },
     {
         id: '2',
         label: 'Gain-of-Function',
         value: 'GAIN_OF_FUNCTION',
         description: 'A molecular mechanism where a mutation results in increased, novel, or constitutive activity of a protein.',
-        strengths: 'Focuses on strategies to inhibit or regulate the aberrant activity caused by the mutation.',
     },
     {
         id: '3',
         label: 'Haploinsufficiency',
         value: 'HAPLOINSUFFICIENCY',
         description: 'A mechanism where one copy of a gene is insufficient to produce adequate protein levels for normal function.',
-        strengths: 'Targets strategies to enhance expression or compensate for the insufficient protein levels.',
     },
     {
         id: '4',

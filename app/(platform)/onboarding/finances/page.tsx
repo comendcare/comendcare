@@ -26,9 +26,6 @@ export default function FinancesOnboardingPage() {
                         <p>
                             {`With these questions we're seeking to understand your organization's capacity for advancing research in topics relevant to your group.`}
                         </p>
-                        <p className="font-semibold">
-                            {`You choose what information is shared publicly. And, we will never share your data externally without your consent.`}
-                        </p>
                     </div>
 
                     <Separator/>
