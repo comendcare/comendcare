@@ -65,6 +65,7 @@ import {RFPEditForm} from "./rfp-edit-form"
 import {PapersEditForm} from "./papers-edit-form"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
+import { getKanbanFromOrganizationId } from "@/lib/fetchers"
 
 type AssetType = Prisma.AssetGetPayload<{
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -116,7 +117,8 @@ const kanbanSelector = (state: KanbanState) => ({
     tasks: state.tasks,
     updateTask: state.updateTask,
     setTasks: state.setTasks,
-    addTask: state.addTask
+    addTask: state.addTask,
+    addColumn: state.addColumn
 })
 
 export function EditMilestoneForm({
@@ -134,7 +136,8 @@ export function EditMilestoneForm({
         tasks: kanbanTasks,
         updateTask,
         setTasks,
-        addTask
+        addTask,
+        addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
 
@@ -697,6 +700,32 @@ export function EditMilestoneForm({
                                         variant={'secondary'}
                                         onClick={async (e) => {
                                             e.preventDefault()
+                                            // if kanban doesn't exist or kanban has no columns
+                                            if (kanbanColumns.length === 0) {
+                                                const response = await getKanbanFromOrganizationId()
+
+                                                if (response.success && response.data) {
+                                                    // kanban found, add column
+                                                    const column = await addColumn({
+                                                        name: 'Unsorted Tasks'
+                                                    })
+
+                                                    if (!column) return
+
+                                                    const newTask = await addTask(column.id)
+                                                    if (newTask) {
+                                                        const updatedTasks = [...form.getValues().tasks || [], {
+                                                            ...newTask,
+                                                            milestoneId: milestoneData?.id,
+                                                            milestone: {id: milestoneData?.id}
+                                                        }]
+                                                        form.setValue('tasks', updatedTasks)
+                                                    }
+
+                                                    return
+                                                }
+                                            }
+
                                             const columnId = kanbanColumns[0].id
 
                                             const newTask = await addTask(columnId)
