@@ -30,7 +30,8 @@ import LoadingDots from "@/components/icons/loading-dots";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {Organization} from "@prisma/client";
 import {concat} from "lodash";
-import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types";
+import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
+import mixpanel from "mixpanel-browser";
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -93,6 +94,9 @@ export default function ResearchOnboardingForm(
     const router = useRouter()
     const [loading, setLoading] = useState(false);
     const [organization, setOrganization] = useState<Organization | null>();
+    const [otherModality, setOtherModality] = useState<string>("");
+    const [otherCategories, setOtherCategories] = useState<string>("");
+    const [otherSystem, setOtherSystem] = useState<string>("");
 
     const form = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
@@ -136,6 +140,29 @@ export default function ResearchOnboardingForm(
                     if (response.success && response.data) {
                         const conditionOrg = await connectOrganizationToCondition(session?.user.organizationId, response.data.id)
                         toast.success("Successfully created condition.")
+
+                        // Mixpanel tracking for "Other" fields
+                        if (otherModality) {
+                            mixpanel.track("Org has other modality", {
+                                orgName: organization?.name || "Unknown Org",
+                                looking: otherModality,
+                            });
+                        }
+
+                        if (otherCategories) {
+                            mixpanel.track("Org has other category", {
+                                orgName: organization?.name || "Unknown Org",
+                                looking: otherCategories,
+                            });
+                        }
+
+                        if (otherSystem) {
+                            mixpanel.track("Org has other system", {
+                                orgName: organization?.name || "Unknown Org",
+                                looking: otherSystem,
+                            });
+                        }
+
                         router.push(nextLink)
                     } else {
                         console.error(response.error)
@@ -326,6 +353,17 @@ export default function ResearchOnboardingForm(
                                             />
                                         </FormControl>
                                         <FormMessage/>
+                                        {form.watch("categories")?.some((item) => item.value === "OTHER") && (
+                                            <div className="mt-2">
+                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                <Input
+                                                    type="text"
+                                                    id="categories-other"
+                                                    value={otherCategories}
+                                                    onChange={(e) => setOtherCategories(e.target.value)}
+                                                />
+                                            </div>
+                                        )}
                                     </FormItem>
                                 )}
                             />
@@ -351,6 +389,17 @@ export default function ResearchOnboardingForm(
                                             />
                                         </FormControl>
                                         <FormMessage/>
+                                        {form.watch("systems")?.some((item) => item.value === "OTHER") && (
+                                            <div className="mt-2">
+                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                <Input
+                                                    type="text"
+                                                    id="systems-other"
+                                                    value={otherSystem}
+                                                    onChange={(e) => setOtherSystem(e.target.value)}
+                                                />
+                                            </div>
+                                        )}
                                     </FormItem>
                                 )}
                             />
@@ -391,6 +440,17 @@ export default function ResearchOnboardingForm(
                                             />
                                         </FormControl>
                                         <FormMessage/>
+                                        {form.watch("modalities")?.some((item) => item.value === "OTHER") && (
+                                            <div className="mt-2">
+                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                <Input
+                                                    type="text"
+                                                    id="modalities-other"
+                                                    value={otherModality}
+                                                    onChange={(e) => setOtherModality(e.target.value)}
+                                                />
+                                            </div>
+                                        )}
                                     </FormItem>
                                 )}
                             />
@@ -508,7 +568,8 @@ export default function ResearchOnboardingForm(
                     </Form>
                 </div>
 
-                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">
+                <div
+                    className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">
                     <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
                         <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
                             Organization profile preview
@@ -741,9 +802,10 @@ export default function ResearchOnboardingForm(
                                         </CardContent>
                                     </Card>
                                     <Card>
-                                        <CardHeader className="w-full flex flex-row items-center justify-between space-y-0">
+                                        <CardHeader
+                                            className="w-full flex flex-row items-center justify-between space-y-0">
                                             <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>
-                                            Research Plan
+                                                Research Plan
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
