@@ -26,6 +26,7 @@
     "@google-cloud/storage": "^7.14.0",
     "@hookform/resolvers": "^3.9.0",
     "@next-auth/prisma-adapter": "^1.0.7",
+    "@notionhq/client": "^2.2.15",
     "@prisma/client": "^5.22.0",
     "@prisma/extension-pulse": "^1.2.0",
     "@radix-ui/react-accordion": "^1.2.0",
