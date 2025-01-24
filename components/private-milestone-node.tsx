@@ -16,11 +16,10 @@ import { DateView } from "./miletone-date-view"
 import { PrivateBadge } from "./private-badge"
 import {monthsList} from "@/lib/data";
 import { Badge } from "./ui/badge"
-import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { MILESTONE_TYPE_OPTIONS, StatusType } from "@/lib/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { Popover } from "./plate-ui/popover"
-import { Edge, StatusType } from "@prisma/client"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 

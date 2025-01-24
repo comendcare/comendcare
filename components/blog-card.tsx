@@ -9,7 +9,6 @@ interface BlogCardProps {
         Roadmap,
         | "slug"
         | "image"
-        | "imageBlurhash"
         | "title"
         | "description"
         | "createdAt"
@@ -27,7 +26,7 @@ export default function BlogCard({ data }: BlogCardProps) {
                     height={400}
                     className="h-64 w-full object-cover"
                     placeholder="blur"
-                    blurDataURL={data?.imageBlurhash ?? placeholderBlurhash}
+                    blurDataURL={placeholderBlurhash}
                 />
                 <div className="h-36 border-t border-stone-200 px-5 py-8 dark:border-stone-700 dark:bg-black">
                     <h3 className="font-title text-xl tracking-wide dark:text-white">

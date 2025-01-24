@@ -10,6 +10,8 @@ export type PostWithAuthorAndComments = Post & {
     comments: Comment[]
 }
 
+export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
+
 export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     {
         label: 'All',
@@ -282,6 +284,8 @@ export const MILESTONE_TYPE_OPTIONS: Option[] = [
     { label: 'IND approval', value: 'INDAPPROVAL' },
     { label: 'No type', value: 'NOTYPE'}
 ]
+
+export type StatusType = 'PLANNED' | 'INPROGRESS' | 'COMPLETED'
 
 export const MILESTONE_STATUS_OPTIONS: Option[] = [
     { label: 'Planned', value: 'PLANNED' },

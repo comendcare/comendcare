@@ -2,7 +2,7 @@
 
 import React, { memo, useState } from "react"
 import { Button } from "./ui/button"
-import { StatusType } from "@prisma/client"
+import { StatusType } from "@/lib/types"
 
 export default function StatusButton({
     status = "PLANNED",

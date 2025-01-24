@@ -21,6 +21,7 @@ import {toast} from "sonner";
 import {initializeKanbanState, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
+import { createKanban } from "@/lib/actions";
 
 
 export type MemberWithOrganization = Member & {
@@ -103,7 +104,12 @@ export default function AppLayout({children}: AppLayoutProps) {
                 toast.error(response.error)
             }
 
-            const kanban = await getKanbanFromOrganizationId()
+            let kanban = await getKanbanFromOrganizationId()
+            if (!kanban.data && orgId) {
+                // kanban was not found, create it
+                kanban = await createKanban(orgId)
+            }
+
             if (kanban.success) {
                 const kanbanResponse = await getColumns(orgId)
                 if (kanbanResponse.success) {
