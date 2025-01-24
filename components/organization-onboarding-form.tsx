@@ -35,6 +35,7 @@ import {checkSubdomainAvailability, getAllOrganizations, getOrganizationFromOrga
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 import { FormImageCropper } from "./edit-pag-profile-page-dialog";
+import mixpanel from "mixpanel-browser";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -321,6 +322,14 @@ export default function OrganizationOnboardingForm(
                     toast.error(res.error)
                 } else {
                     va.track("Created Organization")
+
+                    if (newOrgForm.watch("looking")) {
+                        mixpanel.track(`User is looking for`, {
+                            orgName: newOrgForm.watch("orgName"),
+                            looking: newOrgForm.watch("looking")
+                        })
+                    }
+
                     // Update the session object with the newly created organizationId
                     updateSession(res.id)
                     router.refresh()
