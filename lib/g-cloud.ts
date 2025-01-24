@@ -56,7 +56,16 @@ export async function uploadFeedbackImg(image: {
         })
         const bucket = storage.bucket("comend-app-feedback")
 
-        const filename = `${Date.now()}-${image.name}`
+        let filename = `${Date.now()}`
+
+        if (image.type == "image/png") {
+            filename = filename.concat(".png")
+        } else if (image.type == "image/jpg") {
+            filename = filename.concat(".jpg")
+        } else if (image.type == "image/jpeg") {
+            filename = filename.concat(".jpeg")
+        }
+
         const file = bucket.file(filename)
         const buffer = Buffer.from(image.data, "base64")
 
