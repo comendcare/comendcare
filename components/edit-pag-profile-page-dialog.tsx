@@ -834,30 +834,30 @@ export default function EditPAGProfileDialog() {
                                         className="rounded h-[100px] w-[400px]"
                                     />
 
-                                    <FormField
-                                        control={editOrgForm.control}
-                                        name="looking"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>{`Looking for`}</FormLabel>
-                                                <FormDescription>{`What your organization is looking for and hoping to get from joining Comend.`}</FormDescription>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        defaultOptions={OPTIONS}
-                                                        placeholder="Select options that appeal to you..."
-                                                        hidePlaceholderWhenSelected={true}
-                                                        emptyIndicator={
-                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                                no results found.
-                                                            </p>
-                                                        }
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
+                                    {/*<FormField*/}
+                                    {/*    control={editOrgForm.control}*/}
+                                    {/*    name="looking"*/}
+                                    {/*    render={({field}) => (*/}
+                                    {/*        <FormItem>*/}
+                                    {/*            <FormLabel>{`Looking for`}</FormLabel>*/}
+                                    {/*            <FormDescription>{`What your organization is looking for and hoping to get from joining Comend.`}</FormDescription>*/}
+                                    {/*            <FormControl>*/}
+                                    {/*                <MultipleSelector*/}
+                                    {/*                    {...field}*/}
+                                    {/*                    defaultOptions={OPTIONS}*/}
+                                    {/*                    placeholder="Select options that appeal to you..."*/}
+                                    {/*                    hidePlaceholderWhenSelected={true}*/}
+                                    {/*                    emptyIndicator={*/}
+                                    {/*                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
+                                    {/*                            no results found.*/}
+                                    {/*                        </p>*/}
+                                    {/*                    }*/}
+                                    {/*                />*/}
+                                    {/*            </FormControl>*/}
+                                    {/*            <FormMessage/>*/}
+                                    {/*        </FormItem>*/}
+                                    {/*    )}*/}
+                                    {/*/>*/}
 
                                     <Button type="submit">Save</Button>
                                 </form>

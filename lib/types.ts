@@ -282,6 +282,7 @@ export const MILESTONE_TYPE_OPTIONS: Option[] = [
     { label: 'FDA listening session', value: 'FDALISTENINGSESSION' },
     { label: 'IND submission', value: 'INDSUBMISSION' },
     { label: 'IND approval', value: 'INDAPPROVAL' },
+    { label: 'Other', value: 'OTHER' },
     { label: 'No type', value: 'NOTYPE'}
 ]
 

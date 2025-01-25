@@ -35,6 +35,7 @@ import {checkSubdomainAvailability, getAllOrganizations, getOrganizationFromOrga
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 import { FormImageCropper } from "./edit-pag-profile-page-dialog";
+import mixpanel from "mixpanel-browser";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -321,6 +322,14 @@ export default function OrganizationOnboardingForm(
                     toast.error(res.error)
                 } else {
                     va.track("Created Organization")
+
+                    if (newOrgForm.watch("looking")) {
+                        mixpanel.track(`User is looking for`, {
+                            orgName: newOrgForm.watch("orgName"),
+                            looking: newOrgForm.watch("looking")
+                        })
+                    }
+
                     // Update the session object with the newly created organizationId
                     updateSession(res.id)
                     router.refresh()
@@ -811,9 +820,11 @@ export default function OrganizationOnboardingForm(
                         <div className="w-full flex flex-col space-y-8 my-8">
                             <div>
                                 <div>
-                                    <img className="object-cover h-24 w-full lg:h-36"
+                                    {/* <img className="object-cover h-24 w-full lg:h-36"
                                          src={'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'}
-                                         alt=""/>
+                                         alt=""
+                                    /> */}
+                                    <div className="h-32 w-full object-cover lg:h-48 bg-secondary"></div>
                                 </div>
 
                                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
