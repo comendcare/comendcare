@@ -1705,6 +1705,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     data: {
                         title: milestone.title,
                         type: milestone.type,
+                        otherTypeDetails: milestone.otherTypeDetails,
                         description: milestone.description,
                         startDate: milestone.startDate,
                         endDate: milestone.endDate,
