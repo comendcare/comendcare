@@ -11,6 +11,7 @@ import {
     FormLabel,
     FormItem,
     FormMessage,
+    FormDescription,
 } from "./ui/form"
 import {Input} from "./ui/input"
 import {Textarea} from "./ui/textarea"
@@ -58,14 +59,16 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {MILESTONE_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {Prisma} from "@prisma/client"
+import {Organization, Prisma} from "@prisma/client"
 import {Separator} from "./ui/separator"
 import {AssetEditForm} from "./asset-edit-form"
 import {RFPEditForm} from "./rfp-edit-form"
 import {PapersEditForm} from "./papers-edit-form"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
-import { getKanbanFromOrganizationId } from "@/lib/fetchers"
+import { getKanbanFromOrganizationId, getOrganizationFromOrganizationId } from "@/lib/fetchers"
+import mixpanel from "mixpanel-browser"
+import { useSession } from "next-auth/react"
 
 type AssetType = Prisma.AssetGetPayload<{
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -140,32 +143,7 @@ export function EditMilestoneForm({
         addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
-
-    // useEffect(() => {
-    //     console.log(`updated milestone`, milestoneData)
-    //     // Reset form values when milestoneData changes
-    //     form.reset({
-    //         nodeId: milestoneData?.nodeId || null,
-    //         title: milestoneData?.title || "",
-    //         description: milestoneData?.description || "",
-    //         type: milestoneData?.type || "NOTYPE",
-    //         startDate: {
-    //             month: milestoneData?.startDate?.getMonth() ? monthsList[milestoneData.startDate.getMonth()] : undefined,
-    //             year: milestoneData?.startDate?.getFullYear()?.toString() || undefined
-    //         },
-    //         endDate: {
-    //             month: milestoneData?.endDate?.getMonth() ? monthsList[milestoneData.endDate.getMonth()] : undefined,
-    //             year: milestoneData?.endDate?.getFullYear()?.toString() || undefined
-    //         },
-    //         budget: milestoneData?.budget || undefined,
-    //         papers: milestoneData?.papers || undefined,
-    //         tasks: kanbanTasks.filter(task => task.milestoneId === milestoneData?.id) || [],
-    //         status: milestoneData?.status || "PLANNED",
-    //         private: milestoneData?.private || false,
-    //         asset: milestoneData?.asset || undefined,
-    //         RFP: milestoneData?.RFP || undefined
-    //     })
-    // }, [selectedNodeId])
+    const {data: session} = useSession()
 
     const editMilestoneForm = z.object({
         title: z
@@ -179,6 +157,7 @@ export function EditMilestoneForm({
             .max(1000, "Description must be less than 1000 characters")
             .optional(),
         type: z.string(),
+        otherTypeDetails: z.string().optional(),
         startDate: z.object({
             month: z.string().optional(),
             year: z.string().min(4, "Year must be 4 digits").max(4, "Year must be 4 digits").optional(),
@@ -203,6 +182,7 @@ export function EditMilestoneForm({
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
             type: milestoneData?.type || "NOTYPE",
+            otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
             startDate: {
                 month: milestoneData?.startDate?.getMonth() ? monthsList[milestoneData?.startDate?.getMonth()] : undefined,
                 year: milestoneData?.startDate?.getFullYear()?.toString() || undefined
@@ -225,6 +205,7 @@ export function EditMilestoneForm({
         title: form.watch("title"),
         description: form.watch("description"),
         type: form.watch("type"),
+        otherTypeDetails: form.watch("otherTypeDetails"),
         startDate: form.watch("startDate"),
         endDate: form.watch("endDate"),
         budget: form.watch("budget"),
@@ -265,11 +246,12 @@ export function EditMilestoneForm({
         return Array.from(map.values());
       };
 
-    const handleMilestoneFormSubmit = (values: z.infer<typeof editMilestoneForm>) => {
+    const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         const {
             title,
             description,
             type,
+            otherTypeDetails,
             startDate,
             endDate,
             budget,
@@ -310,6 +292,10 @@ export function EditMilestoneForm({
                     ? {type}
                     : {type: 'NOTYPE'}
             ),
+            ...(otherTypeDetails !== undefined && otherTypeDetails !== null
+                ? {otherTypeDetails}
+                : undefined
+            ),
             status,
             private: isPrivate || false,
             asset,
@@ -341,6 +327,24 @@ export function EditMilestoneForm({
 
             return task
         }))
+
+        // Mixpanel tracking for "Other" field
+        // only send to mixpanel if the details explaining the 'other' type have been updated
+        if (otherTypeDetails && otherTypeDetails !== milestoneData?.otherTypeDetails && session?.user.organizationId) {
+            const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
+
+            // console.log(`track mixpanel event`, {
+            //     name: "Milestone has other type",
+            //     orgName: response?.data?.name || "Unknown Org",
+            //     milestoneTitle: title,
+            //     milestoneType: otherTypeDetails,
+            // })
+            mixpanel.track("Milestone has other type", {
+                orgName: response?.data?.name || "Unknown Org",
+                milestoneTitle: title,
+                milestoneType: otherTypeDetails,
+            });
+        }
 
         toast('Success!', {
             position: "bottom-left",
@@ -469,6 +473,32 @@ export function EditMilestoneForm({
                                 </FormItem>
                             )}
                         />
+
+                        {form.watch("type") === "OTHER" && (
+                            <>
+                            <div>
+                            <FormLabel className="text-md">{`Type Description`}</FormLabel>
+                            <FormDescription>{`This will be used to improve the platform.`}</FormDescription>
+                            </div>
+                            <FormField
+                                control={form.control}
+                                name="otherTypeDetails"
+                                render={({field}) => (
+                                    <FormItem className="flex flex-col grow">
+                                        <FormControl>
+                                            <Textarea
+                                                id="otherTypeDetails"
+                                                placeholder={`Please enter a short description of your milestone type.`}
+                                                defaultValue={field.value}
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                            </>
+                        )}
 
                         <FormLabel className="text-md">{`Private`}</FormLabel>
                         <FormField
