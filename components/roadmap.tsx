@@ -58,7 +58,6 @@ export function Roadmap({
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
-    const { startOnborda } = useOnborda()
 
     const urlView = searchParams.get("view")
     const [view, setView] = useState(urlView ? urlView : "flow")
@@ -80,37 +79,17 @@ export function Roadmap({
             router.push(`${pathname}?${params.toString()}`, { scroll: false })
         }
         if (open) {
-            // setSelectedTaskId(null)
-
             const params = new URLSearchParams(searchParams.toString())
             params.delete("task")
             router.push(`${pathname}?${params.toString()}`, { scroll: false })
         }
     }
 
-    // const handleTaskPanelChange = (open: boolean) => {
-    //     if (!open) {
-    //         // setSelectedTaskId(null)
-
-    //         const params = new URLSearchParams(searchParams.toString())
-    //         params.delete("task")
-    //         router.push(`${pathname}?${params.toString()}`, { scroll: false })
-    //     }
-    //     if (open) {
-    //         setSelectedNodeId(null)
-
-    //         const params = new URLSearchParams(searchParams.toString())
-    //         params.delete("milestone")
-    //         router.push(`${pathname}?${params.toString()}`, { scroll: false })
-    //     }
-    // }
-
     const handleTabChange = (value: string) => {
         setView(value) // for the onboarding tutorial
 
         // close all panels when switching tabs
         setSelectedNodeId(null)
-        // setSelectedTaskId(null)
 
         const params = new URLSearchParams(searchParams.toString())
         params.delete("view")
@@ -137,24 +116,6 @@ export function Roadmap({
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
                                 {/* <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger> */}
                             </TabsList>
-                            {/* {view === 'flow' && (
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            size="icon"
-                                            variant="ghost"
-                                            onClick={() => {
-                                                startOnborda('research-plan-tour')
-                                            }}
-                                        >
-                                            <FaRegQuestionCircle/>
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Click to view the research plan onboarding tutorial</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            )} */}
                         </div>
 
                         {/* Flow View */}
@@ -208,41 +169,32 @@ const MilestoneDetailsPanel = ({
     milestone: any
     handlePanelChange: (open: boolean) => void
 }) => {
+    const { 
+        selectedNodeId, 
+        setSelectedNodeId
+    } = useRoadmapStore(useShallow(selector))
     // const [isEditing, setIsEditing] = useState(false)
     const [isEditing, setIsEditing] = useState(true)
+    const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
+    
+    useEffect(() => {
+        if (selectedNodeId) {
+            // remount if the selected node has changed, this will re-initialize the form data
+            // without closing the side panel since we're now editing a new node
+            const remountkey = milestoneRemountKey
+            setMilestoneRemountKey(remountkey + 1)
+        }
+    }, [selectedNodeId])
 
     const handleClose = () => {
-        // setIsEditing(false)
         handlePanelChange(false)
     }
 
     return (
-        <>
-            <span className="flex flex-row justify-between items-center gap-4">
-                {/* <h1 className="text-2xl font-bold grow">
-                    {isEditing ? `Edit Milestone Details` : `Milestone Details`}
-                </h1> */}
-                {/* {isEditing ? (
-                    <Button onClick={() => setIsEditing(false)}>
-                        Cancel Editing
-                    </Button>
-                ) : (
-                    <Button onClick={() => setIsEditing(true)}>
-                        Edit Milestone
-                    </Button>
-                )} */}
-                {/* <Button variant="secondary" onClick={handleClose}>
-                    <FaX />
-                </Button> */}
-            </span>
-            {isEditing ? (
-                <EditMilestoneForm
-                    milestoneData={milestone}
-                    onClose={handleClose}
-                />
-            ) : (
-                <MilestoneDetails milestone={milestone} />
-            )}
-        </>
+        <EditMilestoneForm
+            key={milestoneRemountKey}
+            milestoneData={milestone}
+            onClose={handleClose}
+        />
     )
 }
