@@ -141,32 +141,6 @@ export function EditMilestoneForm({
     } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
 
-    // useEffect(() => {
-    //     console.log(`updated milestone`, milestoneData)
-    //     // Reset form values when milestoneData changes
-    //     form.reset({
-    //         nodeId: milestoneData?.nodeId || null,
-    //         title: milestoneData?.title || "",
-    //         description: milestoneData?.description || "",
-    //         type: milestoneData?.type || "NOTYPE",
-    //         startDate: {
-    //             month: milestoneData?.startDate?.getMonth() ? monthsList[milestoneData.startDate.getMonth()] : undefined,
-    //             year: milestoneData?.startDate?.getFullYear()?.toString() || undefined
-    //         },
-    //         endDate: {
-    //             month: milestoneData?.endDate?.getMonth() ? monthsList[milestoneData.endDate.getMonth()] : undefined,
-    //             year: milestoneData?.endDate?.getFullYear()?.toString() || undefined
-    //         },
-    //         budget: milestoneData?.budget || undefined,
-    //         papers: milestoneData?.papers || undefined,
-    //         tasks: kanbanTasks.filter(task => task.milestoneId === milestoneData?.id) || [],
-    //         status: milestoneData?.status || "PLANNED",
-    //         private: milestoneData?.private || false,
-    //         asset: milestoneData?.asset || undefined,
-    //         RFP: milestoneData?.RFP || undefined
-    //     })
-    // }, [selectedNodeId])
-
     const editMilestoneForm = z.object({
         title: z
             .string({
