@@ -23,24 +23,24 @@ export default function OrganizationOnboardingResearchPage() {
                                 {`< 6 min`}
                             </p>
                         </div>
-                        <p>
-                            {`
-                        We have some questions about the nature of your disorder, it's demographic, and the ongoing efforts towards treatments and cures.
-                        `}
-                            {`Hover over the `}
-                            <span className="inline-flex items-center">
-                                {" "}
-                                <Tooltip delayDuration={0}>
-                                    <TooltipTrigger>
-                                        <FaQuestionCircle className="h-4 inline-block align-baseline mx-1"/>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Hello there!</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </span>
-                            {` if you're wondering why we need to know something.`}
-                        </p>
+                        {/*<p>*/}
+                        {/*    {`*/}
+                        {/*We have some questions about the nature of your disorder, it's demographic, and the ongoing efforts towards treatments and cures.*/}
+                        {/*`}*/}
+                        {/*    {`Hover over the `}*/}
+                        {/*    <span className="inline-flex items-center">*/}
+                        {/*        {" "}*/}
+                        {/*        <Tooltip delayDuration={0}>*/}
+                        {/*            <TooltipTrigger>*/}
+                        {/*                <FaQuestionCircle className="h-4 inline-block align-baseline mx-1"/>*/}
+                        {/*            </TooltipTrigger>*/}
+                        {/*            <TooltipContent>*/}
+                        {/*                <p>Hello there!</p>*/}
+                        {/*            </TooltipContent>*/}
+                        {/*        </Tooltip>*/}
+                        {/*    </span>*/}
+                        {/*    {` if you're wondering why we need to know something.`}*/}
+                        {/*</p>*/}
                     </div>
 
                     <Separator/>

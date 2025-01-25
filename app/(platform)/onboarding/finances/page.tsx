@@ -23,9 +23,6 @@ export default function FinancesOnboardingPage() {
                                 {`< 5 min`}
                             </p>
                         </div>
-                        <p>
-                            {`With these questions we're seeking to understand your organization's capacity for advancing research in topics relevant to your group.`}
-                        </p>
                     </div>
 
                     <Separator/>
