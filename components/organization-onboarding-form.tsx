@@ -34,7 +34,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {checkSubdomainAvailability, getAllOrganizations, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
-import { FormImageCropper } from "./edit-pag-profile-page-dialog";
+import {FormImageCropper} from "./edit-pag-profile-page-dialog";
 import mixpanel from "mixpanel-browser";
 
 const optionSchema = z.object({
@@ -692,7 +692,7 @@ export default function OrganizationOnboardingForm(
                                 )}
                             />
 
-                            <FormImageCropper 
+                            <FormImageCropper
                                 form={newOrgForm}
                                 name="image"
                                 title={"Organization Logo"}
@@ -796,9 +796,11 @@ export default function OrganizationOnboardingForm(
                                     >
                                         Join Organization
                                     </Button>
-                                    <Button variant="ghost" onClick={() => router.push("/app/profile")}>
-                                        Skip for now
-                                    </Button>
+                                    {showSkip &&
+                                        <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                            Skip for now
+                                        </Button>
+                                    }
                                 </div>
                             </form>
                         </Form>
@@ -806,7 +808,8 @@ export default function OrganizationOnboardingForm(
                 )}
             </div>
             {isNewOrganization &&
-                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">
+                <div
+                    className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">
                     <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
                         <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
                             Organization profile preview
@@ -946,9 +949,10 @@ export default function OrganizationOnboardingForm(
                                         </CardContent>
                                     </Card>
                                     <Card>
-                                        <CardHeader className="w-full flex flex-row items-center justify-between space-y-0">
+                                        <CardHeader
+                                            className="w-full flex flex-row items-center justify-between space-y-0">
                                             <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>
-                                            Research Plan
+                                                Research Plan
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
