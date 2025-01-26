@@ -85,8 +85,8 @@ function generateFiltersString(filters: FiltersType) {
 
 const sortByFilters: { [key: string]: string } = {
     "alphabetical": "name:asc",
-    "patients-low-high": "numberOfIdentifiedPatients:asc",
-    "patients-high-low": "numberOfIdentifiedPatients:desc",
+    "patients-low-high": "numberOfPatientsEngaged:asc",
+    "patients-high-low": "numberOfPatientsEngaged:desc",
     "prevalence-low-high": "prevalenceRatio:asc",
     "prevalence-high-low": "prevalenceRatio:desc",
     "money-raised-low-high": "moneyRaised:asc",

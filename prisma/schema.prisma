@@ -396,7 +396,9 @@ model Condition {
   diseaseCategories           String[]
   prevalenceNumerator         Int?
   prevalenceDenominator       Int?
-  numberOfIdentifiedPatients  Int?
+  numberOfPatientsEngaged     Int?
+  nationalEstimatedPopulation Int?
+  globalEstimatedPopulation   Int?
   relevantDiseaseMechanisms   String[]
   associatedGenes             String[]
   associatedSystems           String[]

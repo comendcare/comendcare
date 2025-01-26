@@ -136,8 +136,14 @@ export const createCondition = async (formData: FormData) => {
     const prevalenceDenominator = formData.get("prevalenceDenominator")
         ? parseInt(formData.get("prevalenceDenominator") as string, 10)
         : null;
-    const numberOfIdentifiedPatients = formData.get("numberOfIdentifiedPatients")
-        ? parseInt(formData.get("numberOfIdentifiedPatients") as string, 10)
+    const numberOfPatientsEngaged = formData.get("numberOfPatientsEngaged")
+        ? parseInt(formData.get("numberOfPatientsEngaged") as string, 10)
+        : null;
+    const nationalEstimatedPopulation = formData.get("nationalEstimatedPopulation")
+        ? parseInt(formData.get("nationalEstimatedPopulation") as string, 10)
+        : null;
+    const globalEstimatedPopulation = formData.get("globalEstimatedPopulation")
+        ? parseInt(formData.get("globalEstimatedPopulation") as string, 10)
         : null;
     const relevantDiseaseMechanisms = formData.get("relevantDiseaseMechanisms")
         ? (formData.get("relevantDiseaseMechanisms") as string).split(",")
@@ -168,7 +174,9 @@ export const createCondition = async (formData: FormData) => {
                 diseaseCategories,
                 prevalenceNumerator,
                 prevalenceDenominator,
-                numberOfIdentifiedPatients,
+                numberOfPatientsEngaged,
+                nationalEstimatedPopulation,
+                globalEstimatedPopulation,
                 relevantDiseaseMechanisms,
                 associatedGenes,
                 associatedSystems,

@@ -625,7 +625,7 @@ export default function EditConditionProfileDialog() {
                     </div>
                     <FormField
                         control={conditionProfileForm.control}
-                        name="population"
+                        name="engaged"
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel>{`Number of patients identified`}</FormLabel>
@@ -633,7 +633,7 @@ export default function EditConditionProfileDialog() {
                                 <FormControl>
                                     <Input
                                         type="number"
-                                        id="population"
+                                        id="engaged"
                                         {...field}
                                     />
                                 </FormControl>

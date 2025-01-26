@@ -154,7 +154,7 @@ const syncToTypesense = async (env: {
                     type: "int64"
                 },
                 {
-                    name: "numberOfIdentifiedPatients",
+                    name: "numberOfPatientsEngaged",
                     facet: false,
                     index: true,
                     infix: false,
