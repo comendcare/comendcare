@@ -1113,8 +1113,8 @@ export default function EditPAGProfileDialog() {
                                         name="national"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Estimated number of patients in your region`}</FormLabel>
-                                                <FormDescription>{`The estimated number of patients in your country or region of influence.`}</FormDescription>
+                                                <FormLabel>{`Estimated number of patients in the US`}</FormLabel>
+                                                <FormDescription>{`The estimated number of patients in the US.`}</FormDescription>
                                                 <FormControl>
                                                     <Input
                                                         type="number"
