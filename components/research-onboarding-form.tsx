@@ -64,8 +64,14 @@ export const researchFormSchema = z.object({
     prevalenceDenominator: z.number().min(1, {
         message: "Your organization's prevalence.",
     }).optional(),
-    population: z.string().min(1, {
-        message: "Your organization's description.",
+    engaged: z.string().min(1, {  // These need to be strings because
+        message: "The number of patients your organization has engaged with.",
+    }).optional(),
+    national: z.string().min(1, {
+        message: "The estimated number of patients nationally.",
+    }).optional(),
+    global: z.string().min(1, {
+        message: "The estimated number of patients globally.",
     }).optional(),
     // mechanisms: z.array(optionSchema).min(0),
     mechanisms: z.array(z.string()).optional(),
@@ -101,9 +107,6 @@ export default function ResearchOnboardingForm(
     const form = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(researchFormSchema),
-        defaultValues: {
-            prevalenceDenominator: 1000000
-        }
     })
 
     async function onSubmit(values: z.infer<typeof researchFormSchema>) {
@@ -122,7 +125,9 @@ export default function ResearchOnboardingForm(
                 diseaseCategories: values.categories?.map((category) => category.label).join(",") || "",
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",
-                numberOfIdentifiedPatients: values.population ? values.population.toString() : "",
+                numberOfPatientsEngaged: values.engaged ? values.engaged.toString() : "",
+                nationalEstimatedPopulation: values.national ? values.national.toString() : "",
+                globalEstimatedPopulation: values.global ? values.global.toString() : "",
                 relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
                 associatedGenes: values.genes?.map((gene) => gene.label).join(",") || "",
                 associatedSystems: values.systems?.map((symptom) => symptom.label).join(",") || "",
@@ -326,7 +331,7 @@ export default function ResearchOnboardingForm(
                                             Mechanisms of action
                                         </FormLabel>
                                         <FormDescription className="flex items-center">
-                                            {`What type of condition is ${'disoder name'}`}
+                                            {`What types of genetic effects are you investigating?`}
                                             <Tooltip delayDuration={0}>
                                                 <TooltipTrigger>
                                                     <FaQuestionCircle
@@ -515,10 +520,8 @@ export default function ResearchOnboardingForm(
                                                                 type="number"
                                                                 id="prevalenceDenominator"
                                                                 {...denominatorField}
-                                                                value={1000000}
                                                                 className="w-32"
                                                                 min={0}
-                                                                disabled
                                                             />
                                                         </FormControl>
                                                     )}
@@ -532,15 +535,53 @@ export default function ResearchOnboardingForm(
 
                             <FormField
                                 control={form.control}
-                                name="population"
+                                name="engaged"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Number of patients identified`}</FormLabel>
-                                        <FormDescription>{`The number of known patients (not the estimated total). The people in this count should be reachable by your organization.`}</FormDescription>
+                                        <FormLabel>{`Number of patients engaged`}</FormLabel>
+                                        <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="number"
-                                                id="population"
+                                                id="engaged"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="national"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>{`Estimated number of patients in your region`}</FormLabel>
+                                        <FormDescription>{`The estimated number of patients in your country or region of influence.`}</FormDescription>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                id="national"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="global"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
+                                        <FormDescription>{`The estimated number of patients in the world.`}</FormDescription>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                id="global"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -723,16 +764,16 @@ export default function ResearchOnboardingForm(
                                                                     Epidemiology
                                                                 </h4>
                                                             </div>
-                                                            {(form.watch("prevalenceNumerator") && form.watch("prevalenceDenominator") && form.watch("population")) ? (
+                                                            {(form.watch("prevalenceNumerator") && form.watch("prevalenceDenominator") && form.watch("engaged")) ? (
                                                                 <ul className="flex flex-col list-disc list-inside">
                                                                     {form.watch("prevalenceNumerator") && form.watch("prevalenceDenominator") && (
                                                                         <li>
                                                                             {`${form.watch("prevalenceNumerator")} in ${form.watch("prevalenceDenominator")} prevalence`}
                                                                         </li>
                                                                     )}
-                                                                    {form.watch("population") && (
+                                                                    {form.watch("engaged") && (
                                                                         <li>
-                                                                            {`${form.watch("population")} patients identified`}
+                                                                            {`${form.watch("engaged")} patients identified`}
                                                                         </li>
                                                                     )}
                                                                 </ul>
