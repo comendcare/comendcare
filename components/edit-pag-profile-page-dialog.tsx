@@ -456,6 +456,8 @@ export default function EditPAGProfileDialog() {
                             prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
                             prevalenceDenominator: condition.prevalenceDenominator || undefined,
                             engaged: condition.numberOfPatientsEngaged?.toString() || "",
+                            national: condition.nationalEstimatedPopulation?.toString() || "",
+                            global: condition.globalEstimatedPopulation?.toString() || "",
                         }));
 
                         // Assuming you're working with one condition at a time (e.g., the first condition)
