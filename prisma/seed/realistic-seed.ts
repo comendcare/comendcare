@@ -381,7 +381,7 @@ async function createConditions(organizationIds: string[]) {
             prevalenceNumerator: 1,
             prevalenceDenominator: 700000,
             prevalenceRatio: 1/700000,
-            numberOfIdentifiedPatients: 22,
+            numberOfPatientsEngaged: 22,
             relevantDiseaseMechanisms: ["Genetic Mutation", "Mitochondrial Dysfunction"],
             associatedGenes: ["ARC1", "NEU4"],
             associatedSignsAndSymptoms: ["Muscle weakness", "Memory loss", "Difficulty swallowing"],

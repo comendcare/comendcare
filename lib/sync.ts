@@ -156,7 +156,7 @@ export const syncToTypesense = async (env: {
                     "index": true,
                     "infix": false,
                     "locale": "",
-                    "name": "numberOfIdentifiedPatients",
+                    "name": "numberOfPatientsEngaged",
                     "optional": false,
                     "sort": true,
                     "stem": false,
