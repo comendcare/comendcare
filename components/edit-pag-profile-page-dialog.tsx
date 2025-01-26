@@ -429,9 +429,6 @@ export default function EditPAGProfileDialog() {
     const editResearchForm = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(researchFormSchema),
-        defaultValues: {
-            prevalenceDenominator: 1000000
-        }
     })
 
     useEffect(() => {
@@ -458,7 +455,7 @@ export default function EditPAGProfileDialog() {
                             systems: condition.associatedSystems.map((system) => ({ label: system, value: system })) || [],
                             prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
                             prevalenceDenominator: condition.prevalenceDenominator || undefined,
-                            population: condition.numberOfIdentifiedPatients?.toString() || "",
+                            engaged: condition.numberOfPatientsEngaged?.toString() || "",
                         }));
 
                         // Assuming you're working with one condition at a time (e.g., the first condition)
@@ -502,7 +499,7 @@ export default function EditPAGProfileDialog() {
                 diseaseCategories: values.categories?.map((item) => item.label) || [],
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
-                numberOfIdentifiedPatients: values.population ? parseInt(values.population, 10) : null,
+                numberOfPatientsEngaged: values.engaged ? parseInt(values.engaged, 10) : null,
                 relevantDiseaseMechanisms: values.mechanisms || [],
                 associatedGenes: values.genes?.map((item) => item.label) || [],
                 associatedSystems: values.systems?.map((item) => item.label) || [],
@@ -1078,9 +1075,7 @@ export default function EditPAGProfileDialog() {
                                                                         id="prevalenceDenominator"
                                                                         {...denominatorField}
                                                                         className="w-32"
-                                                                        value={1000000}
                                                                         min={0}
-                                                                        disabled
                                                                     />
                                                                 </FormControl>
                                                             )}
@@ -1094,15 +1089,53 @@ export default function EditPAGProfileDialog() {
 
                                     <FormField
                                         control={editResearchForm.control}
-                                        name="population"
+                                        name="engaged"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Number of patients identified`}</FormLabel>
-                                                <FormDescription>{`The number of known patients (not the estimated total). The people in this count should be reachable by your organization.`}</FormDescription>
+                                                <FormLabel>{`Number of patients engaged`}</FormLabel>
+                                                <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
                                                 <FormControl>
                                                     <Input
                                                         type="number"
-                                                        id="population"
+                                                        id="engaged"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="national"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Estimated number of patients in your region`}</FormLabel>
+                                                <FormDescription>{`The estimated number of patients in your country or region of influence.`}</FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        id="national"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="global"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
+                                                <FormDescription>{`The estimated number of patients in the world.`}</FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        id="global"
                                                         {...field}
                                                     />
                                                 </FormControl>
