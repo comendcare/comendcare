@@ -331,7 +331,7 @@ export default function ResearchOnboardingForm(
                                             Mechanisms of action
                                         </FormLabel>
                                         <FormDescription className="flex items-center">
-                                            {`What type of condition is ${'disoder name'}`}
+                                            {`What types of genetic effects are you investigating?`}
                                             <Tooltip delayDuration={0}>
                                                 <TooltipTrigger>
                                                     <FaQuestionCircle
