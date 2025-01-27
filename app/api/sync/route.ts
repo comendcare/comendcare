@@ -236,7 +236,7 @@ const syncToTypesense = async (env: {
                     sort: false,
                     stem: false,
                     store: true,
-                    type: "object"
+                    type: "object[]"
                 }
             ],
         };
@@ -356,7 +356,7 @@ const syncToTypesense = async (env: {
                     index: true,
                     infix: false,
                     locale: "",
-                    name: "assetId_exits",
+                    name: "assetId_exists",
                     optional: true,
                     sort: false,
                     stem: false,
