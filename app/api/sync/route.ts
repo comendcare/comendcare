@@ -89,7 +89,7 @@ const bulkImportDocuments = async (
     }
 };
 
-const syncToTypesense = async (env: {
+export const syncToTypesense = async (env: {
     TYPESENSE_ADMIN_API_KEY: string;
     TYPESENSE_URL: string;
 }) => {
@@ -155,78 +155,6 @@ const syncToTypesense = async (env: {
                     type: "int64"
                 },
                 {
-                    name: "numberOfPatientsEngaged",
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    optional: true,
-                    sort: true,
-                    stem: false,
-                    store: true,
-                    type: "int64"
-                },
-                {
-                    name: "prevalenceDenominator",
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    optional: true,
-                    sort: true,
-                    stem: false,
-                    store: true,
-                    type: "int64"
-                },
-                {
-                    name: "prevalenceNumerator",
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    optional: true,
-                    sort: true,
-                    stem: false,
-                    store: true,
-                    type: "int64"
-                },
-                {
-                    name: "prevalenceRatio",
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    optional: true,
-                    sort: true,
-                    stem: false,
-                    store: true,
-                    type: "float"
-                },
-                {
-                    name: "interestedModalities",
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "string[]"
-                },
-                {
-                    name: "diseaseCategories",
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "string[]"
-                },
-                {
                     name: "condition",
                     facet: false,
                     index: true,
@@ -237,11 +165,25 @@ const syncToTypesense = async (env: {
                     stem: false,
                     store: true,
                     type: "object[]"
+                },
+                {
+                    name: "condition.condition.associatedSystems",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string[]"
                 }
+
             ],
         };
         const milestoneSchema = {
             name: 'milestones',
+            enable_nested_fields: true,
             fields: [
                 {
                     facet: false,
@@ -388,7 +330,11 @@ const syncToTypesense = async (env: {
                     where: { id: org.id },
                     include: { condition: {include: {condition: true}}}
                 })
-                return organization
+                
+                return {
+                    ...organization,
+                    // prevalenceRatio: organization?.condition.flatMap(condition => condition.condition?.prevalenceRatio)
+                }
             }))
 
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', uploadOrgs);
