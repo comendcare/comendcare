@@ -136,8 +136,14 @@ export const createCondition = async (formData: FormData) => {
     const prevalenceDenominator = formData.get("prevalenceDenominator")
         ? parseInt(formData.get("prevalenceDenominator") as string, 10)
         : null;
-    const numberOfIdentifiedPatients = formData.get("numberOfIdentifiedPatients")
-        ? parseInt(formData.get("numberOfIdentifiedPatients") as string, 10)
+    const numberOfPatientsEngaged = formData.get("numberOfPatientsEngaged")
+        ? parseInt(formData.get("numberOfPatientsEngaged") as string, 10)
+        : null;
+    const nationalEstimatedPopulation = formData.get("nationalEstimatedPopulation")
+        ? parseInt(formData.get("nationalEstimatedPopulation") as string, 10)
+        : null;
+    const globalEstimatedPopulation = formData.get("globalEstimatedPopulation")
+        ? parseInt(formData.get("globalEstimatedPopulation") as string, 10)
         : null;
     const relevantDiseaseMechanisms = formData.get("relevantDiseaseMechanisms")
         ? (formData.get("relevantDiseaseMechanisms") as string).split(",")
@@ -168,7 +174,9 @@ export const createCondition = async (formData: FormData) => {
                 diseaseCategories,
                 prevalenceNumerator,
                 prevalenceDenominator,
-                numberOfIdentifiedPatients,
+                numberOfPatientsEngaged,
+                nationalEstimatedPopulation,
+                globalEstimatedPopulation,
                 relevantDiseaseMechanisms,
                 associatedGenes,
                 associatedSystems,
@@ -260,6 +268,7 @@ export const createOrganization = async (formData: FormData) => {
             update: {
                 name,
                 description,
+                subdomain,
                 yearFounded: founded?.toString(),
                 website,
                 incorporationStatus,
@@ -273,6 +282,7 @@ export const createOrganization = async (formData: FormData) => {
                 lat,
                 lng,
                 image,
+                verified: true,  // Default verified to true for beta testing
             },
             create: {
                 name,
@@ -296,6 +306,7 @@ export const createOrganization = async (formData: FormData) => {
                         id: session.user.id,
                     },
                 },
+                verified: true,  // Default verified to true for beta testing
             },
         });
 
@@ -695,7 +706,7 @@ export const updateRoadmapMetadata = withRoadmapAuth(
                     },
                     data: {
                         image: url,
-                        imageBlurhash: blurhash
+                        // imageBlurhash: blurhash
                     }
                 })
             } else {
@@ -1246,7 +1257,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                                 roadmapId: roadmap.id,
                                 organizationId,
                                 type: milestone.type || 'NOTYPE',
-                                status: milestone.status || "TODO",
+                                status: milestone.status || "PLANNED",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
@@ -1281,7 +1292,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 //         await prisma.task.create({
                 //             data: {
                 //                 milestoneId: newMilestone?.id,
-                //                 status: task.status || "TODO",
+                //                 status: task.status || "PLANNED",
                 //                 name: task.name,
                 //                 orderPosition: index,
                 //                 kanbanPosition: index,
@@ -1430,7 +1441,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                                         }))
                                     }
                                 },
-                                status: node.data?.status || "TODO",
+                                status: node.data?.status || "PLANNED",
                                 private: node.data?.private || false,
                             }
                         }
@@ -1546,7 +1557,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                         }))
                                     }
                                 },
-                                status: node.data?.status || "TODO",
+                                status: node.data?.status || "PLANNED",
                                 private: node.data?.private || false,
                             }
                         }
@@ -1575,12 +1586,17 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         updatedMilestones = updatedMilestones.filter(milestone => nodeIds.includes(milestone.nodeId))
 
         // Typesense - create typesense milestone documents here...
-        Promise.all(
-            updatedMilestones.map(async (response: any) => {
-                console.log(`Add typesense document`, response)
-                // await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'milestones')
-            })
-        )
+        // Promise.all(
+        //     updatedMilestones.map(async (response: any) => {
+        //         const document = response.map((r: any) => ({
+        //             ...r,
+        //             RFPId_exists: response.RFP ? true : false,
+        //             assetId_exists: response.asset ? true : false
+        //         }))
+        //         console.log(`Add typesense document`, document)
+        //         // await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
+        //     })
+        // )
 
         return { success: true, data: { nodes: updatedNodes, milestones: updatedMilestones} }
     } catch (error: any) {
@@ -1604,7 +1620,7 @@ export async function deleteNode(nodeId: string | undefined) {
         }
 
         // Typesense - delete milestone documents here...
-        console.log(`Delete typesense document`, deletedNode.data.id)
+        // console.log(`Delete typesense document`, deletedNode.data.id)
         // await deleteTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, deletedNode.data.id, 'milestones')
 
         return { success: true, data: deletedNode }
@@ -1697,6 +1713,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     data: {
                         title: milestone.title,
                         type: milestone.type,
+                        otherTypeDetails: milestone.otherTypeDetails,
                         description: milestone.description,
                         startDate: milestone.startDate,
                         endDate: milestone.endDate,
@@ -1710,7 +1727,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                                 }))
                             }
                         },
-                        status: milestone.status || "TODO",
+                        status: milestone.status || "PLANNED",
                         private: milestone.private || false,
                     }
                 })
@@ -1732,12 +1749,17 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         )
 
         // Typesense - update milestone documents here...
-        Promise.all(
-            updatedMilestones.map(async (response: any) => {
-                console.log(`Update typesense document`, response)
-                // await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'milestones')
-            })
-        )
+        // Promise.all(
+        //     updatedMilestones.map(async (response: any) => {
+        //         const document = response.map((r: any) => ({
+        //             ...r,
+        //             RFPId_exists: response.RFP ? true : false,
+        //             assetId_exists: response.asset ? true : false
+        //         }))
+        //         console.log(`Update typesense document`, document)
+        //         // await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
+        //     })
+        // )
 
         console.log(`Successfully updated Milestone`)
         return {success: true, data: updatedMilestones}
@@ -1913,6 +1935,7 @@ async function updateRFP(previousMilestone: Milestone, milestone: Milestone) {
 export async function createKanban(orgId: string) {
     try {
         const newKanban = await prisma.kanban.create({
+            include: { columns: true },
             data: {
                 organization: { connect: { id: orgId } },
                 columns: {
@@ -2123,6 +2146,7 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
 
         // Typesense - if updating typesense, update here...
 
+        console.log(`Successfully updated tasks`)
         return { success: true, data: updatedTasks }
     } catch (error) {
         logError("Could not update task", error)

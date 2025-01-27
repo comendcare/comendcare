@@ -19,8 +19,8 @@ export function ProfilePhoto({
     return (
         <Avatar
             className={cn(
+                "relative rounded-full ring-4 ring-white",
                 className,
-                "relative rounded-full ring-4 ring-white"
             )}
         >
             <AvatarImage

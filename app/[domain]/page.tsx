@@ -21,6 +21,8 @@ import {Label} from "@/components/ui/label"
 import {Button} from "@/components/ui/button"
 import ShareDialog from "@/components/share-dialog";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
+import {Card, CardContent} from "@/components/ui/card";
+import Image from "next/image";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -118,38 +120,56 @@ export default async function OrganizationHomePage({
                                 assets={(roadmaps?.[0]?.milestones.filter(milestone => milestone.asset) || []).map(milestone => milestone.asset)}
                                 rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
                             />
-                            {roadmaps.length > 0 &&
-                                <PublicRoadmapCard roadmap={roadmaps?.[0]}
-                                                   subdomain={organization?.subdomain || undefined} />
+                            {roadmaps.length > 0 ?
+                                <PublicRoadmapCard
+                                    roadmap={roadmaps?.[0]}
+                                    subdomain={organization?.subdomain || undefined}
+                                />
+                                : <Card>
+                                    <CardContent>
+                                        <div className="flex flex-col items-center justify-center space-x-4 my-8">
+                                            <h1 className="font-cal text-4xl">No research plan yet</h1>
+                                            <Image
+                                                alt="missing roadmap"
+                                                src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                                                width={400}
+                                                height={400}
+                                            />
+                                            <p className="text-lg text-stone-500">
+                                                {`${organization.name} doesn't have a roadmap yet.`}
+                                            </p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             }
                         </div>
                     </div>
 
-                    {roadmaps?.length > 1 && (
-                        <div className="mx-5 mb-20 max-w-screen-xl lg:mx-24 2xl:mx-auto">
-                            <h2 className="mb-10 font-title text-4xl dark:text-white md:text-5xl">
-                                More stories
-                            </h2>
-                            <div className="grid w-full grid-cols-1 gap-x-4 gap-y-8">
-                                {roadmaps
-                                    .slice(1)
-                                    .map((metadata: any, index: number) => (
-                                        <BlogCard key={index} data={metadata} />
-                                    ))}
-                            </div>
-                        </div>
-                    )}
+                    {/*{roadmaps?.length > 1 && (*/}
+                    {/*    <div className="mx-5 mb-20 max-w-screen-xl lg:mx-24 2xl:mx-auto">*/}
+                    {/*        <h2 className="mb-10 font-title text-4xl dark:text-white md:text-5xl">*/}
+                    {/*            More stories*/}
+                    {/*        </h2>*/}
+                    {/*        <div className="grid w-full grid-cols-1 gap-x-4 gap-y-8">*/}
+                    {/*            {roadmaps*/}
+                    {/*                .slice(1)*/}
+                    {/*                .map((metadata: any, index: number) => (*/}
+                    {/*                    <BlogCard key={index} data={metadata} />*/}
+                    {/*                ))}*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*)}*/}
 
                 </div>
             </main>
 
             <FloatingDock
                 items={[
-                    {
-                        title: "Post on feed",
-                        icon: <IconShare2/>,
-                        href: "/app/feed",
-                    },
+                    // {
+                    //     title: "Post on feed",
+                    //     icon: <IconShare2/>,
+                    //     href: "/app/feed",
+                    // },
                     {
                         title: "Share on social media",
                         icon: <IconShare/>,

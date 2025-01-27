@@ -272,7 +272,7 @@ export const CloudHeroSection = () => {
                     initial={{opacity: 0, y: 50}}
                     animate={{opacity: 1, y: [50, -10, 0]}}
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-                    className="max-w-screen-sm text-xl"
+                    className="max-w-screen-sm text-2xl"
                 >
                     {`Build your research plan, discover partners, and launch new projects.`}
                 </motion.p>

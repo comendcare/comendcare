@@ -156,7 +156,7 @@ export const syncToTypesense = async (env: {
                     "index": true,
                     "infix": false,
                     "locale": "",
-                    "name": "numberOfIdentifiedPatients",
+                    "name": "numberOfPatientsEngaged",
                     "optional": false,
                     "sort": true,
                     "stem": false,
@@ -267,14 +267,90 @@ export const syncToTypesense = async (env: {
                     "store": true,
                     "type": "string"
                 },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "type",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "string"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "status",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "string"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "RFPId",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "string"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "RFPId_exists",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "bool"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "assetId",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "string"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "assetId_exits",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "bool"
+                },
                 // add additional fields as needed
             ],
         });
         console.log(`Created typesense milestones collection...`)
 
         // Stream organization changes
-        const orgStream = await prisma.organization.stream({name: 'organization-events'});
-        const milestoneStream = await prisma.milestone.stream({name: 'milestone-events'});
+        const orgStream = await prisma.organization.stream({
+            name: 'organization-events',
+        });
+        const milestoneStream = await prisma.milestone.stream({
+            name: 'milestone-events',
+        });
 
         process.on('exit', () => {
             orgStream.stop();
@@ -302,15 +378,35 @@ export const syncToTypesense = async (env: {
             for await (const event of orgStream) {
                 resetTimeout();
                 console.log(`handle organization event`, event);
+                let org = undefined
+
                 try {
                     switch (event.action) {
                         case 'create':
                             console.log("Syncing created organization to Typesense:", event.created);
-                            await addTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.created, 'organizations');
+                            org = await prisma.organization.findUnique({
+                                where: {id: event.created.id},
+                                include: {condition: { include: {condition: true}}}
+                            })
+                            await addTypeSenseDocument(
+                                env.TYPESENSE_URL, 
+                                env.TYPESENSE_ADMIN_API_KEY, 
+                                {...org}, 
+                                'organizations'
+                            );
                             break;
                         case 'update':
                             console.log("Syncing updated organization to Typesense:", event.after);
-                            await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.after, 'organizations');
+                            org = await prisma.organization.findUnique({
+                                where: {id: event.after.id},
+                                include: {condition: { include: {condition: true}}}
+                            })
+                            await updateTypeSenseDocument(
+                                env.TYPESENSE_URL, 
+                                env.TYPESENSE_ADMIN_API_KEY, 
+                                {...org}, 
+                                'organizations'
+                            );
                             break;
                         case 'delete':
                             console.log("Deleting organization from Typesense:", event.deleted);
@@ -327,19 +423,58 @@ export const syncToTypesense = async (env: {
             for await (const event of milestoneStream) {
                 resetTimeout();
                 console.log(`handle milestone event`, event);
+                let milestone = undefined
+
                 try {
                     switch (event.action) {
                         case 'create':
                             console.log("Syncing created milestone to Typesense:", event.created);
-                            await addTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.created, 'milestones');
+                            milestone = await prisma.milestone.findUnique({
+                                where: {id: event.created.id},
+                                include: {
+                                    RFP: true,
+                                    asset: true
+                                }
+                            })
+                            await addTypeSenseDocument(
+                                env.TYPESENSE_URL, 
+                                env.TYPESENSE_ADMIN_API_KEY, 
+                                {
+                                    ...milestone,
+                                    RFPId_exists: milestone?.RFP ? true : false,
+                                    assetId_exists: milestone?.asset ? true : false,
+                                }, 
+                                'milestones'
+                            );
                             break;
                         case 'update':
                             console.log("Syncing updated milestone to Typesense:", event.after);
-                            await updateTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.after, 'milestones');
+                            milestone = await prisma.milestone.findUnique({
+                                where: {id: event.after.id},
+                                include: {
+                                    RFP: true,
+                                    asset: true
+                                }
+                            })
+                            await updateTypeSenseDocument(
+                                env.TYPESENSE_URL, 
+                                env.TYPESENSE_ADMIN_API_KEY, 
+                                {
+                                    ...milestone,
+                                    RFPId_exists: milestone?.RFP ? true : false,
+                                    assetId_exists: milestone?.asset ? true : false,
+                                },
+                                'milestones'
+                            );
                             break;
                         case 'delete':
                             console.log("Deleting milestone from Typesense:", event.deleted);
-                            await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id, 'milestones');
+                            await deleteTypeSenseDocument(
+                                env.TYPESENSE_URL, 
+                                env.TYPESENSE_ADMIN_API_KEY, 
+                                event.deleted.id, 
+                                'milestones'
+                            );
                             break;
                     }
                 } catch (error) {

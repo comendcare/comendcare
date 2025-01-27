@@ -13,7 +13,7 @@ import StatusButton from "./milestone-status-button"
 import { truncate, cn } from "@/lib/utils"
 import { PrivateBadge } from "./private-badge"
 import { Badge } from "./ui/badge"
-import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { MILESTONE_TYPE_OPTIONS, StatusType } from "@/lib/types"
 
 export type PublicMilestoneNode = Node<
     {
@@ -46,8 +46,6 @@ export interface TaskType {
     name: string
     status: StatusType
 }
-
-type StatusType = "TODO" | "INPROGRESS" | "DONE"
 
 function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
     return (

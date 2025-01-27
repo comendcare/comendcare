@@ -43,19 +43,19 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                             <div className="space-y-2">
                                 <div className="flex flex-row items-center justify-between w-full">
                                     <h4 className="scroll-m-20 text-base font-semibold">
-                                        Statistics
+                                        Epidemiology
                                     </h4>
                                 </div>
-                                {(condition.prevalenceNumerator && condition.prevalenceDenominator && condition.numberOfIdentifiedPatients) ? (
+                                {(condition.prevalenceNumerator && condition.prevalenceDenominator && condition.numberOfPatientsEngaged) ? (
                                     <ul className="flex flex-col list-disc list-inside">
                                         {condition.prevalenceNumerator && condition.prevalenceDenominator && (
                                             <li>
                                                 {`${condition.prevalenceNumerator} in ${condition.prevalenceDenominator} prevalence`}
                                             </li>
                                         )}
-                                        {condition.numberOfIdentifiedPatients && (
+                                        {condition.numberOfPatientsEngaged && (
                                             <li>
-                                                {`${condition.numberOfIdentifiedPatients} patients identified`}
+                                                {`${condition.numberOfPatientsEngaged} patients identified`}
                                             </li>
                                         )}
                                     </ul>

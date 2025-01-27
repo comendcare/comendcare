@@ -10,7 +10,7 @@ import {createMemberRequest, createOrganization} from "@/lib/actions";
 import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
 import {useCallback, useEffect, useState} from "react";
@@ -34,7 +34,8 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {checkSubdomainAvailability, getAllOrganizations, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
-import { FormImageCropper } from "./edit-pag-profile-page-dialog";
+import {FormImageCropper} from "./edit-pag-profile-page-dialog";
+import mixpanel from "mixpanel-browser";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -124,6 +125,7 @@ export default function OrganizationOnboardingForm(
 ) {
     const {data: session, update} = useSession()
     const router = useRouter()
+    const pathname = usePathname()
     // const [isNewOrganization, setIsNewOrganization] = useState(true)
     const [organizations, setOrganizations] = useState<Option[]>([])
     const [address, setAddress] = useState<AddressType>({
@@ -143,7 +145,6 @@ export default function OrganizationOnboardingForm(
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [defaultOrganizationValues, setDefaultOrganizationValues] = useState<z.infer<typeof newOrgFormSchema> | undefined>(undefined);
-    console.log(defaultOrganizationValues?.incorporationStatus);
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -289,7 +290,21 @@ export default function OrganizationOnboardingForm(
                 }
             });
 
-            if (selectedFile && values.image) {
+            // Append address fields from state
+            if (address) {
+                formData.append("address1", address.address1 || "");
+                formData.append("address2", address.address2 || "");
+                formData.append("formattedAddress", address.formattedAddress || "");
+                formData.append("city", address.city || "");
+                formData.append("region", address.region || "");
+                formData.append("postalCode", address.postalCode || "");
+                formData.append("country", address.country || "");
+                formData.append("lat", address.lat.toString());
+                formData.append("lng", address.lng.toString());
+            }
+
+            // only upload image if it is not the same as the previous one
+            if (selectedFile && values.image && values.image !== defaultOrganizationValues?.image) {
                 try {
                     const imgUrl = await handleImageUpload(selectedFile as File, values.image)
                     if (imgUrl) {
@@ -298,7 +313,7 @@ export default function OrganizationOnboardingForm(
                 } catch (error) {
                     console.error("Failed to upload image:", error)
                     toast.error("Image upload failed")
-                    return 
+                    return
                 }
             }
 
@@ -307,6 +322,14 @@ export default function OrganizationOnboardingForm(
                     toast.error(res.error)
                 } else {
                     va.track("Created Organization")
+
+                    if (newOrgForm.watch("looking")) {
+                        mixpanel.track(`User is looking for`, {
+                            orgName: newOrgForm.watch("orgName"),
+                            looking: newOrgForm.watch("looking")
+                        })
+                    }
+
                     // Update the session object with the newly created organizationId
                     updateSession(res.id)
                     router.refresh()
@@ -315,7 +338,7 @@ export default function OrganizationOnboardingForm(
                 }
             })
         } catch (error) {
-            toast.error("An error occurred while updating your profile.");
+            toast.error("An error occurred while creating your organization.");
         } finally {
             setLoading(false);
         }
@@ -323,7 +346,7 @@ export default function OrganizationOnboardingForm(
 
     useEffect(() => {
         async function fetchOrganizationData() {
-            if (session?.user?.organizationId) {
+            if (session?.user?.organizationId && pathname === "/onboarding/organization") {
                 let organizationData
                 const response = await getOrganizationFromOrganizationId(session.user.organizationId);
                 if (response.success) {
@@ -510,7 +533,7 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Website`}</FormLabel>
-                                        <FormDescription>{`Your patient group's website URL (with the URL extension like http or https.`}</FormDescription>
+                                        <FormDescription>{`Your patient group's website URL (with the URL extension like http or https).`}</FormDescription>
                                         <FormControl>
                                             <Input
                                                 id="website"
@@ -669,7 +692,7 @@ export default function OrganizationOnboardingForm(
                                 )}
                             />
 
-                            <FormImageCropper 
+                            <FormImageCropper
                                 form={newOrgForm}
                                 name="image"
                                 title={"Organization Logo"}
@@ -773,9 +796,11 @@ export default function OrganizationOnboardingForm(
                                     >
                                         Join Organization
                                     </Button>
-                                    <Button variant="ghost" onClick={() => router.push("/app/profile")}>
-                                        Skip for now
-                                    </Button>
+                                    {showSkip &&
+                                        <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                            Skip for now
+                                        </Button>
+                                    }
                                 </div>
                             </form>
                         </Form>
@@ -783,7 +808,8 @@ export default function OrganizationOnboardingForm(
                 )}
             </div>
             {isNewOrganization &&
-                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">
+                <div
+                    className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">
                     <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
                         <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
                             Organization profile preview
@@ -797,9 +823,11 @@ export default function OrganizationOnboardingForm(
                         <div className="w-full flex flex-col space-y-8 my-8">
                             <div>
                                 <div>
-                                    <img className="object-cover h-24 w-full lg:h-36"
+                                    {/* <img className="object-cover h-24 w-full lg:h-36"
                                          src={'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'}
-                                         alt=""/>
+                                         alt=""
+                                    /> */}
+                                    <div className="h-32 w-full object-cover lg:h-48 bg-secondary"></div>
                                 </div>
 
                                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -923,9 +951,10 @@ export default function OrganizationOnboardingForm(
                                         </CardContent>
                                     </Card>
                                     <Card>
-                                        <CardHeader className="w-full flex flex-row items-center justify-between space-y-0">
+                                        <CardHeader
+                                            className="w-full flex flex-row items-center justify-between space-y-0">
                                             <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>
-                                            Research Plan
+                                                Research Plan
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4">

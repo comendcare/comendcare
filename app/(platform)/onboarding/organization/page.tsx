@@ -19,9 +19,6 @@ export default function OrganizationOnboardingPage() {
                             {`< 5 min`}
                         </p>
                     </div>
-                    <p>
-                        {`To help set up your profile, please answer a few questions about your organization. You can either join an existing organization on Comend or create a new one.`}
-                    </p>
                 </div>
 
                 <Separator/>

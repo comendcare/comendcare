@@ -38,6 +38,50 @@ export async function uploadImg(image: {
     }
 }
 
+export async function uploadFeedbackImg(image: {
+    name: string
+    type: string
+    data: string
+}) {
+    try {
+        const keyFileJson = JSON.parse(
+            process.env.G_CLOUD_KEY || ""
+        )
+        const storage = new Storage({
+            projectId: keyFileJson.project_id,
+            credentials: {
+                client_email: keyFileJson.client_email,
+                private_key: keyFileJson.private_key
+            }
+        })
+        const bucket = storage.bucket("comend-app-feedback")
+
+        let filename = `${Date.now()}`
+
+        if (image.type == "image/png") {
+            filename = filename.concat(".png")
+        } else if (image.type == "image/jpg") {
+            filename = filename.concat(".jpg")
+        } else if (image.type == "image/jpeg") {
+            filename = filename.concat(".jpeg")
+        }
+
+        const file = bucket.file(filename)
+        const buffer = Buffer.from(image.data, "base64")
+
+        await file.save(buffer, {
+            contentType: image.type
+        })
+
+        // public url
+        const imageUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`
+
+        return imageUrl
+    } catch (e) {
+        console.error("Failed to upload image:", e)
+    }
+}
+
 // export async function uploadOrUpdatePublicImg(image: {
 //     name: string
 //     type: string

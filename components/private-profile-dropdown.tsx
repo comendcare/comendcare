@@ -13,7 +13,6 @@ import {useOnborda} from "@/components/onborda/OnbordaContext";
 
 
 export default function PrivateProfileDropdown({subdomain}: { subdomain: string | null }) {
-    const { startOnborda } = useOnborda()
 
     return (
         <DropdownMenu>
@@ -33,22 +32,22 @@ export default function PrivateProfileDropdown({subdomain}: { subdomain: string 
                         <span>Public view</span>
                     </a>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <FaGlasses/>
-                    <span>Edit visibility</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <FaRegCircleCheck/>
-                    <span>Comend verified</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
+                {/*<DropdownMenuItem>*/}
+                {/*    <FaGlasses/>*/}
+                {/*    <span>Edit visibility</span>*/}
+                {/*</DropdownMenuItem>*/}
+                {/*<DropdownMenuItem>*/}
+                {/*    <FaRegCircleCheck/>*/}
+                {/*    <span>Comend verified</span>*/}
+                {/*</DropdownMenuItem>*/}
+                {/* <DropdownMenuItem
                     onClick={() => {
                         startOnborda('organization-profile-tour')
                     }}
                 >
                     <FaWandMagicSparkles/>
                     <span>Take a tour</span>
-                </DropdownMenuItem>
+                </DropdownMenuItem> */}
             </DropdownMenuContent>
         </DropdownMenu>
     )

@@ -1,13 +1,14 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
-import { useShallow } from "zustand/react/shallow"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { MilestoneSearchState, useMilestoneSearchStore, ViewType } from "@/state/search/milestoneSearchStore";
+import React, {useEffect, useState} from "react";
+import {Input} from "@/components/ui/input";
+import {useShallow} from "zustand/react/shallow"
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "./ui/select";
+import {MilestoneSearchState, useMilestoneSearchStore, ViewType} from "@/state/search/milestoneSearchStore";
 
 const selector = (state: MilestoneSearchState) => ({
     setSearchTerm: state.setSearchTerm,
+    sortBy: state.sortBy,
     setSortBy: state.setSortBy,
     view: state.view,
     setView: state.setView
@@ -15,11 +16,12 @@ const selector = (state: MilestoneSearchState) => ({
 
 export default function OrganizationSearchBar() {
     const [query, setQuery] = useState("")
-    const { 
+    const {
         setSearchTerm,
+        sortBy,
         setSortBy,
-        view, 
-        setView, 
+        view,
+        setView,
     } = useMilestoneSearchStore(useShallow(selector))
 
     useEffect(() => {
@@ -34,46 +36,47 @@ export default function OrganizationSearchBar() {
 
     return (
         <div className="w-full h-full flex flex-row gap-4">
-        <div className="w-full h-full grow">
-            <Input
-                className="w-full h-full"
-                placeholder="Search"
-                value={query}
-                onChange={handleInputChange}
-            />
-        </div>
+            <div className="w-full h-full grow">
+                <Input
+                    className="w-full h-full"
+                    placeholder="Search"
+                    value={query}
+                    onChange={handleInputChange}
+                />
+            </div>
 
-        <Select
-            onValueChange={(value: string) => {
-                setSortBy(value)
-            }}
-        >
-        <SelectTrigger className="w-[220px] h-full">
-            <SelectValue placeholder="Sort by" />
-        </SelectTrigger>
-        <SelectContent>
-            <SelectGroup>
-            <SelectItem value="alphabetical">Alphabetical (A-Z)</SelectItem>
-            </SelectGroup>
-        </SelectContent>
-        </Select>
+            <Select
+                value={sortBy}
+                onValueChange={(value: string) => {
+                    setSortBy(value)
+                }}
+            >
+                <SelectTrigger className="w-[220px] h-full">
+                    <SelectValue placeholder="Sort by"/>
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectItem value="alphabetical">Alphabetical (A-Z)</SelectItem>
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
 
-        <Select
-            onValueChange={(view: string) => {
-                setView(view as ViewType)
-            }}
-            defaultValue={view}
-        >
-        <SelectTrigger className="w-[150px] h-full">
-            <SelectValue placeholder="View" />
-        </SelectTrigger>
-        <SelectContent>
-            <SelectGroup>
-            <SelectItem value="grid">Grid View</SelectItem>
-            <SelectItem value="list">List View</SelectItem>
-            </SelectGroup>
-        </SelectContent>
-        </Select>
+            <Select
+                onValueChange={(view: string) => {
+                    setView(view as ViewType)
+                }}
+                defaultValue={view}
+            >
+                <SelectTrigger className="w-[150px] h-full">
+                    <SelectValue placeholder="View"/>
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectGroup>
+                        <SelectItem value="grid">Grid View</SelectItem>
+                        <SelectItem value="list">List View</SelectItem>
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
         </div>
     )
 }

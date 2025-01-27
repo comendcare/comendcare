@@ -30,6 +30,8 @@ import LoadingDots from "@/components/icons/loading-dots";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {Organization} from "@prisma/client";
 import {concat} from "lodash";
+import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
+import mixpanel from "mixpanel-browser";
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -59,11 +61,17 @@ export const researchFormSchema = z.object({
     prevalenceNumerator: z.string().min(1, {
         message: "Your organization's prevalence.",
     }).optional(),
-    prevalenceDenominator: z.number().min(1, {
+    prevalenceDenominator: z.string().min(1, {
         message: "Your organization's prevalence.",
     }).optional(),
-    population: z.string().min(1, {
-        message: "Your organization's description.",
+    engaged: z.string().min(1, {  // These need to be strings because
+        message: "The number of patients your organization has engaged with.",
+    }).optional(),
+    national: z.string().min(1, {
+        message: "The estimated number of patients nationally.",
+    }).optional(),
+    global: z.string().min(1, {
+        message: "The estimated number of patients globally.",
     }).optional(),
     // mechanisms: z.array(optionSchema).min(0),
     mechanisms: z.array(z.string()).optional(),
@@ -74,449 +82,6 @@ export const researchFormSchema = z.object({
     studies: z.array(optionSchema).optional(),
     assets: z.array(optionSchema).optional(),
 })
-
-export const CONDITION_MECHANISM_OPTIONS: Option[] = [
-    {
-        // id: 'autosomal-dominant',
-        label: 'Autosomal dominant',
-        value: 'autosomal-dominant',
-        group: 'Genetics',
-        subgroup: 'Inheritance'
-    },
-    {
-        // id: 'autosomal-recessive',
-        label: 'Autosomal recessive',
-        value: 'autosomal-recessive',
-        group: 'Genetics',
-        subgroup: 'Inheritance'
-    },
-    {
-        // id: 'x-linked',
-        label: 'X-linked',
-        value: 'x-linked',
-        group: 'Genetics',
-        subgroup: 'Inheritance'
-    },
-    {
-        // id: 'y-linked',
-        label: 'Y-linked',
-        value: 'y-linked',
-        group: 'Genetics',
-        subgroup: 'Inheritance'
-    },
-    {
-        // id: 'mitochondrial',
-        label: 'Mitochondrial',
-        value: 'mitochondrial',
-        group: 'Genetics',
-        subgroup: 'Inheritance'
-    },
-    {
-        // id: 'missense',
-        label: 'Missense',
-        value: 'missense',
-        group: 'Genetics',
-        subgroup: 'Molecular nature'
-    },
-    {
-        // id: 'nonsense',
-        label: 'Nonsense',
-        value: 'nonsense',
-        group: 'Genetics',
-        subgroup: 'Molecular nature'
-    },
-    {
-        // id: 'frameshift',
-        label: 'Frameshift',
-        value: 'frameshift',
-        group: 'Genetics',
-        subgroup: 'Molecular nature'
-    },
-    {
-        // id: 'insertion-or-deletion',
-        label: 'Insertion or deletion',
-        value: 'insertion-or-deletion',
-        group: 'Genetics',
-        subgroup: 'Molecular nature'
-    },
-    {
-        // id: 'copy-number-variations',
-        label: 'Copy number variations',
-        value: 'copy-number-variations',
-        group: 'Genetics',
-        subgroup: 'Molecular nature'
-    },
-    {
-        // id: 'splice-site-mutation',
-        label: 'Splice-site mutation',
-        value: 'splice-site-mutation',
-        group: 'Genetics',
-        subgroup: 'Molecular nature'
-    },
-    {
-        // id: 'chromosomal-anomaly',
-        label: 'Chromosomal anomaly',
-        value: 'chromosomal-anomaly',
-        group: 'Genetics',
-        subgroup: 'Chromosomal anomaly'
-    },
-    {
-        // id: 'epigenetic',
-        label: 'Epigenetic',
-        value: 'epigenetic',
-        group: 'Genetics',
-        subgroup: 'Epigenetic'
-    },
-    {
-        // id: 'loss-of-function',
-        label: 'Loss-of-function',
-        value: 'loss-of-function',
-        group: 'Genetics',
-        subgroup: 'Functional impact'
-    },
-    {
-        // id: 'gain-of-function',
-        label: 'Gain-of-function',
-        value: 'gain-of-function',
-        group: 'Genetics',
-        subgroup: 'Functional impact'
-    },
-]
-
-export const SYSTEMS_AFFECTED_OPTIONS: Option[] = [
-    {
-        label: 'Neurological',
-        value: 'neurological',
-    },
-    {
-        label: 'Musculoskeletal',
-        value: 'musculoskeletal',
-    },
-    {
-        label: 'Cardiovascular',
-        value: 'cardiovascular',
-    },
-    {
-        label: 'Respiratory',
-        value: 'respiratory',
-    },
-    {
-        label: 'Renal and urological',
-        value: 'renal-and-urological',
-    },
-    {
-        label: 'Dermatological',
-        value: 'dermatological',
-    },
-    {
-        label: 'Endocrine and metabolic',
-        value: 'endocrine-and-metabolic',
-    },
-    {
-        label: 'Hematological',
-        value: 'hematological',
-    },
-    {
-        label: 'Immune',
-        value: 'immune',
-    },
-]
-
-export const MODALITIES_OF_INTEREST_OPTIONS: Option[] = [
-    {
-        label: 'Gene replacement',
-        value: 'Gene replacement',
-        group: 'Genetic',
-    },
-    {
-        label: 'CRISPR',
-        value: 'CRISPR',
-        group: 'Genetic',
-    },
-    {
-        label: 'Base editing',
-        value: 'Base editing',
-        group: 'Genetic',
-    },
-    {
-        label: 'Prime editing',
-        value: 'Prime editing',
-        group: 'Genetic',
-    },
-    {
-        label: 'ASO',
-        value: 'ASO',
-        group: 'Genetic',
-    },
-    {
-        label: 'RNAi',
-        value: 'RNAi',
-        group: 'Genetic',
-    },
-    {
-        label: 'Enzyme replacement',
-        value: 'Enzyme replacement',
-        group: 'Protein-based',
-    },
-    {
-        label: 'Drug repurposing',
-        value: 'Drug repurposing',
-        group: 'Small-molecule',
-    },
-    {
-        label: 'Pathway modulators',
-        value: 'Pathway modulators',
-        group: 'Small-molecule',
-    },
-    {
-        label: 'Stem cells',
-        value: 'Stem cells',
-        group: 'Cell-based',
-    },
-    {
-        label: 'Nanoparticles',
-        value: 'Nanoparticles',
-        group: 'Delivery systems',
-    },
-    {
-        label: 'Viral vectors',
-        value: 'Viral vectors',
-        group: 'Delivery systems',
-    },
-]
-
-export const MILESTONE_STATUS_OPTIONS: string[] = [
-    'Planned',
-    'Fundraising',
-    'RFP',
-    'In-progress',
-    'Completed',
-]
-
-export const MILESTONE_OUTCOME_OPTIONS: string[] = [
-    'Publication',
-    'Asset',
-    'Data',
-    'Decision',
-]
-
-export const MODALITIES: Option[] = [
-    {
-        id: '1',
-        label: 'Gene Therapy (AAV)',
-        value: 'GENE_THERAPY_AAV',
-        description: 'A therapeutic approach using adeno-associated viruses (AAV) to deliver genetic material into cells, often to correct or replace defective genes.',
-        strengths: 'High precision in targeting specific cells, long-term expression of therapeutic genes, and growing clinical success in various diseases.',
-    },
-    {
-        id: '2',
-        label: 'Gene Editing',
-        value: 'GENE_EDITING',
-        description: 'A technology for directly altering the DNA of an organism, including techniques like CRISPR/Cas9 to modify genes for therapeutic purposes.',
-        strengths: 'Highly versatile, precise gene modifications, and potential for permanent therapeutic outcomes.',
-    },
-    {
-        id: '3',
-        label: 'Antisense Oligonucleotide (ASO)',
-        value: 'ANTISENSE_OLIGONUCLEOTIDE',
-        description: 'Short, synthetic strands of DNA or RNA designed to bind to specific mRNA sequences, modifying gene expression or protein production.',
-        strengths: 'Targets specific genes, reversible effects, and customizable for various genetic disorders.',
-    },
-    {
-        id: '4',
-        label: 'Other RNA Therapy',
-        value: 'OTHER_RNA_THERAPY',
-        description: 'A broad category of therapies leveraging RNA molecules, such as RNA interference (RNAi) and mRNA vaccines, to modulate gene expression or induce immune responses.',
-        strengths: 'Rapid development timelines, adaptable to different diseases, and avoids permanent DNA alterations.',
-    },
-    {
-        id: '5',
-        label: 'Enzyme Replacement',
-        value: 'ENZYME_REPLACEMENT',
-        description: 'A treatment approach involving the administration of exogenous enzymes to replace deficient or malfunctioning enzymes in patients.',
-        strengths: 'Addresses underlying enzyme deficiencies, well-established for several metabolic disorders, and provides symptomatic relief.',
-    },
-    {
-        id: '6',
-        label: 'Drug Repurposing or Drug Screening',
-        value: 'DRUG_REPURPOSING_SCREENING',
-        description: 'Strategies to identify new therapeutic uses for existing drugs or discover novel compounds for specific diseases through systematic screening.',
-        strengths: 'Reduces development timelines, leverages existing safety profiles, and cost-effective compared to de novo drug development.',
-    },
-    {
-        id: '7',
-        label: 'Pathway Modulators',
-        value: 'PATHWAY_MODULATORS',
-        description: 'Therapies designed to target and modulate biological pathways involved in disease processes, such as signaling cascades and metabolic pathways.',
-        strengths: 'Addresses disease mechanisms at a systemic level, potential for broad applications, and integrates well with other therapeutic modalities.',
-    },
-    {
-        id: '8',
-        label: 'Antibodies',
-        value: 'ANTIBODIES',
-        description: 'Biologics that use engineered or natural antibodies to target specific proteins or antigens for therapeutic purposes.',
-        strengths: 'Highly specific targeting, strong efficacy in immune-related diseases, and a proven track record in therapy.',
-    },
-    {
-        id: '9',
-        label: 'Vaccine',
-        value: 'VACCINE',
-        description: 'Biological preparations that provide immunity to specific diseases, often by stimulating the immune system to recognize and combat pathogens.',
-        strengths: 'Prevents disease proactively, adaptable to various pathogens, and scalable for public health impact.',
-    },
-    {
-        id: '10',
-        label: 'Novel Chemistry',
-        value: 'NOVEL_CHEMISTRY',
-        description: 'Innovative small molecule drugs designed using advanced chemical techniques to target unique mechanisms of action.',
-        strengths: 'Highly customizable for specific targets, scalable production, and potential for oral administration.',
-    },
-    {
-        id: '11',
-        label: 'Stem Cell Transplant',
-        value: 'STEM_CELL_TRANSPLANT',
-        description: 'The use of stem cells to regenerate or repair damaged tissues and treat conditions like hematological diseases and genetic disorders.',
-        strengths: 'Potential for long-term regeneration, versatile applications, and addresses root causes of diseases.',
-    },
-    {
-        id: '12',
-        label: 'Other',
-        value: 'OTHER',
-        description: 'Any additional or emerging therapeutic approaches not covered in the predefined categories.',
-        strengths: 'Flexibility to incorporate novel, interdisciplinary methods and adaptability to unique challenges.',
-    },
-];
-
-export const ASSOCIATED_SYSTEMS: Option[] = [
-    {
-        id: '1',
-        label: 'Neurological',
-        value: 'NEURO',
-        description: 'Associated with neurological systems, including the brain, spinal cord, and peripheral nerves.',
-        strengths: 'Focuses on diseases and conditions affecting neural pathways and cognitive functions.',
-    },
-    {
-        id: '2',
-        label: 'Musculoskeletal',
-        value: 'MUSCULOSKELETAL',
-        description: 'Pertains to the musculoskeletal system, including bones, muscles, and connective tissues.',
-        strengths: 'Addresses conditions like degenerative diseases, structural defects, and mobility impairments.',
-    },
-    {
-        id: '3',
-        label: 'Hepatic',
-        value: 'HEPATIC',
-        description: 'Relates to the liver and its associated functions in metabolism and detoxification.',
-        strengths: 'Targets liver-specific conditions and systemic metabolic disorders.',
-    },
-    {
-        id: '4',
-        label: 'Cardiovascular',
-        value: 'CARDIOVASCULAR',
-        description: 'Concerns the heart and blood vessels, including circulatory system-related disorders.',
-        strengths: 'Focuses on cardiovascular health, blood flow optimization, and structural heart issues.',
-    },
-    {
-        id: '5',
-        label: 'Respiratory',
-        value: 'RESPIRATORY',
-        description: 'Involves the lungs and respiratory pathways, addressing diseases affecting breathing and oxygen exchange.',
-        strengths: 'Targets conditions such as asthma, fibrosis, and respiratory infections.',
-    },
-    {
-        id: '6',
-        label: 'Urological',
-        value: 'UROLOGICAL',
-        description: 'Pertains to the urinary system, including kidneys, ureters, bladder, and urethra.',
-        strengths: 'Addresses urological disorders like renal diseases and urinary tract issues.',
-    },
-    {
-        id: '7',
-        label: 'Dermatological',
-        value: 'DERMATOLOGICAL',
-        description: 'Relates to the skin, hair, and nails, including various dermatological diseases and conditions.',
-        strengths: 'Targets skin-related issues, including genetic disorders and immune-mediated skin diseases.',
-    },
-    {
-        id: '8',
-        label: 'Endocrine',
-        value: 'ENDOCRINE',
-        description: 'Concerns the endocrine system, including glands that regulate hormones.',
-        strengths: 'Focuses on hormonal imbalances, glandular disorders, and metabolic dysfunction.',
-    },
-    {
-        id: '9',
-        label: 'Metabolic',
-        value: 'METABOLIC',
-        description: 'Involves metabolic pathways and disorders, such as enzyme deficiencies and inborn errors of metabolism.',
-        strengths: 'Addresses systemic metabolic dysfunctions and energy production issues.',
-    },
-    {
-        id: '10',
-        label: 'Hematological',
-        value: 'HEMATOLOGICAL',
-        description: 'Pertains to blood and its components, including red cells, white cells, platelets, and plasma.',
-        strengths: 'Targets conditions like anemias, clotting disorders, and blood cancers.',
-    },
-    {
-        id: '11',
-        label: 'Immune',
-        value: 'IMMUNE',
-        description: 'Relates to the immune system, focusing on disorders like immunodeficiency, autoimmunity, and hypersensitivities.',
-        strengths: 'Addresses immune system regulation and immune-related genetic conditions.',
-    },
-    {
-        id: '12',
-        label: 'Ophthalmic',
-        value: 'OPHTHALMIC',
-        description: 'Associated with the eyes and vision-related disorders.',
-        strengths: 'Focuses on conditions impacting visual acuity, ocular structures, and retinal health.',
-    },
-    {
-        id: '13',
-        label: 'Other',
-        value: 'OTHER',
-        description: 'Any additional or unclassified associated systems not included in the predefined categories.',
-        strengths: 'Allows flexibility to include emerging or unique system-related conditions.',
-    },
-];
-
-export const MOLECULAR_MECHANISMS: Option[] = [
-    {
-        id: '1',
-        label: 'Loss-of-Function',
-        value: 'LOSS_OF_FUNCTION',
-        description: 'A molecular mechanism where a mutation results in the reduced or complete loss of a protein\'s normal activity.',
-        strengths: 'Enables targeted therapies to restore or compensate for the lost function.',
-    },
-    {
-        id: '2',
-        label: 'Gain-of-Function',
-        value: 'GAIN_OF_FUNCTION',
-        description: 'A molecular mechanism where a mutation results in increased, novel, or constitutive activity of a protein.',
-        strengths: 'Focuses on strategies to inhibit or regulate the aberrant activity caused by the mutation.',
-    },
-    {
-        id: '3',
-        label: 'Haploinsufficiency',
-        value: 'HAPLOINSUFFICIENCY',
-        description: 'A mechanism where one copy of a gene is insufficient to produce adequate protein levels for normal function.',
-        strengths: 'Targets strategies to enhance expression or compensate for the insufficient protein levels.',
-    },
-    {
-        id: '4',
-        label: 'Unknown',
-        value: 'UNKNOWN',
-        description: 'A molecular mechanism where the specific effect of the mutation on the protein\'s function is not yet determined.',
-    },
-    {
-        id: '5',
-        label: 'Other',
-        value: 'OTHER',
-        description: 'None of the above',
-    },
-];
-
 
 export default function ResearchOnboardingForm(
     {
@@ -535,13 +100,13 @@ export default function ResearchOnboardingForm(
     const router = useRouter()
     const [loading, setLoading] = useState(false);
     const [organization, setOrganization] = useState<Organization | null>();
+    const [otherModality, setOtherModality] = useState<string>("");
+    const [otherCategories, setOtherCategories] = useState<string>("");
+    const [otherSystem, setOtherSystem] = useState<string>("");
 
     const form = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(researchFormSchema),
-        defaultValues: {
-            prevalenceDenominator: 1000000
-        }
     })
 
     async function onSubmit(values: z.infer<typeof researchFormSchema>) {
@@ -560,7 +125,9 @@ export default function ResearchOnboardingForm(
                 diseaseCategories: values.categories?.map((category) => category.label).join(",") || "",
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator.toString() : "",
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator.toString() : "",
-                numberOfIdentifiedPatients: values.population ? values.population.toString() : "",
+                numberOfPatientsEngaged: values.engaged ? values.engaged.toString() : "",
+                nationalEstimatedPopulation: values.national ? values.national.toString() : "",
+                globalEstimatedPopulation: values.global ? values.global.toString() : "",
                 relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
                 associatedGenes: values.genes?.map((gene) => gene.label).join(",") || "",
                 associatedSystems: values.systems?.map((symptom) => symptom.label).join(",") || "",
@@ -578,6 +145,29 @@ export default function ResearchOnboardingForm(
                     if (response.success && response.data) {
                         const conditionOrg = await connectOrganizationToCondition(session?.user.organizationId, response.data.id)
                         toast.success("Successfully created condition.")
+
+                        // Mixpanel tracking for "Other" fields
+                        if (otherModality) {
+                            mixpanel.track("Org has other modality", {
+                                orgName: organization?.name || "Unknown Org",
+                                looking: otherModality,
+                            });
+                        }
+
+                        if (otherCategories) {
+                            mixpanel.track("Org has other category", {
+                                orgName: organization?.name || "Unknown Org",
+                                looking: otherCategories,
+                            });
+                        }
+
+                        if (otherSystem) {
+                            mixpanel.track("Org has other system", {
+                                orgName: organization?.name || "Unknown Org",
+                                looking: otherSystem,
+                            });
+                        }
+
                         router.push(nextLink)
                     } else {
                         console.error(response.error)
@@ -734,31 +324,6 @@ export default function ResearchOnboardingForm(
 
                             <FormField
                                 control={form.control}
-                                name="systems"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Associated systems</FormLabel>
-                                        <FormDescription>{`The systems affected by your condition.`}</FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={ASSOCIATED_SYSTEMS}
-                                                placeholder="Select the associated systems of your condition..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
                                 name="categories"
                                 render={({field}) => (
                                     <FormItem>
@@ -766,7 +331,7 @@ export default function ResearchOnboardingForm(
                                             Mechanisms of action
                                         </FormLabel>
                                         <FormDescription className="flex items-center">
-                                            {`What type of condition is ${'disoder name'}`}
+                                            {`What types of genetic effects are you investigating?`}
                                             <Tooltip delayDuration={0}>
                                                 <TooltipTrigger>
                                                     <FaQuestionCircle
@@ -793,6 +358,53 @@ export default function ResearchOnboardingForm(
                                             />
                                         </FormControl>
                                         <FormMessage/>
+                                        {form.watch("categories")?.some((item) => item.value === "OTHER") && (
+                                            <div className="mt-2">
+                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                <Input
+                                                    type="text"
+                                                    id="categories-other"
+                                                    value={otherCategories}
+                                                    onChange={(e) => setOtherCategories(e.target.value)}
+                                                />
+                                            </div>
+                                        )}
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="systems"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Associated systems</FormLabel>
+                                        <FormDescription>{`The systems affected by your condition.`}</FormDescription>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={ASSOCIATED_SYSTEMS}
+                                                placeholder="Select the associated systems of your condition..."
+                                                hidePlaceholderWhenSelected={true}
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                        {form.watch("systems")?.some((item) => item.value === "OTHER") && (
+                                            <div className="mt-2">
+                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                <Input
+                                                    type="text"
+                                                    id="systems-other"
+                                                    value={otherSystem}
+                                                    onChange={(e) => setOtherSystem(e.target.value)}
+                                                />
+                                            </div>
+                                        )}
                                     </FormItem>
                                 )}
                             />
@@ -833,6 +445,17 @@ export default function ResearchOnboardingForm(
                                             />
                                         </FormControl>
                                         <FormMessage/>
+                                        {form.watch("modalities")?.some((item) => item.value === "OTHER") && (
+                                            <div className="mt-2">
+                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                <Input
+                                                    type="text"
+                                                    id="modalities-other"
+                                                    value={otherModality}
+                                                    onChange={(e) => setOtherModality(e.target.value)}
+                                                />
+                                            </div>
+                                        )}
                                     </FormItem>
                                 )}
                             />
@@ -897,10 +520,8 @@ export default function ResearchOnboardingForm(
                                                                 type="number"
                                                                 id="prevalenceDenominator"
                                                                 {...denominatorField}
-                                                                value={1000000}
                                                                 className="w-32"
                                                                 min={0}
-                                                                disabled
                                                             />
                                                         </FormControl>
                                                     )}
@@ -914,15 +535,53 @@ export default function ResearchOnboardingForm(
 
                             <FormField
                                 control={form.control}
-                                name="population"
+                                name="engaged"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Number of patients identified`}</FormLabel>
-                                        <FormDescription>{`The number of known patients (not the estimated total). The people in this count should be reachable by your organization.`}</FormDescription>
+                                        <FormLabel>{`Number of patients engaged`}</FormLabel>
+                                        <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="number"
-                                                id="population"
+                                                id="engaged"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="national"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>{`Estimated number of patients in your region`}</FormLabel>
+                                        <FormDescription>{`The estimated number of patients in your country or region of influence.`}</FormDescription>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                id="national"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="global"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
+                                        <FormDescription>{`The estimated number of patients in the world.`}</FormDescription>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                id="global"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -933,7 +592,7 @@ export default function ResearchOnboardingForm(
 
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
-                                    <Button onClick={() => router.push(previousLink)}>
+                                    <Button type="button" onClick={() => router.push(previousLink)}>
                                         Previous
                                     </Button>
                                     <Button type="submit" disabled={loading}>
@@ -950,7 +609,8 @@ export default function ResearchOnboardingForm(
                     </Form>
                 </div>
 
-                <div className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">
+                <div
+                    className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">
                     <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
                         <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
                             Organization profile preview
@@ -964,9 +624,17 @@ export default function ResearchOnboardingForm(
                         <div className="w-full flex flex-col space-y-8 my-8">
                             <div>
                                 <div>
-                                    <img className="object-cover h-24 w-full lg:h-36"
-                                         src={'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'}
-                                         alt=""/>
+                                    {/* <img className="object-cover h-24 w-full lg:h-36"
+                                         src={organization?.headerImage || 'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'}
+                                         alt=""/> */}
+                                        {organization?.headerImage ? (
+                                            <img className="h-32 w-full object-cover lg:h-48"
+                                                src={organization.headerImage}
+                                                alt=""
+                                            />
+                                        ): (
+                                            <div className="h-32 w-full object-cover lg:h-48 bg-secondary"></div>
+                                        )}
                                 </div>
 
                                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -1093,19 +761,19 @@ export default function ResearchOnboardingForm(
                                                             <div
                                                                 className="flex flex-row items-center justify-between w-full">
                                                                 <h4 className="scroll-m-20 text-base font-semibold">
-                                                                    Statistics
+                                                                    Epidemiology
                                                                 </h4>
                                                             </div>
-                                                            {(form.watch("prevalenceNumerator") && form.watch("prevalenceDenominator") && form.watch("population")) ? (
+                                                            {(form.watch("prevalenceNumerator") && form.watch("prevalenceDenominator") && form.watch("engaged")) ? (
                                                                 <ul className="flex flex-col list-disc list-inside">
                                                                     {form.watch("prevalenceNumerator") && form.watch("prevalenceDenominator") && (
                                                                         <li>
                                                                             {`${form.watch("prevalenceNumerator")} in ${form.watch("prevalenceDenominator")} prevalence`}
                                                                         </li>
                                                                     )}
-                                                                    {form.watch("population") && (
+                                                                    {form.watch("engaged") && (
                                                                         <li>
-                                                                            {`${form.watch("population")} patients identified`}
+                                                                            {`${form.watch("engaged")} patients identified`}
                                                                         </li>
                                                                     )}
                                                                 </ul>
@@ -1183,9 +851,10 @@ export default function ResearchOnboardingForm(
                                         </CardContent>
                                     </Card>
                                     <Card>
-                                        <CardHeader className="w-full flex flex-row items-center justify-between space-y-0">
+                                        <CardHeader
+                                            className="w-full flex flex-row items-center justify-between space-y-0">
                                             <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>
-                                            Research Plan
+                                                Research Plan
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent className="space-y-4">

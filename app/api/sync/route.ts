@@ -104,7 +104,127 @@ const syncToTypesense = async (env: {
             name: 'organizations',
             fields: [
                 { name: 'id', type: 'string', facet: false },
-                { name: 'name', type: 'string', facet: false },
+                { name: 'name', type: 'string', facet: true, index: true },
+                {
+                    name: "description",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    name: "yearFounded",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    name: "moneyDeployed",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
+                },
+                {
+                    name: "moneyRaised",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
+                },
+                {
+                    name: "numberOfPatientsEngaged",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
+                },
+                {
+                    name: "prevalenceDenominator",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
+                },
+                {
+                    name: "prevalenceNumerator",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
+                },
+                {
+                    name: "prevalenceRatio",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "float"
+                },
+                {
+                    name: "interestedModalities",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string[]"
+                },
+                {
+                    name: "diseaseCategories",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string[]"
+                }
             ],
         };
         const milestoneSchema = {
@@ -112,7 +232,7 @@ const syncToTypesense = async (env: {
             fields: [
                 { name: 'id', type: 'string', facet: false },
                 { name: 'title', type: 'string', facet: false },
-                { name: 'description', type: 'string', facet: false },
+                { name: 'description', type: 'string', facet: false, optional: true },
             ],
         };
 

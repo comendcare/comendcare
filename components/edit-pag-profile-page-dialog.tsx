@@ -7,7 +7,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import React, {useCallback, useEffect, useState} from "react";
 import {updateOrganization, updateCondition} from "@/lib/actions";
-import {AddressType} from "@/lib/types";
+import {AddressType, ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
@@ -42,12 +42,7 @@ import {Slider} from "@/components/ui/slider";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {FaQuestionCircle} from "react-icons/fa";
 import {financesFormSchema} from "@/components/finances-onboarding-form";
-import {
-    ASSOCIATED_SYSTEMS,
-    MODALITIES,
-    MOLECULAR_MECHANISMS,
-    researchFormSchema
-} from "@/components/research-onboarding-form";
+import { researchFormSchema } from "@/components/research-onboarding-form";
 
 const OPTIONS: Option[] = [
     {
@@ -230,7 +225,8 @@ export default function EditPAGProfileDialog() {
         });
 
         // Handle the selected profile image upload
-        if (selectedFileProfile && values.image) {
+        // only upload if the image has changed
+        if (selectedFileProfile && values.image && values.image !== defaultOrganizationValues?.image) {
             try {
                 const imgUrl = await handleImageUpload(selectedFileProfile as File, values.image);
                 if (imgUrl) {
@@ -244,7 +240,8 @@ export default function EditPAGProfileDialog() {
         }
 
         // Handle the selected header image upload
-        if (selectedFileHeader && values.headerImage) {
+        // only upload if the image has changed
+        if (selectedFileHeader && values.headerImage && values.headerImage !== defaultOrganizationValues?.headerImage) {
             try {
                 const imgUrl = await handleImageUpload(selectedFileHeader as File, values.headerImage);
                 if (imgUrl) {
@@ -335,6 +332,18 @@ export default function EditPAGProfileDialog() {
                         }
                     }
 
+                    setAddress({
+                        address1: fetchedValues.address1,
+                        address2: fetchedValues.address2,
+                        formattedAddress: fetchedValues.formattedAddress,
+                        city: fetchedValues.city,
+                        region: fetchedValues.region,
+                        postalCode: fetchedValues.postalCode,
+                        country: fetchedValues.country,
+                        lat: fetchedValues.lat,
+                        lng: fetchedValues.lng,
+                    });
+
                     setDefaultOrganizationValues(fetchedValues);
                     // setAddress(fetchedValues); // Set address state as well
                     editOrgForm.reset(fetchedValues); // Reset form with fetched data
@@ -420,9 +429,6 @@ export default function EditPAGProfileDialog() {
     const editResearchForm = useForm<z.infer<typeof researchFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(researchFormSchema),
-        defaultValues: {
-            prevalenceDenominator: 1000000
-        }
     })
 
     useEffect(() => {
@@ -448,8 +454,10 @@ export default function EditPAGProfileDialog() {
                             genes: condition.associatedGenes.map((gene) => ({ label: gene, value: gene })) || [],
                             systems: condition.associatedSystems.map((system) => ({ label: system, value: system })) || [],
                             prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
-                            prevalenceDenominator: condition.prevalenceDenominator || undefined,
-                            population: condition.numberOfIdentifiedPatients?.toString() || "",
+                            prevalenceDenominator: condition.prevalenceDenominator?.toString() || "",
+                            engaged: condition.numberOfPatientsEngaged?.toString() || "",
+                            national: condition.nationalEstimatedPopulation?.toString() || "",
+                            global: condition.globalEstimatedPopulation?.toString() || "",
                         }));
 
                         // Assuming you're working with one condition at a time (e.g., the first condition)
@@ -493,7 +501,7 @@ export default function EditPAGProfileDialog() {
                 diseaseCategories: values.categories?.map((item) => item.label) || [],
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
-                numberOfIdentifiedPatients: values.population ? parseInt(values.population, 10) : null,
+                numberOfPatientsEngaged: values.engaged ? parseInt(values.engaged, 10) : null,
                 relevantDiseaseMechanisms: values.mechanisms || [],
                 associatedGenes: values.genes?.map((item) => item.label) || [],
                 associatedSystems: values.systems?.map((item) => item.label) || [],
@@ -665,7 +673,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Website`}</FormLabel>
-                                                <FormDescription>{`Your patient group's website URL (with the URL extension like http or https.`}</FormDescription>
+                                                <FormDescription>{`Your patient group's website URL (with the URL extension like http or https).`}</FormDescription>
                                                 <FormControl>
                                                     <Input
                                                         id="website"
@@ -825,30 +833,30 @@ export default function EditPAGProfileDialog() {
                                         className="rounded h-[100px] w-[400px]"
                                     />
 
-                                    <FormField
-                                        control={editOrgForm.control}
-                                        name="looking"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>{`Looking for`}</FormLabel>
-                                                <FormDescription>{`What your organization is looking for and hoping to get from joining Comend.`}</FormDescription>
-                                                <FormControl>
-                                                    <MultipleSelector
-                                                        {...field}
-                                                        defaultOptions={OPTIONS}
-                                                        placeholder="Select options that appeal to you..."
-                                                        hidePlaceholderWhenSelected={true}
-                                                        emptyIndicator={
-                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                                no results found.
-                                                            </p>
-                                                        }
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
-                                    />
+                                    {/*<FormField*/}
+                                    {/*    control={editOrgForm.control}*/}
+                                    {/*    name="looking"*/}
+                                    {/*    render={({field}) => (*/}
+                                    {/*        <FormItem>*/}
+                                    {/*            <FormLabel>{`Looking for`}</FormLabel>*/}
+                                    {/*            <FormDescription>{`What your organization is looking for and hoping to get from joining Comend.`}</FormDescription>*/}
+                                    {/*            <FormControl>*/}
+                                    {/*                <MultipleSelector*/}
+                                    {/*                    {...field}*/}
+                                    {/*                    defaultOptions={OPTIONS}*/}
+                                    {/*                    placeholder="Select options that appeal to you..."*/}
+                                    {/*                    hidePlaceholderWhenSelected={true}*/}
+                                    {/*                    emptyIndicator={*/}
+                                    {/*                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
+                                    {/*                            no results found.*/}
+                                    {/*                        </p>*/}
+                                    {/*                    }*/}
+                                    {/*                />*/}
+                                    {/*            </FormControl>*/}
+                                    {/*            <FormMessage/>*/}
+                                    {/*        </FormItem>*/}
+                                    {/*    )}*/}
+                                    {/*/>*/}
 
                                     <Button type="submit">Save</Button>
                                 </form>
@@ -969,7 +977,7 @@ export default function EditPAGProfileDialog() {
                                                     Mechanisms of action
                                                 </FormLabel>
                                                 <FormDescription className="flex items-center">
-                                                    {`What type of condition is ${'disoder name'}`}
+                                                    {`What types of genetic effects are you investigating?`}
                                                     <Tooltip delayDuration={0}>
                                                         <TooltipTrigger>
                                                             <FaQuestionCircle
@@ -1069,9 +1077,7 @@ export default function EditPAGProfileDialog() {
                                                                         id="prevalenceDenominator"
                                                                         {...denominatorField}
                                                                         className="w-32"
-                                                                        value={1000000}
                                                                         min={0}
-                                                                        disabled
                                                                     />
                                                                 </FormControl>
                                                             )}
@@ -1085,15 +1091,53 @@ export default function EditPAGProfileDialog() {
 
                                     <FormField
                                         control={editResearchForm.control}
-                                        name="population"
+                                        name="engaged"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Number of patients identified`}</FormLabel>
-                                                <FormDescription>{`The number of known patients (not the estimated total). The people in this count should be reachable by your organization.`}</FormDescription>
+                                                <FormLabel>{`Number of patients engaged`}</FormLabel>
+                                                <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
                                                 <FormControl>
                                                     <Input
                                                         type="number"
-                                                        id="population"
+                                                        id="engaged"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="national"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Estimated number of patients in the US`}</FormLabel>
+                                                <FormDescription>{`The estimated number of patients in the US.`}</FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        id="national"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="global"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
+                                                <FormDescription>{`The estimated number of patients in the world.`}</FormDescription>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        id="global"
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -1353,27 +1397,28 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
             if (!file) {
                 // toast.error("No file selected!")
                 console.error("No file selected!")
-                return;
+                return
             }
 
             // Additional check to exclude SVG
             if (file.type !== "image/jpg" && file.type !== "image/jpeg" && file.type !== "image/png") {
                 toast.error("Only .jpg, .jpeg, and .png files are allowed. Please select a valid image format.")
                 console.error("Only .jpg, .jpeg, and .png files are allowed. Please select a valid image format.")
-                return;
+                return
             }
 
-            // Check file size (1 MB limit)
-            const maxSizeInBytes = 1 * 1024 * 1024; // 1 MB
+            // Check file size (5 MB limit), image upload size is limited by the next server actions bodySizeLimit
+            // defined in next.config.js
+            const maxSizeInBytes = 5 * 1024 * 1024; // 5 MB
             if (file.size > maxSizeInBytes) {
-                toast.error("File size exceeds 1 MB. Please select a smaller image.")
-                console.error("File size exceeds 1 MB. Please select a smaller image.")
-                return;
+                toast.error("File size exceeds 5 MB. Please select a smaller image.")
+                console.error("File size exceeds 5 MB. Please select a smaller image.")
+                return
             }
 
             const fileWithPreview = Object.assign(file, {
                 preview: URL.createObjectURL(file),
-            });
+            })
 
             setSelectedFile(fileWithPreview)
             setDialogOpen(true)

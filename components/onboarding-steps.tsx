@@ -22,12 +22,12 @@ function classNames(...classes: any[]) {
 const allSteps: Step[] = [
     {
         name: 'Welcome to Comend',
-        description: "We're glad to have you",
+        description: "We're glad to have you.",
         href: '/onboarding/welcome',
     },
     {
         name: 'About you',
-        description: "Create your profile to get started. This will be connected to your Patient Advocacy Organization for a personalized experience.",
+        description: "Create your personal profile to get started. This will then be linked to your patient group.",
         href: '/onboarding/user',
     },
     {
@@ -37,12 +37,12 @@ const allSteps: Step[] = [
     },
     {
         name: 'Research',
-        description: "Provide insights into your current research efforts to unlock tailored opportunities.",
+        description: "Tell us about your condition and research efforts to match with potential partners.",
         href: '/onboarding/research',
     },
     {
         name: 'Finances',
-        description: "Help us understand the financial landscape supporting your research to identify relevant opportunities.",
+        description: "Help us understand your group’s financial status. This data is mainly used to track our impact.",
         href: '/onboarding/finances',
     },
 ];

@@ -96,39 +96,35 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
         <Card
             ref={setNodeRef}
             style={style}
-            className={variants({
-                dragging: isOverlay
-                    ? "overlay"
-                    : isDragging
-                      ? "over"
-                      : undefined
-            })}
+            className={cn(
+                variants({
+                    dragging: isOverlay
+                        ? "overlay"
+                        : isDragging
+                        ? "over"
+                        : undefined
+                }),
+            )}
         >
             <CardHeader className={cn(
-                "p-4 font-semibold border-b-2 text-left flex flex-row space-between items-center"
+                "p-2 font-semibold text-left flex flex-row space-between items-center rounded-t-lg"
             )}>
                 <CardTitle className="w-full flex flex-row justify-between space-between items-center">
-                    <div>
+                    <div className="flex gap-4 items-center">
                         <Button
                             variant="ghost"
                             {...attributes}
                             {...listeners}
-                            className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
+                            className=" p-1 -ml-2 h-auto cursor-grab relative"
                         >
                             <span className="sr-only">{`Move column: ${column.name}`}</span>
                             <GripVertical />
                         </Button>
-                        <Badge
-                            size="large"
-                        >
-                            {column.name}
-                        </Badge>
+                        <h1 className="text-xl">{column.name}</h1>
                     </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="ghost"
-                            >
+                            <Button variant="ghost">
                                 <FaEllipsis/>
                             </Button>
                         </DropdownMenuTrigger>
@@ -145,7 +141,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
                 </CardTitle>
             </CardHeader>
             <ScrollArea className="h-full">
-                <CardContent className="flex flex-grow flex-col gap-2 p-2">
+                <CardContent className="rounded-b-md flex flex-grow flex-col gap-2 p-2">
                     <SortableContext items={tasksIds}>
                         {tasks.map(task => (
                             <TaskCard key={task.id} task={task} />

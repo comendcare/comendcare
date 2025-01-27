@@ -13,7 +13,6 @@ import {handleImageUpload} from "@/lib/upload";
 import {updateOrganization} from "@/lib/actions";
 import {useEffect, useState} from "react";
 import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
-import {getPublicFile} from "@/lib/utils";
 import {useSession} from "next-auth/react";
 import Link from "next/link"
 import {useForm} from "react-hook-form";
@@ -626,7 +625,7 @@ export default function EditConditionProfileDialog() {
                     </div>
                     <FormField
                         control={conditionProfileForm.control}
-                        name="population"
+                        name="engaged"
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel>{`Number of patients identified`}</FormLabel>
@@ -634,7 +633,7 @@ export default function EditConditionProfileDialog() {
                                 <FormControl>
                                     <Input
                                         type="number"
-                                        id="population"
+                                        id="engaged"
                                         {...field}
                                     />
                                 </FormControl>
