@@ -41,33 +41,26 @@ function generateFiltersString(filters: FiltersType) {
     let typesenseFilters = ""
 
     // addative filters
-    // if (filters.mechanisms.length > 0) {
-    //     filters.mechanisms.forEach(mechanism => {
-    //         filtersList.push(`diseaseMechanisms:=[${mechanism.value}]`)
-    //         typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}diseaseMechanisms:=[${mechanism.value}]`)
-    //     })
-    // }
+    if (filters.systems.length > 0) {
+        filters.systems.forEach(system => {
+            filtersList.push(`condition.condition.associatedSystems:=[${system.value}]`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.associatedSystems:=[${system.value}]`)
+        })
+    }
 
-    // if (filters.systemsAffected.length > 0) {
-    //     filters.systemsAffected.forEach(system => {
-    //         filtersList.push(`systemsAffected:=[${system.value}]`)
-    //         typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}systemsAffected:=[${system.value}]`)
-    //     })
-    // }
+    if (filters.mechanisms.length > 0) {
+        filters.mechanisms.forEach(mechanism => {
+            filtersList.push(`condition.condition.relevantDiseaseMechanisms:=[${mechanism.value}]`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.relevantDiseaseMechanisms:=[${mechanism.value}]`)
+        })
+    }
 
-    // if (filters.modalities.length > 0) {
-    //     filters.modalities.forEach(modality => {
-    //         filtersList.push(`interestedModalities:=[${modality.value}]`)
-    //         typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}interestedModalities:=[${modality.value}]`)
-    //     })
-    // }
-
-    // if (filters.genes.length > 0) {
-    //     filters.genes.forEach(gene => {
-    //         filtersList.push(`associatedGenes:=[${gene.value}]`)
-    //         typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}associatedGenes:=[${gene.value}]`)
-    //     })
-    // }
+    if (filters.modalities.length > 0) {
+        filters.modalities.forEach(modality => {
+            filtersList.push(`condition.condition.interestedModalities:=[${modality.value}]`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.interestedModalities:=[${modality.value}]`)
+        })
+    }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
 
@@ -85,10 +78,10 @@ function generateFiltersString(filters: FiltersType) {
 
 const sortByFilters: { [key: string]: string } = {
     "alphabetical": "name:asc",
-    "patients-low-high": "numberOfPatientsEngaged:asc",
-    "patients-high-low": "numberOfPatientsEngaged:desc",
-    "prevalence-low-high": "prevalenceRatio:asc",
-    "prevalence-high-low": "prevalenceRatio:desc",
+    // "patients-low-high": "condition.numberOfIdentifiedPatients:asc",
+    // "patients-high-low": "condition.numberOfIdentifiedPatients:desc",
+    // "prevalence-low-high": "prevalenceRatio:asc",
+    // "prevalence-high-low": "prevalenceRatio:desc",
     "money-raised-low-high": "moneyRaised:asc",
     "money-raised-high-low": "moneyRaised:desc"
 }

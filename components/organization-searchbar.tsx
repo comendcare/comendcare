@@ -57,10 +57,10 @@ export default function OrganizationSearchBar() {
                 <SelectContent>
                     <SelectGroup>
                         <SelectItem value="alphabetical">Alphabetical (A-Z)</SelectItem>
-                        <SelectItem value="patients-low-high">Patients (Low-High)</SelectItem>
+                        {/* <SelectItem value="patients-low-high">Patients (Low-High)</SelectItem>
                         <SelectItem value="patients-high-low">Patients (High-Low)</SelectItem>
                         <SelectItem value="prevalence-low-high">Prevalence (Low-High)</SelectItem>
-                        <SelectItem value="prevalence-high-low">Prevalence (High-Low)</SelectItem>
+                        <SelectItem value="prevalence-high-low">Prevalence (High-Low)</SelectItem> */}
                         <SelectItem value="money-raised-low-high">$ Raised (Low-High)</SelectItem>
                         <SelectItem value="money-raised-high-low">$ Raised (High-Low)</SelectItem>
                     </SelectGroup>

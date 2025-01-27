@@ -44,13 +44,13 @@ function generateFiltersString(filters: FiltersType) {
     }
 
     if (filters.hasProject) {
-        filtersList.push(`RFPId_exist:=true`)
-        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}RFPId_exists!=true`)
+        filtersList.push(`RFPId_exists:=true`)
+        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}RFPId_exists:=true`)
     }
 
     if (filters.hasAsset) {
-        filtersList.push(`assetId_exist:=true`)
-        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}assetId_exists!=true`)
+        filtersList.push(`assetId_exists:=true`)
+        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}assetId_exists:=true`)
     }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
@@ -64,6 +64,7 @@ function generateFiltersString(filters: FiltersType) {
     // }
 
     console.log(`typesense filters: `, typesenseFilters)
+    console.log(`filters list`, filtersList)
     return typesenseFilters
 }
 
