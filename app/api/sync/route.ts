@@ -102,6 +102,7 @@ const syncToTypesense = async (env: {
         // Define schemas
         const organizationSchema = {
             name: 'organizations',
+            enable_nested_fields: true,
             fields: [
                 { name: 'id', type: 'string', facet: false },
                 { name: 'name', type: 'string', facet: true, index: true },
@@ -224,15 +225,144 @@ const syncToTypesense = async (env: {
                     stem: false,
                     store: true,
                     type: "string[]"
+                },
+                {
+                    name: "condition",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "object"
                 }
             ],
         };
         const milestoneSchema = {
             name: 'milestones',
             fields: [
-                { name: 'id', type: 'string', facet: false },
-                { name: 'title', type: 'string', facet: false },
-                { name: 'description', type: 'string', facet: false, optional: true },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "title",
+                    optional: false,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "description",
+                    optional: false,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "type",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "status",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "RFPId",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "RFP",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "object"
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "RFPId_exists",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "bool"
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "assetId",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "asset",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "object"
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "assetId_exits",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "bool"
+                }
             ],
         };
 
@@ -250,16 +380,43 @@ const syncToTypesense = async (env: {
 
         if (organizations.length > 0) {
             console.log('Validating organization data...');
-            organizations.forEach((org, idx) => console.log(`Org ${idx + 1}:`, org));
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizations);
+
+            // map orgs to include all required data
+            const uploadOrgs = await Promise.all(organizations.map(async (org, index) => {
+                console.log(`Org ${index + 1}:`, org)
+                const organization = await prisma.organization.findUnique({
+                    where: { id: org.id },
+                    include: { condition: {include: {condition: true}}}
+                })
+                return organization
+            }))
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', uploadOrgs);
         } else {
             console.log('No organizations to import.');
         }
 
         if (milestones.length > 0) {
             console.log('Validating milestone data...');
-            milestones.forEach((ms, idx) => console.log(`Milestone ${idx + 1}:`, ms));
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestones);
+
+            const uploadMilestones = await Promise.all(milestones.map(async (ms, index) => {
+                console.log(`Milestone ${index + 1}:`, ms)
+                const milestone = await prisma.milestone.findUnique({
+                    where: { id: ms.id },
+                    include: {
+                        RFP: true,
+                        asset: true
+                    }
+                })
+
+                return {
+                    ...milestone,
+                    RFPId_exists: milestone?.RFP ? true : false,
+                    assetId_exists: milestone?.asset ? true : false,
+                }
+            }))
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', uploadMilestones);
         } else {
             console.log('No milestones to import.');
         }
