@@ -30,7 +30,8 @@ import {
     sendInviteEmail,
     sendMemberRequestCreatedEmail,
     sendMemberRequestApprovedEmail,
-    sendNewOrganizationEmail
+    sendNewOrganizationEmail,
+    sendMemberRequestDeniedEmail
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, MemberRequestWithUser} from "@/lib/types";
@@ -57,7 +58,7 @@ export type Column = Prisma.ColumnGetPayload<{
 }>
 
 export type Task = Prisma.TaskGetPayload<{
-    include: { checklist: true, stakeholders: { include: {user: true} } },
+    include: { checklist: true, stakeholders: { include: { user: true } } },
 }>
 
 const nanoid = customAlphabet(
@@ -202,13 +203,13 @@ export const createCondition = async (formData: FormData) => {
 
         if (!condition) {
             console.error("Error creating condition.");
-            return { success: false, error: "Database error. Please try again later." };
+            return {success: false, error: "Database error. Please try again later."};
         }
 
-        return { success: true, data: condition };
+        return {success: true, data: condition};
     } catch (error: any) {
         console.error("Error creating condition:", error);
-        return { success: false, error: "Database error. Please try again later." };
+        return {success: false, error: "Database error. Please try again later."};
     }
 }
 
@@ -945,12 +946,22 @@ export async function createOrGetOrganization(
 
 export async function approveMemberRequestAndCreateMember(
     memberRequest: MemberRequestWithUser
-): Promise<ApiResponse<any>>  {
+): Promise<ApiResponse<any>> {
     if (!memberRequest) {
         throw new Error("Invalid member request");
     }
 
     const session = await getSession()
+
+    const organization = await prisma.organization.findUnique({
+        where: {
+            id: memberRequest.organizationId,
+        },
+    });
+
+    if (!organization) {
+        return {success: false, error: "Organization not found."};
+    }
 
     try {
         const member = await prisma.member.findUnique({
@@ -996,25 +1007,13 @@ export async function approveMemberRequestAndCreateMember(
             return {success: false, error: "Database error. please try again later."}
         }
 
-        const organization = await prisma.organization.findUnique({
-            where: {
-                id: memberRequest.organizationId,
-            }
-        })
-
         if (createdMember && organization) {
             await sendMemberRequestApprovedEmail(
                 {
-                    user: {
-                        name: memberRequest.user.name,
-                        email: memberRequest.email,
-                    },
-                    admin: {
-                        name: session?.user.name,
-                        email: session?.user.email,
-                        organizationName: organization.name || "",
-                        organizationImage: organization.image || "",
-                    },
+                    name: memberRequest.user.name,
+                    email: memberRequest.email,
+                    organizationName: organization.name || "",
+                    organizationImage: organization.image || "",
                 }
             ).then(() => {
                 console.log("email sent")
@@ -1026,6 +1025,61 @@ export async function approveMemberRequestAndCreateMember(
     } catch (error) {
         console.error("Error approving member request:", error);
         throw new Error("Failed to add member to organization.");
+    }
+}
+
+export async function deleteMemberRequest(
+    memberRequest: MemberRequestWithUser
+): Promise<ApiResponse<any>> {
+    if (!memberRequest) {
+        throw new Error("Invalid member request");
+    }
+
+    const organization = await prisma.organization.findUnique({
+        where: {
+            id: memberRequest.organizationId,
+        },
+    });
+
+    if (!organization) {
+        return {success: false, error: "Organization not found."};
+    }
+
+    try {
+        // Ensure the composite key is valid or fallback to another unique identifier like `id`
+        const deletedMemberRequest = await prisma.memberRequest.delete({
+            where: {
+                id: memberRequest.id
+            },
+        });
+
+        if (!deletedMemberRequest) {
+            return {success: false, error: "Failed to delete member request. Request not found."};
+        }
+
+        if (!organization) {
+            return {success: false, error: "Organization not found."};
+        }
+
+        // Send denial email
+        try {
+            await sendMemberRequestDeniedEmail({
+                name: memberRequest.user.name,
+                email: memberRequest.email,
+                organizationName: organization.name || "",
+                organizationImage: organization.image || "",
+            });
+            console.log("Email sent successfully.");
+        } catch (emailError) {
+            console.error("Error sending denial email:", emailError);
+            return {success: false, error: "Failed to send denial email."};
+        }
+
+        return {success: true, data: deletedMemberRequest};
+
+    } catch (error) {
+        console.error("Error deleting member request:", error);
+        return {success: false, error: "Failed to delete member request."};
     }
 }
 
@@ -1273,8 +1327,8 @@ export async function updateCondition(formData: FormData, organizationId: string
 
         // Find the first condition associated with the organization
         const conditions = await prisma.conditionToOrganization.findMany({
-            where: { organizationId },
-            include: { condition: true },
+            where: {organizationId},
+            include: {condition: true},
         });
 
         if (!conditions || conditions.length === 0) {
@@ -1284,17 +1338,17 @@ export async function updateCondition(formData: FormData, organizationId: string
         // Update the condition in Prisma
         if (conditions[0].conditionId) {
             const updatedCondition = await prisma.condition.update({
-                where: { id: conditions[0].conditionId },
+                where: {id: conditions[0].conditionId},
                 data,
             });
-            return { success: true, data: updatedCondition };
+            return {success: true, data: updatedCondition};
         }
 
-        return { success: false, error: "No condition id found" };
+        return {success: false, error: "No condition id found"};
 
     } catch (error: any) {
         console.error("Error updating condition:", error);
-        return { success: false, error: error.message || "Failed to update condition." };
+        return {success: false, error: error.message || "Failed to update condition."};
     }
 }
 
@@ -1450,8 +1504,8 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         const nodeIds = nodes.map((node: any) => node.id)
         // nodes in this roadmap
         const nodesInDB = await prisma.node.findMany({
-            select: { id: true },
-            where: { roadmapId }
+            select: {id: true},
+            where: {roadmapId}
         })
         const nodeIdsInDB = (nodesInDB || []).map((node: any) => node.id)
         const nodesToDelete = nodeIdsInDB.filter(
@@ -1541,7 +1595,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         )
 
         const updatedNodes = await prisma.node.findMany({
-            where: { roadmapId }
+            where: {roadmapId}
         })
         const updatedMilestones = await prisma.milestone.findMany({
             include: {
@@ -1554,21 +1608,21 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                 },
                 tasks: true
             },
-            where: { roadmapId }
+            where: {roadmapId}
         })
         const updatedEdges = await prisma.edge.findMany({
-            where: { roadmapId }
+            where: {roadmapId}
         })
 
         console.log(`Successfully updated Flow`)
-        return { success: true, data: { nodes: updatedNodes, milestones: updatedMilestones, edges: updatedEdges } }
+        return {success: true, data: {nodes: updatedNodes, milestones: updatedMilestones, edges: updatedEdges}}
     } catch (error) {
         console.error(`Error updating Flow: `, error)
-        return { success: false, error: "Internal server error" }
+        return {success: false, error: "Internal server error"}
     }
 }
 
-export async function createNodes({roadmapId, nodes}: { roadmapId: string | null, nodes: any[]}) {
+export async function createNodes({roadmapId, nodes}: { roadmapId: string | null, nodes: any[] }) {
     try {
         const updatedNodes: any[] = []
 
@@ -1587,7 +1641,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         await Promise.all(
             nodes.map(async (node: any) => {
                 const n = await prisma.node.create({
-                    include: { data: true },
+                    include: {data: true},
                     // where: {id: node.id},
                     // update: {
                     //     positionX: node.position?.x,
@@ -1649,7 +1703,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                 },
                 tasks: true
             },
-            where: { roadmapId }
+            where: {roadmapId}
         })
 
         updatedMilestones = updatedMilestones.filter(milestone => nodeIds.includes(milestone.nodeId))
@@ -1667,10 +1721,10 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         //     })
         // )
 
-        return { success: true, data: { nodes: updatedNodes, milestones: updatedMilestones} }
+        return {success: true, data: {nodes: updatedNodes, milestones: updatedMilestones}}
     } catch (error: any) {
         logError("Could not create nodes", error)
-        return { success: false, error: "Internal server error" }
+        return {success: false, error: "Internal server error"}
     }
 }
 
@@ -1681,7 +1735,7 @@ export async function deleteNode(nodeId: string | undefined) {
         // cascading delete will also delete milestone
         const deletedNode = await prisma.node.delete({
             where: {id: nodeId},
-            include: { data: true }
+            include: {data: true}
         })
 
         if (!deletedNode || !deletedNode.data?.id) {
@@ -1692,19 +1746,19 @@ export async function deleteNode(nodeId: string | undefined) {
         // console.log(`Delete typesense document`, deletedNode.data.id)
         // await deleteTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, deletedNode.data.id, 'milestones')
 
-        return { success: true, data: deletedNode }
+        return {success: true, data: deletedNode}
     } catch (error: any) {
         logError("Could not delete node", error)
-        return { success: false, error: "Internal server error" }
+        return {success: false, error: "Internal server error"}
     }
 }
 
-export async function updateEdges({roadmapId, edges}: {roadmapId: string | null, edges: any[]}) {
+export async function updateEdges({roadmapId, edges}: { roadmapId: string | null, edges: any[] }) {
     try {
         if (!roadmapId) throw new Error('No roadmapId provided.')
 
         await prisma.edge.deleteMany({
-            where: { roadmapId }
+            where: {roadmapId}
         })
 
         // Save or update edges
@@ -1729,14 +1783,14 @@ export async function updateEdges({roadmapId, edges}: {roadmapId: string | null,
         )
 
         const updatedEdges: Edge[] = await prisma.edge.findMany({
-            where: { roadmapId }
+            where: {roadmapId}
         })
 
         console.log(`Successfully updated Flow Edges`)
-        return { success: true, data: updatedEdges }
+        return {success: true, data: updatedEdges}
     } catch (error) {
         console.error(`Error updating Flow Edges`, error)
-        return { success: false, error: "Internal server error" }
+        return {success: false, error: "Internal server error"}
     }
 }
 
@@ -1768,7 +1822,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                 }
 
                 let m = await prisma.milestone.update({
-                    where: { nodeId: milestone.nodeId },
+                    where: {nodeId: milestone.nodeId},
                     include: {
                         papers: true,
                         asset: {
@@ -2004,9 +2058,9 @@ async function updateRFP(previousMilestone: Milestone, milestone: Milestone) {
 export async function createKanban(orgId: string) {
     try {
         const newKanban = await prisma.kanban.create({
-            include: { columns: true },
+            include: {columns: true},
             data: {
-                organization: { connect: { id: orgId } },
+                organization: {connect: {id: orgId}},
                 columns: {
                     create: [
                         {
@@ -2044,7 +2098,7 @@ export async function createColumn(column: Partial<Column>) {
                 name: column.name || 'New column',
                 id: nanoid(),
                 kanban: {
-                    connect: { id: kanban.id }
+                    connect: {id: kanban.id}
                 },
                 kanbanPosition: column.kanbanPosition || 0
             }
@@ -2087,10 +2141,10 @@ export async function updateColumns({columns}: { columns: Column[] }) {
 
         // Typesense - if updating typesense, update here...
 
-        return { success: true, data: updatedColumns }
+        return {success: true, data: updatedColumns}
     } catch (error) {
         logError("Could not update column", error)
-        return { success: false, error: "Internal server error" }
+        return {success: false, error: "Internal server error"}
     }
 }
 
@@ -2119,7 +2173,7 @@ export async function deleteColumn(columnId: string) {
 export async function createTask(columnId: string) {
     try {
         const newTask: Task = await prisma.task.create({
-            include: { checklist: true, stakeholders: { include: {user: true} } },
+            include: {checklist: true, stakeholders: {include: {user: true}}},
             data: {
                 name: 'New Task',
                 id: nanoid(),
@@ -2146,10 +2200,10 @@ export async function createTask(columnId: string) {
 
         // Typesense - if updating typesense, update here...
 
-        return { success: true, data: newTask }
+        return {success: true, data: newTask}
     } catch (error: any) {
         logError("Could not create task", error)
-        return { success: false, error: "Internal server error" }
+        return {success: false, error: "Internal server error"}
     }
 }
 
@@ -2163,7 +2217,7 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
 
                 let t = await prisma.task.update({
                     where: {id: task?.id},
-                    include: {milestone: true, checklist: true, stakeholders: { include: {user: true} }},
+                    include: {milestone: true, checklist: true, stakeholders: {include: {user: true}}},
                     data: {
                         name: task.name,
                         // status: task.status,
@@ -2216,17 +2270,17 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
         // Typesense - if updating typesense, update here...
 
         console.log(`Successfully updated tasks`)
-        return { success: true, data: updatedTasks }
+        return {success: true, data: updatedTasks}
     } catch (error) {
         logError("Could not update task", error)
-        return { success: false, error: "Internal server error" }
+        return {success: false, error: "Internal server error"}
     }
 }
 
 export async function deleteTask(taskId: string) {
     try {
         const deletedTask = await prisma.task.delete({
-            include: { checklist: true, stakeholders: { include: {user: true} }},
+            include: {checklist: true, stakeholders: {include: {user: true}}},
             where: {
                 id: taskId
             }
