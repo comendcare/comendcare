@@ -22,7 +22,7 @@ export const templateMilestones = [
         title: 'Construct Mouse Models',
         description: 'Recommended tasks: Secure Funding, Ethical Standards Advocacy, and Prioritize Model Features.',
         status: 'INPROGRESS',
-        type: 'ANIMALMODEL',
+        type: 'MOUSEMODEL',
         papers: [],
     },
     {

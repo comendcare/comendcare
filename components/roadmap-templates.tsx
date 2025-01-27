@@ -51,7 +51,7 @@ export default function RoadmapTemplates() {
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     // papers: defaultData?.papers || [],
                     // tasks: defaultData?.tasks || [],
-                    status: defaultData?.status || "TODO"
+                    status: defaultData?.status || "PLANNED"
                 }
             }
 

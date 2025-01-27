@@ -292,7 +292,7 @@ export default function FinancesOnboardingForm(
 
                 <div className="flex flex-row justify-between">
                     <div className="flex flex-row space-x-2">
-                        <Button onClick={() => router.push(previousLink)}>
+                        <Button type="button" onClick={() => router.push(previousLink)}>
                             Previous
                         </Button>
                         <Button type="submit">

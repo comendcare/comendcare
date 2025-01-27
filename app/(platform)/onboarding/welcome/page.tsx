@@ -1,18 +1,17 @@
-"use client"
+"use client";
 
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import {Button} from "@/components/ui/button";
-import {useRouter} from "next/navigation";
-import {useSession} from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Loading from "@/app/loading";
 
 export default function OnboardingWelcomePage() {
-    const {data: session, status} = useSession()
-    const router = useRouter()
+    const { data: session, status } = useSession();
+    const router = useRouter();
 
     if (status === "loading") {
-        return <Loading />
+        return <Loading />;
     }
 
     return (
@@ -23,18 +22,17 @@ export default function OnboardingWelcomePage() {
                         Welcome to Comend, {session?.user.name?.split(" ")[0]}!
                     </h1>
                     <p>
-                        {`We're happy to have you! We have a few questions to better understand how we can help you.
-                        All questions in this form are optional unless marked as (required).`}
+                        {`We're happy to have you! To create your profile and help us understand how we can help you, we have some questions. This should take about 10 minutes or less. All questions in this form are optional unless marked as (required).`}
                     </p>
                     <p>
-                        {`Anything you add here is editable after you've completed onboarding.`}
+                        {`You can edit any of this information at any time, after completing onboarding.`}
                     </p>
                     <p className="font-semibold">
-                        {`Nothing that you share here will be shared with others, and you have complete control of what info is made public on your organization profile and research plan.`}
+                        {`You choose what information is shared publicly, and we will never share your data externally without your consent.`}
                     </p>
                 </div>
 
-                <Separator/>
+                <Separator />
             </div>
 
             <div className="grid grid-cols-2 gap-8">
@@ -45,15 +43,15 @@ export default function OnboardingWelcomePage() {
                     </h1>
                     <div className="flex flex-col space-y-4">
                         {/* Form header */}
-                        <Skeleton className="h-6 w-1/3"/>
+                        <div className="h-6 w-1/3 border-dashed border-2 border-gray-400 rounded"></div>
                         {/* Form inputs */}
-                        <Skeleton className="h-10 w-full rounded-md"/>
-                        <Skeleton className="h-10 w-full rounded-md"/>
-                        <Skeleton className="h-10 w-full rounded-md" />
-                        <Skeleton className="h-10 w-full rounded-md" />
-                        <Skeleton className="h-10 w-2/3 rounded-md" />
+                        <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>
+                        <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>
+                        <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>
+                        <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>
+                        <div className="h-10 w-2/3 border-dashed border-2 border-gray-400 rounded-md"></div>
                         {/* Button */}
-                        <Skeleton className="h-10 w-1/4 rounded-md" />
+                        <div className="h-10 w-1/4 border-dashed border-2 border-gray-400 rounded-md"></div>
                     </div>
                     <Button
                         variant="default"
@@ -70,18 +68,18 @@ export default function OnboardingWelcomePage() {
                     </h1>
                     <div className="space-y-4">
                         {/* Image preview */}
-                        <Skeleton className="h-[150px] w-full rounded-xl" />
+                        <div className="h-[150px] w-full border-dashed border-2 border-gray-400 rounded-xl"></div>
                         {/* Information section */}
                         <div className="space-y-2">
-                            <Skeleton className="h-6 w-1/2" />
-                            <Skeleton className="h-4 w-3/4" />
-                            <Skeleton className="h-4 w-1/2" />
+                            <div className="h-6 w-1/2 border-dashed border-2 border-gray-400 rounded"></div>
+                            <div className="h-4 w-3/4 border-dashed border-2 border-gray-400 rounded"></div>
+                            <div className="h-4 w-1/2 border-dashed border-2 border-gray-400 rounded"></div>
                         </div>
                         {/* Additional example data */}
                         <div className="space-y-2">
-                            <Skeleton className="h-6 w-2/3" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-3/4" />
+                            <div className="h-6 w-2/3 border-dashed border-2 border-gray-400 rounded"></div>
+                            <div className="h-4 w-full border-dashed border-2 border-gray-400 rounded"></div>
+                            <div className="h-4 w-3/4 border-dashed border-2 border-gray-400 rounded"></div>
                         </div>
                     </div>
                 </div>

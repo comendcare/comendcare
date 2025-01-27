@@ -25,11 +25,11 @@ export default function PAGPublicRoadmapBreadcrumb({ organization, roadmap }: {
     useEffect(() => {
         if (urlMilestone) {
             getMilestoneDetails(urlMilestone).then(response => {
-                if (response.success) {
+                if (response?.success && response?.data) {
                     setMilestone(response.data);
                 } else {
-                    console.error(response.error);
-                    toast.error(response.error);
+                    console.error(response?.error);
+                    toast.error(response?.error);
                 }
             });
         }

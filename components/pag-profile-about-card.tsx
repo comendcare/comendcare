@@ -1,19 +1,35 @@
 "use client"
+import {useEffect} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {cn, nameToInitials} from "@/lib/utils";
+import {cn, isNewUser, nameToInitials, setUserAsReturning} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
-import {Badge} from "@/components/ui/badge";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";
 import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {CalendarDays} from "lucide-react";
-import {ProfilePhoto} from "./profile-photo";
+import {toast} from "sonner";
+import {useOnborda} from "@/components/onborda/OnbordaContext";
+import {usePathname} from "next/navigation";
 
 export const PagProfileAboutCard = ({organization}: {
     organization: Organization & { members: (Member & { user: User })[] } | null
 }) => {
     faker.seed(235)
+    const { startOnborda } = useOnborda()
+    const pathname = usePathname();
+
+    useEffect(() => {
+        // Only start tour if user is new and is on the /app/profile page
+        if (pathname === "/app/profile" && isNewUser()) {
+            startOnbordaAndRemoveToast()
+        }
+    }, [])
+
+    const startOnbordaAndRemoveToast = () => {
+        startOnborda('organization-profile-tour')
+        setUserAsReturning()
+        toast.dismiss()
+    }
 
     return (
         <Card className="organization-profile-tour-step1">
@@ -73,13 +89,15 @@ export const PagProfileAboutCard = ({organization}: {
                         </h3>
                         {organization?.website ?
                             <Link
-                                href={organization.website}
+                                href={organization.website.startsWith("http")
+                                    ? organization.website
+                                    : `https://${organization.website}`}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
                             >
                                 {organization?.website}
-                                <FaArrowUpRightFromSquare/>
+                                <FaArrowUpRightFromSquare />
                             </Link>
                             : (
                                 <p className="text-gray-400">

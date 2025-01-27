@@ -277,7 +277,7 @@ const CustomBar = (props: any) => {
             <CardFooter className="flex justify-between">
                 <StatusButton
                     disabled={true}
-                    status={data?.milestoneData?.status || "TODO"}
+                    status={data?.milestoneData?.status || "PLANNED"}
                     onStatusChange={() => {}}
                 />
             </CardFooter>

@@ -6,7 +6,6 @@ import {Button} from "@/components/ui/button"
 import {cva} from "class-variance-authority"
 import {GripVertical} from "lucide-react"
 import {Badge} from "@/components/ui/badge"
-import {StatusType} from "./milestone-status-button"
 import {
     Dialog,
     DialogContent,
@@ -26,10 +25,13 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import { DisplayPlateEditor } from "./editor/display-plate-editor"
 import { ScrollArea } from "./ui/scroll-area"
-import { User } from "@prisma/client"
+import { Milestone } from "@prisma/client"
 import { ProfilePhoto } from "./profile-photo"
-
-type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
+import { FaCheckSquare } from "react-icons/fa"
+import { FaCalendar } from "react-icons/fa6"
+import { truncate } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
+import { PriorityType, StatusType } from "@/lib/types"
 
 export interface Task {
     columnId: string;
@@ -43,6 +45,7 @@ export interface Task {
     stakeholders?: any[],
     endDate: Date,
     priority: PriorityType
+    milestone: Milestone
 }
 
 interface TaskCardProps {
@@ -117,48 +120,74 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                                 : undefined
                     })}
                 >
-                    <CardHeader className="px-3 py-3 space-between flex flex-row border-b-2 border-secondary relative">
+                    <CardHeader className="px-3 items-center py-3 space-between flex flex-row border-b-2 border-secondary relative">
                         <Button
                             variant={"ghost"}
                             {...attributes}
                             {...listeners}
-                            className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
+                            className="p-1 mt-1 -ml-2 h-auto cursor-grab"
                         >
                             <span className="sr-only">Move task</span>
                             <GripVertical/>
                         </Button>
-                        <div className="flex flex-col gap-1">
-                            <CardTitle className="text-lg">{task?.name}</CardTitle>
-                            {task?.endDate && <p className="text-sm text-muted-foreground">{task.endDate.toDateString()}</p>}
-                            {task?.priority && <PriorityBadge value={task.priority}/>}
-                        </div>
+                        <CardTitle className="text-lg">{task?.name}</CardTitle>
                     </CardHeader>
-                    <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap flex flex-col gap-8">
-                        {description && (
-                            <ScrollArea className="max-h-[200px]">
-                                <DisplayPlateEditor value={description} />
-                            </ScrollArea>
-                        )}
-                        {task?.checklist && task.checklist.length > 0 && (
-                            <div className="flex flex-col gap-2 px-4">
-                                <h2 className="font-semibold">Checklist</h2>
-                                <ol id="checklist" className="flex flex-col gap-2">
-                                    {task?.checklist?.map(
-                                        (item: any, index: number) => (
-                                            <li key={index} className="flex gap-2 items-center">
-                                                <Checkbox checked={item.complete} disabled={true}/>
-                                                <p>{item.name}</p>
-                                            </li>
-                                        )
-                                    )}
-                                </ol>
-                            </div>
-                        )}
+                    <CardContent className="p-7 py-4 text-left whitespace-pre-wrap flex flex-col gap-4">
+                        <div className="flex gap-4 flex-wrap">
+                            <TooltipProvider>
+                                {task?.priority && <PriorityBadge value={task.priority}/>}
+                                {task?.milestone && (
+                                    <Badge className="w-fit h-8 rounded-sm truncate bg-[#3B3C40]">
+                                        {truncate(task.milestone.title, 25)}
+                                    </Badge>
+                                )}
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-64">
+                                        <p>{`Sensitive information includes any information that should be protected. For example, don't include passwords, credit card information, or personal details.`}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                {task?.endDate && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                        <span className="flex gap-2 items-center text-muted-foreground">
+                                            <FaCalendar className="mb-1"/>
+                                            <p className="text-md">{task.endDate.toDateString().split(" ").slice(1).join(" ")}</p>
+                                        </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-64">
+                                            <p>{`Target date`}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                                {task?.checklist && task.checklist.length > 0 && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                        <span className="flex gap-2 items-center text-muted-foreground">
+                                            <FaCheckSquare />
+                                            <p className="text-md">{`${task.checklist.filter(item => item.complete).length}/${task.checklist.length}`}</p>
+                                        </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-64">
+                                            <p>{`Checklist items`}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                            </TooltipProvider>
+                        </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="flex justify-end mr-2">
                         {task?.stakeholders && task?.stakeholders.length > 0 && (
                             task.stakeholders.map((stakeholder, index) => (
-                                <ProfilePhoto key={index} img={stakeholder.user?.image} name={stakeholder.user?.name}/>
+                                <ProfilePhoto 
+                                    className="ring-0 h-8 w-8 -mr-2" 
+                                    key={index} 
+                                    img={stakeholder.user?.image} 
+                                    name={stakeholder.user?.name} 
+                                />
                             ))
                         )}
                     </CardFooter>
@@ -185,15 +214,15 @@ const PriorityBadge = ({value}: {value: PriorityType}) => {
     const options = {
         'HIGH': {
             text: 'High',
-            style: 'bg-red-600 w-fit'
+            style: 'bg-red-600 w-fit h-8 rounded-sm'
         },
         'MEDIUM': {
             text: 'Medium',
-            style: 'bg-yellow-600 w-fit'
+            style: 'bg-yellow-600 w-fit h-8 rounded-sm'
         },
         'LOW': {
             text: 'Low',
-            style: 'bg-green-600 w-fit'
+            style: 'bg-green-600 w-fit h-8 rounded-sm'
         }
     }
 

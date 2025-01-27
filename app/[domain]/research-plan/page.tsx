@@ -43,18 +43,14 @@ export async function generateMetadata({
     const domain = decodeURIComponent(params.domain)
     const slug = decodeURIComponent(params.slug)
 
-    const [data, organizationData] = await Promise.all([
-        getRoadmapData(domain, slug),
-        getOrganizationData(domain)
-    ])
+    const organizationData = await getOrganizationData(domain)
 
     // Fallback to avoid passing null to title or description
-    const title = data?.title || "Default Title" // Use a fallback title
-    const description = data?.description || "Default description" // Use a fallback description
+    const title = organizationData?.name || "Default Title" // Use a fallback title
+    const description = organizationData?.description || "Default description" // Use a fallback description
 
-    console.log("data", data)
     console.log("organizationData", organizationData)
-    if (!data || !organizationData) {
+    if (!organizationData) {
         return {
             title: "Page Not Found",
             description: "The page you are looking for does not exist."
@@ -303,11 +299,11 @@ export default async function OrganizationRoadmapPage({
 
                         <FloatingDock
                             items={[
-                                {
-                                    title: "Post on feed",
-                                    icon: <IconShare2/>,
-                                    href: "/app/feed",
-                                },
+                                // {
+                                //     title: "Post on feed",
+                                //     icon: <IconShare2/>,
+                                //     href: "/app/feed",
+                                // },
                                 {
                                     title: "Share on social media",
                                     icon: <IconShare/>,

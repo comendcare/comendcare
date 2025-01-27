@@ -38,7 +38,7 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
                         height={400}
                     />
                     <p className="text-lg text-stone-500">
-                        You do not have any roadmaps yet. Create one to get started.
+                        You do not have any research plans yet. Create one to get started.
                     </p>
                 </div>
             </CardContent>
@@ -52,7 +52,7 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
             className="w-full"
             onValueChange={handleTabChange}
         >
-            <Card>
+            <Card className="organization-profile-tour-step5">
                 <CardHeader className="w-full pt-6 pb-2 space-y-4">
                     <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
                         <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>

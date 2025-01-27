@@ -16,7 +16,7 @@ export function PlateEditor({ value, onChange }: { value: any[], onChange: (...e
         editor={editor}
         onChange={({ value }) => onChange(value)}
       >
-        <EditorContainer>
+        <EditorContainer className="border-[1px] rounded-sm">
           <Editor variant="fullWidth" />
         </EditorContainer>
       </Plate>

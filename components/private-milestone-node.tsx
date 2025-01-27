@@ -1,5 +1,5 @@
-import React, { memo } from "react"
-import { Handle, Position, Node, NodeProps } from "@xyflow/react"
+import React, { memo, useState } from "react"
+import { Handle, Position, Node, NodeProps, HandleProps, getIncomers, getOutgoers, getConnectedEdges } from "@xyflow/react"
 import { Button } from "./ui/button"
 import {
     Card,
@@ -9,15 +9,19 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import { FaArrowRight, FaCalendar, FaEllipsis, FaPlus } from "react-icons/fa6"
+import { FaArrowRight, FaCalendar, FaEllipsis, FaPlus, FaTrash } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
 import { truncate, cn } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
 import { PrivateBadge } from "./private-badge"
 import {monthsList} from "@/lib/data";
 import { Badge } from "./ui/badge"
-import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { MILESTONE_TYPE_OPTIONS, StatusType } from "@/lib/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
+import { Popover } from "./plate-ui/popover"
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { useShallow } from "zustand/react/shallow"
 
 export type PrivateMilestoneNode = Node<
     {
@@ -50,8 +54,6 @@ export interface TaskType {
     status: StatusType
 }
 
-type StatusType = "TODO" | "INPROGRESS" | "DONE"
-
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     const handleEditClick = () => {
         props.data?.handleEditClick(props?.id)
@@ -72,26 +74,39 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                     {props.data?.private && (
                         <PrivateBadge className="justify-start" />
                     )}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild className="justify-end h-full">
+                    <Popover>
+                        <PopoverTrigger asChild>
                             <Button
                                 variant="ghost"
                                 className="p-2 h-auto justify-end h-full"
                             >
                                 <FaEllipsis />
                             </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuGroup>
-                                <DropdownMenuItem onClick={handleDeleteClick}>
-                                    Delete
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={handleDuplicate}>
-                                    Duplicate
-                                </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-40">
+                            <Card className="p-0 m-0">
+                                <CardContent className="p-2 m-0 flex flex-col gap-0">
+                                    <Button 
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            handleDeleteClick()
+                                        }}
+                                        variant="ghost"
+                                        className="w-full h-full justify-start text-xl"
+                                    >
+                                        Delete
+                                    </Button>
+                                    <Button 
+                                        onClick={handleDuplicate}
+                                        variant="ghost"
+                                        className="w-full h-full justify-start text-xl"
+                                    >
+                                        Duplicate
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        </PopoverContent>
+                    </Popover>
                 </div>
                 <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
                 {/* Description length in node is truncated to 200 characters. */}
@@ -137,21 +152,85 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                 <Button onClick={handleEditClick}>{`Details`}</Button>
             </CardFooter>
 
-            <Handle
-                type="target"
-                position={Position.Left}
-                className="z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2"
+            <NodeHandle type="target" position={Position.Left} node={props as NodeProps<PrivateMilestoneNode>}/>
+            <NodeHandle type="source" position={Position.Right} node={props as NodeProps<PrivateMilestoneNode>}/>
+        </Card> 
+    )
+}
+
+const selector = (state: RoadmapState) => ({
+    nodes: state.nodes,
+    edges: state.edges,
+    onEdgesChange: state.onEdgesChange,
+})
+
+const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilestoneNode> }) => {
+    const [isHovering, setIsHovering] = useState(false)
+    const {
+        nodes,
+        edges,
+        onEdgesChange,
+    } = useRoadmapStore(useShallow(selector))
+
+    const handleTrashClick = async (event: React.MouseEvent) => {
+        event.stopPropagation()
+        let nodesToDelete: any[] = [{ id: props.node.id }]
+
+        if (props.type === 'target') {
+            nodesToDelete = nodesToDelete.concat(getIncomers({ id: props.node.id }, nodes, edges))
+        }
+
+        if (props.type === 'source') {
+            nodesToDelete = nodesToDelete.concat(getOutgoers({ id: props.node.id }, nodes, edges))
+        }
+
+        const edgesToDelete = await getConnectedEdges(nodesToDelete, edges)
+
+        await onEdgesChange(edgesToDelete
+            .filter(edge => {
+                if (props.type === "source") {
+                    return edge.source === props.node.id
+                }
+
+                if (props.type === "target") {
+                    return edge.target === props.node.id
+                }
+
+                return false
+            })
+            .map(edge => ({
+                id: edge.id,
+                type: 'remove'
+        })))
+    }
+
+    return (
+        <Handle
+            type={props.type}
+            position={props.position}
+            onMouseOver={() => setIsHovering(true)}
+            onMouseOut={() => setIsHovering(false)}
+            className={cn(
+                "research-plan-tour-step5 z-10 bg-white transition-all rounded-full border-solid border-black border-2",
+                isHovering ? "p-1 flex flex-col gap-1" : ""
+            )}
+        >
+            <Button 
+                variant="ghost" 
+                className="hover:bg-secondary h-8 w-8 rounded-full pointer-events-none"
             >
                 <FaPlus className="pointer-events-none" />
-            </Handle>
-            <Handle
-                type="source"
-                position={Position.Right}
-                className={cn("z-10 bg-white p-1 transition-all hover:p-2 rounded-full border-solid border-black border-2", props.data?.onboardingMilestone ? "research-plan-tour-step5": "")}
-            >
-                <FaPlus className="pointer-events-none" />
-            </Handle>
-        </Card>
+            </Button>
+            {isHovering && (
+                <Button 
+                    variant="ghost" 
+                    className="h-8 w-8 rounded-full hover:bg-white" 
+                    onClick={handleTrashClick}
+                >
+                    <FaTrash />
+                </Button>
+            )}
+        </Handle>
     )
 }
 

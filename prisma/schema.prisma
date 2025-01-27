@@ -150,8 +150,7 @@ model Roadmap {
   description    String?
   content        String?
   slug           String        @default(cuid())
-  image          String?       @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png")
-  imageBlurhash  String?       @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC")
+  image          String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   published      Boolean       @default(true)
@@ -180,28 +179,29 @@ model Node {
 }
 
 model Milestone {
-  id             String               @id @unique @default(uuid())
-  nodeId         String?              @unique
-  title          String
-  description    String?
-  notes          String?
-  status         StatusType
-  budget         Int?
-  roadmapId      String
-  endDate        DateTime?
-  startDate      DateTime?
-  private        Boolean              @default(false)
-  type           MilestoneType        @default(NOTYPE)
-  RFPId          String?
-  assetId        String?
-  organizationId String
-  papers         ExternalAttachment[]
-  RFP            RFP?                 @relation(fields: [RFPId], references: [id])
-  asset          Asset?               @relation(fields: [assetId], references: [id])
-  node           Node?                @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  roadmap        Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
-  tasks          Task[]
+  id               String               @id @unique @default(uuid())
+  nodeId           String?              @unique
+  title            String
+  description      String?
+  notes            String?
+  status           String               @default("PLANNED")
+  budget           Int?
+  roadmapId        String
+  endDate          DateTime?
+  startDate        DateTime?
+  private          Boolean              @default(false)
+  type             String               @default("NOTYPE")
+  otherTypeDetails String?
+  RFPId            String?
+  assetId          String?
+  organizationId   String
+  papers           ExternalAttachment[]
+  RFP              RFP?                 @relation(fields: [RFPId], references: [id])
+  asset            Asset?               @relation(fields: [assetId], references: [id])
+  node             Node?                @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  organization     Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  roadmap          Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  tasks            Task[]
 }
 
 model Kanban {
@@ -226,7 +226,7 @@ model Column {
 
 model Task {
   id             String            @id @unique @default(uuid())
-  status         StatusType?
+  status         String?           @default("PLANNED")
   name           String            @default("")
   description    String?           @default("")
   milestoneId    String?
@@ -237,7 +237,7 @@ model Task {
   date           DateTime?         @default(now())
   updatedAt      DateTime          @updatedAt
   endDate        DateTime?
-  priority       PriorityType?
+  priority       String?
   private        Boolean           @default(false)
   startDate      DateTime?
   checklist      ChecklistItem[]
@@ -276,8 +276,8 @@ model RFP {
   name          String
   funding       Int
   description   String?
-  researchFocus MilestoneType        @default(NOTYPE)
-  openTo        RFPOpenToType        @default(ALL)
+  researchFocus String               @default("NOTYPE")
+  openTo        String               @default("ALL")
   startDate     DateTime?
   endDate       DateTime?
   attachments   ExternalAttachment[]
@@ -337,9 +337,9 @@ model Organization {
   description         String?                   @db.Text
   logo                String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
   font                String                    @default("font-cal")
-  image               String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png") @db.Text
+  image               String?                   @db.Text
   imageBlurhash       String?                   @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
-  headerImage         String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/hxfcV5V-eInX3jbVUhjAt1suB7zB88uGd1j20b.png") @db.Text
+  headerImage         String?                   @db.Text
   subdomain           String?                   @unique
   customDomain        String?                   @unique
   message404          String?                   @default("Blimey! You've found a page that doesn't exist.") @db.Text
@@ -376,13 +376,13 @@ model Organization {
 }
 
 model Follow {
-  id           String       @id @default(cuid())
+  id           String   @id @default(cuid())
   userId       String
-  followedType FollowedType
+  followedType String
   followedId   String
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, followedType, followedId])
 }
@@ -396,7 +396,9 @@ model Condition {
   diseaseCategories           String[]
   prevalenceNumerator         Int?
   prevalenceDenominator       Int?
-  numberOfIdentifiedPatients  Int?
+  numberOfPatientsEngaged     Int?
+  nationalEstimatedPopulation Int?
+  globalEstimatedPopulation   Int?
   relevantDiseaseMechanisms   String[]
   associatedGenes             String[]
   associatedSystems           String[]
@@ -458,14 +460,14 @@ model Comment {
 }
 
 model Reaction {
-  id            String        @id @default(cuid())
-  type          ReactionType
+  id            String   @id @default(cuid())
+  type          String
   authorId      String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @default(now()) @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
   reactableId   String
-  reactableType ReactableType
-  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reactableType String
+  author        User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   @@unique([authorId, reactableType, reactableId])
 }
@@ -488,76 +490,6 @@ enum Goal {
   INPROGRESS
 }
 
-enum NodeType {
-  MILESTONE
-}
-
-enum StatusType {
-  TODO
-  INPROGRESS
-  DONE
-}
-
-enum PriorityType {
-  LOW
-  MEDIUM
-  HIGH
-}
-
-enum MilestoneType {
-  BASICSCIENCE
-  LITERATUREREVIEW
-  CELLLINE
-  ORGANOID
-  ANIMALMODEL
-  NATURALHISTORYSTUDY
-  PATIENTREGISTRY
-  BIOBANK
-  BIOMARKERANALYSIS
-  CONSTRUCTDESIGN
-  PLASMIDPRODUCTION
-  AAVPRODUCTION
-  TARGETIDENTIFICATION
-  DRUGSCREENING
-  INVITROVERIFICATION
-  INVIVOVERIFICATION
-  PROOFOFCONCEPTSTUDY
-  DOSINGSTUDY
-  TOXICOLOGYSTUDY
-  PREINDMEETING
-  INDSUBMISSION
-  NOTYPE
-}
-
-enum RFPOpenToType {
-  CRO
-  ACADEMIC
-  ALL
-  NONE
-}
-
-enum FollowedType {
-  ORGANIZATION
-}
-
-enum ReactionType {
-  LIKE
-  LOVE
-  SUPPORT
-}
-
-enum ReactableType {
-  POST
-  COMMENT
-}
-
-enum MentionedType {
-  USER
-  ROADMAP
-  ORGANIZATION
-  CONDITION
-}
-
 model Mention {
   id     String  @id @default(cuid())
   postId String? // For mentions in posts
@@ -566,7 +498,7 @@ model Mention {
   commentId String? // For mentions in comments
   comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
-  mentionedType MentionedType
+  mentionedType String
   mentionedId   String // ID of the mentioned entity (e.g., User, Roadmap, Organization, etc.)
 
   createdAt DateTime @default(now())

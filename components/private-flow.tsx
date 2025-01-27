@@ -86,9 +86,11 @@ export const PrivateFlowView = ({
 
     useEffect(() => {
         setLocalNodes(nodes)
-    }, [nodes])
+        setLocalEdges(edges)
+    }, [nodes, edges])
 
     const [localNodes, setLocalNodes] = useState(nodes)
+    const [localEdges, setLocalEdges] = useState(edges)
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes)
@@ -127,7 +129,7 @@ export const PrivateFlowView = ({
                         nodeId: id,
                         type: 'NOTYPE',
                         title: `New Milestone`,
-                        status: "TODO"
+                        status: "PLANNED"
                     },
                     origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.5] : [0.0, 0.5],
                 }
@@ -191,7 +193,7 @@ export const PrivateFlowView = ({
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     // papers: defaultData?.papers || [],
                     // tasks: defaultData?.tasks || [],
-                    status: defaultData?.status || "TODO"
+                    status: defaultData?.status || "PLANNED"
                 }
             }
 
@@ -229,7 +231,8 @@ export const PrivateFlowView = ({
                 params.delete("milestone")
                 params.set("milestone", nodeId)
         
-                router.push(`${pathname}?${params.toString()}`, { scroll: false })
+                // router.push(`${pathname}?${params.toString()}`, { scroll: false })
+                router.replace(`${pathname}?${params.toString()}`)
             },
             handleDelete: (nodeId: string) => {
                 const nodesList = localNodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
@@ -254,7 +257,7 @@ export const PrivateFlowView = ({
         }
     }))
 
-    const updatedEdges = edges.map((edge: Edge) => ({
+    const updatedEdges = localEdges.map((edge: Edge) => ({
         ...edge,
         type: 'DEFAULT'
     }))
@@ -321,7 +324,6 @@ export const PrivateFlowView = ({
             fitViewOptions={{ padding: 2 }}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
-            
         >
             <MiniMap
                 nodeColor='#757575'

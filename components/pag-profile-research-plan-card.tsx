@@ -46,7 +46,7 @@ export const PAGProfileResearchPlanCard = ({ roadmapItems }: { roadmapItems: any
     console.log(`PROPS`, roadmapItems)
 
     return (
-        <Card className="organization-profile-tour-step5">
+        <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     Research Plan
