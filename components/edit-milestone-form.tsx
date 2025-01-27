@@ -417,7 +417,7 @@ export function EditMilestoneForm({
                 <form
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                     // onChange={() => console.log(`CHANGE`)}
-                    className="flex flex-col gap-8 pt-4"
+                    className="flex flex-col gap-8 mt-2 px-1"
                 >
                     <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={onClose}>
                         <FaX/>
@@ -885,7 +885,14 @@ const EditTitle = ({form}: { form: any }) => {
             render={({field}) => (
                 <FormItem className="flex flex-col grow">
                     <FormControl>
-                        <span className="flex flex-row gap-2 items-center">
+                        {/* <Textarea
+                            className="min-h-fit max-h-fit font-semibold text-3xl"
+                            id="title"
+                            placeholder={`Enter a title`}
+                            defaultValue={field.value}
+                            {...field}
+                        /> */}
+                        <span className="flex flex-row gap-2 items-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" >
                             <h1
                                 id="title"
                                 ref={contentRef}
