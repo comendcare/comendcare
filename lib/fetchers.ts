@@ -370,7 +370,7 @@ export async function getInvitees(organizationId: string | undefined) {
     }
 }
 
-export async function getMemberRequests(organizationId: string | undefined) {
+export async function getUnapprovedMemberRequestsWithUsers(organizationId: string | undefined) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};
     }
@@ -378,7 +378,10 @@ export async function getMemberRequests(organizationId: string | undefined) {
     try {
         const fetchedMemberRequests = await prisma?.memberRequest.findMany({
             include: {user: true},
-            where: {organizationId},
+            where: {
+                organizationId,
+                accepted: false
+            },
         })
 
         // return {fetchedMemberRequests}
