@@ -259,7 +259,6 @@ export const MILESTONE_TYPE_OPTIONS: Option[] = [
     { label: 'Patient registry', value: 'PATIENTREGISTRY' },
     { label: 'Natural history study', value: 'NATURALHISTORYSTUDY' },
     { label: 'Biobank', value: 'BIOBANK' },
-    { label: 'Natural history', value: 'NATURALHISTORY' },
     { label: 'Literature review', value: 'LITERATUREREVIEW' },
     { label: 'Assay', value: 'ASSAY' },
     { label: 'Construct design', value: 'CONSTRUCTDESIGN' },
