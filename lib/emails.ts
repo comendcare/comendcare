@@ -8,6 +8,8 @@ import WaitlistEmail from "@/packages/transactional/emails/contact/waitlist-emai
 import InviteToOrganizationEmail from "@/packages/transactional/emails/invitations/invite-to-organization-email";
 import {NewMemberRequestEmail} from "@/packages/transactional/emails/invitations/new-member-request-email";
 import NewOrganizationEmail from "@/packages/transactional/emails/admins/new-organization";
+import memberRequestApprovedEmail from "@/packages/transactional/emails/invitations/member-request-approved-email";
+import memberRequestDeniedEmail from "@/packages/transactional/emails/invitations/member-request-denied-email";
 
 const limiter = rateLimit({
     interval: 600 * 1000, // 10 minutes (600 seconds * 1000 ms)
@@ -206,39 +208,60 @@ export async function sendMemberRequestCreatedEmail(params: {
 
 
 export async function sendMemberRequestApprovedEmail(params: {
-    user: {
-        name: string | null | undefined
-        email: string | null | undefined
-    }
-    admin: {
-        name: string | null | undefined
-        email: string | null | undefined
-        organizationName: string | undefined
-        organizationImage: string | undefined
-    }
+    name: string | null | undefined
+    email: string | null | undefined
+    organizationName: string | undefined
+    organizationImage: string | undefined
 }) {
     const emailTemplate = await render(
-        NewMemberRequestEmail(
+        memberRequestApprovedEmail(
             {
-                requestedByUserName: params.user.name,
-                requestedByUserEmail: params.user.email,
-                adminName: params.admin.name,
-                adminEmail: params.admin.email,
-                organizationName: params.admin.organizationName,
-                organizationImage: params.admin.organizationImage,
+                userName: params.name,
+                userEmail: params.email,
+                organizationName: params.organizationName,
+                organizationImage: params.organizationImage,
             }
         )
     )
 
     sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
-    if (params.admin.email) {
+    if (params.email) {
         const msg = {
-            // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
-            to: params.admin.email,
+            to: params.email,
             from: "corporate@comendcare.com",
             html: emailTemplate,
             text: "A user has sent a message via the contact page.",
-            subject: `${params.user.name} is requesting to join you on Comend`
+            subject: `Your request to join ${params.organizationName} has been approved.`,
+        }
+        await sendEmail(msg)
+    }
+}
+
+export async function sendMemberRequestDeniedEmail(params: {
+    name: string | null | undefined
+    email: string | null | undefined
+    organizationName: string | undefined
+    organizationImage: string | undefined
+}) {
+    const emailTemplate = await render(
+        memberRequestDeniedEmail(
+            {
+                userName: params.name,
+                userEmail: params.email,
+                organizationName: params.organizationName,
+                organizationImage: params.organizationImage,
+            }
+        )
+    )
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
+    if (params.email) {
+        const msg = {
+            to: params.email,
+            from: "corporate@comendcare.com",
+            html: emailTemplate,
+            text: "A user has sent a message via the contact page.",
+            subject: `Your request to join ${params.organizationName} has been denied.`,
         }
         await sendEmail(msg)
     }
