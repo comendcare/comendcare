@@ -18,7 +18,7 @@ import {
 import * as React from "react";
 
 interface NewMemberRequestEmailProps {
-    requestedByUserName?: string
+    requestedByUserName?: string | null
     requestedByUserImage?: string | null
     requestedByUserEmail?: string | null
     adminName?: string | null

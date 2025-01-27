@@ -163,7 +163,7 @@ export async function sendInviteEmail(params: {
 }
 
 
-export async function sendMemberRequestEmail(params: {
+export async function sendMemberRequestCreatedEmail(params: {
     user: {
         name: string | undefined
         email: string | null | undefined
@@ -181,6 +181,46 @@ export async function sendMemberRequestEmail(params: {
             {
                 requestedByUserName: params.user.name,
                 requestedByUserImage: params.user.image,
+                requestedByUserEmail: params.user.email,
+                adminName: params.admin.name,
+                adminEmail: params.admin.email,
+                organizationName: params.admin.organizationName,
+                organizationImage: params.admin.organizationImage,
+            }
+        )
+    )
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
+    if (params.admin.email) {
+        const msg = {
+            // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
+            to: params.admin.email,
+            from: "corporate@comendcare.com",
+            html: emailTemplate,
+            text: "A user has sent a message via the contact page.",
+            subject: `${params.user.name} is requesting to join you on Comend`
+        }
+        await sendEmail(msg)
+    }
+}
+
+
+export async function sendMemberRequestApprovedEmail(params: {
+    user: {
+        name: string | null | undefined
+        email: string | null | undefined
+    }
+    admin: {
+        name: string | null | undefined
+        email: string | null | undefined
+        organizationName: string | undefined
+        organizationImage: string | undefined
+    }
+}) {
+    const emailTemplate = await render(
+        NewMemberRequestEmail(
+            {
+                requestedByUserName: params.user.name,
                 requestedByUserEmail: params.user.email,
                 adminName: params.admin.name,
                 adminEmail: params.admin.email,

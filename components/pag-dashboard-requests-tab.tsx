@@ -1,12 +1,16 @@
-import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog";
-import { getSession } from "@/lib/auth";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { FaUserXmark } from "react-icons/fa6";
+import {getSession} from "@/lib/auth";
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
+import {FaEllipsis, FaUserCheck, FaUserXmark} from "react-icons/fa6";
 import Image from "next/image";
-import {getMemberRequests} from "@/lib/fetchers";
+import {getUnapprovedMemberRequestsWithUsers, getNodesEdgesAndMilestones} from "@/lib/fetchers";
 import {toast} from "sonner";
-import { ProfilePhoto } from "./profile-photo";
+import {ProfilePhoto} from "./profile-photo";
 import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button";
+import {approveMemberRequestAndCreateMember} from "@/lib/actions";
+import {MemberRequest} from "@prisma/client";
+import {initializeRoadmapState} from "@/lib/initialize-client-state";
+import {MemberRequestWithUser} from "@/lib/types";
+import MemberRequestsDropdown from "@/components/member-requests-dropdown";
 
 export default async function PAGDashboardRequestsTab() {
     const session = await getSession();
@@ -40,7 +44,7 @@ export default async function PAGDashboardRequestsTab() {
 
     let fetchedMemberRequests: any[] = []; // Initialize the variable with an empty array
 
-    const response = await getMemberRequests(session.user.organizationId);
+    const response = await getUnapprovedMemberRequestsWithUsers(session.user.organizationId);
 
     if (response.success) {
         fetchedMemberRequests = response.data?.fetchedMemberRequests ?? []; // Access the nested data properly and default to an empty array if undefined
@@ -113,8 +117,8 @@ export default async function PAGDashboardRequestsTab() {
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
-                                {fetchedMemberRequests.map((person) => (
-                                    <tr key={person.email}>
+                                {fetchedMemberRequests.map((memberRequest) => (
+                                    <tr key={memberRequest.email}>
                                         <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                             <div className="flex items-center">
                                                 <div className="h-11 w-11 flex-shrink-0">
@@ -123,36 +127,28 @@ export default async function PAGDashboardRequestsTab() {
                                                         src={createDicebearAvatar(person.email, 50, 40, "identicon")}
                                                         alt=""
                                                     /> */}
-                                                    <ProfilePhoto 
-                                                        img={person?.image}
-                                                        name={person?.name}
+                                                    <ProfilePhoto
+                                                        img={memberRequest?.image}
+                                                        name={memberRequest?.name}
                                                         className="h-11 w-11 rounded-full"
                                                     />
                                                 </div>
                                                 <div className="ml-4 flex flex-col space-y-1">
-                                                    <div className="font-bold text-gray-900">{person.user.name}</div>
-                                                    <div className="font-medium text-gray-900">{person.email}</div>
+                                                    <div
+                                                        className="font-bold text-gray-900">{memberRequest.user.name}</div>
+                                                    <div
+                                                        className="font-medium text-gray-900">{memberRequest.email}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                            {person.role}
+                                            {memberRequest.role}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                            {new Date(person.createdAt).toLocaleDateString()}
+                                            {new Date(memberRequest.createdAt).toLocaleDateString()}
                                         </td>
                                         <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger>
-                                                    Edit<span className="sr-only">, {person.email}</span>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent>
-                                                    <DropdownMenuItem className="text-red-600">
-                                                        <FaUserXmark />
-                                                        Deny request
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            <MemberRequestsDropdown memberRequest={memberRequest} />
                                         </td>
                                     </tr>
                                 ))}

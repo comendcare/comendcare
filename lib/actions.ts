@@ -1,7 +1,16 @@
 "use server"
 
 import prisma from "@/lib/prisma"
-import {Roadmap, Organization, Prisma, Kanban, Post, User, Condition, TaskStakeholder} from "@prisma/client"
+import {
+    Roadmap,
+    Organization,
+    Prisma,
+    Kanban,
+    Post,
+    User,
+    Condition,
+    TaskStakeholder,
+} from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
@@ -17,9 +26,14 @@ import {
     updateTypeSenseDocument
 } from "@/lib/utils";
 import {Session} from "next-auth";
-import {sendInviteEmail, sendMemberRequestEmail, sendNewOrganizationEmail} from "@/lib/emails";
+import {
+    sendInviteEmail,
+    sendMemberRequestCreatedEmail,
+    sendMemberRequestApprovedEmail,
+    sendNewOrganizationEmail
+} from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse} from "@/lib/types";
+import {ApiResponse, MemberRequestWithUser} from "@/lib/types";
 
 export type Node = Prisma.NodeGetPayload<{}>
 
@@ -82,7 +96,7 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
         })
 
         if (organization) {
-            await sendMemberRequestEmail(
+            await sendMemberRequestCreatedEmail(
                 {
                     user: {
                         name: session.user.name,
@@ -929,34 +943,89 @@ export async function createOrGetOrganization(
     }
 }
 
-// Add a member to the organization
-export async function addMemberToOrganization(
-    organizationId: string,
-    session: Session | null
-) {
+export async function approveMemberRequestAndCreateMember(
+    memberRequest: MemberRequestWithUser
+): Promise<ApiResponse<any>>  {
+    if (!memberRequest) {
+        throw new Error("Invalid member request");
+    }
+
+    const session = await getSession()
+
     try {
-        if (!session || !organizationId) {
-            throw new Error("Invalid session or organizationId")
-        }
-
-        const email = session.user?.email
-
-        if (!email) {
-            throw new Error("Email is required but is missing")
-        }
-
-        // If session and organizationId are valid, create a new member for the organization
-        return await prisma.member.create({
-            data: {
-                email: email, // email is guaranteed to be a string here
-                organizationId: organizationId, // Updated to organizationId
-                role: "admin",
-                userId: session.user?.id // Ensure userId is also non-null
+        const member = await prisma.member.findUnique({
+            where: {
+                userId_organizationId: {
+                    userId: memberRequest.userId,
+                    organizationId: memberRequest.organizationId
+                }
             }
         })
+
+        if (member) {
+            return {success: false, error: "This member already exists in your organization."}
+        }
     } catch (error) {
-        console.error("Error adding member to organization:", error)
-        throw new Error("Failed to add member to organization.")
+        console.error("Error checking if member already exists:", error);
+        throw new Error("Failed to check if member already exists.");
+    }
+
+    try {
+
+        const [, createdMember] = await Promise.all([
+            prisma.memberRequest.update({
+                where: {
+                    id: memberRequest.id,
+                },
+                data: {
+                    accepted: true,
+                },
+            }),
+            prisma.member.create({
+                data: {
+                    email: memberRequest.email,
+                    organizationId: memberRequest.organizationId,
+                    role: "admin",
+                    userId: memberRequest.userId,
+                },
+            }),
+        ]);
+
+        if (!createdMember) {
+            console.error("Error approving member request.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        const organization = await prisma.organization.findUnique({
+            where: {
+                id: memberRequest.organizationId,
+            }
+        })
+
+        if (createdMember && organization) {
+            await sendMemberRequestApprovedEmail(
+                {
+                    user: {
+                        name: memberRequest.user.name,
+                        email: memberRequest.email,
+                    },
+                    admin: {
+                        name: session?.user.name,
+                        email: session?.user.email,
+                        organizationName: organization.name || "",
+                        organizationImage: organization.image || "",
+                    },
+                }
+            ).then(() => {
+                console.log("email sent")
+            })
+        }
+
+        // Return the result of prisma.member.create
+        return {success: true, data: createdMember}
+    } catch (error) {
+        console.error("Error approving member request:", error);
+        throw new Error("Failed to add member to organization.");
     }
 }
 
