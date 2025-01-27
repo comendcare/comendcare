@@ -454,7 +454,7 @@ export default function EditPAGProfileDialog() {
                             genes: condition.associatedGenes.map((gene) => ({ label: gene, value: gene })) || [],
                             systems: condition.associatedSystems.map((system) => ({ label: system, value: system })) || [],
                             prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
-                            prevalenceDenominator: condition.prevalenceDenominator || undefined,
+                            prevalenceDenominator: condition.prevalenceDenominator?.toString() || "",
                             engaged: condition.numberOfPatientsEngaged?.toString() || "",
                             national: condition.nationalEstimatedPopulation?.toString() || "",
                             global: condition.globalEstimatedPopulation?.toString() || "",
