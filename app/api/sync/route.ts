@@ -105,7 +105,7 @@ export const syncToTypesense = async (env: {
             enable_nested_fields: true,
             fields: [
                 { name: 'id', type: 'string', facet: false },
-                { name: 'name', type: 'string', facet: true, index: true },
+                { name: 'name', type: 'string', facet: true, sort: true, index: true },
                 {
                     name: "description",
                     facet: false,
@@ -166,19 +166,6 @@ export const syncToTypesense = async (env: {
                     store: true,
                     type: "object[]"
                 },
-                {
-                    name: "condition.condition.associatedSystems",
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "string[]"
-                }
-
             ],
         };
         const milestoneSchema = {
