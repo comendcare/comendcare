@@ -9,7 +9,7 @@ import {
     Post,
     User,
     Condition,
-    TaskStakeholder,
+    TaskStakeholder, Invitation,
 } from "@prisma/client"
 import {revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
@@ -1083,6 +1083,33 @@ export async function deleteMemberRequest(
     }
 }
 
+export async function deleteInvitation(
+    invitation: Invitation
+): Promise<ApiResponse<any>> {
+    if (!invitation) {
+        throw new Error("Invalid invitation");
+    }
+
+    try {
+        // Ensure the composite key is valid or fallback to another unique identifier like `id`
+        const deletedInvitation = await prisma.invitation.delete({
+            where: {
+                id: invitation.id
+            },
+        });
+
+        if (!deletedInvitation) {
+            return {success: false, error: "Failed to delete invitation. Request not found."};
+        }
+
+        return {success: true, data: deletedInvitation};
+
+    } catch (error) {
+        console.error("Error deleting invitation:", error);
+        return {success: false, error: "Failed to delete invitation."};
+    }
+}
+
 // Invite user function with updated Organization model
 export async function leaveOrganization(
     session: Session | null,
@@ -1103,7 +1130,7 @@ export async function leaveOrganization(
         })
 
         if (!member) {
-            return {success: false, error: "membership not found"};
+            return {success: false, error: "Membership not found"};
         }
 
         return {success: true, data: member};
@@ -1112,6 +1139,35 @@ export async function leaveOrganization(
         return {success: false, error: "Internal server error"};
     }
 }
+
+// Invite user function with updated Organization model
+export async function deleteMember(
+    membershipId: string
+) {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        const member = await prisma.member.delete({
+            where: {
+                id: membershipId
+            }
+        })
+
+        if (!member) {
+            return {success: false, error: "Membership not found"};
+        }
+
+        return {success: true, data: member};
+    } catch (error: any) {
+        logError("Error deleting membership", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 
 // Invite user function with updated Organization model
 export async function deleteUser(

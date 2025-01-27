@@ -16,7 +16,7 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
             const response = await approveMemberRequestAndCreateMember(memberRequest)
 
             if (response.success) {
-                toast.success(`Successfully approved member request and added ${response.data.user.name} as a member`)
+                toast.success(`Successfully approved member request and added ${response.data.user.name} as a member.`)
             } else {
                 console.error(response.error)
                 toast.error(response.error)

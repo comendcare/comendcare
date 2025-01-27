@@ -1,6 +1,10 @@
 import type { Option } from "@/components/ui/multiple-selector"
 import {User, Post, Comment, Prisma} from "@prisma/client";
 
+export type MemberWithUser = Prisma.MemberGetPayload<{
+    include: { user: true };
+}>;
+
 export type MemberRequestWithUser = Prisma.MemberRequestGetPayload<{
     include: { user: true };
 }>;

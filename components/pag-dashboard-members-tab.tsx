@@ -5,6 +5,7 @@ import {getMembers} from "@/lib/fetchers";
 import { ProfilePhoto } from "./profile-photo";
 import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog";
 import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button";
+import MembersDropdown from "@/components/members-dropdown";
 
 export default async function PAGDashboardMembersTab() {
     const session = await getSession()
@@ -77,7 +78,7 @@ export default async function PAGDashboardMembersTab() {
                                     </th>
                                     <th scope="col"
                                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        Invited
+                                        Joined
                                     </th>
                                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
                                         <span className="sr-only">Edit</span>
@@ -121,9 +122,7 @@ export default async function PAGDashboardMembersTab() {
                                             {new Date(person.createdAt).toDateString()}
                                         </td>
                                         <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                            <a href="#" className="text-black hover:text-black">
-                                                Edit<span className="sr-only">, {person.user?.name}</span>
-                                            </a>
+                                            <MembersDropdown member={person} />
                                         </td>
                                     </tr>
                                 ))}

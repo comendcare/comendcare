@@ -370,7 +370,7 @@ export async function getInvitees(organizationId: string | undefined) {
     }
 }
 
-export async function getUnapprovedMemberRequestsWithUsers(organizationId: string | undefined) {
+export async function getUnapprovedMemberRequestsWithUsers(organizationId: string | undefined): Promise<ApiResponse<any>> {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};
     }
