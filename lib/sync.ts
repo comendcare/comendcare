@@ -17,7 +17,7 @@ const sendTypeSenseRequest = async (
 ) => {
     const headers = {
         'Content-Type': 'application/json',
-        'X-TYPESENSE-API-KEY': apiKey,
+        'x-typesense-api-key': apiKey,
     };
 
     const body = data ? JSON.stringify(data) : undefined;
@@ -86,417 +86,815 @@ const addPulseExtension = (
     );
 };
 
-// Main sync function
-export const syncToTypesense = async (env: {
-    TYPESENSE_ADMIN_API_KEY: string,
-    TYPESENSE_URL: string,
-    PULSE_API_KEY: string
-}) => {
-    console.log('Starting syncToTypesense job...');
+// Main sync function - outdated
+// export const syncToTypesense = async (env: {
+//     TYPESENSE_ADMIN_API_KEY: string,
+//     TYPESENSE_URL: string,
+//     PULSE_API_KEY: string
+// }) => {
+//     console.log('Starting syncToTypesense job...');
+
+//     try {
+//         // Initialize Prisma and extend with Pulse
+//         const prisma = addPulseExtension(initPrismaClient(), env.PULSE_API_KEY);
+//         console.log(`Added prisma pulse extension...`)
+
+//         // Ensure TypeSense organization collection exists
+//         await createTypeSenseCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
+//             name: 'organizations',
+//             "fields": [
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "description",
+//                     "optional": false,
+//                     "sort": false,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "string"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "yearFounded",
+//                     "optional": false,
+//                     "sort": false,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "string"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "name",
+//                     "optional": false,
+//                     "sort": true,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "string"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "moneyRaised",
+//                     "optional": false,
+//                     "sort": true,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "int64"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "numberOfPatientsEngaged",
+//                     "optional": false,
+//                     "sort": true,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "int64"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "prevalenceDenominator",
+//                     "optional": false,
+//                     "sort": true,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "int64"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "prevalenceNumerator",
+//                     "optional": false,
+//                     "sort": true,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "int64"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "prevalenceRatio",
+//                     "optional": true,
+//                     "sort": true,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "float"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "moneyDeployed",
+//                     "optional": false,
+//                     "sort": true,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "int64"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "interestedModalities",
+//                     "optional": true,
+//                     "sort": false,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "string[]"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "diseaseCategories",
+//                     "optional": true,
+//                     "sort": false,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "string[]"
+//                 }
+//                 // add additional fields as needed
+//             ],
+//         });
+//         console.log(`Created typesense organizations collection...`)
+
+//         await createTypeSenseCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
+//             name: 'milestones',
+//             "fields": [
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "title",
+//                     "optional": false,
+//                     "sort": true,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "string"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "description",
+//                     "optional": false,
+//                     "sort": false,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "string"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "type",
+//                     "optional": true,
+//                     "sort": false,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "string"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "status",
+//                     "optional": true,
+//                     "sort": false,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "string"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "RFPId",
+//                     "optional": true,
+//                     "sort": false,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "string"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "RFPId_exists",
+//                     "optional": true,
+//                     "sort": false,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "bool"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "assetId",
+//                     "optional": true,
+//                     "sort": false,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "string"
+//                 },
+//                 {
+//                     "facet": false,
+//                     "index": true,
+//                     "infix": false,
+//                     "locale": "",
+//                     "name": "assetId_exists",
+//                     "optional": true,
+//                     "sort": false,
+//                     "stem": false,
+//                     "store": true,
+//                     "type": "bool"
+//                 },
+//                 // add additional fields as needed
+//             ],
+//         });
+//         console.log(`Created typesense milestones collection...`)
+
+//         // Stream organization changes
+//         const orgStream = await prisma.organization.stream({
+//             name: 'organization-events',
+//         });
+//         const milestoneStream = await prisma.milestone.stream({
+//             name: 'milestone-events',
+//         });
+
+//         process.on('exit', () => {
+//             orgStream.stop();
+//             milestoneStream.stop();
+//         });
+
+//         const FIVE_MINUTES = 5 * 60 * 1000;
+//         let timeoutId: NodeJS.Timeout;
+
+//         const resetTimeout = () => {
+//             if (timeoutId) {
+//                 clearTimeout(timeoutId);
+//             }
+//             timeoutId = setTimeout(() => {
+//                 console.log('No events for 5 minutes. Terminating stream.');
+//                 orgStream.stop();
+//                 milestoneStream.stop();
+//                 throw Error('Stream terminated due to inactivity');
+//             }, FIVE_MINUTES);
+//         };
+
+//         resetTimeout();
+
+//         const handleOrgStream = async () => {
+//             for await (const event of orgStream) {
+//                 resetTimeout();
+//                 console.log(`handle organization event`, event);
+//                 let org = undefined
+
+//                 try {
+//                     switch (event.action) {
+//                         case 'create':
+//                             console.log("Syncing created organization to Typesense:", event.created);
+//                             org = await prisma.organization.findUnique({
+//                                 where: {id: event.created.id},
+//                                 include: {condition: { include: {condition: true}}}
+//                             })
+//                             await addTypeSenseDocument(
+//                                 env.TYPESENSE_URL, 
+//                                 env.TYPESENSE_ADMIN_API_KEY, 
+//                                 {...org}, 
+//                                 'organizations'
+//                             );
+//                             break;
+//                         case 'update':
+//                             console.log("Syncing updated organization to Typesense:", event.after);
+//                             org = await prisma.organization.findUnique({
+//                                 where: {id: event.after.id},
+//                                 include: {condition: { include: {condition: true}}}
+//                             })
+//                             await updateTypeSenseDocument(
+//                                 env.TYPESENSE_URL, 
+//                                 env.TYPESENSE_ADMIN_API_KEY, 
+//                                 {...org}, 
+//                                 'organizations'
+//                             );
+//                             break;
+//                         case 'delete':
+//                             console.log("Deleting organization from Typesense:", event.deleted);
+//                             await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id, 'organizations');
+//                             break;
+//                     }
+//                 } catch (error) {
+//                     console.error("Error processing event for Typesense:", error);
+//                 }
+//             }
+//         };
+
+//         const handleMilestoneStream = async () => {
+//             for await (const event of milestoneStream) {
+//                 resetTimeout();
+//                 console.log(`handle milestone event`, event);
+//                 let milestone = undefined
+
+//                 try {
+//                     switch (event.action) {
+//                         case 'create':
+//                             console.log("Syncing created milestone to Typesense:", event.created);
+//                             milestone = await prisma.milestone.findUnique({
+//                                 where: {id: event.created.id},
+//                                 include: {
+//                                     RFP: true,
+//                                     asset: true
+//                                 }
+//                             })
+//                             await addTypeSenseDocument(
+//                                 env.TYPESENSE_URL, 
+//                                 env.TYPESENSE_ADMIN_API_KEY, 
+//                                 {
+//                                     ...milestone,
+//                                     RFPId_exists: milestone?.RFP ? true : false,
+//                                     assetId_exists: milestone?.asset ? true : false,
+//                                 }, 
+//                                 'milestones'
+//                             );
+//                             break;
+//                         case 'update':
+//                             console.log("Syncing updated milestone to Typesense:", event.after);
+//                             milestone = await prisma.milestone.findUnique({
+//                                 where: {id: event.after.id},
+//                                 include: {
+//                                     RFP: true,
+//                                     asset: true
+//                                 }
+//                             })
+//                             await updateTypeSenseDocument(
+//                                 env.TYPESENSE_URL, 
+//                                 env.TYPESENSE_ADMIN_API_KEY, 
+//                                 {
+//                                     ...milestone,
+//                                     RFPId_exists: milestone?.RFP ? true : false,
+//                                     assetId_exists: milestone?.asset ? true : false,
+//                                 },
+//                                 'milestones'
+//                             );
+//                             break;
+//                         case 'delete':
+//                             console.log("Deleting milestone from Typesense:", event.deleted);
+//                             await deleteTypeSenseDocument(
+//                                 env.TYPESENSE_URL, 
+//                                 env.TYPESENSE_ADMIN_API_KEY, 
+//                                 event.deleted.id, 
+//                                 'milestones'
+//                             );
+//                             break;
+//                     }
+//                 } catch (error) {
+//                     console.error("Error processing event for Typesense:", error);
+//                 }
+//             }
+//         };
+
+//         // Run both streams concurrently
+//         Promise.all([handleOrgStream(), handleMilestoneStream()])
+//             .catch((err) => console.error('Stream error:', err));
+//     } catch (error) {
+//         console.error('syncToTypesense job failed:', error);
+//         throw error; // Ensure the failure is logged and the job stops
+//     }
+// };
+
+const manageCollection = async (
+    typesenseUrl: string,
+    apiKey: string,
+    collectionName: string,
+    schema?: any
+) => {
+    const collectionUrl = `${typesenseUrl}/collections/${collectionName}`;
+    try {
+        console.log(`Attempting to delete collection: ${collectionName}`);
+        await sendTypeSenseRequest(collectionUrl, 'DELETE', apiKey);
+        console.log(`Deleted existing collection: ${collectionName}`);
+    } catch (err) {
+        if (err instanceof Error) {
+            console.log(`Collection ${collectionName} does not exist or deletion failed:`, err.message);
+        } else {
+            console.log(`Collection ${collectionName} does not exist or deletion failed with unknown error:`, err);
+        }
+    }
+
+    if (schema) {
+        console.log(`Creating collection: ${collectionName} with schema:`, JSON.stringify(schema, null, 2));
+        console.log(`api key`, apiKey)
+        await sendTypeSenseRequest(`${typesenseUrl}/collections`, 'POST', apiKey, schema);
+        console.log(`Recreated collection: ${collectionName}`);
+    }
+};
+
+const bulkImportDocuments = async (
+    typesenseUrl: string,
+    apiKey: string,
+    collectionName: string,
+    documents: any[]
+) => {
+    const importUrl = `${typesenseUrl}/collections/${collectionName}/documents/import`;
+    const documentsString = documents.map((doc) => JSON.stringify(doc)).join('\n');
+
+    console.log(`Importing ${documents.length} documents to collection: ${collectionName}`);
+    console.log('Documents being imported:', documents);
 
     try {
-        // Initialize Prisma and extend with Pulse
-        const prisma = addPulseExtension(initPrismaClient(), env.PULSE_API_KEY);
-        console.log(`Added prisma pulse extension...`)
+        const response = await fetch(importUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain',
+                'X-TYPESENSE-API-KEY': apiKey,
+            },
+            body: documentsString,
+        });
+        const result = await response.text();
+        console.log(`Bulk import result for ${collectionName}:`, result);
+    } catch (error) {
+        console.error(`Error during bulk import for ${collectionName}:`, error);
+        throw error;
+    }
+};
 
-        // Ensure TypeSense organization collection exists
-        await createTypeSenseCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
+const syncToTypesense = async (env: {
+    TYPESENSE_ADMIN_API_KEY: string;
+    TYPESENSE_URL: string;
+}) => {
+    console.log('Starting syncToTypesense job...');
+    console.log('Environment variables:', env);
+
+    try {
+        const prisma = initPrismaClient();
+
+        // Define schemas
+        const organizationSchema = {
             name: 'organizations',
-            "fields": [
+            enable_nested_fields: true,
+            fields: [
+                { name: 'id', type: 'string', facet: false },
+                { name: 'name', type: 'string', facet: true, index: true },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "description",
-                    "optional": false,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
+                    name: "description",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "yearFounded",
-                    "optional": false,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
+                    name: "yearFounded",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "name",
-                    "optional": false,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
+                    name: "moneyDeployed",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "moneyRaised",
-                    "optional": false,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "int64"
+                    name: "moneyRaised",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "numberOfPatientsEngaged",
-                    "optional": false,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "int64"
+                    name: "numberOfPatientsEngaged",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "prevalenceDenominator",
-                    "optional": false,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "int64"
+                    name: "prevalenceDenominator",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "prevalenceNumerator",
-                    "optional": false,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "int64"
+                    name: "prevalenceNumerator",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "int64"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "prevalenceRatio",
-                    "optional": true,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "float"
+                    name: "prevalenceRatio",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "float"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "moneyDeployed",
-                    "optional": false,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "int64"
+                    name: "interestedModalities",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string[]"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "interestedModalities",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string[]"
+                    name: "diseaseCategories",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string[]"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "diseaseCategories",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string[]"
+                    name: "condition",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "object[]"
                 }
-                // add additional fields as needed
             ],
-        });
-        console.log(`Created typesense organizations collection...`)
-
-        await createTypeSenseCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, {
+        };
+        const milestoneSchema = {
             name: 'milestones',
-            "fields": [
+            enable_nested_fields: true,
+            fields: [
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "title",
-                    "optional": false,
-                    "sort": true,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "title",
+                    optional: false,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "string"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "description",
-                    "optional": false,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "description",
+                    optional: false,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "type",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "type",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "status",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "status",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "RFPId",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "RFPId",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "RFPId_exists",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "bool"
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "RFP",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "object"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "assetId",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "string"
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "RFPId_exists",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "bool"
                 },
                 {
-                    "facet": false,
-                    "index": true,
-                    "infix": false,
-                    "locale": "",
-                    "name": "assetId_exits",
-                    "optional": true,
-                    "sort": false,
-                    "stem": false,
-                    "store": true,
-                    "type": "bool"
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "assetId",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
                 },
-                // add additional fields as needed
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "asset",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "object"
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "assetId_exists",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "bool"
+                }
             ],
-        });
-        console.log(`Created typesense milestones collection...`)
-
-        // Stream organization changes
-        const orgStream = await prisma.organization.stream({
-            name: 'organization-events',
-        });
-        const milestoneStream = await prisma.milestone.stream({
-            name: 'milestone-events',
-        });
-
-        process.on('exit', () => {
-            orgStream.stop();
-            milestoneStream.stop();
-        });
-
-        const FIVE_MINUTES = 5 * 60 * 1000;
-        let timeoutId: NodeJS.Timeout;
-
-        const resetTimeout = () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-            timeoutId = setTimeout(() => {
-                console.log('No events for 5 minutes. Terminating stream.');
-                orgStream.stop();
-                milestoneStream.stop();
-                throw Error('Stream terminated due to inactivity');
-            }, FIVE_MINUTES);
         };
 
-        resetTimeout();
+        console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
+        console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
 
-        const handleOrgStream = async () => {
-            for await (const event of orgStream) {
-                resetTimeout();
-                console.log(`handle organization event`, event);
-                let org = undefined
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
 
-                try {
-                    switch (event.action) {
-                        case 'create':
-                            console.log("Syncing created organization to Typesense:", event.created);
-                            org = await prisma.organization.findUnique({
-                                where: {id: event.created.id},
-                                include: {condition: { include: {condition: true}}}
-                            })
-                            await addTypeSenseDocument(
-                                env.TYPESENSE_URL, 
-                                env.TYPESENSE_ADMIN_API_KEY, 
-                                {...org}, 
-                                'organizations'
-                            );
-                            break;
-                        case 'update':
-                            console.log("Syncing updated organization to Typesense:", event.after);
-                            org = await prisma.organization.findUnique({
-                                where: {id: event.after.id},
-                                include: {condition: { include: {condition: true}}}
-                            })
-                            await updateTypeSenseDocument(
-                                env.TYPESENSE_URL, 
-                                env.TYPESENSE_ADMIN_API_KEY, 
-                                {...org}, 
-                                'organizations'
-                            );
-                            break;
-                        case 'delete':
-                            console.log("Deleting organization from Typesense:", event.deleted);
-                            await deleteTypeSenseDocument(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, event.deleted.id, 'organizations');
-                            break;
+        const organizations = await prisma.organization.findMany();
+        const milestones = await prisma.milestone.findMany();
+
+        console.log('Raw organizations data:', organizations);
+        console.log('Raw milestones data:', milestones);
+
+        if (organizations.length > 0) {
+            console.log('Validating organization data...');
+
+            // map orgs to include all required data
+            const uploadOrgs = await Promise.all(organizations.map(async (org, index) => {
+                console.log(`Org ${index + 1}:`, org)
+                const organization = await prisma.organization.findUnique({
+                    where: { id: org.id },
+                    include: { condition: {include: {condition: true}}}
+                })
+                return organization
+            }))
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', uploadOrgs);
+        } else {
+            console.log('No organizations to import.');
+        }
+
+        if (milestones.length > 0) {
+            console.log('Validating milestone data...');
+
+            const uploadMilestones = await Promise.all(milestones.map(async (ms, index) => {
+                console.log(`Milestone ${index + 1}:`, ms)
+                const milestone = await prisma.milestone.findUnique({
+                    where: { id: ms.id },
+                    include: {
+                        RFP: true,
+                        asset: true
                     }
-                } catch (error) {
-                    console.error("Error processing event for Typesense:", error);
+                })
+
+                return {
+                    ...milestone,
+                    RFPId_exists: milestone?.RFP ? true : false,
+                    assetId_exists: milestone?.asset ? true : false,
                 }
-            }
-        };
+            }))
 
-        const handleMilestoneStream = async () => {
-            for await (const event of milestoneStream) {
-                resetTimeout();
-                console.log(`handle milestone event`, event);
-                let milestone = undefined
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', uploadMilestones);
+        } else {
+            console.log('No milestones to import.');
+        }
 
-                try {
-                    switch (event.action) {
-                        case 'create':
-                            console.log("Syncing created milestone to Typesense:", event.created);
-                            milestone = await prisma.milestone.findUnique({
-                                where: {id: event.created.id},
-                                include: {
-                                    RFP: true,
-                                    asset: true
-                                }
-                            })
-                            await addTypeSenseDocument(
-                                env.TYPESENSE_URL, 
-                                env.TYPESENSE_ADMIN_API_KEY, 
-                                {
-                                    ...milestone,
-                                    RFPId_exists: milestone?.RFP ? true : false,
-                                    assetId_exists: milestone?.asset ? true : false,
-                                }, 
-                                'milestones'
-                            );
-                            break;
-                        case 'update':
-                            console.log("Syncing updated milestone to Typesense:", event.after);
-                            milestone = await prisma.milestone.findUnique({
-                                where: {id: event.after.id},
-                                include: {
-                                    RFP: true,
-                                    asset: true
-                                }
-                            })
-                            await updateTypeSenseDocument(
-                                env.TYPESENSE_URL, 
-                                env.TYPESENSE_ADMIN_API_KEY, 
-                                {
-                                    ...milestone,
-                                    RFPId_exists: milestone?.RFP ? true : false,
-                                    assetId_exists: milestone?.asset ? true : false,
-                                },
-                                'milestones'
-                            );
-                            break;
-                        case 'delete':
-                            console.log("Deleting milestone from Typesense:", event.deleted);
-                            await deleteTypeSenseDocument(
-                                env.TYPESENSE_URL, 
-                                env.TYPESENSE_ADMIN_API_KEY, 
-                                event.deleted.id, 
-                                'milestones'
-                            );
-                            break;
-                    }
-                } catch (error) {
-                    console.error("Error processing event for Typesense:", error);
-                }
-            }
-        };
-
-        // Run both streams concurrently
-        Promise.all([handleOrgStream(), handleMilestoneStream()])
-            .catch((err) => console.error('Stream error:', err));
+        console.log('Sync job completed successfully.');
+        return { status: 'success', message: 'Sync job completed successfully.' };
     } catch (error) {
         console.error('syncToTypesense job failed:', error);
-        throw error; // Ensure the failure is logged and the job stops
+        throw error;
     }
 };
 
 // Run sync on start
 syncToTypesense({
-    TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
-    TYPESENSE_URL: "https://" + process.env.NEXT_PUBLIC_TYPESENSE_NODE!,
-    PULSE_API_KEY: process.env.PULSE_API_KEY!
+    TYPESENSE_ADMIN_API_KEY: process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!,
+    TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+    
+    // PULSE_API_KEY: process.env.PULSE_API_KEY!
 }).catch((error) => {
     console.error("Failed to initialize Typesense sync:", error);
 });
