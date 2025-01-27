@@ -413,19 +413,19 @@ export function EditMilestoneForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className="research-plan-tour-step3 px-8 py-4">
+            <ScrollArea className="research-plan-tour-step3 px-8 pb-4">
                 <form
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                     // onChange={() => console.log(`CHANGE`)}
-                    className="flex flex-col gap-8"
+                    className="flex flex-col gap-8 pt-4"
                 >
-                    <span className="flex justify-between">
-                        <EditTitle form={form}/>
-                        <Button variant="secondary" onClick={onClose}>
-                            <FaX/>
-                        </Button>
-                    </span>
+                    <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={onClose}>
+                        <FaX/>
+                    </Button>
 
+                    <span className="mr-10">
+                        <EditTitle form={form}/>
+                    </span>
 
                     <FormField
                         control={form.control}
@@ -825,7 +825,11 @@ export function EditMilestoneForm({
                         RFP={formData.RFP as RFPType}
                     />
 
-                    <span className="flex justify-end gap-4 flex-wrap">
+                    <span className="h-4">
+
+                    </span>
+
+                    <span className="z-[9999] flex justify-end gap-4 flex-wrap absolute bottom-0 right-0 mx-4 my-2">
                         <Dialog>
                             <DialogTrigger>
                                 <Button type="button" variant="destructive">
