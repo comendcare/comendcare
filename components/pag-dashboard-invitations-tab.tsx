@@ -7,6 +7,7 @@ import {getInvitees} from "@/lib/fetchers";
 import {toast} from "sonner";
 import { ProfilePhoto } from "./profile-photo";
 import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button";
+import InvitationsDropdown from "@/components/invitations-dropdown";
 
 export default async function PAGDashboardInvitationsTab() {
     const session = await getSession();
@@ -136,17 +137,7 @@ export default async function PAGDashboardInvitationsTab() {
                                             {new Date(person.createdAt).toLocaleDateString()}
                                         </td>
                                         <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger>
-                                                    Edit<span className="sr-only">, {person.email}</span>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent>
-                                                    <DropdownMenuItem className="text-red-600">
-                                                        <FaUserXmark />
-                                                        Revoke invite
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            <InvitationsDropdown invitation={person} />
                                         </td>
                                     </tr>
                                 ))}

@@ -1,15 +1,9 @@
 import {getSession} from "@/lib/auth";
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
-import {FaEllipsis, FaUserCheck, FaUserXmark} from "react-icons/fa6";
 import Image from "next/image";
 import {getUnapprovedMemberRequestsWithUsers, getNodesEdgesAndMilestones} from "@/lib/fetchers";
 import {toast} from "sonner";
 import {ProfilePhoto} from "./profile-photo";
 import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button";
-import {approveMemberRequestAndCreateMember} from "@/lib/actions";
-import {MemberRequest} from "@prisma/client";
-import {initializeRoadmapState} from "@/lib/initialize-client-state";
-import {MemberRequestWithUser} from "@/lib/types";
 import MemberRequestsDropdown from "@/components/member-requests-dropdown";
 
 export default async function PAGDashboardRequestsTab() {
