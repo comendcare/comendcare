@@ -61,7 +61,7 @@ export const researchFormSchema = z.object({
     prevalenceNumerator: z.string().min(1, {
         message: "Your organization's prevalence.",
     }).optional(),
-    prevalenceDenominator: z.number().min(1, {
+    prevalenceDenominator: z.string().min(1, {
         message: "Your organization's prevalence.",
     }).optional(),
     engaged: z.string().min(1, {  // These need to be strings because
