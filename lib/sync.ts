@@ -104,8 +104,30 @@ export const syncToTypesense = async (env: {
             name: 'organizations',
             enable_nested_fields: true,
             fields: [
-                { name: 'id', type: 'string', facet: false },
-                { name: 'name', type: 'string', facet: true, sort: true, index: true },
+                {
+                    name: "id",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    name: "name",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: true,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
                 {
                     name: "description",
                     facet: false,
