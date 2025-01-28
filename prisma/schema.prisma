@@ -169,6 +169,8 @@ model Roadmap {
 
 model Node {
   id        String     @id @unique @default(uuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   type      String
   positionX Int
   positionY Int
@@ -180,28 +182,29 @@ model Node {
 
 model Milestone {
   id               String               @id @unique @default(uuid())
-  nodeId           String?              @unique
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
   title            String
   description      String?
   notes            String?
-  status           String               @default("PLANNED")
+  status           String?              @default("PLANNED")
   budget           Int?
-  roadmapId        String
   endDate          DateTime?
   startDate        DateTime?
   private          Boolean              @default(false)
-  type             String               @default("NOTYPE")
+  type             String?              @default("NOTYPE")
   otherTypeDetails String?
-  RFPId            String?
-  assetId          String?
-  organizationId   String
-  papers           ExternalAttachment[]
-  RFP              RFP?                 @relation(fields: [RFPId], references: [id])
-  asset            Asset?               @relation(fields: [assetId], references: [id])
-  node             Node?                @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  organization     Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  roadmap          Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  openTo           String?
   tasks            Task[]
+  attachments      ExternalAttachment[]
+  contacts         ExternalContact[]
+
+  roadmapId      String
+  roadmap        Roadmap      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  nodeId         String?      @unique
+  node           Node?        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 }
 
 model Kanban {
@@ -282,7 +285,6 @@ model RFP {
   endDate       DateTime?
   attachments   ExternalAttachment[]
   contacts      ExternalContact[]
-  Milestone     Milestone[]
 }
 
 model Asset {
@@ -293,30 +295,33 @@ model Asset {
   updatedAt   DateTime             @updatedAt
   attachments ExternalAttachment[]
   contacts    ExternalContact[]
-  Milestone   Milestone[]
 }
 
 model ExternalAttachment {
-  id          String     @id @unique @default(uuid())
-  name        String?
-  link        String
-  rFPId       String?
+  id   String  @id @unique @default(uuid())
+  name String?
+  link String
+
   assetId     String?
-  milestoneId String?
   Asset       Asset?     @relation(fields: [assetId], references: [id])
+  RFPId       String?
+  RFP         RFP?       @relation(fields: [RFPId], references: [id])
+  milestoneId String?
   Milestone   Milestone? @relation(fields: [milestoneId], references: [id])
-  RFP         RFP?       @relation(fields: [rFPId], references: [id])
 }
 
 model ExternalContact {
-  id      String  @id @unique @default(uuid())
-  name    String
-  role    String?
-  email   String
-  rFPId   String?
-  assetId String?
-  Asset   Asset?  @relation(fields: [assetId], references: [id])
-  RFP     RFP?    @relation(fields: [rFPId], references: [id])
+  id    String  @id @unique @default(uuid())
+  name  String
+  role  String?
+  email String
+
+  assetId     String?
+  Asset       Asset?     @relation(fields: [assetId], references: [id])
+  RFPId       String?
+  RFP         RFP?       @relation(fields: [RFPId], references: [id])
+  milestoneId String?
+  Milestone   Milestone? @relation(fields: [milestoneId], references: [id])
 }
 
 model Edge {
