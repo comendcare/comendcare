@@ -43,7 +43,6 @@ export type Edge = Prisma.EdgeGetPayload<{}>
 
 export type Milestone = Prisma.MilestoneGetPayload<{
     include: {
-        papers: true,
         asset: {
             include: { contacts: true, attachments: true }
         },
@@ -1472,7 +1471,6 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
                                 ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
                                 ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                // papers: milestone.papers || [],
                                 private: milestone.private || false
                             }
                         }
@@ -1484,7 +1482,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 const newMilestone = await prisma.milestone.findUnique({
                     where: {nodeId: node.id},
                     include: {
-                        papers: true,
+                        attachments: true,
                         asset: {
                             include: {contacts: true, attachments: true}
                         },
@@ -1642,11 +1640,11 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
                                 budget: node.data?.budget,
-                                papers: {
+                                attachments: {
                                     createMany: {
-                                        data: (node.data?.papers || []).map((paper: any) => ({
-                                            link: paper.link,
-                                            ...(paper.name ? {name: paper.name} : undefined)
+                                        data: (node.data?.attachments || []).map((attachment: any) => ({
+                                            link: attachment.link,
+                                            ...(attachment.name ? {name: attachment.name} : undefined)
                                         }))
                                     }
                                 },
@@ -1685,7 +1683,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         })
         const updatedMilestones = await prisma.milestone.findMany({
             include: {
-                papers: true,
+                attachments: true,
                 asset: {
                     include: {contacts: true, attachments: true}
                 },
@@ -1758,11 +1756,11 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
                                 budget: node.data?.budget,
-                                papers: {
+                                attachments: {
                                     createMany: {
-                                        data: (node.data?.papers || []).map((paper: any) => ({
-                                            link: paper.link,
-                                            ...(paper.name ? {name: paper.name} : undefined)
+                                        data: (node.data?.attachments || []).map((attachment: any) => ({
+                                            link: attachment.link,
+                                            ...(attachment.name ? {name: attachment.name} : undefined)
                                         }))
                                     }
                                 },
@@ -1780,7 +1778,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         const nodeIds = updatedNodes.map(node => node.id)
         let updatedMilestones = await prisma.milestone.findMany({
             include: {
-                papers: true,
+                attachments: true,
                 asset: {
                     include: {contacts: true, attachments: true}
                 },
@@ -1891,7 +1889,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     where: {nodeId: milestone.nodeId},
                     // where: {id: milestone.id},
                     include: {
-                        papers: true,
+                        attachments: true,
                         asset: {
                             include: {contacts: true, attachments: true}
                         },
@@ -1910,7 +1908,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                 let m = await prisma.milestone.update({
                     where: {nodeId: milestone.nodeId},
                     include: {
-                        papers: true,
+                        attachments: true,
                         asset: {
                             include: {contacts: true, attachments: true}
                         },
@@ -1927,12 +1925,12 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         startDate: milestone.startDate,
                         endDate: milestone.endDate,
                         budget: milestone.budget,
-                        papers: {
-                            deleteMany: {}, // clear all existing papers
+                        attachments: {
+                            deleteMany: {}, // clear all existing attachments
                             createMany: {
-                                data: milestone.papers.map((paper: any) => ({
-                                    link: paper.link,
-                                    ...(paper.name ? {name: paper.name} : undefined)
+                                data: milestone.attachments.map((attachment: any) => ({
+                                    link: attachment.link,
+                                    ...(attachment.name ? {name: attachment.name} : undefined)
                                 }))
                             }
                         },
@@ -1983,7 +1981,7 @@ async function updateAssets(previousMilestone: Milestone, milestone: Milestone) 
         const updatedMilestone: Milestone = await prisma.milestone.update({
             where: {id: milestone.id},
             include: {
-                papers: true,
+                attachments: true,
                 asset: {
                     include: {contacts: true, attachments: true}
                 },
@@ -2035,7 +2033,7 @@ async function updateAssets(previousMilestone: Milestone, milestone: Milestone) 
         const updatedMilestone: Milestone = await prisma.milestone.update({
             where: {id: milestone.id},
             include: {
-                papers: true,
+                attachments: true,
                 asset: {
                     include: {contacts: true, attachments: true}
                 },
@@ -2060,7 +2058,7 @@ async function updateRFP(previousMilestone: Milestone, milestone: Milestone) {
         const updatedMilestone = await prisma.milestone.update({
             where: {id: milestone.id},
             include: {
-                papers: true,
+                attachments: true,
                 asset: {
                     include: {contacts: true, attachments: true}
                 },
@@ -2120,7 +2118,7 @@ async function updateRFP(previousMilestone: Milestone, milestone: Milestone) {
         const updatedMilestone = await prisma.milestone.update({
             where: {id: milestone.id},
             include: {
-                papers: true,
+                attachments: true,
                 asset: {
                     include: {contacts: true, attachments: true}
                 },

@@ -601,7 +601,7 @@ export async function getMilestoneDetails(id: string) {
                     }
                 },
                 tasks: true,
-                papers: true
+                attachments: true
             }
         })
 
@@ -673,7 +673,7 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
             const dbMilestones = await prisma.milestone.findMany({
                 where: {roadmapId: roadmapId},
                 include: {
-                    papers: true,
+                    attachments: true,
                     asset: {
                         include: {contacts: true, attachments: true}
                     },

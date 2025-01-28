@@ -68,7 +68,7 @@ export default async function OrganizationHomePage({
     dbMilestones = await prisma.milestone.findMany({
         where: {roadmapId: organization.roadmaps?.[0]?.id},
         include: {
-            papers: true,
+            attachments: true,
             asset: {
                 include: {contacts: true, attachments: true}
             },

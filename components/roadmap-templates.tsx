@@ -49,8 +49,6 @@ export default function RoadmapTemplates() {
                     type: defaultData?.type || 'NOTYPE',
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                    // papers: defaultData?.papers || [],
-                    // tasks: defaultData?.tasks || [],
                     status: defaultData?.status || "PLANNED"
                 }
             }
