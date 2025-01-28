@@ -499,7 +499,7 @@ export default function ResearchOnboardingForm(
                                     <FormItem>
                                         <FormLabel>{`Estimated total prevalence`}</FormLabel>
                                         <FormDescription>
-                                            {`The estimated total number of patients in the world.`}
+                                            {`The estimated global prevalence ratio of your condition.`}
                                         </FormDescription>
                                         <FormControl>
                                             <div className="flex flex-row items-end justify-start space-x-2">
