@@ -446,7 +446,7 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                     where: {nodeId: node.id},
                     include: {
                         attachments: true, 
-                        asset: {
+                        // asset: {
                         //     include: { contacts: true, attachments: true }
                         // },
                         // RFP: {
