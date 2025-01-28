@@ -11,7 +11,7 @@ import {
     Condition,
     TaskStakeholder, Invitation,
 } from "@prisma/client"
-import {revalidateTag} from "next/cache"
+import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
@@ -93,6 +93,9 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
         const organization = await prisma.organization.findUnique({
             where: {
                 id: organizationId
+            },
+            include: {
+                user: true
             }
         })
 
@@ -105,8 +108,8 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
                         image: ""
                     },
                     admin: {
-                        name: session?.user.name,
-                        email: session?.user.email,
+                        name: organization.user?.name,
+                        email: organization.user?.email,
                         organizationName: organization.name || "",
                         organizationImage: organization.image || "",
                     },
@@ -951,8 +954,6 @@ export async function approveMemberRequestAndCreateMember(
         throw new Error("Invalid member request");
     }
 
-    const session = await getSession()
-
     const organization = await prisma.organization.findUnique({
         where: {
             id: memberRequest.organizationId,
@@ -970,8 +971,13 @@ export async function approveMemberRequestAndCreateMember(
                     userId: memberRequest.userId,
                     organizationId: memberRequest.organizationId
                 }
+            },
+            include: {
+                user: true
             }
         })
+
+        revalidatePath("/app/dashboard")
 
         if (member) {
             return {success: false, error: "This member already exists in your organization."}
@@ -1075,6 +1081,8 @@ export async function deleteMemberRequest(
             return {success: false, error: "Failed to send denial email."};
         }
 
+        revalidatePath("/app/dashboard")
+
         return {success: true, data: deletedMemberRequest};
 
     } catch (error) {
@@ -1101,6 +1109,8 @@ export async function deleteInvitation(
         if (!deletedInvitation) {
             return {success: false, error: "Failed to delete invitation. Request not found."};
         }
+
+        revalidatePath("/app/dashboard")
 
         return {success: true, data: deletedInvitation};
 
@@ -1160,6 +1170,8 @@ export async function deleteMember(
         if (!member) {
             return {success: false, error: "Membership not found"};
         }
+
+        revalidatePath("/app/dashboard")
 
         return {success: true, data: member};
     } catch (error: any) {
