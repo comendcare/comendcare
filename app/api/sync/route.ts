@@ -243,78 +243,78 @@ const syncToTypesense = async (env: {
                     store: true,
                     type: "string"
                 },
-                {
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    name: "RFPId",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "string"
-                },
-                {
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    name: "RFP",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "object"
-                },
-                {
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    name: "RFPId_exists",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "bool"
-                },
-                {
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    name: "assetId",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "string"
-                },
-                {
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    name: "asset",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "object"
-                },
-                {
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    name: "assetId_exists",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "bool"
-                }
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "RFPId",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "string"
+                // },
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "RFP",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "object"
+                // },
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "RFPId_exists",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "bool"
+                // },
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "assetId",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "string"
+                // },
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "asset",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "object"
+                // },
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "assetId_exists",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "bool"
+                // }
             ],
         };
 
@@ -359,16 +359,16 @@ const syncToTypesense = async (env: {
                 console.log(`Milestone ${index + 1}:`, ms)
                 const milestone = await prisma.milestone.findUnique({
                     where: { id: ms.id },
-                    include: {
-                        RFP: true,
-                        asset: true
-                    }
+                    // include: {
+                    //     RFP: true,
+                    //     asset: true
+                    // }
                 })
 
                 return {
                     ...milestone,
-                    RFPId_exists: milestone?.RFP ? true : false,
-                    assetId_exists: milestone?.asset ? true : false,
+                    // RFPId_exists: milestone?.RFP ? true : false,
+                    // assetId_exists: milestone?.asset ? true : false,
                 }
             }))
 

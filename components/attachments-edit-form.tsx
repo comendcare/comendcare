@@ -14,18 +14,18 @@ type AttachmentType = Prisma.ExternalAttachmentGetPayload<{
     select: { name: true, link: true }
 }>
 
-export function PapersEditForm({ form, papers }: { form: UseFormReturn<any>, papers: AttachmentType[] }) {
+export function AttachmentsEditForm({ form, attachments }: { form: UseFormReturn<any>, attachments: AttachmentType[] }) {
     return (
         <FormField
             control={form.control}
-            name="papers"
+            name="attachments"
             render={({ field }) => (
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <>
-                        {papers && papers.length > 0 && (
+                        {attachments && attachments.length > 0 && (
                             <>
-                                {field.value.length > 0 && <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Associated Papers`}</FormLabel>}
+                                {field.value.length > 0 && <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Associated Attachments`}</FormLabel>}
                                 {field.value.length > 0 && (
                                     <ol className="flex flex-col gap-2">
                                         {field.value.map((paper: AttachmentType, index: number) => (
@@ -35,13 +35,13 @@ export function PapersEditForm({ form, papers }: { form: UseFormReturn<any>, pap
                                                 value={paper}
                                                 onDelete={() => {
                                                     form.setValue(
-                                                        "papers",
+                                                        "attachments",
                                                         field?.value?.filter((t: AttachmentType, i: number) => i !== index)
                                                     )
                                                 }}
                                                 onValueChange={newValue => {
                                                     form.setValue(
-                                                        "papers",
+                                                        "attachments",
                                                         field?.value?.map((currentValue: AttachmentType, i: number) => i === index ? newValue : currentValue)
                                                     )
                                                 }}
@@ -55,7 +55,7 @@ export function PapersEditForm({ form, papers }: { form: UseFormReturn<any>, pap
                             variant="secondary"
                             onClick={(e: any) => {
                                 e.preventDefault()
-                                form.setValue("papers", [
+                                form.setValue("attachments", [
                                     ...(field?.value || []),
                                     { name: '', link: '' }
                                 ])
