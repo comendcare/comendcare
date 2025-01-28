@@ -893,12 +893,12 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                     where: {nodeId: node.id},
                     include: {
                         attachments: true, 
-                        asset: {
-                            include: { contacts: true, attachments: true }
-                        },
-                        RFP: {
-                            include: { contacts: true, attachments: true }
-                        },
+                        // asset: {
+                        //     include: { contacts: true, attachments: true }
+                        // },
+                        // RFP: {
+                        //     include: { contacts: true, attachments: true }
+                        // },
                         tasks: true
                     }
                 })
