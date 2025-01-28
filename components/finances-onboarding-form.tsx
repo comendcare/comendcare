@@ -167,7 +167,7 @@ export default function FinancesOnboardingForm(
                     name="raised"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Raised - {formatMoney(field.value)}</FormLabel>
+                            <FormLabel>Total funds raised - {formatMoney(field.value)}</FormLabel>
                             <FormDescription className="flex items-center">
                                 {`The total amount of funding raised to date by your patient group.`}
                                 <Tooltip delayDuration={0}>
@@ -204,9 +204,6 @@ export default function FinancesOnboardingForm(
                                     }}
                                 />
                             </FormControl>
-                            <FormDescription>
-                                This is a description for the price.
-                            </FormDescription>
                             <FormMessage/>
                         </FormItem>
                     )}
@@ -217,7 +214,7 @@ export default function FinancesOnboardingForm(
                     name="deployed"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>{`Money deployed to research`} - {formatMoney(field.value)}</FormLabel>
+                            <FormLabel>{`Total funds deployed to research`} - {formatMoney(field.value)}</FormLabel>
                             <FormDescription className="flex items-center">
                                 {`The total amount of money deployed to research to date.`}
                                 <Tooltip delayDuration={0}>
