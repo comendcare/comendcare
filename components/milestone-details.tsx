@@ -80,15 +80,15 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                     </>
                 )}
 
-                {milestone.papers && milestone.papers.length > 0 && (
+                {milestone.attachments && milestone.attachments.length > 0 && (
                     <div className="flex flex-col gap-4">
                         <Separator/>
-                        <h2 className="font-semibold text-xl">{`Attached Papers`}</h2>
+                        <h2 className="font-semibold text-xl">{`Attachments`}</h2>
                         <ol className="flex flex-row gap-4 flex-wrap">
-                            {milestone?.papers?.map((paper: any, index: number) => (
-                                <Link href={paper.link} key={index}>
+                            {milestone?.attachments?.map((attachment: any, index: number) => (
+                                <Link href={attachment.link} key={index}>
                                     <Button variant="secondary">
-                                        {paper.name || paper.link}
+                                        {attachment.name || attachment.link}
                                         <FaPaperclip/>
                                     </Button>
                                 </Link>

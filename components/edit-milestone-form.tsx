@@ -63,12 +63,12 @@ import {Organization, Prisma} from "@prisma/client"
 import {Separator} from "./ui/separator"
 import {AssetEditForm} from "./asset-edit-form"
 import {RFPEditForm} from "./rfp-edit-form"
-import {PapersEditForm} from "./papers-edit-form"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
 import { getKanbanFromOrganizationId, getOrganizationFromOrganizationId } from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import { useSession } from "next-auth/react"
+import { AttachmentsEditForm } from "./attachments-edit-form"
 
 type AssetType = Prisma.AssetGetPayload<{
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -167,7 +167,7 @@ export function EditMilestoneForm({
             year: z.string().min(4, "Year must be 4 digits").max(4, "Year must be 4 digits").optional()
         }),
         budget: z.number().optional(),
-        papers: z.array(z.custom<AttachmentType>()).optional(),
+        attachments: z.array(z.custom<AttachmentType>()).optional(),
         tasks: z.array(z.custom<TaskType>()).optional(),
         status: z.string(),
         private: z.boolean(),
@@ -192,7 +192,7 @@ export function EditMilestoneForm({
                 year: milestoneData?.endDate?.getFullYear()?.toString() || undefined
             },
             budget: milestoneData?.budget || undefined,
-            papers: milestoneData?.papers || undefined,
+            attachments: milestoneData?.attachments || undefined,
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
             status: milestoneData?.status || "PLANNED",
             private: milestoneData?.private || false,
@@ -209,7 +209,7 @@ export function EditMilestoneForm({
         startDate: form.watch("startDate"),
         endDate: form.watch("endDate"),
         budget: form.watch("budget"),
-        papers: form.watch("papers"),
+        attachments: form.watch("attachments"),
         tasks: form.watch("tasks"),
         status: form.watch("status"),
         isPrivate: form.watch("private"),
@@ -255,7 +255,7 @@ export function EditMilestoneForm({
             startDate,
             endDate,
             budget,
-            papers,
+            attachments,
             tasks,
             status,
             private: isPrivate,
@@ -284,8 +284,8 @@ export function EditMilestoneForm({
                 )
             } : undefined),
             ...(budget ? {budget} : undefined),
-            ...(papers
-                    ? {papers}
+            ...(attachments
+                    ? {attachments}
                     : undefined
             ),
             ...(type
@@ -806,9 +806,9 @@ export function EditMilestoneForm({
 
                     <Separator/>
 
-                    <PapersEditForm
+                    <AttachmentsEditForm
                         form={form}
-                        papers={formData.papers as AttachmentType[]}
+                        attachments={formData.attachments as AttachmentType[]}
                     />
 
                     <Separator/>

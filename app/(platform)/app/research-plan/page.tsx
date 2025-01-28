@@ -60,7 +60,6 @@ export default async function RoadmapPage() {
         const dbMilestones = await prisma.milestone.findMany({
             where: { roadmapId: roadmapId },
             include: { 
-                papers: true,
                 asset: {
                     include: { contacts: true, attachments: true }
                 },
