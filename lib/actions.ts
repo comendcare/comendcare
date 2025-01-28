@@ -22,6 +22,7 @@ import {
     deleteTypeSenseDocument,
     getBlurDataURL,
     logError,
+    sleep,
     toKebabCase,
     updateTypeSenseDocument
 } from "@/lib/utils";
@@ -1447,6 +1448,8 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
         }
     })
 
+    // await sleep(5000)
+
     // if a roadmap template was provided, create the relevant nodes, milestones, and edges
     if (roadmapTemplate?.milestones) {
         const milestones = roadmapTemplate.milestones
@@ -1533,6 +1536,12 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
     }
 
     return roadmap
+    // const finalRoadmap = await prisma.roadmap.findUnique({
+    //     where: { id: roadmap.id },
+    //     include: { milestones: true, nodes: true, edges: true }
+    // })
+
+    // return finalRoadmap
 }
 
 export async function deleteOrgRoadmap(

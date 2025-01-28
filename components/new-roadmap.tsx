@@ -13,8 +13,11 @@ import { templateMilestones, templateRoadmaps, emptyMilestoneTemplate, emptyRoad
 import ComendLoadingSpinner from "./comend-loading-spinner";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
+import { toast } from "sonner";
+import { initializeRoadmapState } from "@/lib/initialize-client-state";
 
 const selector = (state: RoadmapState) => ({
+    // initializeRoadmapState: state.initState,
     setRoadmapId: state.setRoadmapId
 })
 
@@ -30,7 +33,19 @@ export default function NewRoadmapForm() {
         setIsLoading(true)
         if (session?.user?.organizationId) {
             const roadmap = await createRoadmap(session.user.organizationId, roadmapData)
-            setRoadmapId(roadmap.id) // manually set roadmap ID
+            if (!roadmap) {
+                toast.error("something went wrong, please refresh the page")
+                return
+            }
+
+            // setRoadmapId(roadmap.id) // manually set roadmap ID
+            // initializeRoadmapState({
+            //     nodes: roadmap.nodes,
+            //     milestones: roadmap.milestones,
+            //     edges: roadmap.edges,
+            //     selectedNodeId: null,
+            //     roadmapId: roadmap.id
+            // })
             router.refresh()
         } else {
             console.error(`organization id is not defined in the session:`, session)
