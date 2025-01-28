@@ -10,6 +10,7 @@ import {NewMemberRequestEmail} from "@/packages/transactional/emails/invitations
 import NewOrganizationEmail from "@/packages/transactional/emails/admins/new-organization";
 import memberRequestApprovedEmail from "@/packages/transactional/emails/invitations/member-request-approved-email";
 import memberRequestDeniedEmail from "@/packages/transactional/emails/invitations/member-request-denied-email";
+import MemberDeletedEmail from "@/packages/transactional/emails/invitations/member-deleted-email";
 
 const limiter = rateLimit({
     interval: 600 * 1000, // 10 minutes (600 seconds * 1000 ms)
@@ -164,10 +165,41 @@ export async function sendInviteEmail(params: {
     }
 }
 
+export async function sendMemberDeletedEmail(params: {
+    name: string | null | undefined
+    email: string | null | undefined
+    organizationName: string | undefined
+    organizationImage: string | undefined
+}) {
+    const emailTemplate = await render(
+        MemberDeletedEmail(
+            {
+                userName: params.name,
+                userEmail: params.email,
+                organizationName: params.organizationName,
+                organizationImage: params.organizationImage,
+            }
+        )
+    )
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
+    if (params.email) {
+        const msg = {
+            // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
+            to: params.email,
+            from: "corporate@comendcare.com",
+            html: emailTemplate,
+            text: "A user has sent a message via the contact page.",
+            subject: `Your membership to ${params.organizationName} has been removed`
+        }
+        await sendEmail(msg)
+    }
+}
+
 
 export async function sendMemberRequestCreatedEmail(params: {
     user: {
-        name: string | undefined
+        name: string | null | undefined
         email: string | null | undefined
         image: string | null | undefined
     }

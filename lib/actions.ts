@@ -31,7 +31,8 @@ import {
     sendMemberRequestCreatedEmail,
     sendMemberRequestApprovedEmail,
     sendNewOrganizationEmail,
-    sendMemberRequestDeniedEmail
+    sendMemberRequestDeniedEmail,
+    sendMemberDeletedEmail,
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, MemberRequestWithUser} from "@/lib/types";
@@ -1164,11 +1165,28 @@ export async function deleteMember(
         const member = await prisma.member.delete({
             where: {
                 id: membershipId
+            },
+            include: {
+                user: true,
+                organization: true,
             }
         })
 
         if (!member) {
             return {success: false, error: "Membership not found"};
+        }
+
+        if (member) {
+            await sendMemberDeletedEmail(
+                {
+                    name: member.user.name,
+                    email: member.email,
+                    organizationName: member.organization.name || "",
+                    organizationImage: member.organization.image || "",
+                }
+            ).then(() => {
+                console.log("email sent")
+            })
         }
 
         revalidatePath("/app/dashboard")
