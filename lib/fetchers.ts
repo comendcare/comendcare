@@ -113,20 +113,20 @@ export async function getRoadmapsForOrganization(domain: string) {
                 where: {
                     private: false
                 },
-                include: {
-                    asset: {
-                        include: {
-                            contacts: true,
-                            attachments: true
-                        }
-                    },
-                    RFP: {
-                        include: {
-                            contacts: true,
-                            attachments: true
-                        }
-                    }
-                }
+                // include: {
+                //     asset: {
+                //         include: {
+                //             contacts: true,
+                //             attachments: true
+                //         }
+                //     },
+                //     RFP: {
+                //         include: {
+                //             contacts: true,
+                //             attachments: true
+                //         }
+                //     }
+                // }
             },
         },
         orderBy: [
@@ -588,18 +588,18 @@ export async function getMilestoneDetails(id: string) {
         const milestone = await prisma.milestone.findUnique({
             where: {id},
             include: {
-                asset: {
-                    include: {
-                        contacts: true,
-                        attachments: true,
-                    }
-                },
-                RFP: {
-                    include: {
-                        contacts: true,
-                        attachments: true
-                    }
-                },
+                // asset: {
+                //     include: {
+                //         contacts: true,
+                //         attachments: true,
+                //     }
+                // },
+                // RFP: {
+                //     include: {
+                //         contacts: true,
+                //         attachments: true
+                //     }
+                // },
                 tasks: true,
                 attachments: true
             }
@@ -674,12 +674,12 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                 where: {roadmapId: roadmapId},
                 include: {
                     attachments: true,
-                    asset: {
-                        include: {contacts: true, attachments: true}
-                    },
-                    RFP: {
-                        include: {contacts: true, attachments: true}
-                    },
+                    // asset: {
+                    //     include: {contacts: true, attachments: true}
+                    // },
+                    // RFP: {
+                    //     include: {contacts: true, attachments: true}
+                    // },
                     tasks: {
                         orderBy: {orderPosition: 'asc'},
                         include: {

@@ -61,8 +61,8 @@ import {monthsList} from "@/lib/data";
 import {MILESTONE_TYPE_OPTIONS, StatusType} from "@/lib/types"
 import {Organization, Prisma} from "@prisma/client"
 import {Separator} from "./ui/separator"
-import {AssetEditForm} from "./asset-edit-form"
-import {RFPEditForm} from "./rfp-edit-form"
+// import {AssetEditForm} from "./asset-edit-form"
+// import {RFPEditForm} from "./rfp-edit-form"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
 import { getKanbanFromOrganizationId, getOrganizationFromOrganizationId } from "@/lib/fetchers"
@@ -70,29 +70,29 @@ import mixpanel from "mixpanel-browser"
 import { useSession } from "next-auth/react"
 import { AttachmentsEditForm } from "./attachments-edit-form"
 
-type AssetType = Prisma.AssetGetPayload<{
-    omit: { id: true, createdAt: true, updatedAt: true }
-    include: {
-        contacts: {
-            select: { name: true, role: true, email: true }
-        },
-        attachments: {
-            select: { name: true, link: true }
-        }
-    }
-}>
-type RFPType = Prisma.RFPGetPayload<{
-    omit: { id: true, createdAt: true, updatedAt: true, researchFocus: true }
-    include: {
-        contacts: {
-            select: { name: true, role: true, email: true }
-        },
-        attachments: {
-            select: { name: true, link: true }
-        }
-    }
-}>
-type AttachmentType = AssetType['attachments'][0]
+// type AssetType = Prisma.AssetGetPayload<{
+//     omit: { id: true, createdAt: true, updatedAt: true }
+//     include: {
+//         contacts: {
+//             select: { name: true, role: true, email: true }
+//         },
+//         attachments: {
+//             select: { name: true, link: true }
+//         }
+//     }
+// }>
+// type RFPType = Prisma.RFPGetPayload<{
+//     omit: { id: true, createdAt: true, updatedAt: true, researchFocus: true }
+//     include: {
+//         contacts: {
+//             select: { name: true, role: true, email: true }
+//         },
+//         attachments: {
+//             select: { name: true, link: true }
+//         }
+//     }
+// }>
+type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type TaskType = Prisma.TaskGetPayload<{}>
 
 // const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
@@ -171,8 +171,8 @@ export function EditMilestoneForm({
         tasks: z.array(z.custom<TaskType>()).optional(),
         status: z.string(),
         private: z.boolean(),
-        asset: z.custom<AssetType>().optional(),
-        RFP: z.custom<RFPType>().optional()
+        // asset: z.custom<AssetType>().optional(),
+        // RFP: z.custom<RFPType>().optional()
     })
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -196,8 +196,8 @@ export function EditMilestoneForm({
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
             status: milestoneData?.status || "PLANNED",
             private: milestoneData?.private || false,
-            asset: milestoneData?.asset || undefined,
-            RFP: milestoneData?.RFP || undefined
+            // asset: milestoneData?.asset || undefined,
+            // RFP: milestoneData?.RFP || undefined
         }
     })
 
@@ -213,8 +213,8 @@ export function EditMilestoneForm({
         tasks: form.watch("tasks"),
         status: form.watch("status"),
         isPrivate: form.watch("private"),
-        asset: form.watch("asset"),
-        RFP: form.watch("RFP")
+        // asset: form.watch("asset"),
+        // RFP: form.watch("RFP")
     }
 
     // callback ensures we're not creating a new debounce every time this is called
@@ -259,8 +259,8 @@ export function EditMilestoneForm({
             tasks,
             status,
             private: isPrivate,
-            asset,
-            RFP
+            // asset,
+            // RFP
         } = values;
         const now = new Date()
 
@@ -298,8 +298,8 @@ export function EditMilestoneForm({
             ),
             status,
             private: isPrivate || false,
-            asset,
-            RFP
+            // asset,
+            // RFP
         })
 
         setTasks(unionById(tasks || [], kanbanTasks).map(task => {
@@ -811,7 +811,7 @@ export function EditMilestoneForm({
                         attachments={formData.attachments as AttachmentType[]}
                     />
 
-                    <Separator/>
+                    {/* <Separator/>
 
                     <AssetEditForm
                         form={form}
@@ -823,7 +823,7 @@ export function EditMilestoneForm({
                     <RFPEditForm
                         form={form}
                         RFP={formData.RFP as RFPType}
-                    />
+                    /> */}
 
                     <span className="h-4">
 
