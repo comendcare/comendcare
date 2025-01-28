@@ -170,7 +170,7 @@ model Roadmap {
 model Node {
   id        String     @id @unique @default(uuid())
   createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  updatedAt DateTime   @default(now()) @updatedAt
   type      String
   positionX Int
   positionY Int
@@ -183,7 +183,7 @@ model Node {
 model Milestone {
   id               String               @id @unique @default(uuid())
   createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
+  updatedAt        DateTime             @default(now()) @updatedAt
   title            String
   description      String?
   notes            String?
