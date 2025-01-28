@@ -59,7 +59,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                     <BudgetView budget={milestone.budget}/>
                 </div>
 
-                {(milestone?.asset || milestone?.RFP) && (
+                {/* {(milestone?.asset || milestone?.RFP) && (
                     <>
                         <Separator/>
                         <div className="grid grid-cols-2 gap-4">
@@ -78,7 +78,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                             )}
                         </div>
                     </>
-                )}
+                )} */}
 
                 {milestone.attachments && milestone.attachments.length > 0 && (
                     <div className="flex flex-col gap-4">

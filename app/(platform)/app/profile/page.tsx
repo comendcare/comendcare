@@ -66,22 +66,23 @@ export default async function ProfilePage() {
                     include: {data: true}
                 },
                 edges: true,
-                milestones: {
-                    include: {
-                        asset: {
-                            include: {
-                                contacts: true,
-                                attachments: true
-                            }
-                        },
-                        RFP: {
-                            include: {
-                                contacts: true,
-                                attachments: true
-                            }
-                        }
-                    }
-                }
+                milestones: true
+                // milestones: {
+                //     include: {
+                //         asset: {
+                //             include: {
+                //                 contacts: true,
+                //                 attachments: true
+                //             }
+                //         },
+                //         RFP: {
+                //             include: {
+                //                 contacts: true,
+                //                 attachments: true
+                //             }
+                //         }
+                //     }
+                // }
             }
         })
 
@@ -214,8 +215,10 @@ export default async function ProfilePage() {
                             {/*    </TabsList>*/}
                             {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
                             <PAGProfileAssetsAndProjectsHoverableCard
-                                assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
-                                rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
+                                assets={[]}
+                                rfps={[]}
+                                // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
+                                // rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                             />
                             <PublicRoadmapCard roadmap={roadmaps[0]}
                                                subdomain={organization?.subdomain || undefined}/>

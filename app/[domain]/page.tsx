@@ -69,12 +69,12 @@ export default async function OrganizationHomePage({
         where: {roadmapId: organization.roadmaps?.[0]?.id},
         include: {
             attachments: true,
-            asset: {
-                include: {contacts: true, attachments: true}
-            },
-            RFP: {
-                include: {contacts: true, attachments: true}
-            },
+            // asset: {
+            //     include: {contacts: true, attachments: true}
+            // },
+            // RFP: {
+            //     include: {contacts: true, attachments: true}
+            // },
             tasks: {
                 orderBy: {orderPosition: 'asc'},
                 include: {
@@ -117,8 +117,10 @@ export default async function OrganizationHomePage({
 
                         <div className="md:col-span-4 flex flex-col space-y-4">
                             <PAGProfileAssetsAndProjectsHoverableCard
-                                assets={(roadmaps?.[0]?.milestones.filter(milestone => milestone.asset) || []).map(milestone => milestone.asset)}
-                                rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
+                                assets={[]}
+                                rfps={[]}
+                                // assets={(roadmaps?.[0]?.milestones.filter(milestone => milestone.asset) || []).map(milestone => milestone.asset)}
+                                // rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
                             />
                             {roadmaps.length > 0 ?
                                 <PublicRoadmapCard
