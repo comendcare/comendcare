@@ -447,11 +447,11 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                     include: {
                         attachments: true, 
                         asset: {
-                            include: { contacts: true, attachments: true }
-                        },
-                        RFP: {
-                            include: { contacts: true, attachments: true }
-                        },
+                        //     include: { contacts: true, attachments: true }
+                        // },
+                        // RFP: {
+                        //     include: { contacts: true, attachments: true }
+                        // },
                         tasks: true
                     }
                 })
