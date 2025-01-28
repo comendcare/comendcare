@@ -1,6 +1,7 @@
 // This seed script is meant to help during development, and not to be used to seed production databases
 import {Organization, PrismaClient} from '@prisma/client'
 import { organizations } from '@/data/sample-pags';
+import { sleep } from '@/lib/utils';
 
 const prisma = new PrismaClient()
 

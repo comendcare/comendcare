@@ -65,33 +65,15 @@ export default function AppLayout({children}: AppLayoutProps) {
         console.log(`session changed`, session)
         if (session) {
             setIsLoading(true)
-            let orgId = undefined
 
-            if (session.user.organizationId) {
-                // org id is in the session, so we use that
-                orgId = session.user.organizationId
-            } else {
-                // org id is not in the session, pull it from the database
-                // const user = await getUser(session.user.id)
-                // const defaultOrganization = user?.organizations && user.organizations.length > 0 ? user.organizations[0] : undefined
-
-                // if (!defaultOrganization) {
-                //     console.error(`no organizations found for this user...`)
-                //     return
-                // }
-
-                // orgId = defaultOrganization.id
-
-                // // add orgId to session, since it was previously undefiend
-                // await update({
-                //     ...session,
-                //     organizationId: orgId
-                // })
+            if (!session.user.organizationId) {
+                console.error("Organization id is not set in the session... session data is ", session)
+                toast.error("Error, the organization id is not set.")
+                setIsLoading(false)
+                return
             }
 
-            // await new Promise(resolve => setTimeout(resolve, 5000))
-
-            const response = await getRoadmapId(orgId)
+            const response = await getRoadmapId(session.user.organizationId)
             if (response.success) {
                 // setRoadmapId(response.data)
                 const nodesResponse = await getNodesEdgesAndMilestones(response.data)
@@ -111,13 +93,13 @@ export default function AppLayout({children}: AppLayoutProps) {
             }
 
             let kanban = await getKanbanFromOrganizationId()
-            if (!kanban.data && orgId) {
+            if (!kanban.data && session.user.organizationId) {
                 // kanban was not found, create it
-                kanban = await createKanban(orgId)
+                kanban = await createKanban(session.user.organizationId)
             }
 
             if (kanban.success) {
-                const kanbanResponse = await getColumns(orgId)
+                const kanbanResponse = await getColumns(session.user.organizationId)
                 if (kanbanResponse.success) {
                     initializeKanbanState({
                         columns: kanbanResponse.data.columns
@@ -134,8 +116,8 @@ export default function AppLayout({children}: AppLayoutProps) {
     }
 
     useEffect(() => {
-        // Only run if the session has changed
-        if (JSON.stringify(prevSessionRef.current) !== JSON.stringify(session)) {
+        // Only run if the session data has changed
+        if (JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)) {
             handleSessionUpdate()
         }
 

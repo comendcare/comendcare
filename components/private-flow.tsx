@@ -322,6 +322,8 @@ export const PrivateFlowView = ({
             fitViewOptions={{ padding: 2 }}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
+            // maxZoom={5}
+            // minZoom={0.1}
         >
             <MiniMap
                 nodeColor='#757575'

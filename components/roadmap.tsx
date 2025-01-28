@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useNavStore, useSidebarStore } from "@/state/nav/navStore"
+import { useSidebarStore } from "@/state/nav/navStore"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import {
@@ -10,65 +10,51 @@ import {
     ResizableHandle
 } from "@/components/ui/resizable"
 import {
-    Tooltip,
-    TooltipContent,
     TooltipProvider,
-    TooltipTrigger,
   } from "@/components/ui/tooltip"
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
 import { PrivateFlowView } from "@/components/private-flow"
-import { Button } from "./ui/button"
-import { FaQuestion, FaX } from "react-icons/fa6"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useState } from "react"
-import { MilestoneDetails } from "./milestone-details"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { GanttChartView } from "./gantt-chart"
-import { useOnborda } from "./onborda/OnbordaContext"
-import { FaRegQuestionCircle } from "react-icons/fa";
+import { getRoadmapId } from "@/lib/fetchers"
 
 const selector = (state: RoadmapState) => ({
+    roadmapId: state.roadmapId,
+    nodes: state.nodes,
+    edges: state.edges,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
     initState: state.initState
 })
 
-export function Roadmap({
-    roadmapId,
-    initNodes,
-    initEdges,
-    initMilestones,
-    // initTasks
-}: {
-    roadmapId: string
-    initNodes: any[]
-    initEdges: any[]
-    initMilestones: any[]
-    // initTasks: any[]
-}) {
+export function Roadmap({data}: {data: any}) {
     // Zustand state management
     const { defaultLayout, setLayout } = useSidebarStore()
     const { 
+        roadmapId,
+        nodes,
+        edges,
         selectedNodeId, 
         setSelectedNodeId, 
         milestones, 
-        initState
     } = useRoadmapStore(useShallow(selector))
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
+    // useEffect(() => {
+    //     if (data.id !== roadmapId || data.nodes.length !== nodes.length || data.milestones.length !== milestones.length || data.edges.length !== edges.length) {
+    //         // roadmap data doesn't match, refresh the page
+    //         console.log(`data does not match, refresh page...`)
+    //         router.refresh()
+    //     }
+    // }, [])
+
     const urlView = searchParams.get("view")
     const [view, setView] = useState(urlView ? urlView : "flow")
-
-    // useEffect(() => {
-    //     const params = new URLSearchParams(searchParams.toString())
-    //     const urlMilestone: string | null = params.get("milestone")
-    //     const urlTask: string | null = params.get("task")
-
-    //     initState(initNodes, initEdges, initMilestones, urlMilestone, urlTask, roadmapId)
-    // }, [])
 
     const handleMilestonePanelChange = (open: boolean) => {
         if (!open) {
