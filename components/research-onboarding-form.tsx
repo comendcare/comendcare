@@ -254,14 +254,14 @@ export default function ResearchOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Name of condition`}</FormLabel>
-                                        <div className="w-full flex flex-row justify-between">
-                                            <FormDescription>
-                                                {`The name of your rare condition/disorder.`}
-                                            </FormDescription>
-                                            <FormDescription>
-                                                60 characters max.
-                                            </FormDescription>
-                                        </div>
+                                        {/*<div className="w-full flex flex-row justify-between">*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        {`The name of your rare condition/disorder.`}*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        60 characters max.*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*</div>*/}
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -280,14 +280,14 @@ export default function ResearchOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Summary of condition`}</FormLabel>
-                                        <div className="w-full flex flex-row justify-between">
-                                            <FormDescription>
-                                                {`A few lines describing your condition and what makes it unique`}
-                                            </FormDescription>
-                                            <FormDescription>
-                                                500 characters max.
-                                            </FormDescription>
-                                        </div>
+                                        {/*<div className="w-full flex flex-row justify-between">*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        {`A few lines describing your condition and what makes it unique`}*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        500 characters max.*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*</div>*/}
                                         <FormControl>
                                             <Textarea
                                                 id="summary"
@@ -305,7 +305,7 @@ export default function ResearchOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Associated genes</FormLabel>
-                                        <FormDescription>{`The genes associated with your condition.`}</FormDescription>
+                                        {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
@@ -561,8 +561,8 @@ export default function ResearchOnboardingForm(
                                 name="national"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Estimated number of patients in your region`} - {formatNumberWithCommas(field.value)}</FormLabel>
-                                        <FormDescription>{`The estimated number of patients in your country or region of influence.`}</FormDescription>
+                                        <FormLabel>{`Estimated number of patients in the US`} - {formatNumberWithCommas(field.value)}</FormLabel>
+                                        {/*<FormDescription>{`The estimated number of patients in your country or region of influence.`}</FormDescription>*/}
                                         <FormControl>
                                             <Input
                                                 type="number"
@@ -581,7 +581,7 @@ export default function ResearchOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Estimated number of patients in the world`} - {formatNumberWithCommas(field.value)}</FormLabel>
-                                        <FormDescription>{`The estimated number of patients in the world.`}</FormDescription>
+                                        {/*<FormDescription>{`The estimated number of patients in the world.`}</FormDescription>*/}
                                         <FormControl>
                                             <Input
                                                 type="number"

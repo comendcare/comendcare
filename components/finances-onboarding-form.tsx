@@ -167,7 +167,7 @@ export default function FinancesOnboardingForm(
                     name="raised"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Total funds raised - {formatMoney(field.value)}</FormLabel>
+                            <FormLabel>Total funds raised to date - {formatMoney(field.value)}</FormLabel>
                             <FormDescription className="flex items-center">
                                 {`The total amount of funding raised to date by your patient group.`}
                                 <Tooltip delayDuration={0}>
@@ -256,7 +256,7 @@ export default function FinancesOnboardingForm(
                         <FormItem>
                             <FormLabel>{`Annual research budget`} - {formatMoney(field.value)}</FormLabel>
                             <FormDescription className="flex items-center">
-                                {`The amount of money allocated to advancing research.`}
+                                {`The amount of money allocated to advancing research this year.`}
                                 <Tooltip delayDuration={0}>
                                     {/*disabled to make the tooltip unclickable*/}
                                     <TooltipTrigger disabled>
