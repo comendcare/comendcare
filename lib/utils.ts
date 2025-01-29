@@ -7,6 +7,12 @@ import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
 
+export function formatNumberWithCommas(number: string | undefined) {
+    if (number === undefined) return "0"
+
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 export function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

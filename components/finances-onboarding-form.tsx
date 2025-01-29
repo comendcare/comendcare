@@ -218,7 +218,8 @@ export default function FinancesOnboardingForm(
                             <FormDescription className="flex items-center">
                                 {`The total amount of money deployed to research to date.`}
                                 <Tooltip delayDuration={0}>
-                                    <TooltipTrigger>
+                                    {/*disabled to make the tooltip unclickable*/}
+                                    <TooltipTrigger disabled>
                                         <FaQuestionCircle
                                             className="text-black h-4 inline-block align-baseline mx-1"/>
                                     </TooltipTrigger>
@@ -257,7 +258,8 @@ export default function FinancesOnboardingForm(
                             <FormDescription className="flex items-center">
                                 {`The amount of money allocated to advancing research.`}
                                 <Tooltip delayDuration={0}>
-                                    <TooltipTrigger>
+                                    {/*disabled to make the tooltip unclickable*/}
+                                    <TooltipTrigger disabled>
                                         <FaQuestionCircle
                                             className="text-black h-4 inline-block align-baseline mx-1"/>
                                     </TooltipTrigger>
