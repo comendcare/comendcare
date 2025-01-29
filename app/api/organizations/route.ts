@@ -6,18 +6,6 @@ export async function POST(req: Request) {
         const { ids } = await req.json();
         if (!ids || ids.length === 0) return NextResponse.json([], { status: 200 });
 
-        // Fetch full data from Prisma
-        // const results = await prisma.conditionToOrganization.findMany({
-        //     where: {
-        //         organizationId: {in: ids},  // Filter by organization IDs from TypeSense
-        //     },
-        //     include: {
-        //         organization: true,
-        //         condition: true
-        //     }
-        // })
-        // console.log(results)
-
         const results = await prisma.organization.findMany({
             where: {
                 id: { in: ids }, // Ensure we fetch all organizations

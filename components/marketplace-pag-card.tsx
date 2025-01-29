@@ -20,7 +20,7 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                     : `http://${subdomain}.localhost:3000`
             }
         >
-            <Card className="h-full w-full text-left flex flex-col justify-between">
+            <Card className="h-full w-full text-left flex flex-col justify-start">
                 <CardHeader>
                     <CardTitle className="text-xl font-normal flex flex-row gap-2 items-center">
                         <ProfilePhoto img={image} name={name} className="h-10 w-10"/>
@@ -42,7 +42,7 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                     </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-start justify-center space-y-4">
-                    <div>
+                    <div className="line-clamp-3">
                         {description}
                     </div>
                     <div className="flex flex-row space-x-2">
@@ -60,21 +60,25 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                         ))}
                     </div>
                 </CardContent>
-                <Separator className="px-2"/>
-                <CardFooter>
-                    <h2 className="text-base">
-                        {orgCondition.name}
-                    </h2>
-                    {associatedGenes.length > 0 && (
-                        <span className="w-full flex flex-row gap-2 flex-wrap">
-                            {associatedGenes.map((gene: string, index: number) => (
-                                <Badge key={index} className="flex text-sm">
-                                    {gene}
-                                </Badge>
-                            ))}
-                        </span>
-                    )}
-                </CardFooter>
+                {Object.keys(orgCondition).length === 0 ||
+                    <>
+                        <Separator className="mb-4"/>
+                        <CardFooter>
+                            <h2 className="text-base">
+                                {orgCondition.name}
+                            </h2>
+                            {associatedGenes.length > 0 && (
+                                <span className="w-full flex flex-row gap-2 flex-wrap">
+                                    {associatedGenes.map((gene: string, index: number) => (
+                                        <Badge key={index} className="flex text-sm">
+                                            {gene}
+                                        </Badge>
+                                    ))}
+                                </span>
+                            )}
+                        </CardFooter>
+                    </>
+                }
             </Card>
         </Link>
     );

@@ -88,9 +88,26 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             .documents()
             .search(searchParameters);
 
-        console.log(`search results`, results.hits)
-        if (isNewSearch) return [...(results.hits || [])]           // new search - don't keep previous results
-        return [...state.searchResults, ...(results.hits || [])]    // update search - keep previous results
+        const typeSenseHits = results.hits || [];
+        // @ts-ignore
+        const ids = typeSenseHits.map(hit => hit.document.id);
+
+        if (ids.length === 0) {
+            return isNewSearch ? [] : state.searchResults;
+        }
+
+        const prismaResponse = await fetch('/api/milestones', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids }),
+        });
+
+        const prismaResults = await prismaResponse.json();
+
+        console.log(prismaResults)
+        const enrichedResults = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
+
+        return isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults];
 
     } catch (error) {
         console.error("Search error:", error)
