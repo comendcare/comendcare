@@ -60,137 +60,61 @@ export default function NewRoadmapForm() {
     }
 
     return (
-        <ScrollArea className="h-full w-full">
-            <div className="flex flex-col justify-left gap-12 p-20">
-                <span className="flex flex-col gap-2">
-                    <h1 className="text-3xl text-bold text-primary">
-                        {`Get going faster with a Milestone or Research Plan Template`}
-                    </h1>
-                    <p className="text-muted-foreground">
-                        {`Milestones are the nodes that make up your Research Plan. We've put together some templates to get you started.`}
-                    </p>
-                </span>
+        <div className="w-full h-full flex flex-col justify-left gap-12 p-14">
+            <span className="flex flex-col gap-2">
+                <h1 className="text-3xl text-bold text-primary">
+                    {`Get going faster with an Asset, Milestone, or Project template`}
+                </h1>
+                <p className="text-muted-foreground">
+                    {`Assets, Milestones, and Projectes are the nodes that make up your Research Plan. We've put together some templates to get you started.`}
+                </p>
+            </span>
 
-                <div className="flex flex-col gap-2 w-full">
+            <div className="flex flex-col gap-4 w-full flex-1 overflow-hidden">
                 <h2 className="text-xl text-bold">Start from a Milestone Template</h2>
-                <Carousel
-                    opts={{
-                        align: "start",
-                        loop: true
-                    }}
-                    className="w-full overflow-visible"
-                >
-                    <CarouselContent className="overflow-visible p-2">
+
+                <ScrollArea className="flex-1" type="always">
+                    <div className="grid grid-cols-2 gap-4 pr-5 pt-2">
                         {templateMilestones.map((milestoneData, index) => (
-                            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 2xl:basis-1/4 overflow-visible">
-                                <MilestoneTemplateCard 
-                                    milestoneData={milestoneData}
-                                    selectedMilestones={selectedMilestones}
-                                    setSelectedMilestones={setSelectedMilestones}
-                                />
-                            </CarouselItem>
+                            <MilestoneTemplateCard 
+                                key={index} 
+                                milestoneData={milestoneData}
+                                selectedMilestones={selectedMilestones}
+                                setSelectedMilestones={setSelectedMilestones}
+                            />
                         ))}
-                    </CarouselContent>
-                    <CarouselPrevious />
-                    <CarouselNext />
-                </Carousel>
-
-                <span className="flex flex-col sm:flex-row gap-4">
-                <div className="flex flex-row space-x-2">
-                    <Button
-                        disabled={selectedMilestones.length === 0}
-                        onClick={() => {
-                            createTemplateRoadmap({
-                                title: '',
-                                description: '',
-                                milestones: selectedMilestones
-                            })
-                        }}
-                    >
-                        Create a Research Plan with selected Milestones
-                    </Button>
-                </div>
-                <div className="flex flex-row space-x-2">
-                    <Button 
-                        variant="secondary"
-                        onClick={() => createTemplateRoadmap({
-                            ...emptyRoadmapTemplate,
-                            milestones: [emptyMilestoneTemplate]
-                        })}
-                    >
-                        Create an empty Milestone
-                    </Button>
-                </div>
-                </span>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                <h2 className="text-xl text-bold">Start from a Research Plan Template</h2>
-                <Carousel
-                    opts={{
-                        align: "start"
-                    }}
-                    className="w-full"
-                >
-                    <CarouselContent className="overflow-visible p-2">
-                        {templateRoadmaps.map((roadmapData, index) => (
-                            <CarouselItem key={index} className="xl:basis-1/2 overflow-visible">
-                                <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible" >
-                                    <CardHeader>
-                                        <CheckBubble data={roadmapData} onCheckedChanged={
-                                            (checked: boolean) => {
-                                                if (checked) {
-                                                    setSelectedRoadmap(roadmapData)
-                                                } else {
-                                                    setSelectedRoadmap(undefined)
-                                                }
-                                            }
-                                        }/>
-                                        <CardTitle>{roadmapData.title}</CardTitle>
-                                        <CardDescription>
-                                            {roadmapData.description}
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="flex flex-col gap-2">
-                                        <h5 className="text-lg">Research Plan Milestones</h5>
-                                        <ul className="flex flex-col gap-2">
-                                            {roadmapData.milestones?.map((milestone, index) => (
-                                                <li key={index} className="flex flex-row gap-2 items-center">
-                                                    <FaCheck size={20} className="h-4 w-4 text-green-500"/>
-                                                    <p className="grow">{milestone.title}</p>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </CardContent>
-                                </Card>
-                            </CarouselItem>
-                        ))}
-                    </CarouselContent>
-                    <CarouselPrevious />
-                    <CarouselNext />
-                </Carousel>
+                    </div>
+                </ScrollArea>
 
                 <span className="flex flex-col sm:flex-row gap-4">
                     <div className="flex flex-row space-x-2">
-                        <Button 
-                            disabled={!selectedRoadmap}
-                            onClick={() => createTemplateRoadmap(selectedRoadmap)}
+                        <Button
+                            disabled={selectedMilestones.length === 0}
+                            onClick={() => {
+                                createTemplateRoadmap({
+                                    title: '',
+                                    description: '',
+                                    milestones: selectedMilestones
+                                })
+                            }}
                         >
-                            Create a Research Plan  from selected Template
+                            Create a Research Plan with selected nodes
                         </Button>
                     </div>
                     <div className="flex flex-row space-x-2">
                         <Button 
                             variant="secondary"
-                            onClick={() => createTemplateRoadmap(emptyRoadmapTemplate)}
+                            onClick={() => createTemplateRoadmap({
+                                ...emptyRoadmapTemplate,
+                                milestones: [emptyMilestoneTemplate]
+                            })}
                         >
-                            Create an empty Research Plan
+                            Create an empty node
                         </Button>
                     </div>
                 </span>
-                </div>
             </div>
-        </ScrollArea>
+        </div>
     )
 }
 
