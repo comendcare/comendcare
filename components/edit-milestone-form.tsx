@@ -58,7 +58,7 @@ import {Switch} from "./ui/switch"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
-import {MILESTONE_TYPE_OPTIONS, StatusType} from "@/lib/types"
+import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, StatusType} from "@/lib/types"
 import {Organization, Prisma} from "@prisma/client"
 import {Separator} from "./ui/separator"
 // import {AssetEditForm} from "./asset-edit-form"
@@ -69,6 +69,7 @@ import { getKanbanFromOrganizationId, getOrganizationFromOrganizationId } from "
 import mixpanel from "mixpanel-browser"
 import { useSession } from "next-auth/react"
 import { AttachmentsEditForm } from "./attachments-edit-form"
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 
 // type AssetType = Prisma.AssetGetPayload<{
 //     omit: { id: true, createdAt: true, updatedAt: true }
@@ -146,6 +147,7 @@ export function EditMilestoneForm({
     const {data: session} = useSession()
 
     const editMilestoneForm = z.object({
+        nodeType: z.string(),
         title: z
             .string({
                 required_error: "Please provide a title"
@@ -179,6 +181,7 @@ export function EditMilestoneForm({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
+            nodeType: milestoneData?.node.type || "MILESTONE",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
             type: milestoneData?.type || "NOTYPE",
@@ -202,6 +205,7 @@ export function EditMilestoneForm({
     })
 
     const formData = {
+        nodeType: form.watch("nodeType"),
         title: form.watch("title"),
         description: form.watch("description"),
         type: form.watch("type"),
@@ -248,6 +252,7 @@ export function EditMilestoneForm({
 
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         const {
+            nodeType,
             title,
             description,
             type,
@@ -265,6 +270,7 @@ export function EditMilestoneForm({
         const now = new Date()
 
         setMilestone(milestoneData?.nodeId, {
+            nodeType,
             title,
             ...(description !== undefined && description !== null
                 ? {description}
@@ -426,6 +432,44 @@ export function EditMilestoneForm({
                     <span className="mr-10">
                         <EditTitle form={form}/>
                     </span>
+
+                    <FormField
+                        control={form.control}
+                        name="nodeType"
+                        render={({field}) => (
+                            <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
+                                <FormLabel
+                                    className="text-2xl font-semibold leading-none tracking-tight">{`Node Type`}</FormLabel>
+                                <FormControl>
+                                    <ToggleGroup
+                                        type="single"
+                                        variant="outline"
+                                        value={field.value}
+                                        onValueChange={
+                                            field.onChange
+                                        }
+                                        className="w-fit flex flex-wrap gap-2 justify-start"
+                                    >
+                                        {NODE_TYPE_OPTIONS.map(({label, value}) => (
+                                            <ToggleGroupItem
+                                                key={value}
+                                                value={value}
+                                            >
+                                                {label}
+                                            </ToggleGroupItem>
+                                        ))}
+                                    </ToggleGroup>
+                                    {/* <Textarea
+                                        id="description"
+                                        placeholder={`Enter a description`}
+                                        defaultValue={field.value}
+                                        {...field}
+                                    /> */}
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
                     <FormField
                         control={form.control}

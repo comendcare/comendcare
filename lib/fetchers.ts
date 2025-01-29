@@ -639,7 +639,8 @@ export async function getMilestoneDetails(id: string) {
                 //     }
                 // },
                 tasks: true,
-                attachments: true
+                attachments: true,
+                node: true
             }
         })
 
@@ -723,7 +724,8 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                         include: {
                             checklist: {orderBy: {orderPosition: 'asc'}}
                         }
-                    }
+                    },
+                    node: true
                 }
             })
 
