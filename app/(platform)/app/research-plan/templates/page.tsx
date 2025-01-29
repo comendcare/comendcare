@@ -20,7 +20,7 @@ export default async function TemplatesPage() {
     const response = await getRoadmapId(orgId);
     if (response.success && typeof response.data === 'string') {
         return (
-            <main className="flex flex-col items-center h-screen mx-auto">
+            <main className="flex flex-col items-center h-full mx-auto">
                <RoadmapTemplates />
             </main>
         )
