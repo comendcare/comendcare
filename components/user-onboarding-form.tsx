@@ -299,7 +299,7 @@ export default function UserOnboardingForm() {
                             form={form}
                             name="image"
                             title={"Profile Image"}
-                            // description={"Your profile image."}
+                            description={"Your profile image."}
                             aspect={1}
                             selectedFile={selectedFile}
                             setSelectedFile={setSelectedFile}
