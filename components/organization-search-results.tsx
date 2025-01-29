@@ -18,6 +18,7 @@ const selector = (state: OrganizationSearchState) => ({
 
 export function OrganizationSearchResults() {
     const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useOrganizationSearchStore(useShallow(selector))
+    console.log(searchResults)
 
     if (!searchResults) return <ComendLoadingSpinner />
 
@@ -36,7 +37,7 @@ export function OrganizationSearchResults() {
         return (
             <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                 {searchResults.map((organization, index) => (
-                    <OrganizationMarketplaceCard organization={organization.document} key={index} />
+                    <OrganizationMarketplaceCard organization={organization} key={index} />
                 ))}
             </div>
         )
