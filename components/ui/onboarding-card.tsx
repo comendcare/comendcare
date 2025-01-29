@@ -88,8 +88,6 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
                 type: 'NOTYPE',
                 nodeId: id,
                 title: `New Milestone`,
-                // papers: [],
-                // tasks: [],
                 status: "PLANNED"
             }
         }

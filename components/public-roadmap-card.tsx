@@ -58,14 +58,16 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
                         <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                             Research Plan
                         </CardTitle>
-                        <Button
-                            variant="ghost"
-                            onClick={() => router.push("/app/research-plan")}
-                            className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
-                        >
-                            Edit research plan
-                            <FaArrowUpRightFromSquare/>
-                        </Button>
+                        {pathname === "/app/profile" &&
+                            <Button
+                                variant="ghost"
+                                onClick={() => router.push("/app/research-plan")}
+                                className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
+                            >
+                                Edit research plan
+                                <FaArrowUpRightFromSquare/>
+                            </Button>
+                        }
                     </div>
                     <TabsList className="w-min">
                         <TabsTrigger value="timeline">

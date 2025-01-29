@@ -1,6 +1,7 @@
 // This seed script is meant to help during development, and not to be used to seed production databases
 import {Organization, PrismaClient} from '@prisma/client'
 import { organizations } from '@/data/sample-pags';
+import { sleep } from '@/lib/utils';
 
 const prisma = new PrismaClient()
 
@@ -296,7 +297,7 @@ const exampleASORoadmap = {
             description: 'Our observational research effort that follows individuals with a specific disease over time, collecting data on how the disease develops and progresses without intervention.',
             type: 'NATURALHISTORYSTUDY',
             startDate: new Date(2019, 1, 1),
-            papers: [],
+            attachments: [],
             tasks: []
         },
         {
@@ -305,7 +306,7 @@ const exampleASORoadmap = {
             type: 'LITERATUREREVIEW',
             startDate: new Date(2020, 5, 12),
             endDate: new Date(2021, 1, 3),
-            papers: [],
+            attachments: [],
             tasks: []
         },
         {
@@ -313,7 +314,7 @@ const exampleASORoadmap = {
             description: 'Research and evaluate lab models.',
             startDate: new Date(2023, 3, 3),
             endDate: new Date(2025, 1, 1),
-            papers: [],
+            attachments: [],
             tasks: []
         },
         {
@@ -321,14 +322,14 @@ const exampleASORoadmap = {
             description: '',
             type: 'MOUSEMODEL',
             startDate: new Date(2024, 5, 5),
-            papers: [],
+            attachments: [],
             tasks: []
         },
         {
             title: 'Construct Patient-Derived Cells',
             description: 'Work with researchers to create cell lines that replicate disease characteristics.',
             type: 'CELLLINE',
-            papers: [],
+            attachments: [],
             startDate: new Date(2026, 1, 1),
             tasks: []
         },
@@ -337,7 +338,7 @@ const exampleASORoadmap = {
             description: 'Design an ASO (Antisense Oligonucleotide) construct that specifically targets the genetic mutations driving our disease.',
             type: 'CONSTRUCTDESIGN',
             startDate: new Date(2027, 1, 1),
-            papers: [],
+            attachments: [],
             tasks: []
         },
         {
@@ -345,7 +346,7 @@ const exampleASORoadmap = {
             description: 'Create a DNA template essential for developing and testing therapies.',
             type: 'PLASMIDPRODUCTION',
             startDate: new Date(2028, 1, 1),
-            papers: [],
+            attachments: [],
             tasks: []
         },
         {
@@ -353,7 +354,7 @@ const exampleASORoadmap = {
             startDate: new Date(2029, 1, 1),
             description: 'Design and conduct initial experiments to demonstrate that a potential therapy or intervention can effectively target the disease.',
             type: 'PROOFOFCONCEPTSTUDY',
-            papers: [],
+            attachments: [],
             tasks: []
         },
         {
@@ -361,7 +362,7 @@ const exampleASORoadmap = {
             startDate: new Date(2030, 1, 1),
             description: 'Conduct preclinical trials to evaluate the safety and potential side effects of a therapy.',
             type: 'TOXICOLOGYSTUDY',
-            papers: [],
+            attachments: [],
             tasks: []
         }
     ]
@@ -434,7 +435,6 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
                                 ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
                                 ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                // papers: milestone.papers || [],
                                 private: milestone.private || false
                             }
                         }
@@ -446,14 +446,15 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                 const newMilestone = await prisma.milestone.findUnique({
                     where: {nodeId: node.id},
                     include: {
-                        papers: true, 
-                        asset: {
-                            include: { contacts: true, attachments: true }
-                        },
-                        RFP: {
-                            include: { contacts: true, attachments: true }
-                        },
-                        tasks: true
+                        attachments: true, 
+                        // asset: {
+                        //     include: { contacts: true, attachments: true }
+                        // },
+                        // RFP: {
+                        //     include: { contacts: true, attachments: true }
+                        // },
+                        tasks: true,
+                        node: true
                     }
                 })
 

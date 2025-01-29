@@ -58,41 +58,42 @@ import {Switch} from "./ui/switch"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
-import {MILESTONE_TYPE_OPTIONS, StatusType} from "@/lib/types"
+import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, StatusType} from "@/lib/types"
 import {Organization, Prisma} from "@prisma/client"
 import {Separator} from "./ui/separator"
-import {AssetEditForm} from "./asset-edit-form"
-import {RFPEditForm} from "./rfp-edit-form"
-import {PapersEditForm} from "./papers-edit-form"
+// import {AssetEditForm} from "./asset-edit-form"
+// import {RFPEditForm} from "./rfp-edit-form"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
 import { getKanbanFromOrganizationId, getOrganizationFromOrganizationId } from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import { useSession } from "next-auth/react"
+import { AttachmentsEditForm } from "./attachments-edit-form"
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 
-type AssetType = Prisma.AssetGetPayload<{
-    omit: { id: true, createdAt: true, updatedAt: true }
-    include: {
-        contacts: {
-            select: { name: true, role: true, email: true }
-        },
-        attachments: {
-            select: { name: true, link: true }
-        }
-    }
-}>
-type RFPType = Prisma.RFPGetPayload<{
-    omit: { id: true, createdAt: true, updatedAt: true, researchFocus: true }
-    include: {
-        contacts: {
-            select: { name: true, role: true, email: true }
-        },
-        attachments: {
-            select: { name: true, link: true }
-        }
-    }
-}>
-type AttachmentType = AssetType['attachments'][0]
+// type AssetType = Prisma.AssetGetPayload<{
+//     omit: { id: true, createdAt: true, updatedAt: true }
+//     include: {
+//         contacts: {
+//             select: { name: true, role: true, email: true }
+//         },
+//         attachments: {
+//             select: { name: true, link: true }
+//         }
+//     }
+// }>
+// type RFPType = Prisma.RFPGetPayload<{
+//     omit: { id: true, createdAt: true, updatedAt: true, researchFocus: true }
+//     include: {
+//         contacts: {
+//             select: { name: true, role: true, email: true }
+//         },
+//         attachments: {
+//             select: { name: true, link: true }
+//         }
+//     }
+// }>
+type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type TaskType = Prisma.TaskGetPayload<{}>
 
 // const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
@@ -146,6 +147,7 @@ export function EditMilestoneForm({
     const {data: session} = useSession()
 
     const editMilestoneForm = z.object({
+        nodeType: z.string(),
         title: z
             .string({
                 required_error: "Please provide a title"
@@ -167,18 +169,19 @@ export function EditMilestoneForm({
             year: z.string().min(4, "Year must be 4 digits").max(4, "Year must be 4 digits").optional()
         }),
         budget: z.number().optional(),
-        papers: z.array(z.custom<AttachmentType>()).optional(),
+        attachments: z.array(z.custom<AttachmentType>()).optional(),
         tasks: z.array(z.custom<TaskType>()).optional(),
         status: z.string(),
         private: z.boolean(),
-        asset: z.custom<AssetType>().optional(),
-        RFP: z.custom<RFPType>().optional()
+        // asset: z.custom<AssetType>().optional(),
+        // RFP: z.custom<RFPType>().optional()
     })
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
+            nodeType: milestoneData?.node.type || "MILESTONE",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
             type: milestoneData?.type || "NOTYPE",
@@ -192,16 +195,17 @@ export function EditMilestoneForm({
                 year: milestoneData?.endDate?.getFullYear()?.toString() || undefined
             },
             budget: milestoneData?.budget || undefined,
-            papers: milestoneData?.papers || undefined,
+            attachments: milestoneData?.attachments || undefined,
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
             status: milestoneData?.status || "PLANNED",
             private: milestoneData?.private || false,
-            asset: milestoneData?.asset || undefined,
-            RFP: milestoneData?.RFP || undefined
+            // asset: milestoneData?.asset || undefined,
+            // RFP: milestoneData?.RFP || undefined
         }
     })
 
     const formData = {
+        nodeType: form.watch("nodeType"),
         title: form.watch("title"),
         description: form.watch("description"),
         type: form.watch("type"),
@@ -209,12 +213,12 @@ export function EditMilestoneForm({
         startDate: form.watch("startDate"),
         endDate: form.watch("endDate"),
         budget: form.watch("budget"),
-        papers: form.watch("papers"),
+        attachments: form.watch("attachments"),
         tasks: form.watch("tasks"),
         status: form.watch("status"),
         isPrivate: form.watch("private"),
-        asset: form.watch("asset"),
-        RFP: form.watch("RFP")
+        // asset: form.watch("asset"),
+        // RFP: form.watch("RFP")
     }
 
     // callback ensures we're not creating a new debounce every time this is called
@@ -248,6 +252,7 @@ export function EditMilestoneForm({
 
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         const {
+            nodeType,
             title,
             description,
             type,
@@ -255,16 +260,17 @@ export function EditMilestoneForm({
             startDate,
             endDate,
             budget,
-            papers,
+            attachments,
             tasks,
             status,
             private: isPrivate,
-            asset,
-            RFP
+            // asset,
+            // RFP
         } = values;
         const now = new Date()
 
         setMilestone(milestoneData?.nodeId, {
+            nodeType,
             title,
             ...(description !== undefined && description !== null
                 ? {description}
@@ -284,8 +290,8 @@ export function EditMilestoneForm({
                 )
             } : undefined),
             ...(budget ? {budget} : undefined),
-            ...(papers
-                    ? {papers}
+            ...(attachments
+                    ? {attachments}
                     : undefined
             ),
             ...(type
@@ -298,8 +304,8 @@ export function EditMilestoneForm({
             ),
             status,
             private: isPrivate || false,
-            asset,
-            RFP
+            // asset,
+            // RFP
         })
 
         setTasks(unionById(tasks || [], kanbanTasks).map(task => {
@@ -346,10 +352,10 @@ export function EditMilestoneForm({
             });
         }
 
-        toast('Success!', {
-            position: "bottom-left",
-            description: 'The changes to your milestone have been successfully saved.'
-        })
+        // toast('Success!', {
+        //     position: "bottom-left",
+        //     description: 'The changes to your milestone have been successfully saved.'
+        // })
     }
 
     const sensors = useSensors(
@@ -426,6 +432,44 @@ export function EditMilestoneForm({
                     <span className="mr-10">
                         <EditTitle form={form}/>
                     </span>
+
+                    <FormField
+                        control={form.control}
+                        name="nodeType"
+                        render={({field}) => (
+                            <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
+                                <FormLabel
+                                    className="text-2xl font-semibold leading-none tracking-tight">{`Node Type`}</FormLabel>
+                                <FormControl>
+                                    <ToggleGroup
+                                        type="single"
+                                        variant="outline"
+                                        value={field.value}
+                                        onValueChange={
+                                            field.onChange
+                                        }
+                                        className="w-fit flex flex-wrap gap-2 justify-start"
+                                    >
+                                        {NODE_TYPE_OPTIONS.map(({label, value}) => (
+                                            <ToggleGroupItem
+                                                key={value}
+                                                value={value}
+                                            >
+                                                {label}
+                                            </ToggleGroupItem>
+                                        ))}
+                                    </ToggleGroup>
+                                    {/* <Textarea
+                                        id="description"
+                                        placeholder={`Enter a description`}
+                                        defaultValue={field.value}
+                                        {...field}
+                                    /> */}
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
                     <FormField
                         control={form.control}
@@ -806,12 +850,12 @@ export function EditMilestoneForm({
 
                     <Separator/>
 
-                    <PapersEditForm
+                    <AttachmentsEditForm
                         form={form}
-                        papers={formData.papers as AttachmentType[]}
+                        attachments={formData.attachments as AttachmentType[]}
                     />
 
-                    <Separator/>
+                    {/* <Separator/>
 
                     <AssetEditForm
                         form={form}
@@ -823,7 +867,7 @@ export function EditMilestoneForm({
                     <RFPEditForm
                         form={form}
                         RFP={formData.RFP as RFPType}
-                    />
+                    /> */}
 
                     <span className="h-4">
 

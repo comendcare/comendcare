@@ -25,7 +25,7 @@ export type PublicMilestoneNode = Node<
         startDate?: Date,
         endDate?: Date,
         budget?: number
-        papers?: string[]
+        attachments?: string[]
         stakeholders?: string[]
         labels?: string[]
         // tasks: TaskType[],

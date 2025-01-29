@@ -2,7 +2,7 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {FaArrowUpRightFromSquare, FaChevronRight, FaPaperclip, FaPen} from "react-icons/fa6";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
 import {
@@ -28,6 +28,7 @@ const environments: Record<Recency, string> = {
 export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { assets: any[], rfps: any[] }) => {
     faker.seed(123)
     const router = useRouter();
+    const pathname = usePathname()
 
     return (
         <Card className="organization-profile-tour-step4">
@@ -35,14 +36,16 @@ export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { ass
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     Milestones
                 </CardTitle>
-                <Button
-                    variant="ghost"
-                    onClick={() => router.push("/app/research-plan")}
-                    className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
-                >
-                    Edit research plan
-                    <FaArrowUpRightFromSquare/>
-                </Button>
+                {pathname === "/app/profile" &&
+                    <Button
+                        variant="ghost"
+                        onClick={() => router.push("/app/research-plan")}
+                        className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
+                    >
+                        Edit research plan
+                        <FaArrowUpRightFromSquare/>
+                    </Button>
+                }
             </CardHeader>
 
             <CardContent className="grid grid-rows-2 md:grid-cols-2 gap-4">
