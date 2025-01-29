@@ -14,6 +14,9 @@ import { useShallow } from "zustand/react/shallow";
 import { nanoid } from "nanoid";
 import type { Node } from "@xyflow/react"
 import ComendLoadingSpinner from "./comend-loading-spinner";
+import { Badge } from "./ui/badge";
+import { NODE_TYPE_OPTIONS } from "@/lib/types";
+import { MilestoneTemplateCard } from "./milestone-template-card";
 
 const selector = (state: RoadmapState) => ({
     addNodes: state.addNodes,
@@ -38,7 +41,7 @@ export default function RoadmapTemplates() {
             const id = nanoid()
             const newNode: Node = {
                 id: id,
-                type: "MILESTONE",
+                type: defaultData?.nodeType || "MILESTONE",
                 position: {
                     x: centerX,
                     y: centerY
@@ -93,26 +96,11 @@ export default function RoadmapTemplates() {
                     <CarouselContent className="overflow-visible p-2">
                         {templateMilestones.map((milestoneData, index) => (
                             <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 2xl:basis-1/4 overflow-visible">
-                                <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
-                                    <CardHeader>
-                                        <CheckBubble data={milestoneData} onCheckedChanged={
-                                            (checked: boolean) => {
-                                                if (checked) {
-                                                    setSelectedMilestones([...selectedMilestones, milestoneData])
-                                                } else {
-                                                    setSelectedMilestones(selectedMilestones.filter(m => (
-                                                        m.title !== milestoneData.title &&
-                                                        m.description !== milestoneData.description
-                                                    )))
-                                                }
-                                            }
-                                        }/>
-                                        <CardTitle>{milestoneData.title}</CardTitle>
-                                        <CardDescription>
-                                            {milestoneData.description}
-                                        </CardDescription>
-                                    </CardHeader>
-                                </Card>
+                                <MilestoneTemplateCard 
+                                    milestoneData={milestoneData}
+                                    selectedMilestones={selectedMilestones}
+                                    setSelectedMilestones={setSelectedMilestones}
+                                />
                             </CarouselItem>
                         ))}
                     </CarouselContent>

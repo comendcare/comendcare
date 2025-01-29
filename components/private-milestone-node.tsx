@@ -71,7 +71,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     return (
         <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", props.selected ? "border-black border-2" : "")}>
             <Badge variant="secondary" className="absolute -mt-4 -ml-4 px-4 py-2 flex text-sm">
-                <p className="text-lg">{NODE_TYPE_OPTIONS.find((option) => (option.value === props.data?.node.type))?.label || "Unknown"}</p>
+                <p className="text-lg">{NODE_TYPE_OPTIONS.find((option) => (option.value === props.data?.node?.type))?.label || "Unknown"}</p>
             </Badge>
             <CardHeader>
                 <div className="-mt-4 -mr-4 h-fit flex flex-row align-center justify-end gap-4">

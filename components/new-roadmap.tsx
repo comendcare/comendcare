@@ -15,6 +15,9 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { toast } from "sonner";
 import { initializeRoadmapState } from "@/lib/initialize-client-state";
+import { Badge } from "./ui/badge";
+import { NODE_TYPE_OPTIONS } from "@/lib/types";
+import { MilestoneTemplateCard } from "./milestone-template-card";
 
 const selector = (state: RoadmapState) => ({
     // initializeRoadmapState: state.initState,
@@ -80,36 +83,11 @@ export default function NewRoadmapForm() {
                     <CarouselContent className="overflow-visible p-2">
                         {templateMilestones.map((milestoneData, index) => (
                             <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 2xl:basis-1/4 overflow-visible">
-                                <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
-                                    <CardHeader>
-                                        <CheckBubble data={milestoneData} onCheckedChanged={
-                                            (checked: boolean) => {
-                                                if (checked) {
-                                                    setSelectedMilestones([...selectedMilestones, milestoneData])
-                                                } else {
-                                                    setSelectedMilestones(selectedMilestones.filter(m => (
-                                                        m.title !== milestoneData.title &&
-                                                        m.description !== milestoneData.description
-                                                    )))
-                                                }
-                                            }
-                                        }/>
-                                        <CardTitle>{milestoneData.title}</CardTitle>
-                                        <CardDescription>
-                                            {milestoneData.description}
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="flex flex-col gap-8 overflow-visible">
-                                        {/* <ul className="flex flex-col gap-2">
-                                            {milestoneData.tasks?.map((task: Task, index) => (
-                                                <li key={index} className="flex flex-row gap-2 items-center">
-                                                    <FaCheck size={20} className="h-4 w-4 text-green-500"/>
-                                                    <p className="grow">{task.name}</p>
-                                                </li>
-                                            ))}
-                                        </ul> */}
-                                    </CardContent>
-                                </Card>
+                                <MilestoneTemplateCard 
+                                    milestoneData={milestoneData}
+                                    selectedMilestones={selectedMilestones}
+                                    setSelectedMilestones={setSelectedMilestones}
+                                />
                             </CarouselItem>
                         ))}
                     </CarouselContent>

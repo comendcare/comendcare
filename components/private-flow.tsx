@@ -38,6 +38,9 @@ import { CheckBubble } from "./check-bubble"
 import { templateMilestones } from "@/lib/templates"
 import { debounce } from "lodash"
 import { CustomEdge } from "./custom-edge"
+import { Badge } from "./ui/badge"
+import { NODE_TYPE_OPTIONS } from "@/lib/types"
+import { MilestoneTemplateCard } from "./milestone-template-card"
 
 const proOptions = { hideAttribution: true }
 
@@ -179,7 +182,7 @@ export const PrivateFlowView = ({
             const id = nanoid()
             const newNode: Node = {
                 id: id,
-                type: "MILESTONE",
+                type: defaultData?.nodeType || "MILESTONE",
                 position: {
                     x: centerX,
                     y: centerY
@@ -347,31 +350,17 @@ export const PrivateFlowView = ({
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="w-full max-h-96 overflow-visible">
-                    <ol className="w-full pr-4 flex flex-col gap-4 overflow-visible pt-2">
+                <ScrollArea className="w-full max-h-[50vh] overflow-visible">
+                    <div className="w-full pr-4 grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-visible pt-2">
                         {templateMilestones.map((milestoneData, index) => (
-                            <li key={index} className="w-full overflow-visible">
-                                <Card className="relative text-left overflow-visible">
-                                    <CardHeader>
-                                        <CheckBubble data={milestoneData} onCheckedChanged={
-                                            (checked: boolean) => {
-                                                if (checked) {
-                                                    setSelectedMilestones([...selectedMilestones, milestoneData])
-                                                } else {
-                                                    setSelectedMilestones(selectedMilestones.filter(m => (
-                                                        m.title !== milestoneData.title &&
-                                                        m.description !== milestoneData.description
-                                                    )))
-                                                }
-                                            }
-                                        }/>
-                                        <CardTitle>{milestoneData.title}</CardTitle>
-                                        <CardDescription>{milestoneData.description}</CardDescription>
-                                    </CardHeader>
-                                </Card>
-                            </li>
+                            <MilestoneTemplateCard 
+                                key={index}
+                                milestoneData={milestoneData}
+                                selectedMilestones={selectedMilestones}
+                                setSelectedMilestones={setSelectedMilestones}
+                            />
                         ))}
-                    </ol>
+                    </div>
                 </ScrollArea>
 
                 <DialogFooter>
