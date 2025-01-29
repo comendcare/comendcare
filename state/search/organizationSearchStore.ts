@@ -97,20 +97,39 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
         };
 
+        // Step 1: Search in TypeSense
         const results = await typesense
             .collections("organizations")
             .documents()
             .search(searchParameters);
 
-        console.log(`search results`, results.hits)
-        if (isNewSearch) return [...(results.hits || [])]           // new search - don't keep previous results
-        return [...state.searchResults, ...(results.hits || [])]    // update search - keep previous results
+        const typeSenseHits = results.hits || [];
+        // @ts-ignore
+        const ids = typeSenseHits.map(hit => hit.document.id);
+
+        if (ids.length === 0) {
+            return isNewSearch ? [] : state.searchResults;
+        }
+
+        // Step 2: Fetch full details from API
+        const prismaResponse = await fetch('/api/organizations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids }),
+        });
+
+        const prismaResults = await prismaResponse.json();
+
+        // Step 3: Merge TypeSense ranking with Prisma data
+        const enrichedResults = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
+
+        return isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults];
 
     } catch (error) {
-        console.error("Search error:", error)
-        return []
+        console.error("Search error:", error);
+        return [];
     }
-}
+};
 
 export interface OrganizationSearchState {
     searchTerm: string,
