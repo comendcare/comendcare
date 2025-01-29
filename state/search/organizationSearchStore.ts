@@ -97,7 +97,6 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
         };
 
-        // Step 1: Search in TypeSense
         const results = await typesense
             .collections("organizations")
             .documents()
@@ -111,7 +110,6 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             return isNewSearch ? [] : state.searchResults;
         }
 
-        // Step 2: Fetch full details from API
         const prismaResponse = await fetch('/api/organizations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -120,7 +118,6 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
 
         const prismaResults = await prismaResponse.json();
 
-        // Step 3: Merge TypeSense ranking with Prisma data
         const enrichedResults = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
 
         return isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults];
