@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaLinkSlash, FaX} from "react-icons/fa6"
+import {FaCalendar, FaLinkSlash, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -54,7 +54,7 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {GripVertical} from "lucide-react"
+import {CalendarIcon, GripVertical} from "lucide-react"
 import {cva} from "class-variance-authority"
 import {Switch} from "./ui/switch"
 import {PrivateBadge} from "./private-badge"
@@ -74,6 +74,10 @@ import { AttachmentsEditForm } from "./attachments-edit-form"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import { ExternalContactField } from "./external-contact-field"
 import { ExternalAttachmentField } from "./external-attachment-field"
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
+import { cn } from "@/lib/utils"
+import { format } from "date-fns"
+import { Calendar } from "./ui/calendar"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -786,6 +790,39 @@ const TimelineFormField = ({
             <FormMessage/>
         </FormItem>
     </span>
+    )
+}
+
+const StartDateFormField = ({form}: {form: any}) => {
+    return (
+        <FormField 
+            control={form.control}
+            name="startDate"
+            render={({field}) => (
+                <Popover >
+                    <PopoverTrigger asChild>
+                        <Button
+                        variant={"outline"}
+                        className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                        )}
+                        >
+                        <FaCalendar className="mr-2 h-4 w-4" />
+                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                        <Calendar
+                            mode="single"
+                            selected={field.value || new Date()}
+                            onSelect={field.onChange}
+                            initialFocus
+                        />
+                    </PopoverContent>
+                </Popover>
+            )}
+        />
     )
 }
 

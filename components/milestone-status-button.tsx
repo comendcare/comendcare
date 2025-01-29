@@ -3,15 +3,18 @@
 import React, { memo, useState } from "react"
 import { Button } from "./ui/button"
 import { StatusType } from "@/lib/types"
+import { cn } from "@/lib/utils"
 
 export default function StatusButton({
     status = "PLANNED",
     disabled = false,
-    onStatusChange
+    onStatusChange,
+    className
 }: {
     status?: StatusType
     disabled?: boolean | undefined
     onStatusChange: (status: StatusType) => void
+    className?: string
 }) {
     const StatusData = {
         PLANNED: {
@@ -43,7 +46,7 @@ export default function StatusButton({
     return (
         <Button
             disabled={disabled}
-            className={`${StatusData[status]?.styling}`}
+            className={cn(`${StatusData[status]?.styling}`, className)}
             onClick={handleStateChange}
         >
             {StatusData[status]?.text}
