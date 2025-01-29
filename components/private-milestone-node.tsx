@@ -70,6 +70,9 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
 
     return (
         <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", props.selected ? "border-black border-2" : "")}>
+            <Badge variant="secondary" className="absolute -mt-4 -ml-4 px-4 py-2 flex text-sm">
+                <p className="text-lg">{NODE_TYPE_OPTIONS.find((option) => (option.value === props.data?.node.type))?.label || "Unknown"}</p>
+            </Badge>
             <CardHeader>
                 <div className="-mt-4 -mr-4 h-fit flex flex-row align-center justify-end gap-4">
                     {props.data?.private && (
@@ -117,12 +120,12 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             </CardHeader>
             <CardContent className="flex flex-col gap-8">
                 <span className="w-full flex">
-                    {/* <Badge className="flex text-sm">
-                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
-                    </Badge> */}
                     <Badge className="flex text-sm">
-                        {NODE_TYPE_OPTIONS.find((option) => (option.value === props.data?.node.type))?.label || "Unknown"}
+                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
                     </Badge>
+                    {/* <Badge className="flex text-sm">
+                        {NODE_TYPE_OPTIONS.find((option) => (option.value === props.data?.node.type))?.label || "Unknown"}
+                    </Badge> */}
                 </span>
                 
                 {(props.data?.startDate && props.data?.endDate && props.data.startDate?.getMonth() || props.data?.endDate?.getFullYear()) && (
