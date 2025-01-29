@@ -16,7 +16,7 @@ import { DateView } from "./miletone-date-view"
 import { PrivateBadge } from "./private-badge"
 import {monthsList} from "@/lib/data";
 import { Badge } from "./ui/badge"
-import { MILESTONE_TYPE_OPTIONS, StatusType } from "@/lib/types"
+import { MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, StatusType } from "@/lib/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { Popover } from "./plate-ui/popover"
@@ -26,6 +26,7 @@ import { useShallow } from "zustand/react/shallow"
 export type PrivateMilestoneNode = Node<
     {
         nodeId: string
+        node: any
         title: string
         description?: string
         type?: string,
@@ -116,8 +117,11 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             </CardHeader>
             <CardContent className="flex flex-col gap-8">
                 <span className="w-full flex">
-                    <Badge className="flex text-sm">
+                    {/* <Badge className="flex text-sm">
                         {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
+                    </Badge> */}
+                    <Badge className="flex text-sm">
+                        {NODE_TYPE_OPTIONS.find((option) => (option.value === props.data?.node.type))?.label || "Unknown"}
                     </Badge>
                 </span>
                 

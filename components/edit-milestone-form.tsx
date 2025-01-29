@@ -352,10 +352,10 @@ export function EditMilestoneForm({
             });
         }
 
-        toast('Success!', {
-            position: "bottom-left",
-            description: 'The changes to your milestone have been successfully saved.'
-        })
+        // toast('Success!', {
+        //     position: "bottom-left",
+        //     description: 'The changes to your milestone have been successfully saved.'
+        // })
     }
 
     const sensors = useSensors(
