@@ -15,6 +15,8 @@ import { useShallow } from "zustand/react/shallow"
 import "@xyflow/react/dist/base.css"
 
 import PrivateMilestoneNode from "@/components/private-milestone-node"
+import PrivateAssetNode from "@/components/private-asset-node"
+import PrivateProjectNode from "@/components/private-project-node"
 import { Button } from "./ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
