@@ -20,7 +20,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import {FaQuestionCircle} from "react-icons/fa";
 import {CalendarDays, Timer} from "lucide-react";
 import {Skeleton} from "@/components/ui/skeleton";
-import {cn, nameToInitials} from "@/lib/utils";
+import {cn, formatMoney, formatNumberWithCommas, nameToInitials} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {FaBuildingNgo, FaCalendar, FaUserPlus, FaUsersViewfinder} from "react-icons/fa6";
 import {Badge} from "@/components/ui/badge";
@@ -333,7 +333,8 @@ export default function ResearchOnboardingForm(
                                         <FormDescription className="flex items-center">
                                             {`What types of genetic effects are you investigating?`}
                                             <Tooltip delayDuration={0}>
-                                                <TooltipTrigger>
+                                                {/*disabled to make the tooltip unclickable*/}
+                                                <TooltipTrigger disabled>
                                                     <FaQuestionCircle
                                                         className="text-black h-4 inline-block align-baseline mx-1"/>
                                                 </TooltipTrigger>
@@ -420,7 +421,8 @@ export default function ResearchOnboardingForm(
                                         <FormDescription className="flex items-center">
                                             {`The treatment modalities of interest of your organization.`}
                                             <Tooltip delayDuration={0}>
-                                                <TooltipTrigger>
+                                                {/*disabled to make the tooltip unclickable*/}
+                                                <TooltipTrigger disabled>
                                                     <FaQuestionCircle
                                                         className="text-black h-4 inline-block align-baseline mx-1"/>
                                                 </TooltipTrigger>
@@ -497,7 +499,9 @@ export default function ResearchOnboardingForm(
                                 name="prevalenceNumerator"
                                 render={({field: numeratorField}) => (
                                     <FormItem>
-                                        <FormLabel>{`Estimated total prevalence`}</FormLabel>
+                                        <FormLabel>
+                                            {`Estimated total prevalence`} - {`${formatNumberWithCommas(numeratorField.value)} in ${formatNumberWithCommas(form.watch("prevalenceDenominator"))}`}
+                                        </FormLabel>
                                         <FormDescription>
                                             {`The estimated global prevalence ratio of your condition.`}
                                         </FormDescription>
@@ -538,7 +542,7 @@ export default function ResearchOnboardingForm(
                                 name="engaged"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Number of patients engaged`}</FormLabel>
+                                        <FormLabel>{`Number of patients engaged`} - {formatNumberWithCommas(field.value)}</FormLabel>
                                         <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
                                         <FormControl>
                                             <Input
@@ -557,7 +561,7 @@ export default function ResearchOnboardingForm(
                                 name="national"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Estimated number of patients in your region`}</FormLabel>
+                                        <FormLabel>{`Estimated number of patients in your region`} - {formatNumberWithCommas(field.value)}</FormLabel>
                                         <FormDescription>{`The estimated number of patients in your country or region of influence.`}</FormDescription>
                                         <FormControl>
                                             <Input
@@ -576,7 +580,7 @@ export default function ResearchOnboardingForm(
                                 name="global"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
+                                        <FormLabel>{`Estimated number of patients in the world`} - {formatNumberWithCommas(field.value)}</FormLabel>
                                         <FormDescription>{`The estimated number of patients in the world.`}</FormDescription>
                                         <FormControl>
                                             <Input
