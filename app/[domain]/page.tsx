@@ -69,12 +69,7 @@ export default async function OrganizationHomePage({
         where: {roadmapId: organization.roadmaps?.[0]?.id},
         include: {
             attachments: true,
-            // asset: {
-            //     include: {contacts: true, attachments: true}
-            // },
-            // RFP: {
-            //     include: {contacts: true, attachments: true}
-            // },
+            contacts: true,
             tasks: {
                 orderBy: {orderPosition: 'asc'},
                 include: {

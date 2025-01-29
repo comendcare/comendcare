@@ -70,30 +70,10 @@ import mixpanel from "mixpanel-browser"
 import { useSession } from "next-auth/react"
 import { AttachmentsEditForm } from "./attachments-edit-form"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
+import { ExternalContactField } from "./external-contact-field"
 
-// type AssetType = Prisma.AssetGetPayload<{
-//     omit: { id: true, createdAt: true, updatedAt: true }
-//     include: {
-//         contacts: {
-//             select: { name: true, role: true, email: true }
-//         },
-//         attachments: {
-//             select: { name: true, link: true }
-//         }
-//     }
-// }>
-// type RFPType = Prisma.RFPGetPayload<{
-//     omit: { id: true, createdAt: true, updatedAt: true, researchFocus: true }
-//     include: {
-//         contacts: {
-//             select: { name: true, role: true, email: true }
-//         },
-//         attachments: {
-//             select: { name: true, link: true }
-//         }
-//     }
-// }>
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
+type ContactType = Prisma.ExternalContactGetPayload<{}>
 type TaskType = Prisma.TaskGetPayload<{}>
 
 // const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
@@ -173,8 +153,7 @@ export function EditMilestoneForm({
         tasks: z.array(z.custom<TaskType>()).optional(),
         status: z.string(),
         private: z.boolean(),
-        // asset: z.custom<AssetType>().optional(),
-        // RFP: z.custom<RFPType>().optional()
+        contacts: z.array(z.custom<any>()).optional()
     })
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -199,8 +178,7 @@ export function EditMilestoneForm({
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
             status: milestoneData?.status || "PLANNED",
             private: milestoneData?.private || false,
-            // asset: milestoneData?.asset || undefined,
-            // RFP: milestoneData?.RFP || undefined
+            contacts: milestoneData?.contacts || undefined
         }
     })
 
@@ -217,8 +195,7 @@ export function EditMilestoneForm({
         tasks: form.watch("tasks"),
         status: form.watch("status"),
         isPrivate: form.watch("private"),
-        // asset: form.watch("asset"),
-        // RFP: form.watch("RFP")
+        contacts: form.watch("contacts")
     }
 
     // callback ensures we're not creating a new debounce every time this is called
@@ -264,8 +241,7 @@ export function EditMilestoneForm({
             tasks,
             status,
             private: isPrivate,
-            // asset,
-            // RFP
+            contacts
         } = values;
         const now = new Date()
 
@@ -304,8 +280,10 @@ export function EditMilestoneForm({
             ),
             status,
             private: isPrivate || false,
-            // asset,
-            // RFP
+            ...(contacts
+                ? {contacts}
+                : undefined
+            )
         })
 
         setTasks(unionById(tasks || [], kanbanTasks).map(task => {
@@ -488,6 +466,49 @@ export function EditMilestoneForm({
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>
+                        )}
+                    />
+
+                    <FormField 
+                        control={form.control}
+                        name="contacts"
+                        render={({field}) => (
+                            <>
+                            {field?.value && field.value.length > 0 && <FormLabel className="text-md">{`Contacts`}</FormLabel>}
+                            {field?.value && field.value.length > 0 && (
+                                <ol className="flex flex-col gap-2">
+                                    {field.value.map((contact: ContactType, index: number) => (
+                                        <ExternalContactField 
+                                            key={index}
+                                            index={index}
+                                            value={contact}
+                                            onDelete={() => {
+                                                form.setValue(
+                                                    "contacts",
+                                                    field?.value?.filter((t: ContactType, i: number) => i !== index)
+                                                )
+                                            }}
+                                            onValueChange={newValue => {
+                                                form.setValue(
+                                                    "contacts",
+                                                    field?.value?.map((currentValue: ContactType, i: number) => i === index ? newValue : currentValue)
+                                                )
+                                            }}
+                                        />
+                                    ))}
+                                </ol>
+                            )}
+                            <Button
+                                variant="secondary"
+                                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                    e.preventDefault()
+                                    form.setValue("contacts", [
+                                        ...(field.value || []),
+                                        { name: "", email: "", role: null }
+                                    ])
+                                }}
+                            >{`Add a contact`}</Button>
+                            </>
                         )}
                     />
 
