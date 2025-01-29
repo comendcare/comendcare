@@ -587,10 +587,10 @@ export default function EditConditionProfileDialog() {
                             name="prevalenceNumerator"
                             render={({field: numeratorField}) => (
                                 <FormItem>
-                                    <FormLabel>{`Estimated total prevalence`}</FormLabel>
-                                    <FormDescription>
-                                        {`The estimated total number of patients in the world.`}
-                                    </FormDescription>
+                                    <FormLabel>{`Estimated global prevalence`}</FormLabel>
+                                    {/*<FormDescription>*/}
+                                    {/*    {`The estimated total number of patients in the world.`}*/}
+                                    {/*</FormDescription>*/}
                                     <FormControl>
                                         <div className="flex flex-row items-end justify-start space-x-2">
                                             <Input
