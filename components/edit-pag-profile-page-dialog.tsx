@@ -42,7 +42,7 @@ import {Slider} from "@/components/ui/slider";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {FaQuestionCircle} from "react-icons/fa";
 import {financesFormSchema} from "@/components/finances-onboarding-form";
-import { researchFormSchema } from "@/components/research-onboarding-form";
+import {researchFormSchema} from "@/components/research-onboarding-form";
 
 const OPTIONS: Option[] = [
     {
@@ -449,10 +449,13 @@ export default function EditPAGProfileDialog() {
                         const fetchedValues = conditions.map((condition) => ({
                             disorder: condition.name || "",
                             summary: condition.summary || "",
-                            categories: condition.diseaseCategories.map((cat) => ({ label: cat, value: cat })) || [],
-                            modalities: condition.interestedModalities.map((mod) => ({ label: mod, value: mod })) || [],
-                            genes: condition.associatedGenes.map((gene) => ({ label: gene, value: gene })) || [],
-                            systems: condition.associatedSystems.map((system) => ({ label: system, value: system })) || [],
+                            categories: condition.diseaseCategories.map((cat) => ({label: cat, value: cat})) || [],
+                            modalities: condition.interestedModalities.map((mod) => ({label: mod, value: mod})) || [],
+                            genes: condition.associatedGenes.map((gene) => ({label: gene, value: gene})) || [],
+                            systems: condition.associatedSystems.map((system) => ({
+                                label: system,
+                                value: system
+                            })) || [],
                             prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
                             prevalenceDenominator: condition.prevalenceDenominator?.toString() || "",
                             engaged: condition.numberOfPatientsEngaged?.toString() || "",
@@ -812,22 +815,22 @@ export default function EditPAGProfileDialog() {
                                         )}
                                     />
 
-                                    <FormImageCropper 
+                                    <FormImageCropper
                                         form={editOrgForm}
                                         name="image"
                                         title={"Organization Logo"}
-                                        description={"This will be used as your organization profile's image."}
+                                        // description={"This will be used as your organization profile's image."}
                                         aspect={1}
                                         selectedFile={selectedFileProfile}
                                         setSelectedFile={setSelectedFileProfile}
                                     />
 
-                                    <FormImageCropper 
+                                    <FormImageCropper
                                         form={editOrgForm}
                                         name="headerImage"
                                         title={"Profile Header"}
                                         description={"This will be used as the header image on your organization's profile. (16x4)"}
-                                        aspect={16/4}
+                                        aspect={16 / 4}
                                         selectedFile={selectedFileHeader}
                                         setSelectedFile={setSelectedFileHeader}
                                         className="rounded h-[100px] w-[400px]"
@@ -1053,10 +1056,10 @@ export default function EditPAGProfileDialog() {
                                         name="prevalenceNumerator"
                                         render={({field: numeratorField}) => (
                                             <FormItem>
-                                                <FormLabel>{`Estimated total prevalence`}</FormLabel>
-                                                <FormDescription>
-                                                    {`The estimated total number of patients in the world.`}
-                                                </FormDescription>
+                                                <FormLabel>{`Estimated global prevalence`}</FormLabel>
+                                                {/*<FormDescription>*/}
+                                                {/*    {`The estimated total number of patients in the world.`}*/}
+                                                {/*</FormDescription>*/}
                                                 <FormControl>
                                                     <div className="flex flex-row items-end justify-start space-x-2">
                                                         <Input
@@ -1388,7 +1391,25 @@ export default function EditPAGProfileDialog() {
     )
 }
 
-export const FormImageCropper = ({ className = "", form, name, title, description, aspect, selectedFile, setSelectedFile }: { className?: string, form: any, name: string, title: string, description: string, aspect: number, selectedFile: FileWithPreview | null, setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>> }) => {
+export const FormImageCropper = ({
+                                     className = "",
+                                     form,
+                                     name,
+                                     title,
+                                     description,
+                                     aspect,
+                                     selectedFile,
+                                     setSelectedFile
+                                 }: {
+    className?: string,
+    form: any,
+    name: string,
+    title: string,
+    description?: string,
+    aspect: number,
+    selectedFile: FileWithPreview | null,
+    setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>
+}) => {
     const [isDialogOpen, setDialogOpen] = useState(false);
 
     const onDrop = useCallback(
@@ -1426,7 +1447,7 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
         []
     );
 
-    const { getRootProps, getInputProps } = useDropzone({
+    const {getRootProps, getInputProps} = useDropzone({
         onDrop: onDrop,
         accept,
     });
@@ -1441,9 +1462,11 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
                     <FormLabel>
                         {title}
                     </FormLabel>
-                    <FormDescription>
-                        {description}
-                    </FormDescription>
+                    {description &&
+                        <FormDescription>
+                            {description}
+                        </FormDescription>
+                    }
                     <FormControl>
                         <div className="flex flex-col items-start space-y-4">
                             {selectedFile ? (
