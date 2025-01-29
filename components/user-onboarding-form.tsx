@@ -232,7 +232,7 @@ export default function UserOnboardingForm() {
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel>Your Name (required)</FormLabel>
-                                    <FormDescription>This is your public display name.</FormDescription>
+                                    {/*<FormDescription>This is your public display name.</FormDescription>*/}
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
@@ -299,7 +299,7 @@ export default function UserOnboardingForm() {
                             form={form}
                             name="image"
                             title={"Profile Image"}
-                            description={"Your profile image."}
+                            // description={"Your profile image."}
                             aspect={1}
                             selectedFile={selectedFile}
                             setSelectedFile={setSelectedFile}

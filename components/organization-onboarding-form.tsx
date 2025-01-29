@@ -465,14 +465,14 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Name (required)`}</FormLabel>
-                                        <div className="w-full flex flex-row justify-between">
-                                            <FormDescription>
-                                                {`The name of your organization.`}
-                                            </FormDescription>
-                                            <FormDescription>
-                                                {`60 characters max.`}
-                                            </FormDescription>
-                                        </div>
+                                        {/*<div className="w-full flex flex-row justify-between">*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        {`The name of your organization.`}*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        {`60 characters max.`}*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*</div>*/}
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -492,7 +492,7 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
-                                        <div className="w-full flex flex-row justify-between">
+                                        {/*<div className="w-full flex flex-row justify-between">*/}
                                             <FormDescription>
                                                 {`Enter your organization’s abbreviated name, short form, or nickname in lowercase.`}
                                                 <br/>
@@ -506,10 +506,10 @@ export default function OrganizationOnboardingForm(
                                                         </>
                                                     )}
                                             </FormDescription>
-                                            <FormDescription>
-                                                50 characters max.
-                                            </FormDescription>
-                                        </div>
+                                        {/*    <FormDescription>*/}
+                                        {/*        50 characters max.*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*</div>*/}
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -571,9 +571,9 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Year Founded</FormLabel>
-                                        <FormDescription>
-                                            Select the year your organization was founded.
-                                        </FormDescription>
+                                        {/*<FormDescription>*/}
+                                        {/*    Select the year your organization was founded.*/}
+                                        {/*</FormDescription>*/}
                                         <Select
                                             onValueChange={(value) => field.onChange(`${value}-01-01`)} // Convert year to a date string
                                             defaultValue={field.value?.split("-")[0]} // Extract the year from the date string for the default value
@@ -605,14 +605,14 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Description (required)</FormLabel>
-                                        <div className="w-full flex flex-row justify-between">
-                                            <FormDescription>
-                                                This will be the public description of your organization.
-                                            </FormDescription>
-                                            <FormDescription>
-                                                500 characters max.
-                                            </FormDescription>
-                                        </div>
+                                        {/*<div className="w-full flex flex-row justify-between">*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        This will be the public description of your organization.*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        500 characters max.*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*</div>*/}
                                         <FormControl>
                                             <Textarea
                                                 placeholder="Tell us a little bit about yourself"
@@ -631,7 +631,7 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem className="space-y-3">
                                         <FormLabel>{`What is your 501c3 status?`}</FormLabel>
-                                        <FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>
+                                        {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
                                         <FormControl>
                                             <RadioGroup
                                                 onValueChange={field.onChange}
@@ -676,9 +676,9 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Patient Group Address</FormLabel>
-                                        <FormDescription>
-                                            {`Your organization's address.`}
-                                        </FormDescription>
+                                        {/*<FormDescription>*/}
+                                        {/*    {`Your organization's address.`}*/}
+                                        {/*</FormDescription>*/}
                                         <FormControl>
                                             <AutocompleteComponent
                                                 address={address}
@@ -692,15 +692,15 @@ export default function OrganizationOnboardingForm(
                                 )}
                             />
 
-                            <FormImageCropper
-                                form={newOrgForm}
-                                name="image"
-                                title={"Organization Logo"}
-                                description={"This will be used as your organization profile's image."}
-                                aspect={1}
-                                selectedFile={selectedFile}
-                                setSelectedFile={setSelectedFile}
-                            />
+                            {/*<FormImageCropper*/}
+                            {/*    form={newOrgForm}*/}
+                            {/*    name="image"*/}
+                            {/*    title={"Organization Logo"}*/}
+                            {/*    description={"This will be used as your organization profile's image."}*/}
+                            {/*    aspect={1}*/}
+                            {/*    selectedFile={selectedFile}*/}
+                            {/*    setSelectedFile={setSelectedFile}*/}
+                            {/*/>*/}
 
                             <FormField
                                 control={newOrgForm.control}

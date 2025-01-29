@@ -222,7 +222,7 @@ export default function UserEditForm() {
                             <FormControl>
                                 <Input type="text" {...field} />
                             </FormControl>
-                            <FormDescription>This is your public display name.</FormDescription>
+                            {/*<FormDescription>This is your public display name.</FormDescription>*/}
                             <FormMessage/>
                         </FormItem>
                     )}

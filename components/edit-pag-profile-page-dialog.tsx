@@ -617,7 +617,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Organization name`}</FormLabel>
-                                                <FormDescription>{`The name of your organization`}</FormDescription>
+                                                {/*<FormDescription>{`The name of your organization`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
                                                         type="text"
@@ -691,9 +691,9 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Year Founded</FormLabel>
-                                                <FormDescription>
-                                                    Select the year your organization was founded.
-                                                </FormDescription>
+                                                {/*<FormDescription>*/}
+                                                {/*    Select the year your organization was founded.*/}
+                                                {/*</FormDescription>*/}
                                                 <Select
                                                     onValueChange={(value) => field.onChange(`${value}-01-01`)} // Convert year to a date string
                                                     defaultValue={field.value?.split("-")[0]} // Extract the year from the date string for the default value
@@ -725,14 +725,14 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Description</FormLabel>
-                                                <div className="w-full flex flex-row justify-between">
-                                                    <FormDescription>
-                                                        This will be the public description of your organization.
-                                                    </FormDescription>
-                                                    <FormDescription>
-                                                        500 characters max.
-                                                    </FormDescription>
-                                                </div>
+                                                {/*<div className="w-full flex flex-row justify-between">*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        This will be the public description of your organization.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        500 characters max.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*</div>*/}
                                                 <FormControl>
                                                     <Textarea
                                                         placeholder="Tell us a little bit about yourself"
@@ -751,7 +751,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem className="space-y-3">
                                                 <FormLabel>{`What is your 501c3 status`}</FormLabel>
-                                                <FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>
+                                                {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <RadioGroup
                                                         onValueChange={field.onChange}
@@ -795,10 +795,10 @@ export default function EditPAGProfileDialog() {
                                         name="formattedAddress"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Address</FormLabel>
-                                                <FormDescription>
-                                                    {`Your organization's address.`}
-                                                </FormDescription>
+                                                <FormLabel>Patient Group Address</FormLabel>
+                                                {/*<FormDescription>*/}
+                                                {/*    {`Your organization's address.`}*/}
+                                                {/*</FormDescription>*/}
                                                 <FormControl>
                                                     <AutocompleteComponent
                                                         address={address}
@@ -875,14 +875,14 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Name of condition`}</FormLabel>
-                                                <div className="w-full flex flex-row justify-between">
-                                                    <FormDescription>
-                                                        {`The name of your rare condition/disorder.`}
-                                                    </FormDescription>
-                                                    <FormDescription>
-                                                        60 characters max.
-                                                    </FormDescription>
-                                                </div>
+                                                {/*<div className="w-full flex flex-row justify-between">*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        {`The name of your rare condition/disorder.`}*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        60 characters max.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*</div>*/}
                                                 <FormControl>
                                                     <Input
                                                         type="text"
@@ -901,14 +901,14 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Summary of condition`}</FormLabel>
-                                                <div className="w-full flex flex-row justify-between">
-                                                    <FormDescription>
-                                                        {`A few lines describing your condition and what makes it unique`}
-                                                    </FormDescription>
-                                                    <FormDescription>
-                                                        500 characters max.
-                                                    </FormDescription>
-                                                </div>
+                                                {/*<div className="w-full flex flex-row justify-between">*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        {`A few lines describing your condition and what makes it unique`}*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        500 characters max.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*</div>*/}
                                                 <FormControl>
                                                     <Textarea
                                                         id="summary"
@@ -926,7 +926,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Associated genes</FormLabel>
-                                                <FormDescription>{`The genes associated with your condition.`}</FormDescription>
+                                                {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
