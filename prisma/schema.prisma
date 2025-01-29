@@ -191,7 +191,7 @@ model Milestone {
   budget           Int?
   endDate          DateTime?
   startDate        DateTime?
-  private          Boolean              @default(false)
+  private          Boolean              @default(true)
   type             String?              @default("NOTYPE")
   otherTypeDetails String?
   openTo           String?
@@ -241,7 +241,7 @@ model Task {
   updatedAt      DateTime          @updatedAt
   endDate        DateTime?
   priority       String?
-  private        Boolean           @default(false)
+  private        Boolean           @default(true)
   startDate      DateTime?
   checklist      ChecklistItem[]
   column         Column            @relation(fields: [columnId], references: [id], onDelete: Cascade)
