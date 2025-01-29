@@ -1492,7 +1492,8 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                         // RFP: {
                         //     include: {contacts: true, attachments: true}
                         // },
-                        tasks: true
+                        tasks: true,
+                        node: true
                     }
                 })
 
@@ -1699,7 +1700,8 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                 // RFP: {
                 //     include: {contacts: true, attachments: true}
                 // },
-                tasks: true
+                tasks: true,
+                node: true
             },
             where: {roadmapId}
         })
@@ -1794,7 +1796,8 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                 // RFP: {
                 //     include: {contacts: true, attachments: true}
                 // },
-                tasks: true
+                tasks: true,
+                node: true
             },
             where: {roadmapId}
         })
@@ -1905,7 +1908,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         // RFP: {
                         //     include: {contacts: true, attachments: true}
                         // },
-                        tasks: true
+                        tasks: true,
+                        node: true
                     }
                 })
 
@@ -1924,7 +1928,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         // RFP: {
                         //     include: {contacts: true, attachments: true}
                         // },
-                        tasks: true
+                        tasks: true,
+                        node: true
                     },
                     data: {
                         title: milestone.title,
@@ -1945,8 +1950,15 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         },
                         status: milestone.status || "PLANNED",
                         private: milestone.private || false,
+                        node: {
+                            update: {
+                                type: milestone.nodeType
+                            }
+                        }
                     }
                 })
+
+                console.log(`updated milestone`, m)
 
                 // // add updated asset, if necessary
                 // let result = await updateAssets(previousMilestone, milestone)

@@ -80,7 +80,8 @@ export default async function OrganizationHomePage({
                 include: {
                     checklist: {orderBy: {orderPosition: 'asc'}}
                 }
-            }
+            },
+            node: true
         }
     })
 

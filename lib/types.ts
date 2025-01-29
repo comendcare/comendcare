@@ -253,6 +253,12 @@ export const MOLECULAR_MECHANISMS: Option[] = [
     },
 ]
 
+export const NODE_TYPE_OPTIONS: Option[] = [
+    { label: 'Asset', value: 'ASSET' },
+    { label: 'Milestone', value: 'MILESTONE' },
+    { label: 'Project', value: 'PROJECT' },
+]
+
 export const MILESTONE_TYPE_OPTIONS: Option[] = [
     { label: 'Basic science', value: 'BASICSCIENCE' },
     { label: 'Functional study', value: 'FUNCTIONALSTUDY' },

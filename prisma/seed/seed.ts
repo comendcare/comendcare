@@ -899,7 +899,8 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                         // RFP: {
                         //     include: { contacts: true, attachments: true }
                         // },
-                        tasks: true
+                        tasks: true,
+                        node: true
                     }
                 })
 
