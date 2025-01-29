@@ -11,7 +11,6 @@ import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {cn, formatMoney, isNewUser, setUserAsReturning} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
-import {PAGProfileResearchPlanCard} from "@/components/pag-profile-research-plan-card";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {getSession} from "@/lib/auth";
 import Image from "next/image"
@@ -22,7 +21,6 @@ import prisma from "@/lib/prisma"
 import {PAGProfileOpenRFPsCard} from "@/components/pag-profile-open-rfps-card";
 import EditPAGProfileDialog from "@/components/edit-pag-profile-page-dialog";
 import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
-import {PAGProfileAssetsAndProjectsCard} from "@/components/pag-profile-assets-and-projects-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "sonner";
@@ -66,22 +64,23 @@ export default async function ProfilePage() {
                     include: {data: true}
                 },
                 edges: true,
-                milestones: {
-                    include: {
-                        asset: {
-                            include: {
-                                contacts: true,
-                                attachments: true
-                            }
-                        },
-                        RFP: {
-                            include: {
-                                contacts: true,
-                                attachments: true
-                            }
-                        }
-                    }
-                }
+                milestones: true
+                // milestones: {
+                //     include: {
+                //         asset: {
+                //             include: {
+                //                 contacts: true,
+                //                 attachments: true
+                //             }
+                //         },
+                //         RFP: {
+                //             include: {
+                //                 contacts: true,
+                //                 attachments: true
+                //             }
+                //         }
+                //     }
+                // }
             }
         })
 
@@ -214,8 +213,10 @@ export default async function ProfilePage() {
                             {/*    </TabsList>*/}
                             {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
                             <PAGProfileAssetsAndProjectsHoverableCard
-                                assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
-                                rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
+                                assets={[]}
+                                rfps={[]}
+                                // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
+                                // rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                             />
                             <PublicRoadmapCard roadmap={roadmaps[0]}
                                                subdomain={organization?.subdomain || undefined}/>

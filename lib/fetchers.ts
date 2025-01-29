@@ -113,20 +113,20 @@ export async function getRoadmapsForOrganization(domain: string) {
                 where: {
                     private: false
                 },
-                include: {
-                    asset: {
-                        include: {
-                            contacts: true,
-                            attachments: true
-                        }
-                    },
-                    RFP: {
-                        include: {
-                            contacts: true,
-                            attachments: true
-                        }
-                    }
-                }
+                // include: {
+                //     asset: {
+                //         include: {
+                //             contacts: true,
+                //             attachments: true
+                //         }
+                //     },
+                //     RFP: {
+                //         include: {
+                //             contacts: true,
+                //             attachments: true
+                //         }
+                //     }
+                // }
             },
         },
         orderBy: [
@@ -448,6 +448,44 @@ export async function getRoadmapId(orgId: string | null | undefined) {
     }
 }
 
+export async function getRoadmap(orgId: string | null | undefined) {
+    if (!orgId) {
+        return {success: false, error: "No organization id provided."};
+    }
+
+    try {
+        const organization = await prisma.organization.findUnique({
+            include: {
+                roadmaps: true
+            },
+            where: {
+                id: decodeURIComponent(orgId)
+            }
+        })
+
+        if (!organization) {
+            return {success: false, error: "organization not found"};
+        }
+
+        const roadmap = await prisma.roadmap.findFirst({
+            where: { organizationId: organization.id },
+            include: {
+                nodes: true,
+                milestones: true,
+                edges: true,
+            }
+        })
+
+        return {
+            success: true,
+            data: organization?.roadmaps && organization?.roadmaps?.length > 0 && roadmap ? roadmap : undefined
+        };
+    } catch (error: any) {
+        logError("Error fetching roadmap", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 export const getOrganizationFromOrganizationId = async (organizationId: string) => {
     try {
         const organization = await prisma.organization.findUnique({
@@ -588,20 +626,21 @@ export async function getMilestoneDetails(id: string) {
         const milestone = await prisma.milestone.findUnique({
             where: {id},
             include: {
-                asset: {
-                    include: {
-                        contacts: true,
-                        attachments: true,
-                    }
-                },
-                RFP: {
-                    include: {
-                        contacts: true,
-                        attachments: true
-                    }
-                },
+                // asset: {
+                //     include: {
+                //         contacts: true,
+                //         attachments: true,
+                //     }
+                // },
+                // RFP: {
+                //     include: {
+                //         contacts: true,
+                //         attachments: true
+                //     }
+                // },
                 tasks: true,
-                papers: true
+                attachments: true,
+                node: true
             }
         })
 
@@ -673,19 +712,20 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
             const dbMilestones = await prisma.milestone.findMany({
                 where: {roadmapId: roadmapId},
                 include: {
-                    papers: true,
-                    asset: {
-                        include: {contacts: true, attachments: true}
-                    },
-                    RFP: {
-                        include: {contacts: true, attachments: true}
-                    },
+                    attachments: true,
+                    // asset: {
+                    //     include: {contacts: true, attachments: true}
+                    // },
+                    // RFP: {
+                    //     include: {contacts: true, attachments: true}
+                    // },
                     tasks: {
                         orderBy: {orderPosition: 'asc'},
                         include: {
                             checklist: {orderBy: {orderPosition: 'asc'}}
                         }
-                    }
+                    },
+                    node: true
                 }
             })
 

@@ -42,7 +42,7 @@ import {Slider} from "@/components/ui/slider";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {FaQuestionCircle} from "react-icons/fa";
 import {financesFormSchema} from "@/components/finances-onboarding-form";
-import { researchFormSchema } from "@/components/research-onboarding-form";
+import {researchFormSchema} from "@/components/research-onboarding-form";
 
 const OPTIONS: Option[] = [
     {
@@ -449,10 +449,13 @@ export default function EditPAGProfileDialog() {
                         const fetchedValues = conditions.map((condition) => ({
                             disorder: condition.name || "",
                             summary: condition.summary || "",
-                            categories: condition.diseaseCategories.map((cat) => ({ label: cat, value: cat })) || [],
-                            modalities: condition.interestedModalities.map((mod) => ({ label: mod, value: mod })) || [],
-                            genes: condition.associatedGenes.map((gene) => ({ label: gene, value: gene })) || [],
-                            systems: condition.associatedSystems.map((system) => ({ label: system, value: system })) || [],
+                            categories: condition.diseaseCategories.map((cat) => ({label: cat, value: cat})) || [],
+                            modalities: condition.interestedModalities.map((mod) => ({label: mod, value: mod})) || [],
+                            genes: condition.associatedGenes.map((gene) => ({label: gene, value: gene})) || [],
+                            systems: condition.associatedSystems.map((system) => ({
+                                label: system,
+                                value: system
+                            })) || [],
                             prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
                             prevalenceDenominator: condition.prevalenceDenominator?.toString() || "",
                             engaged: condition.numberOfPatientsEngaged?.toString() || "",
@@ -617,7 +620,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Organization name`}</FormLabel>
-                                                <FormDescription>{`The name of your organization`}</FormDescription>
+                                                {/*<FormDescription>{`The name of your organization`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
                                                         type="text"
@@ -691,9 +694,9 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Year Founded</FormLabel>
-                                                <FormDescription>
-                                                    Select the year your organization was founded.
-                                                </FormDescription>
+                                                {/*<FormDescription>*/}
+                                                {/*    Select the year your organization was founded.*/}
+                                                {/*</FormDescription>*/}
                                                 <Select
                                                     onValueChange={(value) => field.onChange(`${value}-01-01`)} // Convert year to a date string
                                                     defaultValue={field.value?.split("-")[0]} // Extract the year from the date string for the default value
@@ -725,14 +728,14 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Description</FormLabel>
-                                                <div className="w-full flex flex-row justify-between">
-                                                    <FormDescription>
-                                                        This will be the public description of your organization.
-                                                    </FormDescription>
-                                                    <FormDescription>
-                                                        500 characters max.
-                                                    </FormDescription>
-                                                </div>
+                                                {/*<div className="w-full flex flex-row justify-between">*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        This will be the public description of your organization.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        500 characters max.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*</div>*/}
                                                 <FormControl>
                                                     <Textarea
                                                         placeholder="Tell us a little bit about yourself"
@@ -751,7 +754,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem className="space-y-3">
                                                 <FormLabel>{`What is your 501c3 status`}</FormLabel>
-                                                <FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>
+                                                {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <RadioGroup
                                                         onValueChange={field.onChange}
@@ -795,10 +798,10 @@ export default function EditPAGProfileDialog() {
                                         name="formattedAddress"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Address</FormLabel>
-                                                <FormDescription>
-                                                    {`Your organization's address.`}
-                                                </FormDescription>
+                                                <FormLabel>Patient Group Address</FormLabel>
+                                                {/*<FormDescription>*/}
+                                                {/*    {`Your organization's address.`}*/}
+                                                {/*</FormDescription>*/}
                                                 <FormControl>
                                                     <AutocompleteComponent
                                                         address={address}
@@ -812,22 +815,22 @@ export default function EditPAGProfileDialog() {
                                         )}
                                     />
 
-                                    <FormImageCropper 
+                                    <FormImageCropper
                                         form={editOrgForm}
                                         name="image"
                                         title={"Organization Logo"}
-                                        description={"This will be used as your organization profile's image."}
+                                        // description={"This will be used as your organization profile's image."}
                                         aspect={1}
                                         selectedFile={selectedFileProfile}
                                         setSelectedFile={setSelectedFileProfile}
                                     />
 
-                                    <FormImageCropper 
+                                    <FormImageCropper
                                         form={editOrgForm}
                                         name="headerImage"
                                         title={"Profile Header"}
                                         description={"This will be used as the header image on your organization's profile. (16x4)"}
-                                        aspect={16/4}
+                                        aspect={16 / 4}
                                         selectedFile={selectedFileHeader}
                                         setSelectedFile={setSelectedFileHeader}
                                         className="rounded h-[100px] w-[400px]"
@@ -875,14 +878,14 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Name of condition`}</FormLabel>
-                                                <div className="w-full flex flex-row justify-between">
-                                                    <FormDescription>
-                                                        {`The name of your rare condition/disorder.`}
-                                                    </FormDescription>
-                                                    <FormDescription>
-                                                        60 characters max.
-                                                    </FormDescription>
-                                                </div>
+                                                {/*<div className="w-full flex flex-row justify-between">*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        {`The name of your rare condition/disorder.`}*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        60 characters max.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*</div>*/}
                                                 <FormControl>
                                                     <Input
                                                         type="text"
@@ -901,14 +904,14 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Summary of condition`}</FormLabel>
-                                                <div className="w-full flex flex-row justify-between">
-                                                    <FormDescription>
-                                                        {`A few lines describing your condition and what makes it unique`}
-                                                    </FormDescription>
-                                                    <FormDescription>
-                                                        500 characters max.
-                                                    </FormDescription>
-                                                </div>
+                                                {/*<div className="w-full flex flex-row justify-between">*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        {`A few lines describing your condition and what makes it unique`}*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        500 characters max.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*</div>*/}
                                                 <FormControl>
                                                     <Textarea
                                                         id="summary"
@@ -926,7 +929,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Associated genes</FormLabel>
-                                                <FormDescription>{`The genes associated with your condition.`}</FormDescription>
+                                                {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
@@ -1053,10 +1056,10 @@ export default function EditPAGProfileDialog() {
                                         name="prevalenceNumerator"
                                         render={({field: numeratorField}) => (
                                             <FormItem>
-                                                <FormLabel>{`Estimated total prevalence`}</FormLabel>
-                                                <FormDescription>
-                                                    {`The estimated total number of patients in the world.`}
-                                                </FormDescription>
+                                                <FormLabel>{`Estimated global prevalence`}</FormLabel>
+                                                {/*<FormDescription>*/}
+                                                {/*    {`The estimated total number of patients in the world.`}*/}
+                                                {/*</FormDescription>*/}
                                                 <FormControl>
                                                     <div className="flex flex-row items-end justify-start space-x-2">
                                                         <Input
@@ -1388,7 +1391,25 @@ export default function EditPAGProfileDialog() {
     )
 }
 
-export const FormImageCropper = ({ className = "", form, name, title, description, aspect, selectedFile, setSelectedFile }: { className?: string, form: any, name: string, title: string, description: string, aspect: number, selectedFile: FileWithPreview | null, setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>> }) => {
+export const FormImageCropper = ({
+                                     className = "",
+                                     form,
+                                     name,
+                                     title,
+                                     description,
+                                     aspect,
+                                     selectedFile,
+                                     setSelectedFile
+                                 }: {
+    className?: string,
+    form: any,
+    name: string,
+    title: string,
+    description?: string,
+    aspect: number,
+    selectedFile: FileWithPreview | null,
+    setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>
+}) => {
     const [isDialogOpen, setDialogOpen] = useState(false);
 
     const onDrop = useCallback(
@@ -1426,7 +1447,7 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
         []
     );
 
-    const { getRootProps, getInputProps } = useDropzone({
+    const {getRootProps, getInputProps} = useDropzone({
         onDrop: onDrop,
         accept,
     });
@@ -1441,9 +1462,11 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
                     <FormLabel>
                         {title}
                     </FormLabel>
-                    <FormDescription>
-                        {description}
-                    </FormDescription>
+                    {description &&
+                        <FormDescription>
+                            {description}
+                        </FormDescription>
+                    }
                     <FormControl>
                         <div className="flex flex-col items-start space-y-4">
                             {selectedFile ? (

@@ -16,7 +16,7 @@ import { DateView } from "./miletone-date-view"
 import { PrivateBadge } from "./private-badge"
 import {monthsList} from "@/lib/data";
 import { Badge } from "./ui/badge"
-import { MILESTONE_TYPE_OPTIONS, StatusType } from "@/lib/types"
+import { MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, StatusType } from "@/lib/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { Popover } from "./plate-ui/popover"
@@ -26,13 +26,14 @@ import { useShallow } from "zustand/react/shallow"
 export type PrivateMilestoneNode = Node<
     {
         nodeId: string
+        node: any
         title: string
         description?: string
         type?: string,
         startDate?: Date,
         endDate?: Date,
         budget?: number
-        papers?: string[]
+        attachments?: string[]
         stakeholders?: string[]
         labels?: string[]
         // tasks: TaskType[],
@@ -69,6 +70,9 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
 
     return (
         <Card className={cn("w-[350px]", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", props.selected ? "border-black border-2" : "")}>
+            <Badge variant="secondary" className="absolute -mt-4 -ml-4 px-4 py-2 flex text-sm">
+                <p className="text-lg">{NODE_TYPE_OPTIONS.find((option) => (option.value === props.data?.node?.type))?.label || "Unknown"}</p>
+            </Badge>
             <CardHeader>
                 <div className="-mt-4 -mr-4 h-fit flex flex-row align-center justify-end gap-4">
                     {props.data?.private && (
@@ -119,6 +123,9 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                     <Badge className="flex text-sm">
                         {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
                     </Badge>
+                    {/* <Badge className="flex text-sm">
+                        {NODE_TYPE_OPTIONS.find((option) => (option.value === props.data?.node.type))?.label || "Unknown"}
+                    </Badge> */}
                 </span>
                 
                 {(props.data?.startDate && props.data?.endDate && props.data.startDate?.getMonth() || props.data?.endDate?.getFullYear()) && (
