@@ -210,7 +210,7 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
     )
 }
 
-export const TypeBadge = ({type, iconOnly = false, className}: {type: "PROJECT" | "ASSET" | "RFP", iconOnly?: boolean, className?: string}) => {
+export const TypeBadge = ({type, iconOnly = false, className}: {type: string, iconOnly?: boolean, className?: string}) => {
     if (type === "ASSET") {
         return (
             <Badge variant="outline" className={cn("h-8 text-sm flex gap-2 border-green-500 text-green-800", className)}>
