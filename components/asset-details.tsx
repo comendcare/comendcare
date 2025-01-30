@@ -30,8 +30,14 @@ type AssetType = Prisma.AssetGetPayload<{
 }>
 type ContactType = AssetType['contacts'][0]
 type AttachmentType = AssetType['attachments'][0]
+type MilestoneType = Prisma.MilestoneGetPayload<{
+    include: {
+        node: true,
+        contacts: true
+    }
+}>
 
-export function AssetDetails({ asset }: { asset: AssetType }) {
+export function AssetDetails({ asset }: { asset: MilestoneType }) {
     return (
         <HoverCard
             key={asset?.id}
@@ -47,7 +53,7 @@ export function AssetDetails({ asset }: { asset: AssetType }) {
                         <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
                             <div className="flex items-center gap-x-3">
                                 <h2 className="min-w-0 text-sm font-semibold">
-                                    <span className="truncate">{asset?.name}</span>
+                                    <span className="truncate">{asset?.title}</span>
                                 </h2>
                             </div>
                             {asset?.contacts && asset.contacts.length > 0 ? (
@@ -79,7 +85,7 @@ export function AssetDetails({ asset }: { asset: AssetType }) {
             >
                 <div className="flex justify-between space-x-4">
                     <div className="space-y-1">
-                        <h4 className="text-sm font-semibold">{asset?.name}</h4>
+                        <h4 className="text-sm font-semibold">{asset?.title}</h4>
                         <p className="text-sm">
                             {asset?.description}
                         </p>
@@ -87,57 +93,5 @@ export function AssetDetails({ asset }: { asset: AssetType }) {
                 </div>
             </HoverCardContent>
         </HoverCard>
-
-        // <>
-        //     <Card>
-        //         <CardHeader>
-        //             <CardTitle>{asset.name}</CardTitle>
-        //             <CardDescription>{asset.description}</CardDescription>
-        //         </CardHeader>
-
-        //         <CardContent className="flex flex-col gap-4">
-        //             {asset.contacts && asset.contacts.length > 0 && (
-        //                 <div className="flex flex-col gap-4">
-        //                     <Separator />
-        //                     <h2 className="font-semibold text-xl">{`Contacts`}</h2>
-        //                     <ol>
-        //                         {asset.contacts.map((contact: any, index: number) => (
-        //                             <li>
-        //                                 {/* <a
-        //                                     href={contact.email}
-        //                                     className="flex flex-row gap-2 items-center"
-        //                                 >
-        //                                     {`${index + 1}. ${paper.name || paper.link}`}
-        //                                     <FaArrowUpRightFromSquare size={15} />
-        //                                 </a> */}
-        //                                 {`${index + 1}. ${contact.name || contact.email}`}
-        //                             </li>
-        //                         ))}
-        //                     </ol>
-        //                 </div>
-        //             )}
-
-        //             {asset.attachments && asset.attachments.length > 0 && (
-        //                 <div className="flex flex-col gap-4">
-        //                     <Separator />
-        //                     <h2 className="font-semibold text-xl">{`Attachments`}</h2>
-        //                     <ol>
-        //                         {asset.attachments.map((attachment: any, index: number) => (
-        //                             <li>
-        //                                 <a
-        //                                     href={attachment.link}
-        //                                     className="flex flex-row gap-2 items-center"
-        //                                 >
-        //                                     {`${index + 1}. ${attachment.name || attachment.link}`}
-        //                                     <FaArrowUpRightFromSquare size={15} />
-        //                                 </a>
-        //                             </li>
-        //                         ))}
-        //                     </ol>
-        //                 </div>
-        //             )}
-        //         </CardContent>
-        //     </Card>
-        // </>
     )
 }
