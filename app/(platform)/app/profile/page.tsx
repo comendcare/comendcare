@@ -51,7 +51,7 @@ export default async function ProfilePage() {
         if (response.success) {
             conditions = response.data
         } else {
-            console.error(response.error)
+    console.error(response.error)
         }
     }
 
@@ -64,7 +64,11 @@ export default async function ProfilePage() {
                     include: {data: true}
                 },
                 edges: true,
-                milestones: true
+                milestones: {
+                    include: {
+                        node: true
+                    }
+                }
                 // milestones: {
                 //     include: {
                 //         asset: {
