@@ -13,7 +13,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {toast} from "sonner";
 import {
-    getAllOrganizationsFromUserId,
+    getAllMembershipsFromUserId,
     getInvitations,
     getOrganizationFromOrganizationId,
     getUser
@@ -51,7 +51,7 @@ export default function UserProfilePage() {
         async function fetchOrgData() {
             if (session) {
                 try {
-                    const response = await getAllOrganizationsFromUserId(session.user.id);
+                    const response = await getAllMembershipsFromUserId(session.user.id);
 
                     // Map the response to the correct structure if needed
                     if (response.success) {

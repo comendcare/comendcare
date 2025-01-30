@@ -20,7 +20,6 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar";
-import {Organization} from "@prisma/client";
 import {MemberWithOrganization} from "@/app/(platform)/app/layout";
 import {ProfilePhoto} from "@/components/profile-photo";
 
@@ -38,7 +37,7 @@ export function OrganizationSwitcher({
         if (!memberships || memberships.length === 0) return;
 
         const matchingOrganization = memberships.find(
-            (organization) => organization.id === session?.user?.organizationId
+            (membership) => membership.organization.id === session?.user?.organizationId
         );
         setActiveOrganization(matchingOrganization || memberships[0]);
     }, [memberships, session?.user?.organizationId]);
@@ -51,9 +50,6 @@ export function OrganizationSwitcher({
         });
         router.refresh();
     };
-
-    console.log(memberships)
-    console.log(session?.user.organizationId)
 
     return (
         <SidebarMenu>
