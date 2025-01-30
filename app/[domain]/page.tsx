@@ -114,8 +114,8 @@ export default async function OrganizationHomePage({
                         <div className="md:col-span-4 flex flex-col space-y-4">
                             <PAGProfileAssetsAndRFPsHoverableCard
                                 isPrivate={false}
-                                assets={roadmaps?.[0]?.milestones.filter((milestone) => milestone?.node?.type === "ASSET")}
-                                rfps={roadmaps?.[0]?.milestones.filter((milestone) => milestone?.node?.type === "RFP")}
+                                assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "ASSET")}
+                                rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "RFP")}
                                 // assets={(roadmaps?.[0]?.milestones.filter(milestone => milestone.asset) || []).map(milestone => milestone.asset)}
                                 // rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
                             />
