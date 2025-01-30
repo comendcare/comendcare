@@ -3,7 +3,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {FaArrowUpRightFromSquare, FaChevronRight, FaPaperclip, FaPen, FaPlus} from "react-icons/fa6";
 import {usePathname, useRouter} from "next/navigation";
-import {cn} from "@/lib/utils";
+import {cn, sleep} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
 import {
     Dialog,
@@ -20,6 +20,9 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { nanoid } from "nanoid";
 import { useStoreApi, Node } from "@xyflow/react";
+import { getRoadmap } from "@/lib/fetchers";
+import { useSession } from "next-auth/react";
+import { createRoadmap } from "@/lib/actions";
 
 
 // Define types for statuses and environments
@@ -58,6 +61,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
         addNodes,
         onConnect,
     } = useRoadmapStore(useShallow(selector))
+    const {data: session} = useSession()
 
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
@@ -124,11 +128,31 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                 <Button
                                     className="w-fit"
                                     onClick={async () => {
-                                        const newAsset = await addMilestone("ASSET", "New Asset")
+                                        if (session?.user?.organizationId) {
+                                            const response = await getRoadmap(session.user.organizationId)
+                                            if (response.success && response.data && response.data?.id) {
+                                                const newAsset = await addMilestone("ASSET", "New Asset")
+        
+                                                if (newAsset) {
+                                                    router.push(`/app/research-plan?milestone=${newAsset.id}`)
+                                                    router.refresh()
+                                                }
+                                            } else {
+                                                // no roadmap found, create roadmap first
+                                                const roadmap = await createRoadmap(session.user.organizationId, {
+                                                    title: '',
+                                                    description: '',
+                                                    milestones: [{
+                                                        title: 'New Asset',
+                                                        nodeType: "ASSET"
+                                                    },]
+                                                })
 
-                                        if (newAsset) {
-                                            router.push(`/app/research-plan?milestone=${newAsset.id}`)
-                                            router.refresh()
+                                                if (roadmap && roadmap?.nodes?.[0]?.id) {
+                                                    router.push(`/app/research-plan?milestone=${roadmap.nodes[0].id}`)
+                                                    router.refresh()
+                                                }
+                                            }
                                         }
                                     }}
                                 >
@@ -158,11 +182,31 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                 <Button
                                     className="w-fit"
                                     onClick={async () => {
-                                        const newRFP = await addMilestone("RFP", "New RFP")
+                                        if (session?.user?.organizationId) {
+                                            const response = await getRoadmap(session.user.organizationId)
+                                            if (response.success && response.data && response.data?.id) {
+                                                const newRFP = await addMilestone("RFP", "New RFP")
+        
+                                                if (newRFP) {
+                                                    router.push(`/app/research-plan?milestone=${newRFP.id}`)
+                                                    router.refresh()
+                                                }
+                                            } else {
+                                                // no roadmap found, create roadmap first
+                                                const roadmap = await createRoadmap(session.user.organizationId, {
+                                                    title: '',
+                                                    description: '',
+                                                    milestones: [{
+                                                        title: 'New RFP',
+                                                        nodeType: "RFP"
+                                                    }]
+                                                })
 
-                                        if (newRFP) {
-                                            router.push(`/app/research-plan?milestone=${newRFP.id}`)
-                                            router.refresh()
+                                                if (roadmap && roadmap?.nodes?.[0]?.id) {
+                                                    router.push(`/app/research-plan?milestone=${roadmap.nodes[0].id}`)
+                                                    router.refresh()
+                                                }
+                                            }
                                         }
                                     }}
                                 >
