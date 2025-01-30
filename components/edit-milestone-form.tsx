@@ -748,7 +748,7 @@ const TimelineFormField = ({
                             onChange={(event) => {
                                 console.log(`start date year`, event.target.value)
                                 const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
-                                const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || "0")))
+                                const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
                                 form.setValue('startDate', newStartDate)
                             }}
                         />
@@ -809,7 +809,7 @@ const TimelineFormField = ({
                             onChange={(event) => {
                                 console.log(`start date year`, event.target.value)
                                 const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
-                                const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || "0")))
+                                const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
                                 form.setValue('endDate', newEndDate)
                             }}
                         />
