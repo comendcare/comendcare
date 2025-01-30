@@ -691,6 +691,7 @@ const exampleASORoadmap = {
             title: 'Natural History Study',
             description: 'Our observational research effort that follows individuals with a specific disease over time, collecting data on how the disease develops and progresses without intervention.',
             startDate: new Date(2019, 1, 1),
+            budget: 500000,
             attachments: [],
             tasks: []
         },
@@ -699,6 +700,7 @@ const exampleASORoadmap = {
             description: 'Examine existing research to better understand the disease, identify gaps in knowledge, and assess the latest findings on potential treatments.',
             startDate: new Date(2020, 5, 12),
             endDate: new Date(2021, 1, 3),
+            budget: 150000,
             attachments: [],
             tasks: []
         },
@@ -707,6 +709,7 @@ const exampleASORoadmap = {
             description: 'Research and evaluate lab models.',
             startDate: new Date(2023, 3, 3),
             endDate: new Date(2025, 1, 1),
+            budget: 300000,
             attachments: [],
             tasks: []
         },
@@ -714,20 +717,23 @@ const exampleASORoadmap = {
             title: 'Construct Mouse Models',
             description: '',
             startDate: new Date(2024, 5, 5),
+            budget: 750000,
             attachments: [],
             tasks: []
         },
         {
             title: 'Construct Patient-Derived Cells',
             description: 'Work with researchers to create cell lines that replicate disease characteristics.',
-            attachments: [],
             startDate: new Date(2026, 1, 1),
+            budget: 600000,
+            attachments: [],
             tasks: []
         },
         {
             title: 'Design ASO Construct',
             description: 'Design an ASO (Antisense Oligonucleotide) construct that specifically targets the genetic mutations driving our disease.',
             startDate: new Date(2027, 1, 1),
+            budget: 900000,
             attachments: [],
             tasks: []
         },
@@ -735,6 +741,7 @@ const exampleASORoadmap = {
             title: 'Produce Plasmid',
             description: 'Create a DNA template essential for developing and testing therapies.',
             startDate: new Date(2028, 1, 1),
+            budget: 500000,
             attachments: [],
             tasks: []
         },
@@ -742,6 +749,7 @@ const exampleASORoadmap = {
             title: 'Proof-Of-Concept Study',
             startDate: new Date(2029, 1, 1),
             description: 'Design and conduct initial experiments to demonstrate that a potential therapy or intervention can effectively target the disease.',
+            budget: 1200000,
             attachments: [],
             tasks: []
         },
@@ -749,11 +757,12 @@ const exampleASORoadmap = {
             title: 'Animal Toxicology Study',
             startDate: new Date(2030, 1, 1),
             description: 'Conduct preclinical trials to evaluate the safety and potential side effects of a therapy.',
+            budget: 2000000,
             attachments: [],
             tasks: []
         }
     ]
-}
+};
 
 async function createConditions(organizationIds: string[]) {
     const celocynSyndrome = await prisma.condition.create({

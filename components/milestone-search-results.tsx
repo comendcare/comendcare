@@ -26,7 +26,7 @@ export function MilestoneSearchResults() {
             return (
                 <ol className="w-full flex flex-col gap-4">
                     {searchResults.map((milestone, index) => (
-                        <MilestoneMarketplaceListElement milestone={milestone.document} key={index}/>
+                        <MilestoneMarketplaceListElement milestone={milestone} key={index}/>
                     ))}
                 </ol>
             )
@@ -36,7 +36,7 @@ export function MilestoneSearchResults() {
         return (
             <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                 {searchResults.map((milestone, index) => (
-                    <MilestoneMarketplaceCard milestone={milestone.document} key={index} />
+                    <MilestoneMarketplaceCard milestone={milestone} key={index} />
                 ))}
             </div>
         )
