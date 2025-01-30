@@ -1470,7 +1470,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
                                 ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
                                 ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                private: milestone.private || false
+                                private: milestone.private || true
                             }
                         }
                     }
@@ -1762,7 +1762,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                     }
                                 },
                                 status: node.data?.status || "PLANNED",
-                                private: node.data?.private || false,
+                                private: node.data?.private || true,
                             }
                         }
                     }
@@ -2101,7 +2101,7 @@ export async function createTask(columnId: string) {
                 // date: null,
                 // endDate: null,
                 // priority: null,
-                private: false,
+                private: true,
                 // startDate: null,
                 // checklist: []
             }
