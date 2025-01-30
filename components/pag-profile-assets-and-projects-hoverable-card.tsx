@@ -95,86 +95,88 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
         return newNode
     }
 
-    return (
-        <Card className="organization-profile-tour-step4">
-            <CardHeader className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
-                    Milestones
-                </CardTitle>
-            </CardHeader>
+    if (assets && rfps) {
+        return (
+            <Card className="organization-profile-tour-step4">
+                <CardHeader className="flex flex-col md:flex-row items-center justify-between space-y-0">
+                    <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                        Milestones
+                    </CardTitle>
+                </CardHeader>
 
-            <CardContent className="grid grid-rows-2 md:grid-cols-2 gap-4">
-                <div className="flex flex-col space-y-4">
-                    <h3 className="text-xl tracking-tight font-semibold">
-                        {`Assets`}
-                    </h3>
-                    {assets.length > 0 && (
-                        <ul role="list" className="divide-y">
-                            {faker.helpers.arrayElements(assets, faker.number.int({
-                                min: 2,
-                                max: 5
-                            })).map((asset, index) =>
-                                <AssetDetails key={index} asset={asset}/>
-                            )}
-                        </ul>
-                    )}
-                    {assets.length <= 0 && isPrivate && (
-                        <div className="flex flex-col gap-2">
-                            <Button
-                                className="w-fit"
-                                onClick={async () => {
-                                    const newAsset = await addMilestone("ASSET", "New Asset")
+                <CardContent className="grid grid-rows-2 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col space-y-4">
+                        <h3 className="text-xl tracking-tight font-semibold">
+                            {`Assets`}
+                        </h3>
+                        {assets.length > 0 && (
+                            <ul role="list" className="divide-y">
+                                {faker.helpers.arrayElements(assets, faker.number.int({
+                                    min: 2,
+                                    max: 5
+                                })).map((asset, index) =>
+                                    <AssetDetails key={index} asset={asset}/>
+                                )}
+                            </ul>
+                        )}
+                        {assets.length <= 0 && isPrivate && (
+                            <div className="flex flex-col gap-2">
+                                <Button
+                                    className="w-fit"
+                                    onClick={async () => {
+                                        const newAsset = await addMilestone("ASSET", "New Asset")
 
-                                    if (newAsset) {
-                                        router.push(`/app/research-plan?milestone=${newAsset.id}`)
-                                        router.refresh()
-                                    }
-                                }}
-                            >
-                                <FaPlus />
-                                {`Create an asset`}
-                            </Button>
-                        </div>
-                    )}
-                    {assets.length <= 0 && !isPrivate && (
-                        <p>{`No assets to show`}</p>
-                    )}
-                </div>
+                                        if (newAsset) {
+                                            router.push(`/app/research-plan?milestone=${newAsset.id}`)
+                                            router.refresh()
+                                        }
+                                    }}
+                                >
+                                    <FaPlus />
+                                    {`Create an asset`}
+                                </Button>
+                            </div>
+                        )}
+                        {assets.length <= 0 && !isPrivate && (
+                            <p>{`No assets to show`}</p>
+                        )}
+                    </div>
 
-                <div className="flex flex-col space-y-4">
-                    <h3 className="text-xl tracking-tight font-semibold">
-                        {`RFPs`}
-                    </h3>
-                    {rfps.length > 0 && (
-                        <ul role="list" className="divide-y">
-                            {rfps.map((rfp, index) =>
-                                <RFPDetails key={index} rfp={rfp}/>
-                            )}
-                        </ul>
-                    )}
-                    {rfps.length <= 0 && isPrivate && (
-                        <div className="flex flex-col gap-2">
-                            <Button
-                                className="w-fit"
-                                onClick={async () => {
-                                    const newRFP = await addMilestone("RFP", "New RFP")
+                    <div className="flex flex-col space-y-4">
+                        <h3 className="text-xl tracking-tight font-semibold">
+                            {`RFPs`}
+                        </h3>
+                        {rfps.length > 0 && (
+                            <ul role="list" className="divide-y">
+                                {rfps.map((rfp, index) =>
+                                    <RFPDetails key={index} rfp={rfp}/>
+                                )}
+                            </ul>
+                        )}
+                        {rfps.length <= 0 && isPrivate && (
+                            <div className="flex flex-col gap-2">
+                                <Button
+                                    className="w-fit"
+                                    onClick={async () => {
+                                        const newRFP = await addMilestone("RFP", "New RFP")
 
-                                    if (newRFP) {
-                                        router.push(`/app/research-plan?milestone=${newRFP.id}`)
-                                        router.refresh()
-                                    }
-                                }}
-                            >
-                                <FaPlus />
-                                {`Create a RFP (Request for Proposal)`}
-                            </Button>
-                        </div>
-                    )}
-                    {assets.length <= 0 && !isPrivate && (
-                        <p>{`No RFPs (Requests for Proposal) to show`}</p>
-                    )}
-                </div>
-            </CardContent>
-        </Card>
-    );
+                                        if (newRFP) {
+                                            router.push(`/app/research-plan?milestone=${newRFP.id}`)
+                                            router.refresh()
+                                        }
+                                    }}
+                                >
+                                    <FaPlus />
+                                    {`Create a RFP (Request for Proposal)`}
+                                </Button>
+                            </div>
+                        )}
+                        {assets.length <= 0 && !isPrivate && (
+                            <p>{`No RFPs (Requests for Proposal) to show`}</p>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
 }

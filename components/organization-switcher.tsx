@@ -25,9 +25,9 @@ import {MemberWithOrganization} from "@/app/(platform)/app/layout";
 import {ProfilePhoto} from "@/components/profile-photo";
 
 export function OrganizationSwitcher({
-                                 organizations,
+                                 memberships,
                              }: {
-    organizations: MemberWithOrganization[];
+    memberships: MemberWithOrganization[];
 }) {
     const {isMobile} = useSidebar();
     const router = useRouter();
@@ -35,22 +35,25 @@ export function OrganizationSwitcher({
     const [activeOrganization, setActiveOrganization] = React.useState<MemberWithOrganization | null>(null);
 
     React.useEffect(() => {
-        if (!organizations || organizations.length === 0) return;
+        if (!memberships || memberships.length === 0) return;
 
-        const matchingOrganization = organizations.find(
+        const matchingOrganization = memberships.find(
             (organization) => organization.id === session?.user?.organizationId
         );
-        setActiveOrganization(matchingOrganization || organizations[0]);
-    }, [organizations, session?.user?.organizationId]);
+        setActiveOrganization(matchingOrganization || memberships[0]);
+    }, [memberships, session?.user?.organizationId]);
 
-    const handleOrganizationChange = async (organization: MemberWithOrganization) => {
-        setActiveOrganization(organization);
+    const handleOrganizationChange = async (membership: MemberWithOrganization) => {
+        setActiveOrganization(membership);
         await update({
             ...session,
-            organizationId: organization.id,
+            organizationId: membership.organizationId,
         });
         router.refresh();
     };
+
+    console.log(memberships)
+    console.log(session?.user.organizationId)
 
     return (
         <SidebarMenu>
@@ -87,7 +90,7 @@ export function OrganizationSwitcher({
                         <DropdownMenuLabel className="text-xs text-muted-foreground">
                             Organizations
                         </DropdownMenuLabel>
-                        {organizations.map((organization, index) => (
+                        {memberships.map((organization, index) => (
                             <DropdownMenuItem
                                 key={organization.id}
                                 onClick={() => handleOrganizationChange(organization)}
