@@ -108,7 +108,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                     </CardTitle>
                 </CardHeader>
 
-                <CardContent className="grid grid-rows-2 md:grid-cols-2 gap-4">
+                <CardContent className="grid md:grid-cols-2 gap-4">
                     <div className="flex flex-col space-y-4">
                         <h3 className="text-xl tracking-tight font-semibold">
                             {`Assets`}
