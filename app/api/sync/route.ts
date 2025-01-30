@@ -178,6 +178,13 @@ const syncToTypesense = async (env: {
                     type: "int64"
                 },
                 {
+                    name: "firstConditionPatientsEngaged",  // NEEDED FOR SORTING BY PATIENTS ENGAGED IN MARKETPLACE
+                    type: "int32",
+                    index: true,
+                    sort: true,
+                    store: true
+                },
+                {
                     name: "condition",
                     facet: false,
                     index: true,
@@ -340,12 +347,18 @@ const syncToTypesense = async (env: {
                     where: { id: org.id },
                     include: { condition: {include: {condition: true}}}
                 })
-                
+
+                if (!organization) return null;
+
+                const firstConditionPatientsEngaged = organization.condition?.[0]?.condition?.numberOfPatientsEngaged ?? 0;
+
                 return {
                     ...organization,
-                    // prevalenceRatio: organization?.condition.flatMap(condition => condition.condition?.prevalenceRatio)
+                    firstConditionPatientsEngaged
                 }
             }))
+
+            const validOrganizations = uploadOrgs.filter(Boolean);
 
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', uploadOrgs);
         } else {
