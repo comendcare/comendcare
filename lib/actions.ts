@@ -882,6 +882,8 @@ export async function inviteUser(
             return {success: false, error: "Database error. please try again later."}
         }
 
+        revalidatePath("/app/dashboard")
+
         return {success: true, data: invitation}
     } catch (error: any) {
         console.error("Error inviting user:", error)
