@@ -70,6 +70,8 @@ function generateFiltersString(filters: FiltersType) {
 
 const sortByFilters: { [key: string]: string } = {
     "alphabetical": "title:asc",
+    "last-updated-old-new": "updatedAt:asc",
+    "last-updated-new-old": "updatedAt:desc",
 }
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
