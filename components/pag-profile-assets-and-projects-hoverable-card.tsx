@@ -1,7 +1,7 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
-import {FaArrowUpRightFromSquare, FaChevronRight, FaPaperclip, FaPen} from "react-icons/fa6";
+import {FaArrowUpRightFromSquare, FaChevronRight, FaPaperclip, FaPen, FaPlus} from "react-icons/fa6";
 import {usePathname, useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
@@ -16,6 +16,11 @@ import {
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import { AssetDetails } from "./asset-details";
 import { RFPDetails } from "./rfp-details.tsx";
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
+import { useShallow } from "zustand/react/shallow";
+import { nanoid } from "nanoid";
+import { useStoreApi, Node } from "@xyflow/react";
+
 
 // Define types for statuses and environments
 type Recency = 'Due' | 'New';
@@ -25,10 +30,70 @@ const environments: Record<Recency, string> = {
     New: 'text-green-400 bg-green-400/10 ring-green-400/30',
 };
 
-export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { assets: any[], rfps: any[] }) => {
+const selector = (state: RoadmapState) => ({
+    selectedNodeId: state.selectedNodeId,
+    setSelectedNodeId: state.setSelectedNodeId,
+    milestones: state.milestones,
+    nodes: state.nodes,
+    setNodes: state.setNodes,
+    edges: state.edges,
+    onEdgesChange: state.onEdgesChange,
+    onConnect: state.onConnect,
+    addNodes: state.addNodes,
+})
+
+export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }: { assets: any[], rfps: any[], isPrivate: boolean }) => {
     faker.seed(123)
     const router = useRouter();
     const pathname = usePathname()
+    const store = useStoreApi()
+    const {
+        selectedNodeId,
+        setSelectedNodeId,
+        milestones,
+        nodes,
+        setNodes: setDbNodes,
+        edges,
+        onEdgesChange,
+        addNodes,
+        onConnect,
+    } = useRoadmapStore(useShallow(selector))
+
+    // Add a empty milestone node
+    // if a position is provided, place at the given coordinates
+    // if a position is not provided, place in the center
+    const addMilestone = async (type: "ASSET" | "RFP", title: string) => {
+        // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
+        const {
+            height,
+            width,
+            transform: [transformX, transformY, zoomLevel]
+        } = store.getState()
+
+        const zoomMultiplier = 1 / zoomLevel
+        const centerX =
+            -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+        const centerY =
+            -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+
+        const id = nanoid()
+        const newNode = {
+            id: id,
+            type,
+            position: {
+                x: centerX,
+                y: centerY
+            },
+            data: {
+                id: nanoid(),
+                nodeId: id,
+                title,
+            }
+        }
+
+        await addNodes([newNode])
+        return newNode
+    }
 
     return (
         <Card className="organization-profile-tour-step4">
@@ -36,24 +101,14 @@ export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { ass
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     Milestones
                 </CardTitle>
-                {pathname === "/app/profile" &&
-                    <Button
-                        variant="ghost"
-                        onClick={() => router.push("/app/research-plan")}
-                        className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
-                    >
-                        Edit research plan
-                        <FaArrowUpRightFromSquare/>
-                    </Button>
-                }
             </CardHeader>
 
             <CardContent className="grid grid-rows-2 md:grid-cols-2 gap-4">
                 <div className="flex flex-col space-y-4">
                     <h3 className="text-xl tracking-tight font-semibold">
-                        Assets
+                        {`Assets`}
                     </h3>
-                    {assets.length > 0 ? (
+                    {assets.length > 0 && (
                         <ul role="list" className="divide-y">
                             {faker.helpers.arrayElements(assets, faker.number.int({
                                 min: 2,
@@ -62,28 +117,64 @@ export const PAGProfileAssetsAndProjectsHoverableCard = ({ assets, rfps }: { ass
                                 <AssetDetails key={index} asset={asset}/>
                             )}
                         </ul>
-                    ): (
-                        <p className="text-gray-400">No assets to show.</p>
+                    )}
+                    {assets.length <= 0 && isPrivate && (
+                        <div className="flex flex-col gap-2">
+                            <Button
+                                className="w-fit"
+                                onClick={async () => {
+                                    const newAsset = await addMilestone("ASSET", "New Asset")
+
+                                    if (newAsset) {
+                                        router.push(`/app/research-plan?milestone=${newAsset.id}`)
+                                        router.refresh()
+                                    }
+                                }}
+                            >
+                                <FaPlus />
+                                {`Create an asset`}
+                            </Button>
+                        </div>
+                    )}
+                    {assets.length <= 0 && !isPrivate && (
+                        <p>{`No assets to show`}</p>
                     )}
                 </div>
 
                 <div className="flex flex-col space-y-4">
                     <h3 className="text-xl tracking-tight font-semibold">
-                        Projects
+                        {`RFPs`}
                     </h3>
-                    {rfps.length > 0 ? (
+                    {rfps.length > 0 && (
                         <ul role="list" className="divide-y">
                             {rfps.map((rfp, index) =>
                                 <RFPDetails key={index} rfp={rfp}/>
                             )}
                         </ul>
-                    ): (
-                        <p className="text-gray-400">
-                            No projects to show.
-                        </p>
+                    )}
+                    {rfps.length <= 0 && isPrivate && (
+                        <div className="flex flex-col gap-2">
+                            <Button
+                                className="w-fit"
+                                onClick={async () => {
+                                    const newRFP = await addMilestone("RFP", "New RFP")
+
+                                    if (newRFP) {
+                                        router.push(`/app/research-plan?milestone=${newRFP.id}`)
+                                        router.refresh()
+                                    }
+                                }}
+                            >
+                                <FaPlus />
+                                {`Create a RFP (Request for Proposal)`}
+                            </Button>
+                        </div>
+                    )}
+                    {assets.length <= 0 && !isPrivate && (
+                        <p>{`No RFPs (Requests for Proposal) to show`}</p>
                     )}
                 </div>
             </CardContent>
         </Card>
     );
-};
+}

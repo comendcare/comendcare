@@ -19,14 +19,21 @@ import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hov
 
 type RFPType = Prisma.RFPGetPayload<{}>
 
-const Details = ({ rfp }: { rfp: RFPType }) => {
-    if (rfp.startDate && rfp.funding) {
+type MilestoneType = Prisma.MilestoneGetPayload<{
+    include: {
+        node: true,
+        contacts: true
+    }
+}>
+
+const Details = ({ rfp }: { rfp: MilestoneType }) => {
+    if (rfp.startDate && rfp.budget) {
         return (
-            <p>{rfp.startDate.toDateString()}  &bull; {`$ ${rfp.funding.toLocaleString()} USD`}</p>
+            <p>{rfp.startDate.toDateString()}  &bull; {`$ ${rfp.budget.toLocaleString()} USD`}</p>
         )
-    } else if (rfp.funding) {
+    } else if (rfp.budget) {
         return (
-            <p>{`$ ${rfp.funding.toLocaleString()} USD`}</p>
+            <p>{`$ ${rfp.budget.toLocaleString()} USD`}</p>
         )
     } else if (rfp.startDate) {
         return (
@@ -39,7 +46,7 @@ const Details = ({ rfp }: { rfp: RFPType }) => {
     )
 }
 
-export function RFPDetails({ rfp }: { rfp: RFPType }) {
+export function RFPDetails({ rfp }: { rfp: MilestoneType }) {
     return (
         <HoverCard
             key={rfp?.id}
@@ -55,7 +62,7 @@ export function RFPDetails({ rfp }: { rfp: RFPType }) {
                         <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
                             <div className="flex items-center gap-x-3">
                                 <h2 className="min-w-0 text-sm font-semibold">
-                                    <span className="truncate">{rfp?.name}</span>
+                                    <span className="truncate">{rfp?.title}</span>
                                 </h2>
                             </div>
                             <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap">
@@ -71,7 +78,7 @@ export function RFPDetails({ rfp }: { rfp: RFPType }) {
             >
                 <div className="flex justify-between space-x-4">
                     <div className="space-y-1">
-                        <h4 className="text-sm font-semibold">{rfp?.name}</h4>
+                        <h4 className="text-sm font-semibold">{rfp?.title}</h4>
                         <p className="text-sm">
                             {rfp?.description}
                         </p>

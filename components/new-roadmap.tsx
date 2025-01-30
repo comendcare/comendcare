@@ -68,7 +68,7 @@ export default function NewRoadmapForm() {
                     {`Get going faster with an Asset, Milestone, or Project template`}
                 </h1>
                 <p className="text-muted-foreground">
-                    {`Assets, Milestones, and Projectes are the nodes that make up your Research Plan. We've put together some templates to get you started.`}
+                    {`Assets, Milestones, and Projects are the nodes that make up your Research Plan. We've put together some templates to get you started.`}
                 </p>
             </span>
 
