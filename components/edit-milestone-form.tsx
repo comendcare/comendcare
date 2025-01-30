@@ -60,7 +60,7 @@ import {Switch} from "./ui/switch"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
-import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, StatusType} from "@/lib/types"
+import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
 import {Organization, Prisma} from "@prisma/client"
 import {Separator} from "./ui/separator"
 // import {AssetEditForm} from "./asset-edit-form"
@@ -415,7 +415,7 @@ export function EditMilestoneForm({
                     </Button>
 
                     <FormItem className="w-full flex flex-row gap-4 justify-start items-center">
-                        <FormLabel>Private</FormLabel>
+                        <FormLabel className="mt-2">Private</FormLabel>
                         <PrivatePublicFormField form={form} formData={formData} />
                     </FormItem>
 
@@ -823,6 +823,33 @@ const StartDateFormField = ({form}: {form: any}) => {
                 </Popover>
             )}
         />
+    )
+}
+
+const OpenToFormField = ({form}: {form: any}) => {
+    return (
+        <FormItem className="w-full grid grid-cols-[80px_auto] items-center gap-4">
+            <FormLabel className="text-md">{`Open to`}</FormLabel>
+            <FormField 
+                control={form.control}
+                name="RFP.openTo"
+                render={({field}) => (
+                    <Select
+                        defaultValue={field.value}
+                        onValueChange={field.onChange}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Open to work from..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {RFP_OPEN_TO_TYPE_OPTIONS.map((type, index) => (
+                                <SelectItem key={index} value={type.value}>{type.label}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
+            />
+        </FormItem>
     )
 }
 
