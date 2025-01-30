@@ -15,7 +15,9 @@ export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
 
     return (
         <ol className="relative border-s border-gray-200 dark:border-gray-700 space-y-8">
-            {roadmap?.milestones?.map((item: any, index: number) => (
+            {roadmap?.milestones?.sort((a: any, b: any) => {
+                    return a.startDate - b.startDate
+                }).map((item: any, index: number) => (
                 <a
                     href={
                         subdomain ?
