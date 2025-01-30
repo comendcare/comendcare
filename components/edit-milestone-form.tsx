@@ -486,9 +486,9 @@ export function EditMilestoneForm({
 
                             <Separator/>
 
-                            {/* <TimelineFormField 
+                            <TimelineFormField 
                                 form={form}
-                            /> */}
+                            />
 
                             <Separator />
                         </>
@@ -698,12 +698,17 @@ const TimelineFormField = ({
             <FormLabel className="text-md">{`Start`}</FormLabel>
             <FormField
                 control={form.control}
-                name="startDate.month"
+                name="startDate"
                 render={({field}) => (
                     <FormItem className="h-full grow">
                         <Select
-                            defaultValue={field.value}
-                            onValueChange={field.onChange}
+                            defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
+                            onValueChange={(value) => {
+                                const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                const monthIndex = monthsList.indexOf(value)
+                                const newStartDate: Date = new Date(previousStartDate.setMonth(monthIndex))
+                                form.setValue('startDate', newStartDate)
+                            }}
                         >
                             <FormControl>
                                 <SelectTrigger>
@@ -732,14 +737,20 @@ const TimelineFormField = ({
 
             <FormField
                 control={form.control}
-                name="startDate.year"
+                name="startDate"
                 render={({field}) => (
                     <FormItem className="h-full grow">
                         <Input
                             className="h-full"
                             placeholder="Enter a year..."
-                            defaultValue={field.value}
-                            {...field}
+                            maxLength={4}
+                            defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
+                            onChange={(event) => {
+                                console.log(`start date year`, event.target.value)
+                                const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || "0")))
+                                form.setValue('startDate', newStartDate)
+                            }}
                         />
                     </FormItem>
                 )}
@@ -748,12 +759,17 @@ const TimelineFormField = ({
             <FormLabel className="text-md">{`End`}</FormLabel>
             <FormField
                 control={form.control}
-                name="endDate.month"
+                name="endDate"
                 render={({field}) => (
                     <FormItem className="h-full grow">
                         <Select
-                            defaultValue={field.value}
-                            onValueChange={field.onChange}
+                            defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
+                            onValueChange={(value) => {
+                                const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
+                                const monthIndex = monthsList.indexOf(value)
+                                const newEndDate: Date = new Date(previousEndDate.setMonth(monthIndex))
+                                form.setValue('endDate', newEndDate)
+                            }}
                         >
                             <FormControl>
                                 <SelectTrigger>
@@ -782,14 +798,20 @@ const TimelineFormField = ({
 
             <FormField
                 control={form.control}
-                name="endDate.year"
+                name="endDate"
                 render={({field}) => (
                     <FormItem className="h-full grow">
                         <Input
                             className="h-full"
                             placeholder="Enter a year..."
-                            defaultValue={field.value}
-                            {...field}
+                            maxLength={4}
+                            defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
+                            onChange={(event) => {
+                                console.log(`start date year`, event.target.value)
+                                const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
+                                const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || "0")))
+                                form.setValue('endDate', newEndDate)
+                            }}
                         />
                     </FormItem>
                 )}
