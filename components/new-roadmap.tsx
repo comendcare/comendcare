@@ -32,7 +32,7 @@ export default function NewRoadmapForm() {
     const [selectedRoadmap, setSelectedRoadmap] = useState<any>(undefined)
     const [isLoading, setIsLoading] = useState(false)
     const { setRoadmapId } = useRoadmapStore(useShallow(selector))
-    const [filter, setFilter] = useState("MILESTONE")
+    const [filter, setFilter] = useState("PROJECT")
 
     async function createTemplateRoadmap(roadmapData: any) {
         setIsLoading(true)
@@ -65,10 +65,10 @@ export default function NewRoadmapForm() {
         <div className="w-full h-full flex flex-col justify-left gap-12 p-14">
             <span className="flex flex-col gap-2">
                 <h1 className="text-3xl text-bold text-primary">
-                    {`Get going faster with an Asset, Milestone, or Project template`}
+                    {`Get going faster with an Asset, Project, or RFP (Request for Proposal) template`}
                 </h1>
                 <p className="text-muted-foreground">
-                    {`Assets, Milestones, and Projectes are the nodes that make up your Research Plan. We've put together some templates to get you started.`}
+                    {`Assets, Projects, and RFPs (Requests for Proposal) are the milestones that make up your Research Plan. We've put together some templates to get you started.`}
                 </p>
             </span>
 
@@ -77,8 +77,8 @@ export default function NewRoadmapForm() {
                 <Tabs defaultValue={filter} onValueChange={(value) => setFilter(value)} className="flex-1 flex flex-col min-h-0 items-start">
                     <TabsList>
                         <TabsTrigger value="ASSET">Assets</TabsTrigger>
-                        <TabsTrigger value="MILESTONE">Milestones</TabsTrigger>
                         <TabsTrigger value="PROJECT">Projects</TabsTrigger>
+                        <TabsTrigger value="RFP">{`RFPs (Requests for Proposal)`}</TabsTrigger>
                     </TabsList>
                     {filter === "ASSET" && (
                         // have to hide these due to the flex implementation to get the scroll area working
@@ -86,23 +86,6 @@ export default function NewRoadmapForm() {
                             <ScrollArea className="h-0 flex-1 w-full" type="always">
                                 <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
                                     {templateMilestones.filter((template) => template.nodeType === "ASSET").map((milestoneData, index) => (
-                                        <MilestoneTemplateCard 
-                                            key={index} 
-                                            milestoneData={milestoneData}
-                                            selectedMilestones={selectedMilestones}
-                                            setSelectedMilestones={setSelectedMilestones}
-                                        />
-                                    ))}
-                                </div>
-                            </ScrollArea>
-                        </TabsContent>
-                    )}
-                    {filter === "MILESTONE" && (
-                        // have to hide these due to the flex implementation to get the scroll area working
-                        <TabsContent value="MILESTONE" className="flex-1 flex flex-col min-h-0">
-                            <ScrollArea className="h-0 flex-1 w-full" type="always">
-                                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
-                                    {templateMilestones.filter((template) => template.nodeType === "MILESTONE").map((milestoneData, index) => (
                                         <MilestoneTemplateCard 
                                             key={index} 
                                             milestoneData={milestoneData}
@@ -131,6 +114,23 @@ export default function NewRoadmapForm() {
                             </ScrollArea>
                         </TabsContent>
                     )}
+                    {filter === "RFP" && (
+                        // have to hide these due to the flex implementation to get the scroll area working
+                        <TabsContent value="RFP" className="flex-1 flex flex-col min-h-0">
+                            <ScrollArea className="h-0 flex-1 w-full" type="always">
+                                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                                    {templateMilestones.filter((template) => template.nodeType === "RFP").map((milestoneData, index) => (
+                                        <MilestoneTemplateCard 
+                                            key={index} 
+                                            milestoneData={milestoneData}
+                                            selectedMilestones={selectedMilestones}
+                                            setSelectedMilestones={setSelectedMilestones}
+                                        />
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </TabsContent>
+                    )}
                 </Tabs>
             </div>
 
@@ -146,7 +146,7 @@ export default function NewRoadmapForm() {
                             })
                         }}
                     >
-                        Create a Research Plan with selected nodes
+                        Create a Research Plan with selected milestones
                     </Button>
                 </div>
                 <div className="flex flex-row space-x-2">
@@ -157,7 +157,7 @@ export default function NewRoadmapForm() {
                             milestones: [emptyMilestoneTemplate]
                         })}
                     >
-                        Create an empty node
+                        Create an empty milestone
                     </Button>
                 </div>
             </span>

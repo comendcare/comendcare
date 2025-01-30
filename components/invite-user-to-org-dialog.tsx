@@ -34,6 +34,7 @@ export default function InviteUserToOrgDialog() {
     const router = useRouter()
 
     const [organization, setOrganization] = useState<Organization | null>();
+    const [isOpen, setIsOpen] = useState(false); // Control dialog state
 
     useEffect(() => {
         session.data?.user?.organizationId ? getOrganizationFromOrganizationId(session.data?.user?.organizationId).then((response) => {
@@ -45,7 +46,7 @@ export default function InviteUserToOrgDialog() {
                 toast.error(response.error)
             }
         }) : toast.error("No organizationId provided")
-    }, [setOrganization]);
+    }, [session.data?.user?.organizationId, setOrganization]);
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
@@ -68,6 +69,7 @@ export default function InviteUserToOrgDialog() {
 
             if (response.success) {
                 const invitation = response.data
+                setIsOpen(false)
                 toast.success(`Invitation to ${invitation.email} sent successfully.`)
             } else {
                 console.error(response.error)
@@ -79,7 +81,7 @@ export default function InviteUserToOrgDialog() {
     }
 
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 <Button className="gap-x-2">
                     <FaUserPlus/>
@@ -107,12 +109,12 @@ export default function InviteUserToOrgDialog() {
                                     <FormLabel>
                                         Email
                                     </FormLabel>
-                                    <FormControl>
-                                        <Input type="email" placeholder="example@gmail.com" {...field} />
-                                    </FormControl>
                                     <FormDescription>
                                         The invitation to your organization will be sent here.
                                     </FormDescription>
+                                    <FormControl>
+                                        <Input type="email" placeholder="example@gmail.com" {...field} />
+                                    </FormControl>
                                     <FormMessage/>
                                 </FormItem>
                             )}

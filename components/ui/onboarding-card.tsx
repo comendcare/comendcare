@@ -78,7 +78,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         const id = nanoid()
         const newNode = {
             id: id,
-            type: "MILESTONE",
+            type: "PROJECT",
             position: {
                 x: position ? position?.x : centerX,
                 y: position ? position?.y : centerY

@@ -4,7 +4,6 @@ import BlogCard from "@/components/blog-card"
 import {getRoadmapsForOrganization, getOrganizationData, getConditionsDataFromOrgId} from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
 import {PublicRoadmapCard} from "@/components/public-roadmap-card";
-import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
@@ -23,6 +22,7 @@ import ShareDialog from "@/components/share-dialog";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
 import {Card, CardContent} from "@/components/ui/card";
 import Image from "next/image";
+import { PAGProfileAssetsAndRFPsHoverableCard } from "@/components/pag-profile-assets-and-projects-hoverable-card";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -112,9 +112,10 @@ export default async function OrganizationHomePage({
                         </div>
 
                         <div className="md:col-span-4 flex flex-col space-y-4">
-                            <PAGProfileAssetsAndProjectsHoverableCard
-                                assets={[]}
-                                rfps={[]}
+                            <PAGProfileAssetsAndRFPsHoverableCard
+                                isPrivate={false}
+                                assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "ASSET")}
+                                rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "RFP")}
                                 // assets={(roadmaps?.[0]?.milestones.filter(milestone => milestone.asset) || []).map(milestone => milestone.asset)}
                                 // rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
                             />
