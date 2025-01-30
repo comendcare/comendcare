@@ -1,4 +1,4 @@
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
 import {MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS} from "@/lib/types";
 import {Badge} from "./ui/badge";
@@ -6,25 +6,31 @@ import {DateView} from "./miletone-date-view";
 import {getOrganizationFromOrganizationId, getOrganizationFromRoadmapId} from "@/lib/fetchers";
 import {useEffect, useState} from "react";
 import {FaMoneyBill} from "react-icons/fa6";
+import {formatMoney} from "@/lib/utils";
+import {ProfilePhoto} from "@/components/profile-photo";
+import {Separator} from "@/components/ui/separator";
+import {BookCheck, Paperclip, TestTube, UserCheck} from "lucide-react";
+
+const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
+    PLANNED: {
+        text: "Planned",
+        styling: "bg-red-100 border-red-600 text-red-800 hover-red-400 disabled:opacity-100 hover:bg-red-200"
+    },
+    INPROGRESS: {
+        text: "In Progress",
+        styling: "bg-yellow-100 border-yellow-600 text-yellow-800 disabled:opacity-100 hover:bg-yellow-200"
+    },
+    COMPLETED: {
+        text: "Completed",
+        styling: "bg-green-100 border-green-600 text-green-800 disabled:opacity-100 hover:bg-green-200"
+    }
+};
 
 export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
     const startDate = milestone.startDate ? new Date(milestone.startDate) : undefined
     const endDate = milestone.endDate ? new Date(milestone.endDate) : undefined
     const organization = milestone.organization || {};
     console.log(milestone)
-    // const [organization, setOrganization] = useState<any>()
-    //
-    // useEffect(() => {
-    //     const initOrg = async () => {
-    //         const organizationId = await getOrganizationFromRoadmapId(milestone.roadmapId)
-    //         if (organizationId.success) {
-    //             const response = await getOrganizationFromOrganizationId(organizationId?.data)
-    //             if (response.success) setOrganization(response.data)
-    //         }
-    //     }
-    //
-    //     if (!organization) initOrg()
-    // }, [])
 
     const getLink = () => {
         if (organization?.subdomain) {
@@ -41,53 +47,78 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
     const milestoneType = MILESTONE_TYPE_OPTIONS.find((option) => option.value === milestone.type)?.label;
     const status = MILESTONE_STATUS_OPTIONS.find((option) => option.value === milestone.status)?.label;
 
+    const statusKey = milestone.status as keyof typeof StatusData;
+    const statusStyle = StatusData[statusKey]?.styling || "bg-gray-100 text-gray-800";
+
+
     return (
         <Link
             href={getLink()}
         >
             <Card className="h-full w-full text-left flex flex-col justify-between">
-                <CardHeader>
-                    <CardDescription
-                        className="text-base"
-                    >
-                        {organization?.name}
-                    </CardDescription>
-                    <CardTitle className="text-xl font-normal flex flex-row gap-2 items-center">
-                        {milestone.title}
-                    </CardTitle>
-                    <span className="w-full flex">
-                        {(milestoneType && milestoneType !== "No type") && (
-                            <span className="w-full flex">
-                                <Badge className="flex text-sm">{milestoneType}</Badge>
-                            </span>
-                        )}
-                    </span>
-                    <span className="w-full flex">
-                        {milestoneType && (
-                            <span className="w-full flex">
-                                <div
-                                    className="h-10 px-4 py-2 bg-primary text-primary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-red-100 border-red-600 text-red-800 disabled:opacity-100">{status}</div>
-                            </span>
-                        )}
-                    </span>
-                </CardHeader>
-                <CardContent className="flex flex-col items-start justify-center space-y-4 gap-8">
-                    <div className="line-clamp-3">
-                        {milestone.description}
-                    </div>
+                <div>
+                    <CardHeader>
+                        <div className="space-y-4">
+                            <CardDescription
+                                className="text-base flex flex-row justify-between items-center"
+                            >
+                                {organization?.name}
+                                <ProfilePhoto img={organization?.image} name={organization?.name} className="size-6"/>
+                            </CardDescription>
+                            <Separator className="my-2"/>
+                            <div className="flex flex-row items-center justify-between gap-4">
+                                <CardTitle className="text-xl font-normal flex flex-row items-center gap-2 flex-grow">
+                                    {milestone.title}
+                                </CardTitle>
 
-                    <div className="w-full grid gap-4 grid-cols-2">
-                        {(startDate?.getMonth() || endDate?.getFullYear()) && (
-                            <DateView startDate={startDate} endDate={endDate}/>
-                        )}
+                                {status && (
+                                    <div
+                                        className={`h-8 px-2 py-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 flex-shrink-0 ${statusStyle}`}
+                                    >
+                                        {status}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <span className="w-full flex">
+                            {(milestoneType) && (
+                                <span className="w-full flex">
+                                    <Badge className="flex text-sm">{milestoneType}</Badge>
+                                </span>
+                            )}
+                        </span>
+                    </CardHeader>
+
+                    <CardContent className="flex flex-col items-start justify-center gap-4">
+                        <div className="line-clamp-3">
+                            {milestone.description}
+                        </div>
+
                         {milestone.budget &&
                             <div className="m-0 flex items-center">
                                 <FaMoneyBill className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
-                                {milestone.budget}
+                                {formatMoney(milestone.budget)} budget
                             </div>
                         }
+                    </CardContent>
+                </div>
+
+                <CardFooter className="justify-self-end">
+                    <div className="flex flex-row space-x-2">
+                        {[{icon: Paperclip, label: "3 Attachments"}, {
+                            icon: UserCheck,
+                            label: "2 Contacts"
+                        }].map(({icon: Icon, label}, idx) => (
+                            <div
+                                key={idx}
+                                className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
+                            >
+                                <Icon className="size-4"/>
+                                {label}
+                            </div>
+                        ))}
                     </div>
-                </CardContent>
+                </CardFooter>
             </Card>
         </Link>
     )
