@@ -42,7 +42,7 @@ const Details = ({ rfp }: { rfp: MilestoneType }) => {
     }
 
     return (
-        <p>No details provided for this project</p>
+        <p>No details provided for this RFP</p>
     )
 }
 
