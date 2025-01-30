@@ -210,30 +210,30 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
     )
 }
 
-export const TypeBadge = ({type}: {type: "PROJECT" | "ASSET" | "RFP"}) => {
+export const TypeBadge = ({type, iconOnly = false, className}: {type: "PROJECT" | "ASSET" | "RFP", iconOnly?: boolean, className?: string}) => {
     if (type === "ASSET") {
         return (
-            <Badge variant="outline" className="h-8 text-sm flex gap-2 border-green-500 text-green-800">
+            <Badge variant="outline" className={cn("h-8 text-sm flex gap-2 border-green-500 text-green-800", className)}>
                 <FaStar />
-                {"Asset"}
+                {!iconOnly && "Asset"}
             </Badge>
         )
     }
     
     if (type === "PROJECT") {
         return (
-            <Badge variant="outline" className="h-8 text-sm flex gap-2 border-yellow-500 text-yellow-800">
+            <Badge variant="outline" className={cn("h-8 text-sm flex gap-2 border-yellow-500 text-yellow-800", className)}>
                 <FaFileLines />
-                {"Project"}
+                {!iconOnly && "Project"}
             </Badge>
         )
     }
 
     if (type === "RFP") {
         return (
-            <Badge variant="outline" className="h-8 text-sm flex gap-2 border-red-500 text-red-800">
+            <Badge variant="outline" className={cn("h-8 text-sm flex gap-2 border-red-500 text-red-800", className)}>
                 <FaBullhorn />
-                {"RFP (Request for Proposal)"}
+                {!iconOnly && "RFP (Request for Proposal)"}
             </Badge>
         )
     }
