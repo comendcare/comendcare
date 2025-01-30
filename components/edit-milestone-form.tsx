@@ -139,7 +139,8 @@ const editMilestoneForm = z.object({
     tasks: z.array(z.custom<TaskType>()).optional(),
     status: z.string(),
     private: z.boolean(),
-    contacts: z.array(z.custom<any>()).optional()
+    contacts: z.array(z.custom<any>()).optional(),
+    openTo: z.string().optional(),
 })
 
 export function EditMilestoneForm({
@@ -185,7 +186,8 @@ export function EditMilestoneForm({
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
             status: milestoneData?.status || "PLANNED",
             private: milestoneData?.private || false,
-            contacts: milestoneData?.contacts || undefined
+            contacts: milestoneData?.contacts || undefined,
+            openTo: milestoneData?.openTo || undefined
         }
     })
 
@@ -202,7 +204,8 @@ export function EditMilestoneForm({
         tasks: form.watch("tasks"),
         status: form.watch("status"),
         isPrivate: form.watch("private"),
-        contacts: form.watch("contacts")
+        contacts: form.watch("contacts"),
+        openTo: form.watch("openTo")
     }
 
     // callback ensures we're not creating a new debounce every time this is called
@@ -248,7 +251,8 @@ export function EditMilestoneForm({
             tasks,
             status,
             private: isPrivate,
-            contacts
+            contacts,
+            openTo
         } = values;
         const now = new Date()
 
@@ -289,6 +293,10 @@ export function EditMilestoneForm({
             private: isPrivate || false,
             ...(contacts
                 ? {contacts}
+                : undefined
+            ),
+            ...(openTo
+                ? {openTo}
                 : undefined
             )
         })
@@ -414,14 +422,12 @@ export function EditMilestoneForm({
                         <FaX/>
                     </Button>
 
-                    <FormItem className="w-full flex flex-row gap-4 justify-start items-center">
-                        <FormLabel className="mt-2">Private</FormLabel>
+                    <FormItem className="w-full flex flex-row gap-4 justify-start items-center mr-10">
+                        <FormLabel className="text-md mt-2">Private</FormLabel>
                         <PrivatePublicFormField form={form} formData={formData} />
                     </FormItem>
 
-                    <span className="mr-10">
-                        <EditTitle form={form}/>
-                    </span>
+                    <EditTitle form={form}/>
 
                     <FormField
                         control={form.control}
@@ -496,6 +502,13 @@ export function EditMilestoneForm({
                             />
 
                             <Separator />
+                        </>
+                    )}
+
+                    {milestoneData?.node?.type === "PROJECT" && (
+                        <>
+                        <Separator />
+                        <OpenToFormField form={form}/>
                         </>
                     )}
 
@@ -829,10 +842,10 @@ const StartDateFormField = ({form}: {form: any}) => {
 const OpenToFormField = ({form}: {form: any}) => {
     return (
         <FormItem className="w-full grid grid-cols-[80px_auto] items-center gap-4">
-            <FormLabel className="text-md">{`Open to`}</FormLabel>
+            <FormLabel className="text-md mt-2">{`Open to`}</FormLabel>
             <FormField 
                 control={form.control}
-                name="RFP.openTo"
+                name="openTo"
                 render={({field}) => (
                     <Select
                         defaultValue={field.value}
