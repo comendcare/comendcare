@@ -72,10 +72,10 @@ export default function RoadmapTemplates() {
         <div className="w-full h-full flex flex-col justify-left gap-12 p-14">
             <span className="flex flex-col gap-2">
                 <h1 className="text-3xl font-bold text-primary">
-                    {`Expand your Research Plan faster with an Asset, Milestone, or Project template`}
+                    {`Expand your Research Plan faster with an Asset, Project, or RFP (Request for Proposal) template`}
                 </h1>
                 <p className="text-muted-foreground">
-                    {`Assets, Milestones, and Projects are the nodes that make up your Research Plan. We've put together some templates to get you started.`}
+                    {`Assets, Projects, and RFPs (Requests for Proposal) are the milestones that make up your Research Plan. We've put together some templates to get you started.`}
                 </p>
             </span>
 
@@ -151,7 +151,7 @@ export default function RoadmapTemplates() {
                             router.refresh()
                         }}
                     >
-                        Add selected nodes
+                        Add selected milestones
                     </Button>
                 </div>
                 <div className="flex flex-row space-x-2">
@@ -164,7 +164,7 @@ export default function RoadmapTemplates() {
                             router.refresh()
                         }}
                     >
-                        Add an empty node
+                        Add an empty milestone
                     </Button>
                 </div>
             </span>
