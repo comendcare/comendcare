@@ -500,6 +500,8 @@ export function EditMilestoneForm({
                                 <OpenToFormField form={form}/>
                                 <FormLabel className="text-md mt-2">{`Start Date`}</FormLabel>
                                 <StartDateFormField form={form} />
+                                <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                <BudgetFormField form={form} />
                             </FormItem>
                         </FormItem>
                     )}
