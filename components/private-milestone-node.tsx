@@ -244,52 +244,74 @@ const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode>}) => {
     if (props?.type === "MILESTONE") {
         return (
             <>  
+            <ul className="flex flex-col gap-2 text-sm">
                 {(props.data?.startDate && props.data?.endDate && props.data.startDate?.getMonth() || props.data?.endDate?.getFullYear()) && (
                     <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
                 )}
-                <span className="w-full flex gap-2 flex-wrap">
-                    <Badge className="flex text-sm">
-                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
-                    </Badge>
-                    <StatusButton
-                        className="rounded-full h-8"
-                        disabled={true}
-                        status={props.data.status}
-                        onStatusChange={() => {}}
-                    />
-                </span>
+                {/* {props.data.contacts.map((contact, index) => {
+                    if (contact.name && contact.email) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center break-words">
+                                <FaUser />
+                                {contact.name} &bull; {contact.email}
+                            </li>)
+                    } else if (contact.name) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center break-words">
+                                <FaUser />
+                                {contact.name}
+                            </li>)
+                    } else if (contact.email) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center break-words">
+                                <FaUser />
+                                {contact.email}
+                            </li>)
+                    }
+                })} */}
+            </ul>
+            <span className="w-full flex gap-2 flex-wrap">
+                <Badge className="flex text-sm">
+                    {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
+                </Badge>
+                <StatusButton
+                    className="rounded-full h-8"
+                    disabled={true}
+                    status={props.data.status}
+                    onStatusChange={() => {}}
+                />
+            </span>
             </>
+
         )
     }
 
     if (props?.type === "ASSET") {
         if (props.data?.contacts && props.data.contacts.length > 0) {
             return (
-                <div className={"mt-2 flex items-center gap-x-2.5 text-sm text-wrap"}>
-                    <ul className="flex flex-col gap-2 break-words">
-                        {props.data.contacts.map((contact, index) => {
-                            if (contact.name && contact.email) {
-                                return (
-                                    <li key={index} className="flex gap-2 items-center break-words">
-                                        <FaUser />
-                                        {contact.name} &bull; {contact.email}
-                                    </li>)
-                            } else if (contact.name) {
-                                return (
-                                    <li key={index} className="flex gap-2 items-center break-words">
-                                        <FaUser />
-                                        {contact.name}
-                                    </li>)
-                            } else if (contact.email) {
-                                return (
-                                    <li key={index} className="flex gap-2 items-center break-words">
-                                        <FaUser />
-                                        {contact.email}
-                                    </li>)
-                            }
-                        })}
-                    </ul>
-                </div>
+                <ul className="flex flex-col gap-2 text-sm">
+                    {props.data.contacts.map((contact, index) => {
+                        if (contact.name && contact.email) {
+                            return (
+                                <li key={index} className="flex gap-2 items-center break-words">
+                                    <FaUser />
+                                    {contact.name} &bull; {contact.email}
+                                </li>)
+                        } else if (contact.name) {
+                            return (
+                                <li key={index} className="flex gap-2 items-center break-words">
+                                    <FaUser />
+                                    {contact.name}
+                                </li>)
+                        } else if (contact.email) {
+                            return (
+                                <li key={index} className="flex gap-2 items-center break-words">
+                                    <FaUser />
+                                    {contact.email}
+                                </li>)
+                        }
+                    })}
+                </ul>
             )
         }
 
@@ -298,20 +320,41 @@ const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode>}) => {
 
     if (props?.type === "PROJECT") {
         return (
-            <div className="flex flex-col">
+            <ul className="flex flex-col gap-2 text-sm">
                 {props?.data?.startDate && (
-                    <span className="flex gap-2 items-center">
+                    <li className="flex gap-2 items-center">
                         <FaCalendar />
                         <p>{props?.data.startDate.toDateString()}</p>
-                    </span>
+                    </li>
                 )}
                 {props?.data?.budget && (
-                    <span className="flex gap-2 items-center">
+                    <li className="flex gap-2 items-center">
                         <FaDollarSign />
                         <p>{`${props?.data.budget.toLocaleString()} USD`}</p>
-                    </span>
+                    </li>
                 )}
-            </div>
+                {props.data.contacts.map((contact, index) => {
+                    if (contact.name && contact.email) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center">
+                                <FaUser />
+                                {contact.name} &bull; {contact.email}
+                            </li>)
+                    } else if (contact.name) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center">
+                                <FaUser />
+                                {contact.name}
+                            </li>)
+                    } else if (contact.email) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center">
+                                <FaUser />
+                                {contact.email}
+                            </li>)
+                    }
+                })}
+            </ul>
         )
     }
 

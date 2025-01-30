@@ -61,10 +61,8 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {Organization, Prisma} from "@prisma/client"
+import {Prisma} from "@prisma/client"
 import {Separator} from "./ui/separator"
-// import {AssetEditForm} from "./asset-edit-form"
-// import {RFPEditForm} from "./rfp-edit-form"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
 import { getKanbanFromOrganizationId, getOrganizationFromOrganizationId } from "@/lib/fetchers"
@@ -83,21 +81,7 @@ type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 type TaskType = Prisma.TaskGetPayload<{}>
 
-// const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
-
-// const today = new Date()
-
-// const getYearsList = () => {
-//     const currentYear = today.getFullYear()
-//     let years = []
-
-//     for (let i = currentYear - 100; i <= currentYear + 100; i++) {
-//         years.push(i.toString())
-//     }
-
-//     return years
-// }
 
 const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone
