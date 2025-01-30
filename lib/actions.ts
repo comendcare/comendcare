@@ -882,6 +882,8 @@ export async function inviteUser(
             return {success: false, error: "Database error. please try again later."}
         }
 
+        revalidatePath("/app/dashboard")
+
         return {success: true, data: invitation}
     } catch (error: any) {
         console.error("Error inviting user:", error)
@@ -1456,7 +1458,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 const node = await prisma.node.create({
                     data: {
                         roadmapId: roadmap.id,
-                        type: milestone.nodeType || 'MILESTONE',
+                        type: milestone.nodeType || 'PROJECT',
                         positionX: index * 500,
                         positionY: 0,
                         data: {
@@ -1527,7 +1529,15 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
         }
     }
 
-    return roadmap
+    const finalRoadmap = prisma.roadmap.findUnique({
+        where: { id: roadmap.id },
+        include: {
+            milestones: true,
+            nodes: true
+        }
+    })
+
+    return finalRoadmap
     // const finalRoadmap = await prisma.roadmap.findUnique({
     //     where: { id: roadmap.id },
     //     include: { milestones: true, nodes: true, edges: true }

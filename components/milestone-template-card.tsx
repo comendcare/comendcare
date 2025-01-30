@@ -23,6 +23,7 @@ import { Popover } from "./plate-ui/popover"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { CheckBubble } from "./check-bubble"
+import { TypeBadge } from "./private-milestone-node"
 
 export function MilestoneTemplateCard({ milestoneData, selectedMilestones, setSelectedMilestones }: {milestoneData: any, selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void}) {
     return (
@@ -40,15 +41,13 @@ export function MilestoneTemplateCard({ milestoneData, selectedMilestones, setSe
                         }
                     }
                 }/>
-                <Badge variant="secondary" className="w-fit px-4 py-2 flex text-sm">
-                    <p className="text-lg">{NODE_TYPE_OPTIONS.find((option) => (option.value === milestoneData?.nodeType))?.label || "Unknown"}</p>
-                </Badge>
+                <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestoneData?.nodeType))?.value || "PROJECT"}/>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-2 overflow-visible">
                 <CardTitle>{milestoneData.title}</CardTitle>
                 <CardDescription>
                     {milestoneData.description}
                 </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-8 overflow-visible">
                 {/* <ul className="flex flex-col gap-2">
                     {milestoneData.tasks?.map((task: Task, index) => (
                         <li key={index} className="flex flex-row gap-2 items-center">

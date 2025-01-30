@@ -22,7 +22,7 @@ export default function RoadmapTemplates() {
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const [selectedRoadmap, setSelectedRoadmap] = useState<any>(undefined)
     const [isLoading, setIsLoading] = useState(false)
-    const [filter, setFilter] = useState("MILESTONE")
+    const [filter, setFilter] = useState("PROJECT")
 
     const {
         addNodes,
@@ -37,7 +37,7 @@ export default function RoadmapTemplates() {
             const id = nanoid()
             const newNode: Node = {
                 id: id,
-                type: defaultData?.nodeType || "MILESTONE",
+                type: defaultData?.nodeType || "PROJECT",
                 position: {
                     x: centerX,
                     y: centerY
@@ -72,10 +72,10 @@ export default function RoadmapTemplates() {
         <div className="w-full h-full flex flex-col justify-left gap-12 p-14">
             <span className="flex flex-col gap-2">
                 <h1 className="text-3xl font-bold text-primary">
-                    {`Expand your Research Plan faster with an Asset, Milestone, or Project template`}
+                    {`Expand your Research Plan faster with an Asset, Project, or RFP (Request for Proposal) template`}
                 </h1>
                 <p className="text-muted-foreground">
-                    {`Assets, Milestones, and Projects are the nodes that make up your Research Plan. We've put together some templates to get you started.`}
+                    {`Assets, Projects, and RFPs (Requests for Proposal) are the milestones that make up your Research Plan. We've put together some templates to get you started.`}
                 </p>
             </span>
 
@@ -83,8 +83,8 @@ export default function RoadmapTemplates() {
                 <Tabs defaultValue={filter} onValueChange={(value) => setFilter(value)} className="flex-1 flex flex-col min-h-0 items-start">
                     <TabsList>
                         <TabsTrigger value="ASSET">Assets</TabsTrigger>
-                        <TabsTrigger value="MILESTONE">Milestones</TabsTrigger>
                         <TabsTrigger value="PROJECT">Projects</TabsTrigger>
+                        <TabsTrigger value="RFP">{`RFPs (Requests for Proposal)`}</TabsTrigger>
                     </TabsList>
                     {filter === "ASSET" && (
                         // have to hide these due to the flex implementation to get the scroll area working
@@ -92,23 +92,6 @@ export default function RoadmapTemplates() {
                             <ScrollArea className="h-0 flex-1 w-full" type="always">
                                 <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
                                     {templateMilestones.filter((template) => template.nodeType === "ASSET").map((milestoneData, index) => (
-                                        <MilestoneTemplateCard 
-                                            key={index} 
-                                            milestoneData={milestoneData}
-                                            selectedMilestones={selectedMilestones}
-                                            setSelectedMilestones={setSelectedMilestones}
-                                        />
-                                    ))}
-                                </div>
-                            </ScrollArea>
-                        </TabsContent>
-                    )}
-                    {filter === "MILESTONE" && (
-                        // have to hide these due to the flex implementation to get the scroll area working
-                        <TabsContent value="MILESTONE" className="flex-1 flex flex-col min-h-0">
-                            <ScrollArea className="h-0 flex-1 w-full" type="always">
-                                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
-                                    {templateMilestones.filter((template) => template.nodeType === "MILESTONE").map((milestoneData, index) => (
                                         <MilestoneTemplateCard 
                                             key={index} 
                                             milestoneData={milestoneData}
@@ -137,6 +120,23 @@ export default function RoadmapTemplates() {
                             </ScrollArea>
                         </TabsContent>
                     )}
+                    {filter === "RFP" && (
+                        // have to hide these due to the flex implementation to get the scroll area working
+                        <TabsContent value="RFP" className="flex-1 flex flex-col min-h-0">
+                            <ScrollArea className="h-0 flex-1 w-full" type="always">
+                                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                                    {templateMilestones.filter((template) => template.nodeType === "RFP").map((milestoneData, index) => (
+                                        <MilestoneTemplateCard 
+                                            key={index} 
+                                            milestoneData={milestoneData}
+                                            selectedMilestones={selectedMilestones}
+                                            setSelectedMilestones={setSelectedMilestones}
+                                        />
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </TabsContent>
+                    )}
                 </Tabs>
             </div>
 
@@ -148,9 +148,10 @@ export default function RoadmapTemplates() {
                             setIsLoading(true)
                             await addMilestones(selectedMilestones)
                             router.push('/app/research-plan')
+                            router.refresh()
                         }}
                     >
-                        Add selected nodes
+                        Add selected milestones
                     </Button>
                 </div>
                 <div className="flex flex-row space-x-2">
@@ -160,9 +161,10 @@ export default function RoadmapTemplates() {
                             setIsLoading(true)
                             await addMilestones([{name: 'New Milestone'}])
                             router.push('/app/research-plan')
+                            router.refresh()
                         }}
                     >
-                        Add an empty node
+                        Add an empty milestone
                     </Button>
                 </div>
             </span>

@@ -24,7 +24,7 @@ import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/l
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "sonner";
-import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
+import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {PublicRoadmapCard} from "@/components/public-roadmap-card";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
@@ -51,7 +51,7 @@ export default async function ProfilePage() {
         if (response.success) {
             conditions = response.data
         } else {
-            console.error(response.error)
+    console.error(response.error)
         }
     }
 
@@ -64,23 +64,12 @@ export default async function ProfilePage() {
                     include: {data: true}
                 },
                 edges: true,
-                milestones: true
-                // milestones: {
-                //     include: {
-                //         asset: {
-                //             include: {
-                //                 contacts: true,
-                //                 attachments: true
-                //             }
-                //         },
-                //         RFP: {
-                //             include: {
-                //                 contacts: true,
-                //                 attachments: true
-                //             }
-                //         }
-                //     }
-                // }
+                milestones: {
+                    include: {
+                        node: true,
+                        contacts: true
+                    }
+                }
             }
         })
 
@@ -212,9 +201,10 @@ export default async function ProfilePage() {
                             {/*        </TabsTrigger>*/}
                             {/*    </TabsList>*/}
                             {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
-                            <PAGProfileAssetsAndProjectsHoverableCard
-                                assets={[]}
-                                rfps={[]}
+                            <PAGProfileAssetsAndRFPsHoverableCard
+                                isPrivate={true}
+                                assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "ASSET")}
+                                rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "RFP")}
                                 // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
                                 // rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                             />

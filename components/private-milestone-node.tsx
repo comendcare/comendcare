@@ -22,6 +22,7 @@ import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { Popover } from "./plate-ui/popover"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
+import { PublicMilestoneNode } from "./public-milestone-node"
 
 export type PrivateMilestoneNode = Node<
     {
@@ -48,7 +49,7 @@ export type PrivateMilestoneNode = Node<
         private: boolean,
         contacts: any[]
     },
-    "MILESTONE" | "ASSET" | "PROJECT"
+    "PROJECT" | "ASSET" | "RFP"
 >
 
 export interface TaskType {
@@ -209,30 +210,30 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
     )
 }
 
-const TypeBadge = ({type}: {type: "MILESTONE" | "ASSET" | "PROJECT"}) => {
+export const TypeBadge = ({type, iconOnly = false, className}: {type: string, iconOnly?: boolean, className?: string}) => {
     if (type === "ASSET") {
         return (
-            <Badge variant="outline" className="h-8 text-sm flex gap-2 border-green-500 text-green-800">
+            <Badge variant="outline" className={cn("h-8 text-sm flex gap-2 border-green-500 text-green-800", className)}>
                 <FaStar />
-                {"Asset"}
+                {!iconOnly && "Asset"}
             </Badge>
         )
     }
     
-    if (type === "MILESTONE") {
+    if (type === "PROJECT") {
         return (
-            <Badge variant="outline" className="h-8 text-sm flex gap-2 border-yellow-500 text-yellow-800">
+            <Badge variant="outline" className={cn("h-8 text-sm flex gap-2 border-yellow-500 text-yellow-800", className)}>
                 <FaFileLines />
-                {"Milestone"}
+                {!iconOnly && "Project"}
             </Badge>
         )
     }
 
-    if (type === "PROJECT") {
+    if (type === "RFP") {
         return (
-            <Badge variant="outline" className="h-8 text-sm flex gap-2 border-red-500 text-red-800">
+            <Badge variant="outline" className={cn("h-8 text-sm flex gap-2 border-red-500 text-red-800", className)}>
                 <FaBullhorn />
-                {"Project"}
+                {!iconOnly && "RFP (Request for Proposal)"}
             </Badge>
         )
     }
@@ -240,78 +241,121 @@ const TypeBadge = ({type}: {type: "MILESTONE" | "ASSET" | "PROJECT"}) => {
     return
 }
 
-const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode>}) => {
-    if (props?.type === "MILESTONE") {
+export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | PublicMilestoneNode>}) => {
+    if (props?.type === "PROJECT") {
         return (
             <>  
+            <ul className="flex flex-col gap-2 text-sm">
                 {(props.data?.startDate && props.data?.endDate && props.data.startDate?.getMonth() || props.data?.endDate?.getFullYear()) && (
                     <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
                 )}
-                <span className="w-full flex gap-2 flex-wrap">
-                    <Badge className="flex text-sm">
-                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
-                    </Badge>
-                    <StatusButton
-                        className="rounded-full h-8"
-                        disabled={true}
-                        status={props.data.status}
-                        onStatusChange={() => {}}
-                    />
-                </span>
+                {/* {props.data.contacts.map((contact, index) => {
+                    if (contact.name && contact.email) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center break-words">
+                                <FaUser />
+                                {contact.name} &bull; {contact.email}
+                            </li>)
+                    } else if (contact.name) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center break-words">
+                                <FaUser />
+                                {contact.name}
+                            </li>)
+                    } else if (contact.email) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center break-words">
+                                <FaUser />
+                                {contact.email}
+                            </li>)
+                    }
+                })} */}
+            </ul>
+            <span className="w-full flex gap-2 flex-wrap">
+                <Badge className="flex text-sm">
+                    {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
+                </Badge>
+                <StatusButton
+                    className="rounded-full h-8"
+                    disabled={true}
+                    status={props.data.status}
+                    onStatusChange={() => {}}
+                />
+            </span>
             </>
+
         )
     }
 
     if (props?.type === "ASSET") {
         if (props.data?.contacts && props.data.contacts.length > 0) {
             return (
-                <div className={"mt-2 flex items-center gap-x-2.5 text-sm text-wrap"}>
-                    <ul className="flex flex-col gap-2 break-words">
-                        {props.data.contacts.map((contact, index) => {
-                            if (contact.name && contact.email) {
-                                return (
-                                    <li key={index} className="flex gap-2 items-center break-words">
-                                        <FaUser />
-                                        {contact.name} &bull; {contact.email}
-                                    </li>)
-                            } else if (contact.name) {
-                                return (
-                                    <li key={index} className="flex gap-2 items-center break-words">
-                                        <FaUser />
-                                        {contact.name}
-                                    </li>)
-                            } else if (contact.email) {
-                                return (
-                                    <li key={index} className="flex gap-2 items-center break-words">
-                                        <FaUser />
-                                        {contact.email}
-                                    </li>)
-                            }
-                        })}
-                    </ul>
-                </div>
+                <ul className="flex flex-col gap-2 text-sm">
+                    {(props.data?.contacts || []).map((contact, index) => {
+                        if (contact.name && contact.email) {
+                            return (
+                                <li key={index} className="flex gap-2 items-center break-words">
+                                    <FaUser />
+                                    {contact.name} &bull; {contact.email}
+                                </li>)
+                        } else if (contact.name) {
+                            return (
+                                <li key={index} className="flex gap-2 items-center break-words">
+                                    <FaUser />
+                                    {contact.name}
+                                </li>)
+                        } else if (contact.email) {
+                            return (
+                                <li key={index} className="flex gap-2 items-center break-words">
+                                    <FaUser />
+                                    {contact.email}
+                                </li>)
+                        }
+                    })}
+                </ul>
             )
         }
 
         return
     }
 
-    if (props?.type === "PROJECT") {
+    if (props?.type === "RFP") {
         return (
-            <div className="flex flex-col">
+            <ul className="flex flex-col gap-2 text-sm">
                 {props?.data?.startDate && (
-                    <span className="flex gap-2 items-center">
+                    <li className="flex gap-2 items-center">
                         <FaCalendar />
                         <p>{props?.data.startDate.toDateString()}</p>
-                    </span>
+                    </li>
                 )}
                 {props?.data?.budget && (
-                    <span className="flex gap-2 items-center">
+                    <li className="flex gap-2 items-center">
                         <FaDollarSign />
                         <p>{`${props?.data.budget.toLocaleString()} USD`}</p>
-                    </span>
+                    </li>
                 )}
-            </div>
+                {(props.data?.contacts || []).map((contact, index) => {
+                    if (contact.name && contact.email) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center">
+                                <FaUser />
+                                {contact.name} &bull; {contact.email}
+                            </li>)
+                    } else if (contact.name) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center">
+                                <FaUser />
+                                {contact.name}
+                            </li>)
+                    } else if (contact.email) {
+                        return (
+                            <li key={index} className="flex gap-2 items-center">
+                                <FaUser />
+                                {contact.email}
+                            </li>)
+                    }
+                })}
+            </ul>
         )
     }
 

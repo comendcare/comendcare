@@ -61,10 +61,8 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {Organization, Prisma} from "@prisma/client"
+import {Prisma} from "@prisma/client"
 import {Separator} from "./ui/separator"
-// import {AssetEditForm} from "./asset-edit-form"
-// import {RFPEditForm} from "./rfp-edit-form"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
 import { getKanbanFromOrganizationId, getOrganizationFromOrganizationId } from "@/lib/fetchers"
@@ -83,21 +81,7 @@ type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 type TaskType = Prisma.TaskGetPayload<{}>
 
-// const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
-
-// const today = new Date()
-
-// const getYearsList = () => {
-//     const currentYear = today.getFullYear()
-//     let years = []
-
-//     for (let i = currentYear - 100; i <= currentYear + 100; i++) {
-//         years.push(i.toString())
-//     }
-
-//     return years
-// }
 
 const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone
@@ -140,7 +124,7 @@ const editMilestoneForm = z.object({
     attachments: z.array(z.custom<AttachmentType>()).optional(),
     tasks: z.array(z.custom<TaskType>()).optional(),
     status: z.string(),
-    private: z.boolean(),
+    isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.string().optional(),
 })
@@ -170,7 +154,7 @@ export function EditMilestoneForm({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
-            nodeType: milestoneData?.node.type || "MILESTONE",
+            nodeType: milestoneData?.node.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
             type: milestoneData?.type || "NOTYPE",
@@ -189,7 +173,7 @@ export function EditMilestoneForm({
             attachments: milestoneData?.attachments || undefined,
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
             status: milestoneData?.status || "PLANNED",
-            private: milestoneData?.private || false,
+            isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
             openTo: milestoneData?.openTo || undefined
         }
@@ -207,7 +191,7 @@ export function EditMilestoneForm({
         attachments: form.watch("attachments"),
         tasks: form.watch("tasks"),
         status: form.watch("status"),
-        isPrivate: form.watch("private"),
+        isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
         openTo: form.watch("openTo")
     }
@@ -254,11 +238,10 @@ export function EditMilestoneForm({
             attachments,
             tasks,
             status,
-            private: isPrivate,
+            isPrivate,
             contacts,
             openTo
         } = values;
-        const now = new Date()
 
         setMilestone(milestoneData?.nodeId, {
             nodeType,
@@ -285,7 +268,7 @@ export function EditMilestoneForm({
             ...(type ? {type} : {type: 'NOTYPE'}),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
-            private: isPrivate || true,
+            private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined)
         })
@@ -470,15 +453,15 @@ export function EditMilestoneForm({
                         )}
                     />
 
-                    {milestoneData?.node?.type === "MILESTONE" && (
+                    {milestoneData?.node?.type === "PROJECT" && (
                         <>
                             <FormItem>
                                 <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
                                 <FormItem className="w-full grid grid-cols-[120px_auto] gap-x-2 items-center">
-                                    <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
+                                    <FormLabel className="text-md mt-2">{`Project Type`}</FormLabel>
                                     <MilestoneTypeFormField form={form} />
 
-                                    <FormLabel className="text-md mt-2">{`Milestone Status`}</FormLabel>
+                                    <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
                                     <StatusFormField form={form} />
 
                                     <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
@@ -492,7 +475,7 @@ export function EditMilestoneForm({
                         </>
                     )}
 
-                    {milestoneData?.node?.type === "PROJECT" && (
+                    {milestoneData?.node?.type === "RFP" && (
                         <FormItem>
                             <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
                             <FormItem className="w-full grid grid-cols-[120px_auto] items-center">
@@ -500,6 +483,8 @@ export function EditMilestoneForm({
                                 <OpenToFormField form={form}/>
                                 <FormLabel className="text-md mt-2">{`Start Date`}</FormLabel>
                                 <StartDateFormField form={form} />
+                                <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                <BudgetFormField form={form} />
                             </FormItem>
                         </FormItem>
                     )}
@@ -610,7 +595,7 @@ const PrivatePublicFormField = ({form, formData}: {form: any, formData: any}) =>
     return (
         <FormField
             control={form.control}
-            name="private"
+            name="isPrivate"
             render={({field}) => (
                 <span className="h-full items-center flex flex-row justify-end gap-4">
                     <FormControl>
@@ -1037,7 +1022,7 @@ export function AttachmentsFormField({ form, attachments }: { form: UseFormRetur
                     <FormControl>
                         <>
                         <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Attachments`}</FormLabel>
-                        {field.value.length > 0 && (
+                        {field.value && field.value.length > 0 && (
                             <ol className="flex flex-col gap-2">
                                 {field.value.map((paper: AttachmentType, index: number) => (
                                     <ExternalAttachmentField 
