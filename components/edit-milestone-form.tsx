@@ -154,7 +154,7 @@ export function EditMilestoneForm({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
-            nodeType: milestoneData?.node.type || "MILESTONE",
+            nodeType: milestoneData?.node.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
             type: milestoneData?.type || "NOTYPE",
@@ -453,15 +453,15 @@ export function EditMilestoneForm({
                         )}
                     />
 
-                    {milestoneData?.node?.type === "MILESTONE" && (
+                    {milestoneData?.node?.type === "PROJECT" && (
                         <>
                             <FormItem>
                                 <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
                                 <FormItem className="w-full grid grid-cols-[120px_auto] gap-x-2 items-center">
-                                    <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
+                                    <FormLabel className="text-md mt-2">{`Project Type`}</FormLabel>
                                     <MilestoneTypeFormField form={form} />
 
-                                    <FormLabel className="text-md mt-2">{`Milestone Status`}</FormLabel>
+                                    <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
                                     <StatusFormField form={form} />
 
                                     <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
@@ -475,7 +475,7 @@ export function EditMilestoneForm({
                         </>
                     )}
 
-                    {milestoneData?.node?.type === "PROJECT" && (
+                    {milestoneData?.node?.type === "RFP" && (
                         <FormItem>
                             <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
                             <FormItem className="w-full grid grid-cols-[120px_auto] items-center">

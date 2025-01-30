@@ -49,7 +49,7 @@ export type PrivateMilestoneNode = Node<
         private: boolean,
         contacts: any[]
     },
-    "MILESTONE" | "ASSET" | "PROJECT"
+    "PROJECT" | "ASSET" | "RFP"
 >
 
 export interface TaskType {
@@ -210,7 +210,7 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
     )
 }
 
-export const TypeBadge = ({type}: {type: "MILESTONE" | "ASSET" | "PROJECT"}) => {
+export const TypeBadge = ({type}: {type: "PROJECT" | "ASSET" | "RFP"}) => {
     if (type === "ASSET") {
         return (
             <Badge variant="outline" className="h-8 text-sm flex gap-2 border-green-500 text-green-800">
@@ -220,20 +220,20 @@ export const TypeBadge = ({type}: {type: "MILESTONE" | "ASSET" | "PROJECT"}) => 
         )
     }
     
-    if (type === "MILESTONE") {
+    if (type === "PROJECT") {
         return (
             <Badge variant="outline" className="h-8 text-sm flex gap-2 border-yellow-500 text-yellow-800">
                 <FaFileLines />
-                {"Milestone"}
+                {"Project"}
             </Badge>
         )
     }
 
-    if (type === "PROJECT") {
+    if (type === "RFP") {
         return (
             <Badge variant="outline" className="h-8 text-sm flex gap-2 border-red-500 text-red-800">
                 <FaBullhorn />
-                {"Project"}
+                {"RFP (Request for Proposal)"}
             </Badge>
         )
     }
@@ -242,7 +242,7 @@ export const TypeBadge = ({type}: {type: "MILESTONE" | "ASSET" | "PROJECT"}) => 
 }
 
 export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | PublicMilestoneNode>}) => {
-    if (props?.type === "MILESTONE") {
+    if (props?.type === "PROJECT") {
         return (
             <>  
             <ul className="flex flex-col gap-2 text-sm">
@@ -319,7 +319,7 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
         return
     }
 
-    if (props?.type === "PROJECT") {
+    if (props?.type === "RFP") {
         return (
             <ul className="flex flex-col gap-2 text-sm">
                 {props?.data?.startDate && (

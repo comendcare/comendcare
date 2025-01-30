@@ -40,7 +40,7 @@ export type PublicMilestoneNode = Node<
         focused: boolean
         contacts: any[]
     },
-    "MILESTONE" | "ASSET" | "PROJECT"
+    "PROJECT" | "ASSET" | "RFP"
 >
 
 export interface TaskType {

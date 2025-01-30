@@ -421,7 +421,7 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                 const node = await prisma.node.create({
                     data: {
                         roadmapId: roadmap.id,
-                        type: 'MILESTONE',
+                        type: 'PROJECT',
                         positionX: index * 500,
                         positionY: 0,
                         data: {
