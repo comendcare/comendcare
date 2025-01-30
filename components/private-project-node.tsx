@@ -124,7 +124,7 @@ const Details = ({ rfp }: { rfp: any }) => {
     }
 
     return (
-        <p>No details provided for this project</p>
+        <p>No details provided for this RFP</p>
     )
 }
 
