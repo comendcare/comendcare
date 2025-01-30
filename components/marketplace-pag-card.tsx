@@ -54,7 +54,7 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                                 key={idx}
                                 className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
                             >
-                                <Icon/>
+                                <Icon className="size-4"/>
                                 {label}
                             </div>
                         ))}
