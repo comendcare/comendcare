@@ -1022,7 +1022,7 @@ export function AttachmentsFormField({ form, attachments }: { form: UseFormRetur
                     <FormControl>
                         <>
                         <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Attachments`}</FormLabel>
-                        {field.value.length > 0 && (
+                        {field.value && field.value.length > 0 && (
                             <ol className="flex flex-col gap-2">
                                 {field.value.map((paper: AttachmentType, index: number) => (
                                     <ExternalAttachmentField 
