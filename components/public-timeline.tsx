@@ -40,7 +40,7 @@ export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
                                 <FaArrowUpRightFromSquare size={12}/>
                             )}
                             <time
-                                className="block mb-2 font-semibold leading-none dark:text-gray-500">
+                                className="ml-auto block font-semibold leading-none dark:text-gray-500">
                                 {getDates(item)}
                             </time>
                         </div>
