@@ -378,14 +378,18 @@ const syncToTypesense = async (env: {
                     // }
                 })
 
+                if (!milestone) return null;
+
                 return {
                     ...milestone,
-                    // RFPId_exists: milestone?.RFP ? true : false,
-                    // assetId_exists: milestone?.asset ? true : false,
+                    updatedAt: new Date(milestone.updatedAt).getTime(), // Convert to int64
                 }
             }))
 
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', uploadMilestones);
+
+            const validMilestones = uploadMilestones.filter(Boolean);
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', validMilestones);
         } else {
             console.log('No milestones to import.');
         }

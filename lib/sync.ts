@@ -249,6 +249,18 @@ export const syncToTypesense = async (env: {
                     store: true,
                     type: "string"
                 },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "updatedAt",
+                    optional: false,
+                    sort: true,  // Enable sorting
+                    stem: false,
+                    store: true,
+                    type: "int64" // Store timestamps as Unix timestamps (milliseconds)
+                },
                 // {
                 //     facet: false,
                 //     index: true,
@@ -380,14 +392,17 @@ export const syncToTypesense = async (env: {
                     // }
                 })
 
+                if (!milestone) return null;
+
                 return {
                     ...milestone,
-                    // RFPId_exists: milestone?.RFP ? true : false,
-                    // assetId_exists: milestone?.asset ? true : false,
+                    updatedAt: new Date(milestone.updatedAt).getTime(), // Convert to int64
                 }
             }))
 
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', uploadMilestones);
+            const validMilestones = uploadMilestones.filter(Boolean);
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', validMilestones);
         } else {
             console.log('No milestones to import.');
         }
