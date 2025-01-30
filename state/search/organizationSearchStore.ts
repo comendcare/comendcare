@@ -83,7 +83,11 @@ const sortByFilters: { [key: string]: string } = {
     // "prevalence-low-high": "prevalenceRatio:asc",
     // "prevalence-high-low": "prevalenceRatio:desc",
     "money-raised-low-high": "moneyRaised:asc",
-    "money-raised-high-low": "moneyRaised:desc"
+    "money-raised-high-low": "moneyRaised:desc",
+    "money-deployed-low-high": "moneyDeployed:asc",
+    "money-deployed-high-low": "moneyDeployed:desc",
+    "patients-engaged-low-high": "firstConditionPatientsEngaged:asc",
+    "patients-engaged-high-low": "firstConditionPatientsEngaged:desc"
 }
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
@@ -102,15 +106,31 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             .documents()
             .search(searchParameters);
 
-        console.log(`search results`, results.hits)
-        if (isNewSearch) return [...(results.hits || [])]           // new search - don't keep previous results
-        return [...state.searchResults, ...(results.hits || [])]    // update search - keep previous results
+        const typeSenseHits = results.hits || [];
+        // @ts-ignore
+        const ids = typeSenseHits.map(hit => hit.document.id);
+
+        if (ids.length === 0) {
+            return isNewSearch ? [] : state.searchResults;
+        }
+
+        const prismaResponse = await fetch('/api/organizations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids }),
+        });
+
+        const prismaResults = await prismaResponse.json();
+
+        const enrichedResults = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
+
+        return isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults];
 
     } catch (error) {
-        console.error("Search error:", error)
-        return []
+        console.error("Search error:", error);
+        return [];
     }
-}
+};
 
 export interface OrganizationSearchState {
     searchTerm: string,

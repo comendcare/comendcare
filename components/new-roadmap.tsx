@@ -18,6 +18,7 @@ import { initializeRoadmapState } from "@/lib/initialize-client-state";
 import { Badge } from "./ui/badge";
 import { NODE_TYPE_OPTIONS } from "@/lib/types";
 import { MilestoneTemplateCard } from "./milestone-template-card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 const selector = (state: RoadmapState) => ({
     // initializeRoadmapState: state.initState,
@@ -31,6 +32,7 @@ export default function NewRoadmapForm() {
     const [selectedRoadmap, setSelectedRoadmap] = useState<any>(undefined)
     const [isLoading, setIsLoading] = useState(false)
     const { setRoadmapId } = useRoadmapStore(useShallow(selector))
+    const [filter, setFilter] = useState("MILESTONE")
 
     async function createTemplateRoadmap(roadmapData: any) {
         setIsLoading(true)
@@ -70,50 +72,95 @@ export default function NewRoadmapForm() {
                 </p>
             </span>
 
-            <div className="flex flex-col gap-4 w-full flex-1 overflow-hidden">
-                <h2 className="text-xl text-bold">Start from a Milestone Template</h2>
 
-                <ScrollArea className="flex-1" type="always">
-                    <div className="grid grid-cols-2 gap-4 pr-5 pt-2">
-                        {templateMilestones.map((milestoneData, index) => (
-                            <MilestoneTemplateCard 
-                                key={index} 
-                                milestoneData={milestoneData}
-                                selectedMilestones={selectedMilestones}
-                                setSelectedMilestones={setSelectedMilestones}
-                            />
-                        ))}
-                    </div>
-                </ScrollArea>
-
-                <span className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex flex-row space-x-2">
-                        <Button
-                            disabled={selectedMilestones.length === 0}
-                            onClick={() => {
-                                createTemplateRoadmap({
-                                    title: '',
-                                    description: '',
-                                    milestones: selectedMilestones
-                                })
-                            }}
-                        >
-                            Create a Research Plan with selected nodes
-                        </Button>
-                    </div>
-                    <div className="flex flex-row space-x-2">
-                        <Button 
-                            variant="secondary"
-                            onClick={() => createTemplateRoadmap({
-                                ...emptyRoadmapTemplate,
-                                milestones: [emptyMilestoneTemplate]
-                            })}
-                        >
-                            Create an empty node
-                        </Button>
-                    </div>
-                </span>
+            <div className="min-h-0 h-full flex flex-col">
+                <Tabs defaultValue={filter} onValueChange={(value) => setFilter(value)} className="flex-1 flex flex-col min-h-0 items-start">
+                    <TabsList>
+                        <TabsTrigger value="ASSET">Assets</TabsTrigger>
+                        <TabsTrigger value="MILESTONE">Milestones</TabsTrigger>
+                        <TabsTrigger value="PROJECT">Projects</TabsTrigger>
+                    </TabsList>
+                    {filter === "ASSET" && (
+                        // have to hide these due to the flex implementation to get the scroll area working
+                        <TabsContent value="ASSET" className="flex-1 flex flex-col min-h-0">
+                            <ScrollArea className="h-0 flex-1 w-full" type="always">
+                                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                                    {templateMilestones.filter((template) => template.nodeType === "ASSET").map((milestoneData, index) => (
+                                        <MilestoneTemplateCard 
+                                            key={index} 
+                                            milestoneData={milestoneData}
+                                            selectedMilestones={selectedMilestones}
+                                            setSelectedMilestones={setSelectedMilestones}
+                                        />
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </TabsContent>
+                    )}
+                    {filter === "MILESTONE" && (
+                        // have to hide these due to the flex implementation to get the scroll area working
+                        <TabsContent value="MILESTONE" className="flex-1 flex flex-col min-h-0">
+                            <ScrollArea className="h-0 flex-1 w-full" type="always">
+                                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                                    {templateMilestones.filter((template) => template.nodeType === "MILESTONE").map((milestoneData, index) => (
+                                        <MilestoneTemplateCard 
+                                            key={index} 
+                                            milestoneData={milestoneData}
+                                            selectedMilestones={selectedMilestones}
+                                            setSelectedMilestones={setSelectedMilestones}
+                                        />
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </TabsContent>
+                    )}
+                    {filter === "PROJECT" && (
+                        // have to hide these due to the flex implementation to get the scroll area working
+                        <TabsContent value="PROJECT" className="flex-1 flex flex-col min-h-0">
+                            <ScrollArea className="h-0 flex-1 w-full" type="always">
+                                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                                    {templateMilestones.filter((template) => template.nodeType === "PROJECT").map((milestoneData, index) => (
+                                        <MilestoneTemplateCard 
+                                            key={index} 
+                                            milestoneData={milestoneData}
+                                            selectedMilestones={selectedMilestones}
+                                            setSelectedMilestones={setSelectedMilestones}
+                                        />
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </TabsContent>
+                    )}
+                </Tabs>
             </div>
+
+            <span className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-row space-x-2">
+                    <Button
+                        disabled={selectedMilestones.length === 0}
+                        onClick={() => {
+                            createTemplateRoadmap({
+                                title: '',
+                                description: '',
+                                milestones: selectedMilestones
+                            })
+                        }}
+                    >
+                        Create a Research Plan with selected nodes
+                    </Button>
+                </div>
+                <div className="flex flex-row space-x-2">
+                    <Button 
+                        variant="secondary"
+                        onClick={() => createTemplateRoadmap({
+                            ...emptyRoadmapTemplate,
+                            milestones: [emptyMilestoneTemplate]
+                        })}
+                    >
+                        Create an empty node
+                    </Button>
+                </div>
+            </span>
         </div>
     )
 }
