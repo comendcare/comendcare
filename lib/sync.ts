@@ -177,6 +177,13 @@ export const syncToTypesense = async (env: {
                     type: "int64"
                 },
                 {
+                    name: "firstConditionPatientsEngaged",  // NEEDED FOR SORTING BY PATIENTS ENGAGED IN MARKETPLACE
+                    type: "int32",
+                    index: true,
+                    sort: true,
+                    store: true
+                },
+                {
                     name: "condition",
                     facet: false,
                     index: true,
@@ -241,6 +248,18 @@ export const syncToTypesense = async (env: {
                     stem: false,
                     store: true,
                     type: "string"
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "updatedAt",
+                    optional: false,
+                    sort: true,  // Enable sorting
+                    stem: false,
+                    store: true,
+                    type: "int64" // Store timestamps as Unix timestamps (milliseconds)
                 },
                 // {
                 //     facet: false,
@@ -339,14 +358,23 @@ export const syncToTypesense = async (env: {
                     where: { id: org.id },
                     include: { condition: {include: {condition: true}}}
                 })
-                
+
+                if (!organization) return null;
+
+                // Special case made for sortable condition attributes
+                // This is temporary until we find a better way to handle the organization condition relationship
+                const firstConditionPatientsEngaged = organization.condition?.[0]?.condition?.numberOfPatientsEngaged ?? 0;
+
+
                 return {
                     ...organization,
-                    // prevalenceRatio: organization?.condition.flatMap(condition => condition.condition?.prevalenceRatio)
+                    firstConditionPatientsEngaged,
                 }
             }))
 
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', uploadOrgs);
+            const validOrganizations = uploadOrgs.filter(Boolean);
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', validOrganizations);
         } else {
             console.log('No organizations to import.');
         }
@@ -364,14 +392,17 @@ export const syncToTypesense = async (env: {
                     // }
                 })
 
+                if (!milestone) return null;
+
                 return {
                     ...milestone,
-                    // RFPId_exists: milestone?.RFP ? true : false,
-                    // assetId_exists: milestone?.asset ? true : false,
+                    updatedAt: new Date(milestone.updatedAt).getTime(), // Convert to int64
                 }
             }))
 
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', uploadMilestones);
+            const validMilestones = uploadMilestones.filter(Boolean);
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', validMilestones);
         } else {
             console.log('No milestones to import.');
         }

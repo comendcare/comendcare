@@ -66,7 +66,6 @@ const data = {
             icon: LayoutDashboard,
             variant: "ghost",
             url: "/app/dashboard",
-            comingSoon: true
         },
         {
             title: "Settings",

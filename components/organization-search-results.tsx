@@ -26,7 +26,7 @@ export function OrganizationSearchResults() {
             return (
                 <ol className="w-full flex flex-col gap-4">
                     {searchResults.map((organization, index) => (
-                        <OrganizationMarketplaceListElement organization={organization.document} key={index}/>
+                        <OrganizationMarketplaceListElement organization={organization} key={index}/>
                     ))}
                 </ol>
             )
@@ -36,7 +36,7 @@ export function OrganizationSearchResults() {
         return (
             <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                 {searchResults.map((organization, index) => (
-                    <OrganizationMarketplaceCard organization={organization.document} key={index} />
+                    <OrganizationMarketplaceCard organization={organization} key={index} />
                 ))}
             </div>
         )

@@ -2,20 +2,14 @@
 
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { FaCheck } from "react-icons/fa6";
-import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import { ScrollArea} from "./ui/scroll-area";
 import { useState } from "react";
-import { CheckBubble } from "./check-bubble";
-import { templateMilestones, templateRoadmaps } from '@/lib/templates'
+import { templateMilestones } from '@/lib/templates'
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { nanoid } from "nanoid";
 import type { Node } from "@xyflow/react"
 import ComendLoadingSpinner from "./comend-loading-spinner";
-import { Badge } from "./ui/badge";
-import { NODE_TYPE_OPTIONS } from "@/lib/types";
 import { MilestoneTemplateCard } from "./milestone-template-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
@@ -28,6 +22,7 @@ export default function RoadmapTemplates() {
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const [selectedRoadmap, setSelectedRoadmap] = useState<any>(undefined)
     const [isLoading, setIsLoading] = useState(false)
+    const [filter, setFilter] = useState("MILESTONE")
 
     const {
         addNodes,
@@ -84,84 +79,93 @@ export default function RoadmapTemplates() {
                 </p>
             </span>
 
-            <div className="flex flex-col gap-4 w-full flex-1 overflow-hidden">
-                <Tabs defaultValue="MILESTONE" className="flex-1 grow flex flex-col items-start">
+            <div className="min-h-0 h-full flex flex-col">
+                <Tabs defaultValue={filter} onValueChange={(value) => setFilter(value)} className="flex-1 flex flex-col min-h-0 items-start">
                     <TabsList>
                         <TabsTrigger value="ASSET">Assets</TabsTrigger>
                         <TabsTrigger value="MILESTONE">Milestones</TabsTrigger>
                         <TabsTrigger value="PROJECT">Projects</TabsTrigger>
                     </TabsList>
-                    <TabsContent value="ASSET" className="flex-1 h-full w-full">
-                        <ScrollArea className="flex-1 h-full w-full" type="always">
-                            <div className="w-full grid grid-cols-2 gap-4 pr-5 pt-2">
-                                {templateMilestones.filter((template) => template.nodeType === "ASSET").map((milestoneData, index) => (
-                                    <MilestoneTemplateCard 
-                                        key={index} 
-                                        milestoneData={milestoneData}
-                                        selectedMilestones={selectedMilestones}
-                                        setSelectedMilestones={setSelectedMilestones}
-                                    />
-                                ))}
-                            </div>
-                        </ScrollArea>
-                    </TabsContent>
-                    <TabsContent value="MILESTONE" className="flex-1 h-full w-full">
-                        <ScrollArea className="flex-1 h-full w-full" type="always">
-                            <div className="w-full grid grid-cols-2 gap-4 pr-5 pt-2">
-                                {templateMilestones.filter((template) => template.nodeType === "MILESTONE").map((milestoneData, index) => (
-                                    <MilestoneTemplateCard 
-                                        key={index} 
-                                        milestoneData={milestoneData}
-                                        selectedMilestones={selectedMilestones}
-                                        setSelectedMilestones={setSelectedMilestones}
-                                    />
-                                ))}
-                            </div>
-                        </ScrollArea>
-                    </TabsContent>
-                    <TabsContent value="PROJECT" className="flex-1 h-full w-full">
-                        <ScrollArea className="flex-1 h-full w-full" type="always">
-                            <div className="w-full grid grid-cols-2 gap-4 pr-5 pt-2">
-                                {templateMilestones.filter((template) => template.nodeType === "PROJECT").map((milestoneData, index) => (
-                                    <MilestoneTemplateCard 
-                                        key={index} 
-                                        milestoneData={milestoneData}
-                                        selectedMilestones={selectedMilestones}
-                                        setSelectedMilestones={setSelectedMilestones}
-                                    />
-                                ))}
-                            </div>
-                        </ScrollArea>
-                    </TabsContent>
+                    {filter === "ASSET" && (
+                        // have to hide these due to the flex implementation to get the scroll area working
+                        <TabsContent value="ASSET" className="flex-1 flex flex-col min-h-0">
+                            <ScrollArea className="h-0 flex-1 w-full" type="always">
+                                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                                    {templateMilestones.filter((template) => template.nodeType === "ASSET").map((milestoneData, index) => (
+                                        <MilestoneTemplateCard 
+                                            key={index} 
+                                            milestoneData={milestoneData}
+                                            selectedMilestones={selectedMilestones}
+                                            setSelectedMilestones={setSelectedMilestones}
+                                        />
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </TabsContent>
+                    )}
+                    {filter === "MILESTONE" && (
+                        // have to hide these due to the flex implementation to get the scroll area working
+                        <TabsContent value="MILESTONE" className="flex-1 flex flex-col min-h-0">
+                            <ScrollArea className="h-0 flex-1 w-full" type="always">
+                                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                                    {templateMilestones.filter((template) => template.nodeType === "MILESTONE").map((milestoneData, index) => (
+                                        <MilestoneTemplateCard 
+                                            key={index} 
+                                            milestoneData={milestoneData}
+                                            selectedMilestones={selectedMilestones}
+                                            setSelectedMilestones={setSelectedMilestones}
+                                        />
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </TabsContent>
+                    )}
+                    {filter === "PROJECT" && (
+                        // have to hide these due to the flex implementation to get the scroll area working
+                        <TabsContent value="PROJECT" className="flex-1 flex flex-col min-h-0">
+                            <ScrollArea className="h-0 flex-1 w-full" type="always">
+                                <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                                    {templateMilestones.filter((template) => template.nodeType === "PROJECT").map((milestoneData, index) => (
+                                        <MilestoneTemplateCard 
+                                            key={index} 
+                                            milestoneData={milestoneData}
+                                            selectedMilestones={selectedMilestones}
+                                            setSelectedMilestones={setSelectedMilestones}
+                                        />
+                                    ))}
+                                </div>
+                            </ScrollArea>
+                        </TabsContent>
+                    )}
                 </Tabs>
-
-                <span className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex flex-row space-x-2">
-                        <Button
-                            disabled={selectedMilestones.length === 0}
-                            onClick={async () => {
-                                setIsLoading(true)
-                                await addMilestones(selectedMilestones)
-                                router.push('/app/research-plan')
-                            }}
-                        >
-                            Add selected nodes
-                        </Button>
-                    </div>
-                    <div className="flex flex-row space-x-2">
-                        <Button 
-                            variant="secondary"
-                            onClick={async () => {
-                                setIsLoading(true)
-                                await addMilestones([{name: 'New Milestone'}])
-                                router.push('/app/research-plan')
-                            }}
-                        >
-                            Add an empty node
-                        </Button>
-                    </div>
-                </span>
             </div>
+
+            <span className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-row space-x-2">
+                    <Button
+                        disabled={selectedMilestones.length === 0}
+                        onClick={async () => {
+                            setIsLoading(true)
+                            await addMilestones(selectedMilestones)
+                            router.push('/app/research-plan')
+                        }}
+                    >
+                        Add selected nodes
+                    </Button>
+                </div>
+                <div className="flex flex-row space-x-2">
+                    <Button 
+                        variant="secondary"
+                        onClick={async () => {
+                            setIsLoading(true)
+                            await addMilestones([{name: 'New Milestone'}])
+                            router.push('/app/research-plan')
+                        }}
+                    >
+                        Add an empty node
+                    </Button>
+                </div>
+            </span>
         </div>
     )
 }
