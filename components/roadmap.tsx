@@ -19,6 +19,7 @@ import { useEffect, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { GanttChartView } from "./gantt-chart"
 import { getRoadmapId } from "@/lib/fetchers"
+import { PrivateTimelineView } from "./private-timeline"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -100,6 +101,7 @@ export function Roadmap({data}: {data: any}) {
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1">
                             <TabsList>
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
+                                <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                                 {/* <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger> */}
                             </TabsList>
                         </div>
@@ -112,6 +114,14 @@ export function Roadmap({data}: {data: any}) {
                             <PrivateFlowView
                                 width={defaultLayout[0]}
                             />
+                        </TabsContent>
+                        
+                        {/* Timeline view */}
+                        <TabsContent
+                            value="timeline"
+                            className="m-0 h-[calc(100vh-6rem)]"
+                        >
+                            <PrivateTimelineView />
                         </TabsContent>
 
                         {/* Gantt Chart View */}
