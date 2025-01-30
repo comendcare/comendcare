@@ -555,7 +555,7 @@ export const getAllOrganizations = async () => {
     }
 };
 
-export const getAllOrganizationsFromUserId = async (userId: string) => {
+export const getAllMembershipsFromUserId = async (userId: string) => {
     try {
         const memberships = await prisma.member.findMany({
             where: {
