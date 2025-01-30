@@ -404,7 +404,6 @@ export function EditMilestoneForm({
             <ScrollArea className="research-plan-tour-step3 px-8 pb-4">
                 <form
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                    // onChange={() => console.log(`CHANGE`)}
                     className="flex flex-col gap-8 mt-2 px-1"
                 >
                     <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={onClose}>
@@ -428,9 +427,11 @@ export function EditMilestoneForm({
                                         type="single"
                                         variant="outline"
                                         value={field.value}
-                                        onValueChange={
-                                            field.onChange
-                                        }
+                                        onValueChange={(value) => {
+                                            if (value) {
+                                                field.onChange(value)
+                                            }
+                                        }}
                                         className="w-full flex flex-wrap gap-2 justify-between"
                                     >
                                         {NODE_TYPE_OPTIONS.map(({label, value}) => (
@@ -469,41 +470,38 @@ export function EditMilestoneForm({
                         )}
                     />
 
-                    <Separator />
-
                     {milestoneData?.node?.type === "MILESTONE" && (
                         <>
-                            <FormItem className="w-full grid grid-cols-[150px_auto] gap-4 items-center">
-                                <FormLabel className="text-md">{`Milestone Type`}</FormLabel>
-                                <MilestoneTypeFormField form={form} />
+                            <FormItem>
+                                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
+                                <FormItem className="w-full grid grid-cols-[120px_auto] gap-x-2 items-center">
+                                    <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
+                                    <MilestoneTypeFormField form={form} />
 
-                                <FormLabel className="text-md">{`Milestone Status`}</FormLabel>
-                                <StatusFormField form={form} />
+                                    <FormLabel className="text-md mt-2">{`Milestone Status`}</FormLabel>
+                                    <StatusFormField form={form} />
 
-                                <FormLabel className="text-md">{`Budget`}</FormLabel>
-                                <BudgetFormField form={form} />
+                                    <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                    <BudgetFormField form={form} />
+                                </FormItem>
                             </FormItem>
 
-                            <Separator/>
-
                             <TimelineFormField 
-                                form={form}
+                                    form={form}
                             />
-
-                            <Separator />
                         </>
                     )}
 
                     {milestoneData?.node?.type === "PROJECT" && (
-                        <>
-                            <FormItem className="w-full grid grid-cols-[90px_auto] items-center">
+                        <FormItem>
+                            <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
+                            <FormItem className="w-full grid grid-cols-[120px_auto] items-center">
                                 <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
                                 <OpenToFormField form={form}/>
                                 <FormLabel className="text-md mt-2">{`Start Date`}</FormLabel>
                                 <StartDateFormField form={form} />
                             </FormItem>
-                            <Separator />
-                        </>
+                        </FormItem>
                     )}
 
                     <AttachmentsFormField
@@ -511,10 +509,7 @@ export function EditMilestoneForm({
                         attachments={formData.attachments as AttachmentType[]}
                     />
 
-                    <Separator />
                     <ContactsFormField form={form} />
-
-                    <Separator />
 
                     <TasksFormField 
                         form={form}
@@ -641,8 +636,9 @@ const StatusFormField = ({form}: {form: any}) => {
             name="status"
             render={({field}) => (
                 <FormItem className="h-full flex items-center justify-end gap-4">
-                    <FormControl className="h-full">
+                    <FormControl>
                         <StatusButton
+                            className="h-[40px] w-full"
                             status={
                                 field?.value as StatusType
                             }
@@ -662,7 +658,8 @@ const BudgetFormField = ({form}: {form: any}) => {
             control={form.control}
             name="budget"
             render={({field}) => (
-                <FormItem className="h-full flex items-center justify-end gap-4">
+                // <FormItem className="h-full flex items-center justify-end gap-4">
+                <>
                     <FormControl className="grow w-full h-full">
                         <Input
                             className="h-full"
@@ -678,7 +675,8 @@ const BudgetFormField = ({form}: {form: any}) => {
                         />
                     </FormControl>
                     <FormMessage/>
-                </FormItem>
+                </>
+                // </FormItem>
             )}
         />
     )
@@ -694,8 +692,8 @@ const TimelineFormField = ({
         <FormLabel
             className="text-2xl font-semibold leading-none tracking-tight">{`Timeline`}</FormLabel>
 
-        <FormItem className="w-full grid grid-cols-[50px_auto_auto] gap-4 items-center">
-            <FormLabel className="text-md">{`Start`}</FormLabel>
+        <FormItem className="w-full grid grid-cols-[120px_120px_auto] gap-x-2 items-center">
+            <FormLabel className="text-md mt-2">{`Start`}</FormLabel>
             <FormField
                 control={form.control}
                 name="startDate"
@@ -756,7 +754,7 @@ const TimelineFormField = ({
                 )}
             />
 
-            <FormLabel className="text-md">{`End`}</FormLabel>
+            <FormLabel className="text-md mt-2">{`End`}</FormLabel>
             <FormField
                 control={form.control}
                 name="endDate"
@@ -910,59 +908,54 @@ const TasksFormField = ({
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <>
-                            {formData.tasks && formData.tasks.length > 0 && (
-                                <>
-                                    <FormLabel
-                                        className="text-2xl font-semibold leading-none tracking-tight">{`Tasks`}</FormLabel>
-                                    <DndContext
-                                        accessibility={{
-                                            announcements
-                                        }}
-                                        collisionDetection={closestCorners}
-                                        sensors={sensors}
-                                        onDragEnd={(event) => {
-                                            const {active, over} = event
+                            <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Tasks`}</FormLabel>
+                            <DndContext
+                                accessibility={{
+                                    announcements
+                                }}
+                                collisionDetection={closestCorners}
+                                sensors={sensors}
+                                onDragEnd={(event) => {
+                                    const {active, over} = event
 
-                                            if (active.id === over?.id) return
+                                    if (active.id === over?.id) return
 
-                                            const originalPosition = field?.value?.findIndex((item: any) => item.id === active.id) || 0
-                                            const newPosition = field?.value?.findIndex((item: any) => item.id === over?.id) || 0
+                                    const originalPosition = field?.value?.findIndex((item: any) => item.id === active.id) || 0
+                                    const newPosition = field?.value?.findIndex((item: any) => item.id === over?.id) || 0
 
-                                            form.setValue('tasks', arrayMove(field?.value || [], originalPosition, newPosition))
-                                        }}
-                                    >
-                                        <ol className="flex flex-col gap-2">
-                                            <SortableContext
-                                                items={field?.value?.map((item: any) => item.id) || []}
-                                                strategy={verticalListSortingStrategy}>
-                                                {field?.value?.map((task: any, index: number) => (
-                                                    <TaskField
-                                                        key={task.id}
-                                                        index={index}
-                                                        task={task}
-                                                        onUnlink={() => {
-                                                            form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
-                                                        }}
-                                                        onNameChange={(newName) => {
-                                                            form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
-                                                                ...t,
-                                                                name: newName
-                                                            } : t))
-                                                        }}
-                                                        onColumnChange={(newColumnId) => {
-                                                            form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
-                                                                ...t,
-                                                                columnId: newColumnId
-                                                            } : t))
-                                                        }}
-                                                        kanbanColumns={kanbanColumns}
-                                                    />
-                                                ))}
-                                            </SortableContext>
-                                        </ol>
-                                    </DndContext>
-                                </>
-                            )}
+                                    form.setValue('tasks', arrayMove(field?.value || [], originalPosition, newPosition))
+                                }}
+                            >
+                                <ol className="flex flex-col gap-2">
+                                    <SortableContext
+                                        items={field?.value?.map((item: any) => item.id) || []}
+                                        strategy={verticalListSortingStrategy}>
+                                        {field?.value?.map((task: any, index: number) => (
+                                            <TaskField
+                                                key={task.id}
+                                                index={index}
+                                                task={task}
+                                                onUnlink={() => {
+                                                    form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
+                                                }}
+                                                onNameChange={(newName) => {
+                                                    form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
+                                                        ...t,
+                                                        name: newName
+                                                    } : t))
+                                                }}
+                                                onColumnChange={(newColumnId) => {
+                                                    form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
+                                                        ...t,
+                                                        columnId: newColumnId
+                                                    } : t))
+                                                }}
+                                                kanbanColumns={kanbanColumns}
+                                            />
+                                        ))}
+                                    </SortableContext>
+                                </ol>
+                            </DndContext>
 
                             <LinkTask
                                 milestoneId={milestoneData?.id}
@@ -1043,33 +1036,29 @@ export function AttachmentsFormField({ form, attachments }: { form: UseFormRetur
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <>
-                        {attachments && attachments.length > 0 && (
-                            <>
-                                {field.value.length > 0 && <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Associated Attachments`}</FormLabel>}
-                                {field.value.length > 0 && (
-                                    <ol className="flex flex-col gap-2">
-                                        {field.value.map((paper: AttachmentType, index: number) => (
-                                            <ExternalAttachmentField 
-                                                key={index}
-                                                index={index}
-                                                value={paper}
-                                                onDelete={() => {
-                                                    form.setValue(
-                                                        "attachments",
-                                                        field?.value?.filter((t: AttachmentType, i: number) => i !== index)
-                                                    )
-                                                }}
-                                                onValueChange={newValue => {
-                                                    form.setValue(
-                                                        "attachments",
-                                                        field?.value?.map((currentValue: AttachmentType, i: number) => i === index ? newValue : currentValue)
-                                                    )
-                                                }}
-                                            />
-                                        ))}
-                                    </ol>
-                                )}
-                            </>
+                        <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Attachments`}</FormLabel>
+                        {field.value.length > 0 && (
+                            <ol className="flex flex-col gap-2">
+                                {field.value.map((paper: AttachmentType, index: number) => (
+                                    <ExternalAttachmentField 
+                                        key={index}
+                                        index={index}
+                                        value={paper}
+                                        onDelete={() => {
+                                            form.setValue(
+                                                "attachments",
+                                                field?.value?.filter((t: AttachmentType, i: number) => i !== index)
+                                            )
+                                        }}
+                                        onValueChange={newValue => {
+                                            form.setValue(
+                                                "attachments",
+                                                field?.value?.map((currentValue: AttachmentType, i: number) => i === index ? newValue : currentValue)
+                                            )
+                                        }}
+                                    />
+                                ))}
+                            </ol>
                         )}
                         <Button
                             variant="secondary"
@@ -1096,8 +1085,8 @@ const ContactsFormField = ({form}: {form: any}) => {
             control={form.control}
             name="contacts"
             render={({field}) => (
-                <>
-                {field?.value && field.value.length > 0 && <FormLabel className="text-md">{`Contacts`}</FormLabel>}
+                <FormItem>
+                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Contacts`}</FormLabel>
                 {field?.value && field.value.length > 0 && (
                     <ol className="flex flex-col gap-2">
                         {field.value.map((contact: ContactType, index: number) => (
@@ -1123,6 +1112,7 @@ const ContactsFormField = ({form}: {form: any}) => {
                 )}
                 <Button
                     variant="secondary"
+                    className="w-full"
                     onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                         e.preventDefault()
                         form.setValue("contacts", [
@@ -1131,7 +1121,7 @@ const ContactsFormField = ({form}: {form: any}) => {
                         ])
                     }}
                 >{`Add a contact`}</Button>
-                </>
+                </FormItem>
             )}
         />
     )
