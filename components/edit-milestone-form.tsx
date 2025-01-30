@@ -126,14 +126,16 @@ const editMilestoneForm = z.object({
         .optional(),
     type: z.string(),
     otherTypeDetails: z.string().optional(),
-    startDate: z.object({
-        month: z.string().optional(),
-        year: z.string().min(4, "Year must be 4 digits").max(4, "Year must be 4 digits").optional(),
-    }),
-    endDate: z.object({
-        month: z.string().optional(),
-        year: z.string().min(4, "Year must be 4 digits").max(4, "Year must be 4 digits").optional()
-    }),
+    startDate: z.date().optional(),
+    endDate: z.date().optional(),
+    // startDate: z.object({
+    //     month: z.string().optional(),
+    //     year: z.string().min(4, "Year must be 4 digits").max(4, "Year must be 4 digits").optional(),
+    // }),
+    // endDate: z.object({
+    //     month: z.string().optional(),
+    //     year: z.string().min(4, "Year must be 4 digits").max(4, "Year must be 4 digits").optional()
+    // }),
     budget: z.number().optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
     tasks: z.array(z.custom<TaskType>()).optional(),
@@ -173,14 +175,16 @@ export function EditMilestoneForm({
             description: milestoneData?.description || "",
             type: milestoneData?.type || "NOTYPE",
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
-            startDate: {
-                month: milestoneData?.startDate?.getMonth() ? monthsList[milestoneData?.startDate?.getMonth()] : undefined,
-                year: milestoneData?.startDate?.getFullYear()?.toString() || undefined
-            },
-            endDate: {
-                month: milestoneData?.endDate?.getMonth() ? monthsList[milestoneData?.endDate?.getMonth()] : undefined,
-                year: milestoneData?.endDate?.getFullYear()?.toString() || undefined
-            },
+            startDate: milestoneData?.startDate,
+            endDate: milestoneData?.endDate,
+            // startDate: {
+            //     month: milestoneData?.startDate?.getMonth() ? monthsList[milestoneData?.startDate?.getMonth()] : undefined,
+            //     year: milestoneData?.startDate?.getFullYear()?.toString() || undefined
+            // },
+            // endDate: {
+            //     month: milestoneData?.endDate?.getMonth() ? monthsList[milestoneData?.endDate?.getMonth()] : undefined,
+            //     year: milestoneData?.endDate?.getFullYear()?.toString() || undefined
+            // },
             budget: milestoneData?.budget || undefined,
             attachments: milestoneData?.attachments || undefined,
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
@@ -259,46 +263,31 @@ export function EditMilestoneForm({
         setMilestone(milestoneData?.nodeId, {
             nodeType,
             title,
-            ...(description !== undefined && description !== null
-                ? {description}
-                : undefined),
-            ...(startDate.month !== undefined || startDate.year !== undefined ? {
-                startDate: new Date(
-                    startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
-                    startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
-                    1
-                )
-            } : undefined),
-            ...(endDate.month !== undefined || endDate.year !== undefined ? {
-                endDate: new Date(
-                    endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
-                    endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
-                    1
-                )
-            } : undefined),
+            ...(description !== undefined && description !== null ? {description} : undefined),
+            // ...(startDate.month !== undefined || startDate.year !== undefined ? {
+            //     startDate: new Date(
+            //         startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
+            //         startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
+            //         1
+            //     )
+            // } : undefined),
+            // ...(endDate.month !== undefined || endDate.year !== undefined ? {
+            //     endDate: new Date(
+            //         endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
+            //         endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
+            //         1
+            //     )
+            // } : undefined),
+            ...(startDate ? {startDate} : undefined),
+            ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
-            ...(attachments
-                    ? {attachments}
-                    : undefined
-            ),
-            ...(type
-                    ? {type}
-                    : {type: 'NOTYPE'}
-            ),
-            ...(otherTypeDetails !== undefined && otherTypeDetails !== null
-                ? {otherTypeDetails}
-                : undefined
-            ),
+            ...(attachments ? {attachments} : undefined),
+            ...(type ? {type} : {type: 'NOTYPE'}),
+            ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
-            private: isPrivate || false,
-            ...(contacts
-                ? {contacts}
-                : undefined
-            ),
-            ...(openTo
-                ? {openTo}
-                : undefined
-            )
+            private: isPrivate || true,
+            ...(contacts ? {contacts} : undefined),
+            ...(openTo ? {openTo} : undefined)
         })
 
         setTasks(unionById(tasks || [], kanbanTasks).map(task => {
@@ -497,9 +486,9 @@ export function EditMilestoneForm({
 
                             <Separator/>
 
-                            <TimelineFormField 
+                            {/* <TimelineFormField 
                                 form={form}
-                            />
+                            /> */}
 
                             <Separator />
                         </>
@@ -507,8 +496,13 @@ export function EditMilestoneForm({
 
                     {milestoneData?.node?.type === "PROJECT" && (
                         <>
-                        <Separator />
-                        <OpenToFormField form={form}/>
+                            <FormItem className="w-full grid grid-cols-[90px_auto] items-center">
+                                <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
+                                <OpenToFormField form={form}/>
+                                <FormLabel className="text-md mt-2">{`Start Date`}</FormLabel>
+                                <StartDateFormField form={form} />
+                            </FormItem>
+                            <Separator />
                         </>
                     )}
 
@@ -841,28 +835,25 @@ const StartDateFormField = ({form}: {form: any}) => {
 
 const OpenToFormField = ({form}: {form: any}) => {
     return (
-        <FormItem className="w-full grid grid-cols-[80px_auto] items-center gap-4">
-            <FormLabel className="text-md mt-2">{`Open to`}</FormLabel>
-            <FormField 
-                control={form.control}
-                name="openTo"
-                render={({field}) => (
-                    <Select
-                        defaultValue={field.value}
-                        onValueChange={field.onChange}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Open to work from..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {RFP_OPEN_TO_TYPE_OPTIONS.map((type, index) => (
-                                <SelectItem key={index} value={type.value}>{type.label}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                )}
-            />
-        </FormItem>
+        <FormField 
+            control={form.control}
+            name="openTo"
+            render={({field}) => (
+                <Select
+                    defaultValue={field.value}
+                    onValueChange={field.onChange}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="Open to work from..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {RFP_OPEN_TO_TYPE_OPTIONS.map((type, index) => (
+                            <SelectItem key={index} value={type.value}>{type.label}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            )}
+        />
     )
 }
 
