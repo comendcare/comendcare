@@ -255,8 +255,8 @@ export const MOLECULAR_MECHANISMS: Option[] = [
 
 export const NODE_TYPE_OPTIONS: Option[] = [
     { label: 'Asset', value: 'ASSET' },
-    { label: 'Milestone', value: 'MILESTONE' },
     { label: 'Project', value: 'PROJECT' },
+    { label: 'RFP (Request for Proposal)', value: 'RFP' },
 ]
 
 export const MILESTONE_TYPE_OPTIONS: Option[] = [

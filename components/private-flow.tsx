@@ -80,7 +80,7 @@ export const PrivateFlowView = ({
     const pathname = usePathname()
     const searchParams = useSearchParams()
     // const { undo, redo, clear } = useRoadmapStore.temporal.getState()
-    const nodeTypes = { MILESTONE: PrivateMilestoneNode, ASSET: PrivateMilestoneNode, PROJECT: PrivateMilestoneNode }
+    const nodeTypes = { PROJECT: PrivateMilestoneNode, ASSET: PrivateMilestoneNode, RFP: PrivateMilestoneNode }
     const edgeTypes = { DEFAULT: CustomEdge }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
@@ -124,7 +124,7 @@ export const PrivateFlowView = ({
                     'changedTouches' in event ? event.changedTouches[0] : event;
                 const newNode: Node = {
                     id,
-                    type: "MILESTONE",
+                    type: "PROJECT",
                     position: screenToFlowPosition({
                         x: clientX,
                         y: clientY,
@@ -184,7 +184,7 @@ export const PrivateFlowView = ({
             const id = nanoid()
             const newNode: Node = {
                 id: id,
-                type: defaultData?.nodeType || "MILESTONE",
+                type: defaultData?.nodeType || "PROJECT",
                 position: {
                     x: centerX,
                     y: centerY
