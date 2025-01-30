@@ -124,7 +124,7 @@ const editMilestoneForm = z.object({
     attachments: z.array(z.custom<AttachmentType>()).optional(),
     tasks: z.array(z.custom<TaskType>()).optional(),
     status: z.string(),
-    private: z.boolean(),
+    isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.string().optional(),
 })
@@ -173,7 +173,7 @@ export function EditMilestoneForm({
             attachments: milestoneData?.attachments || undefined,
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
             status: milestoneData?.status || "PLANNED",
-            private: milestoneData?.private || false,
+            isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
             openTo: milestoneData?.openTo || undefined
         }
@@ -191,7 +191,7 @@ export function EditMilestoneForm({
         attachments: form.watch("attachments"),
         tasks: form.watch("tasks"),
         status: form.watch("status"),
-        isPrivate: form.watch("private"),
+        isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
         openTo: form.watch("openTo")
     }
@@ -238,11 +238,10 @@ export function EditMilestoneForm({
             attachments,
             tasks,
             status,
-            private: isPrivate,
+            isPrivate,
             contacts,
             openTo
         } = values;
-        const now = new Date()
 
         setMilestone(milestoneData?.nodeId, {
             nodeType,
@@ -269,7 +268,7 @@ export function EditMilestoneForm({
             ...(type ? {type} : {type: 'NOTYPE'}),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
-            private: isPrivate || true,
+            private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined)
         })
@@ -596,7 +595,7 @@ const PrivatePublicFormField = ({form, formData}: {form: any, formData: any}) =>
     return (
         <FormField
             control={form.control}
-            name="private"
+            name="isPrivate"
             render={({field}) => (
                 <span className="h-full items-center flex flex-row justify-end gap-4">
                     <FormControl>

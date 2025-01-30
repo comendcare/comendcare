@@ -22,6 +22,7 @@ import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { Popover } from "./plate-ui/popover"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
+import { PublicMilestoneNode } from "./public-milestone-node"
 
 export type PrivateMilestoneNode = Node<
     {
@@ -209,7 +210,7 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
     )
 }
 
-const TypeBadge = ({type}: {type: "MILESTONE" | "ASSET" | "PROJECT"}) => {
+export const TypeBadge = ({type}: {type: "MILESTONE" | "ASSET" | "PROJECT"}) => {
     if (type === "ASSET") {
         return (
             <Badge variant="outline" className="h-8 text-sm flex gap-2 border-green-500 text-green-800">
@@ -240,7 +241,7 @@ const TypeBadge = ({type}: {type: "MILESTONE" | "ASSET" | "PROJECT"}) => {
     return
 }
 
-const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode>}) => {
+export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | PublicMilestoneNode>}) => {
     if (props?.type === "MILESTONE") {
         return (
             <>  
@@ -290,7 +291,7 @@ const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode>}) => {
         if (props.data?.contacts && props.data.contacts.length > 0) {
             return (
                 <ul className="flex flex-col gap-2 text-sm">
-                    {props.data.contacts.map((contact, index) => {
+                    {(props.data?.contacts || []).map((contact, index) => {
                         if (contact.name && contact.email) {
                             return (
                                 <li key={index} className="flex gap-2 items-center break-words">
@@ -333,7 +334,7 @@ const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode>}) => {
                         <p>{`${props?.data.budget.toLocaleString()} USD`}</p>
                     </li>
                 )}
-                {props.data.contacts.map((contact, index) => {
+                {(props.data?.contacts || []).map((contact, index) => {
                     if (contact.name && contact.email) {
                         return (
                             <li key={index} className="flex gap-2 items-center">
