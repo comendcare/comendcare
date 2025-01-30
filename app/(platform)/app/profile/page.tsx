@@ -76,7 +76,7 @@ export default async function ProfilePage() {
         // Existing verified organization rendering logic
         return (
             <main className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
-                <div className="flex flex-col space-y-8 my-8">
+                <div className="w-full flex flex-col space-y-8 my-8">
                     <div>
                         <div>
                             {/* <img className="h-32 w-full object-cover lg:h-48"
