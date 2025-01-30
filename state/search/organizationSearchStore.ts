@@ -83,7 +83,11 @@ const sortByFilters: { [key: string]: string } = {
     // "prevalence-low-high": "prevalenceRatio:asc",
     // "prevalence-high-low": "prevalenceRatio:desc",
     "money-raised-low-high": "moneyRaised:asc",
-    "money-raised-high-low": "moneyRaised:desc"
+    "money-raised-high-low": "moneyRaised:desc",
+    "money-deployed-low-high": "moneyDeployed:asc",
+    "money-deployed-high-low": "moneyDeployed:desc",
+    "patients-engaged-low-high": "firstConditionPatientsEngaged:asc",
+    "patients-engaged-high-low": "firstConditionPatientsEngaged:desc"
 }
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
