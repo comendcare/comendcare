@@ -334,7 +334,16 @@ export const createOrganization = async (formData: FormData) => {
             }
         })
 
-        await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'organizations');
+        await addTypeSenseDocument(
+            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+            (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!, 
+            response, 
+            'organizations'
+        );
 
         await revalidateTag(
             `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
@@ -430,7 +439,16 @@ export const updateOrganization = withOrganizationAuth(
                 data,
             });
 
-            await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'organizations');
+            await updateTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!,
+                response, 
+                'organizations'
+            );
 
             return response;
         } catch (error: any) {
@@ -585,7 +603,11 @@ export async function deleteOrganization(organization: Organization) {
 
         const deleteTypeSense = deleteTypeSenseDocument(
             `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-            process.env.TYPESENSE_ADMIN_API_KEY!,
+            (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!,
             organization.id,
             'organizations'
         );
@@ -1804,7 +1826,16 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         //             assetId_exists: response.asset ? true : false
         //         }))
         //         console.log(`Add typesense document`, document)
-        //         // await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
+        //         await addTypeSenseDocument(
+        //              `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+        //              (
+        //                 process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+        //                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+        //                     : process.env.TYPESENSE_ADMIN_API_KEY
+        //             )!, 
+        //              document, 
+        //              'milestones'
+        //         )
         //     })
         // )
 
@@ -1831,7 +1862,16 @@ export async function deleteNode(nodeId: string | undefined) {
 
         // Typesense - delete milestone documents here...
         // console.log(`Delete typesense document`, deletedNode.data.id)
-        // await deleteTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, deletedNode.data.id, 'milestones')
+        // await deleteTypeSenseDocument(
+        //     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+        //     (
+        //         process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+        //             ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+        //             : process.env.TYPESENSE_ADMIN_API_KEY
+        //     )!, 
+        //     deletedNode.data.id, 
+        //     'milestones'
+        // )
 
         return {success: true, data: deletedNode}
     } catch (error: any) {
@@ -1965,7 +2005,16 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         //             assetId_exists: response.asset ? true : false
         //         }))
         //         console.log(`Update typesense document`, document)
-        //         // await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
+        //         await updateTypeSenseDocument(
+        //             `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+        //             (
+        //                 process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+        //                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+        //                     : process.env.TYPESENSE_ADMIN_API_KEY
+        //             )!,
+        //             document, 
+        //             'milestones'
+        //         )
         //     })
         // )
 
