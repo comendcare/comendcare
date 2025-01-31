@@ -182,7 +182,8 @@ const syncToTypesense = async (env: {
                     type: "int32",
                     index: true,
                     sort: true,
-                    store: true
+                    store: true,
+                    optional: true
                 },
                 {
                     name: "condition",
