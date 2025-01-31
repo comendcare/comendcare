@@ -7,7 +7,7 @@
 import Typesense from "typesense";
 // const Typesense = require('typesense')
 
-console.log(process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY)
+console.log(process.env.TYPESENSE_ADMIN_API_KEY)
 console.log(process.env.NEXT_PUBLIC_TYPESENSE_NODE)
 console.log(process.env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY)
 export const typesense = new Typesense.Client({
@@ -17,7 +17,7 @@ export const typesense = new Typesense.Client({
         'protocol': 'https'   // For self-hosting locally use "http"
     }],
     'apiKey': (process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+            ? process.env.TYPESENSE_ADMIN_API_KEY
             : process.env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY)
         || "",
     'connectionTimeoutSeconds': 2
