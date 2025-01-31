@@ -20,6 +20,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { GanttChartView } from "./gantt-chart"
 import { getRoadmapId } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
+import { buttonVariants } from "./ui/button"
+import { cn } from "@/lib/utils"
+import Link from "next/link"
+import { FaArrowUpRightFromSquare } from "react-icons/fa6"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -98,12 +102,23 @@ export function Roadmap({data}: {data: any}) {
             >
                 <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
                     <Tabs defaultValue={urlView ? urlView : "flow"} onValueChange={handleTabChange}>
-                        <div className="flex flex-row items-center m-1 p-1 gap-x-1">
+                        <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-between">
                             <TabsList>
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
                                 <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                                 {/* <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger> */}
                             </TabsList>
+
+                            <Link
+                                href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
+                                className={cn(
+                                    buttonVariants({ variant: "secondary" }),
+                                    "flex items-center"
+                                )}
+                            >
+                                {`View public research plan`}
+                                <FaArrowUpRightFromSquare size={12}/>
+                            </Link>
                         </div>
 
                         {/* Flow View */}
