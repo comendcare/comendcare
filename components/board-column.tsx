@@ -23,6 +23,7 @@ import {FaEllipsis, FaTrash} from "react-icons/fa6";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
 import EditColumnDialog from "./edit-column-dialog"
+import { useSession } from "next-auth/react"
 
 
 export type ColumnType = "Column"
@@ -36,13 +37,15 @@ interface BoardColumnProps {
     column: Column
     tasks: Task[]
     isOverlay?: boolean
+    filter?: string
 }
 
 const selector = (state: KanbanState) => ({
     deleteColumn: state.deleteColumn
 })
 
-export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
+export function BoardColumn({ column, tasks, isOverlay, filter }: BoardColumnProps) {
+    const {data: session} = useSession()
     const {deleteColumn} = useKanbanStore(useShallow(selector))
     const tasksIds = useMemo(() => {
         return tasks.map(task => task.id)
@@ -147,7 +150,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
                             <TaskCard key={task.id} task={task} />
                         ))}
                     </SortableContext>
-                    <NewKanbanTaskButton column={column}/>
+                    <NewKanbanTaskButton column={column} assignTo={session?.user?.id && filter === 'personal' ? session.user.id : undefined}/>
                 </CardContent>
             </ScrollArea>
         </Card>
