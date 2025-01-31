@@ -43,6 +43,10 @@ import { CustomEdge } from "./custom-edge"
 import { Badge } from "./ui/badge"
 import { NODE_TYPE_OPTIONS } from "@/lib/types"
 import { MilestoneTemplateCard } from "./milestone-template-card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { FaInfoCircle } from "react-icons/fa";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { MilestoneTemplateTabs } from "./roadmap-templates"
 
 const proOptions = { hideAttribution: true }
 
@@ -342,7 +346,7 @@ export const PrivateFlowView = ({
             if (!open) setSelectedMilestones([])
             setNewMilestoneIsOpen(open)
         }}>
-            <DialogContent className="min-w-fit">
+            <DialogContent className="min-w-fit h-[80vh] flex flex-col justify-start">
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
                         Select from a milestone template
@@ -352,7 +356,7 @@ export const PrivateFlowView = ({
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="w-full max-h-[50vh] overflow-visible">
+                {/* <ScrollArea className="w-full max-h-[50vh] overflow-visible">
                     <div className="w-full pr-4 grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-visible pt-2">
                         {templateMilestones.map((milestoneData, index) => (
                             <MilestoneTemplateCard 
@@ -363,7 +367,12 @@ export const PrivateFlowView = ({
                             />
                         ))}
                     </div>
-                </ScrollArea>
+                </ScrollArea> */}
+
+                <MilestoneTemplateTabs 
+                    selectedMilestones={selectedMilestones}
+                    setSelectedMilestones={setSelectedMilestones}
+                />
 
                 <DialogFooter>
                     <DialogClose>

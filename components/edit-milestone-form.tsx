@@ -76,6 +76,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import { Calendar } from "./ui/calendar"
+import { FaInfoCircle } from "react-icons/fa";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -417,13 +419,21 @@ export function EditMilestoneForm({
                                         }}
                                         className="w-full flex flex-wrap gap-2 justify-between"
                                     >
-                                        {NODE_TYPE_OPTIONS.map(({label, value}) => (
+                                        {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
                                             <ToggleGroupItem
                                                 key={value}
                                                 value={value}
-                                                className={"text-md grow"}
+                                                className={"text-md grow flex gap-2"}
                                             >
                                                 {label}
+                                                <Tooltip>
+                                                    <TooltipTrigger>
+                                                        <FaInfoCircle />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                                        {description}
+                                                    </TooltipContent>
+                                                </Tooltip>
                                             </ToggleGroupItem>
                                         ))}
                                     </ToggleGroup>
