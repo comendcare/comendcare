@@ -1,7 +1,7 @@
 "use client"
 import {useEffect} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {cn, isNewUser, nameToInitials, setUserAsReturning} from "@/lib/utils";
+import {cn, isOnboarded, nameToInitials, setOnboarded} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";
@@ -20,14 +20,14 @@ export const PagProfileAboutCard = ({organization}: {
 
     useEffect(() => {
         // Only start tour if user is new and is on the /app/profile page
-        if (pathname === "/app/profile" && isNewUser()) {
+        if (pathname === "/app/profile" && !isOnboarded('organization-profile-tour')) {
             startOnbordaAndRemoveToast()
         }
     }, [])
 
     const startOnbordaAndRemoveToast = () => {
         startOnborda('organization-profile-tour')
-        setUserAsReturning()
+        setOnboarded('organization-profile-tour')
         toast.dismiss()
     }
 

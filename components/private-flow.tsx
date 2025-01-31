@@ -33,7 +33,7 @@ import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { toast } from "sonner"
-import { isNewUser, setUserAsReturning } from "@/lib/utils"
+import { isOnboarded, setOnboarded} from "@/lib/utils"
 import { ScrollArea } from "./ui/scroll-area"
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { CheckBubble } from "./check-bubble"
@@ -283,34 +283,14 @@ export const PrivateFlowView = ({
     }, [width, selectedNodeId])
 
     useEffect(() => {
-        if (isNewUser()) {
-            // toast("Welcome to your research plan!", {
-            //     id: "onborda",
-            //     duration: 300000,
-            //     description: `Would you like to take a quick tour?`,
-            //     action: (
-            //         <div className="flex flex-col space-y-2 ml-4">
-            //             <Button
-            //                 onClick={startOnbordaAndRemoveToast}
-            //             >{`Yes please!`}</Button>
-            //             <Button
-            //                 onClick={() => {
-            //                     toast.dismiss()
-            //                     setUserAsReturning()
-            //                 }}
-            //             >
-            //                 {`No thanks!`}
-            //             </Button>
-            //         </div>
-            //     )
-            // })
+        if (!isOnboarded('research-plan-tour')) {
             startOnbordaAndRemoveToast()
         }
     }, [localNodes])
 
     const startOnbordaAndRemoveToast = () => {
         startOnborda('research-plan-tour')
-        setUserAsReturning()
+        setOnboarded('research-plan-tour')
         toast.dismiss()
     }
 

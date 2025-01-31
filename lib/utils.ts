@@ -187,13 +187,13 @@ export function formatDate(dateString: string): string {
 
 export const mapsFetcher = (url: string) => fetch(url).then((r) => r.json());
 
-export const isNewUser = () => {
-    const isNew = localStorage.getItem("isNewUser")
-    return isNew === null
+export const isOnboarded = (tutorialName: string) => {
+    const onboarded = localStorage.getItem(tutorialName)
+    return !(onboarded === null)
 }
 
-export const setUserAsReturning = () => {
-    localStorage.setItem("isNewUser", "false")
+export const setOnboarded = (tutorialName: string) => {
+    localStorage.setItem(tutorialName, "true")
 }
 
 type DraggableData = ColumnDragData | TaskDragData
