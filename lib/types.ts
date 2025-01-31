@@ -254,9 +254,21 @@ export const MOLECULAR_MECHANISMS: Option[] = [
 ]
 
 export const NODE_TYPE_OPTIONS: Option[] = [
-    { label: 'Asset', value: 'ASSET' },
-    { label: 'Project', value: 'PROJECT' },
-    { label: 'RFP (Request for Proposal)', value: 'RFP' },
+    { 
+        label: 'Asset', 
+        value: 'ASSET',
+        description: 'A milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
+    },
+    { 
+        label: 'Project', 
+        value: 'PROJECT',
+        description: 'A milestone you’re interested in supporting through funding and/or other resources.'
+    },
+    { 
+        label: 'RFP (Request for Proposal)', 
+        value: 'RFP',
+        description: 'A milestone that is being planned or is under development.'
+    },
 ]
 
 export const MILESTONE_TYPE_OPTIONS: Option[] = [
