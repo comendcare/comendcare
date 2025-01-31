@@ -11,7 +11,11 @@ async function main() {
         await sendTypeSenseRequest(
             `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}/collections/organizations`,
             'DELETE',
-            process.env.TYPESENSE_ADMIN_API_KEY!
+            (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!,
         );
         console.log(`Deleted existing collection: "organizations"`);
     } catch (err) {
@@ -389,171 +393,186 @@ async function main() {
 
     console.log(arcadion)
 
-    await createTypeSenseCollection(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, {
-        name: 'organizations',
-        "fields": [
-            {
-                "name": 'id',
-                "type": 'string',
-                "facet": false,
-                "index": true,
-                "optional": false, // Ensure it's marked as required, ID is required
-                "sort": true,
-                "store": true,
-            },
-            {
-                "facet": false,
-                "index": true,
-                "infix": false,
-                "locale": "",
-                "name": "description",
-                "optional": true,
-                "sort": false,
-                "stem": false,
-                "store": true,
-                "type": "string"
-            },
-            {
-                "facet": false,
-                "index": true,
-                "infix": false,
-                "locale": "",
-                "name": "yearFounded",
-                "optional": true,
-                "sort": false,
-                "stem": false,
-                "store": true,
-                "type": "string"
-            },
-            {
-                "facet": false,
-                "index": true,
-                "infix": false,
-                "locale": "",
-                "name": "name",
-                "optional": true,
-                "sort": true,
-                "stem": false,
-                "store": true,
-                "type": "string"
-            },
-            {
-                "facet": false,
-                "index": true,
-                "infix": false,
-                "locale": "",
-                "name": "moneyRaised",
-                "optional": true,
-                "sort": true,
-                "stem": false,
-                "store": true,
-                "type": "int64"
-            },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "numberOfPatientsEngaged",
-            //     "optional": true,
-            //     "sort": true,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "int64"
-            // },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "prevalenceDenominator",
-            //     "optional": false,
-            //     "sort": true,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "int64"
-            // },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "prevalenceNumerator",
-            //     "optional": false,
-            //     "sort": true,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "int64"
-            // },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "prevalenceRatio",
-            //     "optional": true,
-            //     "sort": true,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "float"
-            // },
-            {
-                "facet": false,
-                "index": true,
-                "infix": false,
-                "locale": "",
-                "name": "moneyDeployed",
-                "optional": true,
-                "sort": true,
-                "stem": false,
-                "store": true,
-                "type": "int64"
-            },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "interestedModalities",
-            //     "optional": true,
-            //     "sort": false,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "string[]"
-            // },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "diseaseCategories",
-            //     "optional": true,
-            //     "sort": false,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "string[]"
-            // }
-            // add additional fields as needed
-        ],
-    });
+    await createTypeSenseCollection(
+        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+        (
+            process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                : process.env.TYPESENSE_ADMIN_API_KEY
+        )!, 
+        {
+            name: 'organizations',
+            "fields": [
+                {
+                    "name": 'id',
+                    "type": 'string',
+                    "facet": false,
+                    "index": true,
+                    "optional": false, // Ensure it's marked as required, ID is required
+                    "sort": true,
+                    "store": true,
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "description",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "string"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "yearFounded",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "string"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "name",
+                    "optional": true,
+                    "sort": true,
+                    "stem": false,
+                    "store": true,
+                    "type": "string"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "moneyRaised",
+                    "optional": true,
+                    "sort": true,
+                    "stem": false,
+                    "store": true,
+                    "type": "int64"
+                },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "numberOfPatientsEngaged",
+                //     "optional": true,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "int64"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "prevalenceDenominator",
+                //     "optional": false,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "int64"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "prevalenceNumerator",
+                //     "optional": false,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "int64"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "prevalenceRatio",
+                //     "optional": true,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "float"
+                // },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "moneyDeployed",
+                    "optional": true,
+                    "sort": true,
+                    "stem": false,
+                    "store": true,
+                    "type": "int64"
+                },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "interestedModalities",
+                //     "optional": true,
+                //     "sort": false,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "string[]"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "diseaseCategories",
+                //     "optional": true,
+                //     "sort": false,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "string[]"
+                // }
+                // add additional fields as needed
+            ],
+        }
+    );
     console.log(`Created typesense organizations collection...`)
 
     const organizations = await prisma.organization.findMany()
     for (const organization of organizations) {
         try {
-            await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, {
-                id: organization.id,
-                name: organization.name,
-                description: organization.description,
-                subdomain: organization.subdomain,
-                customDomain: organization.customDomain,
-                yearFounded: organization.yearFounded,
-                incorporationStatus: organization.incorporationStatus,
-                website: organization.website,
-                moneyRaised: organization.moneyRaised,
-                moneyDeployed: organization.moneyDeployed,
-                researchBudget: organization.researchBudget,
-            }, 'organizations');
+            await addTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!, 
+                {
+                    id: organization.id,
+                    name: organization.name,
+                    description: organization.description,
+                    subdomain: organization.subdomain,
+                    customDomain: organization.customDomain,
+                    yearFounded: organization.yearFounded,
+                    incorporationStatus: organization.incorporationStatus,
+                    website: organization.website,
+                    moneyRaised: organization.moneyRaised,
+                    moneyDeployed: organization.moneyDeployed,
+                    researchBudget: organization.researchBudget,
+                }, 'organizations');
             console.log(`Added organization ${organization.name} to TypeSense`);
         } catch (error) {
             console.error(`Failed to add organization ${organization.name} to TypeSense:`, error);
