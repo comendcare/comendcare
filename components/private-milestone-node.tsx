@@ -23,6 +23,7 @@ import { Popover } from "./plate-ui/popover"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { PublicMilestoneNode } from "./public-milestone-node"
+// import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export type PrivateMilestoneNode = Node<
     {
@@ -233,7 +234,7 @@ export const TypeBadge = ({type, iconOnly = false, className}: {type: string, ic
         return (
             <Badge variant="outline" className={cn("h-8 text-sm flex gap-2 border-red-500 text-red-800", className)}>
                 <FaBullhorn />
-                {!iconOnly && "RFP (Request for Proposal)"}
+                {!iconOnly && "RFP"}
             </Badge>
         )
     }

@@ -23,7 +23,9 @@ import { useStoreApi, Node } from "@xyflow/react";
 import { getRoadmap } from "@/lib/fetchers";
 import { useSession } from "next-auth/react";
 import { createRoadmap } from "@/lib/actions";
-
+import { FaInfoCircle } from "react-icons/fa";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { NODE_TYPE_OPTIONS } from "@/lib/types";
 
 // Define types for statuses and environments
 type Recency = 'Due' | 'New';
@@ -101,7 +103,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
 
     if (assets && rfps) {
         return (
-            <Card className="organization-profile-tour-step4">
+            <Card className="organization-profile-tour-step5">
                 <CardHeader className="flex flex-col md:flex-row items-center justify-between space-y-0">
                     <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                         Milestones
@@ -110,9 +112,21 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
 
                 <CardContent className="grid md:grid-cols-2 gap-4">
                     <div className="flex flex-col space-y-4">
-                        <h3 className="text-xl tracking-tight font-semibold">
-                            {`Assets`}
-                        </h3>
+                        <span className="flex gap-2">
+                            <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                {`Assets`}
+                            </h3>
+                            {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET") && (
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                            {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET")?.description}
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
+                        </span>
                         {assets.length > 0 && (
                             <ul role="list" className="divide-y">
                                 {faker.helpers.arrayElements(assets, faker.number.int({
@@ -167,9 +181,21 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                     </div>
 
                     <div className="flex flex-col space-y-4">
-                        <h3 className="text-xl tracking-tight font-semibold">
-                            {`Requests for Proposals`}
-                        </h3>
+                        <span className="flex gap-2">
+                            <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                {`Requests for Proposal`}
+                            </h3>
+                            {NODE_TYPE_OPTIONS.find(value => value.value === "RFP") && (
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                            {NODE_TYPE_OPTIONS.find(value => value.value === "RFP")?.description}
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
+                        </span>
                         {rfps.length > 0 && (
                             <ul role="list" className="divide-y">
                                 {rfps.map((rfp, index) =>

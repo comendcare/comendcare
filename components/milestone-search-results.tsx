@@ -13,19 +13,22 @@ const selector = (state: MilestoneSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
     setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
-    searchResults: state.searchResults
+    searchResultsAdd: state.searchResultsAdd,
+    searchResultsSub: state.searchResultsSub
 })
 
 export function MilestoneSearchResults() {
-    const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useMilestoneSearchStore(useShallow(selector))
+    const { lastFetchedPage, setLastFetchedPage, view, searchResultsAdd, searchResultsSub } = useMilestoneSearchStore(useShallow(selector))
+    console.log(searchResultsAdd)
+    console.log(searchResultsSub)
 
-    if (!searchResults) return <ComendLoadingSpinner />
+    if (!searchResultsAdd) return <ComendLoadingSpinner />
 
     const ResultsView = () => {
         if (view === "list") {
             return (
                 <ol className="w-full flex flex-col gap-4">
-                    {searchResults.map((milestone, index) => (
+                    {searchResultsAdd.map((milestone, index) => (
                         <MilestoneMarketplaceListElement milestone={milestone} key={index}/>
                     ))}
                 </ol>
@@ -35,7 +38,7 @@ export function MilestoneSearchResults() {
         // default to grid view
         return (
             <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
-                {searchResults.map((milestone, index) => (
+                {searchResultsAdd.map((milestone, index) => (
                     <MilestoneMarketplaceCard milestone={milestone} key={index} />
                 ))}
             </div>
@@ -66,7 +69,7 @@ export function MilestoneSearchResults() {
         )
     }
 
-    return searchResults && (searchResults.length > 0) ? (
+    return searchResultsAdd && (searchResultsAdd.length > 0) ? (
         <>
             <ResultsView />
             <InfiniteScroll 

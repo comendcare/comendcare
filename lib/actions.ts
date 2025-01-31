@@ -2142,7 +2142,7 @@ export async function deleteColumn(columnId: string) {
 }
 
 /* HANDLE KANBAN TASKS - create, update, delete -------------------------------------------------------------------------- */
-export async function createTask(columnId: string) {
+export async function createTask(columnId: string, properties?: any) {
     try {
         const newTask: Task = await prisma.task.create({
             include: {checklist: true, stakeholders: {include: {user: true}}},
@@ -2163,6 +2163,14 @@ export async function createTask(columnId: string) {
                 private: true,
                 // startDate: null,
                 // checklist: []
+                ...(properties?.stakeholders ? {stakeholders: {
+                    createMany: {
+                        data: (properties.stakeholders || []).map((stakeholder: any) => ({
+                            userId: stakeholder?.user?.id || stakeholder?.userId,
+                            // user: { connect: { id: stakeholder.id }},
+                        }))
+                    }
+                }}: undefined)
             }
         })
 
@@ -2210,7 +2218,7 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                             deleteMany: {},
                             createMany: {
                                 data: (task.stakeholders || []).map((stakeholder: any) => ({
-                                    userId: stakeholder.user.id || stakeholder.userId,
+                                    userId: stakeholder?.user?.id || stakeholder?.userId,
                                     // user: { connect: { id: stakeholder.id }},
                                 }))
                             }

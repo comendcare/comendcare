@@ -78,6 +78,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
             roleDescription: "Task"
         }
     })
+    const [isOpen, setIsOpen] = useState(false)
 
     const style = {
         transition,
@@ -107,7 +108,9 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
     }, [task]) // Dependency on task.description to trigger re-render
 
     return (
-        <Dialog>
+        <>
+        {isOpen && <div className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />}
+        <Dialog modal={false} open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 <Card
                     ref={setNodeRef} // necessary for drag and drop to work
@@ -193,20 +196,24 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                     </CardFooter>
                 </Card>
             </DialogTrigger>
-            <DialogContent className="min-w-fit min-h-fit">
-                <DialogHeader>
-                    <DialogTitle>Edit Task Details</DialogTitle>
-                    <DialogDescription>
-                        {`Make changes to your profile here. Click save when you're done.`}
-                    </DialogDescription>
-                </DialogHeader>
-                <EditTaskForm
-                    taskData={task}
-                    onClose={() => {}}
-                />
+            {/* <DialogContent className="min-w-fit min-h-fit overflow-visible"> */}
+            <DialogContent className="min-w-[50vw]">
+                {/* <div className="fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" /> */}
+                {/* <div className="bg-white h-[80vh] w-[50vw] z-60"> */}
+                    <DialogHeader>
+                        <DialogTitle>Edit Task Details</DialogTitle>
+                        <DialogDescription>
+                            {`Make changes to your profile here. Click save when you're done.`}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <EditTaskForm
+                        taskData={task}
+                        onClose={() => {}}
+                    />
+                {/* </div> */}
             </DialogContent>
         </Dialog>
-
+        </>
     )
 }
 
