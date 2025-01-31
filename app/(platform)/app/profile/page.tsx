@@ -143,11 +143,13 @@ export default async function ProfilePage() {
                                                     {formatMoney(organization?.moneyRaised)} raised
                                                 </div>
                                             }
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                            aria-hidden="true"/>
-                                                Founded in {new Date(organization?.yearFounded ?? "").getFullYear()}
-                                            </div>
+                                            {organization?.yearFounded && (
+                                                <div className="mt-2 flex items-center text-gray-500">
+                                                    <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                                aria-hidden="true"/>
+                                                    Founded in {new Date(organization?.yearFounded ?? "").getFullYear()}
+                                                </div>
+                                            )}
                                             {organization?.incorporationStatus === "YES" &&
                                                 <div className="mt-2 flex items-center text-gray-500">
                                                     <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
