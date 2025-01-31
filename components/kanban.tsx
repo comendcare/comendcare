@@ -425,6 +425,7 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
                                 if (filter == "personal" && session?.user.id && !task.stakeholders?.map(stakeholder => stakeholder.userId).includes(session?.user.id)) return false
                                 return task?.columnId === col.id
                             })}
+                            filter={filter}
                         />
                     )) : <div>{`You don't have any columns`}</div>}
                 </SortableContext>
