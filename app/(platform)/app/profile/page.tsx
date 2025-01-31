@@ -8,7 +8,7 @@ import {DonutChartCard} from "@/components/donut-chart-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
-import {cn, formatMoney, isNewUser, setUserAsReturning} from "@/lib/utils";
+import {cn, formatMoney} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
