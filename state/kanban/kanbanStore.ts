@@ -12,7 +12,7 @@ export type KanbanState = {
     deleteColumn: (columnId: string) => Promise<Column | void>
     updateColumn: (columnId: string, newProperties: any) => Promise<Column[] | void>,
     setColumns: (columns: Column[]) => Promise<Column[] | void>,
-    addTask: (columnId: string) => Promise<Task | void>,
+    addTask: (columnId: string, properties?: any) => Promise<Task | void>,
     updateTask: (taskId: string, newProperties: any) => Promise<Task[] | void>,
     setTasks: (tasks: any[]) => Promise<Task[] | void>,
     deleteTask: (taskId: string) => Promise<Task | void>,
@@ -93,10 +93,10 @@ export const useKanbanStore = create<KanbanState>()(
                     toast.error('There was an error updating your column')
                 }
             },
-            addTask: async (columnId: string) => {
+            addTask: async (columnId: string, properties?: any) => {
                 console.log(`add task`)
                 // create task in the database
-                const response = await createTask(columnId)
+                const response = await createTask(columnId, properties)
 
                 if (response?.success && response?.data) {
                     // if task was created successfully, update zustand state
