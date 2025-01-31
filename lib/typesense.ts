@@ -16,7 +16,7 @@ export const typesense = new Typesense.Client({
         'port': 443,      // For self-hosting locally use "8108"
         'protocol': 'https'   // For self-hosting locally use "http"
     }],
-    'apiKey': (process.env.NEXT_PUBLIC_NODE_ENV === "development"
+    'apiKey': (process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
             ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
             : process.env.NEXT_PUBLIC_TYPESENSE_SEARCH_ONLY_API_KEY)
         || "",
