@@ -182,7 +182,8 @@ const syncToTypesense = async (env: {
                     type: "int32",
                     index: true,
                     sort: true,
-                    store: true
+                    store: true,
+                    optional: true
                 },
                 {
                     name: "condition",
@@ -405,7 +406,11 @@ const syncToTypesense = async (env: {
 export async function POST(req: Request) {
     try {
         const env = {
-            TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
+            TYPESENSE_ADMIN_API_KEY: (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!,
             TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
         };
 
@@ -425,7 +430,11 @@ export async function POST(req: Request) {
 export async function GET() {
     try {
         const env = {
-            TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
+            TYPESENSE_ADMIN_API_KEY: (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!,
             TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
         };
 
