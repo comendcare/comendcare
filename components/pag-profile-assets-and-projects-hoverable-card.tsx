@@ -168,7 +168,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
 
                     <div className="flex flex-col space-y-4">
                         <h3 className="text-xl tracking-tight font-semibold">
-                            {`RFPs`}
+                            {`Requests for Proposals`}
                         </h3>
                         {rfps.length > 0 && (
                             <ul role="list" className="divide-y">
