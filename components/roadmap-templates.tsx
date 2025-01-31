@@ -125,8 +125,8 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
         <div className="min-h-0 h-full flex flex-col">
             <Tabs defaultValue={filter} onValueChange={(value) => setFilter(value)} className="flex-1 flex flex-col min-h-0 items-start">
                 <TabsList>
-                    {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
-                        <TabsTrigger value={value} className="flex gap-2">
+                    {NODE_TYPE_OPTIONS.map(({label, value, description}, index) => (
+                        <TabsTrigger key={index} value={value} className="flex gap-2">
                             {label}
                             <Tooltip>
                                 <TooltipTrigger>
