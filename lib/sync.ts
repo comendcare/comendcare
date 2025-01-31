@@ -418,7 +418,11 @@ export const syncToTypesense = async (env: {
 
 // Run sync on start - pull sync from app/api/sync/route.ts, this is the same sync we use for our global sync cron job
 syncToTypesense({
-    TYPESENSE_ADMIN_API_KEY: process.env.TYPESENSE_ADMIN_API_KEY!,
+    TYPESENSE_ADMIN_API_KEY: (
+        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+            : process.env.TYPESENSE_ADMIN_API_KEY
+    )!,
     TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
 }).catch((error) => {
     console.error("Failed to initialize Typesense sync:", error);
