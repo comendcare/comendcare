@@ -13,6 +13,9 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
+import { FaInfoCircle } from "react-icons/fa";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { NODE_TYPE_OPTIONS } from "@/lib/types";
 
 // Define types for statuses and environments
 type Status = 'offline' | 'online' | 'error';
@@ -115,9 +118,21 @@ export const PAGProfileAssetsAndProjectsCard = () => {
 
             <CardContent className="grid grid-cols-2">
                 <div className="flex flex-col space-y-4">
-                    <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                        Assets
-                    </h3>
+                    <span className="flex gap-2">
+                        <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                            {`Assets`}
+                        </h3>
+                        {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET") && (
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <FaInfoCircle />
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                        {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET")?.description}
+                                </TooltipContent>
+                            </Tooltip>
+                        )}
+                    </span>
                     <ul className="space-y-4 text-left text-gray-500 dark:text-gray-400">
                         {faker.helpers.arrayElements(milestones, faker.number.int({
                             min: 3,

@@ -23,8 +23,6 @@ import { Checkbox } from "./ui/checkbox"
 
 const selector = (state: MilestoneSearchState) => ({
     filters: state.filters,
-    allResults: state.allResults,
-    searchResults: state.searchResults,
     setFilters: state.setFilters
 })
 
@@ -42,7 +40,7 @@ const filtersFormSchema = z.object({
 })
 
 export function MilestoneFilters() {
-    const { filters, allResults, searchResults, setFilters } = useMilestoneSearchStore(useShallow(selector))
+    const { filters, setFilters } = useMilestoneSearchStore(useShallow(selector))
     const form = useForm<z.infer<typeof filtersFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(filtersFormSchema),

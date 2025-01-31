@@ -44,6 +44,7 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
         return '#'
     }
 
+    console.log(milestone)
     const milestoneType = MILESTONE_TYPE_OPTIONS.find((option) => option.value === milestone.type)?.label;
     const status = MILESTONE_STATUS_OPTIONS.find((option) => option.value === milestone.status)?.label;
 

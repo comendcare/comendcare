@@ -33,7 +33,7 @@ import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { toast } from "sonner"
-import { isNewUser, setUserAsReturning } from "@/lib/utils"
+import { isOnboarded, setOnboarded} from "@/lib/utils"
 import { ScrollArea } from "./ui/scroll-area"
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { CheckBubble } from "./check-bubble"
@@ -43,6 +43,10 @@ import { CustomEdge } from "./custom-edge"
 import { Badge } from "./ui/badge"
 import { NODE_TYPE_OPTIONS } from "@/lib/types"
 import { MilestoneTemplateCard } from "./milestone-template-card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { FaInfoCircle } from "react-icons/fa";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { MilestoneTemplateTabs } from "./roadmap-templates"
 
 const proOptions = { hideAttribution: true }
 
@@ -279,34 +283,14 @@ export const PrivateFlowView = ({
     }, [width, selectedNodeId])
 
     useEffect(() => {
-        if (isNewUser()) {
-            // toast("Welcome to your research plan!", {
-            //     id: "onborda",
-            //     duration: 300000,
-            //     description: `Would you like to take a quick tour?`,
-            //     action: (
-            //         <div className="flex flex-col space-y-2 ml-4">
-            //             <Button
-            //                 onClick={startOnbordaAndRemoveToast}
-            //             >{`Yes please!`}</Button>
-            //             <Button
-            //                 onClick={() => {
-            //                     toast.dismiss()
-            //                     setUserAsReturning()
-            //                 }}
-            //             >
-            //                 {`No thanks!`}
-            //             </Button>
-            //         </div>
-            //     )
-            // })
+        if (!isOnboarded('research-plan-tour')) {
             startOnbordaAndRemoveToast()
         }
     }, [localNodes])
 
     const startOnbordaAndRemoveToast = () => {
         startOnborda('research-plan-tour')
-        setUserAsReturning()
+        setOnboarded('research-plan-tour')
         toast.dismiss()
     }
 
@@ -342,7 +326,7 @@ export const PrivateFlowView = ({
             if (!open) setSelectedMilestones([])
             setNewMilestoneIsOpen(open)
         }}>
-            <DialogContent className="min-w-fit">
+            <DialogContent className="min-w-fit h-[80vh] flex flex-col justify-start">
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
                         Select from a milestone template
@@ -352,7 +336,7 @@ export const PrivateFlowView = ({
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="w-full max-h-[50vh] overflow-visible">
+                {/* <ScrollArea className="w-full max-h-[50vh] overflow-visible">
                     <div className="w-full pr-4 grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-visible pt-2">
                         {templateMilestones.map((milestoneData, index) => (
                             <MilestoneTemplateCard 
@@ -363,7 +347,12 @@ export const PrivateFlowView = ({
                             />
                         ))}
                     </div>
-                </ScrollArea>
+                </ScrollArea> */}
+
+                <MilestoneTemplateTabs 
+                    selectedMilestones={selectedMilestones}
+                    setSelectedMilestones={setSelectedMilestones}
+                />
 
                 <DialogFooter>
                     <DialogClose>

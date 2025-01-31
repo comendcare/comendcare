@@ -465,6 +465,7 @@ export async function getRoadmap(orgId: string | null | undefined) {
                 nodes: true,
                 milestones: true,
                 edges: true,
+                organization: true
             }
         })
 

@@ -712,7 +712,9 @@ const exampleASORoadmap = {
             startDate: new Date(2019, 1, 1),
             budget: 500000,
             attachments: [],
-            tasks: []
+            tasks: [],
+            status: 'COMPLETED',
+            type: 'NATURALHISTORYSTUDY'
         },
         {
             title: 'Literature Review',
@@ -721,7 +723,9 @@ const exampleASORoadmap = {
             endDate: new Date(2021, 1, 3),
             budget: 150000,
             attachments: [],
-            tasks: []
+            tasks: [],
+            status: 'COMPLETED',
+            type: 'LITERATUREREVIEW'
         },
         {
             title: 'Identify Existing Disease Models',
@@ -730,7 +734,9 @@ const exampleASORoadmap = {
             endDate: new Date(2025, 1, 1),
             budget: 300000,
             attachments: [],
-            tasks: []
+            tasks: [],
+            status: 'INPROGRESS',
+            type: 'OTHERANIMALMODEL'
         },
         {
             title: 'Construct Mouse Models',
@@ -738,7 +744,9 @@ const exampleASORoadmap = {
             startDate: new Date(2024, 5, 5),
             budget: 750000,
             attachments: [],
-            tasks: []
+            tasks: [],
+            status: 'INPROGRESS',
+            type: 'MOUSEMODEL'
         },
         {
             title: 'Construct Patient-Derived Cells',
@@ -746,7 +754,9 @@ const exampleASORoadmap = {
             startDate: new Date(2026, 1, 1),
             budget: 600000,
             attachments: [],
-            tasks: []
+            tasks: [],
+            status: 'INPROGRESS',
+            type: 'PATIENTDERIVEDCELLLINE'
         },
         {
             title: 'Design ASO Construct',
@@ -754,7 +764,9 @@ const exampleASORoadmap = {
             startDate: new Date(2027, 1, 1),
             budget: 900000,
             attachments: [],
-            tasks: []
+            tasks: [],
+            status: 'COMPLETED',
+            type: 'CONSTRUCTDESIGN'
         },
         {
             title: 'Produce Plasmid',
@@ -762,7 +774,9 @@ const exampleASORoadmap = {
             startDate: new Date(2028, 1, 1),
             budget: 500000,
             attachments: [],
-            tasks: []
+            tasks: [],
+            status: 'PLANNED',
+            type: 'PLASMIDPRODUCTION'
         },
         {
             title: 'Proof-Of-Concept Study',
@@ -770,7 +784,9 @@ const exampleASORoadmap = {
             description: 'Design and conduct initial experiments to demonstrate that a potential therapy or intervention can effectively target the disease.',
             budget: 1200000,
             attachments: [],
-            tasks: []
+            tasks: [],
+            status: 'PLANNED',
+            type: 'PROOFOFCONCEPT'
         },
         {
             title: 'Animal Toxicology Study',
@@ -778,7 +794,9 @@ const exampleASORoadmap = {
             description: 'Conduct preclinical trials to evaluate the safety and potential side effects of a therapy.',
             budget: 2000000,
             attachments: [],
-            tasks: []
+            tasks: [],
+            status: 'PLANNED',
+            type: 'TOXICOLOGY'
         }
     ]
 };
@@ -909,6 +927,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
                                 ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
                                 ...(milestone.budget ? {budget: milestone.budget} : undefined),
+                                type: milestone.type,
                                 private: milestone.private || false
                             }
                         }
