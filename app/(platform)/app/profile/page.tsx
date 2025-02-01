@@ -165,7 +165,7 @@ export default async function ProfilePage() {
                                 className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
                                 <div className="flex flex-row space-x-2">
                                     {/*<EditPAGProfileHeaderDialog/>*/}
-                                    <EditPAGProfileDialog/>
+                                    <EditPAGProfileDialog organization={organization}/>
                                     {/*<Button*/}
                                     {/*    className="gap-x-2"*/}
                                     {/*>*/}

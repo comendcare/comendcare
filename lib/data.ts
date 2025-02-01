@@ -1,4 +1,3 @@
-import {CheckCircledIcon, CrossCircledIcon, StopwatchIcon} from "@radix-ui/react-icons";
 import {FaSuitcase, FaFlaskVial, FaUsers} from "react-icons/fa6";
 
 export const bioassets = [

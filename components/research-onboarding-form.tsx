@@ -46,8 +46,7 @@ export const researchFormSchema = z.object({
         })
         .max(60, {
             message: "The name of your condition needs to be shorter than 60 characters",
-        })
-        .optional(),
+        }),
     summary: z.string()
         .min(30, {
             message: "The summary of your condition needs to be longer than 30 characters",
@@ -253,7 +252,7 @@ export default function ResearchOnboardingForm(
                                 name="disorder"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Name of condition`}</FormLabel>
+                                        <FormLabel>{`Name of condition (required)`}</FormLabel>
                                         {/*<div className="w-full flex flex-row justify-between">*/}
                                         {/*    <FormDescription>*/}
                                         {/*        {`The name of your rare condition/disorder.`}*/}
@@ -274,30 +273,30 @@ export default function ResearchOnboardingForm(
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="summary"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`Summary of condition`}</FormLabel>
-                                        {/*<div className="w-full flex flex-row justify-between">*/}
-                                        {/*    <FormDescription>*/}
-                                        {/*        {`A few lines describing your condition and what makes it unique`}*/}
-                                        {/*    </FormDescription>*/}
-                                        {/*    <FormDescription>*/}
-                                        {/*        500 characters max.*/}
-                                        {/*    </FormDescription>*/}
-                                        {/*</div>*/}
-                                        <FormControl>
-                                            <Textarea
-                                                id="summary"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={form.control}*/}
+                            {/*    name="summary"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>{`Summary of condition`}</FormLabel>*/}
+                            {/*            /!*<div className="w-full flex flex-row justify-between">*!/*/}
+                            {/*            /!*    <FormDescription>*!/*/}
+                            {/*            /!*        {`A few lines describing your condition and what makes it unique`}*!/*/}
+                            {/*            /!*    </FormDescription>*!/*/}
+                            {/*            /!*    <FormDescription>*!/*/}
+                            {/*            /!*        500 characters max.*!/*/}
+                            {/*            /!*    </FormDescription>*!/*/}
+                            {/*            /!*</div>*!/*/}
+                            {/*            <FormControl>*/}
+                            {/*                <Textarea*/}
+                            {/*                    id="summary"*/}
+                            {/*                    {...field}*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
                             <FormField
                                 control={form.control}
@@ -332,18 +331,6 @@ export default function ResearchOnboardingForm(
                                         </FormLabel>
                                         <FormDescription className="flex items-center">
                                             {`What types of genetic effects are you investigating?`}
-                                            <Tooltip delayDuration={0}>
-                                                {/*disabled to make the tooltip unclickable*/}
-                                                <TooltipTrigger disabled>
-                                                    <FaQuestionCircle
-                                                        className="text-black h-4 inline-block align-baseline mx-1"/>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>
-                                                        {`This will help us match you with the experts of your particular modality.`}
-                                                    </p>
-                                                </TooltipContent>
-                                            </Tooltip>
                                         </FormDescription>
                                         <FormControl>
                                             <MultipleSelector
@@ -374,41 +361,41 @@ export default function ResearchOnboardingForm(
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="systems"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Associated systems</FormLabel>
-                                        <FormDescription>{`The systems affected by your condition.`}</FormDescription>
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                defaultOptions={ASSOCIATED_SYSTEMS}
-                                                placeholder="Select the associated systems of your condition..."
-                                                hidePlaceholderWhenSelected={true}
-                                                emptyIndicator={
-                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                                        no results found.
-                                                    </p>
-                                                }
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                        {form.watch("systems")?.some((item) => item.value === "OTHER") && (
-                                            <div className="mt-2">
-                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
-                                                <Input
-                                                    type="text"
-                                                    id="systems-other"
-                                                    value={otherSystem}
-                                                    onChange={(e) => setOtherSystem(e.target.value)}
-                                                />
-                                            </div>
-                                        )}
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={form.control}*/}
+                            {/*    name="systems"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>Associated systems</FormLabel>*/}
+                            {/*            <FormDescription>{`The systems affected by your condition.`}</FormDescription>*/}
+                            {/*            <FormControl>*/}
+                            {/*                <MultipleSelector*/}
+                            {/*                    {...field}*/}
+                            {/*                    defaultOptions={ASSOCIATED_SYSTEMS}*/}
+                            {/*                    placeholder="Select the associated systems of your condition..."*/}
+                            {/*                    hidePlaceholderWhenSelected={true}*/}
+                            {/*                    emptyIndicator={*/}
+                            {/*                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
+                            {/*                            no results found.*/}
+                            {/*                        </p>*/}
+                            {/*                    }*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*            {form.watch("systems")?.some((item) => item.value === "OTHER") && (*/}
+                            {/*                <div className="mt-2">*/}
+                            {/*                    <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>*/}
+                            {/*                    <Input*/}
+                            {/*                        type="text"*/}
+                            {/*                        id="systems-other"*/}
+                            {/*                        value={otherSystem}*/}
+                            {/*                        onChange={(e) => setOtherSystem(e.target.value)}*/}
+                            {/*                    />*/}
+                            {/*                </div>*/}
+                            {/*            )}*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
                             <FormField
                                 control={form.control}
@@ -494,48 +481,48 @@ export default function ResearchOnboardingForm(
                             {/*    )}*/}
                             {/*/>*/}
 
-                            <FormField
-                                control={form.control}
-                                name="prevalenceNumerator"
-                                render={({field: numeratorField}) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            {`Estimated total prevalence`} - {`${formatNumberWithCommas(numeratorField.value)} in ${formatNumberWithCommas(form.watch("prevalenceDenominator"))}`}
-                                        </FormLabel>
-                                        <FormDescription>
-                                            {`The estimated global prevalence ratio of your condition.`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <div className="flex flex-row items-end justify-start space-x-2">
-                                                <Input
-                                                    type="number"
-                                                    id="prevalenceNumerator"
-                                                    {...numeratorField}
-                                                    className="w-16"
-                                                    min={0}
-                                                />
-                                                <span>in</span>
-                                                <FormField
-                                                    control={form.control}
-                                                    name="prevalenceDenominator"
-                                                    render={({field: denominatorField}) => (
-                                                        <FormControl>
-                                                            <Input
-                                                                type="number"
-                                                                id="prevalenceDenominator"
-                                                                {...denominatorField}
-                                                                className="w-32"
-                                                                min={0}
-                                                            />
-                                                        </FormControl>
-                                                    )}
-                                                />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={form.control}*/}
+                            {/*    name="prevalenceNumerator"*/}
+                            {/*    render={({field: numeratorField}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>*/}
+                            {/*                {`Estimated total prevalence`} - {`${formatNumberWithCommas(numeratorField.value)} in ${formatNumberWithCommas(form.watch("prevalenceDenominator"))}`}*/}
+                            {/*            </FormLabel>*/}
+                            {/*            <FormDescription>*/}
+                            {/*                {`The estimated global prevalence ratio of your condition.`}*/}
+                            {/*            </FormDescription>*/}
+                            {/*            <FormControl>*/}
+                            {/*                <div className="flex flex-row items-end justify-start space-x-2">*/}
+                            {/*                    <Input*/}
+                            {/*                        type="number"*/}
+                            {/*                        id="prevalenceNumerator"*/}
+                            {/*                        {...numeratorField}*/}
+                            {/*                        className="w-16"*/}
+                            {/*                        min={0}*/}
+                            {/*                    />*/}
+                            {/*                    <span>in</span>*/}
+                            {/*                    <FormField*/}
+                            {/*                        control={form.control}*/}
+                            {/*                        name="prevalenceDenominator"*/}
+                            {/*                        render={({field: denominatorField}) => (*/}
+                            {/*                            <FormControl>*/}
+                            {/*                                <Input*/}
+                            {/*                                    type="number"*/}
+                            {/*                                    id="prevalenceDenominator"*/}
+                            {/*                                    {...denominatorField}*/}
+                            {/*                                    className="w-32"*/}
+                            {/*                                    min={0}*/}
+                            {/*                                />*/}
+                            {/*                            </FormControl>*/}
+                            {/*                        )}*/}
+                            {/*                    />*/}
+                            {/*                </div>*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
                             <FormField
                                 control={form.control}
@@ -543,7 +530,7 @@ export default function ResearchOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Number of patients engaged`} - {formatNumberWithCommas(field.value)}</FormLabel>
-                                        <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
+                                        <FormDescription>{`An estimated number of diagnosed patients engaged with your organization.`}</FormDescription>
                                         <FormControl>
                                             <Input
                                                 type="number"
@@ -556,43 +543,43 @@ export default function ResearchOnboardingForm(
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="national"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`Estimated number of patients in the US`} - {formatNumberWithCommas(field.value)}</FormLabel>
-                                        {/*<FormDescription>{`The estimated number of patients in your country or region of influence.`}</FormDescription>*/}
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                id="national"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={form.control}*/}
+                            {/*    name="national"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>{`Estimated number of patients in the US`} - {formatNumberWithCommas(field.value)}</FormLabel>*/}
+                            {/*            /!*<FormDescription>{`The estimated number of patients in your country or region of influence.`}</FormDescription>*!/*/}
+                            {/*            <FormControl>*/}
+                            {/*                <Input*/}
+                            {/*                    type="number"*/}
+                            {/*                    id="national"*/}
+                            {/*                    {...field}*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
-                            <FormField
-                                control={form.control}
-                                name="global"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`Estimated number of patients in the world`} - {formatNumberWithCommas(field.value)}</FormLabel>
-                                        {/*<FormDescription>{`The estimated number of patients in the world.`}</FormDescription>*/}
-                                        <FormControl>
-                                            <Input
-                                                type="number"
-                                                id="global"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={form.control}*/}
+                            {/*    name="global"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>{`Estimated number of patients in the world`} - {formatNumberWithCommas(field.value)}</FormLabel>*/}
+                            {/*            /!*<FormDescription>{`The estimated number of patients in the world.`}</FormDescription>*!/*/}
+                            {/*            <FormControl>*/}
+                            {/*                <Input*/}
+                            {/*                    type="number"*/}
+                            {/*                    id="global"*/}
+                            {/*                    {...field}*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
