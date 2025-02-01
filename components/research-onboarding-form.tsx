@@ -55,25 +55,23 @@ export const researchFormSchema = z.object({
             message: "The name of your condition needs to be shorter than 500 characters",
         })
         .optional(),
+    therapeutics: z.array(optionSchema).min(0).optional(),
     modalities: z.array(optionSchema).min(0).optional(),
     categories: z.array(optionSchema).optional(),
     prevalenceNumerator: z.string().min(1, {
-        message: "Your organization's prevalence.",
+        message: "Your prevalence numerator must be at least 1",
     }).optional(),
     prevalenceDenominator: z.string().min(1, {
-        message: "Your organization's prevalence.",
+        message: "Your prevalence denominator must be at least 1",
     }).optional(),
     engaged: z.string().min(1, {  // These need to be strings because
-        message: "The number of patients your organization has engaged with.",
+        message: "The number of patients your organization has engaged with must be at least 1.",
     }).optional(),
-    national: z.string().min(1, {
-        message: "The estimated number of patients nationally.",
-    }).optional(),
-    global: z.string().min(1, {
-        message: "The estimated number of patients globally.",
-    }).optional(),
+    national: z.string().optional(),
+    global: z.string().optional(),
     // mechanisms: z.array(optionSchema).min(0),
     mechanisms: z.array(z.string()).optional(),
+    causal: z.array(optionSchema).optional(),
     genes: z.array(optionSchema).optional(),
     biomarkers: z.array(optionSchema).optional(),
     systems: z.array(optionSchema).optional(),
@@ -118,6 +116,7 @@ export default function ResearchOnboardingForm(
 
             // Map form values into FormData
             const data = {
+                therapeuticsInDevelopment: values.therapeutics?.map((therapeutic) => therapeutic.label).join(",") || "",
                 interestedModalities: values.modalities?.map((modality) => modality.label).join(",") || "",
                 name: values.disorder || "",
                 summary: values.summary || "",
@@ -128,6 +127,7 @@ export default function ResearchOnboardingForm(
                 nationalEstimatedPopulation: values.national ? values.national.toString() : "",
                 globalEstimatedPopulation: values.global ? values.global.toString() : "",
                 relevantDiseaseMechanisms: values.mechanisms?.join(",") || "",
+                causalGenes: values.causal?.map((gene) => gene.label).join(",") || "",
                 associatedGenes: values.genes?.map((gene) => gene.label).join(",") || "",
                 associatedSystems: values.systems?.map((symptom) => symptom.label).join(",") || "",
             };
@@ -300,6 +300,29 @@ export default function ResearchOnboardingForm(
 
                             <FormField
                                 control={form.control}
+                                name="causal"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Causal genes</FormLabel>
+                                        {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                onSearch={handleAsyncSearch}
+                                                placeholder="Search for genes..."
+                                                hidePlaceholderWhenSelected={true}
+                                                loadingIndicator={<p>Loading genes...</p>}
+                                                emptyIndicator={<p>No genes found.</p>}
+                                                showHoverCard={false}
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
                                 name="genes"
                                 render={({field}) => (
                                     <FormItem>
@@ -399,11 +422,48 @@ export default function ResearchOnboardingForm(
 
                             <FormField
                                 control={form.control}
+                                name="therapeutics"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            Therapeutics under development
+                                        </FormLabel>
+                                        <FormControl>
+                                            <MultipleSelector
+                                                {...field}
+                                                defaultOptions={MODALITIES}
+                                                placeholder="Select modalities you like..."
+                                                hidePlaceholderWhenSelected={true}
+                                                emptyIndicator={
+                                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                        no results found.
+                                                    </p>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                        {form.watch("therapeutics")?.some((item) => item.value === "OTHER") && (
+                                            <div className="mt-2">
+                                                <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                <Input
+                                                    type="text"
+                                                    id="modalities-other"
+                                                    value={otherModality}
+                                                    onChange={(e) => setOtherModality(e.target.value)}
+                                                />
+                                            </div>
+                                        )}
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
                                 name="modalities"
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>
-                                            Modalities of interest
+                                            Therapeutics of interest
                                         </FormLabel>
                                         <FormDescription className="flex items-center">
                                             {`The treatment modalities of interest of your organization.`}
