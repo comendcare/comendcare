@@ -505,12 +505,14 @@ export default function EditPAGProfileDialog({organization}: {organization: Orga
             const mappedData: Record<string, any> = {
                 name: values.disorder || "",
                 summary: values.summary || "",
+                therapeuticsInDevelopment: values.therapeutics?.map((item) => item.label) || [],
                 interestedModalities: values.modalities?.map((item) => item.label) || [],
                 diseaseCategories: values.categories?.map((item) => item.label) || [],
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
                 numberOfPatientsEngaged: values.engaged ? parseInt(values.engaged, 10) : null,
                 relevantDiseaseMechanisms: values.mechanisms || [],
+                causalGenes: values.causal?.map((item) => item.label) || [],
                 associatedGenes: values.genes?.map((item) => item.label) || [],
                 associatedSystems: values.systems?.map((item) => item.label) || [],
                 associatedSignsAndSymptoms: values.symptoms?.map((item) => item.label) || [],
@@ -953,6 +955,28 @@ export default function EditPAGProfileDialog({organization}: {organization: Orga
 
                                     <FormField
                                         control={editResearchForm.control}
+                                        name="causal"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Causal genes</FormLabel>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        onSearch={handleAsyncSearch}
+                                                        placeholder="Search for genes..."
+                                                        hidePlaceholderWhenSelected={true}
+                                                        loadingIndicator={<p>Loading genes...</p>}
+                                                        emptyIndicator={<p>No genes found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
                                         name="genes"
                                         render={({field}) => (
                                             <FormItem>
@@ -1052,11 +1076,48 @@ export default function EditPAGProfileDialog({organization}: {organization: Orga
 
                                     <FormField
                                         control={editResearchForm.control}
+                                        name="therapeutics"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Therapeutics under development
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        defaultOptions={MODALITIES}
+                                                        placeholder="Select modalities you like..."
+                                                        hidePlaceholderWhenSelected={true}
+                                                        emptyIndicator={
+                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                no results found.
+                                                            </p>
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                                {editResearchForm.watch("therapeutics")?.some((item) => item.value === "OTHER") && (
+                                                    <div className="mt-2">
+                                                        <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                        <Input
+                                                            type="text"
+                                                            id="modalities-other"
+                                                            value={otherModality}
+                                                            onChange={(e) => setOtherModality(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
                                         name="modalities"
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>
-                                                    Modalities of interest
+                                                    Therapeutics of interest
                                                 </FormLabel>
                                                 <FormDescription className="flex items-center">
                                                     {`The treatment modalities of interest of your organization.`}
