@@ -251,6 +251,30 @@ const syncToTypesense = async (env: {
                     store: true,
                     type: "string"
                 },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "updatedAt",
+                    optional: false,
+                    sort: true,  // Enable sorting
+                    stem: false,
+                    store: true,
+                    type: "int64" // Store timestamps as Unix timestamps (milliseconds)
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "nodeType",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
                 // {
                 //     facet: false,
                 //     index: true,
@@ -373,16 +397,14 @@ const syncToTypesense = async (env: {
                 console.log(`Milestone ${index + 1}:`, ms)
                 const milestone = await prisma.milestone.findUnique({
                     where: { id: ms.id },
-                    // include: {
-                    //     RFP: true,
-                    //     asset: true
-                    // }
+                    include: { node: true }
                 })
 
                 if (!milestone) return null;
 
                 return {
                     ...milestone,
+                    nodeType: milestone.node?.type,
                     updatedAt: new Date(milestone.updatedAt).getTime(), // Convert to int64
                 }
             }))

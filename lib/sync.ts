@@ -262,6 +262,18 @@ export const syncToTypesense = async (env: {
                     store: true,
                     type: "int64" // Store timestamps as Unix timestamps (milliseconds)
                 },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "nodeType",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
                 // {
                 //     facet: false,
                 //     index: true,
@@ -387,16 +399,14 @@ export const syncToTypesense = async (env: {
                 console.log(`Milestone ${index + 1}:`, ms)
                 const milestone = await prisma.milestone.findUnique({
                     where: { id: ms.id },
-                    // include: {
-                    //     RFP: true,
-                    //     asset: true
-                    // }
+                    include: { node: true }
                 })
 
                 if (!milestone) return null;
 
                 return {
                     ...milestone,
+                    nodeType: milestone.node?.type,
                     updatedAt: new Date(milestone.updatedAt).getTime(), // Convert to int64
                 }
             }))
@@ -419,9 +429,9 @@ export const syncToTypesense = async (env: {
 // Run sync on start - pull sync from app/api/sync/route.ts, this is the same sync we use for our global sync cron job
 syncToTypesense({
     TYPESENSE_ADMIN_API_KEY: (
-        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-            : process.env.TYPESENSE_ADMIN_API_KEY
+        process.env.NEXT_PUBLIC_NODE_ENV === "production"
+            ? process.env.TYPESENSE_ADMIN_API_KEY
+            : process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
     )!,
     TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
 }).catch((error) => {
