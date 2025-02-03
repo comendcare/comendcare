@@ -29,15 +29,15 @@ type MilestoneType = Prisma.MilestoneGetPayload<{
 const Details = ({ rfp }: { rfp: MilestoneType }) => {
     if (rfp.startDate && rfp.budget) {
         return (
-            <p>{rfp.startDate.toDateString()}  &bull; {`$ ${rfp.budget.toLocaleString()} USD`}</p>
+            <p className="w-full text-wrap break-words">{rfp.startDate.toDateString()}  &bull; {`$ ${rfp.budget.toLocaleString()} USD`}</p>
         )
     } else if (rfp.budget) {
         return (
-            <p>{`$ ${rfp.budget.toLocaleString()} USD`}</p>
+            <p className="w-full text-wrap break-words">{`$ ${rfp.budget.toLocaleString()} USD`}</p>
         )
     } else if (rfp.startDate) {
         return (
-            <p>{rfp.startDate.toDateString()}</p>
+            <p className="w-full text-wrap break-words">{rfp.startDate.toDateString()}</p>
         )
     }
 
@@ -76,10 +76,10 @@ export function RFPDetails({ rfp }: { rfp: MilestoneType }) {
                 side="top"
                 className="w-80"
             >
-                <div className="flex justify-between space-x-4">
-                    <div className="space-y-1">
+                <div className="w-full flex justify-between space-x-4">
+                    <div className="w-full space-y-1">
                         <h4 className="text-sm font-semibold">{rfp?.title}</h4>
-                        <p className="text-sm">
+                        <p className="w-full text-sm text-wrap break-words">
                             {rfp?.description}
                         </p>
                     </div>
