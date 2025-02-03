@@ -467,8 +467,15 @@ export function EditMilestoneForm({
                     <FormItem>
                         <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
                         <FormItem className="w-full grid grid-cols-[120px_auto] gap-x-2 items-center">
-                            <FormLabel className="text-md mt-2">{`Project Type`}</FormLabel>
+                            <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
                             <MilestoneTypeFormField form={form} />
+
+                            {milestoneData?.node?.type === "ASSET" && (
+                                <>
+                                <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
+                                <BudgetFormField form={form} />
+                                </>
+                            )}
 
                             {milestoneData?.node?.type === "PROJECT" && (
                                 <>
