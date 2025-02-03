@@ -78,6 +78,7 @@ import { format } from "date-fns"
 import { Calendar } from "./ui/calendar"
 import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { PublicBadge } from "./public-badge"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -463,48 +464,49 @@ export function EditMilestoneForm({
                         )}
                     />
 
-                    {milestoneData?.node?.type === "PROJECT" && (
-                        <>
-                            <FormItem>
-                                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
-                                <FormItem className="w-full grid grid-cols-[120px_auto] gap-x-2 items-center">
-                                    <FormLabel className="text-md mt-2">{`Project Type`}</FormLabel>
-                                    <MilestoneTypeFormField form={form} />
+                    <FormItem>
+                        <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
+                        <FormItem className="w-full grid grid-cols-[120px_auto] gap-x-2 items-center">
+                            <FormLabel className="text-md mt-2">{`Project Type`}</FormLabel>
+                            <MilestoneTypeFormField form={form} />
 
-                                    <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
-                                    <StatusFormField form={form} />
+                            {milestoneData?.node?.type === "PROJECT" && (
+                                <>
+                                <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
+                                <StatusFormField form={form} />
 
-                                    <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                    <BudgetFormField form={form} />
-                                </FormItem>
-                            </FormItem>
-
-                            <TimelineFormField 
-                                    form={form}
-                            />
-                        </>
-                    )}
-
-                    {milestoneData?.node?.type === "RFP" && (
-                        <FormItem>
-                            <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
-                            <FormItem className="w-full grid grid-cols-[120px_auto] items-center">
-                                <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
-                                <OpenToFormField form={form}/>
-                                <FormLabel className="text-md mt-2">{`Start Date`}</FormLabel>
-                                <StartDateFormField form={form} />
                                 <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
                                 <BudgetFormField form={form} />
-                            </FormItem>
+                                </>
+                            )}
+
+                            {milestoneData?.node?.type === "RFP" && (
+                                <>
+                                <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
+                                <OpenToFormField form={form}/>
+
+                                <FormLabel className="text-md mt-2">{`Start Date`}</FormLabel>
+                                <StartDateFormField form={form} />
+
+                                <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                <BudgetFormField form={form} />
+                                </>
+                            )}
                         </FormItem>
+                    </FormItem>
+
+                    {milestoneData?.node?.type === "PROJECT" && (
+                        <TimelineFormField 
+                            form={form}
+                        />
                     )}
+
+                    <ContactsFormField form={form} />
 
                     <AttachmentsFormField
                         form={form}
                         attachments={formData.attachments as AttachmentType[]}
                     />
-
-                    <ContactsFormField form={form} />
 
                     <TasksFormField 
                         form={form}
@@ -614,9 +616,10 @@ const PrivatePublicFormField = ({form, formData}: {form: any, formData: any}) =>
                             onCheckedChange={field.onChange}
                         />
                     </FormControl>
-                    {formData.isPrivate && (
-                        <PrivateBadge className="mt-0"/>
-                    )}
+                    {formData.isPrivate 
+                        ? <PrivateBadge className="mt-0"/>
+                        : <PublicBadge className="mt-0" />
+                    }
                     <FormMessage/>
                 </span>
             )}
