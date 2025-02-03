@@ -22,17 +22,18 @@ import {ProfilePhoto} from "@/components/profile-photo";
 import {Button} from "@/components/ui/button"
 import {acceptInvitation} from "@/lib/actions";
 import Image from "next/image"
+import {useRouter} from "next/navigation";
 
 type InvitationWithOrganization = Invitation & {
     organization?: Organization | null; // Optional because the organization might be null if not fetched
 };
 
 export default function UserProfilePage() {
+    const router = useRouter();
     const {data: session, update, status} = useSession()
     const [user, setUser] = useState<User>();
     const [orgs, setOrgs] = useState<Organization[]>();
     const [invitations, setInvitations] = useState<InvitationWithOrganization[]>();
-    console.log(session?.user.email)
 
     useEffect(() => {
         async function fetchUserData() {
@@ -81,7 +82,6 @@ export default function UserProfilePage() {
             try {
                 const response = await getInvitations();
 
-                console.log(response)
                 if (response.success && response.data) {
                     const invitationsWithDetails = await Promise.all(
                         response.data.map(async (invitation) => {
@@ -132,6 +132,7 @@ export default function UserProfilePage() {
                     ...session,
                     organizationId: response.data.organizationId,
                 })
+                router.refresh()
             } else {
                 toast.error(response.error || "Failed to accept the invitation.");
             }
