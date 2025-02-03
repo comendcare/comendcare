@@ -170,6 +170,7 @@ export default async function OrganizationRoadmapPage({
     if (!organization) {
         notFound()
     }
+    console.log(roadmaps[0])
 
     return (
         <>
