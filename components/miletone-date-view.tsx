@@ -14,20 +14,20 @@ export function DateView({startDate, endDate}: {startDate: Date | undefined, end
         )
     } else if (startDate) {
         return (
-            <span className="flex items-center text-bottom">
-                <FaCalendar 
+            <span className="flex items-center gap-2 text-bottom">
+                <FaCalendar
                     aria-hidden="true"
                 />
-                <p>{`${monthsList[startDate.getMonth()]} ${startDate.getFullYear()}`}</p>
+                <p>Starting: {`${monthsList[startDate.getMonth()]} ${startDate.getFullYear()}`}</p>
             </span>
         )
     } else if (endDate) {
         return (
-            <span className="flex items-center text-bottom">
-                <FaCalendar 
+            <span className="flex items-center gap-2 text-bottom">
+                <FaCalendar
                     aria-hidden="true"
                 />
-                <p>{`${monthsList[endDate.getMonth()]} ${endDate.getFullYear()}`}</p>
+                <p>Ending: {`${monthsList[endDate.getMonth()]} ${endDate.getFullYear()}`}</p>
             </span>
         )
     }

@@ -1,4 +1,4 @@
-import {formatMoney} from "@/lib/utils";
+import {formatMoney, standardizeYear} from "@/lib/utils";
 import {FaCity, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup} from "react-icons/fa6";
 import {Organization} from "@prisma/client";
 import PublicProfileDropdown from "@/components/public-profile-dropdown";
@@ -81,7 +81,7 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                                     <div className="mt-2 flex items-center text-gray-500">
                                         <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                     aria-hidden="true"/>
-                                        Founded in {new Date(organization?.yearFounded ?? "").getFullYear()}
+                                        Founded in {standardizeYear(organization?.yearFounded ?? "")}
                                     </div>
                                     {organization?.incorporationStatus === "YES" &&
                                         <div className="mt-2 flex items-center text-gray-500">
