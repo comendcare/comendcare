@@ -22,13 +22,16 @@ export default function OnboardingWelcomePage() {
                         Welcome to Comend, {session?.user.name?.split(" ")[0]}!
                     </h1>
                     <p>
-                        {`We're happy to have you! To create your profile and help us understand how we can help you, we have some questions. This should take about 10 minutes or less. All questions in this form are optional unless marked as (required).`}
+                        {`To create your profile and help us understand how we can best support you, we have some questions.`}
                     </p>
                     <p>
-                        {`You can edit any of this information at any time, after completing onboarding.`}
+                        {`This should take ~10 minutes.`}
+                    </p>
+                    <p>
+                        {`All questions in this form are optional unless marked as (required), and you can edit your information at any time after signing up.`}
                     </p>
                     <p className="font-semibold">
-                        {`You choose what information is shared publicly, and we will never share your data externally without your consent.`}
+                        {`You choose what information is shared publicly. We will never share your data externally without your consent.`}
                     </p>
                 </div>
 
