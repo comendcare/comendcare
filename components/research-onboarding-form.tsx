@@ -321,28 +321,28 @@ export default function ResearchOnboardingForm(
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="genes"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Associated genes</FormLabel>
-                                        {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
-                                        <FormControl>
-                                            <MultipleSelector
-                                                {...field}
-                                                onSearch={handleAsyncSearch}
-                                                placeholder="Search for genes..."
-                                                hidePlaceholderWhenSelected={true}
-                                                loadingIndicator={<p>Loading genes...</p>}
-                                                emptyIndicator={<p>No genes found.</p>}
-                                                showHoverCard={false}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={form.control}*/}
+                            {/*    name="genes"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>Associated genes</FormLabel>*/}
+                            {/*            /!*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*!/*/}
+                            {/*            <FormControl>*/}
+                            {/*                <MultipleSelector*/}
+                            {/*                    {...field}*/}
+                            {/*                    onSearch={handleAsyncSearch}*/}
+                            {/*                    placeholder="Search for genes..."*/}
+                            {/*                    hidePlaceholderWhenSelected={true}*/}
+                            {/*                    loadingIndicator={<p>Loading genes...</p>}*/}
+                            {/*                    emptyIndicator={<p>No genes found.</p>}*/}
+                            {/*                    showHoverCard={false}*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
                             <FormField
                                 control={form.control}
