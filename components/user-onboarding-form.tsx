@@ -295,15 +295,16 @@ export default function UserOnboardingForm() {
                                 </FormItem>
                             )}
                         /> */}
-                        <FormImageCropper
-                            form={form}
-                            name="image"
-                            title={"Profile Image"}
-                            description={"Your profile image."}
-                            aspect={1}
-                            selectedFile={selectedFile}
-                            setSelectedFile={setSelectedFile}
-                        />
+
+                        {/*<FormImageCropper*/}
+                        {/*    form={form}*/}
+                        {/*    name="image"*/}
+                        {/*    title={"Profile Image"}*/}
+                        {/*    description={"Your profile image."}*/}
+                        {/*    aspect={1}*/}
+                        {/*    selectedFile={selectedFile}*/}
+                        {/*    setSelectedFile={setSelectedFile}*/}
+                        {/*/>*/}
 
                         <div className="space-y-2">
                             <FormField

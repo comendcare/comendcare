@@ -599,31 +599,31 @@ export default function OrganizationOnboardingForm(
                                 )}
                             />
 
-                            <FormField
-                                control={newOrgForm.control}
-                                name="description"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Description (required)</FormLabel>
-                                        {/*<div className="w-full flex flex-row justify-between">*/}
-                                        {/*    <FormDescription>*/}
-                                        {/*        This will be the public description of your organization.*/}
-                                        {/*    </FormDescription>*/}
-                                        {/*    <FormDescription>*/}
-                                        {/*        500 characters max.*/}
-                                        {/*    </FormDescription>*/}
-                                        {/*</div>*/}
-                                        <FormControl>
-                                            <Textarea
-                                                placeholder="Tell us a little bit about yourself"
-                                                className="resize-none"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={newOrgForm.control}*/}
+                            {/*    name="description"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>Description (required)</FormLabel>*/}
+                            {/*            /!*<div className="w-full flex flex-row justify-between">*!/*/}
+                            {/*            /!*    <FormDescription>*!/*/}
+                            {/*            /!*        This will be the public description of your organization.*!/*/}
+                            {/*            /!*    </FormDescription>*!/*/}
+                            {/*            /!*    <FormDescription>*!/*/}
+                            {/*            /!*        500 characters max.*!/*/}
+                            {/*            /!*    </FormDescription>*!/*/}
+                            {/*            /!*</div>*!/*/}
+                            {/*            <FormControl>*/}
+                            {/*                <Textarea*/}
+                            {/*                    placeholder="Tell us a little bit about yourself"*/}
+                            {/*                    className="resize-none"*/}
+                            {/*                    {...field}*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
                             <FormField
                                 control={newOrgForm.control}
