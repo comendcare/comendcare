@@ -20,7 +20,7 @@ import {
     SidebarRail,
 } from "@/components/ui/sidebar"
 import {
-    getAllOrganizationsFromUserId
+    getAllMembershipsFromUserId
 } from "@/lib/fetchers";
 import {toast} from "sonner";
 import {useEffect, useState} from "react";
@@ -66,7 +66,6 @@ const data = {
             icon: LayoutDashboard,
             variant: "ghost",
             url: "/app/dashboard",
-            comingSoon: true
         },
         {
             title: "Settings",
@@ -79,14 +78,14 @@ const data = {
 
 export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const {data: session} = useSession()
-    const [organizations, setOrganizations] = useState<MemberWithOrganization[]>([]);
+    const [memberships, setMemberships] = useState<MemberWithOrganization[]>([]);
 
     const fetchOrganizations = async () => {
         if (session) {
-            const response = await getAllOrganizationsFromUserId(session.user.id);
+            const response = await getAllMembershipsFromUserId(session.user.id);
             if (response.success) {
                 const orgs = response.data ?? []
-                setOrganizations(orgs)
+                setMemberships(orgs)
             } else {
                 console.error(response.error)
                 toast.error(response.error)
@@ -101,7 +100,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
-                <OrganizationSwitcher organizations={organizations}/>
+                <OrganizationSwitcher memberships={memberships}/>
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain}/>

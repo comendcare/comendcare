@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
 import { defaultFilters, MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore"
-import { MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS } from "@/lib/types"
 import type { Option } from "./ui/multiple-selector"
 import MultipleSelector from "./ui/multiple-selector"
 import { Checkbox } from "./ui/checkbox"
@@ -23,8 +23,6 @@ import { Checkbox } from "./ui/checkbox"
 
 const selector = (state: MilestoneSearchState) => ({
     filters: state.filters,
-    allResults: state.allResults,
-    searchResults: state.searchResults,
     setFilters: state.setFilters
 })
 
@@ -37,12 +35,13 @@ const optionSchema = z.object({
 const filtersFormSchema = z.object({
     milestoneTypes: z.array(optionSchema),
     milestoneStatus: z.array(z.string()),
-    hasProject: z.boolean(),
-    hasAsset: z.boolean()
+    nodeType: z.array(z.string())
+    // hasProject: z.boolean(),
+    // hasAsset: z.boolean()
 })
 
 export function MilestoneFilters() {
-    const { filters, allResults, searchResults, setFilters } = useMilestoneSearchStore(useShallow(selector))
+    const { filters, setFilters } = useMilestoneSearchStore(useShallow(selector))
     const form = useForm<z.infer<typeof filtersFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(filtersFormSchema),
@@ -60,7 +59,7 @@ export function MilestoneFilters() {
                 onSubmit={form.handleSubmit(handleSubmit)}
                 className="flex flex-col gap-8 px-1"
             >
-                <h1 className={"scroll-m-20 text-3xl font-bold tracking-tight"}>
+                <h1 className={"scroll-m-20 text-2xl font-bold tracking-tight"}>
                     Filters
                 </h1>
 
@@ -120,7 +119,38 @@ export function MilestoneFilters() {
                     )}
                 />
 
-                <FormItem>
+                <FormField
+                    control={form.control}
+                    name="nodeType"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel className="font-semibold text-base">Milestone status</FormLabel>
+                            <FormControl>
+                                <ToggleGroup
+                                    type="multiple"
+                                    variant="outline"
+                                    value={field.value}
+                                    onValueChange={
+                                        field.onChange
+                                    }
+                                    className="w-fit flex flex-wrap gap-2 justify-start"
+                                >
+                                    {NODE_TYPE_OPTIONS.map(({label, value}) => (
+                                        <ToggleGroupItem
+                                            key={value}
+                                            value={value}
+                                        >
+                                            {label}
+                                        </ToggleGroupItem>
+                                    ))}
+                                </ToggleGroup>
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                {/* <FormItem>
                     <FormLabel className="font-semibold text-base">Projects and assets</FormLabel>
                     <FormField
                         control={form.control}
@@ -166,7 +196,7 @@ export function MilestoneFilters() {
                             </div>
                         )}
                     />
-                </FormItem>
+                </FormItem> */}
 
                 <span className="flex justify-end gap-4 flex-wrap">
                     <Button type="submit" variant="destructive" onClick={() => {

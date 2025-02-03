@@ -14,6 +14,7 @@ import { truncate, cn } from "@/lib/utils"
 import { PrivateBadge } from "./private-badge"
 import { Badge } from "./ui/badge"
 import { MILESTONE_TYPE_OPTIONS, StatusType } from "@/lib/types"
+import { CardContents, TypeBadge } from "./private-milestone-node"
 
 export type PublicMilestoneNode = Node<
     {
@@ -25,7 +26,7 @@ export type PublicMilestoneNode = Node<
         startDate?: Date,
         endDate?: Date,
         budget?: number
-        papers?: string[]
+        attachments?: string[]
         stakeholders?: string[]
         labels?: string[]
         // tasks: TaskType[],
@@ -37,8 +38,9 @@ export type PublicMilestoneNode = Node<
         private: boolean
         subdomain: string | undefined
         focused: boolean
+        contacts: any[]
     },
-    "MILESTONE"
+    "PROJECT" | "ASSET" | "RFP"
 >
 
 export interface TaskType {
@@ -49,11 +51,13 @@ export interface TaskType {
 
 function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
     return (
-        <a href={
-            props?.data?.subdomain ? 
-                `http://${props.data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${props?.data?.id}&view=flow` :
-                ''
+        <a 
+            href={
+                props?.data?.subdomain && !props.data?.private ? 
+                    `http://${props.data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${props?.data?.id}&view=flow` :
+                    '/'
             }
+            className={cn(props.data?.private ? "pointer-events-none": "")}
             // target="_blank"
         >
         <Card 
@@ -64,31 +68,25 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
             )}
         >
             <CardHeader>
-                {props.data?.private && (
-                    <PrivateBadge className="-mt-2 justify-end" />
-                )}
-                <CardTitle className="flex flex-row gap-4 justify-between w-full">
-                    {props.data?.title || "New Milestone"}
-                    <FaArrowUpRightFromSquare className="h-[20px] w-[20px]"/>
-                </CardTitle>
-                {/* Description length in node is truncated to 200 characters. */}
-                <CardDescription>
-                    {truncate(props.data?.description || "", 200)}
-                </CardDescription>
+                <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
+                    <TypeBadge type={props.type}/>
+                    {!props.data?.private && <FaArrowUpRightFromSquare className="h-[20px] w-[20px]"/>}
+                </div>
             </CardHeader>
-            <CardContent className="flex flex-col gap-8">
-                <span className="w-full flex">
-                    <Badge className="flex text-sm">
-                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
-                    </Badge>
-                </span>
+            <CardContent className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                    <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
+                    <CardDescription className="text-wrap break-words">
+                        {truncate(props.data?.description || "", 200)}
+                    </CardDescription>
+                </div>
+
+                <CardContents props={props}/>
             </CardContent>
-            <CardFooter className="flex justify-between">
-                <StatusButton
-                    disabled={true}
-                    status={props.data.status}
-                    onStatusChange={() => {}}
-                />
+            <CardFooter className="flex justify-start">
+                {props.data?.private && (
+                    <PrivateBadge className="justify-start" />
+                )}
             </CardFooter>
 
             <Handle

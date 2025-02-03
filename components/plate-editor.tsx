@@ -289,11 +289,11 @@ export function PlateEditor() {
                     </FixedToolbar>
 
                     <Editor />
-
+                    {/* 
                     <FloatingToolbar>
                         <FloatingToolbarButtons />
-                    </FloatingToolbar>
-                    <CommentsPopover />
+                    </FloatingToolbar> */}
+                    {/* <CommentsPopover /> */}
                 </Plate>
             </DndProvider>
         </TooltipProvider>

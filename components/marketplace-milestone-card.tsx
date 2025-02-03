@@ -1,27 +1,36 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
-import { MILESTONE_TYPE_OPTIONS } from "@/lib/types";
-import { Badge } from "./ui/badge";
-import { DateView } from "./miletone-date-view";
-import { getOrganizationFromOrganizationId, getOrganizationFromRoadmapId } from "@/lib/fetchers";
-import { useEffect, useState } from "react";
+import {MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS} from "@/lib/types";
+import {Badge} from "./ui/badge";
+import {DateView} from "./miletone-date-view";
+import {getOrganizationFromOrganizationId, getOrganizationFromRoadmapId} from "@/lib/fetchers";
+import React, {useEffect, useState} from "react";
+import {FaMoneyBill} from "react-icons/fa6";
+import {formatMoney} from "@/lib/utils";
+import {ProfilePhoto} from "@/components/profile-photo";
+import {Separator} from "@/components/ui/separator";
+import {BookCheck, Paperclip, TestTube, UserCheck} from "lucide-react";
+import {TypeBadge} from "@/components/private-milestone-node";
 
-export function MilestoneMarketplaceCard({ milestone }: { milestone: any }) {
+const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
+    PLANNED: {
+        text: "Planned",
+        styling: "bg-red-100 border-red-600 text-red-800"
+    },
+    INPROGRESS: {
+        text: "In Progress",
+        styling: "bg-yellow-100 border-yellow-600 text-yellow-800"
+    },
+    COMPLETED: {
+        text: "Completed",
+        styling: "bg-green-100 border-green-600 text-green-800"
+    }
+};
+
+export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
     const startDate = milestone.startDate ? new Date(milestone.startDate) : undefined
     const endDate = milestone.endDate ? new Date(milestone.endDate) : undefined
-    const [organization, setOrganization] = useState<any>()
-
-    useEffect(() => {
-        const initOrg = async () => {
-            const organizationId = await getOrganizationFromRoadmapId(milestone.roadmapId)
-            if (organizationId.success) {
-                const response = await getOrganizationFromOrganizationId(organizationId?.data)
-                if (response.success) setOrganization(response.data)
-            }
-        }
-
-        if (!organization) initOrg()
-    }, [])
+    const organization = milestone.organization || {};
 
     const getLink = () => {
         if (organization?.subdomain) {
@@ -35,35 +44,89 @@ export function MilestoneMarketplaceCard({ milestone }: { milestone: any }) {
         return '#'
     }
 
+    const milestoneType = MILESTONE_TYPE_OPTIONS.find((option) => option.value === milestone.type)?.label;
+    const status = MILESTONE_STATUS_OPTIONS.find((option) => option.value === milestone.status)?.label;
+
+    const statusKey = milestone.status as keyof typeof StatusData;
+    const statusStyle = StatusData[statusKey]?.styling || "bg-gray-100 text-gray-800";
+
     return (
         <Link
-            // href={
-            //     organization?.subdomain ? 
-            //     // `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${milestone?.roadmapId}&view=flow` :
-            //     `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` :
-            //     '#'
-            // }
             href={getLink()}
         >
-        <Card className="h-full w-full text-left flex flex-col justify-between">
-            <CardHeader>
-                <CardTitle className="flex flex-row gap-2 items-center">
-                    {milestone.title}
-                </CardTitle>
-                <CardDescription>{milestone.description}</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-8">
-                <span className="w-full flex">
-                    <Badge className="flex text-sm">
-                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestone.type))?.label || "No type"}
-                    </Badge>
-                </span>
-                
-                {(startDate?.getMonth() || endDate?.getFullYear()) && (
-                    <DateView startDate={startDate} endDate={endDate}/>
-                )}
-            </CardContent>
-        </Card>
+            <Card className="h-full w-full text-left flex flex-col justify-between">
+                <div>
+                    <CardHeader>
+                        <div className="space-y-4">
+                            <CardDescription
+                                className="text-base flex flex-row justify-between items-center"
+                            >
+                                {organization?.name}
+                                <ProfilePhoto img={organization?.image} name={organization?.name} className="size-6"/>
+                            </CardDescription>
+                            <Separator className="my-2"/>
+                            <div className="flex flex-row items-center justify-between gap-4">
+                                <CardTitle className="text-xl font-normal flex flex-row items-center gap-2 flex-grow">
+                                    {milestone.title}
+                                </CardTitle>
+
+                                {status && (
+                                    <div
+                                        className={`h-8 px-2 py-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 flex-shrink-0 ${statusStyle}`}
+                                    >
+                                        {status}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone?.nodeType))?.value || "PROJECT"}/>
+
+                        {/*<span className="w-full flex">*/}
+                        {/*    {(milestoneType) && (*/}
+                        {/*        <span className="w-full flex">*/}
+                        {/*            <Badge className="flex text-sm">{milestoneType}</Badge>*/}
+                        {/*        </span>*/}
+                        {/*    )}*/}
+                        {/*</span>*/}
+                    </CardHeader>
+
+                    <CardContent className="flex flex-col items-start justify-center gap-4">
+                        <div className="line-clamp-3">
+                            {milestone.description}
+                        </div>
+
+                        {/*{milestone.budget &&*/}
+                        {/*    <div className="m-0 flex items-center">*/}
+                        {/*        <FaMoneyBill className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>*/}
+                        {/*        {formatMoney(milestone.budget)} budget*/}
+                        {/*    </div>*/}
+                        {/*}*/}
+                    </CardContent>
+                </div>
+
+                {milestone.budget &&
+                    <CardFooter className="justify-self-end">
+                        <div className="m-0 flex items-center">
+                            <FaMoneyBill className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
+                            {formatMoney(milestone.budget)} budget
+                        </div>
+                        {/*<div className="flex flex-row space-x-2">*/}
+                        {/*    {[{icon: Paperclip, label: "3 Attachments"}, {*/}
+                        {/*        icon: UserCheck,*/}
+                        {/*        label: "2 Contacts"*/}
+                        {/*    }].map(({icon: Icon, label}, idx) => (*/}
+                        {/*        <div*/}
+                        {/*            key={idx}*/}
+                        {/*            className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"*/}
+                        {/*        >*/}
+                        {/*            <Icon className="size-4"/>*/}
+                        {/*            {label}*/}
+                        {/*        </div>*/}
+                        {/*    ))}*/}
+                        {/*</div>*/}
+                    </CardFooter>
+                }
+            </Card>
         </Link>
     )
 }

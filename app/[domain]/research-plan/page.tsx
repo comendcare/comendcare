@@ -6,10 +6,6 @@ import BlurImage from "@/components/blur-image"
 import MDX from "@/components/mdx"
 import {cn, createDicebearAvatar, formatMoney, placeholderBlurhash, toDateString} from "@/lib/utils"
 import Image from "next/image"
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
-import {PublicFlowView} from "@/components/public-flow"
-import {PublicTimelineView} from "@/components/public-timeline"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
 import {Button} from "@/components/ui/button"
 import {PublicRoadmapCard} from "@/components/public-roadmap-card"
 import {PublicMilestoneDetails} from "@/components/public-milestone-details"
@@ -208,7 +204,7 @@ export default async function OrganizationRoadmapPage({
                                             <HoverCard>
                                                 <HoverCardTrigger asChild>
                                                     <h1 className="text-wrap md:truncate  cursor-pointer">
-                                                        {`${organization?.name}'s ${roadmaps[0].title}`}
+                                                        {`${organization?.name}'s Research Plan`}
                                                     </h1>
                                                 </HoverCardTrigger>
                                                 <HoverCardContent
@@ -234,11 +230,13 @@ export default async function OrganizationRoadmapPage({
                                                     {formatMoney(organization?.moneyRaised)} raised
                                                 </div>
                                             }
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                            aria-hidden="true"/>
-                                                Founded in {new Date(organization?.yearFounded ?? "").getFullYear()}
-                                            </div>
+                                            {organization?.yearFounded && (
+                                                <div className="mt-2 flex items-center text-gray-500">
+                                                    <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                                aria-hidden="true"/>
+                                                    Founded in {new Date(organization?.yearFounded ?? "").getFullYear()}
+                                                </div>
+                                            )}
                                             {organization?.incorporationStatus === "YES" &&
                                                 <div className="mt-2 flex items-center text-gray-500">
                                                     <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"

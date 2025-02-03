@@ -57,6 +57,8 @@ export default function OrganizationSearchBar() {
                 <SelectContent>
                     <SelectGroup>
                         <SelectItem value="alphabetical">Alphabetical (A-Z)</SelectItem>
+                        <SelectItem value="last-updated-old-new">Oldest First</SelectItem>
+                        <SelectItem value="last-updated-new-old">Newest First</SelectItem>
                     </SelectGroup>
                 </SelectContent>
             </Select>

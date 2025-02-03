@@ -75,17 +75,6 @@ export default function OrganizationSettingsPage({organization}: { organization:
     if (organization) {
         return (
             <main className="flex flex-col items-start w-full h-screen mx-auto p-8 space-y-8">
-                <div className="flex flex-col space-y-8 w-full">
-                    <div className="space-y-2 sm:flex-auto">
-                        <h1 className="text-3xl font-bold tracking-tight">
-                            Settings
-                        </h1>
-                        <p className="text-sm text-gray-700">
-                            Organization-wide settings.
-                        </p>
-                    </div>
-                </div>
-
                 <div className="w-full flex flex-col space-y-4">
                     <div>
                         <h2 className="text-md font-semibold leading-6 text-gray-900">

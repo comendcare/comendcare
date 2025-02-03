@@ -11,7 +11,11 @@ async function main() {
         await sendTypeSenseRequest(
             `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}/collections/organizations`,
             'DELETE',
-            process.env.TYPESENSE_ADMIN_API_KEY!
+            (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!,
         );
         console.log(`Deleted existing collection: "organizations"`);
     } catch (err) {
@@ -389,171 +393,186 @@ async function main() {
 
     console.log(arcadion)
 
-    await createTypeSenseCollection(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, {
-        name: 'organizations',
-        "fields": [
-            {
-                "name": 'id',
-                "type": 'string',
-                "facet": false,
-                "index": true,
-                "optional": false, // Ensure it's marked as required, ID is required
-                "sort": true,
-                "store": true,
-            },
-            {
-                "facet": false,
-                "index": true,
-                "infix": false,
-                "locale": "",
-                "name": "description",
-                "optional": true,
-                "sort": false,
-                "stem": false,
-                "store": true,
-                "type": "string"
-            },
-            {
-                "facet": false,
-                "index": true,
-                "infix": false,
-                "locale": "",
-                "name": "yearFounded",
-                "optional": true,
-                "sort": false,
-                "stem": false,
-                "store": true,
-                "type": "string"
-            },
-            {
-                "facet": false,
-                "index": true,
-                "infix": false,
-                "locale": "",
-                "name": "name",
-                "optional": true,
-                "sort": true,
-                "stem": false,
-                "store": true,
-                "type": "string"
-            },
-            {
-                "facet": false,
-                "index": true,
-                "infix": false,
-                "locale": "",
-                "name": "moneyRaised",
-                "optional": true,
-                "sort": true,
-                "stem": false,
-                "store": true,
-                "type": "int64"
-            },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "numberOfPatientsEngaged",
-            //     "optional": true,
-            //     "sort": true,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "int64"
-            // },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "prevalenceDenominator",
-            //     "optional": false,
-            //     "sort": true,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "int64"
-            // },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "prevalenceNumerator",
-            //     "optional": false,
-            //     "sort": true,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "int64"
-            // },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "prevalenceRatio",
-            //     "optional": true,
-            //     "sort": true,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "float"
-            // },
-            {
-                "facet": false,
-                "index": true,
-                "infix": false,
-                "locale": "",
-                "name": "moneyDeployed",
-                "optional": true,
-                "sort": true,
-                "stem": false,
-                "store": true,
-                "type": "int64"
-            },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "interestedModalities",
-            //     "optional": true,
-            //     "sort": false,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "string[]"
-            // },
-            // {
-            //     "facet": false,
-            //     "index": true,
-            //     "infix": false,
-            //     "locale": "",
-            //     "name": "diseaseCategories",
-            //     "optional": true,
-            //     "sort": false,
-            //     "stem": false,
-            //     "store": true,
-            //     "type": "string[]"
-            // }
-            // add additional fields as needed
-        ],
-    });
+    await createTypeSenseCollection(
+        `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+        (
+            process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                : process.env.TYPESENSE_ADMIN_API_KEY
+        )!, 
+        {
+            name: 'organizations',
+            "fields": [
+                {
+                    "name": 'id',
+                    "type": 'string',
+                    "facet": false,
+                    "index": true,
+                    "optional": false, // Ensure it's marked as required, ID is required
+                    "sort": true,
+                    "store": true,
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "description",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "string"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "yearFounded",
+                    "optional": true,
+                    "sort": false,
+                    "stem": false,
+                    "store": true,
+                    "type": "string"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "name",
+                    "optional": true,
+                    "sort": true,
+                    "stem": false,
+                    "store": true,
+                    "type": "string"
+                },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "moneyRaised",
+                    "optional": true,
+                    "sort": true,
+                    "stem": false,
+                    "store": true,
+                    "type": "int64"
+                },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "numberOfPatientsEngaged",
+                //     "optional": true,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "int64"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "prevalenceDenominator",
+                //     "optional": false,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "int64"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "prevalenceNumerator",
+                //     "optional": false,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "int64"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "prevalenceRatio",
+                //     "optional": true,
+                //     "sort": true,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "float"
+                // },
+                {
+                    "facet": false,
+                    "index": true,
+                    "infix": false,
+                    "locale": "",
+                    "name": "moneyDeployed",
+                    "optional": true,
+                    "sort": true,
+                    "stem": false,
+                    "store": true,
+                    "type": "int64"
+                },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "interestedModalities",
+                //     "optional": true,
+                //     "sort": false,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "string[]"
+                // },
+                // {
+                //     "facet": false,
+                //     "index": true,
+                //     "infix": false,
+                //     "locale": "",
+                //     "name": "diseaseCategories",
+                //     "optional": true,
+                //     "sort": false,
+                //     "stem": false,
+                //     "store": true,
+                //     "type": "string[]"
+                // }
+                // add additional fields as needed
+            ],
+        }
+    );
     console.log(`Created typesense organizations collection...`)
 
     const organizations = await prisma.organization.findMany()
     for (const organization of organizations) {
         try {
-            await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, {
-                id: organization.id,
-                name: organization.name,
-                description: organization.description,
-                subdomain: organization.subdomain,
-                customDomain: organization.customDomain,
-                yearFounded: organization.yearFounded,
-                incorporationStatus: organization.incorporationStatus,
-                website: organization.website,
-                moneyRaised: organization.moneyRaised,
-                moneyDeployed: organization.moneyDeployed,
-                researchBudget: organization.researchBudget,
-            }, 'organizations');
+            await addTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!, 
+                {
+                    id: organization.id,
+                    name: organization.name,
+                    description: organization.description,
+                    subdomain: organization.subdomain,
+                    customDomain: organization.customDomain,
+                    yearFounded: organization.yearFounded,
+                    incorporationStatus: organization.incorporationStatus,
+                    website: organization.website,
+                    moneyRaised: organization.moneyRaised,
+                    moneyDeployed: organization.moneyDeployed,
+                    researchBudget: organization.researchBudget,
+                }, 'organizations');
             console.log(`Added organization ${organization.name} to TypeSense`);
         } catch (error) {
             console.error(`Failed to add organization ${organization.name} to TypeSense:`, error);
@@ -691,69 +710,96 @@ const exampleASORoadmap = {
             title: 'Natural History Study',
             description: 'Our observational research effort that follows individuals with a specific disease over time, collecting data on how the disease develops and progresses without intervention.',
             startDate: new Date(2019, 1, 1),
-            papers: [],
-            tasks: []
+            budget: 500000,
+            attachments: [],
+            tasks: [],
+            status: 'COMPLETED',
+            type: 'NATURALHISTORYSTUDY'
         },
         {
             title: 'Literature Review',
             description: 'Examine existing research to better understand the disease, identify gaps in knowledge, and assess the latest findings on potential treatments.',
             startDate: new Date(2020, 5, 12),
             endDate: new Date(2021, 1, 3),
-            papers: [],
-            tasks: []
+            budget: 150000,
+            attachments: [],
+            tasks: [],
+            status: 'COMPLETED',
+            type: 'LITERATUREREVIEW'
         },
         {
             title: 'Identify Existing Disease Models',
             description: 'Research and evaluate lab models.',
             startDate: new Date(2023, 3, 3),
             endDate: new Date(2025, 1, 1),
-            papers: [],
-            tasks: []
+            budget: 300000,
+            attachments: [],
+            tasks: [],
+            status: 'INPROGRESS',
+            type: 'OTHERANIMALMODEL'
         },
         {
             title: 'Construct Mouse Models',
             description: '',
             startDate: new Date(2024, 5, 5),
-            papers: [],
-            tasks: []
+            budget: 750000,
+            attachments: [],
+            tasks: [],
+            status: 'INPROGRESS',
+            type: 'MOUSEMODEL'
         },
         {
             title: 'Construct Patient-Derived Cells',
             description: 'Work with researchers to create cell lines that replicate disease characteristics.',
-            papers: [],
             startDate: new Date(2026, 1, 1),
-            tasks: []
+            budget: 600000,
+            attachments: [],
+            tasks: [],
+            status: 'INPROGRESS',
+            type: 'PATIENTDERIVEDCELLLINE'
         },
         {
             title: 'Design ASO Construct',
             description: 'Design an ASO (Antisense Oligonucleotide) construct that specifically targets the genetic mutations driving our disease.',
             startDate: new Date(2027, 1, 1),
-            papers: [],
-            tasks: []
+            budget: 900000,
+            attachments: [],
+            tasks: [],
+            status: 'COMPLETED',
+            type: 'CONSTRUCTDESIGN'
         },
         {
             title: 'Produce Plasmid',
             description: 'Create a DNA template essential for developing and testing therapies.',
             startDate: new Date(2028, 1, 1),
-            papers: [],
-            tasks: []
+            budget: 500000,
+            attachments: [],
+            tasks: [],
+            status: 'PLANNED',
+            type: 'PLASMIDPRODUCTION'
         },
         {
             title: 'Proof-Of-Concept Study',
             startDate: new Date(2029, 1, 1),
             description: 'Design and conduct initial experiments to demonstrate that a potential therapy or intervention can effectively target the disease.',
-            papers: [],
-            tasks: []
+            budget: 1200000,
+            attachments: [],
+            tasks: [],
+            status: 'PLANNED',
+            type: 'PROOFOFCONCEPT'
         },
         {
             title: 'Animal Toxicology Study',
             startDate: new Date(2030, 1, 1),
             description: 'Conduct preclinical trials to evaluate the safety and potential side effects of a therapy.',
-            papers: [],
-            tasks: []
+            budget: 2000000,
+            attachments: [],
+            tasks: [],
+            status: 'PLANNED',
+            type: 'TOXICOLOGY'
         }
     ]
-}
+};
 
 async function createConditions(organizationIds: string[]) {
     const celocynSyndrome = await prisma.condition.create({
@@ -868,7 +914,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                 const node = await prisma.node.create({
                     data: {
                         roadmapId: roadmap.id,
-                        type: 'MILESTONE',
+                        type: 'PROJECT',
                         positionX: index * 500,
                         positionY: 0,
                         data: {
@@ -881,7 +927,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
                                 ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
                                 ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                // ...(milestone.papers && milestone.papers.length > 0 ? { papers: milestone.papers } : undefined),
+                                type: milestone.type,
                                 private: milestone.private || false
                             }
                         }
@@ -893,14 +939,15 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                 const newMilestone = await prisma.milestone.findUnique({
                     where: {nodeId: node.id},
                     include: {
-                        papers: true, 
-                        asset: {
-                            include: { contacts: true, attachments: true }
-                        },
-                        RFP: {
-                            include: { contacts: true, attachments: true }
-                        },
-                        tasks: true
+                        attachments: true, 
+                        // asset: {
+                        //     include: { contacts: true, attachments: true }
+                        // },
+                        // RFP: {
+                        //     include: { contacts: true, attachments: true }
+                        // },
+                        tasks: true,
+                        node: true
                     }
                 })
 

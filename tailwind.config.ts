@@ -15,9 +15,6 @@ const config: Config = {
     ],
     theme: {
     	extend: {
-			fontSize: {
-				base: '18px', // Default font size increased to 18px
-			},
     		colors: {
     			background: 'hsl(var(--background))',
     			foreground: 'hsl(var(--foreground))',

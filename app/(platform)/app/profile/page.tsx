@@ -8,10 +8,9 @@ import {DonutChartCard} from "@/components/donut-chart-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
-import {cn, formatMoney, isNewUser, setUserAsReturning} from "@/lib/utils";
+import {cn, formatMoney} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
-import {PAGProfileResearchPlanCard} from "@/components/pag-profile-research-plan-card";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {getSession} from "@/lib/auth";
 import Image from "next/image"
@@ -22,11 +21,10 @@ import prisma from "@/lib/prisma"
 import {PAGProfileOpenRFPsCard} from "@/components/pag-profile-open-rfps-card";
 import EditPAGProfileDialog from "@/components/edit-pag-profile-page-dialog";
 import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
-import {PAGProfileAssetsAndProjectsCard} from "@/components/pag-profile-assets-and-projects-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "sonner";
-import {PAGProfileAssetsAndProjectsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
+import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {PublicRoadmapCard} from "@/components/public-roadmap-card";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
@@ -53,7 +51,7 @@ export default async function ProfilePage() {
         if (response.success) {
             conditions = response.data
         } else {
-            console.error(response.error)
+    console.error(response.error)
         }
     }
 
@@ -68,18 +66,8 @@ export default async function ProfilePage() {
                 edges: true,
                 milestones: {
                     include: {
-                        asset: {
-                            include: {
-                                contacts: true,
-                                attachments: true
-                            }
-                        },
-                        RFP: {
-                            include: {
-                                contacts: true,
-                                attachments: true
-                            }
-                        }
+                        node: true,
+                        contacts: true
                     }
                 }
             }
@@ -88,7 +76,7 @@ export default async function ProfilePage() {
         // Existing verified organization rendering logic
         return (
             <main className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
-                <div className="flex flex-col space-y-8 my-8">
+                <div className="w-full flex flex-col space-y-8 my-8">
                     <div>
                         <div>
                             {/* <img className="h-32 w-full object-cover lg:h-48"
@@ -155,11 +143,13 @@ export default async function ProfilePage() {
                                                     {formatMoney(organization?.moneyRaised)} raised
                                                 </div>
                                             }
-                                            <div className="mt-2 flex items-center text-gray-500">
-                                                <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                            aria-hidden="true"/>
-                                                Founded in {new Date(organization?.yearFounded ?? "").getFullYear()}
-                                            </div>
+                                            {organization?.yearFounded && (
+                                                <div className="mt-2 flex items-center text-gray-500">
+                                                    <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                                aria-hidden="true"/>
+                                                    Founded in {new Date(organization?.yearFounded ?? "").getFullYear()}
+                                                </div>
+                                            )}
                                             {organization?.incorporationStatus === "YES" &&
                                                 <div className="mt-2 flex items-center text-gray-500">
                                                     <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
@@ -175,7 +165,7 @@ export default async function ProfilePage() {
                                 className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
                                 <div className="flex flex-row space-x-2">
                                     {/*<EditPAGProfileHeaderDialog/>*/}
-                                    <EditPAGProfileDialog/>
+                                    <EditPAGProfileDialog organization={organization}/>
                                     {/*<Button*/}
                                     {/*    className="gap-x-2"*/}
                                     {/*>*/}
@@ -213,9 +203,12 @@ export default async function ProfilePage() {
                             {/*        </TabsTrigger>*/}
                             {/*    </TabsList>*/}
                             {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
-                            <PAGProfileAssetsAndProjectsHoverableCard
-                                assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
-                                rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
+                            <PAGProfileAssetsAndRFPsHoverableCard
+                                isPrivate={true}
+                                assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "ASSET")}
+                                rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "RFP")}
+                                // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
+                                // rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                             />
                             <PublicRoadmapCard roadmap={roadmaps[0]}
                                                subdomain={organization?.subdomain || undefined}/>

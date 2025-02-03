@@ -34,7 +34,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {cn, formatMoney, getPublicFile, years} from "@/lib/utils";
+import {cn, formatMoney, formatNumberWithCommas, getPublicFile, years} from "@/lib/utils";
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
@@ -42,7 +42,9 @@ import {Slider} from "@/components/ui/slider";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {FaQuestionCircle} from "react-icons/fa";
 import {financesFormSchema} from "@/components/finances-onboarding-form";
-import { researchFormSchema } from "@/components/research-onboarding-form";
+import {researchFormSchema} from "@/components/research-onboarding-form";
+import mixpanel from "mixpanel-browser";
+import {Organization} from "@prisma/client";
 
 const OPTIONS: Option[] = [
     {
@@ -115,7 +117,7 @@ const editOrgFormSchema = z.object({
     headerImage: z.string().optional()
 })
 
-export default function EditPAGProfileDialog() {
+export default function EditPAGProfileDialog({organization}: {organization: Organization}) {
     const {data: session, update} = useSession()
     const router = useRouter()
     const [searchInput, setSearchInput] = useState("");
@@ -123,6 +125,9 @@ export default function EditPAGProfileDialog() {
     const [selectedFileHeader, setSelectedFileHeader] = useState<FileWithPreview | null>(null);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [otherModality, setOtherModality] = useState<string>("");
+    const [otherCategories, setOtherCategories] = useState<string>("");
+    const [otherSystem, setOtherSystem] = useState<string>("");
     const [address, setAddress] = useState<AddressType>({
         address1: "",
         address2: "",
@@ -449,10 +454,13 @@ export default function EditPAGProfileDialog() {
                         const fetchedValues = conditions.map((condition) => ({
                             disorder: condition.name || "",
                             summary: condition.summary || "",
-                            categories: condition.diseaseCategories.map((cat) => ({ label: cat, value: cat })) || [],
-                            modalities: condition.interestedModalities.map((mod) => ({ label: mod, value: mod })) || [],
-                            genes: condition.associatedGenes.map((gene) => ({ label: gene, value: gene })) || [],
-                            systems: condition.associatedSystems.map((system) => ({ label: system, value: system })) || [],
+                            categories: condition.diseaseCategories.map((cat) => ({label: cat, value: cat})) || [],
+                            modalities: condition.interestedModalities.map((mod) => ({label: mod, value: mod})) || [],
+                            genes: condition.associatedGenes.map((gene) => ({label: gene, value: gene})) || [],
+                            systems: condition.associatedSystems.map((system) => ({
+                                label: system,
+                                value: system
+                            })) || [],
                             prevalenceNumerator: condition.prevalenceNumerator?.toString() || "",
                             prevalenceDenominator: condition.prevalenceDenominator?.toString() || "",
                             engaged: condition.numberOfPatientsEngaged?.toString() || "",
@@ -497,12 +505,14 @@ export default function EditPAGProfileDialog() {
             const mappedData: Record<string, any> = {
                 name: values.disorder || "",
                 summary: values.summary || "",
+                therapeuticsInDevelopment: values.therapeutics?.map((item) => item.label) || [],
                 interestedModalities: values.modalities?.map((item) => item.label) || [],
                 diseaseCategories: values.categories?.map((item) => item.label) || [],
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
                 numberOfPatientsEngaged: values.engaged ? parseInt(values.engaged, 10) : null,
                 relevantDiseaseMechanisms: values.mechanisms || [],
+                causalGenes: values.causal?.map((item) => item.label) || [],
                 associatedGenes: values.genes?.map((item) => item.label) || [],
                 associatedSystems: values.systems?.map((item) => item.label) || [],
                 associatedSignsAndSymptoms: values.symptoms?.map((item) => item.label) || [],
@@ -526,6 +536,29 @@ export default function EditPAGProfileDialog() {
 
             if (response.success) {
                 toast.success("Condition updated successfully!");
+
+                // Mixpanel tracking for "Other" fields
+                if (otherModality) {
+                    mixpanel.track("Org has other modality", {
+                        orgName: organization?.name || "Unknown Org",
+                        looking: otherModality,
+                    });
+                }
+
+                if (otherCategories) {
+                    mixpanel.track("Org has other category", {
+                        orgName: organization?.name || "Unknown Org",
+                        looking: otherCategories,
+                    });
+                }
+
+                if (otherSystem) {
+                    mixpanel.track("Org has other system", {
+                        orgName: organization?.name || "Unknown Org",
+                        looking: otherSystem,
+                    });
+                }
+
                 setOpen(false)
                 router.refresh(); // Refresh the page to reflect changes
             } else {
@@ -579,7 +612,7 @@ export default function EditPAGProfileDialog() {
                 <DialogTrigger asChild>
                     <Button
                         variant="secondary"
-                        className="gap-x-2"
+                        className="gap-x-2 organization-profile-tour-step2"
                     >
                         <FaPen/>
                         Edit profile
@@ -617,7 +650,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Organization name`}</FormLabel>
-                                                <FormDescription>{`The name of your organization`}</FormDescription>
+                                                {/*<FormDescription>{`The name of your organization`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
                                                         type="text"
@@ -691,9 +724,9 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Year Founded</FormLabel>
-                                                <FormDescription>
-                                                    Select the year your organization was founded.
-                                                </FormDescription>
+                                                {/*<FormDescription>*/}
+                                                {/*    Select the year your organization was founded.*/}
+                                                {/*</FormDescription>*/}
                                                 <Select
                                                     onValueChange={(value) => field.onChange(`${value}-01-01`)} // Convert year to a date string
                                                     defaultValue={field.value?.split("-")[0]} // Extract the year from the date string for the default value
@@ -725,14 +758,14 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Description</FormLabel>
-                                                <div className="w-full flex flex-row justify-between">
-                                                    <FormDescription>
-                                                        This will be the public description of your organization.
-                                                    </FormDescription>
-                                                    <FormDescription>
-                                                        500 characters max.
-                                                    </FormDescription>
-                                                </div>
+                                                {/*<div className="w-full flex flex-row justify-between">*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        This will be the public description of your organization.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        500 characters max.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*</div>*/}
                                                 <FormControl>
                                                     <Textarea
                                                         placeholder="Tell us a little bit about yourself"
@@ -751,7 +784,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem className="space-y-3">
                                                 <FormLabel>{`What is your 501c3 status`}</FormLabel>
-                                                <FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>
+                                                {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <RadioGroup
                                                         onValueChange={field.onChange}
@@ -795,10 +828,10 @@ export default function EditPAGProfileDialog() {
                                         name="formattedAddress"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Address</FormLabel>
-                                                <FormDescription>
-                                                    {`Your organization's address.`}
-                                                </FormDescription>
+                                                <FormLabel>Patient Group Address</FormLabel>
+                                                {/*<FormDescription>*/}
+                                                {/*    {`Your organization's address.`}*/}
+                                                {/*</FormDescription>*/}
                                                 <FormControl>
                                                     <AutocompleteComponent
                                                         address={address}
@@ -812,22 +845,22 @@ export default function EditPAGProfileDialog() {
                                         )}
                                     />
 
-                                    <FormImageCropper 
+                                    <FormImageCropper
                                         form={editOrgForm}
                                         name="image"
                                         title={"Organization Logo"}
-                                        description={"This will be used as your organization profile's image."}
+                                        // description={"This will be used as your organization profile's image."}
                                         aspect={1}
                                         selectedFile={selectedFileProfile}
                                         setSelectedFile={setSelectedFileProfile}
                                     />
 
-                                    <FormImageCropper 
+                                    <FormImageCropper
                                         form={editOrgForm}
                                         name="headerImage"
                                         title={"Profile Header"}
                                         description={"This will be used as the header image on your organization's profile. (16x4)"}
-                                        aspect={16/4}
+                                        aspect={16 / 4}
                                         selectedFile={selectedFileHeader}
                                         setSelectedFile={setSelectedFileHeader}
                                         className="rounded h-[100px] w-[400px]"
@@ -874,15 +907,15 @@ export default function EditPAGProfileDialog() {
                                         name="disorder"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Name of condition`}</FormLabel>
-                                                <div className="w-full flex flex-row justify-between">
-                                                    <FormDescription>
-                                                        {`The name of your rare condition/disorder.`}
-                                                    </FormDescription>
-                                                    <FormDescription>
-                                                        60 characters max.
-                                                    </FormDescription>
-                                                </div>
+                                                <FormLabel>{`Name of condition (required)`}</FormLabel>
+                                                {/*<div className="w-full flex flex-row justify-between">*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        {`The name of your rare condition/disorder.`}*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        60 characters max.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*</div>*/}
                                                 <FormControl>
                                                     <Input
                                                         type="text"
@@ -901,14 +934,14 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Summary of condition`}</FormLabel>
-                                                <div className="w-full flex flex-row justify-between">
-                                                    <FormDescription>
-                                                        {`A few lines describing your condition and what makes it unique`}
-                                                    </FormDescription>
-                                                    <FormDescription>
-                                                        500 characters max.
-                                                    </FormDescription>
-                                                </div>
+                                                {/*<div className="w-full flex flex-row justify-between">*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        {`A few lines describing your condition and what makes it unique`}*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*    <FormDescription>*/}
+                                                {/*        500 characters max.*/}
+                                                {/*    </FormDescription>*/}
+                                                {/*</div>*/}
                                                 <FormControl>
                                                     <Textarea
                                                         id="summary"
@@ -922,11 +955,10 @@ export default function EditPAGProfileDialog() {
 
                                     <FormField
                                         control={editResearchForm.control}
-                                        name="genes"
+                                        name="causal"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>Associated genes</FormLabel>
-                                                <FormDescription>{`The genes associated with your condition.`}</FormDescription>
+                                                <FormLabel>Causal genes</FormLabel>
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
@@ -939,6 +971,69 @@ export default function EditPAGProfileDialog() {
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="genes"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Associated genes</FormLabel>
+                                                {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        onSearch={handleAsyncSearch}
+                                                        placeholder="Search for genes..."
+                                                        hidePlaceholderWhenSelected={true}
+                                                        loadingIndicator={<p>Loading genes...</p>}
+                                                        emptyIndicator={<p>No genes found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="categories"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Mechanisms of action
+                                                </FormLabel>
+                                                <FormDescription className="flex items-center">
+                                                    {`What types of genetic effects are you investigating?`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        defaultOptions={MOLECULAR_MECHANISMS}
+                                                        placeholder="Select categories that apply to you..."
+                                                        hidePlaceholderWhenSelected={true}
+                                                        emptyIndicator={
+                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                no results found.
+                                                            </p>
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                                {editResearchForm.watch("categories")?.some((item) => item.value === "OTHER") && (
+                                                    <div className="mt-2">
+                                                        <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                        <Input
+                                                            type="text"
+                                                            id="categories-other"
+                                                            value={otherCategories}
+                                                            onChange={(e) => setOtherCategories(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
                                             </FormItem>
                                         )}
                                     />
@@ -964,37 +1059,34 @@ export default function EditPAGProfileDialog() {
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
+                                                {editResearchForm.watch("systems")?.some((item) => item.value === "OTHER") && (
+                                                    <div className="mt-2">
+                                                        <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                        <Input
+                                                            type="text"
+                                                            id="systems-other"
+                                                            value={otherSystem}
+                                                            onChange={(e) => setOtherSystem(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
                                             </FormItem>
                                         )}
                                     />
 
                                     <FormField
                                         control={editResearchForm.control}
-                                        name="categories"
+                                        name="therapeutics"
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>
-                                                    Mechanisms of action
+                                                    Therapeutics under development
                                                 </FormLabel>
-                                                <FormDescription className="flex items-center">
-                                                    {`What types of genetic effects are you investigating?`}
-                                                    <Tooltip delayDuration={0}>
-                                                        <TooltipTrigger>
-                                                            <FaQuestionCircle
-                                                                className="text-black h-4 inline-block align-baseline mx-1"/>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <p>
-                                                                {`This will help us match you with the experts of your particular modality.`}
-                                                            </p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </FormDescription>
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
-                                                        defaultOptions={MOLECULAR_MECHANISMS}
-                                                        placeholder="Select categories that apply to you..."
+                                                        defaultOptions={MODALITIES}
+                                                        placeholder="Select modalities you like..."
                                                         hidePlaceholderWhenSelected={true}
                                                         emptyIndicator={
                                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
@@ -1004,6 +1096,17 @@ export default function EditPAGProfileDialog() {
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
+                                                {editResearchForm.watch("therapeutics")?.some((item) => item.value === "OTHER") && (
+                                                    <div className="mt-2">
+                                                        <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                        <Input
+                                                            type="text"
+                                                            id="modalities-other"
+                                                            value={otherModality}
+                                                            onChange={(e) => setOtherModality(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
                                             </FormItem>
                                         )}
                                     />
@@ -1014,7 +1117,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>
-                                                    Modalities of interest
+                                                    Therapeutics of interest
                                                 </FormLabel>
                                                 <FormDescription className="flex items-center">
                                                     {`The treatment modalities of interest of your organization.`}
@@ -1044,6 +1147,17 @@ export default function EditPAGProfileDialog() {
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
+                                                {editResearchForm.watch("modalities")?.some((item) => item.value === "OTHER") && (
+                                                    <div className="mt-2">
+                                                        <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                        <Input
+                                                            type="text"
+                                                            id="modalities-other"
+                                                            value={otherModality}
+                                                            onChange={(e) => setOtherModality(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
                                             </FormItem>
                                         )}
                                     />
@@ -1053,9 +1167,11 @@ export default function EditPAGProfileDialog() {
                                         name="prevalenceNumerator"
                                         render={({field: numeratorField}) => (
                                             <FormItem>
-                                                <FormLabel>{`Estimated total prevalence`}</FormLabel>
+                                                <FormLabel>
+                                                    {`Estimated total prevalence`} - {`${formatNumberWithCommas(numeratorField.value)} in ${formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}`}
+                                                </FormLabel>
                                                 <FormDescription>
-                                                    {`The estimated total number of patients in the world.`}
+                                                    {`The estimated global prevalence ratio of your condition.`}
                                                 </FormDescription>
                                                 <FormControl>
                                                     <div className="flex flex-row items-end justify-start space-x-2">
@@ -1114,7 +1230,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Estimated number of patients in the US`}</FormLabel>
-                                                <FormDescription>{`The estimated number of patients in the US.`}</FormDescription>
+                                                {/*<FormDescription>{`The estimated number of patients in the US.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
                                                         type="number"
@@ -1133,7 +1249,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
-                                                <FormDescription>{`The estimated number of patients in the world.`}</FormDescription>
+                                                {/*<FormDescription>{`The estimated number of patients in the world.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
                                                         type="number"
@@ -1388,7 +1504,25 @@ export default function EditPAGProfileDialog() {
     )
 }
 
-export const FormImageCropper = ({ className = "", form, name, title, description, aspect, selectedFile, setSelectedFile }: { className?: string, form: any, name: string, title: string, description: string, aspect: number, selectedFile: FileWithPreview | null, setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>> }) => {
+export const FormImageCropper = ({
+                                     className = "",
+                                     form,
+                                     name,
+                                     title,
+                                     description,
+                                     aspect,
+                                     selectedFile,
+                                     setSelectedFile
+                                 }: {
+    className?: string,
+    form: any,
+    name: string,
+    title: string,
+    description?: string,
+    aspect: number,
+    selectedFile: FileWithPreview | null,
+    setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>
+}) => {
     const [isDialogOpen, setDialogOpen] = useState(false);
 
     const onDrop = useCallback(
@@ -1426,7 +1560,7 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
         []
     );
 
-    const { getRootProps, getInputProps } = useDropzone({
+    const {getRootProps, getInputProps} = useDropzone({
         onDrop: onDrop,
         accept,
     });
@@ -1441,9 +1575,11 @@ export const FormImageCropper = ({ className = "", form, name, title, descriptio
                     <FormLabel>
                         {title}
                     </FormLabel>
-                    <FormDescription>
-                        {description}
-                    </FormDescription>
+                    {description &&
+                        <FormDescription>
+                            {description}
+                        </FormDescription>
+                    }
                     <FormControl>
                         <div className="flex flex-col items-start space-y-4">
                             {selectedFile ? (

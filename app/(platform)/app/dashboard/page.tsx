@@ -12,6 +12,8 @@ import UnverifiedOrganizationPage from "@/components/unverified-organization-pag
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {getSession} from "@/lib/auth";
 import NoOrganizationPage from "@/components/no-organization-page";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import React from "react";
 
 export default async function DashboardPage() {
     const session = await getSession()
@@ -31,43 +33,49 @@ export default async function DashboardPage() {
         if (!organization.verified) {
             // Render unverified organization state
             return (
-                <UnverifiedOrganizationPage organization={organization} />
+                <UnverifiedOrganizationPage organization={organization}/>
             );
         }
         return (
-            <main className="flex flex-col space-y-4 justify-center items-start w-full max-w-7xl mx-auto p-8">
-                <div className="flex items-center justify-between space-y-2">
-                    <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                </div>
-                <Tabs defaultValue="analytics" className="space-y-4 w-full">
-                    <TabsList>
-                        <TabsTrigger value="analytics">
-                            Analytics
-                        </TabsTrigger>
-                        <TabsTrigger value="members">
-                            Members
-                        </TabsTrigger>
-                        <TabsTrigger value="invitations">
-                            Invitations
-                        </TabsTrigger>
-                        <TabsTrigger value="requests">
-                            Requests
-                        </TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="analytics" className="space-y-4 w-full">
-                        <PAGDashboardAnalyticsTab/>
-                    </TabsContent>
-                    <TabsContent value="members" className="space-y-4 w-full">
-                        <PAGDashboardMembersTab/>
-                    </TabsContent>
-                    <TabsContent value="invitations" className="space-y-4 w-full">
-                        <PAGDashboardInvitationsTab/>
-                    </TabsContent>
-                    <TabsContent value="requests" className="space-y-4 w-full">
-                        <PAGDashboardRequestsTab/>
-                    </TabsContent>
-                </Tabs>
-            </main>
+            <TooltipProvider>
+                <main className="flex flex-col space-y-4 justify-center items-start w-full max-w-7xl mx-auto p-8">
+                    <Tabs defaultValue="members" className="space-y-4 w-full">
+                        <TabsList>
+                            <Tooltip delayDuration={0}>
+                                <TooltipTrigger disabled>
+                                    <TabsTrigger value="analytics" disabled>
+                                        Analytics
+                                    </TabsTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {`Coming soon!`}
+                                </TooltipContent>
+                            </Tooltip>
+                            <TabsTrigger value="members">
+                                Members
+                            </TabsTrigger>
+                            <TabsTrigger value="invitations">
+                                Invitations
+                            </TabsTrigger>
+                            <TabsTrigger value="requests">
+                                Requests
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="analytics" className="space-y-4 w-full">
+                            <PAGDashboardAnalyticsTab/>
+                        </TabsContent>
+                        <TabsContent value="members" className="space-y-4 w-full">
+                            <PAGDashboardMembersTab/>
+                        </TabsContent>
+                        <TabsContent value="invitations" className="space-y-4 w-full">
+                            <PAGDashboardInvitationsTab/>
+                        </TabsContent>
+                        <TabsContent value="requests" className="space-y-4 w-full">
+                            <PAGDashboardRequestsTab/>
+                        </TabsContent>
+                    </Tabs>
+                </main>
+            </TooltipProvider>
         )
     } else {
         return (

@@ -1,6 +1,6 @@
-import { typesense } from '@/lib/typesense';
-import { temporal } from 'zundo';
-import { create } from 'zustand';
+import {typesense} from '@/lib/typesense';
+import {temporal} from 'zundo';
+import {create} from 'zustand';
 
 export type ViewType = 'grid' | 'list'
 
@@ -11,20 +11,23 @@ export type FiltersType = {
         disable?: boolean,
     }[],
     milestoneStatus: string[],
-    hasProject: boolean,
-    hasAsset: boolean
+    nodeType: string[],
+    // hasProject: boolean,
+    // hasAsset: boolean
 }
 
 export const defaultFilters = {
     milestoneTypes: [],
     milestoneStatus: [],
-    hasProject: false,
-    hasAsset: false
+    nodeType: []
+    // hasProject: false,
+    // hasAsset: false
 }
 
-function generateFiltersString(filters: FiltersType) {
+function generateFiltersString(filters: FiltersType, strategy: "add" | "sub") {
     let filtersList: string[] = []
     let typesenseFilters = ""
+    const strategyString = strategy === "add" ? "||" : "&&"
 
     console.log(`form filters`, filtersList)
 
@@ -32,26 +35,33 @@ function generateFiltersString(filters: FiltersType) {
     if (filters.milestoneTypes.length > 0) {
         filters.milestoneTypes.forEach(type => {
             filtersList.push(`type:=${type.value}`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}type:=${type.value}`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}type:=${type.value}`)
         })
     }
 
     if (filters.milestoneStatus.length > 0) {
         filters.milestoneStatus.forEach(status => {
             filtersList.push(`status:=${status}`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}status:=${status}`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}status:=${status}`)
         })
     }
 
-    if (filters.hasProject) {
-        filtersList.push(`RFPId_exists:=true`)
-        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}RFPId_exists:=true`)
+    if (filters.nodeType.length > 0) {
+        filters.nodeType.forEach(type => {
+            filtersList.push(`nodeType:=${type}`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}nodeType:=${type}`)
+        })
     }
 
-    if (filters.hasAsset) {
-        filtersList.push(`assetId_exists:=true`)
-        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}assetId_exists:=true`)
-    }
+    // if (filters.hasProject) {
+    //     filtersList.push(`RFPId_exists:=true`)
+    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}RFPId_exists:=true`)
+    // }
+
+    // if (filters.hasAsset) {
+    //     filtersList.push(`assetId_exists:=true`)
+    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}assetId_exists:=true`)
+    // }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
 
@@ -70,16 +80,18 @@ function generateFiltersString(filters: FiltersType) {
 
 const sortByFilters: { [key: string]: string } = {
     "alphabetical": "title:asc",
+    "last-updated-old-new": "updatedAt:asc",
+    "last-updated-new-old": "updatedAt:desc",
 }
 
-const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
+const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true, filterStrategy: "add" | "sub") => {
     try {
         const searchParameters = {
             q: state.searchTerm,
             query_by: "title",
             per_page: 10,
             page: state.lastFetchedPage,
-            ...(generateFiltersString(state.filters) ? { filter_by: generateFiltersString(state.filters) } : undefined),
+            ...(generateFiltersString(state.filters, filterStrategy) ? { filter_by: generateFiltersString(state.filters, filterStrategy) } : undefined),
             ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
         };
 
@@ -88,9 +100,28 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             .documents()
             .search(searchParameters);
 
-        console.log(`search results`, results.hits)
-        if (isNewSearch) return [...(results.hits || [])]           // new search - don't keep previous results
-        return [...state.searchResults, ...(results.hits || [])]    // update search - keep previous results
+        const typeSenseHits = results.hits || [];
+        // @ts-ignore
+        const ids = typeSenseHits.map(hit => hit.document.id);
+
+        if (ids.length === 0) {
+            return isNewSearch ? [] : (filterStrategy === "add" ? state.searchResultsAdd : state.searchResultsSub);
+        }
+
+        const prismaResponse = await fetch('/api/milestones', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ids}),
+        });
+
+        const prismaResults = await prismaResponse.json();
+
+        const enrichedResults = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
+
+        return isNewSearch ? enrichedResults : [
+            ...(filterStrategy === "add" ? state.searchResultsAdd : state.searchResultsSub),
+            ...enrichedResults
+        ];
 
     } catch (error) {
         console.error("Search error:", error)
@@ -109,65 +140,94 @@ export interface MilestoneSearchState {
     setView: (view: ViewType) => void,
     allResults: any[],
     setAllResults: (results: any[]) => void,
-    searchResults: any[] | undefined
-    setSearchResults: (results: any[]) => void
+    searchResultsAdd: any[] | undefined
+    searchResultsSub: any[] | undefined
+    setSearchResults: (resultsAdd: any[], resultsSub: any[]) => void
     filters: FiltersType,
     setFilters: (updatedFilters: FiltersType) => void
 }
 
 export const useMilestoneSearchStore = create<MilestoneSearchState>()(
     temporal((set, get) => ({
-        searchTerm: '',
-        setSearchTerm: async (newSearch: string) => {
-            const newSearchResults = await getUpdatedSearchResults({
-                ...get(),
-                searchTerm: newSearch,
-                lastFetchedPage: 1,
-            }, true)
-            set({ searchTerm: newSearch, searchResults: newSearchResults, lastFetchedPage: 1 })
-        },
-        sortBy: undefined,
-        setSortBy: async (sortBy: string | undefined) => {
-            const newSearchResults = await getUpdatedSearchResults({
-                ...get(),
-                sortBy,
-                lastFetchedPage: 1,
-            }, true)
-            set({ sortBy, searchResults: newSearchResults, lastFetchedPage: 1 })
-        },
-        lastFetchedPage: 1, // page numbers in TypeSense start at 1
-        setLastFetchedPage: async (page: number) => {
-            const updateSearchResults = await getUpdatedSearchResults({ 
-                ...get(),
-                lastFetchedPage: page
-            }, false)
-            set({ lastFetchedPage: page, searchResults: updateSearchResults })
-        },
-        view: 'grid',
-        setView: (view: ViewType) => set({ view }),
-        allResults: [],
-        setAllResults: (results: any[]) => set({ allResults: results }),
-        searchResults: undefined,
-        setSearchResults: (results: any[]) => set({ searchResults: results }),
-        filters: defaultFilters,
-        setFilters: async (updatedFilters: FiltersType) => {
-            const newFilters = {
-                ...get().filters,
-                ...updatedFilters
+            searchTerm: '',
+            setSearchTerm: async (newSearch: string) => {
+                const newSearchResultsAdd = await getUpdatedSearchResults({
+                    ...get(), searchTerm: newSearch, lastFetchedPage: 1
+                }, true, "add");
+
+                const newSearchResultsSub = await getUpdatedSearchResults({
+                    ...get(), searchTerm: newSearch, lastFetchedPage: 1
+                }, true, "sub");
+
+                set({
+                    searchTerm: newSearch,
+                    searchResultsAdd: newSearchResultsAdd,
+                    searchResultsSub: newSearchResultsSub,
+                    lastFetchedPage: 1
+                });
+            },
+            sortBy: undefined,
+            setSortBy: async (sortBy: string | undefined) => {
+                const newSearchResultsAdd = await getUpdatedSearchResults({
+                    ...get(),
+                    sortBy,
+                    lastFetchedPage: 1,
+                }, true, "add");
+
+                const newSearchResultsSub = await getUpdatedSearchResults({
+                    ...get(),
+                    sortBy,
+                    lastFetchedPage: 1,
+                }, true, "sub");
+
+                set({ sortBy, searchResultsAdd: newSearchResultsAdd, searchResultsSub: newSearchResultsSub, lastFetchedPage: 1 });
+            },
+            lastFetchedPage: 1, // page numbers in TypeSense start at 1
+            setLastFetchedPage: async (page: number) => {
+                const newSearchResultsAdd = await getUpdatedSearchResults({
+                    ...get(),
+                    lastFetchedPage: page
+                }, false, "add");
+
+                const newSearchResultsSub = await getUpdatedSearchResults({
+                    ...get(),
+                    lastFetchedPage: page
+                }, false, "sub");
+
+                set({ lastFetchedPage: page, searchResultsAdd: newSearchResultsAdd, searchResultsSub: newSearchResultsSub });
+            },
+            view: 'grid',
+            setView: (view: ViewType) => set({view}),
+            allResults: [],
+            setAllResults: (results: any[]) => set({allResults: results}),
+            searchResultsAdd: undefined,
+            searchResultsSub: undefined,
+            setSearchResults: (resultsAdd: any[], resultsSub: any[]) => set({ searchResultsAdd: resultsAdd, searchResultsSub: resultsSub }),
+            filters: defaultFilters,
+            setFilters: async (updatedFilters: FiltersType) => {
+                const newFilters = { ...get().filters, ...updatedFilters };
+
+                const newSearchResultsAdd = await getUpdatedSearchResults({
+                    ...get(),
+                    filters: newFilters,
+                    lastFetchedPage: 1,
+                }, true, "add");
+
+                const newSearchResultsSub = await getUpdatedSearchResults({
+                    ...get(),
+                    filters: newFilters,
+                    lastFetchedPage: 1,
+                }, true, "sub");
+
+                set({
+                    filters: newFilters,
+                    lastFetchedPage: 1,
+                    searchResultsAdd: newSearchResultsAdd,
+                    searchResultsSub: newSearchResultsSub
+                });
             }
-            const newSearchResults = await getUpdatedSearchResults({
-                ...get(),
-                filters: newFilters,
-                lastFetchedPage: 1,
-            }, true)
-            set({ 
-                filters: newFilters, 
-                lastFetchedPage: 1,
-                searchResults: newSearchResults
-            })
-        }
     }),
-    {
-        limit: 100, // limit the stored history states to 100
-    })
+        {
+            limit: 100, // limit the stored history states to 100
+        })
 )

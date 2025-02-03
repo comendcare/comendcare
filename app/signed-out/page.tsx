@@ -1,17 +1,26 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import {useRouter, useSearchParams} from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
+import {toast} from "sonner";
 
 export default function SignOutPage() {
     const [countdown, setCountdown] = useState(5)
     const router = useRouter()
+    const searchParams = useSearchParams()
 
     useEffect(() => {
 
         signOut({ redirect: false }) // Prevent automatic redirect from NextAuth
+
+        const reason = searchParams.get('reason');
+        if (reason === "not_whitelisted") {
+            toast.error("Sorry! you're not on the user whitelist. If this is a mistake, please contact us.");
+        } else if (reason === "terminated") {
+            toast.error("Your account has been deleted. If this was a mistake, please contact us.");
+        }
 
         const timer = setInterval(() => {
             setCountdown((prevCount) => {
