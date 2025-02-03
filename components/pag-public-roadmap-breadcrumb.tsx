@@ -17,6 +17,7 @@ export default function PAGPublicRoadmapBreadcrumb({ organization, roadmap }: {
     organization?: Organization,
     roadmap?: Roadmap,
 }) {
+    console.log(roadmap)
 
     const searchParams = useSearchParams();
     const urlMilestone = searchParams.get("milestone");
@@ -41,7 +42,7 @@ export default function PAGPublicRoadmapBreadcrumb({ organization, roadmap }: {
             label: organization.name,
             href: `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
         },
-        roadmap && {
+        (roadmap && roadmap.title) && {
             label: roadmap.title,
             href: organization?.subdomain
                 ? `http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`
