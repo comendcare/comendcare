@@ -5,7 +5,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {FaArrowUpRightFromSquare, FaDollarSign, FaPaperclip} from "react-icons/fa6"
 import {Label} from "./ui/label"
-import {TaskType} from "./private-milestone-node"
+import {TaskType, TypeBadge} from "./private-milestone-node"
 import {
     Card,
     CardContent,
@@ -14,7 +14,7 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import {MILESTONE_TYPE_OPTIONS} from "@/lib/types"
+import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS} from "@/lib/types"
 import {Badge} from "./ui/badge"
 import {DateView} from "./miletone-date-view"
 import {BudgetView} from "./milestone-budget-view"
@@ -33,28 +33,35 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                     <CardTitle
                         className="flex flex-row gap-4 items-center scroll-m-20 text-2xl font-bold tracking-tight">
                         {milestone.title}
+
+                        <StatusButton
+                            disabled={true}
+                            status={milestone.status}
+                            onStatusChange={() => {
+                            }}
+                            className="w-fit font-normal"
+                        />
                     </CardTitle>
-                    <CardDescription className="text-base">
-                        {milestone.description}
-                    </CardDescription>
-                </span>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-8">
-                <div className="flex flex-col gap-4 text-gray-500">
+
+                    {milestone.node.type && (
+                        <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone.node.type))?.value || "PROJECT"}/>
+                    )}
+
                     {milestone.type && milestone.type !== 'NOTYPE' && (
-                        <Badge className="flex text-sm h-[30px]">
+                        <Badge className="flex text-sm h-[30px] w-fit">
                             {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestone.type))?.label || "No type"}
                         </Badge>
                     )}
 
-                    <StatusButton
-                        disabled={true}
-                        status={milestone.status}
-                        onStatusChange={() => {
-                        }}
-                    />
+                    <CardDescription className="text-base">
+                        {milestone.description}
+                    </CardDescription>
 
                     <DateView startDate={milestone.startDate} endDate={milestone.endDate}/>
+                </span>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-8">
+                <div className="flex flex-col gap-4 text-gray-500">
 
                     <BudgetView budget={milestone.budget}/>
                 </div>
