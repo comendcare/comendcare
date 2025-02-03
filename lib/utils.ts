@@ -7,6 +7,16 @@ import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
 
+export function formatNumberWithCommas(number: string | undefined) {
+    if (number === undefined) return "0"
+
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+export function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export const sendTypeSenseRequest = async (
     url: string,
     method: string,
@@ -177,13 +187,13 @@ export function formatDate(dateString: string): string {
 
 export const mapsFetcher = (url: string) => fetch(url).then((r) => r.json());
 
-export const isNewUser = () => {
-    const isNew = localStorage.getItem("isNewUser")
-    return isNew === null
+export const isOnboarded = (tutorialName: string) => {
+    const onboarded = localStorage.getItem(tutorialName)
+    return !(onboarded === null)
 }
 
-export const setUserAsReturning = () => {
-    localStorage.setItem("isNewUser", "false")
+export const setOnboarded = (tutorialName: string) => {
+    localStorage.setItem(tutorialName, "true")
 }
 
 type DraggableData = ColumnDragData | TaskDragData

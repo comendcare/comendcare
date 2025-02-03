@@ -22,13 +22,16 @@ export default function OnboardingWelcomePage() {
                         Welcome to Comend, {session?.user.name?.split(" ")[0]}!
                     </h1>
                     <p>
-                        {`We're happy to have you! To create your profile and help us understand how we can help you, we have some questions. This should take about 10 minutes or less. All questions in this form are optional unless marked as (required).`}
+                        {`To create your profile and help us understand how we can best support you, we have some questions.`}
                     </p>
                     <p>
-                        {`You can edit any of this information at any time, after completing onboarding.`}
+                        {`This should take ~10 minutes.`}
+                    </p>
+                    <p>
+                        {`All questions in this form are optional unless marked as (required), and you can edit your information at any time after signing up.`}
                     </p>
                     <p className="font-semibold">
-                        {`You choose what information is shared publicly, and we will never share your data externally without your consent.`}
+                        {`You choose what information is shared publicly. We will never share your data externally without your consent.`}
                     </p>
                 </div>
 
@@ -62,27 +65,27 @@ export default function OnboardingWelcomePage() {
                 </div>
 
                 {/* Right side: Platform preview */}
-                <div className="col-span-1 space-y-6">
-                    <h1 className="text-xl font-semibold">
-                        {`We'll show you how your information will be used here.`}
-                    </h1>
-                    <div className="space-y-4">
-                        {/* Image preview */}
-                        <div className="h-[150px] w-full border-dashed border-2 border-gray-400 rounded-xl"></div>
-                        {/* Information section */}
-                        <div className="space-y-2">
-                            <div className="h-6 w-1/2 border-dashed border-2 border-gray-400 rounded"></div>
-                            <div className="h-4 w-3/4 border-dashed border-2 border-gray-400 rounded"></div>
-                            <div className="h-4 w-1/2 border-dashed border-2 border-gray-400 rounded"></div>
-                        </div>
-                        {/* Additional example data */}
-                        <div className="space-y-2">
-                            <div className="h-6 w-2/3 border-dashed border-2 border-gray-400 rounded"></div>
-                            <div className="h-4 w-full border-dashed border-2 border-gray-400 rounded"></div>
-                            <div className="h-4 w-3/4 border-dashed border-2 border-gray-400 rounded"></div>
-                        </div>
-                    </div>
-                </div>
+                {/*<div className="col-span-1 space-y-6">*/}
+                {/*    <h1 className="text-xl font-semibold">*/}
+                {/*        {`We'll show you how your information will be used here.`}*/}
+                {/*    </h1>*/}
+                {/*    <div className="space-y-4">*/}
+                {/*        /!* Image preview *!/*/}
+                {/*        <div className="h-[150px] w-full border-dashed border-2 border-gray-400 rounded-xl"></div>*/}
+                {/*        /!* Information section *!/*/}
+                {/*        <div className="space-y-2">*/}
+                {/*            <div className="h-6 w-1/2 border-dashed border-2 border-gray-400 rounded"></div>*/}
+                {/*            <div className="h-4 w-3/4 border-dashed border-2 border-gray-400 rounded"></div>*/}
+                {/*            <div className="h-4 w-1/2 border-dashed border-2 border-gray-400 rounded"></div>*/}
+                {/*        </div>*/}
+                {/*        /!* Additional example data *!/*/}
+                {/*        <div className="space-y-2">*/}
+                {/*            <div className="h-6 w-2/3 border-dashed border-2 border-gray-400 rounded"></div>*/}
+                {/*            <div className="h-4 w-full border-dashed border-2 border-gray-400 rounded"></div>*/}
+                {/*            <div className="h-4 w-3/4 border-dashed border-2 border-gray-400 rounded"></div>*/}
+                {/*        </div>*/}
+                {/*    </div>*/}
+                {/*</div>*/}
             </div>
         </main>
     );

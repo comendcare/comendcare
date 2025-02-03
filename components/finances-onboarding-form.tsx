@@ -167,7 +167,7 @@ export default function FinancesOnboardingForm(
                     name="raised"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Raised - {formatMoney(field.value)}</FormLabel>
+                            <FormLabel>Total funds raised to date - {formatMoney(field.value)}</FormLabel>
                             <FormDescription className="flex items-center">
                                 {`The total amount of funding raised to date by your patient group.`}
                                 <Tooltip delayDuration={0}>
@@ -204,9 +204,6 @@ export default function FinancesOnboardingForm(
                                     }}
                                 />
                             </FormControl>
-                            <FormDescription>
-                                This is a description for the price.
-                            </FormDescription>
                             <FormMessage/>
                         </FormItem>
                     )}
@@ -217,11 +214,12 @@ export default function FinancesOnboardingForm(
                     name="deployed"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>{`Money deployed to research`} - {formatMoney(field.value)}</FormLabel>
+                            <FormLabel>{`Total funds deployed to research`} - {formatMoney(field.value)}</FormLabel>
                             <FormDescription className="flex items-center">
                                 {`The total amount of money deployed to research to date.`}
                                 <Tooltip delayDuration={0}>
-                                    <TooltipTrigger>
+                                    {/*disabled to make the tooltip unclickable*/}
+                                    <TooltipTrigger disabled>
                                         <FaQuestionCircle
                                             className="text-black h-4 inline-block align-baseline mx-1"/>
                                     </TooltipTrigger>
@@ -258,9 +256,10 @@ export default function FinancesOnboardingForm(
                         <FormItem>
                             <FormLabel>{`Annual research budget`} - {formatMoney(field.value)}</FormLabel>
                             <FormDescription className="flex items-center">
-                                {`The amount of money allocated to advancing research.`}
+                                {`The amount of money allocated to advancing research this year.`}
                                 <Tooltip delayDuration={0}>
-                                    <TooltipTrigger>
+                                    {/*disabled to make the tooltip unclickable*/}
+                                    <TooltipTrigger disabled>
                                         <FaQuestionCircle
                                             className="text-black h-4 inline-block align-baseline mx-1"/>
                                     </TooltipTrigger>

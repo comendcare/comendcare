@@ -10,7 +10,7 @@ import "@xyflow/react/dist/base.css"
 import PublicMilestoneNode from "./public-milestone-node"
 
 export const PublicFlowView = ({ roadmap, subdomain, urlMilestone }: { roadmap: any, subdomain: string | undefined, urlMilestone: string | undefined }) => {
-    const nodeTypes = { MILESTONE: PublicMilestoneNode }
+    const nodeTypes = { PROJECT: PublicMilestoneNode, ASSET: PublicMilestoneNode, RFP: PublicMilestoneNode }
     const { fitView } = useReactFlow()
 
     console.log(roadmap)
@@ -30,7 +30,7 @@ export const PublicFlowView = ({ roadmap, subdomain, urlMilestone }: { roadmap: 
 
     return (
     <ReactFlow
-        width={32}
+        width={80}
         nodes={roadmap?.nodes.map((node: any) => ({
             ...node, 
             position: {x: node.positionX, y: node.positionY}, 

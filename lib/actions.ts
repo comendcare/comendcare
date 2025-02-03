@@ -11,7 +11,7 @@ import {
     Condition,
     TaskStakeholder, Invitation,
 } from "@prisma/client"
-import {revalidateTag} from "next/cache"
+import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
 import {getSession} from "@/lib/auth"
 import {addDomainToVercel, removeDomainFromVercelProject, validDomainRegex,} from "@/lib/domains";
@@ -22,6 +22,7 @@ import {
     deleteTypeSenseDocument,
     getBlurDataURL,
     logError,
+    sleep,
     toKebabCase,
     updateTypeSenseDocument
 } from "@/lib/utils";
@@ -31,7 +32,8 @@ import {
     sendMemberRequestCreatedEmail,
     sendMemberRequestApprovedEmail,
     sendNewOrganizationEmail,
-    sendMemberRequestDeniedEmail
+    sendMemberRequestDeniedEmail,
+    sendMemberDeletedEmail,
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, MemberRequestWithUser} from "@/lib/types";
@@ -42,13 +44,8 @@ export type Edge = Prisma.EdgeGetPayload<{}>
 
 export type Milestone = Prisma.MilestoneGetPayload<{
     include: {
-        papers: true,
-        asset: {
-            include: { contacts: true, attachments: true }
-        },
-        RFP: {
-            include: { contacts: true, attachments: true }
-        },
+        attachments: true,
+        contacts: true
         tasks: true
     }
 }>
@@ -93,6 +90,9 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
         const organization = await prisma.organization.findUnique({
             where: {
                 id: organizationId
+            },
+            include: {
+                user: true
             }
         })
 
@@ -105,8 +105,8 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
                         image: ""
                     },
                     admin: {
-                        name: session?.user.name,
-                        email: session?.user.email,
+                        name: organization.user?.name,
+                        email: organization.user?.email,
                         organizationName: organization.name || "",
                         organizationImage: organization.image || "",
                     },
@@ -334,7 +334,16 @@ export const createOrganization = async (formData: FormData) => {
             }
         })
 
-        await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'organizations');
+        await addTypeSenseDocument(
+            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+            (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!, 
+            response, 
+            'organizations'
+        );
 
         await revalidateTag(
             `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
@@ -430,7 +439,16 @@ export const updateOrganization = withOrganizationAuth(
                 data,
             });
 
-            await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, response, 'organizations');
+            await updateTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!,
+                response, 
+                'organizations'
+            );
 
             return response;
         } catch (error: any) {
@@ -585,7 +603,11 @@ export async function deleteOrganization(organization: Organization) {
 
         const deleteTypeSense = deleteTypeSenseDocument(
             `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-            process.env.TYPESENSE_ADMIN_API_KEY!,
+            (
+                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                    : process.env.TYPESENSE_ADMIN_API_KEY
+            )!,
             organization.id,
             'organizations'
         );
@@ -882,6 +904,8 @@ export async function inviteUser(
             return {success: false, error: "Database error. please try again later."}
         }
 
+        revalidatePath("/app/dashboard")
+
         return {success: true, data: invitation}
     } catch (error: any) {
         console.error("Error inviting user:", error)
@@ -951,8 +975,6 @@ export async function approveMemberRequestAndCreateMember(
         throw new Error("Invalid member request");
     }
 
-    const session = await getSession()
-
     const organization = await prisma.organization.findUnique({
         where: {
             id: memberRequest.organizationId,
@@ -970,8 +992,13 @@ export async function approveMemberRequestAndCreateMember(
                     userId: memberRequest.userId,
                     organizationId: memberRequest.organizationId
                 }
+            },
+            include: {
+                user: true
             }
         })
+
+        revalidatePath("/app/dashboard")
 
         if (member) {
             return {success: false, error: "This member already exists in your organization."}
@@ -1075,6 +1102,8 @@ export async function deleteMemberRequest(
             return {success: false, error: "Failed to send denial email."};
         }
 
+        revalidatePath("/app/dashboard")
+
         return {success: true, data: deletedMemberRequest};
 
     } catch (error) {
@@ -1101,6 +1130,8 @@ export async function deleteInvitation(
         if (!deletedInvitation) {
             return {success: false, error: "Failed to delete invitation. Request not found."};
         }
+
+        revalidatePath("/app/dashboard")
 
         return {success: true, data: deletedInvitation};
 
@@ -1154,12 +1185,31 @@ export async function deleteMember(
         const member = await prisma.member.delete({
             where: {
                 id: membershipId
+            },
+            include: {
+                user: true,
+                organization: true,
             }
         })
 
         if (!member) {
             return {success: false, error: "Membership not found"};
         }
+
+        if (member) {
+            await sendMemberDeletedEmail(
+                {
+                    name: member.user.name,
+                    email: member.email,
+                    organizationName: member.organization.name || "",
+                    organizationImage: member.organization.image || "",
+                }
+            ).then(() => {
+                console.log("email sent")
+            })
+        }
+
+        revalidatePath("/app/dashboard")
 
         return {success: true, data: member};
     } catch (error: any) {
@@ -1418,6 +1468,8 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
         }
     })
 
+    // await sleep(5000)
+
     // if a roadmap template was provided, create the relevant nodes, milestones, and edges
     if (roadmapTemplate?.milestones) {
         const milestones = roadmapTemplate.milestones
@@ -1428,7 +1480,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 const node = await prisma.node.create({
                     data: {
                         roadmapId: roadmap.id,
-                        type: 'MILESTONE',
+                        type: milestone.nodeType || 'PROJECT',
                         positionX: index * 500,
                         positionY: 0,
                         data: {
@@ -1442,8 +1494,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
                                 ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
                                 ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                // papers: milestone.papers || [],
-                                private: milestone.private || false
+                                private: milestone.private || true
                             }
                         }
                     }
@@ -1454,14 +1505,10 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 const newMilestone = await prisma.milestone.findUnique({
                     where: {nodeId: node.id},
                     include: {
-                        papers: true,
-                        asset: {
-                            include: {contacts: true, attachments: true}
-                        },
-                        RFP: {
-                            include: {contacts: true, attachments: true}
-                        },
-                        tasks: true
+                        attachments: true,
+                        contacts: true,
+                        tasks: true,
+                        node: true
                     }
                 })
 
@@ -1504,7 +1551,21 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
         }
     }
 
-    return roadmap
+    const finalRoadmap = prisma.roadmap.findUnique({
+        where: { id: roadmap.id },
+        include: {
+            milestones: true,
+            nodes: true
+        }
+    })
+
+    return finalRoadmap
+    // const finalRoadmap = await prisma.roadmap.findUnique({
+    //     where: { id: roadmap.id },
+    //     include: { milestones: true, nodes: true, edges: true }
+    // })
+
+    // return finalRoadmap
 }
 
 export async function deleteOrgRoadmap(
@@ -1612,11 +1673,11 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
                                 budget: node.data?.budget,
-                                papers: {
+                                attachments: {
                                     createMany: {
-                                        data: (node.data?.papers || []).map((paper: any) => ({
-                                            link: paper.link,
-                                            ...(paper.name ? {name: paper.name} : undefined)
+                                        data: (node.data?.attachments || []).map((attachment: any) => ({
+                                            link: attachment.link,
+                                            ...(attachment.name ? {name: attachment.name} : undefined)
                                         }))
                                     }
                                 },
@@ -1655,14 +1716,10 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         })
         const updatedMilestones = await prisma.milestone.findMany({
             include: {
-                papers: true,
-                asset: {
-                    include: {contacts: true, attachments: true}
-                },
-                RFP: {
-                    include: {contacts: true, attachments: true}
-                },
-                tasks: true
+                attachments: true,
+                contacts: true,
+                tasks: true,
+                node: true
             },
             where: {roadmapId}
         })
@@ -1728,16 +1785,16 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
                                 budget: node.data?.budget,
-                                papers: {
+                                attachments: {
                                     createMany: {
-                                        data: (node.data?.papers || []).map((paper: any) => ({
-                                            link: paper.link,
-                                            ...(paper.name ? {name: paper.name} : undefined)
+                                        data: (node.data?.attachments || []).map((attachment: any) => ({
+                                            link: attachment.link,
+                                            ...(attachment.name ? {name: attachment.name} : undefined)
                                         }))
                                     }
                                 },
                                 status: node.data?.status || "PLANNED",
-                                private: node.data?.private || false,
+                                private: node.data?.private || true,
                             }
                         }
                     }
@@ -1750,14 +1807,10 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         const nodeIds = updatedNodes.map(node => node.id)
         let updatedMilestones = await prisma.milestone.findMany({
             include: {
-                papers: true,
-                asset: {
-                    include: {contacts: true, attachments: true}
-                },
-                RFP: {
-                    include: {contacts: true, attachments: true}
-                },
-                tasks: true
+                attachments: true,
+                contacts: true,
+                tasks: true,
+                node: true
             },
             where: {roadmapId}
         })
@@ -1773,7 +1826,16 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         //             assetId_exists: response.asset ? true : false
         //         }))
         //         console.log(`Add typesense document`, document)
-        //         // await addTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
+        //         await addTypeSenseDocument(
+        //              `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+        //              (
+        //                 process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+        //                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+        //                     : process.env.TYPESENSE_ADMIN_API_KEY
+        //             )!, 
+        //              document, 
+        //              'milestones'
+        //         )
         //     })
         // )
 
@@ -1800,7 +1862,16 @@ export async function deleteNode(nodeId: string | undefined) {
 
         // Typesense - delete milestone documents here...
         // console.log(`Delete typesense document`, deletedNode.data.id)
-        // await deleteTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, deletedNode.data.id, 'milestones')
+        // await deleteTypeSenseDocument(
+        //     `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+        //     (
+        //         process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+        //             ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+        //             : process.env.TYPESENSE_ADMIN_API_KEY
+        //     )!, 
+        //     deletedNode.data.id, 
+        //     'milestones'
+        // )
 
         return {success: true, data: deletedNode}
     } catch (error: any) {
@@ -1861,14 +1932,10 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     where: {nodeId: milestone.nodeId},
                     // where: {id: milestone.id},
                     include: {
-                        papers: true,
-                        asset: {
-                            include: {contacts: true, attachments: true}
-                        },
-                        RFP: {
-                            include: {contacts: true, attachments: true}
-                        },
-                        tasks: true
+                        attachments: true,
+                        contacts: true,
+                        tasks: true,
+                        node: true
                     }
                 })
 
@@ -1880,14 +1947,10 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                 let m = await prisma.milestone.update({
                     where: {nodeId: milestone.nodeId},
                     include: {
-                        papers: true,
-                        asset: {
-                            include: {contacts: true, attachments: true}
-                        },
-                        RFP: {
-                            include: {contacts: true, attachments: true}
-                        },
-                        tasks: true
+                        attachments: true,
+                        contacts: true,
+                        tasks: true,
+                        node: true
                     },
                     data: {
                         title: milestone.title,
@@ -1897,31 +1960,37 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         startDate: milestone.startDate,
                         endDate: milestone.endDate,
                         budget: milestone.budget,
-                        papers: {
-                            deleteMany: {}, // clear all existing papers
+                        attachments: {
+                            deleteMany: {}, // clear all existing attachments
                             createMany: {
-                                data: milestone.papers.map((paper: any) => ({
-                                    link: paper.link,
-                                    ...(paper.name ? {name: paper.name} : undefined)
+                                data: milestone.attachments.map((attachment: any) => ({
+                                    link: attachment.link,
+                                    ...(attachment.name ? {name: attachment.name} : undefined)
                                 }))
                             }
                         },
+                        contacts: {
+                            deleteMany: {},
+                            createMany: {
+                                data: milestone.contacts.map((contact: any) => ({
+                                    name: contact.name,
+                                    email: contact.email,
+                                    ...(contact.role ? {role: contact.role} : undefined)
+                                }))
+                            }
+                        },
+                        openTo: milestone.openTo,
                         status: milestone.status || "PLANNED",
                         private: milestone.private || false,
+                        node: {
+                            update: {
+                                type: milestone.nodeType
+                            }
+                        }
                     }
                 })
 
-                // add updated asset, if necessary
-                let result = await updateAssets(previousMilestone, milestone)
-                if (result) {
-                    m = result
-                }
-
-                // add updated RFP if necessary
-                result = await updateRFP(previousMilestone, milestone)
-                if (result) {
-                    m = result
-                }
+                console.log(`updated milestone`, m)
 
                 updatedMilestones.push(m)
             })
@@ -1936,7 +2005,16 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         //             assetId_exists: response.asset ? true : false
         //         }))
         //         console.log(`Update typesense document`, document)
-        //         // await updateTypeSenseDocument(`https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, process.env.TYPESENSE_ADMIN_API_KEY!, document, 'milestones')
+        //         await updateTypeSenseDocument(
+        //             `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+        //             (
+        //                 process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+        //                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+        //                     : process.env.TYPESENSE_ADMIN_API_KEY
+        //             )!,
+        //             document, 
+        //             'milestones'
+        //         )
         //     })
         // )
 
@@ -1945,168 +2023,6 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
     } catch (error: any) {
         logError(`Error updating Milestone: `, error)
         return {success: false, error: "Internal server error"}
-    }
-}
-
-async function updateAssets(previousMilestone: Milestone, milestone: Milestone) {
-    if (milestone.asset) {
-        const updatedMilestone: Milestone = await prisma.milestone.update({
-            where: {id: milestone.id},
-            include: {
-                papers: true,
-                asset: {
-                    include: {contacts: true, attachments: true}
-                },
-                RFP: {
-                    include: {contacts: true, attachments: true}
-                },
-                tasks: true
-            },
-            data: {
-                asset: {
-                    upsert: {
-                        create: {
-                            name: milestone.asset.name
-                        },
-                        update: {
-                            name: milestone.asset.name,
-                            description: milestone.asset.description,
-                            contacts: {
-                                deleteMany: {},  // clear all existing contacts
-                                createMany: {
-                                    data: milestone.asset.contacts.map((contact: any) => ({
-                                        name: contact.name,
-                                        role: contact.role,
-                                        email: contact.email
-                                    }))
-                                }
-                            },
-                            attachments: {
-                                deleteMany: {}, // clear all existing attachments
-                                createMany: {
-                                    data: milestone.asset.attachments.map((attachment: any) => ({
-                                        link: attachment.link,
-                                        name: attachment.name
-                                    }))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        })
-
-        // Typesense - update asset documents here...
-
-        return updatedMilestone
-    }
-
-    if (!milestone.asset && previousMilestone.asset) {
-        const updatedMilestone: Milestone = await prisma.milestone.update({
-            where: {id: milestone.id},
-            include: {
-                papers: true,
-                asset: {
-                    include: {contacts: true, attachments: true}
-                },
-                RFP: {
-                    include: {contacts: true, attachments: true}
-                },
-                tasks: true
-            },
-            data: {
-                asset: {delete: true}
-            }
-        })
-
-        // Typesense - if updating typesense, update here...
-
-        return updatedMilestone
-    }
-}
-
-async function updateRFP(previousMilestone: Milestone, milestone: Milestone) {
-    if (milestone.RFP) {
-        const updatedMilestone = await prisma.milestone.update({
-            where: {id: milestone.id},
-            include: {
-                papers: true,
-                asset: {
-                    include: {contacts: true, attachments: true}
-                },
-                RFP: {
-                    include: {contacts: true, attachments: true}
-                },
-                tasks: true
-            },
-            data: {
-                RFP: {
-                    upsert: {
-                        create: {
-                            name: milestone.RFP.name,
-                            funding: milestone.RFP.funding,
-                            researchFocus: milestone.type,
-                            openTo: milestone.RFP.openTo
-                        },
-                        update: {
-                            name: milestone.RFP.name,
-                            funding: milestone.RFP.funding,
-                            description: milestone.RFP.description,
-                            contacts: {
-                                deleteMany: {}, // clear all existing contacts
-                                createMany: {
-                                    data: milestone.RFP.contacts.map((contact: any) => ({
-                                        name: contact.name,
-                                        role: contact.role,
-                                        email: contact.email
-                                    }))
-                                }
-                            },
-                            attachments: {
-                                deleteMany: {}, // clear all existing attachments
-                                createMany: {
-                                    data: milestone.RFP.attachments.map((attachment: any) => ({
-                                        link: attachment.link,
-                                        name: attachment.name
-                                    }))
-                                }
-                            },
-                            researchFocus: milestone.type,
-                            openTo: milestone.RFP.openTo,
-                            startDate: milestone.RFP.startDate,
-                            endDate: milestone.RFP.endDate
-                        }
-                    }
-                }
-            }
-        })
-
-        // Typesense - update RFP documents here...
-
-        return updatedMilestone
-    }
-
-    if (!milestone.RFP && previousMilestone.RFP) {
-        const updatedMilestone = await prisma.milestone.update({
-            where: {id: milestone.id},
-            include: {
-                papers: true,
-                asset: {
-                    include: {contacts: true, attachments: true}
-                },
-                RFP: {
-                    include: {contacts: true, attachments: true}
-                },
-                tasks: true
-            },
-            data: {
-                RFP: {delete: true}
-            }
-        })
-
-        // Typesense - if updating typesense, update here...
-
-        return updatedMilestone
     }
 }
 
@@ -2226,7 +2142,7 @@ export async function deleteColumn(columnId: string) {
 }
 
 /* HANDLE KANBAN TASKS - create, update, delete -------------------------------------------------------------------------- */
-export async function createTask(columnId: string) {
+export async function createTask(columnId: string, properties?: any) {
     try {
         const newTask: Task = await prisma.task.create({
             include: {checklist: true, stakeholders: {include: {user: true}}},
@@ -2244,9 +2160,17 @@ export async function createTask(columnId: string) {
                 // date: null,
                 // endDate: null,
                 // priority: null,
-                private: false,
+                private: true,
                 // startDate: null,
                 // checklist: []
+                ...(properties?.stakeholders ? {stakeholders: {
+                    createMany: {
+                        data: (properties.stakeholders || []).map((stakeholder: any) => ({
+                            userId: stakeholder?.user?.id || stakeholder?.userId,
+                            // user: { connect: { id: stakeholder.id }},
+                        }))
+                    }
+                }}: undefined)
             }
         })
 
@@ -2294,7 +2218,7 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                             deleteMany: {},
                             createMany: {
                                 data: (task.stakeholders || []).map((stakeholder: any) => ({
-                                    userId: stakeholder.user.id || stakeholder.userId,
+                                    userId: stakeholder?.user?.id || stakeholder?.userId,
                                     // user: { connect: { id: stakeholder.id }},
                                 }))
                             }

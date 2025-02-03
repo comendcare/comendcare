@@ -465,14 +465,14 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Name (required)`}</FormLabel>
-                                        <div className="w-full flex flex-row justify-between">
-                                            <FormDescription>
-                                                {`The name of your organization.`}
-                                            </FormDescription>
-                                            <FormDescription>
-                                                {`60 characters max.`}
-                                            </FormDescription>
-                                        </div>
+                                        {/*<div className="w-full flex flex-row justify-between">*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        {`The name of your organization.`}*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        {`60 characters max.`}*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*</div>*/}
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -492,24 +492,24 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
-                                        <div className="w-full flex flex-row justify-between">
+                                        {/*<div className="w-full flex flex-row justify-between">*/}
                                             <FormDescription>
-                                                {`Enter your organization’s abbreviated name, short form, or nickname in lowercase.`}
+                                                {`Enter an acronym, short form, or nickname for your organization.`}
                                                 <br/>
                                                 {newOrgForm.watch("subdomain") &&
                                                     !newOrgForm.formState.errors.subdomain && (
-                                                        <>
-                                                            {`Your organization's domain will be ${newOrgForm
+                                                        <div className="font-semibold">
+                                                            {`The custom site for your organization’s profile will be found at ${newOrgForm
                                                                 .watch("subdomain")
                                                                 .toLowerCase()
                                                                 .replace(/\s+/g, "-")}.comend.io`}
-                                                        </>
+                                                        </div>
                                                     )}
                                             </FormDescription>
-                                            <FormDescription>
-                                                50 characters max.
-                                            </FormDescription>
-                                        </div>
+                                        {/*    <FormDescription>*/}
+                                        {/*        50 characters max.*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*</div>*/}
                                         <FormControl>
                                             <Input
                                                 type="text"
@@ -571,9 +571,9 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Year Founded</FormLabel>
-                                        <FormDescription>
-                                            Select the year your organization was founded.
-                                        </FormDescription>
+                                        {/*<FormDescription>*/}
+                                        {/*    Select the year your organization was founded.*/}
+                                        {/*</FormDescription>*/}
                                         <Select
                                             onValueChange={(value) => field.onChange(`${value}-01-01`)} // Convert year to a date string
                                             defaultValue={field.value?.split("-")[0]} // Extract the year from the date string for the default value
@@ -605,14 +605,14 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem>
                                         <FormLabel>Description (required)</FormLabel>
-                                        <div className="w-full flex flex-row justify-between">
-                                            <FormDescription>
-                                                This will be the public description of your organization.
-                                            </FormDescription>
-                                            <FormDescription>
-                                                500 characters max.
-                                            </FormDescription>
-                                        </div>
+                                        {/*<div className="w-full flex flex-row justify-between">*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        This will be the public description of your organization.*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*    <FormDescription>*/}
+                                        {/*        500 characters max.*/}
+                                        {/*    </FormDescription>*/}
+                                        {/*</div>*/}
                                         <FormControl>
                                             <Textarea
                                                 placeholder="Tell us a little bit about yourself"
@@ -631,7 +631,7 @@ export default function OrganizationOnboardingForm(
                                 render={({field}) => (
                                     <FormItem className="space-y-3">
                                         <FormLabel>{`What is your 501c3 status?`}</FormLabel>
-                                        <FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>
+                                        {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
                                         <FormControl>
                                             <RadioGroup
                                                 onValueChange={field.onChange}
@@ -670,66 +670,56 @@ export default function OrganizationOnboardingForm(
                                 )}
                             />
 
-                            <FormField
-                                control={newOrgForm.control}
-                                name="formattedAddress"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Patient Group Address</FormLabel>
-                                        <FormDescription>
-                                            {`Your organization's address.`}
-                                        </FormDescription>
-                                        <FormControl>
-                                            <AutocompleteComponent
-                                                address={address}
-                                                setAddress={setAddress}
-                                                searchInput={searchInput}
-                                                setSearchInput={setSearchInput}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={newOrgForm.control}*/}
+                            {/*    name="formattedAddress"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>Patient Group Address</FormLabel>*/}
+                            {/*            /!*<FormDescription>*!/*/}
+                            {/*            /!*    {`Your organization's address.`}*!/*/}
+                            {/*            /!*</FormDescription>*!/*/}
+                            {/*            <FormControl>*/}
+                            {/*                <AutocompleteComponent*/}
+                            {/*                    address={address}*/}
+                            {/*                    setAddress={setAddress}*/}
+                            {/*                    searchInput={searchInput}*/}
+                            {/*                    setSearchInput={setSearchInput}*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
-                            <FormImageCropper
-                                form={newOrgForm}
-                                name="image"
-                                title={"Organization Logo"}
-                                description={"This will be used as your organization profile's image."}
-                                aspect={1}
-                                selectedFile={selectedFile}
-                                setSelectedFile={setSelectedFile}
-                            />
+                            {/*<FormImageCropper*/}
+                            {/*    form={newOrgForm}*/}
+                            {/*    name="image"*/}
+                            {/*    title={"Organization Logo"}*/}
+                            {/*    description={"This will be used as your organization profile's image."}*/}
+                            {/*    aspect={1}*/}
+                            {/*    selectedFile={selectedFile}*/}
+                            {/*    setSelectedFile={setSelectedFile}*/}
+                            {/*/>*/}
 
-                            <FormField
-                                control={newOrgForm.control}
-                                name="looking"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`What your organization is looking for and hoping to get from joining Comend.`}</FormLabel>
-                                        <FormDescription>{`What are your organization’s priorities over the next year? How might Comend help?`}</FormDescription>
-                                        <FormControl>
-                                            <Input
-                                                type="text"
-                                                id="looking"
-                                                {...field}
-                                            />
-                                            {/*<MultipleSelector*/}
-                                            {/*    {...field}*/}
-                                            {/*    defaultOptions={OPTIONS}*/}
-                                            {/*    placeholder="Select options that appeal to you..."*/}
-                                            {/*    emptyIndicator={*/}
-                                            {/*        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
-                                            {/*            no results found.*/}
-                                            {/*        </p>*/}
-                                            {/*    }*/}
-                                            {/*/>*/}
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={newOrgForm.control}*/}
+                            {/*    name="looking"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>{`What your organization is looking for and hoping to get from joining Comend.`}</FormLabel>*/}
+                            {/*            <FormDescription>{`What are your organization’s priorities over the next year? How might Comend help?`}</FormDescription>*/}
+                            {/*            <FormControl>*/}
+                            {/*                <Input*/}
+                            {/*                    type="text"*/}
+                            {/*                    id="looking"*/}
+                            {/*                    {...field}*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
@@ -807,168 +797,169 @@ export default function OrganizationOnboardingForm(
                     </div>
                 )}
             </div>
-            {isNewOrganization &&
-                <div
-                    className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">
-                    <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">
-                        <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">
-                            Organization profile preview
-                        </h1>
 
-                        <div
-                            className="h-10 w-full bg-white text-gray-800 text-left px-4 flex items-center border border-gray-300 rounded-md shadow-sm">
-                            {newOrgForm.watch("subdomain") && `${newOrgForm.watch("subdomain")}.comend.io`}
-                        </div>
+            {/*{isNewOrganization &&*/}
+            {/*    <div*/}
+            {/*        className="sticky top-8 col-span-1 space-y-4 border-2 rounded-lg h-[calc(100vh-250px)] overflow-y-auto">*/}
+            {/*        <div className="flex flex-col items-center w-full max-w-7xl mx-auto p-8">*/}
+            {/*            <h1 className="min-w-0 flex-1 truncate text-2xl font-bold text-gray-900 mb-4">*/}
+            {/*                Organization profile preview*/}
+            {/*            </h1>*/}
 
-                        <div className="w-full flex flex-col space-y-8 my-8">
-                            <div>
-                                <div>
-                                    {/* <img className="object-cover h-24 w-full lg:h-36"
-                                         src={'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'}
-                                         alt=""
-                                    /> */}
-                                    <div className="h-32 w-full object-cover lg:h-48 bg-secondary"></div>
-                                </div>
+            {/*            <div*/}
+            {/*                className="h-10 w-full bg-white text-gray-800 text-left px-4 flex items-center border border-gray-300 rounded-md shadow-sm">*/}
+            {/*                {newOrgForm.watch("subdomain") && `${newOrgForm.watch("subdomain")}.comend.io`}*/}
+            {/*            </div>*/}
 
-                                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                                    <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
+            {/*            <div className="w-full flex flex-col space-y-8 my-8">*/}
+            {/*                <div>*/}
+            {/*                    <div>*/}
+            {/*                        /!* <img className="object-cover h-24 w-full lg:h-36"*/}
+            {/*                             src={'https://images.unsplash.com/photo-1444628838545-ac4016a5418a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80'}*/}
+            {/*                             alt=""*/}
+            {/*                        /> *!/*/}
+            {/*                        <div className="h-32 w-full object-cover lg:h-48 bg-secondary"></div>*/}
+            {/*                    </div>*/}
 
-                                        <div className="flex">
-                                            {selectedFile?.preview ?
-                                                <img
-                                                    className="object-cover h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"
-                                                    src={selectedFile?.preview}
-                                                    alt=""/>
-                                                :
-                                                <p
-                                                    className={"flex items-center justify-center bg-muted h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18 text-2xl"}
-                                                >
-                                                    {nameToInitials(newOrgForm.watch("orgName"))}
-                                                </p>
-                                            }
-                                        </div>
+            {/*                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">*/}
+            {/*                        <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">*/}
 
-                                        <div
-                                            className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
-                                        >
-                                            <div className="mt-6 min-w-0 flex-1 sm:hidden md:block space-y-1">
-                                                <h1 className="mt-6 min-w-0 flex-1 truncate text-xl font-bold text-gray-900">
-                                                    {newOrgForm.watch("orgName") || <Skeleton className="h-4 w-full"/>}
-                                                </h1>
-                                                <div className="flex flex-row space-x-2">
-                                                    {newOrgForm.watch("founded") ?
-                                                        <div
-                                                            className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
-                                                            <div className="mt-1 flex items-center text-gray-500">
-                                                                <FaCalendar
-                                                                    className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"
-                                                                    aria-hidden="true"/>
-                                                                Founded in {newOrgForm.watch("founded")?.split("-")[0]}
-                                                            </div>
-                                                        </div> :
-                                                        <Skeleton className="h-2 w-1/4"/>
-                                                    }
-                                                    {newOrgForm.watch("incorporationStatus") === "YES" &&
-                                                        <div
-                                                            className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">
-                                                            <div className="mt-1 flex items-center text-gray-500">
-                                                                <FaBuildingNgo
-                                                                    className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"
-                                                                    aria-hidden="true"/>
-                                                                {"501c3"}
-                                                            </div>
-                                                        </div>
-                                                    }
-                                                </div>
-                                            </div>
-                                        </div>
+            {/*                            <div className="flex">*/}
+            {/*                                {selectedFile?.preview ?*/}
+            {/*                                    <img*/}
+            {/*                                        className="object-cover h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18"*/}
+            {/*                                        src={selectedFile?.preview}*/}
+            {/*                                        alt=""/>*/}
+            {/*                                    :*/}
+            {/*                                    <p*/}
+            {/*                                        className={"flex items-center justify-center bg-muted h-24 w-24 rounded-full ring-4 ring-white sm:h-18 sm:w-18 text-2xl"}*/}
+            {/*                                    >*/}
+            {/*                                        {nameToInitials(newOrgForm.watch("orgName"))}*/}
+            {/*                                    </p>*/}
+            {/*                                }*/}
+            {/*                            </div>*/}
 
-                                    </div>
-                                    <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
-                                        <h1 className="truncate text-2xl font-bold text-gray-900">
-                                            {newOrgForm.watch("orgName")}
-                                        </h1>
-                                    </div>
-                                </div>
-                            </div>
+            {/*                            <div*/}
+            {/*                                className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"*/}
+            {/*                            >*/}
+            {/*                                <div className="mt-6 min-w-0 flex-1 sm:hidden md:block space-y-1">*/}
+            {/*                                    <h1 className="mt-6 min-w-0 flex-1 truncate text-xl font-bold text-gray-900">*/}
+            {/*                                        {newOrgForm.watch("orgName") || <Skeleton className="h-4 w-full"/>}*/}
+            {/*                                    </h1>*/}
+            {/*                                    <div className="flex flex-row space-x-2">*/}
+            {/*                                        {newOrgForm.watch("founded") ?*/}
+            {/*                                            <div*/}
+            {/*                                                className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">*/}
+            {/*                                                <div className="mt-1 flex items-center text-gray-500">*/}
+            {/*                                                    <FaCalendar*/}
+            {/*                                                        className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"*/}
+            {/*                                                        aria-hidden="true"/>*/}
+            {/*                                                    Founded in {newOrgForm.watch("founded")?.split("-")[0]}*/}
+            {/*                                                </div>*/}
+            {/*                                            </div> :*/}
+            {/*                                            <Skeleton className="h-2 w-1/4"/>*/}
+            {/*                                        }*/}
+            {/*                                        {newOrgForm.watch("incorporationStatus") === "YES" &&*/}
+            {/*                                            <div*/}
+            {/*                                                className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">*/}
+            {/*                                                <div className="mt-1 flex items-center text-gray-500">*/}
+            {/*                                                    <FaBuildingNgo*/}
+            {/*                                                        className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"*/}
+            {/*                                                        aria-hidden="true"/>*/}
+            {/*                                                    {"501c3"}*/}
+            {/*                                                </div>*/}
+            {/*                                            </div>*/}
+            {/*                                        }*/}
+            {/*                                    </div>*/}
+            {/*                                </div>*/}
+            {/*                            </div>*/}
 
-                            <div className="grid grid-cols-6 gap-2">
-                                <div className="col-span-2 space-y-2">
-                                    <Card>
-                                        <CardHeader
-                                            className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                            <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>
-                                                About
-                                            </CardTitle>
-                                        </CardHeader>
+            {/*                        </div>*/}
+            {/*                        <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">*/}
+            {/*                            <h1 className="truncate text-2xl font-bold text-gray-900">*/}
+            {/*                                {newOrgForm.watch("orgName")}*/}
+            {/*                            </h1>*/}
+            {/*                        </div>*/}
+            {/*                    </div>*/}
+            {/*                </div>*/}
 
-                                        <CardContent>
-                                            <div className="flex flex-col space-y-4">
-                                                <div className="flex-shrink-0 space-y-4">
-                                                    <div className="flex-grow space-y-4">
-                                                        <div className="space-y-2">
-                                                            {newOrgForm.watch("description") ?
-                                                                <p className="text-xs line-clamp-6">
-                                                                    {newOrgForm.watch("description")}
-                                                                </p> : <Skeleton className="h-4 w-full"/>
-                                                            }
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                            <h3 className={cn("scroll-m-20 text-md tracking-tight font-semibold")}>
-                                                                Website
-                                                            </h3>
-                                                            {newOrgForm.watch("website") ?
-                                                                <p className="text-xs truncate">
-                                                                    {newOrgForm.watch("website")}
-                                                                </p> : <Skeleton className="h-4 w-full"/>
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+            {/*                <div className="grid grid-cols-6 gap-2">*/}
+            {/*                    <div className="col-span-2 space-y-2">*/}
+            {/*                        <Card>*/}
+            {/*                            <CardHeader*/}
+            {/*                                className="flex flex-row items-center justify-between space-y-0 pb-2">*/}
+            {/*                                <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>*/}
+            {/*                                    About*/}
+            {/*                                </CardTitle>*/}
+            {/*                            </CardHeader>*/}
 
-                                        </CardContent>
-                                    </Card>
-                                </div>
+            {/*                            <CardContent>*/}
+            {/*                                <div className="flex flex-col space-y-4">*/}
+            {/*                                    <div className="flex-shrink-0 space-y-4">*/}
+            {/*                                        <div className="flex-grow space-y-4">*/}
+            {/*                                            <div className="space-y-2">*/}
+            {/*                                                {newOrgForm.watch("description") ?*/}
+            {/*                                                    <p className="text-xs line-clamp-6">*/}
+            {/*                                                        {newOrgForm.watch("description")}*/}
+            {/*                                                    </p> : <Skeleton className="h-4 w-full"/>*/}
+            {/*                                                }*/}
+            {/*                                            </div>*/}
+            {/*                                            <div className="space-y-2">*/}
+            {/*                                                <h3 className={cn("scroll-m-20 text-md tracking-tight font-semibold")}>*/}
+            {/*                                                    Website*/}
+            {/*                                                </h3>*/}
+            {/*                                                {newOrgForm.watch("website") ?*/}
+            {/*                                                    <p className="text-xs truncate">*/}
+            {/*                                                        {newOrgForm.watch("website")}*/}
+            {/*                                                    </p> : <Skeleton className="h-4 w-full"/>*/}
+            {/*                                                }*/}
+            {/*                                            </div>*/}
+            {/*                                        </div>*/}
+            {/*                                    </div>*/}
+            {/*                                </div>*/}
 
-                                <div className="col-span-4 flex flex-col space-y-2">
-                                    <Card>
-                                        <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                                            <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>
-                                                Milestones
-                                            </CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="grid grid-cols-2 gap-x-2">
-                                            <div className="flex flex-col gap-y-2">
-                                                <Skeleton className="h-4 w-full"/>
-                                                <Skeleton className="h-4 w-1/2"/>
-                                            </div>
-                                            <div className="flex flex-col gap-y-2">
-                                                <Skeleton className="h-4 w-full"/>
-                                                <Skeleton className="h-4 w-1/2"/>
-                                                <Skeleton className="h-4 w-1/2"/>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                    <Card>
-                                        <CardHeader
-                                            className="w-full flex flex-row items-center justify-between space-y-0">
-                                            <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>
-                                                Research Plan
-                                            </CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="space-y-4">
-                                            <Skeleton className="h-4 w-full"/>
-                                            <Skeleton className="h-4 w-[200px]"/>
-                                            <Skeleton className="h-4 w-[200px]"/>
-                                        </CardContent>
-                                    </Card>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
+            {/*                            </CardContent>*/}
+            {/*                        </Card>*/}
+            {/*                    </div>*/}
+
+            {/*                    <div className="col-span-4 flex flex-col space-y-2">*/}
+            {/*                        <Card>*/}
+            {/*                            <CardHeader className="flex flex-row items-center justify-between space-y-0">*/}
+            {/*                                <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>*/}
+            {/*                                    Milestones*/}
+            {/*                                </CardTitle>*/}
+            {/*                            </CardHeader>*/}
+            {/*                            <CardContent className="grid grid-cols-2 gap-x-2">*/}
+            {/*                                <div className="flex flex-col gap-y-2">*/}
+            {/*                                    <Skeleton className="h-4 w-full"/>*/}
+            {/*                                    <Skeleton className="h-4 w-1/2"/>*/}
+            {/*                                </div>*/}
+            {/*                                <div className="flex flex-col gap-y-2">*/}
+            {/*                                    <Skeleton className="h-4 w-full"/>*/}
+            {/*                                    <Skeleton className="h-4 w-1/2"/>*/}
+            {/*                                    <Skeleton className="h-4 w-1/2"/>*/}
+            {/*                                </div>*/}
+            {/*                            </CardContent>*/}
+            {/*                        </Card>*/}
+            {/*                        <Card>*/}
+            {/*                            <CardHeader*/}
+            {/*                                className="w-full flex flex-row items-center justify-between space-y-0">*/}
+            {/*                                <CardTitle className={cn("scroll-m-20 text-lg font-bold tracking-tight")}>*/}
+            {/*                                    Research Plan*/}
+            {/*                                </CardTitle>*/}
+            {/*                            </CardHeader>*/}
+            {/*                            <CardContent className="space-y-4">*/}
+            {/*                                <Skeleton className="h-4 w-full"/>*/}
+            {/*                                <Skeleton className="h-4 w-[200px]"/>*/}
+            {/*                                <Skeleton className="h-4 w-[200px]"/>*/}
+            {/*                            </CardContent>*/}
+            {/*                        </Card>*/}
+            {/*                    </div>*/}
+            {/*                </div>*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*}*/}
         </div>
     )
 }

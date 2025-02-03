@@ -16,9 +16,9 @@ export default async function PlatformLayout({children}: PlatformLayoutProps) {
     if (!session) {
         redirect("/");
     } else if (!isWhitelisted) {
-        redirect("/signed-out");
+        redirect("/signed-out?reason=not_whitelisted");
     } else if (session.terminate) {
-        redirect("/signed-out")
+        redirect("/signed-out?reason=terminated");
     }
 
     return (

@@ -177,6 +177,14 @@ export const syncToTypesense = async (env: {
                     type: "int64"
                 },
                 {
+                    name: "firstConditionPatientsEngaged",  // NEEDED FOR SORTING BY PATIENTS ENGAGED IN MARKETPLACE
+                    type: "int32",
+                    index: true,
+                    sort: true,
+                    store: true,
+                    optional: true,
+                },
+                {
                     name: "condition",
                     facet: false,
                     index: true,
@@ -247,73 +255,97 @@ export const syncToTypesense = async (env: {
                     index: true,
                     infix: false,
                     locale: "",
-                    name: "RFPId",
+                    name: "updatedAt",
+                    optional: false,
+                    sort: true,  // Enable sorting
+                    stem: false,
+                    store: true,
+                    type: "int64" // Store timestamps as Unix timestamps (milliseconds)
+                },
+                {
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    name: "nodeType",
                     optional: true,
                     sort: false,
                     stem: false,
                     store: true,
                     type: "string"
                 },
-                {
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    name: "RFP",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "object"
-                },
-                {
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    name: "RFPId_exists",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "bool"
-                },
-                {
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    name: "assetId",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "string"
-                },
-                {
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    name: "asset",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "object"
-                },
-                {
-                    facet: false,
-                    index: true,
-                    infix: false,
-                    locale: "",
-                    name: "assetId_exists",
-                    optional: true,
-                    sort: false,
-                    stem: false,
-                    store: true,
-                    type: "bool"
-                }
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "RFPId",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "string"
+                // },
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "RFP",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "object"
+                // },
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "RFPId_exists",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "bool"
+                // },
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "assetId",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "string"
+                // },
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "asset",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "object"
+                // },
+                // {
+                //     facet: false,
+                //     index: true,
+                //     infix: false,
+                //     locale: "",
+                //     name: "assetId_exists",
+                //     optional: true,
+                //     sort: false,
+                //     stem: false,
+                //     store: true,
+                //     type: "bool"
+                // }
             ],
         };
 
@@ -339,14 +371,23 @@ export const syncToTypesense = async (env: {
                     where: { id: org.id },
                     include: { condition: {include: {condition: true}}}
                 })
-                
+
+                if (!organization) return null;
+
+                // Special case made for sortable condition attributes
+                // This is temporary until we find a better way to handle the organization condition relationship
+                const firstConditionPatientsEngaged = organization.condition?.[0]?.condition?.numberOfPatientsEngaged ?? 0;
+
+
                 return {
                     ...organization,
-                    // prevalenceRatio: organization?.condition.flatMap(condition => condition.condition?.prevalenceRatio)
+                    firstConditionPatientsEngaged,
                 }
             }))
 
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', uploadOrgs);
+            const validOrganizations = uploadOrgs.filter(Boolean);
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', validOrganizations);
         } else {
             console.log('No organizations to import.');
         }
@@ -358,20 +399,21 @@ export const syncToTypesense = async (env: {
                 console.log(`Milestone ${index + 1}:`, ms)
                 const milestone = await prisma.milestone.findUnique({
                     where: { id: ms.id },
-                    include: {
-                        RFP: true,
-                        asset: true
-                    }
+                    include: { node: true }
                 })
+
+                if (!milestone) return null;
 
                 return {
                     ...milestone,
-                    RFPId_exists: milestone?.RFP ? true : false,
-                    assetId_exists: milestone?.asset ? true : false,
+                    nodeType: milestone.node?.type,
+                    updatedAt: new Date(milestone.updatedAt).getTime(), // Convert to int64
                 }
             }))
 
-            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', uploadMilestones);
+            const validMilestones = uploadMilestones.filter(Boolean);
+
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', validMilestones);
         } else {
             console.log('No milestones to import.');
         }
@@ -386,7 +428,11 @@ export const syncToTypesense = async (env: {
 
 // Run sync on start - pull sync from app/api/sync/route.ts, this is the same sync we use for our global sync cron job
 syncToTypesense({
-    TYPESENSE_ADMIN_API_KEY: process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY!,
+    TYPESENSE_ADMIN_API_KEY: (
+        process.env.NEXT_PUBLIC_NODE_ENV === "production"
+            ? process.env.TYPESENSE_ADMIN_API_KEY
+            : process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+    )!,
     TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
 }).catch((error) => {
     console.error("Failed to initialize Typesense sync:", error);

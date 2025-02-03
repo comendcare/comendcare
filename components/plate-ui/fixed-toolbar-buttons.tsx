@@ -77,16 +77,16 @@ export function FixedToolbarButtons() {
           {/*  </AIToolbarButton>*/}
           {/*</ToolbarGroup>*/}
 
-          <ToolbarGroup>
+          {/* <ToolbarGroup>
             <ExportToolbarButton>
               <ArrowUpToLineIcon />
             </ExportToolbarButton>
-          </ToolbarGroup>
+          </ToolbarGroup> */}
 
-          <ToolbarGroup>
+          {/* <ToolbarGroup>
             <InsertDropdownMenu />
             <TurnIntoDropdownMenu />
-          </ToolbarGroup>
+          </ToolbarGroup> */}
 
           <ToolbarGroup>
             <MarkToolbarButton nodeType={BoldPlugin.key} tooltip="Bold (⌘+B)">
@@ -114,27 +114,31 @@ export function FixedToolbarButtons() {
               <StrikethroughIcon />
             </MarkToolbarButton>
 
-            <MarkToolbarButton nodeType={CodePlugin.key} tooltip="Code (⌘+E)">
-              <Code2Icon />
+            <MarkToolbarButton nodeType={HighlightPlugin.key} tooltip="Highlight">
+              <HighlighterIcon />
             </MarkToolbarButton>
 
-            <ColorDropdownMenu
+            {/* <MarkToolbarButton nodeType={CodePlugin.key} tooltip="Code (⌘+E)">
+              <Code2Icon />
+            </MarkToolbarButton> */}
+
+            {/* <ColorDropdownMenu
               nodeType={FontColorPlugin.key}
               tooltip="Text color"
             >
               <BaselineIcon />
-            </ColorDropdownMenu>
+            </ColorDropdownMenu> */}
 
-            <ColorDropdownMenu
+            {/* <ColorDropdownMenu
               nodeType={FontBackgroundColorPlugin.key}
               tooltip="Background color"
             >
               <PaintBucketIcon />
-            </ColorDropdownMenu>
+            </ColorDropdownMenu> */}
           </ToolbarGroup>
 
           <ToolbarGroup>
-            <AlignDropdownMenu />
+            {/* <AlignDropdownMenu /> */}
 
             <IndentListToolbarButton nodeType={ListStyleType.Disc} />
             <IndentListToolbarButton nodeType={ListStyleType.Decimal} />
@@ -148,37 +152,37 @@ export function FixedToolbarButtons() {
             <EmojiDropdownMenu />
           </ToolbarGroup>
 
-          <ToolbarGroup>
+          {/* <ToolbarGroup>
             <MediaToolbarButton nodeType={ImagePlugin.key} />
             <MediaToolbarButton nodeType={VideoPlugin.key} />
             <MediaToolbarButton nodeType={AudioPlugin.key} />
             <MediaToolbarButton nodeType={FilePlugin.key} />
-          </ToolbarGroup>
+          </ToolbarGroup> */}
 
-          <ToolbarGroup>
+          {/* <ToolbarGroup>
             <LineHeightDropdownMenu />
             <OutdentToolbarButton />
             <IndentToolbarButton />
-          </ToolbarGroup>
+          </ToolbarGroup> */}
 
-          <ToolbarGroup>
+          {/* <ToolbarGroup>
             <MoreDropdownMenu />
-          </ToolbarGroup>
+          </ToolbarGroup> */}
         </>
       )}
 
-      <div className="grow" />
+      {/* <div className="grow" /> */}
 
-      <ToolbarGroup>
+      {/* <ToolbarGroup>
         <MarkToolbarButton nodeType={HighlightPlugin.key} tooltip="Highlight">
           <HighlighterIcon />
         </MarkToolbarButton>
         <CommentToolbarButton />
-      </ToolbarGroup>
+      </ToolbarGroup> */}
 
-      <ToolbarGroup>
+      {/* <ToolbarGroup>
         <ModeDropdownMenu />
-      </ToolbarGroup>
+      </ToolbarGroup> */}
     </div>
   );
 }

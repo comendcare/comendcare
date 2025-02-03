@@ -52,20 +52,22 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
             className="w-full"
             onValueChange={handleTabChange}
         >
-            <Card className="organization-profile-tour-step5">
+            <Card className="organization-profile-tour-step4">
                 <CardHeader className="w-full pt-6 pb-2 space-y-4">
                     <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
                         <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                             Research Plan
                         </CardTitle>
-                        <Button
-                            variant="ghost"
-                            onClick={() => router.push("/app/research-plan")}
-                            className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
-                        >
-                            Edit research plan
-                            <FaArrowUpRightFromSquare/>
-                        </Button>
+                        {pathname === "/app/profile" &&
+                            <Button
+                                variant="ghost"
+                                onClick={() => router.push("/app/research-plan")}
+                                className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
+                            >
+                                Edit research plan
+                                <FaArrowUpRightFromSquare/>
+                            </Button>
+                        }
                     </div>
                     <TabsList className="w-min">
                         <TabsTrigger value="timeline">
@@ -83,7 +85,7 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
                                             urlMilestone={urlMilestone || undefined}/>
                     </TabsContent>
                     <TabsContent value="flow" className="space-y-4 w-full">
-                        <div className="h-[800px]">
+                        <div className="h-[800px] w-full">
                             <PublicFlowView roadmap={roadmap} subdomain={subdomain}
                                             urlMilestone={urlMilestone || undefined}/>
                         </div>

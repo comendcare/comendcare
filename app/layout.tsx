@@ -159,9 +159,9 @@ const steps: Tour[] = [
             {
                 icon: <>👋</>,
                 title: "Updating your organization",
-                content: <>{`If you'd like to update your organization's information, click the Edit profile button.`}</>,
+                content: <>{`If you'd like to update your organization's information, click the "Edit profile" button.`}</>,
                 selector: ".organization-profile-tour-step2",
-                side: "right" as any,
+                side: "left" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10,
@@ -178,20 +178,20 @@ const steps: Tour[] = [
             },
             {
                 icon: <>⭐</>,
-                title: "Your miletones",
-                content: <>{`Your milestones include assets (the results of completed milestones) and projects (ongoing or proposal-stage milestones). To update them, visit the research planner.`}</>,
+                title: "Your research plan",
+                content: <>{`A timeline view of your research plan will be found here. To create and edit your plan, visit the Research Planner.`}</>,
                 selector: ".organization-profile-tour-step4",
-                side: "left" as any,
+                side: "top-right" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10
             },
             {
                 icon: <>⭐</>,
-                title: "Your research plan",
-                content: <>{`A timeline view of your research plan will be found here. To see the entire research plan and to edit details, visit the research planner.`}</>,
+                title: "Your miletones",
+                content: <>{`Highlight your assets (ex/ data and models) and requests for proposals (ex/ funding opportunities) to potential partners. We recommend starting here!`}</>,
                 selector: ".organization-profile-tour-step5",
-                side: "top-right" as any,
+                side: "left" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10

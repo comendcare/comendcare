@@ -15,6 +15,8 @@ import { useShallow } from "zustand/react/shallow"
 import "@xyflow/react/dist/base.css"
 
 import PrivateMilestoneNode from "@/components/private-milestone-node"
+import PrivateAssetNode from "@/components/private-asset-node"
+import PrivateProjectNode from "@/components/private-project-node"
 import { Button } from "./ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
@@ -31,13 +33,20 @@ import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { toast } from "sonner"
-import { isNewUser, setUserAsReturning } from "@/lib/utils"
+import { isOnboarded, setOnboarded} from "@/lib/utils"
 import { ScrollArea } from "./ui/scroll-area"
 import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { CheckBubble } from "./check-bubble"
 import { templateMilestones } from "@/lib/templates"
 import { debounce } from "lodash"
 import { CustomEdge } from "./custom-edge"
+import { Badge } from "./ui/badge"
+import { NODE_TYPE_OPTIONS } from "@/lib/types"
+import { MilestoneTemplateCard } from "./milestone-template-card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { FaInfoCircle } from "react-icons/fa";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { MilestoneTemplateTabs } from "./roadmap-templates"
 
 const proOptions = { hideAttribution: true }
 
@@ -75,7 +84,7 @@ export const PrivateFlowView = ({
     const pathname = usePathname()
     const searchParams = useSearchParams()
     // const { undo, redo, clear } = useRoadmapStore.temporal.getState()
-    const nodeTypes = { MILESTONE: PrivateMilestoneNode }
+    const nodeTypes = { PROJECT: PrivateMilestoneNode, ASSET: PrivateMilestoneNode, RFP: PrivateMilestoneNode }
     const edgeTypes = { DEFAULT: CustomEdge }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
@@ -119,7 +128,7 @@ export const PrivateFlowView = ({
                     'changedTouches' in event ? event.changedTouches[0] : event;
                 const newNode: Node = {
                     id,
-                    type: "MILESTONE",
+                    type: "PROJECT",
                     position: screenToFlowPosition({
                         x: clientX,
                         y: clientY,
@@ -179,7 +188,7 @@ export const PrivateFlowView = ({
             const id = nanoid()
             const newNode: Node = {
                 id: id,
-                type: "MILESTONE",
+                type: defaultData?.nodeType || "PROJECT",
                 position: {
                     x: centerX,
                     y: centerY
@@ -191,8 +200,6 @@ export const PrivateFlowView = ({
                     type: defaultData?.type || 'NOTYPE',
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                    // papers: defaultData?.papers || [],
-                    // tasks: defaultData?.tasks || [],
                     status: defaultData?.status || "PLANNED"
                 }
             }
@@ -276,34 +283,14 @@ export const PrivateFlowView = ({
     }, [width, selectedNodeId])
 
     useEffect(() => {
-        if (isNewUser()) {
-            // toast("Welcome to your research plan!", {
-            //     id: "onborda",
-            //     duration: 300000,
-            //     description: `Would you like to take a quick tour?`,
-            //     action: (
-            //         <div className="flex flex-col space-y-2 ml-4">
-            //             <Button
-            //                 onClick={startOnbordaAndRemoveToast}
-            //             >{`Yes please!`}</Button>
-            //             <Button
-            //                 onClick={() => {
-            //                     toast.dismiss()
-            //                     setUserAsReturning()
-            //                 }}
-            //             >
-            //                 {`No thanks!`}
-            //             </Button>
-            //         </div>
-            //     )
-            // })
+        if (!isOnboarded('research-plan-tour')) {
             startOnbordaAndRemoveToast()
         }
     }, [localNodes])
 
     const startOnbordaAndRemoveToast = () => {
         startOnborda('research-plan-tour')
-        setUserAsReturning()
+        setOnboarded('research-plan-tour')
         toast.dismiss()
     }
 
@@ -324,6 +311,8 @@ export const PrivateFlowView = ({
             fitViewOptions={{ padding: 2 }}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
+            // maxZoom={5}
+            // minZoom={0.1}
         >
             <MiniMap
                 nodeColor='#757575'
@@ -337,7 +326,7 @@ export const PrivateFlowView = ({
             if (!open) setSelectedMilestones([])
             setNewMilestoneIsOpen(open)
         }}>
-            <DialogContent className="min-w-fit">
+            <DialogContent className="min-w-fit h-[80vh] flex flex-col justify-start">
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
                         Select from a milestone template
@@ -347,32 +336,23 @@ export const PrivateFlowView = ({
                     </DialogDescription>
                 </DialogHeader>
 
-                <ScrollArea className="w-full max-h-96 overflow-visible">
-                    <ol className="w-full pr-4 flex flex-col gap-4 overflow-visible pt-2">
+                {/* <ScrollArea className="w-full max-h-[50vh] overflow-visible">
+                    <div className="w-full pr-4 grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-visible pt-2">
                         {templateMilestones.map((milestoneData, index) => (
-                            <li key={index} className="w-full overflow-visible">
-                                <Card className="relative text-left overflow-visible">
-                                    <CardHeader>
-                                        <CheckBubble data={milestoneData} onCheckedChanged={
-                                            (checked: boolean) => {
-                                                if (checked) {
-                                                    setSelectedMilestones([...selectedMilestones, milestoneData])
-                                                } else {
-                                                    setSelectedMilestones(selectedMilestones.filter(m => (
-                                                        m.title !== milestoneData.title &&
-                                                        m.description !== milestoneData.description
-                                                    )))
-                                                }
-                                            }
-                                        }/>
-                                        <CardTitle>{milestoneData.title}</CardTitle>
-                                        <CardDescription>{milestoneData.description}</CardDescription>
-                                    </CardHeader>
-                                </Card>
-                            </li>
+                            <MilestoneTemplateCard 
+                                key={index}
+                                milestoneData={milestoneData}
+                                selectedMilestones={selectedMilestones}
+                                setSelectedMilestones={setSelectedMilestones}
+                            />
                         ))}
-                    </ol>
-                </ScrollArea>
+                    </div>
+                </ScrollArea> */}
+
+                <MilestoneTemplateTabs 
+                    selectedMilestones={selectedMilestones}
+                    setSelectedMilestones={setSelectedMilestones}
+                />
 
                 <DialogFooter>
                     <DialogClose>

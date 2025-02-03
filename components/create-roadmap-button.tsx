@@ -19,7 +19,7 @@ export default function CreateRoadmapButton() {
                     const roadmap = await createRoadmap(id)
                     va.track("Created Roadmap")
                     router.refresh()
-                    router.push(`/admin/research-plan/${roadmap.id}`)
+                    if (roadmap) router.push(`/admin/research-plan/${roadmap?.id}`)
                 })
             }
             className={cn(

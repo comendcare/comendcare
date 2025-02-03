@@ -273,7 +273,7 @@ export function EditTaskForm({
                     className="flex flex-col gap-2 p-4 pt-0"
                 >
 
-                    <FormField
+                    {/* <FormField
                         control={form.control}
                         name="private"
                         render={({ field }) => (
@@ -291,7 +291,7 @@ export function EditTaskForm({
                                 <FormMessage />
                             </FormItem>
                         )}
-                    />
+                    /> */}
 
                     <FormField
                         control={form.control}

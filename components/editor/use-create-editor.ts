@@ -166,7 +166,7 @@ export const useCreateEditor = ({ value }: { value?: Value | undefined | null })
       // ...copilotPlugins,
       ...editorPlugins,
       FixedToolbarPlugin,
-      FloatingToolbarPlugin,
+      // FloatingToolbarPlugin,
     ],
     value: value || DEFAULT_VALUE,
   });
