@@ -102,11 +102,23 @@ function PrivateAssetNode(props: NodeProps<PrivateMilestoneNode>) {
                         <ul className={cn(props.data.contacts.length > 1 ? "list-disc pl-6": "")}>
                             {props.data.contacts.map((contact, index) => {
                                 if (contact.name && contact.email) {
-                                    return (<li key={index}>{contact.name} &bull; {contact.email}</li>)
+                                    return (
+                                        <li key={index}>
+                                        <p className="text-wrap break-words">{contact.name} &bull; {contact.email}</p>
+                                        </li>
+                                    )
                                 } else if (contact.name) {
-                                    return (<li key={index}>{contact.name}</li>)
+                                    return (
+                                        <li key={index}>
+                                        <p className="text-wrap break-words">{contact.name}</p>
+                                        </li>
+                                    )
                                 } else if (contact.email) {
-                                    return (<li key={index}>{contact.email}</li>)
+                                    return (
+                                        <li key={index}>
+                                        <p className="text-wrap break-words">{contact.email}</p>
+                                        </li>
+                                    )
                                 }
                             })}
                         </ul>

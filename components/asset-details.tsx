@@ -57,15 +57,27 @@ export function AssetDetails({ asset }: { asset: MilestoneType }) {
                                 </h2>
                             </div>
                             {asset?.contacts && asset.contacts.length > 0 ? (
-                                <div className={"mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap"}>
-                                    <ul className={cn(asset.contacts.length > 1 ? "list-disc pl-6": "")}>
+                                <div className={"w-full mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap"}>
+                                    <ul className={cn("w-full", asset.contacts.length > 1 ? "list-disc pl-6": "")}>
                                         {asset.contacts.map((contact, index) => {
                                             if (contact.name && contact.email) {
-                                                return (<li key={index}>{contact.name} &bull; {contact.email}</li>)
+                                                return (
+                                                    <li key={index} className="w-full">
+                                                    <p className="w-full text-wrap break-words">{contact.name} &bull; {contact.email}</p>
+                                                    </li>
+                                                )
                                             } else if (contact.name) {
-                                                return (<li key={index}>{contact.name}</li>)
+                                                return (
+                                                    <li key={index} className="w-full">
+                                                    <p className="w-full text-wrap break-words">{contact.name}</p>
+                                                    </li>
+                                                )
                                             } else if (contact.email) {
-                                                return (<li key={index}>{contact.email}</li>)
+                                                return (
+                                                    <li key={index} className="w-full">
+                                                    <p className="w-full text-wrap break-words">{contact.email}</p>
+                                                    </li>
+                                                )
                                             }
                                         })}
                                     </ul>
@@ -83,10 +95,10 @@ export function AssetDetails({ asset }: { asset: MilestoneType }) {
                 side="top"
                 className="w-80"
             >
-                <div className="flex justify-between space-x-4">
-                    <div className="space-y-1">
+                <div className="w-full flex justify-between space-x-4">
+                    <div className="w-full space-y-1">
                         <h4 className="text-sm font-semibold">{asset?.title}</h4>
-                        <p className="text-sm">
+                        <p className="w-full text-sm text-wrap break-words">
                             {asset?.description}
                         </p>
                     </div>

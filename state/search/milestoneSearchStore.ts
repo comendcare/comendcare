@@ -11,15 +11,17 @@ export type FiltersType = {
         disable?: boolean,
     }[],
     milestoneStatus: string[],
-    hasProject: boolean,
-    hasAsset: boolean
+    nodeType: string[],
+    // hasProject: boolean,
+    // hasAsset: boolean
 }
 
 export const defaultFilters = {
     milestoneTypes: [],
     milestoneStatus: [],
-    hasProject: false,
-    hasAsset: false
+    nodeType: []
+    // hasProject: false,
+    // hasAsset: false
 }
 
 function generateFiltersString(filters: FiltersType, strategy: "add" | "sub") {
@@ -44,15 +46,22 @@ function generateFiltersString(filters: FiltersType, strategy: "add" | "sub") {
         })
     }
 
-    if (filters.hasProject) {
-        filtersList.push(`RFPId_exists:=true`)
-        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}RFPId_exists:=true`)
+    if (filters.nodeType.length > 0) {
+        filters.nodeType.forEach(type => {
+            filtersList.push(`nodeType:=${type}`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}nodeType:=${type}`)
+        })
     }
 
-    if (filters.hasAsset) {
-        filtersList.push(`assetId_exists:=true`)
-        typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}assetId_exists:=true`)
-    }
+    // if (filters.hasProject) {
+    //     filtersList.push(`RFPId_exists:=true`)
+    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}RFPId_exists:=true`)
+    // }
+
+    // if (filters.hasAsset) {
+    //     filtersList.push(`assetId_exists:=true`)
+    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}assetId_exists:=true`)
+    // }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
 
