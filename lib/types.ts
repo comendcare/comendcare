@@ -262,12 +262,12 @@ export const NODE_TYPE_OPTIONS: Option[] = [
     { 
         label: 'Project', 
         value: 'PROJECT',
-        description: 'A milestone you’re interested in supporting through funding and/or other resources.'
+        description: 'A milestone that is being planned or is under development.'
     },
     { 
         label: 'RFP (Request for Proposal)', 
         value: 'RFP',
-        description: 'A milestone that is being planned or is under development.'
+        description: 'A milestone you’re interested in supporting through funding and/or other resources.'
     },
 ]
 
