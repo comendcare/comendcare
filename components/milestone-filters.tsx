@@ -124,7 +124,7 @@ export function MilestoneFilters() {
                     name="nodeType"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">Milestone status</FormLabel>
+                            <FormLabel className="font-semibold text-base">Milestone class</FormLabel>
                             <FormControl>
                                 <ToggleGroup
                                     type="multiple"
