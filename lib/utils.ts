@@ -7,6 +7,11 @@ import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
 
+export function standardizeYear(dateString: string): string {
+    const match = dateString.match(/^(\d{4})/);
+    return match ? match[1] : "";
+}
+
 export function formatNumberWithCommas(number: string | undefined) {
     if (number === undefined) return "0"
 
