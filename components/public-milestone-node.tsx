@@ -76,7 +76,7 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
             <CardContent className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                     <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-wrap break-words">
                         {truncate(props.data?.description || "", 200)}
                     </CardDescription>
                 </div>

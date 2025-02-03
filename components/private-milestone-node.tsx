@@ -246,33 +246,12 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
     if (props?.type === "PROJECT") {
         return (
             <>  
-            <ul className="flex flex-col gap-2 text-sm text-wrap break-words">
+            <ul className="flex flex-col gap-2 text-sm text-wrap">
                 {(props.data?.startDate && props.data?.endDate && props.data.startDate?.getMonth() || props.data?.endDate?.getFullYear()) && (
                     <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
                 )}
-                {/* {props.data.contacts.map((contact, index) => {
-                    if (contact.name && contact.email) {
-                        return (
-                            <li key={index} className="flex gap-2 items-center break-words">
-                                <FaUser />
-                                {contact.name} &bull; {contact.email}
-                            </li>)
-                    } else if (contact.name) {
-                        return (
-                            <li key={index} className="flex gap-2 items-center break-words">
-                                <FaUser />
-                                {contact.name}
-                            </li>)
-                    } else if (contact.email) {
-                        return (
-                            <li key={index} className="flex gap-2 items-center break-words">
-                                <FaUser />
-                                {contact.email}
-                            </li>)
-                    }
-                })} */}
             </ul>
-            <span className="w-full flex gap-2 flex-wrap text-wrap break-words">
+            <span className="w-full flex gap-2 flex-wrap text-wrap">
                 <Badge className="flex text-sm">
                     {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
                 </Badge>
@@ -295,21 +274,21 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                     {(props.data?.contacts || []).map((contact, index) => {
                         if (contact.name && contact.email) {
                             return (
-                                <li key={index} className="flex gap-2 items-center text-wrap break-words">
+                                <li key={index} className="flex gap-2 items-center">
                                     <FaUser />
-                                    {contact.name} &bull; {contact.email}
+                                    <p className="w-[90%] text-wrap break-words">{contact.name} &bull; {contact.email}</p>
                                 </li>)
                         } else if (contact.name) {
                             return (
-                                <li key={index} className="flex gap-2 items-center text-wrap break-words">
+                                <li key={index} className="flex gap-2 items-center w-full">
                                     <FaUser />
-                                    {contact.name}
+                                    <p className="w-[90%] text-wrap break-words">{contact.name}</p>
                                 </li>)
                         } else if (contact.email) {
                             return (
-                                <li key={index} className="flex gap-2 items-center text-wrap break-words">
+                                <li key={index} className="flex gap-2 items-center">
                                     <FaUser />
-                                    {contact.email}
+                                    <p className="w-[90%] text-wrap break-words">{contact.email}</p>
                                 </li>)
                         }
                     })}
@@ -340,19 +319,19 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                         return (
                             <li key={index} className="flex gap-2 items-center">
                                 <FaUser />
-                                {contact.name} &bull; {contact.email}
+                                <p className="w-[90%] text-wrap break-words">{contact.name} &bull; {contact.email}</p>
                             </li>)
                     } else if (contact.name) {
                         return (
                             <li key={index} className="flex gap-2 items-center">
                                 <FaUser />
-                                {contact.name}
+                                <p className="w-[90%] text-wrap break-words">{contact.name}</p>
                             </li>)
                     } else if (contact.email) {
                         return (
                             <li key={index} className="flex gap-2 items-center">
                                 <FaUser />
-                                {contact.email}
+                                <p className="w-[90%] text-wrap break-words">{contact.email}</p>
                             </li>)
                     }
                 })}
