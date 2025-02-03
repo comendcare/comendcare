@@ -4,7 +4,7 @@ import {getRoadmapData, getOrganizationData, getRoadmapsForOrganization, getMile
 import BlogCard from "@/components/blog-card"
 import BlurImage from "@/components/blur-image"
 import MDX from "@/components/mdx"
-import {cn, createDicebearAvatar, formatMoney, placeholderBlurhash, toDateString} from "@/lib/utils"
+import {cn, createDicebearAvatar, formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
 import {Button} from "@/components/ui/button"
 import {PublicRoadmapCard} from "@/components/public-roadmap-card"
@@ -170,6 +170,7 @@ export default async function OrganizationRoadmapPage({
     if (!organization) {
         notFound()
     }
+    console.log(roadmaps[0])
 
     return (
         <>
@@ -234,7 +235,7 @@ export default async function OrganizationRoadmapPage({
                                                 <div className="mt-2 flex items-center text-gray-500">
                                                     <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                                 aria-hidden="true"/>
-                                                    Founded in {new Date(organization?.yearFounded ?? "").getFullYear()}
+                                                    Founded in {standardizeYear(organization?.yearFounded ?? "")}
                                                 </div>
                                             )}
                                             {organization?.incorporationStatus === "YES" &&

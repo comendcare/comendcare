@@ -8,7 +8,7 @@ import {DonutChartCard} from "@/components/donut-chart-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
-import {cn, formatMoney} from "@/lib/utils";
+import {cn, formatMoney, standardizeYear} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
@@ -147,7 +147,7 @@ export default async function ProfilePage() {
                                                 <div className="mt-2 flex items-center text-gray-500">
                                                     <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                                 aria-hidden="true"/>
-                                                    Founded in {new Date(organization?.yearFounded ?? "").getFullYear()}
+                                                    Founded in {standardizeYear(organization?.yearFounded ?? "")}
                                                 </div>
                                             )}
                                             {organization?.incorporationStatus === "YES" &&
