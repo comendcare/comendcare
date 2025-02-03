@@ -6,8 +6,6 @@ import {Suspense, useEffect} from "react";
 import fullLogo from "@/public/logos/comend-full-logo.svg"
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
-import {cn} from "@/lib/utils";
-import {ChevronRight} from "lucide-react";
 
 export default function LoginPage() {
     const {data: session} = useSession()
