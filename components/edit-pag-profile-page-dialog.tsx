@@ -34,7 +34,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {cn, formatMoney, getPublicFile, years} from "@/lib/utils";
+import {cn, formatMoney, formatNumberWithCommas, getPublicFile, years} from "@/lib/utils";
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
@@ -43,6 +43,8 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {FaQuestionCircle} from "react-icons/fa";
 import {financesFormSchema} from "@/components/finances-onboarding-form";
 import {researchFormSchema} from "@/components/research-onboarding-form";
+import mixpanel from "mixpanel-browser";
+import {Organization} from "@prisma/client";
 
 const OPTIONS: Option[] = [
     {
@@ -115,7 +117,7 @@ const editOrgFormSchema = z.object({
     headerImage: z.string().optional()
 })
 
-export default function EditPAGProfileDialog() {
+export default function EditPAGProfileDialog({organization}: {organization: Organization}) {
     const {data: session, update} = useSession()
     const router = useRouter()
     const [searchInput, setSearchInput] = useState("");
@@ -123,6 +125,9 @@ export default function EditPAGProfileDialog() {
     const [selectedFileHeader, setSelectedFileHeader] = useState<FileWithPreview | null>(null);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [otherModality, setOtherModality] = useState<string>("");
+    const [otherCategories, setOtherCategories] = useState<string>("");
+    const [otherSystem, setOtherSystem] = useState<string>("");
     const [address, setAddress] = useState<AddressType>({
         address1: "",
         address2: "",
@@ -500,12 +505,14 @@ export default function EditPAGProfileDialog() {
             const mappedData: Record<string, any> = {
                 name: values.disorder || "",
                 summary: values.summary || "",
+                therapeuticsInDevelopment: values.therapeutics?.map((item) => item.label) || [],
                 interestedModalities: values.modalities?.map((item) => item.label) || [],
                 diseaseCategories: values.categories?.map((item) => item.label) || [],
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
                 numberOfPatientsEngaged: values.engaged ? parseInt(values.engaged, 10) : null,
                 relevantDiseaseMechanisms: values.mechanisms || [],
+                causalGenes: values.causal?.map((item) => item.label) || [],
                 associatedGenes: values.genes?.map((item) => item.label) || [],
                 associatedSystems: values.systems?.map((item) => item.label) || [],
                 associatedSignsAndSymptoms: values.symptoms?.map((item) => item.label) || [],
@@ -529,6 +536,29 @@ export default function EditPAGProfileDialog() {
 
             if (response.success) {
                 toast.success("Condition updated successfully!");
+
+                // Mixpanel tracking for "Other" fields
+                if (otherModality) {
+                    mixpanel.track("Org has other modality", {
+                        orgName: organization?.name || "Unknown Org",
+                        looking: otherModality,
+                    });
+                }
+
+                if (otherCategories) {
+                    mixpanel.track("Org has other category", {
+                        orgName: organization?.name || "Unknown Org",
+                        looking: otherCategories,
+                    });
+                }
+
+                if (otherSystem) {
+                    mixpanel.track("Org has other system", {
+                        orgName: organization?.name || "Unknown Org",
+                        looking: otherSystem,
+                    });
+                }
+
                 setOpen(false)
                 router.refresh(); // Refresh the page to reflect changes
             } else {
@@ -877,7 +907,7 @@ export default function EditPAGProfileDialog() {
                                         name="disorder"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Name of condition`}</FormLabel>
+                                                <FormLabel>{`Name of condition (required)`}</FormLabel>
                                                 {/*<div className="w-full flex flex-row justify-between">*/}
                                                 {/*    <FormDescription>*/}
                                                 {/*        {`The name of your rare condition/disorder.`}*/}
@@ -925,6 +955,28 @@ export default function EditPAGProfileDialog() {
 
                                     <FormField
                                         control={editResearchForm.control}
+                                        name="causal"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Causal genes</FormLabel>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        onSearch={handleAsyncSearch}
+                                                        placeholder="Search for genes..."
+                                                        hidePlaceholderWhenSelected={true}
+                                                        loadingIndicator={<p>Loading genes...</p>}
+                                                        emptyIndicator={<p>No genes found.</p>}
+                                                        showHoverCard={false}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
                                         name="genes"
                                         render={({field}) => (
                                             <FormItem>
@@ -942,6 +994,46 @@ export default function EditPAGProfileDialog() {
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={editResearchForm.control}
+                                        name="categories"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Mechanisms of action
+                                                </FormLabel>
+                                                <FormDescription className="flex items-center">
+                                                    {`What types of genetic effects are you investigating?`}
+                                                </FormDescription>
+                                                <FormControl>
+                                                    <MultipleSelector
+                                                        {...field}
+                                                        defaultOptions={MOLECULAR_MECHANISMS}
+                                                        placeholder="Select categories that apply to you..."
+                                                        hidePlaceholderWhenSelected={true}
+                                                        emptyIndicator={
+                                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                                no results found.
+                                                            </p>
+                                                        }
+                                                    />
+                                                </FormControl>
+                                                <FormMessage/>
+                                                {editResearchForm.watch("categories")?.some((item) => item.value === "OTHER") && (
+                                                    <div className="mt-2">
+                                                        <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                        <Input
+                                                            type="text"
+                                                            id="categories-other"
+                                                            value={otherCategories}
+                                                            onChange={(e) => setOtherCategories(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
                                             </FormItem>
                                         )}
                                     />
@@ -967,37 +1059,34 @@ export default function EditPAGProfileDialog() {
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
+                                                {editResearchForm.watch("systems")?.some((item) => item.value === "OTHER") && (
+                                                    <div className="mt-2">
+                                                        <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                        <Input
+                                                            type="text"
+                                                            id="systems-other"
+                                                            value={otherSystem}
+                                                            onChange={(e) => setOtherSystem(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
                                             </FormItem>
                                         )}
                                     />
 
                                     <FormField
                                         control={editResearchForm.control}
-                                        name="categories"
+                                        name="therapeutics"
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>
-                                                    Mechanisms of action
+                                                    Therapeutics under development
                                                 </FormLabel>
-                                                <FormDescription className="flex items-center">
-                                                    {`What types of genetic effects are you investigating?`}
-                                                    <Tooltip delayDuration={0}>
-                                                        <TooltipTrigger>
-                                                            <FaQuestionCircle
-                                                                className="text-black h-4 inline-block align-baseline mx-1"/>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <p>
-                                                                {`This will help us match you with the experts of your particular modality.`}
-                                                            </p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </FormDescription>
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
-                                                        defaultOptions={MOLECULAR_MECHANISMS}
-                                                        placeholder="Select categories that apply to you..."
+                                                        defaultOptions={MODALITIES}
+                                                        placeholder="Select modalities you like..."
                                                         hidePlaceholderWhenSelected={true}
                                                         emptyIndicator={
                                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
@@ -1007,6 +1096,17 @@ export default function EditPAGProfileDialog() {
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
+                                                {editResearchForm.watch("therapeutics")?.some((item) => item.value === "OTHER") && (
+                                                    <div className="mt-2">
+                                                        <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                        <Input
+                                                            type="text"
+                                                            id="modalities-other"
+                                                            value={otherModality}
+                                                            onChange={(e) => setOtherModality(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
                                             </FormItem>
                                         )}
                                     />
@@ -1017,7 +1117,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>
-                                                    Modalities of interest
+                                                    Therapeutics of interest
                                                 </FormLabel>
                                                 <FormDescription className="flex items-center">
                                                     {`The treatment modalities of interest of your organization.`}
@@ -1047,6 +1147,17 @@ export default function EditPAGProfileDialog() {
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
+                                                {editResearchForm.watch("modalities")?.some((item) => item.value === "OTHER") && (
+                                                    <div className="mt-2">
+                                                        <FormDescription>{`Other details. This won't be saved to your condition's profile, but will be used to improve the platform.`}</FormDescription>
+                                                        <Input
+                                                            type="text"
+                                                            id="modalities-other"
+                                                            value={otherModality}
+                                                            onChange={(e) => setOtherModality(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
                                             </FormItem>
                                         )}
                                     />
@@ -1056,10 +1167,12 @@ export default function EditPAGProfileDialog() {
                                         name="prevalenceNumerator"
                                         render={({field: numeratorField}) => (
                                             <FormItem>
-                                                <FormLabel>{`Estimated global prevalence`}</FormLabel>
-                                                {/*<FormDescription>*/}
-                                                {/*    {`The estimated total number of patients in the world.`}*/}
-                                                {/*</FormDescription>*/}
+                                                <FormLabel>
+                                                    {`Estimated total prevalence`} - {`${formatNumberWithCommas(numeratorField.value)} in ${formatNumberWithCommas(editResearchForm.watch("prevalenceDenominator"))}`}
+                                                </FormLabel>
+                                                <FormDescription>
+                                                    {`The estimated global prevalence ratio of your condition.`}
+                                                </FormDescription>
                                                 <FormControl>
                                                     <div className="flex flex-row items-end justify-start space-x-2">
                                                         <Input
@@ -1117,7 +1230,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Estimated number of patients in the US`}</FormLabel>
-                                                <FormDescription>{`The estimated number of patients in the US.`}</FormDescription>
+                                                {/*<FormDescription>{`The estimated number of patients in the US.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
                                                         type="number"
@@ -1136,7 +1249,7 @@ export default function EditPAGProfileDialog() {
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
-                                                <FormDescription>{`The estimated number of patients in the world.`}</FormDescription>
+                                                {/*<FormDescription>{`The estimated number of patients in the world.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
                                                         type="number"

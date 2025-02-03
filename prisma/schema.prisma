@@ -398,6 +398,7 @@ model Condition {
   slug                        String                    @unique
   description                 String?
   interestedModalities        String[]
+  therapeuticsInDevelopment   String[]
   diseaseCategories           String[]
   prevalenceNumerator         Int?
   prevalenceDenominator       Int?
@@ -405,6 +406,7 @@ model Condition {
   nationalEstimatedPopulation Int?
   globalEstimatedPopulation   Int?
   relevantDiseaseMechanisms   String[]
+  causalGenes                 String[]
   associatedGenes             String[]
   associatedSystems           String[]
   associatedSignsAndSymptoms  String[]

@@ -494,16 +494,16 @@ export default function OrganizationOnboardingForm(
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                         {/*<div className="w-full flex flex-row justify-between">*/}
                                             <FormDescription>
-                                                {`Enter your organization’s abbreviated name, short form, or nickname in lowercase.`}
+                                                {`Enter an acronym, short form, or nickname for your organization.`}
                                                 <br/>
                                                 {newOrgForm.watch("subdomain") &&
                                                     !newOrgForm.formState.errors.subdomain && (
-                                                        <>
-                                                            {`Your organization's domain will be ${newOrgForm
+                                                        <div className="font-semibold">
+                                                            {`The custom site for your organization’s profile will be found at ${newOrgForm
                                                                 .watch("subdomain")
                                                                 .toLowerCase()
                                                                 .replace(/\s+/g, "-")}.comend.io`}
-                                                        </>
+                                                        </div>
                                                     )}
                                             </FormDescription>
                                         {/*    <FormDescription>*/}
@@ -670,27 +670,27 @@ export default function OrganizationOnboardingForm(
                                 )}
                             />
 
-                            <FormField
-                                control={newOrgForm.control}
-                                name="formattedAddress"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Patient Group Address</FormLabel>
-                                        {/*<FormDescription>*/}
-                                        {/*    {`Your organization's address.`}*/}
-                                        {/*</FormDescription>*/}
-                                        <FormControl>
-                                            <AutocompleteComponent
-                                                address={address}
-                                                setAddress={setAddress}
-                                                searchInput={searchInput}
-                                                setSearchInput={setSearchInput}
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={newOrgForm.control}*/}
+                            {/*    name="formattedAddress"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>Patient Group Address</FormLabel>*/}
+                            {/*            /!*<FormDescription>*!/*/}
+                            {/*            /!*    {`Your organization's address.`}*!/*/}
+                            {/*            /!*</FormDescription>*!/*/}
+                            {/*            <FormControl>*/}
+                            {/*                <AutocompleteComponent*/}
+                            {/*                    address={address}*/}
+                            {/*                    setAddress={setAddress}*/}
+                            {/*                    searchInput={searchInput}*/}
+                            {/*                    setSearchInput={setSearchInput}*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
                             {/*<FormImageCropper*/}
                             {/*    form={newOrgForm}*/}
@@ -702,34 +702,24 @@ export default function OrganizationOnboardingForm(
                             {/*    setSelectedFile={setSelectedFile}*/}
                             {/*/>*/}
 
-                            <FormField
-                                control={newOrgForm.control}
-                                name="looking"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>{`What your organization is looking for and hoping to get from joining Comend.`}</FormLabel>
-                                        <FormDescription>{`What are your organization’s priorities over the next year? How might Comend help?`}</FormDescription>
-                                        <FormControl>
-                                            <Input
-                                                type="text"
-                                                id="looking"
-                                                {...field}
-                                            />
-                                            {/*<MultipleSelector*/}
-                                            {/*    {...field}*/}
-                                            {/*    defaultOptions={OPTIONS}*/}
-                                            {/*    placeholder="Select options that appeal to you..."*/}
-                                            {/*    emptyIndicator={*/}
-                                            {/*        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
-                                            {/*            no results found.*/}
-                                            {/*        </p>*/}
-                                            {/*    }*/}
-                                            {/*/>*/}
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                            {/*<FormField*/}
+                            {/*    control={newOrgForm.control}*/}
+                            {/*    name="looking"*/}
+                            {/*    render={({field}) => (*/}
+                            {/*        <FormItem>*/}
+                            {/*            <FormLabel>{`What your organization is looking for and hoping to get from joining Comend.`}</FormLabel>*/}
+                            {/*            <FormDescription>{`What are your organization’s priorities over the next year? How might Comend help?`}</FormDescription>*/}
+                            {/*            <FormControl>*/}
+                            {/*                <Input*/}
+                            {/*                    type="text"*/}
+                            {/*                    id="looking"*/}
+                            {/*                    {...field}*/}
+                            {/*                />*/}
+                            {/*            </FormControl>*/}
+                            {/*            <FormMessage/>*/}
+                            {/*        </FormItem>*/}
+                            {/*    )}*/}
+                            {/*/>*/}
 
                             <div className="flex flex-row justify-between">
                                 <div className="flex flex-row space-x-2">
