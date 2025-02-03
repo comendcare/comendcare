@@ -46,7 +46,7 @@ export const MemberDeletedEmail = ({
                     <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
                         <Section className="mt-[32px]">
                             <Img
-                                src="https://storage.cloud.google.com/comend-app-public-permanent/Full%20logo.png"
+                                src="https://storage.googleapis.com/comend-app-public-permanent/Full%20logo.png"
                                 width="40"
                                 height="37"
                                 alt="Comend"
