@@ -1,5 +1,5 @@
 import {
-    FaCalendar, FaCircleDollarToSlot, FaCity, FaEllipsis, FaPen,
+    FaCalendar, FaCircleDollarToSlot, FaCity, FaEllipsis, FaEye, FaPen,
     FaPencil, FaPeopleGroup, FaPhone, FaPlus,
 } from "react-icons/fa6";
 import {Button, buttonVariants} from "@/components/ui/button";
@@ -172,7 +172,16 @@ export default async function ProfilePage() {
                                     {/*    <FaPlus/>*/}
                                     {/*    Add post*/}
                                     {/*</Button>*/}
-                                    <PrivateProfileDropdown subdomain={organization.subdomain}/>
+                                    <a
+                                        href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={cn(buttonVariants({variant: "secondary"}), "flex items-center gap-2")}>
+
+                                        <FaEye/>
+                                        <span>Public view</span>
+                                    </a>
+                                    {/*<PrivateProfileDropdown subdomain={organization.subdomain}/>*/}
                                 </div>
                             </div>
                             <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
