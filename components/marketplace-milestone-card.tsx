@@ -1,28 +1,29 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
-import {MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS} from "@/lib/types";
+import {MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS} from "@/lib/types";
 import {Badge} from "./ui/badge";
 import {DateView} from "./miletone-date-view";
 import {getOrganizationFromOrganizationId, getOrganizationFromRoadmapId} from "@/lib/fetchers";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {FaMoneyBill} from "react-icons/fa6";
 import {formatMoney} from "@/lib/utils";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {Separator} from "@/components/ui/separator";
 import {BookCheck, Paperclip, TestTube, UserCheck} from "lucide-react";
+import {TypeBadge} from "@/components/private-milestone-node";
 
 const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
     PLANNED: {
         text: "Planned",
-        styling: "bg-red-100 border-red-600 text-red-800 hover-red-400 disabled:opacity-100 hover:bg-red-200"
+        styling: "bg-red-100 border-red-600 text-red-800"
     },
     INPROGRESS: {
         text: "In Progress",
-        styling: "bg-yellow-100 border-yellow-600 text-yellow-800 disabled:opacity-100 hover:bg-yellow-200"
+        styling: "bg-yellow-100 border-yellow-600 text-yellow-800"
     },
     COMPLETED: {
         text: "Completed",
-        styling: "bg-green-100 border-green-600 text-green-800 disabled:opacity-100 hover:bg-green-200"
+        styling: "bg-green-100 border-green-600 text-green-800"
     }
 };
 
@@ -30,7 +31,6 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
     const startDate = milestone.startDate ? new Date(milestone.startDate) : undefined
     const endDate = milestone.endDate ? new Date(milestone.endDate) : undefined
     const organization = milestone.organization || {};
-    console.log(milestone)
 
     const getLink = () => {
         if (organization?.subdomain) {
@@ -44,13 +44,11 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
         return '#'
     }
 
-    console.log(milestone)
     const milestoneType = MILESTONE_TYPE_OPTIONS.find((option) => option.value === milestone.type)?.label;
     const status = MILESTONE_STATUS_OPTIONS.find((option) => option.value === milestone.status)?.label;
 
     const statusKey = milestone.status as keyof typeof StatusData;
     const statusStyle = StatusData[statusKey]?.styling || "bg-gray-100 text-gray-800";
-
 
     return (
         <Link
@@ -81,13 +79,15 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
                                 )}
                             </div>
                         </div>
-                        <span className="w-full flex">
-                            {(milestoneType) && (
-                                <span className="w-full flex">
-                                    <Badge className="flex text-sm">{milestoneType}</Badge>
-                                </span>
-                            )}
-                        </span>
+                        <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone?.nodeType))?.value || "PROJECT"}/>
+
+                        {/*<span className="w-full flex">*/}
+                        {/*    {(milestoneType) && (*/}
+                        {/*        <span className="w-full flex">*/}
+                        {/*            <Badge className="flex text-sm">{milestoneType}</Badge>*/}
+                        {/*        </span>*/}
+                        {/*    )}*/}
+                        {/*</span>*/}
                     </CardHeader>
 
                     <CardContent className="flex flex-col items-start justify-center gap-4">
@@ -95,31 +95,37 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
                             {milestone.description}
                         </div>
 
-                        {milestone.budget &&
-                            <div className="m-0 flex items-center">
-                                <FaMoneyBill className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
-                                {formatMoney(milestone.budget)} budget
-                            </div>
-                        }
+                        {/*{milestone.budget &&*/}
+                        {/*    <div className="m-0 flex items-center">*/}
+                        {/*        <FaMoneyBill className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>*/}
+                        {/*        {formatMoney(milestone.budget)} budget*/}
+                        {/*    </div>*/}
+                        {/*}*/}
                     </CardContent>
                 </div>
 
-                <CardFooter className="justify-self-end">
-                    <div className="flex flex-row space-x-2">
-                        {[{icon: Paperclip, label: "3 Attachments"}, {
-                            icon: UserCheck,
-                            label: "2 Contacts"
-                        }].map(({icon: Icon, label}, idx) => (
-                            <div
-                                key={idx}
-                                className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
-                            >
-                                <Icon className="size-4"/>
-                                {label}
-                            </div>
-                        ))}
-                    </div>
-                </CardFooter>
+                {milestone.budget &&
+                    <CardFooter className="justify-self-end">
+                        <div className="m-0 flex items-center">
+                            <FaMoneyBill className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
+                            {formatMoney(milestone.budget)} budget
+                        </div>
+                        {/*<div className="flex flex-row space-x-2">*/}
+                        {/*    {[{icon: Paperclip, label: "3 Attachments"}, {*/}
+                        {/*        icon: UserCheck,*/}
+                        {/*        label: "2 Contacts"*/}
+                        {/*    }].map(({icon: Icon, label}, idx) => (*/}
+                        {/*        <div*/}
+                        {/*            key={idx}*/}
+                        {/*            className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"*/}
+                        {/*        >*/}
+                        {/*            <Icon className="size-4"/>*/}
+                        {/*            {label}*/}
+                        {/*        </div>*/}
+                        {/*    ))}*/}
+                        {/*</div>*/}
+                    </CardFooter>
+                }
             </Card>
         </Link>
     )

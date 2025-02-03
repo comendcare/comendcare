@@ -3,7 +3,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {FaArrowUpRightFromSquare, FaChevronRight, FaPaperclip, FaPen, FaPlus} from "react-icons/fa6";
 import {usePathname, useRouter} from "next/navigation";
-import {cn, sleep} from "@/lib/utils";
+import {cn, setOnboarded, sleep} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
 import {
     Dialog,
@@ -148,6 +148,8 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                 const newAsset = await addMilestone("ASSET", "New Asset")
         
                                                 if (newAsset) {
+                                                    // don't do onboarding if the user starts from 'New Asset' button
+                                                    setOnboarded('research-plan-tour')
                                                     router.push(`/app/research-plan?milestone=${newAsset.id}`)
                                                     router.refresh()
                                                 }
@@ -163,6 +165,8 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                 })
 
                                                 if (roadmap && roadmap?.nodes?.[0]?.id) {
+                                                    // don't do onboarding if the user starts from 'New Asset' button
+                                                    setOnboarded('research-plan-tour')
                                                     router.push(`/app/research-plan?milestone=${roadmap.nodes[0].id}`)
                                                     router.refresh()
                                                 }
@@ -214,6 +218,8 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                 const newRFP = await addMilestone("RFP", "New RFP")
         
                                                 if (newRFP) {
+                                                    // don't do onboarding if the user starts from 'New RFP' button
+                                                    setOnboarded('research-plan-tour')
                                                     router.push(`/app/research-plan?milestone=${newRFP.id}`)
                                                     router.refresh()
                                                 }
@@ -229,6 +235,8 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                 })
 
                                                 if (roadmap && roadmap?.nodes?.[0]?.id) {
+                                                    // don't do onboarding if the user starts from 'New RFP' button
+                                                    setOnboarded('research-plan-tour')
                                                     router.push(`/app/research-plan?milestone=${roadmap.nodes[0].id}`)
                                                     router.refresh()
                                                 }
