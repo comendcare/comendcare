@@ -28,7 +28,7 @@ type InvitationWithOrganization = Invitation & {
 };
 
 export default function UserProfilePage() {
-    const {data: session, status} = useSession()
+    const {data: session, update, status} = useSession()
     const [user, setUser] = useState<User>();
     const [orgs, setOrgs] = useState<Organization[]>();
     const [invitations, setInvitations] = useState<InvitationWithOrganization[]>();
@@ -122,12 +122,16 @@ export default function UserProfilePage() {
         try {
             const response = await acceptInvitation(invitationId);
 
-            if (response.success) {
+            if (response.success && response.data) {
                 toast.success("Invitation accepted successfully!");
                 // Remove the accepted invitation from the list
                 setInvitations((prevInvitations) =>
                     prevInvitations?.filter((invitation) => invitation.id !== invitationId)
                 );
+                await update({
+                    ...session,
+                    organizationId: response.data.organizationId,
+                })
             } else {
                 toast.error(response.error || "Failed to accept the invitation.");
             }
