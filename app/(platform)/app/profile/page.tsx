@@ -51,7 +51,7 @@ export default async function ProfilePage() {
         if (response.success) {
             conditions = response.data
         } else {
-    console.error(response.error)
+            console.error(response.error)
         }
     }
 
@@ -85,10 +85,10 @@ export default async function ProfilePage() {
                             /> */}
                             {organization.headerImage ? (
                                 <img className="h-32 w-full object-cover lg:h-48"
-                                    src={organization.headerImage}
-                                    alt=""
+                                     src={organization.headerImage}
+                                     alt=""
                                 />
-                            ): (
+                            ) : (
                                 <div className="h-32 w-full object-cover lg:h-48 bg-secondary"></div>
                             )}
                         </div>
