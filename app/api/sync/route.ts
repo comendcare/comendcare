@@ -353,6 +353,24 @@ const syncToTypesense = async (env: {
     }
 };
 
+const { tmpdir } = require("os")
+const fs = require("fs")
+
+function writeDecodedFile(filename: string, base64Content: any) {
+    const filePath = `${tmpdir()}/${filename}`
+    const contentBuffer = Buffer.from(base64Content, "base64")
+
+    try {
+        fs.writeFileSync(filePath, contentBuffer)
+        console.log(`${filename} successfully written to ${filePath}`)
+        console.log(`File exists: ${fs.existsSync(filePath)}`)
+    } catch (err) {
+        console.error(`Error writing ${filename}:`, err)
+        throw err
+    }
+}
+
+
 export async function POST(req: Request) {
     try {
         const env = {
@@ -363,6 +381,24 @@ export async function POST(req: Request) {
             )!,
             TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
         };
+
+        if (process.env.CLIENT_CERT_BASE64) {
+            writeDecodedFile("client-cert.pem", process.env.CLIENT_CERT_BASE64)
+        } else {
+            console.error("CLIENT_CERT_BASE64 environment variable is not set.")
+        }
+        
+        if (process.env.CLIENT_KEY_BASE64) {
+            writeDecodedFile("client-key.pem", process.env.CLIENT_KEY_BASE64)
+        } else {
+            console.error("CLIENT_KEY_BASE64 environment variable is not set.")
+        }
+        
+        if (process.env.SERVER_CA_BASE64) {
+            writeDecodedFile("server-ca.pem", process.env.SERVER_CA_BASE64)
+        } else {
+            console.error("SERVER_CA_BASE64 environment variable is not set.")
+        }
 
         const result = await syncToTypesense(env);
         return NextResponse.json(result, { status: 200 });
@@ -387,6 +423,24 @@ export async function GET() {
             )!,
             TYPESENSE_URL: `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
         };
+
+        if (process.env.CLIENT_CERT_BASE64) {
+            writeDecodedFile("client-cert.pem", process.env.CLIENT_CERT_BASE64)
+        } else {
+            console.error("CLIENT_CERT_BASE64 environment variable is not set.")
+        }
+        
+        if (process.env.CLIENT_KEY_BASE64) {
+            writeDecodedFile("client-key.pem", process.env.CLIENT_KEY_BASE64)
+        } else {
+            console.error("CLIENT_KEY_BASE64 environment variable is not set.")
+        }
+        
+        if (process.env.SERVER_CA_BASE64) {
+            writeDecodedFile("server-ca.pem", process.env.SERVER_CA_BASE64)
+        } else {
+            console.error("SERVER_CA_BASE64 environment variable is not set.")
+        }
 
         const result = await syncToTypesense(env);
         return NextResponse.json(result, { status: 200 });
