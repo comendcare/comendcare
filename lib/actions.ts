@@ -1975,7 +1975,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                                 data: milestone.contacts.map((contact: any) => ({
                                     name: contact.name,
                                     email: contact.email,
-                                    ...(contact.role ? {role: contact.role} : undefined)
+                                    ...(contact.role ? {role: contact.role} : undefined),
+                                    ...(contact.affiliation ? {affiliation: contact.affiliation}: undefined)
                                 }))
                             }
                         },
