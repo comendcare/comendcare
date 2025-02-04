@@ -18,21 +18,21 @@ const links = [
         href: "/milestones",
         comingSoon: false
     },
+    // {
+    //     name: "Researchers",
+    //     href: "/researchers",
+    //     comingSoon: true
+    // },
     {
-        name: "Researchers",
-        href: "/researchers",
-        comingSoon: true
+        name: "Academics",
+        href: "#",
+        comingSoon: false
     },
-    // {
-    //     name: "Contractors",
-    //     href: "/contractors",
-    //     comingSoon: true
-    // },
-    // {
-    //     name: "Grants",
-    //     href: "/grants",
-    //     comingSoon: true
-    // },
+    {
+        name: "CROs",
+        href: "#",
+        comingSoon: false
+    },
 ]
 
 interface ExamplesNavProps extends React.HTMLAttributes<HTMLDivElement> {

@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaCalendar, FaLinkSlash, FaX} from "react-icons/fa6"
+import {FaCalendar, FaEllipsis, FaLinkSlash, FaTrash, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -79,6 +79,7 @@ import { Calendar } from "./ui/calendar"
 import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { PublicBadge } from "./public-badge"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -96,6 +97,7 @@ const kanbanSelector = (state: KanbanState) => ({
     updateTask: state.updateTask,
     setTasks: state.setTasks,
     addTask: state.addTask,
+    deleteTask: state.deleteTask,
     addColumn: state.addColumn
 })
 
@@ -148,6 +150,7 @@ export function EditMilestoneForm({
         updateTask,
         setTasks,
         addTask,
+        deleteTask,
         addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
@@ -276,31 +279,31 @@ export function EditMilestoneForm({
             ...(openTo ? {openTo} : undefined)
         })
 
-        setTasks(unionById(tasks || [], kanbanTasks).map(task => {
-            const newTask = tasks?.find(t => t.id === task.id)
+        // setTasks(unionById(tasks || [], kanbanTasks).map(task => {
+        //     const newTask = tasks?.find(t => t.id === task.id)
 
-            // link relevant tasks to this milestone
-            if (newTask) {
-                return {
-                    ...task,
-                    name: newTask.name,
-                    columnId: newTask.columnId,
-                    milestone: {id: milestoneData?.id},
-                    milestoneId: milestoneData?.id,
-                }
-            }
+        //     // link relevant tasks to this milestone
+        //     if (newTask) {
+        //         return {
+        //             ...task,
+        //             name: newTask.name,
+        //             columnId: newTask.columnId,
+        //             milestone: {id: milestoneData?.id},
+        //             milestoneId: milestoneData?.id,
+        //         }
+        //     }
 
-            // unlink tasks that are no longer attached to this milestone
-            if (!newTask && milestoneData?.id && task.milestoneId === milestoneData.id) {
-                return {
-                    ...task,
-                    milestone: undefined,
-                    milestoneId: undefined
-                }
-            }
+        //     // unlink tasks that are no longer attached to this milestone
+        //     if (!newTask && milestoneData?.id && task.milestoneId === milestoneData.id) {
+        //         return {
+        //             ...task,
+        //             milestone: undefined,
+        //             milestoneId: undefined
+        //         }
+        //     }
 
-            return task
-        }))
+        //     return task
+        // }))
 
         // Mixpanel tracking for "Other" field
         // only send to mixpanel if the details explaining the 'other' type have been updated
@@ -902,6 +905,7 @@ const TasksFormField = ({
         updateTask,
         setTasks,
         addTask,
+        deleteTask,
         addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
 
@@ -940,20 +944,64 @@ const TasksFormField = ({
                                                 key={task.id}
                                                 index={index}
                                                 task={task}
-                                                onUnlink={() => {
+                                                onUnlink={async () => {
+                                                    // form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
+
+                                                    const newTasks = await setTasks(kanbanTasks.map(t => {
+                                                        if (t.id === task.id) {
+                                                            return ({
+                                                                ...t,
+                                                                milestone: undefined,
+                                                                milestoneId: undefined
+                                                            })
+                                                        }
+
+                                                        return t
+                                                    }))
+
+                                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
+                                                }}
+                                                onDelete={async () => {
+                                                    await deleteTask(task.id)
                                                     form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
                                                 }}
-                                                onNameChange={(newName) => {
-                                                    form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
-                                                        ...t,
-                                                        name: newName
-                                                    } : t))
+                                                onNameChange={async (newName) => {
+                                                    // form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
+                                                    //     ...t,
+                                                    //     name: newName
+                                                    // } : t))
+
+                                                    const newTasks = await setTasks(kanbanTasks.map(t => {
+                                                        if (t.id === task.id) {
+                                                            return ({
+                                                                ...t,
+                                                                name: newName
+                                                            })
+                                                        }
+
+                                                        return t
+                                                    }))
+
+                                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                                 }}
-                                                onColumnChange={(newColumnId) => {
-                                                    form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
-                                                        ...t,
-                                                        columnId: newColumnId
-                                                    } : t))
+                                                onColumnChange={async (newColumnId) => {
+                                                    // form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
+                                                    //     ...t,
+                                                    //     columnId: newColumnId
+                                                    // } : t))
+
+                                                    const newTasks = await setTasks(kanbanTasks.map(t => {
+                                                        if (t.id === task.id) {
+                                                            return ({
+                                                                ...t,
+                                                                columnId: newColumnId
+                                                            })
+                                                        }
+
+                                                        return t
+                                                    }))
+
+                                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                                 }}
                                                 kanbanColumns={kanbanColumns}
                                             />
@@ -965,16 +1013,27 @@ const TasksFormField = ({
                             <LinkTask
                                 milestoneId={milestoneData?.id}
                                 kanbanTasks={kanbanTasks}
-                                onLink={(taskId) => {
+                                onLink={async (taskId) => {
                                     const newTask = kanbanTasks?.find((task) => task.id === taskId)
-                                    form.setValue(
-                                        'tasks',
-                                        [...field?.value || [], {
-                                            ...newTask,
-                                            milestoneId: milestoneData?.id,
-                                            milestone: {id: milestoneData?.id}
-                                        }]
-                                    )
+                                    // form.setValue(
+                                    //     'tasks',
+                                    //     [...field?.value || [], {
+                                    //         ...newTask,
+                                    //         milestoneId: milestoneData?.id,
+                                    //         milestone: {id: milestoneData?.id}
+                                    //     }]
+                                    // )
+                                    const newTasks = await setTasks(kanbanTasks.map(t => {
+                                        if (t.id === newTask.id) {
+                                            return ({
+                                                ...t,
+                                                milestoneId: milestoneData?.id,
+                                                milestone: {id: milestoneData?.id}
+                                            })
+                                        }
+                                        return t
+                                    }))
+                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                 }}
                             />
                             
@@ -1011,14 +1070,28 @@ const TasksFormField = ({
                                     const columnId = kanbanColumns[0].id
 
                                     const newTask = await addTask(columnId)
-                                    if (newTask) {
-                                        const updatedTasks = [...form.getValues().tasks || [], {
-                                            ...newTask,
-                                            milestoneId: milestoneData?.id,
-                                            milestone: {id: milestoneData?.id}
-                                        }]
-                                        form.setValue('tasks', updatedTasks)
-                                    }
+                                    // if (newTask) {
+                                    //     const updatedTasks = [...form.getValues().tasks || [], {
+                                    //         ...newTask,
+                                    //         milestoneId: milestoneData?.id,
+                                    //         milestone: {id: milestoneData?.id}
+                                    //     }]
+                                    //     form.setValue('tasks', updatedTasks)
+                                    // }
+                                    const newTasks = await setTasks([
+                                        ...kanbanTasks,
+                                        { ...newTask, milestoneId: milestoneData?.id, milestone: {id: milestoneData?.id}}
+                                    ].map(t => {
+                                        if (t.id === newTask?.id) {
+                                            return ({
+                                                ...t,
+                                                milestoneId: milestoneData?.id,
+                                                milestone: {id: milestoneData?.id}
+                                            })
+                                        }
+                                        return t
+                                    }))
+                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                 }}
                             >
                                 {`Add a new kanban task`}
@@ -1237,6 +1310,7 @@ const TaskField = ({
                        index,
                        task,
                        onUnlink,
+                       onDelete,
                        onNameChange,
                        onColumnChange,
                        kanbanColumns,
@@ -1244,6 +1318,7 @@ const TaskField = ({
     index: number
     task: TaskType
     onUnlink: () => void
+    onDelete: () => void
     onNameChange: (newName: string) => void
     onColumnChange: (newColumnId: string) => void
     kanbanColumns: any[]
@@ -1264,6 +1339,11 @@ const TaskField = ({
     const unlinkTask = (e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault()
         onUnlink()
+    }
+
+    const deleteTask = (e: React.MouseEvent<HTMLElement>) => {
+        e.preventDefault()
+        onDelete()
     }
 
     const nameChanged = (e: React.FormEvent<HTMLInputElement>) => {
@@ -1287,9 +1367,12 @@ const TaskField = ({
             key={index}
             ref={setNodeRef}
             style={style}
-            className={variants({
-                dragging: isDragging ? "overlay" : undefined
-            })}
+            className={cn(
+                "grid grid-cols-4",
+                variants({
+                    dragging: isDragging ? "overlay" : undefined
+                })
+            )}
         >
             {/* move task */}
             <Button
@@ -1305,8 +1388,8 @@ const TaskField = ({
 
             {/* select kanban column */}
             <Select onValueChange={(value: string) => columnChanged(value)} value={task.columnId}>
-                <SelectTrigger className="w-[180px]">
-                    <SelectValue/>
+                <SelectTrigger className="w-[100px]">
+                    <SelectValue className="text-left" />
                 </SelectTrigger>
                 <SelectContent>
                     {kanbanColumns.map(column => (
@@ -1325,10 +1408,28 @@ const TaskField = ({
                 />
             </div>
 
-            {/* delete task */}
-            <Button variant="secondary" size="icon" onClick={unlinkTask}>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button size="icon" variant="secondary">
+                        <FaEllipsis/>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="left">
+                    <DropdownMenuItem onClick={deleteTask}>
+                        <FaTrash/>
+                        Delete task
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={unlinkTask}>
+                        <FaLinkSlash />
+                        Unlink from milestone
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* unlink task */}
+            {/* <Button variant="secondary" size="icon" onClick={unlinkTask}>
                 <FaLinkSlash/>
-            </Button>
+            </Button> */}
         </li>
     )
 }
