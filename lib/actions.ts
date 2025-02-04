@@ -429,6 +429,12 @@ export const updateOrganization = withOrganizationAuth(
             if (key === "yearFounded") {
                 data[key] = value.toString();
             }
+
+            if ((key === "image" || key === "headerImage") && !value) {
+                // remove image
+                data[key] = null
+            }
+
         });
 
         try {
@@ -1554,8 +1560,16 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
     const finalRoadmap = prisma.roadmap.findUnique({
         where: { id: roadmap.id },
         include: {
-            milestones: true,
-            nodes: true
+            milestones: {
+                include: {
+                    attachments: true,
+                    contacts: true,
+                    tasks: true,
+                    node: true
+                }
+            },
+            nodes: true,
+            edges: true
         }
     })
 
