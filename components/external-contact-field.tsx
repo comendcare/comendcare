@@ -56,11 +56,11 @@ export const ExternalContactField = ({
             <Input
                 className="h-full"
                 placeholder={`Affiliation`}
-                value={value.affiliation}
+                value={value.affiliation || undefined}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                     onValueChange({
                         ...value,
-                        email: e.currentTarget.value
+                        affiliation: e.currentTarget.value
                     })
                 }}
             />
