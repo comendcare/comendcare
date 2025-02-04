@@ -23,7 +23,7 @@ import {AddressType} from "@/lib/types";
 import {useDebounce} from "use-debounce";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Bold, Italic} from "lucide-react";
-import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
+import {FileWithPreview} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
@@ -34,7 +34,6 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {checkSubdomainAvailability, getAllOrganizations, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
-import {FormImageCropper} from "./edit-pag-profile-page-dialog";
 import mixpanel from "mixpanel-browser";
 
 const optionSchema = z.object({

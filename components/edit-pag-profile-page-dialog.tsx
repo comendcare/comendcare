@@ -227,6 +227,11 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                     formData.append(mappedKey, value.toString());
                 }
             }
+
+            // special case for images, make sure the image is removed is the value is not defined
+            if ((mappedKey === "image" || mappedKey === "headerImage") && !value) {
+                formData.append(mappedKey, "") // empty string is falsey, see actions.ts, updateOrganization() for useage
+            }
         });
 
         // Handle the selected profile image upload

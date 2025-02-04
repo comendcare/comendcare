@@ -22,7 +22,7 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {AddressType} from "@/lib/types";
 import {useCallback, useEffect, useState} from "react";
-import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
+import {FileWithPreview} from "@/components/image-cropper";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaUpload} from "react-icons/fa6";
@@ -135,7 +135,7 @@ export default function UserEditForm() {
                         country: userData.country || "",
                         lat: userData.lat || 0,
                         lng: userData.lng || 0,
-                        image: userData.image || "",
+                        image: userData.image || undefined,
                     };
 
                     if (userData.image) {
@@ -183,10 +183,20 @@ export default function UserEditForm() {
             }
 
             for (const [key, value] of Object.entries(values)) {
-                const res: any = await editUser(session?.user?.id as string, {[key]: value});
-                if (res?.error) {
-                    toast.error(res.error);
-                    return;
+                if (key === "image" && !value) {
+                    // special case for images - in case the user wants to remove the image
+                    const res: any = await editUser(session?.user?.id as string, {[key]: null});
+                    if (res?.error) {
+                        toast.error(res.error);
+                        return;
+                    }
+                    
+                } else {
+                    const res: any = await editUser(session?.user?.id as string, {[key]: value});
+                    if (res?.error) {
+                        toast.error(res.error);
+                        return;
+                    }
                 }
             }
 
