@@ -2,7 +2,7 @@ import React from "react"
 import { FaCalendar } from "react-icons/fa6"
 import {monthsList} from "@/lib/data";
 
-export function DateView({startDate, endDate}: {startDate: Date | undefined, endDate: Date | undefined}) {
+export function DateView({startDate, endDate, startLabel, endLabel}: {startDate: Date | undefined, endDate: Date | undefined, startLabel?: string | undefined, endLabel?: string | undefined}) {
     if (startDate && endDate) {
         return (
             <span className="flex items-center gap-2 text-bottom">
@@ -18,7 +18,7 @@ export function DateView({startDate, endDate}: {startDate: Date | undefined, end
                 <FaCalendar
                     aria-hidden="true"
                 />
-                <p>Starting: {`${monthsList[startDate.getMonth()]} ${startDate.getFullYear()}`}</p>
+                <p>{`${startLabel || "Starting:"} ${monthsList[startDate.getMonth()]} ${startDate.getFullYear()}`}</p>
             </span>
         )
     } else if (endDate) {
@@ -27,7 +27,7 @@ export function DateView({startDate, endDate}: {startDate: Date | undefined, end
                 <FaCalendar
                     aria-hidden="true"
                 />
-                <p>Ending: {`${monthsList[endDate.getMonth()]} ${endDate.getFullYear()}`}</p>
+                <p>{`${endLabel || "Ending:"} ${monthsList[endDate.getMonth()]} ${endDate.getFullYear()}`}</p>
             </span>
         )
     }
