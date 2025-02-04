@@ -4,7 +4,7 @@ import { Input } from "./ui/input"
 import { Prisma } from "@prisma/client"
 
 type ContactType = Prisma.ExternalContactGetPayload<{
-    select: { name: true, role: true, email: true }
+    select: { name: true, role: true, email: true, affiliation: true }
 }>
 
 export const ExternalContactField = ({
@@ -56,7 +56,7 @@ export const ExternalContactField = ({
             <Input
                 className="h-full"
                 placeholder={`Affiliation`}
-                value={value.email}
+                value={value.affiliation}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                     onValueChange({
                         ...value,
