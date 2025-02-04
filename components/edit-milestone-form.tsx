@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaCalendar, FaLinkSlash, FaX} from "react-icons/fa6"
+import {FaCalendar, FaEllipsis, FaLinkSlash, FaTrash, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -79,6 +79,7 @@ import { Calendar } from "./ui/calendar"
 import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { PublicBadge } from "./public-badge"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -96,6 +97,7 @@ const kanbanSelector = (state: KanbanState) => ({
     updateTask: state.updateTask,
     setTasks: state.setTasks,
     addTask: state.addTask,
+    deleteTask: state.deleteTask,
     addColumn: state.addColumn
 })
 
@@ -148,6 +150,7 @@ export function EditMilestoneForm({
         updateTask,
         setTasks,
         addTask,
+        deleteTask,
         addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
@@ -902,6 +905,7 @@ const TasksFormField = ({
         updateTask,
         setTasks,
         addTask,
+        deleteTask,
         addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
 
@@ -942,6 +946,11 @@ const TasksFormField = ({
                                                 task={task}
                                                 onUnlink={() => {
                                                     form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
+                                                }}
+                                                onDelete={() => {
+                                                    form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
+                                                    deleteTask(task.id)
+                                                    // form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
                                                 }}
                                                 onNameChange={(newName) => {
                                                     form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
@@ -1237,6 +1246,7 @@ const TaskField = ({
                        index,
                        task,
                        onUnlink,
+                       onDelete,
                        onNameChange,
                        onColumnChange,
                        kanbanColumns,
@@ -1244,6 +1254,7 @@ const TaskField = ({
     index: number
     task: TaskType
     onUnlink: () => void
+    onDelete: () => void
     onNameChange: (newName: string) => void
     onColumnChange: (newColumnId: string) => void
     kanbanColumns: any[]
@@ -1264,6 +1275,11 @@ const TaskField = ({
     const unlinkTask = (e: React.MouseEvent<HTMLElement>) => {
         e.preventDefault()
         onUnlink()
+    }
+
+    const deleteTask = (e: React.MouseEvent<HTMLElement>) => {
+        e.preventDefault()
+        onDelete()
     }
 
     const nameChanged = (e: React.FormEvent<HTMLInputElement>) => {
@@ -1287,9 +1303,12 @@ const TaskField = ({
             key={index}
             ref={setNodeRef}
             style={style}
-            className={variants({
-                dragging: isDragging ? "overlay" : undefined
-            })}
+            className={cn(
+                "grid grid-cols-4",
+                variants({
+                    dragging: isDragging ? "overlay" : undefined
+                })
+            )}
         >
             {/* move task */}
             <Button
@@ -1305,8 +1324,8 @@ const TaskField = ({
 
             {/* select kanban column */}
             <Select onValueChange={(value: string) => columnChanged(value)} value={task.columnId}>
-                <SelectTrigger className="w-[180px]">
-                    <SelectValue/>
+                <SelectTrigger className="w-[100px]">
+                    <SelectValue className="text-left" />
                 </SelectTrigger>
                 <SelectContent>
                     {kanbanColumns.map(column => (
@@ -1325,10 +1344,28 @@ const TaskField = ({
                 />
             </div>
 
-            {/* delete task */}
-            <Button variant="secondary" size="icon" onClick={unlinkTask}>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button size="icon" variant="secondary">
+                        <FaEllipsis/>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="left">
+                    <DropdownMenuItem onClick={deleteTask}>
+                        <FaTrash/>
+                        Delete task
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={unlinkTask}>
+                        <FaLinkSlash />
+                        Unlink from milestone
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* unlink task */}
+            {/* <Button variant="secondary" size="icon" onClick={unlinkTask}>
                 <FaLinkSlash/>
-            </Button>
+            </Button> */}
         </li>
     )
 }

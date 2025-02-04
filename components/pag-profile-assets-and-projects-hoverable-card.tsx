@@ -249,7 +249,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                 </Button>
                             </div>
                         )}
-                        {assets.length <= 0 && !isPrivate && (
+                        {rfps.length <= 0 && !isPrivate && (
                             <p>{`No RFPs (Requests for Proposal) to show`}</p>
                         )}
                     </div>
