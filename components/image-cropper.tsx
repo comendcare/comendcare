@@ -159,17 +159,17 @@ export function ImageCropper({
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
             </DialogTrigger>
-            <DialogContent className="p-0 gap-0">
-                <div className="p-6 size-full">
+            <DialogContent className="p-0 gap-0 max-h-[90vh] overflow-hidden">
+                <div className="p-6 size-full max-h-full">
                     <ReactCrop
                         crop={crop}
                         onComplete={(c) => onCropComplete(c)}
                         onChange={(_, percentCrop) => setCrop(percentCrop)}
                         aspect={aspect}
-                        className="w-full"
+                        className="w-full max-h-[80vh]"
                     >
                         <img
-                            className="w-full"
+                            className="w-full object-cover"
                             ref={imgRef}
                             src={selectedFile?.preview}
                             onLoad={onImageLoad}
