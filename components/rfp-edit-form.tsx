@@ -33,7 +33,7 @@ type RFPType = Prisma.RFPGetPayload<{
     omit: { id: true, createdAt: true, updatedAt: true, researchFocus: true }
     include: { 
         contacts: { 
-            select: { name: true, role: true, email: true } 
+            select: { name: true, role: true, email: true, affiliation: true } 
         }, 
         attachments: {
             select: { name: true, link: true }
