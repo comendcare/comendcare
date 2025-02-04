@@ -24,7 +24,7 @@ export const ExternalContactField = ({
     }
 
     return (
-        <li key={index} className="grid grid-cols-[20px_auto_auto_40px] gap-2 items-center">
+        <li key={index} className="grid grid-cols-[20px_auto_40px] lg:grid-cols-[20px_auto_auto_40px] gap-2 items-center">
             <FaUser className="row-start-1 col-start-1"/>
             <div className="h-full w-full grow row-start-1 col-start-2">
             <Input
@@ -39,7 +39,7 @@ export const ExternalContactField = ({
                 }}
             />
             </div>
-            <div className="h-full w-full grow row-start-1 col-start-3">
+            <div className="h-full w-full grow row-start-2 col-start-2 lg:row-start-1 lg:col-start-3">
             <Input
                 className="h-full"
                 placeholder={`Email`}
@@ -52,7 +52,7 @@ export const ExternalContactField = ({
                 }}
             />
             </div>
-            <div className="h-full w-full grow row-start-2 col-start-2 col-span-2">
+            <div className="h-full w-full grow row-start-3 col-start-2 lg:row-start-2 lg:col-start-2 lg:col-span-2">
             <Input
                 className="h-full"
                 placeholder={`Affiliation`}
@@ -65,7 +65,7 @@ export const ExternalContactField = ({
                 }}
             />
             </div>
-            <Button className="row-start-1 col-start-4" variant="secondary" onClick={deleteElement}>
+            <Button className="row-start-1 col-start-3 lg:col-start-4" variant="secondary" onClick={deleteElement}>
                 <FaTrash />
             </Button>
         </li>
