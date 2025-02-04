@@ -429,6 +429,12 @@ export const updateOrganization = withOrganizationAuth(
             if (key === "yearFounded") {
                 data[key] = value.toString();
             }
+
+            if ((key === "image" || key === "headerImage") && !value) {
+                // remove image
+                data[key] = null
+            }
+
         });
 
         try {
