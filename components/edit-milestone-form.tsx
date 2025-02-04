@@ -495,8 +495,8 @@ export function EditMilestoneForm({
                                 <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
                                 <OpenToFormField form={form}/>
 
-                                <FormLabel className="text-md mt-2">{`Start Date`}</FormLabel>
-                                <StartDateFormField form={form} />
+                                {/* <FormLabel className="text-md mt-2">{`Start Date`}</FormLabel>
+                                <StartDateFormField form={form} /> */}
 
                                 <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
                                 <BudgetFormField form={form} />
@@ -506,9 +506,11 @@ export function EditMilestoneForm({
                     </FormItem>
 
                     {milestoneData?.node?.type === "PROJECT" && (
-                        <TimelineFormField 
-                            form={form}
-                        />
+                        <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
+                    )}
+
+                    {milestoneData?.node?.type === "RFP" && (
+                        <TimelineFormField form={form} startLabel={"Request Opens"} endLabel={"Deadline for Proposals"} />
                     )}
 
                     <ContactsFormField form={form} />
@@ -691,22 +693,26 @@ const BudgetFormField = ({form}: {form: any}) => {
 }
 
 const TimelineFormField = ({
-    form
+    form,
+    startLabel,
+    endLabel
 }: {
-    form: any
+    form: any,
+    startLabel?: string,
+    endLabel?: string
 }) => {
     return (
         <span className="flex flex-col gap-2 align-center">
         <FormLabel
             className="text-2xl font-semibold leading-none tracking-tight">{`Timeline`}</FormLabel>
 
-        <FormItem className="w-full grid grid-cols-[120px_120px_auto] gap-x-2 items-center">
-            <FormLabel className="text-md mt-2">{`Start`}</FormLabel>
+        <FormItem className="w-full grid grid-rows[auto_auto] grid-cols-[120px_120px_auto] space-y-0 gap-2 items-center">
+            <FormLabel className="text-md h-fit w-fit">{startLabel ? startLabel : `Start`}</FormLabel>
             <FormField
                 control={form.control}
                 name="startDate"
                 render={({field}) => (
-                    <FormItem className="h-full grow">
+                    <FormItem className="h-[40px]">
                         <Select
                             defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                             onValueChange={(value) => {
@@ -717,7 +723,7 @@ const TimelineFormField = ({
                             }}
                         >
                             <FormControl>
-                                <SelectTrigger>
+                                <SelectTrigger className="h-[40px]">
                                     <SelectValue placeholder="Select a month"/>
                                 </SelectTrigger>
                             </FormControl>
@@ -745,9 +751,9 @@ const TimelineFormField = ({
                 control={form.control}
                 name="startDate"
                 render={({field}) => (
-                    <FormItem className="h-full grow">
+                    <FormItem className="h-[40px]">
                         <Input
-                            className="h-full"
+                            className="h-[40px]"
                             placeholder="Enter a year..."
                             maxLength={4}
                             defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
@@ -762,12 +768,12 @@ const TimelineFormField = ({
                 )}
             />
 
-            <FormLabel className="text-md mt-2">{`End`}</FormLabel>
+            <FormLabel className="text-md h-fit w-fit">{endLabel ? endLabel : `End`}</FormLabel>
             <FormField
                 control={form.control}
                 name="endDate"
                 render={({field}) => (
-                    <FormItem className="h-full grow">
+                    <FormItem className="h-[40px]">
                         <Select
                             defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                             onValueChange={(value) => {
@@ -778,7 +784,7 @@ const TimelineFormField = ({
                             }}
                         >
                             <FormControl>
-                                <SelectTrigger>
+                                <SelectTrigger className="h-[40px]">
                                     <SelectValue placeholder="Select a month"/>
                                 </SelectTrigger>
                             </FormControl>
@@ -806,9 +812,9 @@ const TimelineFormField = ({
                 control={form.control}
                 name="endDate"
                 render={({field}) => (
-                    <FormItem className="h-full grow">
+                    <FormItem className="h-[40px]">
                         <Input
-                            className="h-full"
+                            className="h-[40px]"
                             placeholder="Enter a year..."
                             maxLength={4}
                             defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
