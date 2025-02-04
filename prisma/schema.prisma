@@ -194,7 +194,7 @@ model Milestone {
   private          Boolean              @default(true)
   type             String?              @default("NOTYPE")
   otherTypeDetails String?
-  openTo           String?
+  openTo           String[]
   tasks            Task[]
   attachments      ExternalAttachment[]
   contacts         ExternalContact[]
@@ -280,7 +280,7 @@ model RFP {
   funding       Int
   description   String?
   researchFocus String               @default("NOTYPE")
-  openTo        String               @default("ALL")
+  openTo        String[]
   startDate     DateTime?
   endDate       DateTime?
   attachments   ExternalAttachment[]

@@ -1980,7 +1980,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                                 }))
                             }
                         },
-                        openTo: milestone.openTo,
+                        openTo: milestone.openTo || [],
                         status: milestone.status || "PLANNED",
                         private: milestone.private || false,
                         node: {
