@@ -117,7 +117,7 @@ const editOrgFormSchema = z.object({
     headerImage: z.string().optional()
 })
 
-export default function EditPAGProfileDialog({organization}: {organization: Organization}) {
+export default function EditPAGProfileDialog({organization}: { organization: Organization }) {
     const {data: session, update} = useSession()
     const router = useRouter()
     const [searchInput, setSearchInput] = useState("");
@@ -671,12 +671,12 @@ export default function EditPAGProfileDialog({organization}: {organization: Orga
                                             <FormItem>
                                                 <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                                 <FormDescription>
-                                                    {`Enter your organization’s abbreviated name, short form, or nickname in lowercase.`}
+                                                    {`Enter an acronym, short form, or nickname for your organization.`}
                                                     <br/>
                                                     {editOrgForm.watch("subdomain") &&
                                                         !editOrgForm.formState.errors.subdomain && (
                                                             <>
-                                                                {`Your organization's domain will be ${editOrgForm
+                                                                {`The custom site for your organization’s profile will be found at ${editOrgForm
                                                                     .watch("subdomain")
                                                                     .toLowerCase()
                                                                     .replace(/\s+/g, "-")}.comend.io`}
@@ -1210,7 +1210,7 @@ export default function EditPAGProfileDialog({organization}: {organization: Orga
                                         name="engaged"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Number of patients engaged`}</FormLabel>
+                                                <FormLabel>{`Number of patients engaged`} - {formatNumberWithCommas(field.value)}</FormLabel>
                                                 <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
                                                 <FormControl>
                                                     <Input
@@ -1229,7 +1229,7 @@ export default function EditPAGProfileDialog({organization}: {organization: Orga
                                         name="national"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Estimated number of patients in the US`}</FormLabel>
+                                                <FormLabel>{`Estimated number of patients in the US`} - {formatNumberWithCommas(field.value)}</FormLabel>
                                                 {/*<FormDescription>{`The estimated number of patients in the US.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
@@ -1248,7 +1248,7 @@ export default function EditPAGProfileDialog({organization}: {organization: Orga
                                         name="global"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
+                                                <FormLabel>{`Estimated number of patients in the world`} - {formatNumberWithCommas(field.value)}</FormLabel>
                                                 {/*<FormDescription>{`The estimated number of patients in the world.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
