@@ -1560,8 +1560,16 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
     const finalRoadmap = prisma.roadmap.findUnique({
         where: { id: roadmap.id },
         include: {
-            milestones: true,
-            nodes: true
+            milestones: {
+                include: {
+                    attachments: true,
+                    contacts: true,
+                    tasks: true,
+                    node: true
+                }
+            },
+            nodes: true,
+            edges: true
         }
     })
 

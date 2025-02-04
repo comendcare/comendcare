@@ -20,12 +20,14 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { nanoid } from "nanoid";
 import { useStoreApi, Node } from "@xyflow/react";
-import { getRoadmap } from "@/lib/fetchers";
+import { getNodesEdgesAndMilestones, getRoadmap } from "@/lib/fetchers";
 import { useSession } from "next-auth/react";
 import { createRoadmap } from "@/lib/actions";
 import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { NODE_TYPE_OPTIONS } from "@/lib/types";
+import { initializeRoadmapState } from "@/lib/initialize-client-state";
+import { toast } from "sonner";
 
 // Define types for statuses and environments
 type Recency = 'Due' | 'New';
@@ -161,14 +163,35 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                     milestones: [{
                                                         title: 'New Asset',
                                                         nodeType: "ASSET"
-                                                    },]
+                                                    }]
                                                 })
+
+                                                if (roadmap?.id) {
+                                                    // setRoadmapId(response.data)
+                                                    const nodesResponse = await getNodesEdgesAndMilestones(roadmap.id)
+                                                    const urlNode = roadmap.nodes[0].id
+                                                    if (nodesResponse.success) {
+                                                        initializeRoadmapState({
+                                                            roadmapId: roadmap.id,
+                                                            nodes: nodesResponse.data.nodes,
+                                                            edges: nodesResponse.data.edges,
+                                                            milestones: nodesResponse.data.milestones,
+                                                            selectedNodeId: urlNode
+                                                        })
+                                                    }
+                                                    toast.success(`Successfully created roadmap`)
+                                                } else {
+                                                    console.error(response.error)
+                                                    toast.error(response.error)
+                                                }
+
+                                                console.log(`created roadmap`, roadmap)
 
                                                 if (roadmap && roadmap?.nodes?.[0]?.id) {
                                                     // don't do onboarding if the user starts from 'New Asset' button
                                                     setOnboarded('research-plan-tour')
                                                     router.push(`/app/research-plan?milestone=${roadmap.nodes[0].id}`)
-                                                    router.refresh()
+                                                    // router.refresh()
                                                 }
                                             }
                                         }
@@ -234,11 +257,32 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                     }]
                                                 })
 
+                                                if (roadmap?.id) {
+                                                    // setRoadmapId(response.data)
+                                                    const nodesResponse = await getNodesEdgesAndMilestones(roadmap.id)
+                                                    const urlNode = roadmap.nodes[0].id
+                                                    if (nodesResponse.success) {
+                                                        initializeRoadmapState({
+                                                            roadmapId: roadmap.id,
+                                                            nodes: nodesResponse.data.nodes,
+                                                            edges: nodesResponse.data.edges,
+                                                            milestones: nodesResponse.data.milestones,
+                                                            selectedNodeId: urlNode
+                                                        })
+                                                    }
+                                                    toast.success(`Successfully created roadmap`)
+                                                } else {
+                                                    console.error(response.error)
+                                                    toast.error(response.error)
+                                                }
+
+                                                console.log(`created roadmap`, roadmap)
+
                                                 if (roadmap && roadmap?.nodes?.[0]?.id) {
                                                     // don't do onboarding if the user starts from 'New RFP' button
                                                     setOnboarded('research-plan-tour')
                                                     router.push(`/app/research-plan?milestone=${roadmap.nodes[0].id}`)
-                                                    router.refresh()
+                                                    // router.refresh()
                                                 }
                                             }
                                         }
