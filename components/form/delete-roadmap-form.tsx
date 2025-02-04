@@ -7,6 +7,7 @@ import { useFormStatus } from "react-dom"
 import { toast } from "sonner"
 import { deleteRoadmap } from "@/lib/actions"
 import va from "@vercel/analytics"
+import { initializeRoadmapState } from "@/lib/initialize-client-state"
 
 export default function DeleteRoadmapForm({
     roadmapName
@@ -17,11 +18,11 @@ export default function DeleteRoadmapForm({
     const router = useRouter()
     return (
         <form
-            action={async (data: FormData) =>
+            action={async (data: FormData) => {
                 window.confirm(
                     "Are you sure you want to delete your roadmap?"
                 ) &&
-                deleteRoadmap(data, id, "delete").then(res => {
+                (await deleteRoadmap(data, id, "delete").then(res => {
                     if (res.error) {
                         toast.error(res.error)
                     } else {
@@ -30,7 +31,16 @@ export default function DeleteRoadmapForm({
                         router.push(`/organization/${res.organizationId}`)
                         toast.success(`Successfully deleted roadmap!`)
                     }
+                }))
+
+                initializeRoadmapState({
+                    roadmapId: null,
+                    nodes: [],
+                    edges: [],
+                    milestones: [],
+                    selectedNodeId: null
                 })
+            }
             }
             className="rounded-lg border border-red-600 bg-white dark:bg-black"
         >
