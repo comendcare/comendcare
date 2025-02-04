@@ -311,10 +311,11 @@ model ExternalAttachment {
 }
 
 model ExternalContact {
-  id    String  @id @unique @default(uuid())
-  name  String
-  role  String?
-  email String
+  id          String  @id @unique @default(uuid())
+  name        String
+  role        String?
+  email       String
+  affiliation String?
 
   assetId     String?
   Asset       Asset?     @relation(fields: [assetId], references: [id])
