@@ -35,7 +35,7 @@ export const PrivateTimelineView = () => {
         addNodes,
         onConnect,
     } = useRoadmapStore(useShallow(selector))
-    const router = useRouter()
+const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
