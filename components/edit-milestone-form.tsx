@@ -594,6 +594,7 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                                 {...field}
                                 defaultOptions={MILESTONE_TYPE_OPTIONS}
                                 hidePlaceholderWhenSelected={true}
+                                showHoverCard={false}
                                 placeholder="Select a milestone type..."
                                 emptyIndicator={
                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
