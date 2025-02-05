@@ -909,6 +909,10 @@ const TasksFormField = ({
         addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
 
+    const debounceSetTasks = useCallback(
+        debounce((updatedValues) => setTasks(updatedValues), 500), []
+    )
+
     return (
         <FormField
             control={form.control}
@@ -945,9 +949,9 @@ const TasksFormField = ({
                                                 index={index}
                                                 task={task}
                                                 onUnlink={async () => {
-                                                    // form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
+                                                    form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
 
-                                                    const newTasks = await setTasks(kanbanTasks.map(t => {
+                                                    debounceSetTasks(kanbanTasks.map(t => {
                                                         if (t.id === task.id) {
                                                             return ({
                                                                 ...t,
@@ -959,19 +963,19 @@ const TasksFormField = ({
                                                         return t
                                                     }))
 
-                                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
+                                                    // form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                                 }}
                                                 onDelete={async () => {
                                                     await deleteTask(task.id)
                                                     form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
                                                 }}
                                                 onNameChange={async (newName) => {
-                                                    // form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
-                                                    //     ...t,
-                                                    //     name: newName
-                                                    // } : t))
+                                                    form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
+                                                        ...t,
+                                                        name: newName
+                                                    } : t))
 
-                                                    const newTasks = await setTasks(kanbanTasks.map(t => {
+                                                    debounceSetTasks(kanbanTasks.map(t => {
                                                         if (t.id === task.id) {
                                                             return ({
                                                                 ...t,
@@ -982,15 +986,15 @@ const TasksFormField = ({
                                                         return t
                                                     }))
 
-                                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
+                                                    // form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                                 }}
                                                 onColumnChange={async (newColumnId) => {
-                                                    // form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
-                                                    //     ...t,
-                                                    //     columnId: newColumnId
-                                                    // } : t))
+                                                    form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
+                                                        ...t,
+                                                        columnId: newColumnId
+                                                    } : t))
 
-                                                    const newTasks = await setTasks(kanbanTasks.map(t => {
+                                                    debounceSetTasks(kanbanTasks.map(t => {
                                                         if (t.id === task.id) {
                                                             return ({
                                                                 ...t,
@@ -1001,7 +1005,7 @@ const TasksFormField = ({
                                                         return t
                                                     }))
 
-                                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
+                                                    // form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                                 }}
                                                 kanbanColumns={kanbanColumns}
                                             />
@@ -1015,15 +1019,15 @@ const TasksFormField = ({
                                 kanbanTasks={kanbanTasks}
                                 onLink={async (taskId) => {
                                     const newTask = kanbanTasks?.find((task) => task.id === taskId)
-                                    // form.setValue(
-                                    //     'tasks',
-                                    //     [...field?.value || [], {
-                                    //         ...newTask,
-                                    //         milestoneId: milestoneData?.id,
-                                    //         milestone: {id: milestoneData?.id}
-                                    //     }]
-                                    // )
-                                    const newTasks = await setTasks(kanbanTasks.map(t => {
+                                    form.setValue(
+                                        'tasks',
+                                        [...field?.value || [], {
+                                            ...newTask,
+                                            milestoneId: milestoneData?.id,
+                                            milestone: {id: milestoneData?.id}
+                                        }]
+                                    )
+                                    debounceSetTasks(kanbanTasks.map(t => {
                                         if (t.id === newTask.id) {
                                             return ({
                                                 ...t,
@@ -1033,7 +1037,7 @@ const TasksFormField = ({
                                         }
                                         return t
                                     }))
-                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
+                                    // form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                 }}
                             />
                             
@@ -1393,7 +1397,13 @@ const TaskField = ({
                 </SelectTrigger>
                 <SelectContent>
                     {kanbanColumns.map(column => (
-                        <SelectItem key={column.id} value={column.id}>{column.name}</SelectItem>
+                        <SelectItem 
+                            key={column.id} 
+                            value={column.id}
+                            // defaultValue={column.id}
+                        >
+                            {column.name}
+                        </SelectItem>
                     ))}
                 </SelectContent>
             </Select>
@@ -1402,7 +1412,8 @@ const TaskField = ({
             <div className="grow">
                 <Input
                     placeholder={task.name}
-                    value={task.name}
+                    defaultValue={task.name}
+                    // value={task.name}
                     onChange={nameChanged}
                     className="h-full"
                 />
