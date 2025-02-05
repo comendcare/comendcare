@@ -34,8 +34,8 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
         <Link
             href={
                 process.env.NEXT_PUBLIC_VERCEL_ENV
-                    ? `https://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-                    : `http://${subdomain}.localhost:3000`
+                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${subdomain}`
+                    : `http://localhost:3000/app/organization/${subdomain}`
             }
         >
             <Card className="h-full w-full text-left flex flex-col justify-start">
