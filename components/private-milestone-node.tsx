@@ -43,7 +43,7 @@ export type PrivateMilestoneNode = Node<
         dependencies?: string[]
         notes?: string
         status: StatusType
-        handleEditClick: (nodeId: string) => void,
+        // handleEditClick: (nodeId: string) => void,
         handleDelete: (nodeId: string) => void,
         handleDuplicate: (nodeId: string) => void,
         onboardingMilestone: boolean,
@@ -60,9 +60,9 @@ export interface TaskType {
 }
 
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
-    const handleEditClick = () => {
-        props.data?.handleEditClick(props?.id)
-    }
+    // const handleEditClick = () => {
+    //     props.data?.handleEditClick(props?.id)
+    // }
     
     const handleDeleteClick = () => {
         props.data?.handleDelete(props?.id)
@@ -126,7 +126,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                 {props.data?.private && (
                     <PrivateBadge className="justify-start" />
                 )}
-                <Button onClick={handleEditClick} className="ml-auto">{`Details`}</Button>
+                {/* <Button onClick={handleEditClick} className="ml-auto">{`Details`}</Button> */}
             </CardFooter>
 
             <NodeHandle type="target" position={Position.Left} node={props as NodeProps<PrivateMilestoneNode>}/>
