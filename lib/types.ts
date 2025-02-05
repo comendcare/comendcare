@@ -21,10 +21,10 @@ export type PostWithAuthorAndComments = Post & {
 export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 
 export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
-    {
-        label: 'All',
-        value: 'ALL',
-    },
+    // {
+    //     label: 'All',
+    //     value: 'ALL',
+    // },
     {
         label: 'CROs',
         value: 'CRO',
@@ -33,10 +33,10 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
         label: 'Academics',
         value: 'ACADEMIC',
     },
-    {
-        label: 'None',
-        value: 'NONE',
-    },
+    // {
+    //     label: 'None',
+    //     value: 'NONE',
+    // },
 ]
 
 export const MODALITIES: Option[] = [

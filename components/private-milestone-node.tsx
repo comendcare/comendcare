@@ -247,8 +247,10 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
         return (
             <>  
             <ul className="flex flex-col gap-2 text-sm text-wrap">
-                {(props.data?.startDate && props.data?.endDate && props.data.startDate?.getMonth() || props.data?.endDate?.getFullYear()) && (
+                {(props?.data?.startDate || props?.data?.endDate) && (
+                    <li>
                     <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
+                    </li>
                 )}
             </ul>
             <span className="w-full flex gap-2 flex-wrap text-wrap">
@@ -302,10 +304,13 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
     if (props?.type === "RFP") {
         return (
             <ul className="flex flex-col gap-2 text-sm">
-                {props?.data?.startDate && (
-                    <li className="flex gap-2 items-center">
-                        <FaCalendar />
-                        <p>{props?.data.startDate.toDateString()}</p>
+                {(props?.data?.startDate || props?.data?.endDate) && (
+                    // <li className="flex gap-2 items-center">
+                    //     <FaCalendar />
+                    //     <p>{props?.data.startDate.toDateString()}</p>
+                    // </li>
+                    <li>
+                    <DateView startDate={props.data?.startDate} endDate={props.data?.endDate} startLabel={"Request Opens:"} endLabel={"Deadline for Proposals:"}/>
                     </li>
                 )}
                 {props?.data?.budget && (
