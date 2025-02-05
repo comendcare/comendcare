@@ -1,9 +1,9 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import React, { useCallback, useEffect, useRef, useState } from "react"
-import { useForm, UseFormReturn } from "react-hook-form"
-import { z } from "zod"
+import {zodResolver} from "@hookform/resolvers/zod"
+import React, {useCallback, useEffect, useRef, useState} from "react"
+import {useForm, UseFormReturn} from "react-hook-form"
+import {z} from "zod"
 import {
     Form,
     FormControl,
@@ -13,14 +13,14 @@ import {
     FormMessage,
     FormDescription,
 } from "./ui/form"
-import { Input } from "./ui/input"
-import { Textarea } from "./ui/textarea"
-import { Button } from "./ui/button"
-import { ScrollArea } from "./ui/scroll-area"
+import {Input} from "./ui/input"
+import {Textarea} from "./ui/textarea"
+import {Button} from "./ui/button"
+import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
-import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
-import { useShallow } from "zustand/react/shallow"
-import { FaCalendar, FaEllipsis, FaLinkSlash, FaTrash, FaX } from "react-icons/fa6"
+import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
+import {useShallow} from "zustand/react/shallow"
+import {FaCalendar, FaEllipsis, FaLinkSlash, FaTrash, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -32,8 +32,8 @@ import {
     Dialog,
     DialogTrigger
 } from "./ui/dialog"
-import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
-import { toast } from "sonner"
+import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
+import {toast} from "sonner"
 import {
     DndContext,
     useSensor,
@@ -46,7 +46,7 @@ import {
     SensorDescriptor,
     SensorOptions
 } from "@dnd-kit/core"
-import { CSS } from "@dnd-kit/utilities"
+import {CSS} from "@dnd-kit/utilities"
 import {
     arrayMove,
     SortableContext,
@@ -54,32 +54,33 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import { CalendarIcon, GripVertical } from "lucide-react"
-import { cva } from "class-variance-authority"
-import { Switch } from "./ui/switch"
-import { PrivateBadge } from "./private-badge"
-import { debounce } from "lodash"
-import { monthsList } from "@/lib/data";
-import { MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType } from "@/lib/types"
-import { Prisma } from "@prisma/client"
-import { Separator } from "./ui/separator"
-import { FaEdit } from "react-icons/fa"
-import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
-import { getKanbanFromOrganizationId, getOrganizationFromOrganizationId } from "@/lib/fetchers"
+import {CalendarIcon, GripVertical} from "lucide-react"
+import {cva} from "class-variance-authority"
+import {Switch} from "./ui/switch"
+import {PrivateBadge} from "./private-badge"
+import {debounce} from "lodash"
+import {monthsList} from "@/lib/data";
+import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
+import {Prisma} from "@prisma/client"
+import {Separator} from "./ui/separator"
+import {FaEdit} from "react-icons/fa"
+import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
+import {getKanbanFromOrganizationId, getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
-import { useSession } from "next-auth/react"
-import { AttachmentsEditForm } from "./attachments-edit-form"
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
-import { ExternalContactField } from "./external-contact-field"
-import { ExternalAttachmentField } from "./external-attachment-field"
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
-import { Calendar } from "./ui/calendar"
-import { FaInfoCircle } from "react-icons/fa";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { PublicBadge } from "./public-badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import {useSession} from "next-auth/react"
+import {AttachmentsEditForm} from "./attachments-edit-form"
+import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
+import {ExternalContactField} from "./external-contact-field"
+import {ExternalAttachmentField} from "./external-attachment-field"
+import {Popover, PopoverContent, PopoverTrigger} from "./ui/popover"
+import {cn} from "@/lib/utils"
+import {format} from "date-fns"
+import {Calendar} from "./ui/calendar"
+import {FaInfoCircle} from "react-icons/fa";
+import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
+import {PublicBadge} from "./public-badge"
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "./ui/dropdown-menu"
+import MoneyInput from "@/components/money-input";
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -135,13 +136,13 @@ const editMilestoneForm = z.object({
 })
 
 export function EditMilestoneForm({
-    milestoneData,
-    onClose
-}: {
+                                      milestoneData,
+                                      onClose
+                                  }: {
     milestoneData: any
     onClose: () => void
 }) {
-    const { setMilestone } = useRoadmapStore(
+    const {setMilestone} = useRoadmapStore(
         useShallow(selector)
     )
     const {
@@ -154,7 +155,7 @@ export function EditMilestoneForm({
         addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
-    const { data: session } = useSession()
+    const {data: session} = useSession()
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -252,7 +253,7 @@ export function EditMilestoneForm({
         setMilestone(milestoneData?.nodeId, {
             nodeType,
             title,
-            ...(description !== undefined && description !== null ? { description } : undefined),
+            ...(description !== undefined && description !== null ? {description} : undefined),
             // ...(startDate.month !== undefined || startDate.year !== undefined ? {
             //     startDate: new Date(
             //         startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
@@ -267,16 +268,16 @@ export function EditMilestoneForm({
             //         1
             //     )
             // } : undefined),
-            ...(startDate ? { startDate } : undefined),
-            ...(endDate ? { endDate } : undefined),
-            ...(budget ? { budget } : undefined),
-            ...(attachments ? { attachments } : undefined),
-            ...(type ? { type } : { type: 'NOTYPE' }),
-            ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? { otherTypeDetails } : undefined),
+            ...(startDate ? {startDate} : undefined),
+            ...(endDate ? {endDate} : undefined),
+            ...(budget ? {budget} : undefined),
+            ...(attachments ? {attachments} : undefined),
+            ...(type ? {type} : {type: 'NOTYPE'}),
+            ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
-            ...(contacts ? { contacts } : undefined),
-            ...(openTo ? { openTo } : undefined)
+            ...(contacts ? {contacts} : undefined),
+            ...(openTo ? {openTo} : undefined)
         })
 
         // setTasks(unionById(tasks || [], kanbanTasks).map(task => {
@@ -342,17 +343,17 @@ export function EditMilestoneForm({
         const position = (formData.tasks?.findIndex(task => task.id === id) || 0) + 1
         const length = formData.tasks?.length || 0
 
-        return { name, position, length }
+        return {name, position, length}
     }
 
     const announcements: Announcements = {
-        onDragStart({ active }) {
+        onDragStart({active}) {
             const data = getDraggedData(active?.id.toString())
             const message = `Picked up task ${data.name} at position ${data.position} of ${data.length}`
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
             return message
         },
-        onDragOver({ active, over }) {
+        onDragOver({active, over}) {
             const activeData = getDraggedData(active?.id.toString())
 
             if (over) {
@@ -366,7 +367,7 @@ export function EditMilestoneForm({
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
             return message
         },
-        onDragEnd({ active, over }) {
+        onDragEnd({active, over}) {
             const activeData = getDraggedData(active?.id.toString())
 
             if (over) {
@@ -380,7 +381,7 @@ export function EditMilestoneForm({
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
             return message
         },
-        onDragCancel({ active }) {
+        onDragCancel({active}) {
             const activeData = getDraggedData(active?.id.toString())
             const message = `Dragging was cancelled. Task ${activeData.name} was dropped.`
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
@@ -396,20 +397,20 @@ export function EditMilestoneForm({
                     className="flex flex-col gap-8 mt-2 px-1"
                 >
                     <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={onClose}>
-                        <FaX />
+                        <FaX/>
                     </Button>
 
                     <FormItem className="w-full flex flex-row gap-4 justify-start items-center mr-10">
                         <FormLabel className="text-md mt-2">Private</FormLabel>
-                        <PrivatePublicFormField form={form} formData={formData} />
+                        <PrivatePublicFormField form={form} formData={formData}/>
                     </FormItem>
 
-                    <EditTitle form={form} />
+                    <EditTitle form={form}/>
 
                     <FormField
                         control={form.control}
                         name="nodeType"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
                                 <FormControl>
                                     <ToggleGroup
@@ -423,7 +424,7 @@ export function EditMilestoneForm({
                                         }}
                                         className="w-full flex flex-wrap gap-2 justify-between"
                                     >
-                                        {NODE_TYPE_OPTIONS.map(({ label, value, description }) => (
+                                        {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
                                             <ToggleGroupItem
                                                 key={value}
                                                 value={value}
@@ -432,7 +433,7 @@ export function EditMilestoneForm({
                                                 {label}
                                                 <Tooltip>
                                                     <TooltipTrigger>
-                                                        <FaInfoCircle />
+                                                        <FaInfoCircle/>
                                                     </TooltipTrigger>
                                                     <TooltipContent className="max-w-80 text-wrap text-left">
                                                         {description}
@@ -442,7 +443,7 @@ export function EditMilestoneForm({
                                         ))}
                                     </ToggleGroup>
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
@@ -450,7 +451,7 @@ export function EditMilestoneForm({
                     <FormField
                         control={form.control}
                         name="description"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <FormItem className="flex flex-col grow">
                                 <FormLabel
                                     className="text-2xl font-semibold leading-none tracking-tight">{`Description`}</FormLabel>
@@ -462,31 +463,32 @@ export function EditMilestoneForm({
                                         {...field}
                                     />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
 
                     <FormItem>
-                        <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
+                        <FormLabel
+                            className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
                         <FormItem className="w-full grid grid-cols-[120px_auto] gap-x-2 items-center">
                             <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
-                            <MilestoneTypeFormField form={form} />
+                            <MilestoneTypeFormField form={form}/>
 
                             {milestoneData?.node?.type === "ASSET" && (
                                 <>
                                     <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
-                                    <BudgetFormField form={form} />
+                                    <BudgetFormField form={form}/>
                                 </>
                             )}
 
                             {milestoneData?.node?.type === "PROJECT" && (
                                 <>
                                     <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
-                                    <StatusFormField form={form} />
+                                    <StatusFormField form={form}/>
 
                                     <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                    <BudgetFormField form={form} />
+                                    <BudgetFormField form={form}/>
                                 </>
                             )}
 
@@ -496,24 +498,25 @@ export function EditMilestoneForm({
                                     <StartDateFormField form={form} /> */}
 
                                     <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                    <BudgetFormField form={form} />
+                                    <BudgetFormField form={form}/>
 
                                     <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
-                                    <OpenToFormField form={form} />
+                                    <OpenToFormField form={form}/>
                                 </>
                             )}
                         </FormItem>
                     </FormItem>
 
                     {milestoneData?.node?.type === "PROJECT" && (
-                        <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"} />
+                        <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
                     )}
 
                     {milestoneData?.node?.type === "RFP" && (
-                        <TimelineFormField form={form} startLabel={"Request Opens"} endLabel={"Deadline for Proposals"} />
+                        <TimelineFormField form={form} startLabel={"Request Opens"}
+                                           endLabel={"Deadline for Proposals"}/>
                     )}
 
-                    <ContactsFormField form={form} />
+                    <ContactsFormField form={form}/>
 
                     <AttachmentsFormField
                         form={form}
@@ -539,7 +542,7 @@ export function EditMilestoneForm({
                                     Delete Milestone
                                 </Button>
                             </DialogTrigger>
-                            <DeleteMilestoneDialogContent milestoneData={milestoneData} />
+                            <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
                         </Dialog>
                         <Button
                             id="edit-milestone-scroll-area"
@@ -558,13 +561,13 @@ export function EditMilestoneForm({
     )
 }
 
-const MilestoneTypeFormField = ({ form }: { form: any }) => {
+const MilestoneTypeFormField = ({form}: { form: any }) => {
     return (
         <>
             <FormField
                 control={form.control}
                 name="type"
-                render={({ field }) => (
+                render={({field}) => (
                     <FormItem className="w-full">
                         <FormControl>
                             <Select
@@ -572,7 +575,7 @@ const MilestoneTypeFormField = ({ form }: { form: any }) => {
                                 onValueChange={field.onChange}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select a milestone type..." />
+                                    <SelectValue placeholder="Select a milestone type..."/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     {MILESTONE_TYPE_OPTIONS.map((type, index) => (
@@ -581,7 +584,7 @@ const MilestoneTypeFormField = ({ form }: { form: any }) => {
                                 </SelectContent>
                             </Select>
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage/>
                     </FormItem>
                 )}
             />
@@ -595,7 +598,7 @@ const MilestoneTypeFormField = ({ form }: { form: any }) => {
                     <FormField
                         control={form.control}
                         name="otherTypeDetails"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <FormItem className="flex flex-col grow">
                                 <FormControl>
                                     <Textarea
@@ -605,7 +608,7 @@ const MilestoneTypeFormField = ({ form }: { form: any }) => {
                                         {...field}
                                     />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
@@ -615,12 +618,12 @@ const MilestoneTypeFormField = ({ form }: { form: any }) => {
     )
 }
 
-const PrivatePublicFormField = ({ form, formData }: { form: any, formData: any }) => {
+const PrivatePublicFormField = ({form, formData}: { form: any, formData: any }) => {
     return (
         <FormField
             control={form.control}
             name="isPrivate"
-            render={({ field }) => (
+            render={({field}) => (
                 <span className="h-full items-center flex flex-row justify-end gap-4">
                     <FormControl>
                         <Switch
@@ -629,22 +632,22 @@ const PrivatePublicFormField = ({ form, formData }: { form: any, formData: any }
                         />
                     </FormControl>
                     {formData.isPrivate
-                        ? <PrivateBadge className="mt-0" />
-                        : <PublicBadge className="mt-0" />
+                        ? <PrivateBadge className="mt-0"/>
+                        : <PublicBadge className="mt-0"/>
                     }
-                    <FormMessage />
+                    <FormMessage/>
                 </span>
             )}
         />
     )
 }
 
-const StatusFormField = ({ form }: { form: any }) => {
+const StatusFormField = ({form}: { form: any }) => {
     return (
         <FormField
             control={form.control}
             name="status"
-            render={({ field }) => (
+            render={({field}) => (
                 <FormItem className="h-full flex items-center justify-end gap-4">
                     <FormControl>
                         <StatusButton
@@ -655,48 +658,27 @@ const StatusFormField = ({ form }: { form: any }) => {
                             onStatusChange={field.onChange}
                         />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage/>
                 </FormItem>
             )}
         />
     )
 }
 
-const BudgetFormField = ({ form }: { form: any }) => {
+const BudgetFormField = ({form}: { form: any }) => {
     return (
-        <FormField
-            control={form.control}
+        <MoneyInput
+            form={form}
             name="budget"
-            render={({ field }) => (
-                // <FormItem className="h-full flex items-center justify-end gap-4">
-                <>
-                    <FormControl className="grow w-full h-full">
-                        <Input
-                            className="h-full"
-                            id="budget"
-                            type="number"
-                            defaultValue={field.value}
-                            onChange={e =>
-                                field.onChange(
-                                    Number(e.target.value)
-                                )
-                            }
-                            variant={"currency"}
-                        />
-                    </FormControl>
-                    <FormMessage />
-                </>
-                // </FormItem>
-            )}
         />
     )
 }
 
 const TimelineFormField = ({
-    form,
-    startLabel,
-    endLabel
-}: {
+                               form,
+                               startLabel,
+                               endLabel
+                           }: {
     form: any,
     startLabel?: string,
     endLabel?: string
@@ -706,12 +688,13 @@ const TimelineFormField = ({
             <FormLabel
                 className="text-2xl font-semibold leading-none tracking-tight">{`Timeline`}</FormLabel>
 
-            <FormItem className="w-full grid grid-rows[auto_auto] grid-cols-[120px_120px_auto] space-y-0 gap-2 items-center">
+            <FormItem
+                className="w-full grid grid-rows[auto_auto] grid-cols-[120px_120px_auto] space-y-0 gap-2 items-center">
                 <FormLabel className="text-md h-fit w-fit">{startLabel ? startLabel : `Start`}</FormLabel>
                 <FormField
                     control={form.control}
                     name="startDate"
-                    render={({ field }) => (
+                    render={({field}) => (
                         <FormItem className="h-[40px]">
                             <Select
                                 defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
@@ -724,7 +707,7 @@ const TimelineFormField = ({
                             >
                                 <FormControl>
                                     <SelectTrigger className="h-[40px]">
-                                        <SelectValue placeholder="Select a month" />
+                                        <SelectValue placeholder="Select a month"/>
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
@@ -750,7 +733,7 @@ const TimelineFormField = ({
                 <FormField
                     control={form.control}
                     name="startDate"
-                    render={({ field }) => (
+                    render={({field}) => (
                         <FormItem className="h-[40px]">
                             <Input
                                 className="h-[40px]"
@@ -772,7 +755,7 @@ const TimelineFormField = ({
                 <FormField
                     control={form.control}
                     name="endDate"
-                    render={({ field }) => (
+                    render={({field}) => (
                         <FormItem className="h-[40px]">
                             <Select
                                 defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
@@ -785,7 +768,7 @@ const TimelineFormField = ({
                             >
                                 <FormControl>
                                     <SelectTrigger className="h-[40px]">
-                                        <SelectValue placeholder="Select a month" />
+                                        <SelectValue placeholder="Select a month"/>
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
@@ -811,7 +794,7 @@ const TimelineFormField = ({
                 <FormField
                     control={form.control}
                     name="endDate"
-                    render={({ field }) => (
+                    render={({field}) => (
                         <FormItem className="h-[40px]">
                             <Input
                                 className="h-[40px]"
@@ -828,19 +811,19 @@ const TimelineFormField = ({
                         </FormItem>
                     )}
                 />
-                <FormMessage />
+                <FormMessage/>
             </FormItem>
         </span>
     )
 }
 
-const StartDateFormField = ({ form }: { form: any }) => {
+const StartDateFormField = ({form}: { form: any }) => {
     return (
         <FormField
             control={form.control}
             name="startDate"
-            render={({ field }) => (
-                <Popover >
+            render={({field}) => (
+                <Popover>
                     <PopoverTrigger asChild>
                         <Button
                             variant={"outline"}
@@ -849,7 +832,7 @@ const StartDateFormField = ({ form }: { form: any }) => {
                                 !field.value && "text-muted-foreground"
                             )}
                         >
-                            <FaCalendar className="mr-2 h-4 w-4" />
+                            <FaCalendar className="mr-2 h-4 w-4"/>
                             {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                         </Button>
                     </PopoverTrigger>
@@ -867,12 +850,12 @@ const StartDateFormField = ({ form }: { form: any }) => {
     )
 }
 
-const OpenToFormField = ({ form }: { form: any }) => {
+const OpenToFormField = ({form}: { form: any }) => {
     return (
         <FormField
             control={form.control}
             name="openTo"
-            render={({ field }) => (
+            render={({field}) => (
                 <ToggleGroup
                     type="multiple"
                     variant="outline"
@@ -911,12 +894,12 @@ const OpenToFormField = ({ form }: { form: any }) => {
 }
 
 const TasksFormField = ({
-    form,
-    formData,
-    announcements,
-    sensors,
-    milestoneData
-}: {
+                            form,
+                            formData,
+                            announcements,
+                            sensors,
+                            milestoneData
+                        }: {
     form: any,
     // formData: z.infer<typeof editMilestoneForm>,
     formData: any,
@@ -947,11 +930,12 @@ const TasksFormField = ({
         <FormField
             control={form.control}
             name="tasks"
-            render={({ field }) => (
+            render={({field}) => (
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <>
-                            <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Tasks`}</FormLabel>
+                            <FormLabel
+                                className="text-2xl font-semibold leading-none tracking-tight">{`Tasks`}</FormLabel>
                             <DndContext
                                 accessibility={{
                                     announcements
@@ -959,7 +943,7 @@ const TasksFormField = ({
                                 collisionDetection={closestCorners}
                                 sensors={sensors}
                                 onDragEnd={(event) => {
-                                    const { active, over } = event
+                                    const {active, over} = event
 
                                     if (active.id === over?.id) return
 
@@ -1053,7 +1037,7 @@ const TasksFormField = ({
                                             return ({
                                                 ...t,
                                                 milestoneId: milestoneData?.id,
-                                                milestone: { id: milestoneData?.id }
+                                                milestone: {id: milestoneData?.id}
                                             })
                                         }
                                         return t
@@ -1082,7 +1066,7 @@ const TasksFormField = ({
                                                 const updatedTasks = [...form.getValues().tasks || [], {
                                                     ...newTask,
                                                     milestoneId: milestoneData?.id,
-                                                    milestone: { id: milestoneData?.id }
+                                                    milestone: {id: milestoneData?.id}
                                                 }]
                                                 form.setValue('tasks', updatedTasks)
                                             }
@@ -1104,13 +1088,13 @@ const TasksFormField = ({
                                     // }
                                     const newTasks = await setTasks([
                                         ...kanbanTasks,
-                                        { ...newTask, milestoneId: milestoneData?.id, milestone: { id: milestoneData?.id } }
+                                        {...newTask, milestoneId: milestoneData?.id, milestone: {id: milestoneData?.id}}
                                     ].map(t => {
                                         if (t.id === newTask?.id) {
                                             return ({
                                                 ...t,
                                                 milestoneId: milestoneData?.id,
-                                                milestone: { id: milestoneData?.id }
+                                                milestone: {id: milestoneData?.id}
                                             })
                                         }
                                         return t
@@ -1122,23 +1106,24 @@ const TasksFormField = ({
                             </Button>
                         </>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage/>
                 </FormItem>
             )}
         />
     )
 }
 
-export function AttachmentsFormField({ form, attachments }: { form: UseFormReturn<any>, attachments: AttachmentType[] }) {
+export function AttachmentsFormField({form, attachments}: { form: UseFormReturn<any>, attachments: AttachmentType[] }) {
     return (
         <FormField
             control={form.control}
             name="attachments"
-            render={({ field }) => (
+            render={({field}) => (
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <>
-                            <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Attachments`}</FormLabel>
+                            <FormLabel
+                                className="text-2xl font-semibold leading-none tracking-tight">{`Attachments`}</FormLabel>
                             {field.value && field.value.length > 0 && (
                                 <ol className="flex flex-col gap-2">
                                     {field.value.map((paper: AttachmentType, index: number) => (
@@ -1168,25 +1153,25 @@ export function AttachmentsFormField({ form, attachments }: { form: UseFormRetur
                                     e.preventDefault()
                                     form.setValue("attachments", [
                                         ...(field?.value || []),
-                                        { name: '', link: '' }
+                                        {name: '', link: ''}
                                     ])
                                 }}
                             >{`Add an attachment`}</Button>
                         </>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage/>
                 </FormItem>
             )}
         />
     )
 }
 
-const ContactsFormField = ({ form }: { form: any }) => {
+const ContactsFormField = ({form}: { form: any }) => {
     return (
         <FormField
             control={form.control}
             name="contacts"
-            render={({ field }) => (
+            render={({field}) => (
                 <FormItem>
                     <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Contacts`}</FormLabel>
                     {field?.value && field.value.length > 0 && (
@@ -1219,7 +1204,7 @@ const ContactsFormField = ({ form }: { form: any }) => {
                             e.preventDefault()
                             form.setValue("contacts", [
                                 ...(field.value || []),
-                                { name: "", email: "", role: null }
+                                {name: "", email: "", role: null}
                             ])
                         }}
                     >{`Add a contact`}</Button>
@@ -1229,7 +1214,7 @@ const ContactsFormField = ({ form }: { form: any }) => {
     )
 }
 
-const EditTitle = ({ form }: { form: any }) => {
+const EditTitle = ({form}: { form: any }) => {
     const contentRef = useRef<HTMLHeadingElement>(null);
 
     const handleInput = (e: React.FormEvent<HTMLHeadingElement>) => {
@@ -1256,7 +1241,7 @@ const EditTitle = ({ form }: { form: any }) => {
         <FormField
             control={form.control}
             name="title"
-            render={({ field }) => (
+            render={({field}) => (
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         {/* <Textarea
@@ -1266,7 +1251,8 @@ const EditTitle = ({ form }: { form: any }) => {
                             defaultValue={field.value}
                             {...field}
                         /> */}
-                        <span className="flex flex-row gap-2 items-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" >
+                        <span
+                            className="flex flex-row gap-2 items-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                             <h1
                                 id="title"
                                 ref={contentRef}
@@ -1279,14 +1265,14 @@ const EditTitle = ({ form }: { form: any }) => {
                             </h1>
                         </span>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage/>
                 </FormItem>
             )}
         />
     );
 };
 
-const LinkTask = ({ milestoneId, kanbanTasks, onLink }: {
+const LinkTask = ({milestoneId, kanbanTasks, onLink}: {
     milestoneId: string,
     kanbanTasks: any[],
     onLink: (id: string) => void
@@ -1302,7 +1288,7 @@ const LinkTask = ({ milestoneId, kanbanTasks, onLink }: {
                 }}
             >
                 <SelectTrigger className="w-full">
-                    <SelectValue placeholder={'Select a task'} />
+                    <SelectValue placeholder={'Select a task'}/>
                 </SelectTrigger>
                 <SelectContent>
                     {kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).map(task => (
@@ -1331,14 +1317,14 @@ const LinkTask = ({ milestoneId, kanbanTasks, onLink }: {
 }
 
 const TaskField = ({
-    index,
-    task,
-    onUnlink,
-    onDelete,
-    onNameChange,
-    onColumnChange,
-    kanbanColumns,
-}: {
+                       index,
+                       task,
+                       onUnlink,
+                       onDelete,
+                       onNameChange,
+                       onColumnChange,
+                       kanbanColumns,
+                   }: {
     index: number
     task: TaskType
     onUnlink: () => void
@@ -1354,7 +1340,7 @@ const TaskField = ({
         transform,
         transition,
         isDragging
-    } = useSortable({ id: task.id || "" })
+    } = useSortable({id: task.id || ""})
     const style = {
         transition,
         transform: CSS.Translate.toString(transform)
@@ -1407,18 +1393,18 @@ const TaskField = ({
                 className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
             >
                 <span className="sr-only">Move task</span>
-                <GripVertical />
+                <GripVertical/>
             </Button>
 
             {/* select kanban column */}
             <Select onValueChange={(value: string) => columnChanged(value)} value={task.columnId}>
                 <SelectTrigger className="w-[100px]">
-                    <SelectValue className="text-left" />
+                    <SelectValue className="text-left"/>
                 </SelectTrigger>
                 <SelectContent>
                     {kanbanColumns.map(column => (
-                        <SelectItem 
-                            key={column.id} 
+                        <SelectItem
+                            key={column.id}
                             value={column.id}
                             // defaultValue={column.id}
                         >
@@ -1442,16 +1428,16 @@ const TaskField = ({
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button size="icon" variant="secondary">
-                        <FaEllipsis />
+                        <FaEllipsis/>
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="left">
                     <DropdownMenuItem onClick={deleteTask}>
-                        <FaTrash />
+                        <FaTrash/>
                         Delete task
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={unlinkTask}>
-                        <FaLinkSlash />
+                        <FaLinkSlash/>
                         Unlink from milestone
                     </DropdownMenuItem>
                 </DropdownMenuContent>
