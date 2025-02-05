@@ -155,7 +155,7 @@ export function Roadmap({data}: {data: any}) {
 
                         <ResizablePanel
                             defaultSize={defaultLayout[1]}
-                            minSize={30}
+                            minSize={50}
                             className="h-full flex flex-col"
                         >
                             <MilestoneDetailsPanel
