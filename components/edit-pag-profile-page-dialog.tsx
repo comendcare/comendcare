@@ -93,9 +93,7 @@ const editOrgFormSchema = z.object({
     }),
     looking: z.array(optionSchema).min(0).optional(),
     founded: z.string().optional(),
-    description: z.string().min(2, {
-        message: "Your organization's description must be at least 2 characters long.",
-    }).max(500, {
+    description: z.string().max(500, {
         message: "Your organization's description must less than 500 characters long.",
     }).optional(),
     website: z.string().min(2, {
