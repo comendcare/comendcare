@@ -8,9 +8,8 @@ import {
     useReactFlow,
     useStoreApi,
     applyNodeChanges,
-    useOnSelectionChange,
 } from "@xyflow/react"
-import type { ConnectionState, Edge, FinalConnectionState, Node, NodeChange } from "@xyflow/react"
+import type { Edge, Node, NodeChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
 
 import "@xyflow/react/dist/base.css"
@@ -33,18 +32,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { toast } from "sonner"
 import { isOnboarded, setOnboarded} from "@/lib/utils"
-import { ScrollArea } from "./ui/scroll-area"
-import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { CheckBubble } from "./check-bubble"
-import { templateMilestones } from "@/lib/templates"
 import { debounce } from "lodash"
 import { CustomEdge } from "./custom-edge"
-import { Badge } from "./ui/badge"
-import { NODE_TYPE_OPTIONS } from "@/lib/types"
-import { MilestoneTemplateCard } from "./milestone-template-card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { FaInfoCircle } from "react-icons/fa";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { MilestoneTemplateTabs } from "./roadmap-templates"
 
 const proOptions = { hideAttribution: true }
@@ -100,43 +89,16 @@ export const PrivateFlowView = ({
     const [localNodes, setLocalNodes] = useState(nodes)
     const [localEdges, setLocalEdges] = useState(edges)
 
-    // const handleEditClick = (event: React.MouseEvent, node: Node) => {
-    //     setSelectedNodeId(node.id)
+    const handleEditClick = (event: React.MouseEvent, node: Node) => {
+        setSelectedNodeId(node.id)
 
-    //     const params = new URLSearchParams(searchParams.toString())
-    //     params.delete("milestone")
-    //     params.set("milestone", node.id)
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete("milestone")
+        params.set("milestone", node.id)
 
-    //     // router.push(`${pathname}?${params.toString()}`, { scroll: false })
-    //     router.replace(`${pathname}?${params.toString()}`)
-    // }
-
-    // the passed handler has to be memoized, otherwise the hook will not work correctly
-    const onChange = useCallback(({ nodes }: { nodes: Node[]}) => {
-        console.log(`GOT HERE`)
-        console.log(`nodes`, nodes)
-        if (nodes && nodes.length > 0) {
-            setSelectedNodeId(nodes[0].id)
-
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete("milestone")
-            params.set("milestone", nodes[0].id)
-    
-            // router.push(`${pathname}?${params.toString()}`, { scroll: false })
-            router.replace(`${pathname}?${params.toString()}`)
-        }
-    }, []);
-    
-    useOnSelectionChange({
-        onChange,
-    });
-
-    // const handleDeselect = (event: React.MouseEvent, node: Node) => {
-    //     setSelectedNodeId(null)
-    //     const params = new URLSearchParams(searchParams.toString())
-    //     params.delete("milestone")
-    //     router.replace(`${pathname}?${params.toString()}`)
-    // }
+        // router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        router.replace(`${pathname}?${params.toString()}`)
+    }
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes)
@@ -268,16 +230,6 @@ export const PrivateFlowView = ({
         ...node,
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
-            // handleEditClick: (nodeId: string) => {
-            //     setSelectedNodeId(nodeId)
-
-            //     const params = new URLSearchParams(searchParams.toString())
-            //     params.delete("milestone")
-            //     params.set("milestone", nodeId)
-        
-            //     // router.push(`${pathname}?${params.toString()}`, { scroll: false })
-            //     router.replace(`${pathname}?${params.toString()}`)
-            // },
             handleDelete: (nodeId: string) => {
                 const nodesList = localNodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
                 const edgesList = edges.filter((edge: Edge) => edge.source === nodeId || edge.target === nodeId)
@@ -312,7 +264,7 @@ export const PrivateFlowView = ({
             if (selectedNodeId) {
                 fitView({ nodes: [{ id: selectedNodeId }], padding: 2 })
             } else {
-                fitView({ padding: 2 })
+                fitView({ nodes: localNodes.map(node => ({ id: node.id })), padding: 0.4 })
             }
         }, 1) // Delay by a short time to allow layout adjustment
 
@@ -331,23 +283,13 @@ export const PrivateFlowView = ({
         toast.dismiss()
     }
 
-    // const [selectedNodes, setSelectedNodes] = useState([]);
-    // const [selectedEdges, setSelectedEdges] = useState([]);
-
-    // // the passed handler has to be memoized, otherwise the hook will not work correctly
-    // const onChange = useCallback(({ nodes, edges }) => {
-    //     setSelectedNodes(nodes.map((node) => node.id));
-    //     setSelectedEdges(edges.map((edge) => edge.id));
-    // }, []);
-
     return (
         <>
         <ReactFlow
             width={width}
             nodes={updatedNodes}
             edges={updatedEdges}
-            // onNodeClick={handleSelect}
-            selectNodesOnDrag={false}
+            onNodeClick={handleEditClick}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
@@ -359,8 +301,7 @@ export const PrivateFlowView = ({
             fitViewOptions={{ padding: 2 }}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
-            // maxZoom={5}
-            // minZoom={0.1}
+            minZoom={0.1}
         >
             <MiniMap
                 nodeColor='#757575'
