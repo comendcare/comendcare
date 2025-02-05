@@ -264,7 +264,7 @@ export const PrivateFlowView = ({
             if (selectedNodeId) {
                 fitView({ nodes: [{ id: selectedNodeId }], padding: 2 })
             } else {
-                fitView({ padding: 2 })
+                fitView({ nodes: localNodes.map(node => ({ id: node.id })), padding: 0.4 })
             }
         }, 1) // Delay by a short time to allow layout adjustment
 
