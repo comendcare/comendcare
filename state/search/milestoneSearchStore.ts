@@ -32,10 +32,17 @@ function generateFiltersString(filters: FiltersType, strategy: "add" | "sub") {
     console.log(`form filters`, filtersList)
 
     // addative filters
+    // if (filters.milestoneTypes.length > 0) {
+    //     filters.milestoneTypes.forEach(type => {
+    //         filtersList.push(`types:=${type.value}`)
+    //         typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}types:=${type.value}`)
+    //     })
+    // }
+
     if (filters.milestoneTypes.length > 0) {
         filters.milestoneTypes.forEach(type => {
-            filtersList.push(`type:=${type.value}`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? strategyString : '('}type:=${type.value}`)
+            filtersList.push(`types:=[${type}]`)
+            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}types:=[${type}]`)
         })
     }
 

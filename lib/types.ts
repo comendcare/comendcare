@@ -308,7 +308,6 @@ export const MILESTONE_TYPE_OPTIONS: Option[] = [
     { label: 'IND submission', value: 'INDSUBMISSION' },
     { label: 'IND approval', value: 'INDAPPROVAL' },
     { label: 'Other', value: 'OTHER' },
-    { label: 'No type', value: 'NOTYPE'}
 ]
 
 export type StatusType = 'PLANNED' | 'INPROGRESS' | 'COMPLETED'

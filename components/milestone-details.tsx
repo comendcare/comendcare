@@ -47,11 +47,11 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                         <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone.node.type))?.value || "PROJECT"}/>
                     )}
 
-                    {milestone.type && milestone.type !== 'NOTYPE' && (
-                        <Badge className="flex text-sm h-[30px] w-fit">
-                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestone.type))?.label || "No type"}
+                    {(milestone.types || []).map((type: string, index: number) => (
+                        <Badge className="flex text-sm h-[30px] w-fit" key={index}>
+                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === type))?.label || "No type"}
                         </Badge>
-                    )}
+                    ))}
 
                     <CardDescription className="text-base">
                         {milestone.description}

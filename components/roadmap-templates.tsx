@@ -47,7 +47,7 @@ export default function RoadmapTemplates() {
                 data: {
                     id: nanoid(),
                     nodeId: id,
-                    type: defaultData?.type || 'NOTYPE',
+                    types: defaultData?.types || [],
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     status: defaultData?.status || "PLANNED"
