@@ -192,7 +192,7 @@ model Milestone {
   endDate          DateTime?
   startDate        DateTime?
   private          Boolean              @default(true)
-  type             String?              @default("NOTYPE")
+  types            String[]             @default([])
   otherTypeDetails String?
   openTo           String[]
   tasks            Task[]

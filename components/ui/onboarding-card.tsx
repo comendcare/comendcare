@@ -11,6 +11,7 @@ import { nanoid } from "nanoid"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { types } from "node:util"
 
 const selector = (state: RoadmapState) => ({
     setOnboardingActive: state.setOnboardingActive,
@@ -85,7 +86,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
             },
             data: {
                 id: nanoid(),
-                type: 'NOTYPE',
+                types: [],
                 nodeId: id,
                 title: `New Milestone`,
                 status: "PLANNED"

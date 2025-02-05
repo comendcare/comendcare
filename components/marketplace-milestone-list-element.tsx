@@ -25,9 +25,11 @@ export function MilestoneMarketplaceListElement({ milestone }: { milestone: any 
                 <CardDescription>{milestone.description}</CardDescription>
             </CardHeader>
             <CardContent className="w-full flex flex-row gap-4 flex-wrap">
-                <Badge className="flex text-sm">
-                    {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestone.type))?.label || "No type"}
-                </Badge>
+                {(milestone?.types || []).map((type: any) => (
+                    <Badge className="flex text-sm">
+                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === type))?.label || "No type"}
+                    </Badge>
+                ))}
                 
                 {(startDate?.getMonth() || endDate?.getFullYear()) && (
                     <DateView startDate={startDate} endDate={endDate}/>

@@ -81,10 +81,17 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import {PublicBadge} from "./public-badge"
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "./ui/dropdown-menu"
 import MoneyInput from "@/components/money-input";
+import MultipleSelector from "./ui/multiple-selector"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 type TaskType = Prisma.TaskGetPayload<{}>
+
+export const optionSchema = z.object({
+    label: z.string(),
+    value: z.string(),
+    // disable: z.boolean().optional(),
+});
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
@@ -114,7 +121,7 @@ const editMilestoneForm = z.object({
         .string()
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
-    type: z.string(),
+    types: z.array(optionSchema).optional(),
     otherTypeDetails: z.string().optional(),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
@@ -164,7 +171,7 @@ export function EditMilestoneForm({
             nodeType: milestoneData?.node.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            type: milestoneData?.type || "NOTYPE",
+            types: (milestoneData?.types || []).map((type: any) => MILESTONE_TYPE_OPTIONS.find(option => option?.value === type) || {label: 'Unknown', value: "UNKNOWN"}),
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
             startDate: milestoneData?.startDate,
             endDate: milestoneData?.endDate,
@@ -190,7 +197,7 @@ export function EditMilestoneForm({
         nodeType: form.watch("nodeType"),
         title: form.watch("title"),
         description: form.watch("description"),
-        type: form.watch("type"),
+        types: form.watch("types"),
         otherTypeDetails: form.watch("otherTypeDetails"),
         startDate: form.watch("startDate"),
         endDate: form.watch("endDate"),
@@ -237,7 +244,7 @@ export function EditMilestoneForm({
             nodeType,
             title,
             description,
-            type,
+            types,
             otherTypeDetails,
             startDate,
             endDate,
@@ -272,7 +279,7 @@ export function EditMilestoneForm({
             ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
             ...(attachments ? {attachments} : undefined),
-            ...(type ? {type} : {type: 'NOTYPE'}),
+            ...(types ? { types: types.map(t => t?.value) } : undefined),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
@@ -566,11 +573,11 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
         <>
             <FormField
                 control={form.control}
-                name="type"
+                name="types"
                 render={({field}) => (
                     <FormItem className="w-full">
                         <FormControl>
-                            <Select
+                            {/* <Select
                                 defaultValue={field.value}
                                 onValueChange={field.onChange}
                             >
@@ -582,7 +589,18 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                                         <SelectItem key={index} value={type.value}>{type.label}</SelectItem>
                                     ))}
                                 </SelectContent>
-                            </Select>
+                            </Select> */}
+                            <MultipleSelector
+                                {...field}
+                                defaultOptions={MILESTONE_TYPE_OPTIONS}
+                                hidePlaceholderWhenSelected={true}
+                                placeholder="Select a milestone type..."
+                                emptyIndicator={
+                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                        no results found.
+                                    </p>
+                                }
+                            />
                         </FormControl>
                         <FormMessage/>
                     </FormItem>
