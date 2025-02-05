@@ -59,11 +59,18 @@ export interface TaskType {
     status: StatusType
 }
 
+const selector = (state: RoadmapState) => ({
+    selectedNodeId: state.selectedNodeId,
+    nodes: state.nodes,
+    edges: state.edges,
+    onEdgesChange: state.onEdgesChange,
+})
+
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
-    // const handleEditClick = () => {
-    //     props.data?.handleEditClick(props?.id)
-    // }
-    
+    const {
+        selectedNodeId,
+    } = useRoadmapStore(useShallow(selector))
+
     const handleDeleteClick = () => {
         props.data?.handleDelete(props?.id)
     }
@@ -73,25 +80,26 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     }
 
     return (
-        <Card className={cn("w-[350px] text-wrap break-words", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", props.selected ? "border-black border-2" : "")}>
+        <Card className={cn("w-[350px] text-wrap break-words", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", selectedNodeId === props?.id ? "border-black border-2" : "")}>
             <CardHeader>
                 <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
                     <TypeBadge type={props.type}/>
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
+                                onClick={(e) => e.stopPropagation()}
                                 variant="ghost"
-                                className="p-2 h-auto justify-end h-full"
+                                className="p-2 h-auto justify-end h-full z-20"
                             >
                                 <FaEllipsis />
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-40">
+                        <PopoverContent className="w-40 z-20">
                             <Card className="p-0 m-0">
                                 <CardContent className="p-2 m-0 flex flex-col gap-0">
                                     <Button 
                                         onClick={(e) => {
-                                            e.preventDefault()
+                                            e.stopPropagation()
                                             handleDeleteClick()
                                         }}
                                         variant="ghost"
@@ -100,7 +108,10 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                                         Delete
                                     </Button>
                                     <Button 
-                                        onClick={handleDuplicate}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleDuplicate()
+                                        }}
                                         variant="ghost"
                                         className="w-full h-full justify-start text-xl"
                                     >
@@ -134,12 +145,6 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
         </Card> 
     )
 }
-
-const selector = (state: RoadmapState) => ({
-    nodes: state.nodes,
-    edges: state.edges,
-    onEdgesChange: state.onEdgesChange,
-})
 
 export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilestoneNode> }) => {
     const [isHovering, setIsHovering] = useState(false)
