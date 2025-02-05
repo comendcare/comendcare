@@ -15,8 +15,6 @@ import { useShallow } from "zustand/react/shallow"
 import "@xyflow/react/dist/base.css"
 
 import PrivateMilestoneNode from "@/components/private-milestone-node"
-import PrivateAssetNode from "@/components/private-asset-node"
-import PrivateProjectNode from "@/components/private-project-node"
 import { Button } from "./ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
@@ -188,7 +186,7 @@ export const PrivateFlowView = ({
             const id = nanoid()
             const newNode: Node = {
                 id: id,
-                type: defaultData?.nodeType || "PROJECT",
+                type: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
                 position: {
                     x: centerX,
                     y: centerY

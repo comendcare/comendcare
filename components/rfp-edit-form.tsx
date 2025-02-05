@@ -33,7 +33,7 @@ type RFPType = Prisma.RFPGetPayload<{
     omit: { id: true, createdAt: true, updatedAt: true, researchFocus: true }
     include: { 
         contacts: { 
-            select: { name: true, role: true, email: true } 
+            select: { name: true, role: true, email: true, affiliation: true } 
         }, 
         attachments: {
             select: { name: true, link: true }
@@ -203,7 +203,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                 />
                             </FormItem>
 
-                            <FormItem className="w-full grid grid-cols-[80px_auto] items-center gap-4">
+                            {/* <FormItem className="w-full grid grid-cols-[80px_auto] items-center gap-4">
                                 <FormLabel className="text-md">{`Open to`}</FormLabel>
                                 <FormField 
                                     control={form.control}
@@ -224,7 +224,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                         </Select>
                                     )}
                                 />
-                            </FormItem>
+                            </FormItem> */}
 
                             <FormItem className="w-full grid grid-cols-[80px_auto] items-center gap-4">
                                 <FormLabel className="text-md">{`Start`}</FormLabel>
@@ -317,7 +317,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                 description: null,
                                 contacts: [],
                                 attachments: [],
-                                openTo: 'ALL',
+                                openTo: [],
                                 startDate: null,
                                 endDate: null
                             })
