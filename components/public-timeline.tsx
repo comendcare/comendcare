@@ -6,6 +6,7 @@ import {PrivateBadge} from "./private-badge"
 import {FaArrowUpRightFromSquare} from "react-icons/fa6"
 import { TypeBadge } from "./private-milestone-node"
 import { cn } from "@/lib/utils"
+import { Card, CardContent } from "./ui/card"
 
 export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
     roadmap: any,

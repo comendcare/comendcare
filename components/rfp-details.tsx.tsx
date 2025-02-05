@@ -46,15 +46,15 @@ const Details = ({ rfp }: { rfp: MilestoneType }) => {
     )
 }
 
-export function RFPDetails({ rfp }: { rfp: MilestoneType }) {
+export function RFPDetails({ rfp, isPublic }: { rfp: MilestoneType, isPublic: boolean }) {
     return (
         <HoverCard
             key={rfp?.id}
             openDelay={0}
             closeDelay={0}
         >
-            <HoverCardTrigger asChild>
-                <a href={"#"}>
+            {/* <HoverCardTrigger asChild> */}
+                <a href={isPublic ? `/research-plan?milestone=${rfp?.id}&view=flow` : `/app/research-plan?milestone=${rfp?.nodeId || rfp?.node?.id}`}>
                     <li
                         key={rfp?.id}
                         className="w-full flex items-center justify-between space-x-4 py-2 text-wrap"
@@ -71,8 +71,8 @@ export function RFPDetails({ rfp }: { rfp: MilestoneType }) {
                         </div>
                     </li>
                 </a>
-            </HoverCardTrigger>
-            <HoverCardContent
+            {/* </HoverCardTrigger> */}
+            {/* <HoverCardContent
                 side="top"
                 className="w-80"
             >
@@ -84,7 +84,7 @@ export function RFPDetails({ rfp }: { rfp: MilestoneType }) {
                         </p>
                     </div>
                 </div>
-            </HoverCardContent>
+            </HoverCardContent> */}
         </HoverCard>
 
 

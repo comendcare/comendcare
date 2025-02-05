@@ -37,15 +37,15 @@ type MilestoneType = Prisma.MilestoneGetPayload<{
     }
 }>
 
-export function AssetDetails({ asset }: { asset: MilestoneType }) {
+export function AssetDetails({ asset, isPublic }: { asset: MilestoneType, isPublic: boolean }) {
     return (
         <HoverCard
             key={asset?.id}
             openDelay={0}
             closeDelay={0}
         >
-            <HoverCardTrigger asChild>
-                <a href={"#"}>
+            {/* <HoverCardTrigger asChild> */}
+                <a href={isPublic ? `/research-plan?milestone=${asset?.id}&view=flow` : `/app/research-plan?milestone=${asset?.nodeId || asset?.node?.id}`}>
                     <li
                         key={asset?.id}
                         className="w-full flex items-center justify-between space-x-4 py-2"
@@ -90,8 +90,8 @@ export function AssetDetails({ asset }: { asset: MilestoneType }) {
                         </div>
                     </li>
                 </a>
-            </HoverCardTrigger>
-            <HoverCardContent
+            {/* </HoverCardTrigger> */}
+            {/* <HoverCardContent
                 side="top"
                 className="w-80"
             >
@@ -103,7 +103,7 @@ export function AssetDetails({ asset }: { asset: MilestoneType }) {
                         </p>
                     </div>
                 </div>
-            </HoverCardContent>
+            </HoverCardContent> */}
         </HoverCard>
     )
 }

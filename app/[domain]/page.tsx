@@ -3,7 +3,7 @@ import {notFound} from "next/navigation"
 import BlogCard from "@/components/blog-card"
 import {getRoadmapsForOrganization, getOrganizationData, getConditionsDataFromOrgId} from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {PublicRoadmapCard} from "@/components/public-roadmap-card";
+import {RoadmapCard} from "@/components/public-roadmap-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
@@ -120,9 +120,10 @@ export default async function OrganizationHomePage({
                                 // rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
                             />
                             {roadmaps.length > 0 ?
-                                <PublicRoadmapCard
+                                <RoadmapCard
                                     roadmap={roadmaps?.[0]}
                                     subdomain={organization?.subdomain || undefined}
+                                    isPublic={true}
                                 />
                                 : <Card>
                                     <CardContent>
@@ -135,7 +136,7 @@ export default async function OrganizationHomePage({
                                                 height={400}
                                             />
                                             <p className="text-lg text-stone-500">
-                                                {`${organization.name} doesn't have a roadmap yet.`}
+                                                {`${organization.name} doesn't have a research plan yet.`}
                                             </p>
                                         </div>
                                     </CardContent>
