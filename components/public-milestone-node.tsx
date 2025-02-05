@@ -22,7 +22,7 @@ export type PublicMilestoneNode = Node<
         nodeId: string
         title: string
         description?: string
-        type?: string,
+        types?: string[],
         startDate?: Date,
         endDate?: Date,
         budget?: number

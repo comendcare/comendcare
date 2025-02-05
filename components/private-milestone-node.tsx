@@ -32,7 +32,7 @@ export type PrivateMilestoneNode = Node<
         node: any
         title: string
         description?: string
-        type?: string,
+        types?: string[],
         startDate?: Date,
         endDate?: Date,
         budget?: number
@@ -254,9 +254,11 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                 )}
             </ul>
             <span className="w-full flex gap-2 flex-wrap text-wrap">
-                <Badge className="flex text-sm">
-                    {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
-                </Badge>
+                {(props?.data?.types || []).map((milestoneType, index) => (
+                    <Badge className="flex text-sm" key={index}>
+                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                    </Badge>
+                ))}
                 <StatusButton
                     className="rounded-full h-8"
                     disabled={true}

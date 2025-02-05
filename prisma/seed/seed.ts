@@ -714,7 +714,7 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'COMPLETED',
-            type: 'NATURALHISTORYSTUDY'
+            types: ['NATURALHISTORYSTUDY']
         },
         {
             title: 'Literature Review',
@@ -725,7 +725,7 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'COMPLETED',
-            type: 'LITERATUREREVIEW'
+            types: ['LITERATUREREVIEW']
         },
         {
             title: 'Identify Existing Disease Models',
@@ -736,7 +736,7 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'INPROGRESS',
-            type: 'OTHERANIMALMODEL'
+            types: ['OTHERANIMALMODEL']
         },
         {
             title: 'Construct Mouse Models',
@@ -746,7 +746,7 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'INPROGRESS',
-            type: 'MOUSEMODEL'
+            types: ['MOUSEMODEL']
         },
         {
             title: 'Construct Patient-Derived Cells',
@@ -756,7 +756,7 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'INPROGRESS',
-            type: 'PATIENTDERIVEDCELLLINE'
+            types: ['PATIENTDERIVEDCELLLINE']
         },
         {
             title: 'Design ASO Construct',
@@ -766,7 +766,7 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'COMPLETED',
-            type: 'CONSTRUCTDESIGN'
+            types: ['CONSTRUCTDESIGN']
         },
         {
             title: 'Produce Plasmid',
@@ -776,7 +776,7 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'PLANNED',
-            type: 'PLASMIDPRODUCTION'
+            types: ['PLASMIDPRODUCTION']
         },
         {
             title: 'Proof-Of-Concept Study',
@@ -786,7 +786,7 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'PLANNED',
-            type: 'PROOFOFCONCEPT'
+            types: ['PROOFOFCONCEPT']
         },
         {
             title: 'Animal Toxicology Study',
@@ -796,7 +796,7 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'PLANNED',
-            type: 'TOXICOLOGY'
+            types: ['TOXICOLOGY']
         }
     ]
 };
@@ -927,7 +927,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
                                 ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
                                 ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                type: milestone.type,
+                                types: milestone.types || [],
                                 private: milestone.private || false
                             }
                         }
