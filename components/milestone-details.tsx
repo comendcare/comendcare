@@ -47,8 +47,8 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                         <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone.node.type))?.value || "PROJECT"}/>
                     )}
 
-                    {(milestone.types || []).map((type: string) => (
-                        <Badge className="flex text-sm h-[30px] w-fit">
+                    {(milestone.types || []).map((type: string, index: number) => (
+                        <Badge className="flex text-sm h-[30px] w-fit" key={index}>
                             {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === type))?.label || "No type"}
                         </Badge>
                     ))}
