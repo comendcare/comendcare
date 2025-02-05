@@ -210,7 +210,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                     <div className="flex flex-col space-y-4">
                         <span className="flex gap-2">
                             <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                {`Requests for Proposal`}
+                                {`Requests for Proposals`}
                             </h3>
                             {NODE_TYPE_OPTIONS.find(value => value.value === "RFP") && (
                                 <Tooltip>
@@ -289,12 +289,12 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                     }}
                                 >
                                     <FaPlus />
-                                    {`Create a RFP (Request for Proposal)`}
+                                    {`Create a RFP (Request for Proposals)`}
                                 </Button>
                             </div>
                         )}
                         {rfps.length <= 0 && !isPrivate && (
-                            <p>{`No RFPs (Requests for Proposal) to show`}</p>
+                            <p>{`No RFPs (Requests for Proposals) to show`}</p>
                         )}
                     </div>
                 </CardContent>
