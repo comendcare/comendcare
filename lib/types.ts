@@ -265,7 +265,7 @@ export const NODE_TYPE_OPTIONS: Option[] = [
         description: 'A milestone that is being planned or is under development.'
     },
     { 
-        label: 'RFP (Request for Proposal)', 
+        label: 'RFP (Request for Proposals)', 
         value: 'RFP',
         description: 'A milestone you’re interested in supporting through funding and/or other resources.'
     },
