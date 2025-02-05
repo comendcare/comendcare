@@ -8,6 +8,7 @@ import {
     useReactFlow,
     useStoreApi,
     applyNodeChanges,
+    useOnSelectionChange,
 } from "@xyflow/react"
 import type { ConnectionState, Edge, FinalConnectionState, Node, NodeChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
@@ -99,6 +100,44 @@ export const PrivateFlowView = ({
     const [localNodes, setLocalNodes] = useState(nodes)
     const [localEdges, setLocalEdges] = useState(edges)
 
+    // const handleEditClick = (event: React.MouseEvent, node: Node) => {
+    //     setSelectedNodeId(node.id)
+
+    //     const params = new URLSearchParams(searchParams.toString())
+    //     params.delete("milestone")
+    //     params.set("milestone", node.id)
+
+    //     // router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    //     router.replace(`${pathname}?${params.toString()}`)
+    // }
+
+    // the passed handler has to be memoized, otherwise the hook will not work correctly
+    const onChange = useCallback(({ nodes }: { nodes: Node[]}) => {
+        console.log(`GOT HERE`)
+        console.log(`nodes`, nodes)
+        if (nodes && nodes.length > 0) {
+            setSelectedNodeId(nodes[0].id)
+
+            const params = new URLSearchParams(searchParams.toString())
+            params.delete("milestone")
+            params.set("milestone", nodes[0].id)
+    
+            // router.push(`${pathname}?${params.toString()}`, { scroll: false })
+            router.replace(`${pathname}?${params.toString()}`)
+        }
+    }, []);
+    
+    useOnSelectionChange({
+        onChange,
+    });
+
+    // const handleDeselect = (event: React.MouseEvent, node: Node) => {
+    //     setSelectedNodeId(null)
+    //     const params = new URLSearchParams(searchParams.toString())
+    //     params.delete("milestone")
+    //     router.replace(`${pathname}?${params.toString()}`)
+    // }
+
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes)
         setLocalNodes(newNodes)
@@ -134,7 +173,7 @@ export const PrivateFlowView = ({
                     data: {
                         id: nanoid(),
                         nodeId: id,
-                        type: 'NOTYPE',
+                        types: [],
                         title: `New Milestone`,
                         status: "PLANNED"
                     },
@@ -195,7 +234,7 @@ export const PrivateFlowView = ({
                 data: {
                     id: nanoid(),
                     nodeId: id,
-                    type: defaultData?.type || 'NOTYPE',
+                    types: defaultData?.types || [],
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     status: defaultData?.status || "PLANNED"
@@ -229,16 +268,16 @@ export const PrivateFlowView = ({
         ...node,
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
-            handleEditClick: (nodeId: string) => {
-                setSelectedNodeId(nodeId)
+            // handleEditClick: (nodeId: string) => {
+            //     setSelectedNodeId(nodeId)
 
-                const params = new URLSearchParams(searchParams.toString())
-                params.delete("milestone")
-                params.set("milestone", nodeId)
+            //     const params = new URLSearchParams(searchParams.toString())
+            //     params.delete("milestone")
+            //     params.set("milestone", nodeId)
         
-                // router.push(`${pathname}?${params.toString()}`, { scroll: false })
-                router.replace(`${pathname}?${params.toString()}`)
-            },
+            //     // router.push(`${pathname}?${params.toString()}`, { scroll: false })
+            //     router.replace(`${pathname}?${params.toString()}`)
+            // },
             handleDelete: (nodeId: string) => {
                 const nodesList = localNodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
                 const edgesList = edges.filter((edge: Edge) => edge.source === nodeId || edge.target === nodeId)
@@ -292,12 +331,23 @@ export const PrivateFlowView = ({
         toast.dismiss()
     }
 
+    // const [selectedNodes, setSelectedNodes] = useState([]);
+    // const [selectedEdges, setSelectedEdges] = useState([]);
+
+    // // the passed handler has to be memoized, otherwise the hook will not work correctly
+    // const onChange = useCallback(({ nodes, edges }) => {
+    //     setSelectedNodes(nodes.map((node) => node.id));
+    //     setSelectedEdges(edges.map((edge) => edge.id));
+    // }, []);
+
     return (
         <>
         <ReactFlow
             width={width}
             nodes={updatedNodes}
             edges={updatedEdges}
+            // onNodeClick={handleSelect}
+            selectNodesOnDrag={false}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}

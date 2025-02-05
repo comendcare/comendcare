@@ -1493,7 +1493,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                             create: {
                                 roadmapId: roadmap.id,
                                 organizationId,
-                                type: milestone.type || 'NOTYPE',
+                                types: milestone.types || [],
                                 status: milestone.status || "PLANNED",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
@@ -1682,7 +1682,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                                     connect: {id: organizationId}
                                 },
                                 title: node.data?.title || "New Milestone",
-                                type: node.data?.type || undefined,
+                                types: node.data?.types || [],
                                 description: node.data?.description,
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
@@ -1794,7 +1794,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                     connect: {id: organizationId}
                                 },
                                 title: node.data?.title || "New Milestone",
-                                type: node.data?.type || undefined,
+                                types: node.data?.types || [],
                                 description: node.data?.description,
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
@@ -1968,7 +1968,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     },
                     data: {
                         title: milestone.title,
-                        type: milestone.type,
+                        types: milestone.types || [],
                         otherTypeDetails: milestone.otherTypeDetails,
                         description: milestone.description,
                         startDate: milestone.startDate,

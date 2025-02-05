@@ -32,7 +32,7 @@ export type PrivateMilestoneNode = Node<
         node: any
         title: string
         description?: string
-        type?: string,
+        types?: string[],
         startDate?: Date,
         endDate?: Date,
         budget?: number
@@ -43,7 +43,7 @@ export type PrivateMilestoneNode = Node<
         dependencies?: string[]
         notes?: string
         status: StatusType
-        handleEditClick: (nodeId: string) => void,
+        // handleEditClick: (nodeId: string) => void,
         handleDelete: (nodeId: string) => void,
         handleDuplicate: (nodeId: string) => void,
         onboardingMilestone: boolean,
@@ -60,9 +60,9 @@ export interface TaskType {
 }
 
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
-    const handleEditClick = () => {
-        props.data?.handleEditClick(props?.id)
-    }
+    // const handleEditClick = () => {
+    //     props.data?.handleEditClick(props?.id)
+    // }
     
     const handleDeleteClick = () => {
         props.data?.handleDelete(props?.id)
@@ -126,7 +126,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                 {props.data?.private && (
                     <PrivateBadge className="justify-start" />
                 )}
-                <Button onClick={handleEditClick} className="ml-auto">{`Details`}</Button>
+                {/* <Button onClick={handleEditClick} className="ml-auto">{`Details`}</Button> */}
             </CardFooter>
 
             <NodeHandle type="target" position={Position.Left} node={props as NodeProps<PrivateMilestoneNode>}/>
@@ -254,9 +254,11 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                 )}
             </ul>
             <span className="w-full flex gap-2 flex-wrap text-wrap">
-                <Badge className="flex text-sm">
-                    {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
-                </Badge>
+                {(props?.data?.types || []).map((milestoneType, index) => (
+                    <Badge className="flex text-sm" key={index}>
+                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                    </Badge>
+                ))}
                 <StatusButton
                     className="rounded-full h-8"
                     disabled={true}
