@@ -407,11 +407,6 @@ export function EditMilestoneForm({
                         <FaX/>
                     </Button>
 
-                    <FormItem className="w-full flex flex-row gap-4 justify-start items-center mr-10">
-                        <FormLabel className="text-md mt-2">Private</FormLabel>
-                        <PrivatePublicFormField form={form} formData={formData}/>
-                    </FormItem>
-
                     <EditTitle form={form}/>
 
                     <FormField
@@ -454,6 +449,11 @@ export function EditMilestoneForm({
                             </FormItem>
                         )}
                     />
+
+                    <FormItem className="w-full flex flex-row gap-4 justify-start items-center mr-10">
+                        <FormLabel className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Private</FormLabel>
+                        <PrivatePublicFormField form={form} formData={formData}/>
+                    </FormItem>
 
                     <FormField
                         control={form.control}
@@ -644,16 +644,16 @@ const PrivatePublicFormField = ({form, formData}: { form: any, formData: any }) 
             name="isPrivate"
             render={({field}) => (
                 <span className="h-full items-center flex flex-row justify-end gap-4">
+                    {formData.isPrivate
+                        ? <PrivateBadge className="mt-0"/>
+                        : <PublicBadge className="mt-0"/>
+                    }
                     <FormControl>
                         <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                         />
                     </FormControl>
-                    {formData.isPrivate
-                        ? <PrivateBadge className="mt-0"/>
-                        : <PublicBadge className="mt-0"/>
-                    }
                     <FormMessage/>
                 </span>
             )}
