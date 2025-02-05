@@ -1261,7 +1261,7 @@ const EditTitle = ({form}: { form: any }) => {
             control={form.control}
             name="title"
             render={({field}) => (
-                <FormItem className="flex flex-col grow">
+                <FormItem className="flex flex-col grow mr-10">
                     <FormControl>
                         {/* <Textarea
                             className="min-h-fit max-h-fit font-semibold text-3xl"
