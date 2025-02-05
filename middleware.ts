@@ -15,6 +15,10 @@ export const config = {
 }
 
 export default async function middleware(req: NextRequest) {
+    console.log("Cookies in Middleware:", req.cookies.getAll()); // Logs all cookies
+    const session = await getToken({ req });
+    console.log("Session in Middleware:", session); // Logs session token if available
+
     const url = req.nextUrl
 
     // Get hostname of request (e.g. demo.vercel.pub, demo.localhost:3000)
@@ -71,5 +75,8 @@ export default async function middleware(req: NextRequest) {
     }
 
     // rewrite everything else to `/[domain]/[slug] dynamic route
-    return NextResponse.rewrite(new URL(`/${hostname}${path}`, req.url))
+    // return NextResponse.rewrite(new URL(`/${hostname}${path}`, req.url))
+    const response = NextResponse.rewrite(new URL(`/${hostname}${path}`, req.url));
+    response.headers.set("Set-Cookie", req.headers.get("cookie") || "");
+    return response;
 }
