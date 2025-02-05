@@ -5,12 +5,30 @@ import {formatMoney} from "@/lib/utils";
 import {Badge} from "./ui/badge";
 import {ProfilePhoto} from "./profile-photo";
 import {Separator} from "@/components/ui/separator";
-import {BookCheck, TestTube} from "lucide-react";
+import {BookCheck, TestTube, Search} from "lucide-react";
+
+type NodeTypeCount = Record<string, number>;
+
+function countNodeTypes(data: { node: { type: string } }[]): NodeTypeCount {
+    return data.reduce((acc: NodeTypeCount, item) => {
+        const type = item.node.type;
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+    }, {});
+}
 
 export function OrganizationMarketplaceCard({organization}: { organization: any }) {
     const {subdomain, image, name, description, moneyRaised, condition} = organization;
     const orgCondition = condition?.[0]?.condition || {};
     const {associatedGenes = [], numberOfPatientsEngaged} = orgCondition;
+
+    const nodeTypeCount = countNodeTypes(organization.Milestone);
+
+    const nodeTypeLabels = [
+        { key: "ASSET", icon: BookCheck, label: "Assets" },
+        { key: "RFP", icon: Search, label: "RFPs" },
+        { key: "PROJECT", icon: TestTube, label: "Projects" }
+    ];
 
     return (
         <Link
@@ -21,7 +39,7 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
             }
         >
             <Card className="h-full w-full text-left flex flex-col justify-start">
-                <CardHeader>
+                <CardHeader className="gap-2">
                     <CardTitle className="text-xl font-normal flex flex-row gap-2 items-center">
                         <ProfilePhoto img={image} name={name} className="h-10 w-10"/>
                         {name}
@@ -46,18 +64,17 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                         {description}
                     </div>
                     <div className="flex flex-row space-x-2">
-                        {[{icon: BookCheck, label: "3 Assets"}, {
-                            icon: TestTube,
-                            label: "1 Project"
-                        }].map(({icon: Icon, label}, idx) => (
+                        {nodeTypeLabels.map(({ key, icon: Icon, label }) => (
+                        nodeTypeCount[key] ? (
                             <div
-                                key={idx}
-                                className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
+                                key={key}
+                                className="text-sm w-min inline-flex flex-row justify-start items-center gap-x-2 truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors dark:bg-stone-800 dark:text-stone-400"
                             >
-                                <Icon className="size-4"/>
-                                {label}
+                                <Icon className="size-4" />
+                                {nodeTypeCount[key]} {label}
                             </div>
-                        ))}
+                        ) : null
+                    ))}
                     </div>
                 </CardContent>
                 {Object.keys(orgCondition).length === 0 ||

@@ -45,6 +45,7 @@ import {financesFormSchema} from "@/components/finances-onboarding-form";
 import {researchFormSchema} from "@/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
+import MoneyInput from "@/components/money-input";
 
 const OPTIONS: Option[] = [
     {
@@ -93,9 +94,7 @@ const editOrgFormSchema = z.object({
     }),
     looking: z.array(optionSchema).min(0).optional(),
     founded: z.string().optional(),
-    description: z.string().min(2, {
-        message: "Your organization's description must be at least 2 characters long.",
-    }).max(500, {
+    description: z.string().max(500, {
         message: "Your organization's description must less than 500 characters long.",
     }).optional(),
     website: z.string().min(2, {
@@ -1357,143 +1356,26 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                     {/*    )}*/}
                                     {/*/>*/}
 
-                                    <FormField
-                                        control={editFinancesForm.control}
+
+                                    <MoneyInput
+                                        form={editFinancesForm}
+                                        label="Total funds raised to date"
+                                        description="The total amount of funding raised to date by your patient group."
                                         name="raised"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Raised - {formatMoney(field.value)}</FormLabel>
-                                                <FormDescription className="flex items-center">
-                                                    {`The total amount of funding raised to date by your patient group.`}
-                                                    <Tooltip delayDuration={0}>
-                                                        <TooltipTrigger>
-                                                            <FaQuestionCircle
-                                                                className="text-black h-4 inline-block align-baseline mx-1"/>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent
-                                                            align="end"
-                                                            className="max-w-[300px] break-words text-sm z-50"
-                                                        >
-                                                            <p>
-                                                                {`Just a ballpark estimate so that we know to recommend vendors within a reasonable price range.`}
-                                                            </p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </FormDescription>
-                                                <FormControl>
-                                                    {/*<Slider*/}
-                                                    {/*    min={0}*/}
-                                                    {/*    max={1000000}*/}
-                                                    {/*    step={50000}*/}
-                                                    {/*    defaultValue={value ? [value] : [0]}*/}
-                                                    {/*    onValueChange={(vals: number[]) => {*/}
-                                                    {/*        onChange(vals[0]);*/}
-                                                    {/*    }}*/}
-                                                    {/*/>*/}
-                                                    <Input
-                                                        variant="currency"
-                                                        type="number"
-                                                        min={0}
-                                                        id="deployed"
-                                                        {...field}
-                                                        onChange={(e) => {
-                                                            const parsedValue = parseFloat(e.target.value);
-                                                            field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormDescription>
-                                                    This is a description for the price.
-                                                </FormDescription>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
                                     />
 
-                                    <FormField
-                                        control={editFinancesForm.control}
+                                    <MoneyInput
+                                        form={editFinancesForm}
+                                        label="Total funds deployed to research"
+                                        description="The total amount of money deployed to research to date."
                                         name="deployed"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>{`Money deployed to research`} - {formatMoney(field.value)}</FormLabel>
-                                                <FormDescription className="flex items-center">
-                                                    {`The total amount of money deployed to research to date.`}
-                                                    <Tooltip delayDuration={0}>
-                                                        <TooltipTrigger>
-                                                            <FaQuestionCircle
-                                                                className="text-black h-4 inline-block align-baseline mx-1"/>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent
-                                                            align="end"
-                                                            className="max-w-[300px] break-words text-sm z-50"
-                                                        >
-                                                            <p>
-                                                                Knowing how much you have deployed to research so far
-                                                                helps us understand how much experience you have with
-                                                                driving research.
-                                                            </p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </FormDescription>
-                                                <FormControl>
-                                                    <Input
-                                                        variant="currency"
-                                                        type="number"
-                                                        min={0}
-                                                        id="deployed"
-                                                        {...field}
-                                                        onChange={(e) => {
-                                                            const parsedValue = parseFloat(e.target.value);
-                                                            field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
                                     />
 
-                                    <FormField
-                                        control={editFinancesForm.control}
+                                    <MoneyInput
+                                        form={editFinancesForm}
+                                        label="Annual research budget"
+                                        description="The amount of money allocated to advancing research this year."
                                         name="budget"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>{`Annual research budget`} - {formatMoney(field.value)}</FormLabel>
-                                                <FormDescription className="flex items-center">
-                                                    {`The amount of money allocated to advancing research.`}
-                                                    <Tooltip delayDuration={0}>
-                                                        <TooltipTrigger>
-                                                            <FaQuestionCircle
-                                                                className="text-black h-4 inline-block align-baseline mx-1"/>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent
-                                                            align="end"
-                                                            className="max-w-[300px] break-words text-sm z-50"
-                                                        >
-                                                            <p>
-                                                                Knowing how much you have budgeted to research helps us
-                                                                prioritize
-                                                                based on what you prioritize.
-                                                            </p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </FormDescription>
-                                                <FormControl>
-                                                    <Input
-                                                        variant="currency"
-                                                        type="number"
-                                                        min={0}
-                                                        id="budget"
-                                                        {...field}
-                                                        onChange={(e) => {
-                                                            const parsedValue = parseFloat(e.target.value);
-                                                            field.onChange(!isNaN(parsedValue) ? parsedValue : 0); // Parse to float or default to 0
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage/>
-                                            </FormItem>
-                                        )}
                                     />
 
                                     <Button type="submit">

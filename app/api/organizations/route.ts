@@ -15,6 +15,11 @@ export async function POST(req: Request) {
                     include: {
                         condition: true
                     }
+                },
+                Milestone: {
+                    include: {
+                        node: true
+                    }
                 }
             }
         });
