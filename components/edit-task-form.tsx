@@ -1,7 +1,7 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod"
-import React, {useCallback, useEffect, useState} from "react"
+import React, {useCallback, useEffect, useRef, useState} from "react"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {
@@ -118,6 +118,7 @@ export function EditTaskForm({
     taskData: any
     onClose: () => void
 }) {
+    const initializing = useRef(true)
     const { data: session } = useSession()
     const { updateTask } = useKanbanStore(useShallow(selector))
     const form = useForm<z.infer<typeof editTaskForm>>({
@@ -154,22 +155,55 @@ export function EditTaskForm({
             } else {
                 console.error(milestonesResponse.error)
             }
+            // Allow update once form is initialized
+            initializing.current = false;
         }
 
         fetchData()
     }, [])
 
-    const name = form.watch("name")
-    const status = form.watch("status")
-    const description = form.watch("description")
-    const checklist = form.watch("checklist")
-    const stakeholders = form.watch("stakeholders")
-    const milestone = form.watch("milestone")
-    const targetDate = form.watch("targetDate")
-    const priority = form.watch("priority")
-    const isPrivate = form.watch("private")
+    const formData = {
+        name: form.watch("name"),
+        status: form.watch("status"),
+        description: form.watch("description"),
+        checklist: form.watch("checklist"),
+        stakeholders: form.watch("stakeholders"),
+        milestone: form.watch("milestone"),
+        targetDate: form.watch("targetDate"),
+        priority: form.watch("priority"),
+        isPrivate: form.watch("private"),
+    }
+
+    // callback ensures we're not creating a new debounce every time this is called
+    const debounceUpdates = useCallback(
+        debounce((updatedValues) => handleFormSubmit(updatedValues), 500), []
+    )
+
+    // // Allow update once form is initialized
+    // useEffect(() => {
+    //     initializing.current = false;
+    // }, []);
+
+    // Watch form changes, don't watch while initializing
+    useEffect(() => {
+        const subscription = form.watch((values) => debounceUpdates(values))
+        return () => subscription.unsubscribe();
+    }, [form.watch])
 
     const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
+        const {
+
+            name,
+            status,
+            description,
+            checklist,
+            stakeholders,
+            milestone,
+            targetDate,
+            priority,
+            private: isPrivate
+        } = values;
+
         const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
 
         updateTask(
@@ -214,9 +248,9 @@ export function EditTaskForm({
     )
 
     function getDraggedData(id: string) {
-        const name = checklist?.find(item => item.id === id)?.name
-        const position = (checklist?.findIndex(item => item.id === id) || 0) + 1
-        const length = checklist?.length || 0
+        const name = formData.checklist?.find(item => item.id === id)?.name
+        const position = (formData.checklist?.findIndex(item => item.id === id) || 0) + 1
+        const length = formData.checklist?.length || 0
 
         return {name, position, length}
     }
@@ -385,7 +419,7 @@ export function EditTaskForm({
                                 <FormLabel className="text-md mt-2">{`Associated Milestone`}</FormLabel>
                                 <div className="flex flex-row gap-4">
                                     <Select
-                                        value={milestone || ''}
+                                        value={formData.milestone || ''}
                                         onValueChange={field.onChange}
                                     >
                                         <FormControl>
