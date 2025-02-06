@@ -121,26 +121,29 @@ const steps: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Connecting Milestones",
-                content: <>{`Once you've created more than one milestone, you can create relationships between them by dragging from the + icon.`}</>,
-                selector: ".research-plan-tour-step5",
-                side: "left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>⭐</>,
-                title: "Re-Ordering Milestones",
                 content: <>
-                    {`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}
+                    {`Once you've created more than one milestone, you can create or remove relationships between them by clicking and dragging from the + icon.`}
                     <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
-                </>,
+                </>,                
                 selector: ".research-plan-tour-step5",
-                side: "left" as any,
+                side: "right" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10
             },
+            // {
+            //     icon: <>⭐</>,
+            //     title: "Re-Ordering Milestones",
+            //     content: <>
+            //         {`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}
+            //         <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
+            //     </>,
+            //     selector: ".research-plan-tour-step5",
+            //     side: "left" as any,
+            //     showControls: true,
+            //     pointerPadding: 10,
+            //     pointerRadius: 10
+            // },
         ]
     },
     {
