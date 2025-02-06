@@ -1005,6 +1005,7 @@ export async function approveMemberRequestAndCreateMember(
         })
 
         revalidatePath("/app/dashboard")
+        revalidatePath("/app/profile")
 
         if (member) {
             return {success: false, error: "This member already exists in your organization."}
@@ -1017,12 +1018,9 @@ export async function approveMemberRequestAndCreateMember(
     try {
 
         const [, createdMember] = await Promise.all([
-            prisma.memberRequest.update({
+            prisma.memberRequest.delete({
                 where: {
                     id: memberRequest.id,
-                },
-                data: {
-                    accepted: true,
                 },
             }),
             prisma.member.create({
@@ -1032,6 +1030,9 @@ export async function approveMemberRequestAndCreateMember(
                     role: "admin",
                     userId: memberRequest.userId,
                 },
+                include: {
+                    user: true
+                }
             }),
         ]);
 

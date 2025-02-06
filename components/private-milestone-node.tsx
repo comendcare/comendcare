@@ -141,7 +141,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             </CardFooter>
 
             <NodeHandle type="target" position={Position.Left} node={props as NodeProps<PrivateMilestoneNode>}/>
-            <NodeHandle type="source" position={Position.Right} node={props as NodeProps<PrivateMilestoneNode>}/>
+            <NodeHandle className={"research-plan-tour-step5"} type="source" position={Position.Right} node={props as NodeProps<PrivateMilestoneNode>}/>
         </Card> 
     )
 }
@@ -193,8 +193,9 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
             onMouseOver={() => setIsHovering(true)}
             onMouseOut={() => setIsHovering(false)}
             className={cn(
-                "research-plan-tour-step5 z-10 bg-white transition-all rounded-full border-solid border-black border-2",
-                isHovering ? "p-1 flex flex-col gap-1" : ""
+                "z-10 bg-white transition-all rounded-full border-solid border-black border-2",
+                isHovering ? "p-1 flex flex-col gap-1" : "",
+                props.className
             )}
         >
             <Button 

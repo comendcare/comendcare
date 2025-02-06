@@ -62,7 +62,7 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
         >
         <Card 
             className={cn(
-                "w-[350px]", 
+                "w-[350px] text-wrap break-words", 
                 props.data?.onboardingMilestone ? "research-plan-tour-step2" : "",
                 props.data?.focused ? "border-2 border-black" : ""
             )}

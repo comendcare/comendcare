@@ -595,7 +595,7 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                                 defaultOptions={MILESTONE_TYPE_OPTIONS}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
-                                placeholder="Select a milestone type..."
+                                placeholder="Milestone type"
                                 emptyIndicator={
                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                         no results found.
@@ -687,6 +687,7 @@ const StatusFormField = ({form}: { form: any }) => {
 const BudgetFormField = ({form}: { form: any }) => {
     return (
         <MoneyInput
+            className="h-[40px] -mt-2"
             form={form}
             name="budget"
         />
@@ -726,7 +727,7 @@ const TimelineFormField = ({
                             >
                                 <FormControl>
                                     <SelectTrigger className="h-[40px]">
-                                        <SelectValue placeholder="Select a month"/>
+                                        <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
@@ -756,7 +757,7 @@ const TimelineFormField = ({
                         <FormItem className="h-[40px]">
                             <Input
                                 className="h-[40px]"
-                                placeholder="Enter a year..."
+                                placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
                                 onChange={(event) => {
@@ -787,7 +788,7 @@ const TimelineFormField = ({
                             >
                                 <FormControl>
                                     <SelectTrigger className="h-[40px]">
-                                        <SelectValue placeholder="Select a month"/>
+                                        <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
@@ -817,7 +818,7 @@ const TimelineFormField = ({
                         <FormItem className="h-[40px]">
                             <Input
                                 className="h-[40px]"
-                                placeholder="Enter a year..."
+                                placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
                                 onChange={(event) => {
@@ -1417,8 +1418,8 @@ const TaskField = ({
 
             {/* select kanban column */}
             <Select onValueChange={(value: string) => columnChanged(value)} value={task.columnId}>
-                <SelectTrigger className="w-[100px]">
-                    <SelectValue className="text-left"/>
+                <SelectTrigger className="w-[120px]">
+                    <SelectValue/>
                 </SelectTrigger>
                 <SelectContent>
                     {kanbanColumns.map(column => (

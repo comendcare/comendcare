@@ -150,7 +150,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                     // don't do onboarding if the user starts from 'New RFP' button
                                                     setOnboarded('research-plan-tour')
                                                     router.push(`/app/research-plan?milestone=${newRFP.id}`)
-                                                    router.refresh()
+                                                    // router.refresh()
                                                 }
                                             } else {
                                                 // no roadmap found, create roadmap first
@@ -244,7 +244,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                     // don't do onboarding if the user starts from 'New Asset' button
                                                     setOnboarded('research-plan-tour')
                                                     router.push(`/app/research-plan?milestone=${newAsset.id}`)
-                                                    router.refresh()
+                                                    // router.refresh()
                                                 }
                                             } else {
                                                 // no roadmap found, create roadmap first
