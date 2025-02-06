@@ -232,10 +232,10 @@ export function EditTaskForm({
                 private: isPrivate || false
             }
         )
-        toast('Success!', {
-            position: "bottom-left",
-            description: 'The changes to your task have been successfully saved.'
-        })
+        // toast('Success!', {
+        //     position: "bottom-left",
+        //     description: 'The changes to your task have been successfully saved.'
+        // })
         onClose()
     }
 
