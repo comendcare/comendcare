@@ -22,7 +22,11 @@ import ShareDialog from "@/components/share-dialog";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
 import {Card, CardContent} from "@/components/ui/card";
 import Image from "next/image";
-import { PAGProfileAssetsAndRFPsHoverableCard } from "@/components/pag-profile-assets-and-projects-hoverable-card";
+import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
+import {FeedbackSheet} from "@/components/feedback";
+import FeedbackForm from "@/components/feedback-form";
+import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
+import React from "react";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -101,13 +105,13 @@ export default async function OrganizationHomePage({
         <>
             <main className="grid grid-cols-8 w-full max-w-7xl mx-auto mt-16 gap-4">
                 <div className="col-span-8 flex flex-col items-center space-y-8 px-4 lg:px-0">
-                    <PAGPublicProfileHeader organization={organization} />
+                    <PAGPublicProfileHeader organization={organization}/>
 
                     <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                         <div className="relative md:col-span-2 space-y-4">
                             <div className="sticky top-4 space-y-4">
-                                <PagProfileAboutCard organization={organization} />
-                                <PAGProfileConditionsCard conditions={conditions} />
+                                <PagProfileAboutCard organization={organization}/>
+                                <PAGProfileConditionsCard conditions={conditions}/>
                             </div>
                         </div>
 
@@ -178,23 +182,12 @@ export default async function OrganizationHomePage({
                     {
                         title: "Report an issue",
                         icon: <IconFlag/>,
-                        dialog: (
-                            <>
-                                <DialogHeader>
-                                    <DialogTitle>Edit profile</DialogTitle>
-                                    <DialogDescription>
-                                        {`Make changes to your profile here. Click save when you're done.`}
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input id="name" defaultValue="John Doe"/>
-                                </div>
-                                <DialogFooter>
-                                    <Button type="submit">Save changes</Button>
-                                </DialogFooter>
-                            </>
-                        ),
+                        sheet: <>
+                            <SheetHeader>
+                                <SheetTitle>Send Feedback</SheetTitle>
+                            </SheetHeader>
+                            <FeedbackForm/>
+                        </>
                     }
                 ]}
                 orientation="vertical"
