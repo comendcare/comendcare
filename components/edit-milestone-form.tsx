@@ -595,7 +595,7 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                                 defaultOptions={MILESTONE_TYPE_OPTIONS}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
-                                placeholder="Select a milestone type..."
+                                placeholder="Milestone type"
                                 emptyIndicator={
                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                         no results found.
@@ -726,7 +726,7 @@ const TimelineFormField = ({
                             >
                                 <FormControl>
                                     <SelectTrigger className="h-[40px]">
-                                        <SelectValue placeholder="Select a month"/>
+                                        <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
@@ -756,7 +756,7 @@ const TimelineFormField = ({
                         <FormItem className="h-[40px]">
                             <Input
                                 className="h-[40px]"
-                                placeholder="Enter a year..."
+                                placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
                                 onChange={(event) => {
@@ -787,7 +787,7 @@ const TimelineFormField = ({
                             >
                                 <FormControl>
                                     <SelectTrigger className="h-[40px]">
-                                        <SelectValue placeholder="Select a month"/>
+                                        <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
@@ -817,7 +817,7 @@ const TimelineFormField = ({
                         <FormItem className="h-[40px]">
                             <Input
                                 className="h-[40px]"
-                                placeholder="Enter a year..."
+                                placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
                                 onChange={(event) => {
