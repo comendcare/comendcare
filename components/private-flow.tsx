@@ -315,7 +315,7 @@ export const PrivateFlowView = ({
             if (!open) setSelectedMilestones([])
             setNewMilestoneIsOpen(open)
         }}>
-            <DialogContent className="min-w-fit h-[80vh] flex flex-col justify-start">
+            <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start">
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
                         Select from a milestone template
