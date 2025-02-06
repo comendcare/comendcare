@@ -1418,7 +1418,7 @@ const TaskField = ({
 
             {/* select kanban column */}
             <Select onValueChange={(value: string) => columnChanged(value)} value={task.columnId}>
-                <SelectTrigger className="w-[100px]">
+                <SelectTrigger className="w-[120px]">
                     <SelectValue/>
                 </SelectTrigger>
                 <SelectContent>
