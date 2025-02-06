@@ -100,7 +100,7 @@ export default async function OrganizationHomePage({
     return (
         <>
             <main className="grid grid-cols-8 w-full max-w-7xl mx-auto mt-16 gap-4">
-                <div className="col-span-8 flex flex-col items-center space-y-8">
+                <div className="col-span-8 flex flex-col items-center space-y-8 px-4 lg:px-0">
                     <PAGPublicProfileHeader organization={organization} />
 
                     <div className="grid grid-cols-1 md:grid-cols-6 gap-4">

@@ -1,20 +1,18 @@
 import Image from "next/image"
 import Link from "next/link"
-import { ReactNode } from "react"
-import CTA from "@/components/cta"
-import ReportAbuse from "@/components/report-abuse"
-import { notFound, redirect } from "next/navigation"
-import { getOrganizationData } from "@/lib/fetchers"
-import { fontMapper } from "@/styles/fonts"
-import { Metadata } from "next"
+import {ReactNode} from "react"
+import {notFound, redirect} from "next/navigation"
+import {getOrganizationData} from "@/lib/fetchers"
+import {fontMapper} from "@/styles/fonts"
+import {Metadata} from "next"
 import {LandingNavbar} from "@/components/layout/sections/landing-navbar";
 import PublicPageFooter from "@/components/public-page-footer"
-import { Button } from "@/components/ui/button"
-import { TooltipProvider } from "@radix-ui/react-tooltip"
+import {Button} from "@/components/ui/button"
+import {TooltipProvider} from "@radix-ui/react-tooltip"
 
 export async function generateMetadata({
-    params
-}: {
+                                           params
+                                       }: {
     params: { domain: string }
 }): Promise<Metadata | null> {
     const domain = decodeURIComponent(params.domain)
@@ -62,9 +60,9 @@ export async function generateMetadata({
 }
 
 export default async function SiteLayout({
-    params,
-    children
-}: {
+                                             params,
+                                             children
+                                         }: {
     params: { domain: string }
     children: ReactNode
 }) {
@@ -87,16 +85,11 @@ export default async function SiteLayout({
     return (
         <div className={fontMapper[data.font]}>
             <TooltipProvider>
-            <LandingNavbar />
-            <div>{children}</div>
-
-            {domain == `demo.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}` ||
-            domain == `platformize.co` ? (
-                <CTA />
-            ) : (
-                <ReportAbuse />
-            )}
-            <PublicPageFooter/>
+                <LandingNavbar/>
+                <div>
+                    {children}
+                </div>
+                <PublicPageFooter/>
             </TooltipProvider>
         </div>
     )
