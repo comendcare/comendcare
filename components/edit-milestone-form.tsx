@@ -14,7 +14,7 @@ import {
     FormDescription,
 } from "./ui/form"
 import {Input} from "./ui/input"
-import {Textarea} from "./ui/textarea"
+import {AutosizeTextarea, Textarea} from "./ui/textarea"
 import {Button} from "./ui/button"
 import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
@@ -1235,27 +1235,27 @@ const ContactsFormField = ({form}: { form: any }) => {
 }
 
 const EditTitle = ({form}: { form: any }) => {
-    const contentRef = useRef<HTMLHeadingElement>(null);
+    // const contentRef = useRef<HTMLHeadingElement>(null);
 
-    const handleInput = (e: React.FormEvent<HTMLHeadingElement>) => {
-        const selection = window.getSelection();
-        const range = selection?.getRangeAt(0);
-        const cursorPosition = range ? range.startOffset : 0;
+    // const handleInput = (e: React.FormEvent<HTMLHeadingElement>) => {
+    //     const selection = window.getSelection();
+    //     const range = selection?.getRangeAt(0);
+    //     const cursorPosition = range ? range.startOffset : 0;
 
-        // Update the form value without causing a re-render
-        form.setValue("title", e.currentTarget.textContent || "");
+    //     // Update the form value without causing a re-render
+    //     form.setValue("title", e.currentTarget.textContent || "");
 
-        // Restore cursor position
-        if (range && selection) {
-            setTimeout(() => {
-                const newRange = document.createRange();
-                newRange.setStart(contentRef.current!.childNodes[0], cursorPosition);
-                newRange.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-            }, 0);
-        }
-    };
+    //     // Restore cursor position
+    //     if (range && selection) {
+    //         setTimeout(() => {
+    //             const newRange = document.createRange();
+    //             newRange.setStart(contentRef.current!.childNodes[0], cursorPosition);
+    //             newRange.collapse(true);
+    //             selection.removeAllRanges();
+    //             selection.addRange(newRange);
+    //         }, 0);
+    //     }
+    // };
 
     return (
         <FormField
@@ -1264,14 +1264,14 @@ const EditTitle = ({form}: { form: any }) => {
             render={({field}) => (
                 <FormItem className="flex flex-col grow mr-10">
                     <FormControl>
-                        {/* <Textarea
-                            className="min-h-fit max-h-fit font-semibold text-3xl"
-                            id="title"
-                            placeholder={`Enter a title`}
-                            defaultValue={field.value}
-                            {...field}
-                        /> */}
-                        <span
+                        <AutosizeTextarea 
+                                className="overflow-hidden resize-none font-semibold text-3xl"
+                                id="title"
+                                placeholder={`Enter a title`}
+                                defaultValue={field.value}
+                                onChange={field.onChange}
+                        />
+                        {/* <span
                             className="flex flex-row gap-2 items-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                             <h1
                                 id="title"
@@ -1283,7 +1283,7 @@ const EditTitle = ({form}: { form: any }) => {
                             >
                                 {field.value}
                             </h1>
-                        </span>
+                        </span> */}
                     </FormControl>
                     <FormMessage/>
                 </FormItem>
