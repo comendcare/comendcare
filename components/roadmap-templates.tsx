@@ -124,7 +124,7 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
     return (
         <div className="min-h-0 h-full flex flex-col">
             <Tabs defaultValue={filter} onValueChange={(value) => setFilter(value)} className="flex-1 flex flex-col min-h-0 items-start">
-                <TabsList>
+                {/* <TabsList>
                     {NODE_TYPE_OPTIONS.map(({label, value, description}, index) => (
                         <TabsTrigger key={index} value={value} className="flex gap-2">
                             {label}
@@ -138,12 +138,12 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                             </Tooltip>
                         </TabsTrigger>
                     ))}
-                </TabsList>
+                </TabsList> */}
                 {filter === "ASSET" && (
                     // have to hide these due to the flex implementation to get the scroll area working
                     <TabsContent value="ASSET" className="flex-1 flex flex-col min-h-0">
                         <ScrollArea className="h-0 flex-1 w-full" type="always">
-                            <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
                                 {templateMilestones.filter((template) => template.nodeType === "ASSET").map((milestoneData, index) => (
                                     <MilestoneTemplateCard 
                                         key={index} 
@@ -160,7 +160,7 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                     // have to hide these due to the flex implementation to get the scroll area working
                     <TabsContent value="PROJECT" className="flex-1 flex flex-col min-h-0">
                         <ScrollArea className="h-0 flex-1 w-full" type="always">
-                            <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
                                 {templateMilestones.filter((template) => template.nodeType === "PROJECT").map((milestoneData, index) => (
                                     <MilestoneTemplateCard 
                                         key={index} 
@@ -177,7 +177,7 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                     // have to hide these due to the flex implementation to get the scroll area working
                     <TabsContent value="RFP" className="flex-1 flex flex-col min-h-0">
                         <ScrollArea className="h-0 flex-1 w-full" type="always">
-                            <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
                                 {templateMilestones.filter((template) => template.nodeType === "RFP").map((milestoneData, index) => (
                                     <MilestoneTemplateCard 
                                         key={index} 

@@ -4,7 +4,8 @@ export const templateMilestones = [
         description: 'Our observational research effort that follows individuals with a specific disease over time, collecting data on how the disease develops and progresses without intervention.',
         types: ['NATURALHISTORYSTUDY'],
         attachments: [],
-        nodeType: "ASSET"
+        // nodeType: "ASSET"
+        nodeType: "PROJECT"
     },
     {
         title: 'Literature Review',
@@ -27,42 +28,48 @@ export const templateMilestones = [
         status: 'INPROGRESS',
         types: ['MOUSEMODEL'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     },
     {
         title: 'Construct Patient-Derived Cells',
         description: 'Work with researchers to create cell lines that replicate disease characteristics.',
         types: ['PATIENTDERIVEDCELLLINE'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     },
     {
         title: 'Design ASO Construct',
         description: 'Design an ASO (Antisense Oligonucleotide) construct that specifically targets the genetic mutations driving our disease.',
         types: ['CONSTRUCTDESIGN'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     },
     {
         title: 'Produce Plasmid',
         description: 'Create a DNA template essential for developing and testing therapies.',
         types: ['PLASMIDPRODUCTION'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     },
     {
         title: 'Proof-Of-Concept Study',
         description: 'Design and conduct initial experiments to demonstrate that a potential therapy or intervention can effectively target the disease.',
         types: ['PROOFOFCONCEPT'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     },
     {
         title: 'Animal Toxicology Study',
         description: 'Conduct preclinical trials to evaluate the safety and potential side effects of a therapy.',
         types: ['TOXICOLOGY'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     }
 ]
 
