@@ -146,9 +146,28 @@ export const authOptions: NextAuthOptions = {
 
         session: async ({session, token}) => {
             // Check if the user still exists in the database
+            // Check if the user still exists in the database
             const dbUser = await prisma.user.findUnique({
                 where: {id: token.sub},
+                include: { memberships: true }, // Ensure we get latest memberships
             });
+
+            const organizationIds = dbUser?.memberships.map((m) => m.organizationId);
+
+
+            let activeOrganizationId = token.organizationId as string | null;
+
+            if (organizationIds) {
+                // If activeOrganizationId is null but the user has memberships, use the first membership
+                if (!activeOrganizationId && organizationIds.length > 0) {
+                    activeOrganizationId = organizationIds[0];
+                }
+
+                // If activeOrganizationId is set but not in the user's memberships, reset to null
+                if (activeOrganizationId && !organizationIds.includes(activeOrganizationId)) {
+                    activeOrganizationId = null;
+                }
+            }
 
             if (!dbUser) {
                 // Continue with your existing session logic
@@ -175,7 +194,7 @@ export const authOptions: NextAuthOptions = {
                 id: token.sub,
                 // @ts-expect-error
                 username: token?.user?.username || token?.user?.gh_username,
-                organizationId: token.organizationId as string | null, // Ensure type matches
+                organizationId: activeOrganizationId
             };
 
             return session;

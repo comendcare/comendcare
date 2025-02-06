@@ -80,7 +80,7 @@ model MemberRequest {
   email          String
   role           String       @db.VarChar
   organizationId String
-  accepted       Boolean      @default(false)
+  accepted       Boolean      @default(false) // As of Feb 6 we are no longer using this
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
