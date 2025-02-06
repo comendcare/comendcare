@@ -22,7 +22,7 @@ import {initializeKanbanState, initializeRoadmapState} from "@/lib/initialize-cl
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import { createKanban } from "@/lib/actions";
-import { FeedbackForm } from "@/components/feedback";
+import { FeedbackSheet } from "@/components/feedback";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import { useOnborda } from "@/components/onborda/OnbordaContext";
 import { Button } from "@/components/ui/button";
@@ -181,7 +181,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                                     <FaWandMagicSparkles/>
                                     <span>Take a tour</span>
                                 </Button>
-                                <FeedbackForm />
+                                <FeedbackSheet />
                                 <Button
                                     variant="ghost"
                                     // disabled={true}

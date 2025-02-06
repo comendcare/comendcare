@@ -22,6 +22,11 @@ import {
     DialogContent,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+    Sheet,
+    SheetTrigger,
+    SheetContent,
+} from "@/components/ui/sheet"
 
 export const FloatingDock = ({
                                  items,
@@ -34,6 +39,7 @@ export const FloatingDock = ({
         icon: React.ReactNode;
         href?: string;
         dialog?: React.ReactNode;
+        sheet?: React.ReactNode;
     }[];
     orientation?: "horizontal" | "vertical";
     desktopClassName?: string;
@@ -77,19 +83,20 @@ const FloatingDockMobile = ({
                         {items.map((item, idx) => (
                             <motion.div
                                 key={item.title}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                initial={{opacity: 0, y: 10}}
+                                animate={{opacity: 1, y: 0}}
                                 exit={{
                                     opacity: 0,
                                     y: 10,
-                                    transition: { delay: idx * 0.05 },
+                                    transition: {delay: idx * 0.05},
                                 }}
-                                transition={{ delay: (items.length - 1 - idx) * 0.05 }}
+                                transition={{delay: (items.length - 1 - idx) * 0.05}}
                             >
                                 {item.dialog ? (
                                     <Dialog>
                                         <DialogTrigger asChild>
-                                            <button className="h-10 w-10 rounded-full bg-gray-50 dark:bg-neutral-900 flex items-center justify-center">
+                                            <button
+                                                className="h-10 w-10 rounded-full bg-gray-50 dark:bg-neutral-900 flex items-center justify-center">
                                                 <div className="h-4 w-4">{item.icon}</div>
                                             </button>
                                         </DialogTrigger>
@@ -112,7 +119,7 @@ const FloatingDockMobile = ({
                 onClick={() => setOpen(!open)}
                 className="h-10 w-10 rounded-full bg-gray-50 dark:bg-neutral-800 flex items-center justify-center"
             >
-                <IconLayoutNavbarCollapse className="h-5 w-5 text-neutral-500 dark:text-neutral-400" />
+                <IconLayoutNavbarCollapse className="h-5 w-5 text-neutral-500 dark:text-neutral-400"/>
             </button>
         </div>
     );
@@ -174,6 +181,7 @@ function IconContainer({
                            icon,
                            href,
                            dialog,
+                           sheet
                        }: {
     mouseX: MotionValue;
     mouseY: MotionValue;
@@ -182,6 +190,7 @@ function IconContainer({
     icon: React.ReactNode;
     href?: string | undefined;
     dialog?: React.ReactNode;
+    sheet?: React.ReactNode;
 }) {
     let ref = useRef<HTMLDivElement>(null);
 
@@ -208,9 +217,6 @@ function IconContainer({
     let widthTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
     let heightTransformIcon = useTransform(distance, [-150, 0, 150], [20, 40, 20]);
 
-    let width = useSpring(widthTransform, { mass: 0.1, stiffness: 150, damping: 12 });
-    let height = useSpring(heightTransform, { mass: 0.1, stiffness: 150, damping: 12 });
-
     let widthIcon = useSpring(widthTransformIcon, {
         mass: 0.1,
         stiffness: 150,
@@ -222,6 +228,11 @@ function IconContainer({
         damping: 12,
     });
 
+    let width = useSpring(widthTransform, {mass: 0.1, stiffness: 150, damping: 12});
+    let height = useSpring(heightTransform, {mass: 0.1, stiffness: 150, damping: 12});
+    let widthIconSpring = useSpring(widthIcon, {mass: 0.1, stiffness: 150, damping: 12});
+    let heightIconSpring = useSpring(heightIcon, {mass: 0.1, stiffness: 150, damping: 12});
+
     const [hovered, setHovered] = useState(false);
 
     if (dialog) {
@@ -230,13 +241,13 @@ function IconContainer({
                 <DialogTrigger asChild>
                     <motion.div
                         ref={ref}
-                        style={{ width, height }}
+                        style={{width, height}}
                         onMouseEnter={() => setHovered(true)}
                         onMouseLeave={() => setHovered(false)}
                         className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative cursor-pointer"
                     >
                         <motion.div
-                            style={{ width: widthIcon, height: heightIcon }}
+                            style={{width: widthIcon, height: heightIcon}}
                             className="flex items-center justify-center"
                         >
                             {icon}
@@ -244,9 +255,9 @@ function IconContainer({
                         <AnimatePresence>
                             {hovered && (
                                 <motion.div
-                                    initial={{ opacity: 0, y: 10, x: "-50%" }}
-                                    animate={{ opacity: 1, y: 0, x: "-50%" }}
-                                    exit={{ opacity: 0, y: 2, x: "-50%" }}
+                                    initial={{opacity: 0, y: 10, x: "-50%"}}
+                                    animate={{opacity: 1, y: 0, x: "-50%"}}
+                                    exit={{opacity: 0, y: 2, x: "-50%"}}
                                     className="px-2 py-0.5 whitespace-pre rounded-md bg-gray-100 border dark:bg-neutral-800 dark:border-neutral-900 dark:text-white border-gray-200 text-neutral-700 absolute left-1/2 -translate-x-1/2 -top-8 w-fit text-xs"
                                 >
                                     {title}
@@ -260,11 +271,45 @@ function IconContainer({
         );
     }
 
+    if (sheet) {
+        return (
+            <Sheet>
+                <SheetTrigger asChild>
+                    <motion.div
+                        ref={ref}
+                        style={{width, height}}
+                        onMouseEnter={() => setHovered(true)}
+                        onMouseLeave={() => setHovered(false)}
+                        className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative cursor-pointer"
+                    >
+                        <motion.div style={{width: widthIconSpring, height: heightIconSpring}}
+                                    className="flex items-center justify-center">
+                            {icon}
+                        </motion.div>
+                        <AnimatePresence>
+                            {hovered && (
+                                <motion.div
+                                    initial={{opacity: 0, y: 10, x: "-50%"}}
+                                    animate={{opacity: 1, y: 0, x: "-50%"}}
+                                    exit={{opacity: 0, y: 2, x: "-50%"}}
+                                    className="px-2 py-0.5 whitespace-pre rounded-md bg-gray-100 border dark:bg-neutral-800 dark:border-neutral-900 dark:text-white border-gray-200 text-neutral-700 absolute left-1/2 -translate-x-1/2 -top-8 w-fit text-xs"
+                                >
+                                    {title}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
+                </SheetTrigger>
+                <SheetContent>{sheet}</SheetContent>
+            </Sheet>
+        );
+    }
+
     return (
         <Link href={href || ""}>
             <motion.div
                 ref={ref}
-                style={{ width, height }}
+                style={{width, height}}
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
                 className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative"
@@ -272,9 +317,9 @@ function IconContainer({
                 <AnimatePresence>
                     {hovered && (
                         <motion.div
-                            initial={{ opacity: 0, y: 10, x: "-50%" }}
-                            animate={{ opacity: 1, y: 0, x: "-50%" }}
-                            exit={{ opacity: 0, y: 2, x: "-50%" }}
+                            initial={{opacity: 0, y: 10, x: "-50%"}}
+                            animate={{opacity: 1, y: 0, x: "-50%"}}
+                            exit={{opacity: 0, y: 2, x: "-50%"}}
                             className="px-2 py-0.5 whitespace-pre rounded-md bg-gray-100 border dark:bg-neutral-800 dark:border-neutral-900 dark:text-white border-gray-200 text-neutral-700 absolute left-1/2 -translate-x-1/2 -top-8 w-fit text-xs"
                         >
                             {title}
@@ -282,7 +327,7 @@ function IconContainer({
                     )}
                 </AnimatePresence>
                 <motion.div
-                    style={{ width: widthIcon, height: heightIcon }}
+                    style={{width: widthIcon, height: heightIcon}}
                     className="flex items-center justify-center"
                 >
                     {icon}
