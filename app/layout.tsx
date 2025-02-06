@@ -83,7 +83,7 @@ const steps: Tour[] = [
                 title: "Adding a Milestone",
                 content: <>{`Start building your research plan by adding a new milestone.`}</>,
                 selector: ".research-plan-tour-step1",
-                side: "top" as any,
+                side: "top-left" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10,
