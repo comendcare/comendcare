@@ -71,17 +71,21 @@ export function ImageCropper({
         const canvas = document.createElement("canvas");
         const scaleX = image.naturalWidth / image.width;
         const scaleY = image.naturalHeight / image.height;
-    
+      
         // Set canvas dimensions based on the crop size and image scaling
         canvas.width = crop.width * scaleX;
         canvas.height = crop.height * scaleY;
-    
+      
         const ctx = canvas.getContext("2d");
-    
+      
         if (ctx) {
             // Disable image smoothing for pixel-perfect results (optional)
             ctx.imageSmoothingEnabled = false;
     
+            // Fill the canvas with a white background
+            ctx.fillStyle = "#ffffff"; // Set background color to white
+            ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill the entire canvas with white
+        
             // Draw the cropped image onto the canvas
             ctx.drawImage(
                 image,
@@ -95,7 +99,7 @@ export function ImageCropper({
                 crop.height * scaleY
             );
         }
-    
+      
         // Return the cropped image as a data URL with the specified format and quality
         return canvas.toDataURL(format, quality);
     }

@@ -116,9 +116,100 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                     <div className="flex flex-col space-y-4">
                         <span className="flex gap-2">
                             <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
+                                {`Requests for Proposals`}
+                            </h3>
+                            {/* {NODE_TYPE_OPTIONS.find(value => value.value === "RFP") && (
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                            {NODE_TYPE_OPTIONS.find(value => value.value === "RFP")?.description}
+                                    </TooltipContent>
+                                </Tooltip>
+                            )} */}
+                        </span>
+                        {rfps.length > 0 && (
+                            <ul role="list" className="divide-y">
+                                {rfps.map((rfp, index) =>
+                                    <RFPDetails key={index} rfp={rfp} isPublic={!isPrivate}/>
+                                )}
+                            </ul>
+                        )}
+                        {isPrivate && (
+                            <div className="flex flex-col gap-2">
+                                <Button
+                                    className="w-fit"
+                                    onClick={async () => {
+                                        if (session?.user?.organizationId) {
+                                            const response = await getRoadmap(session.user.organizationId)
+                                            if (response.success && response.data && response.data?.id) {
+                                                const newRFP = await addMilestone("RFP", "New RFP")
+        
+                                                if (newRFP) {
+                                                    // don't do onboarding if the user starts from 'New RFP' button
+                                                    setOnboarded('research-plan-tour')
+                                                    router.push(`/app/research-plan?milestone=${newRFP.id}`)
+                                                    router.refresh()
+                                                }
+                                            } else {
+                                                // no roadmap found, create roadmap first
+                                                const roadmap = await createRoadmap(session.user.organizationId, {
+                                                    title: '',
+                                                    description: '',
+                                                    milestones: [{
+                                                        title: 'New RFP',
+                                                        nodeType: "RFP"
+                                                    }]
+                                                })
+
+                                                if (roadmap?.id) {
+                                                    // setRoadmapId(response.data)
+                                                    const nodesResponse = await getNodesEdgesAndMilestones(roadmap.id)
+                                                    const urlNode = roadmap.nodes[0].id
+                                                    if (nodesResponse.success) {
+                                                        initializeRoadmapState({
+                                                            roadmapId: roadmap.id,
+                                                            nodes: nodesResponse.data.nodes,
+                                                            edges: nodesResponse.data.edges,
+                                                            milestones: nodesResponse.data.milestones,
+                                                            selectedNodeId: urlNode
+                                                        })
+                                                    }
+                                                    toast.success(`Successfully created roadmap`)
+                                                } else {
+                                                    console.error(response.error)
+                                                    toast.error(response.error)
+                                                }
+
+                                                console.log(`created roadmap`, roadmap)
+
+                                                if (roadmap && roadmap?.nodes?.[0]?.id) {
+                                                    // don't do onboarding if the user starts from 'New RFP' button
+                                                    setOnboarded('research-plan-tour')
+                                                    router.push(`/app/research-plan?milestone=${roadmap.nodes[0].id}`)
+                                                    // router.refresh()
+                                                }
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <FaPlus />
+                                    {`Create an RFP`}
+                                </Button>
+                            </div>
+                        )}
+                        {rfps.length <= 0 && !isPrivate && (
+                            <p>{`No RFPs (Requests for Proposals) to show`}</p>
+                        )}
+                    </div>
+
+                    <div className="flex flex-col space-y-4">
+                        <span className="flex gap-2">
+                            <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
                                 {`Assets`}
                             </h3>
-                            {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET") && (
+                            {/* {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET") && (
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <FaInfoCircle />
@@ -127,7 +218,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                             {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET")?.description}
                                     </TooltipContent>
                                 </Tooltip>
-                            )}
+                            )} */}
                         </span>
                         {assets.length > 0 && (
                             <ul role="list" className="divide-y">
@@ -135,11 +226,11 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                     min: 2,
                                     max: 5
                                 })).map((asset, index) =>
-                                    <AssetDetails key={index} asset={asset}/>
+                                    <AssetDetails key={index} asset={asset} isPublic={!isPrivate}/>
                                 )}
                             </ul>
                         )}
-                        {assets.length <= 0 && isPrivate && (
+                        {isPrivate && (
                             <div className="flex flex-col gap-2">
                                 <Button
                                     className="w-fit"
@@ -204,97 +295,6 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                         )}
                         {assets.length <= 0 && !isPrivate && (
                             <p>{`No assets to show`}</p>
-                        )}
-                    </div>
-
-                    <div className="flex flex-col space-y-4">
-                        <span className="flex gap-2">
-                            <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
-                                {`Requests for Proposal`}
-                            </h3>
-                            {NODE_TYPE_OPTIONS.find(value => value.value === "RFP") && (
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <FaInfoCircle />
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80 text-wrap text-left">
-                                            {NODE_TYPE_OPTIONS.find(value => value.value === "RFP")?.description}
-                                    </TooltipContent>
-                                </Tooltip>
-                            )}
-                        </span>
-                        {rfps.length > 0 && (
-                            <ul role="list" className="divide-y">
-                                {rfps.map((rfp, index) =>
-                                    <RFPDetails key={index} rfp={rfp}/>
-                                )}
-                            </ul>
-                        )}
-                        {rfps.length <= 0 && isPrivate && (
-                            <div className="flex flex-col gap-2">
-                                <Button
-                                    className="w-fit"
-                                    onClick={async () => {
-                                        if (session?.user?.organizationId) {
-                                            const response = await getRoadmap(session.user.organizationId)
-                                            if (response.success && response.data && response.data?.id) {
-                                                const newRFP = await addMilestone("RFP", "New RFP")
-        
-                                                if (newRFP) {
-                                                    // don't do onboarding if the user starts from 'New RFP' button
-                                                    setOnboarded('research-plan-tour')
-                                                    router.push(`/app/research-plan?milestone=${newRFP.id}`)
-                                                    router.refresh()
-                                                }
-                                            } else {
-                                                // no roadmap found, create roadmap first
-                                                const roadmap = await createRoadmap(session.user.organizationId, {
-                                                    title: '',
-                                                    description: '',
-                                                    milestones: [{
-                                                        title: 'New RFP',
-                                                        nodeType: "RFP"
-                                                    }]
-                                                })
-
-                                                if (roadmap?.id) {
-                                                    // setRoadmapId(response.data)
-                                                    const nodesResponse = await getNodesEdgesAndMilestones(roadmap.id)
-                                                    const urlNode = roadmap.nodes[0].id
-                                                    if (nodesResponse.success) {
-                                                        initializeRoadmapState({
-                                                            roadmapId: roadmap.id,
-                                                            nodes: nodesResponse.data.nodes,
-                                                            edges: nodesResponse.data.edges,
-                                                            milestones: nodesResponse.data.milestones,
-                                                            selectedNodeId: urlNode
-                                                        })
-                                                    }
-                                                    toast.success(`Successfully created roadmap`)
-                                                } else {
-                                                    console.error(response.error)
-                                                    toast.error(response.error)
-                                                }
-
-                                                console.log(`created roadmap`, roadmap)
-
-                                                if (roadmap && roadmap?.nodes?.[0]?.id) {
-                                                    // don't do onboarding if the user starts from 'New RFP' button
-                                                    setOnboarded('research-plan-tour')
-                                                    router.push(`/app/research-plan?milestone=${roadmap.nodes[0].id}`)
-                                                    // router.refresh()
-                                                }
-                                            }
-                                        }
-                                    }}
-                                >
-                                    <FaPlus />
-                                    {`Create a RFP (Request for Proposal)`}
-                                </Button>
-                            </div>
-                        )}
-                        {rfps.length <= 0 && !isPrivate && (
-                            <p>{`No RFPs (Requests for Proposal) to show`}</p>
                         )}
                     </div>
                 </CardContent>

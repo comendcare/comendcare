@@ -7,7 +7,7 @@ import MDX from "@/components/mdx"
 import {cn, createDicebearAvatar, formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
 import {Button} from "@/components/ui/button"
-import {PublicRoadmapCard} from "@/components/public-roadmap-card"
+import {RoadmapCard} from "@/components/public-roadmap-card"
 import {PublicMilestoneDetails} from "@/components/public-milestone-details"
 import {FaArrowLeft, FaCalendar, FaCircleDollarToSlot, FaCity, FaPeopleGroup, FaPlus} from "react-icons/fa6"
 import {BackButton} from "@/components/back-button"
@@ -270,9 +270,10 @@ export default async function OrganizationRoadmapPage({
                             {/*<div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">*/}
                             <div className="flex flex-col-reverse md:grid md:grid-cols-3 m-auto w-full gap-4">
                                 <div className="md:col-span-2">
-                                    <PublicRoadmapCard
+                                    <RoadmapCard
                                         roadmap={roadmaps[0]}
                                         subdomain={organization?.subdomain || undefined}
+                                        isPublic={true}
                                     />
                                 </div>
                                 <div className="col-span-1">

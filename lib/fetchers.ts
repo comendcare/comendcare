@@ -51,7 +51,7 @@ export async function getConditionsDataFromOrgId(organizationId: string): Promis
 export async function getOrganizationData(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
-        : null
+        : domain
 
     return await unstable_cache(
         async () => {
@@ -79,7 +79,7 @@ export async function getOrganizationData(domain: string) {
 export async function getRoadmapsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
-        : null
+        : domain
 
     const roadmaps = prisma.roadmap.findMany({
         where: {

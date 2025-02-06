@@ -1356,7 +1356,6 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                     {/*    )}*/}
                                     {/*/>*/}
 
-
                                     <MoneyInput
                                         form={editFinancesForm}
                                         label="Total funds raised to date"
