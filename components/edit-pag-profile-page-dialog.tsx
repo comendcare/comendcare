@@ -1024,6 +1024,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                                 no results found.
                                                             </p>
                                                         }
+                                                        showHoverCard={false}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
@@ -1060,6 +1061,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                                 no results found.
                                                             </p>
                                                         }
+                                                        showHoverCard={false}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
@@ -1097,6 +1099,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                                 no results found.
                                                             </p>
                                                         }
+                                                        showHoverCard={false}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>
@@ -1148,6 +1151,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                                 no results found.
                                                             </p>
                                                         }
+                                                        showHoverCard={false}
                                                     />
                                                 </FormControl>
                                                 <FormMessage/>

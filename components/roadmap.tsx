@@ -95,9 +95,9 @@ export function Roadmap({data}: {data: any}) {
         <TooltipProvider delayDuration={0}>
             <ResizablePanelGroup
                 direction="horizontal"
-                onLayout={(sizes: number[]) => {
-                    setLayout(sizes) // Use Zustand's setLayout to save panel sizes
-                }}
+                // onLayout={(sizes: number[]) => {
+                //     setLayout(sizes) // Use Zustand's setLayout to save panel sizes
+                // }}
                 className="h-full items-stretch"
             >
                 <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
@@ -154,8 +154,8 @@ export function Roadmap({data}: {data: any}) {
                         <ResizableHandle withHandle />
 
                         <ResizablePanel
-                            defaultSize={defaultLayout[1]}
-                            minSize={50}
+                            defaultSize={25}
+                            minSize={25}
                             className="h-full flex flex-col"
                         >
                             <MilestoneDetailsPanel
