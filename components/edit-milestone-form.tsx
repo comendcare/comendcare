@@ -687,6 +687,7 @@ const StatusFormField = ({form}: { form: any }) => {
 const BudgetFormField = ({form}: { form: any }) => {
     return (
         <MoneyInput
+            className="h-[40px] -mt-2"
             form={form}
             name="budget"
         />

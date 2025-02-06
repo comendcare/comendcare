@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/form";
 import {Input} from "@/components/ui/input"; // ShadCN UI Input
 import {UseFormReturn} from "react-hook-form";
-import {formatMoney} from "@/lib/utils";
+import {cn, formatMoney} from "@/lib/utils";
 
 type TextInputProps = {
     form: UseFormReturn<any>;
@@ -28,7 +28,7 @@ const moneyFormatter = Intl.NumberFormat("en-US", {
     maximumFractionDigits: 2,
 });
 
-export default function MoneyInput(props: TextInputProps) {
+export default function MoneyInput(props: TextInputProps & {className?: string}) {
     const initialValue = props.form.getValues()[props.name]
         ? moneyFormatter.format(props.form.getValues()[props.name])
         : "";
@@ -64,6 +64,7 @@ export default function MoneyInput(props: TextInputProps) {
                         }
                         <FormControl>
                             <Input
+                                className={cn(props.className)}
                                 variant={"currency"}
                                 placeholder={props.placeholder || ""}
                                 type="text"
