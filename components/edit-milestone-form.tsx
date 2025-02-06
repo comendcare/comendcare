@@ -1419,7 +1419,7 @@ const TaskField = ({
             {/* select kanban column */}
             <Select onValueChange={(value: string) => columnChanged(value)} value={task.columnId}>
                 <SelectTrigger className="w-[100px]">
-                    <SelectValue className="text-left"/>
+                    <SelectValue/>
                 </SelectTrigger>
                 <SelectContent>
                     {kanbanColumns.map(column => (
