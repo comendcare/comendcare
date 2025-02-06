@@ -352,50 +352,50 @@ const Onborda: React.FC<OnbordaProps> = ({
       case "top-left":
         return {
           transform: `rotate(90deg)`,
-          left: "10px",
+          left: "20px",
           bottom: "-23px",
         };
       case "top-right":
         return {
           transform: `rotate(90deg)`,
-          right: "10px",
+          right: "20px",
           bottom: "-23px",
         };
       case "bottom-left":
         return {
           transform: `rotate(270deg)`,
-          left: "10px",
+          left: "20px",
           top: "-23px",
         };
       case "bottom-right":
         return {
           transform: `rotate(270deg)`,
-          right: "10px",
+          right: "20px",
           top: "-23px",
         };
       case "right-bottom":
         return {
           transform: `rotate(180deg)`,
           left: "-23px",
-          bottom: "10px",
+          bottom: "20px",
         };
       case "right-top":
         return {
           transform: `rotate(180deg)`,
           left: "-23px",
-          top: "10px",
+          top: "20px",
         };
       case "left-bottom":
         return {
           transform: `rotate(0deg)`,
           right: "-23px",
-          bottom: "10px",
+          bottom: "20px",
         };
       case "left-top":
         return {
           transform: `rotate(0deg)`,
           right: "-23px",
-          top: "10px",
+          top: "20px",
         };
       default:
         return {}; // Default case if no side is specified
