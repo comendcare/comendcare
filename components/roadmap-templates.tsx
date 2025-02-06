@@ -74,10 +74,10 @@ export default function RoadmapTemplates() {
         <div className="w-full h-full flex flex-col justify-left gap-12 p-14">
             <span className="flex flex-col gap-2">
                 <h1 className="text-3xl font-bold text-primary">
-                    {`Expand your Research Plan faster with an Asset, Project, or RFP (Request for Proposal) template`}
+                    {`Expand your Research Plan faster with an Asset, Project, or RFP (Request for Proposals) template`}
                 </h1>
                 <p className="text-muted-foreground">
-                    {`Assets, Projects, and RFPs (Requests for Proposal) are the milestones that make up your Research Plan. We've put together some templates to get you started.`}
+                    {`Assets, Projects, and RFPs (Requests for Proposals) are the milestones that make up your Research Plan. We've put together some templates to get you started.`}
                 </p>
             </span>
 

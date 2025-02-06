@@ -73,8 +73,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                                             {condition.numberOfPatientsEngaged && (
                                                 <li>
                                                     <span
-                                                        className="font-bold">{condition.numberOfPatientsEngaged}</span> patients
-                                                    engaged
+                                                        className="font-bold">{condition.numberOfPatientsEngaged}</span> patients engaged
                                                 </li>
                                             )}
                                             {condition.nationalEstimatedPopulation && (

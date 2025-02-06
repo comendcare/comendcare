@@ -353,7 +353,7 @@ export default function ResearchOnboardingForm(
                                             Mechanisms of action
                                         </FormLabel>
                                         <FormDescription className="flex items-center">
-                                            {`What types of genetic effects are you investigating?`}
+                                            {`What types of genetic effects are you investigating? Select all that apply.`}
                                         </FormDescription>
                                         <FormControl>
                                             <MultipleSelector
@@ -428,6 +428,9 @@ export default function ResearchOnboardingForm(
                                         <FormLabel>
                                             Therapeutics under development
                                         </FormLabel>
+                                        <FormDescription className="flex items-center">
+                                            {`What types of treatments is your organization currently developing? Select all that apply.`}
+                                        </FormDescription>
                                         <FormControl>
                                             <MultipleSelector
                                                 {...field}
@@ -466,7 +469,7 @@ export default function ResearchOnboardingForm(
                                             Therapeutics of interest
                                         </FormLabel>
                                         <FormDescription className="flex items-center">
-                                            {`The treatment modalities of interest of your organization.`}
+                                            {`The treatment modalities your organization is interested in. Select all that apply.`}
                                             <Tooltip delayDuration={0}>
                                                 {/*disabled to make the tooltip unclickable*/}
                                                 <TooltipTrigger disabled>
