@@ -65,7 +65,7 @@ export function RFPDetails({ rfp, isPublic }: { rfp: MilestoneType, isPublic: bo
                                 <h2 className="text-sm font-semibold truncate text-wrap break-words">
                                     {rfp?.title}
                                 </h2>
-                                {!isPublic && <PrivateBadge />}
+                                {rfp.private && <PrivateBadge />}
                             </div>
                             <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap">
                                 <Details rfp={rfp} />

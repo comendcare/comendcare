@@ -56,7 +56,7 @@ export function AssetDetails({ asset, isPublic }: { asset: MilestoneType, isPubl
                                 <h2 className="text-sm font-semibold truncate text-wrap break-words">
                                     {asset?.title}
                                 </h2>
-                                {!isPublic && <PrivateBadge />}
+                                {asset.private && <PrivateBadge />}
                             </div>
                             {asset?.contacts && asset.contacts.length > 0 ? (
                                 <div className={"w-full mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap"}>
