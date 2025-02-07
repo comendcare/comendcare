@@ -18,7 +18,7 @@ export default function CreateRoadmapButton() {
                 startTransition(async () => {
                     const roadmap = await createRoadmap(id)
                     va.track("Created Roadmap")
-                    // router.refresh()
+                    router.refresh()
                     if (roadmap) router.push(`/admin/research-plan/${roadmap?.id}`)
                 })
             }

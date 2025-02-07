@@ -253,10 +253,10 @@ export default function OrganizationOnboardingForm(
     }, [address, newOrgForm]);
 
     async function updateSession(organizationId: string) {
-        // await update({
-        //     ...session,
-        //     organizationId: organizationId,
-        // })
+        await update({
+            ...session,
+            organizationId: organizationId,
+        })
     }
 
     async function joinOrgOnSubmit() {
@@ -331,7 +331,7 @@ export default function OrganizationOnboardingForm(
 
                     // Update the session object with the newly created organizationId
                     updateSession(res.id)
-                    // router.refresh()
+                    router.refresh()
                     router.push(nextLink)
                     toast.success(`Successfully created organization!`)
                 }

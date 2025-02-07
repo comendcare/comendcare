@@ -267,7 +267,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
             await updateOrganization(formData, session.user.organizationId);
             toast.success("Organization profile updated successfully!");
             setOpen(false)
-            // router.refresh(); // Refresh the page to reflect changes
+            router.refresh(); // Refresh the page to reflect changes
         } catch (error) {
             console.error("Error updating organization:", error);
             toast.error("Failed to update organization profile.");
@@ -429,7 +429,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
             await updateOrganization(formData, session.user.organizationId);
             toast.success("Organization updated successfully!");
             setOpen(false)
-            // router.refresh(); // Refresh the page to reflect changes
+            router.refresh(); // Refresh the page to reflect changes
         } catch (error) {
             toast.error("Failed to update organization.");
         }
@@ -564,7 +564,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                 }
 
                 setOpen(false)
-                // router.refresh(); // Refresh the page to reflect changes
+                router.refresh(); // Refresh the page to reflect changes
             } else {
                 console.error(response.error);
                 toast.error(response.error || "Failed to update condition.");

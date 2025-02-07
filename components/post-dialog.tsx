@@ -98,7 +98,7 @@ export function PostDialog(
 
     const onDelete = React.useCallback(async () => {
         await deletePost(post.id)
-        // router.refresh()
+        router.refresh()
     }, [post.id]);
 
     return (

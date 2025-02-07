@@ -200,7 +200,7 @@ export default function UserOnboardingForm() {
             }
 
             toast.success("Successfully updated user profile!");
-            // router.refresh();
+            router.refresh();
             router.push("/onboarding/organization");
         } catch (error) {
             toast.error("An error occurred while updating your profile.");

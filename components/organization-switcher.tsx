@@ -44,11 +44,11 @@ export function OrganizationSwitcher({
 
     const handleOrganizationChange = async (membership: MemberWithOrganization) => {
         setActiveOrganization(membership);
-        // await update({
-        //     ...session,
-        //     organizationId: membership.organizationId,
-        // });
-        // router.refresh();
+        await update({
+            ...session,
+            organizationId: membership.organizationId,
+        });
+        router.refresh();
     };
 
     return (

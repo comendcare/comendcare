@@ -70,7 +70,7 @@ export function Post({data}: PostProps) {
 
     const onDelete = React.useCallback(async () => {
         await deletePost(data.id)
-        // router.refresh()
+        router.refresh()
     }, [data.id]);
 
     const [ref, {height}] = useMeasure();
