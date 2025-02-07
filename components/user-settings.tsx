@@ -50,7 +50,7 @@ export default function UserSettings() {
             const response = await leaveOrganization(session, session?.user.organizationId || "")
 
             if (response.success) {
-                // await update({organizationId: null})
+                await update({organizationId: null})
                 revalidatePath("/app/profile")
                 toast.success("Removed from Organization successfully");
             } else {
@@ -71,7 +71,7 @@ export default function UserSettings() {
             const response = await deleteUser(session)
 
             if (response.success) {
-                // await update({organizationId: null})
+                await update({organizationId: null})
                 revalidatePath("/app/profile")
                 toast.success("Deleted your account successfully.");
             } else {

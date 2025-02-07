@@ -34,10 +34,10 @@ export default function OrganizationSettingsPage({organization}: { organization:
             await deleteOrganization(organization)
                 .then(async res => {
                     if (res.success) {
-                        // await update({
-                        //     ...session,
-                        //     organizationId: undefined
-                        // })
+                        await update({
+                            ...session,
+                            organizationId: undefined
+                        })
                         toast.success(`Successfully deleted organization!`)
                     } else {
                         toast.error(res.error)

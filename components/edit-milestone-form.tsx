@@ -257,35 +257,35 @@ export function EditMilestoneForm({
             openTo
         } = values;
 
-        // setMilestone(milestoneData?.nodeId, {
-        //     nodeType,
-        //     title,
-        //     ...(description !== undefined && description !== null ? {description} : undefined),
-        //     // ...(startDate.month !== undefined || startDate.year !== undefined ? {
-        //     //     startDate: new Date(
-        //     //         startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
-        //     //         startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
-        //     //         1
-        //     //     )
-        //     // } : undefined),
-        //     // ...(endDate.month !== undefined || endDate.year !== undefined ? {
-        //     //     endDate: new Date(
-        //     //         endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
-        //     //         endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
-        //     //         1
-        //     //     )
-        //     // } : undefined),
-        //     ...(startDate ? {startDate} : undefined),
-        //     ...(endDate ? {endDate} : undefined),
-        //     ...(budget ? {budget} : undefined),
-        //     ...(attachments ? {attachments} : undefined),
-        //     ...(types ? { types: types.map(t => t?.value) } : undefined),
-        //     ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
-        //     status,
-        //     private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
-        //     ...(contacts ? {contacts} : undefined),
-        //     ...(openTo ? {openTo} : undefined)
-        // })
+        setMilestone(milestoneData?.nodeId, {
+            nodeType,
+            title,
+            ...(description !== undefined && description !== null ? {description} : undefined),
+            // ...(startDate.month !== undefined || startDate.year !== undefined ? {
+            //     startDate: new Date(
+            //         startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
+            //         startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
+            //         1
+            //     )
+            // } : undefined),
+            // ...(endDate.month !== undefined || endDate.year !== undefined ? {
+            //     endDate: new Date(
+            //         endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
+            //         endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
+            //         1
+            //     )
+            // } : undefined),
+            ...(startDate ? {startDate} : undefined),
+            ...(endDate ? {endDate} : undefined),
+            ...(budget ? {budget} : undefined),
+            ...(attachments ? {attachments} : undefined),
+            ...(types ? { types: types.map(t => t?.value) } : undefined),
+            ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
+            status,
+            private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
+            ...(contacts ? {contacts} : undefined),
+            ...(openTo ? {openTo} : undefined)
+        })
 
         // setTasks(unionById(tasks || [], kanbanTasks).map(task => {
         //     const newTask = tasks?.find(t => t.id === task.id)
