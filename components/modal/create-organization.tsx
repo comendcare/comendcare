@@ -39,7 +39,7 @@ export default function CreateOrganizationModal() {
                     } else {
                         va.track("Created Site")
                         const { id } = res
-                        router.refresh()
+                        // router.refresh()
                         router.push(`/admin/organization/${id}`)
                         modal?.hide()
                         toast.success(`Successfully created organization!`)

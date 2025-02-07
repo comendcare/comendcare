@@ -13,7 +13,7 @@ export default function NewKanbanForm() {
         if (session?.user?.organizationId) {
             const kanban = await createKanban(session.user.organizationId)
             console.log(`kanban`, kanban)
-            router.refresh() // refresh to reflect changes
+            // router.refresh() // refresh to reflect changes
         } else {
             console.error(`organization id is not defined in the session:`, session)
         }

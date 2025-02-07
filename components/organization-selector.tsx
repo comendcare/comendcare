@@ -58,11 +58,11 @@ export default function OrganizationSelector({
     const handleOrganizationChange = async (org: MemberWithOrganization) => {
         setSelectedOrganization(org);
         setOpen(false);
-        await update({
-            ...session,
-            organizationId: org.organization.id,
-        });
-        router.refresh()
+        // await update({
+        //     ...session,
+        //     organizationId: org.organization.id,
+        // });
+        // router.refresh()
     };
 
     return (

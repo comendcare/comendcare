@@ -110,8 +110,7 @@ export const PrivateFlowView = ({
     const debounceUpdateStore = useCallback(
         debounce(
             (nodes: Node[]) => {
-                // updateDBFlow({ roadmapId, nodes, edges })
-                setDbNodes(nodes)
+                // setDbNodes(nodes)
             }, 500
         ),
         []

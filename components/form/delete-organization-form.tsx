@@ -30,12 +30,12 @@ export default function DeleteOrganizationForm({
                         const response = await deleteOrganization(organization);
 
                         if (response.success) {
-                            await update({
-                                ...session,
-                                organizationId: undefined,
-                            });
+                            // await update({
+                            //     ...session,
+                            //     organizationId: undefined,
+                            // });
                             va.track("Deleted Organization");
-                            router.refresh();
+                            // router.refresh();
                             router.push("/admin/organizations");
                             toast.success("Successfully deleted organization!");
                         } else {

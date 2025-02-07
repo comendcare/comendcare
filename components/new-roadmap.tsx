@@ -53,7 +53,7 @@ export default function NewRoadmapForm() {
             //     selectedNodeId: null,
             //     roadmapId: roadmap.id
             // })
-            router.refresh() // refresh to reflect changes
+            // router.refresh() // refresh to reflect changes
         } else {
             console.error(`organization id is not defined in the session:`, session)
         }
