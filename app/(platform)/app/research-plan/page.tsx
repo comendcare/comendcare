@@ -18,26 +18,49 @@ export default async function RoadmapPage() {
     }
 
     // check if this organization has an existing roadmap
-    const response = await getRoadmap(orgId)
-    if (response.success && response.data) {
-        if (response.data.milestones && response.data.milestones.length > 0) {
-            return (
-                <main className="flex flex-col items-center h-full mx-auto">
-                    <Roadmap data={response.data}/>
-                </main>
-            )
-        }
+    // const response = await getRoadmap(orgId)
+    // if (response.success && response.data) {
+    //     if (response.data.milestones && response.data.milestones.length > 0) {
+    //         return (
+    //             <main className="flex flex-col items-center h-full mx-auto">
+    //                 <Roadmap data={response.data}/>
+    //             </main>
+    //         )
+    //     }
 
-        return (
-            <main className="flex flex-col items-center h-full mx-auto">
-               <RoadmapTemplates />
-            </main>
-        )
-    }
+    //     return (
+    //         <main className="flex flex-col items-center h-full mx-auto">
+    //            <RoadmapTemplates />
+    //         </main>
+    //     )
+    // }
 
+    // const response = await getRoadmap(orgId)
+    // if (response.success && response.data) {
+    //     if (response.data.milestones && response.data.milestones.length > 0) {
+    //         return (
+    //             <main className="flex flex-col items-center h-full mx-auto">
+    //                 <Roadmap/>
+    //             </main>
+    //         )
+    //     }
+
+    //     return (
+    //         <main className="flex flex-col items-center h-full mx-auto">
+    //            <RoadmapTemplates />
+    //         </main>
+    //     )
+    // }
+    
     return (
         <main className="flex gap-8 flex-col w-full h-full justify-center items-center mx-auto">
-            <NewRoadmapForm />
+            <Roadmap />
         </main>
     )
+
+    // return (
+    //     <main className="flex gap-8 flex-col w-full h-full justify-center items-center mx-auto">
+    //         <NewRoadmapForm />
+    //     </main>
+    // )
 }
