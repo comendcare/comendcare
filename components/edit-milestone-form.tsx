@@ -171,7 +171,10 @@ export function EditMilestoneForm({
             nodeType: milestoneData?.node.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            types: (milestoneData?.types || []).map((type: any) => MILESTONE_TYPE_OPTIONS.find(option => option?.value === type) || {label: 'Unknown', value: "UNKNOWN"}),
+            types: (milestoneData?.types || []).map((type: any) => MILESTONE_TYPE_OPTIONS.find(option => option?.value === type) || {
+                label: 'Unknown',
+                value: "UNKNOWN"
+            }),
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
             startDate: milestoneData?.startDate,
             endDate: milestoneData?.endDate,
@@ -279,7 +282,7 @@ export function EditMilestoneForm({
             ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
             ...(attachments ? {attachments} : undefined),
-            ...(types ? { types: types.map(t => t?.value) } : undefined),
+            ...(types ? {types: types.map(t => t?.value)} : undefined),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
@@ -412,75 +415,80 @@ export function EditMilestoneForm({
 
                     <EditTitle form={form}/>
 
-                    <FormField
-                        control={form.control}
-                        name="nodeType"
-                        render={({field}) => (
-                            <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
-                                <FormControl>
-                                    <ToggleGroup
-                                        type="single"
-                                        variant="outline"
-                                        value={field.value}
-                                        onValueChange={(value) => {
-                                            if (value) {
-                                                field.onChange(value)
-                                            }
-                                        }}
-                                        className="w-full flex flex-wrap gap-2 justify-between"
-                                    >
-                                        {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
-                                            <ToggleGroupItem
-                                                key={value}
-                                                value={value}
-                                                className={"text-md grow flex gap-2"}
-                                            >
-                                                {label}
-                                                <Tooltip>
-                                                    <TooltipTrigger>
-                                                        <FaInfoCircle/>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent className="max-w-80 text-wrap text-left">
-                                                        {description}
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </ToggleGroupItem>
-                                        ))}
-                                    </ToggleGroup>
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
                     <FormItem className="w-full flex flex-row gap-4 justify-start items-center mr-10">
-                        <FormLabel className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Private</FormLabel>
+                        <FormLabel
+                            className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Private</FormLabel>
                         <PrivatePublicFormField form={form} formData={formData}/>
                     </FormItem>
 
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col grow">
-                                <FormLabel
-                                    className="text-2xl font-semibold leading-none tracking-tight">{`Description`}</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        id="description"
-                                        placeholder={`Enter a description`}
-                                        defaultValue={field.value}
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
                     <FormItem>
                         <FormLabel
-                            className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
+                            className="text-2xl font-semibold leading-none tracking-tight">{`Details`}
+                        </FormLabel>
+
+                        <FormField
+                            control={form.control}
+                            name="nodeType"
+                            render={({field}) => (
+                                <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
+                                    <FormControl>
+                                        <ToggleGroup
+                                            type="single"
+                                            variant="outline"
+                                            value={field.value}
+                                            onValueChange={(value) => {
+                                                if (value) {
+                                                    field.onChange(value)
+                                                }
+                                            }}
+                                            className="w-full flex flex-wrap gap-2 justify-between"
+                                        >
+                                            {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
+                                                <ToggleGroupItem
+                                                    key={value}
+                                                    value={value}
+                                                    className={"text-md grow flex gap-2"}
+                                                >
+                                                    {label}
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            <FaInfoCircle/>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                                            {description}
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </ToggleGroupItem>
+                                            ))}
+                                        </ToggleGroup>
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({field}) => (
+                                <FormItem className="w-full grid grid-cols-[120px_auto] gap-x-2 items-start">
+                                    <FormLabel className="text-md mt-2">
+                                        {`Description`}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            id="description"
+                                            placeholder={`Enter a description`}
+                                            defaultValue={field.value}
+                                            {...field}
+                                            className="border-transparent hover:border-input"
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
                         <FormItem className="w-full grid grid-cols-[120px_auto] gap-x-2 items-center">
                             <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
                             <MilestoneTypeFormField form={form}/>
@@ -512,16 +520,16 @@ export function EditMilestoneForm({
                                 </>
                             )}
                         </FormItem>
+
+                        {milestoneData?.node?.type === "PROJECT" && (
+                            <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
+                        )}
+
+                        {milestoneData?.node?.type === "RFP" && (
+                            <TimelineFormField form={form} startLabel={"Request Opens"}
+                                               endLabel={"Deadline for Proposals"}/>
+                        )}
                     </FormItem>
-
-                    {milestoneData?.node?.type === "PROJECT" && (
-                        <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
-                    )}
-
-                    {milestoneData?.node?.type === "RFP" && (
-                        <TimelineFormField form={form} startLabel={"Request Opens"}
-                                           endLabel={"Deadline for Proposals"}/>
-                    )}
 
                     <ContactsFormField form={form}/>
 
@@ -596,6 +604,7 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Milestone type"
+                                className="border-transparent hover:border-input"
                                 emptyIndicator={
                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                         no results found.
@@ -687,7 +696,7 @@ const StatusFormField = ({form}: { form: any }) => {
 const BudgetFormField = ({form}: { form: any }) => {
     return (
         <MoneyInput
-            className="h-[40px] -mt-2"
+            className="h-[40px] -mt-2 border-transparent hover:border-input"
             form={form}
             name="budget"
         />
@@ -705,8 +714,6 @@ const TimelineFormField = ({
 }) => {
     return (
         <span className="flex flex-col gap-2 align-center">
-            <FormLabel
-                className="text-2xl font-semibold leading-none tracking-tight">{`Timeline`}</FormLabel>
 
             <FormItem
                 className="w-full grid grid-rows[auto_auto] grid-cols-[120px_120px_auto] space-y-0 gap-2 items-center">
@@ -715,7 +722,7 @@ const TimelineFormField = ({
                     control={form.control}
                     name="startDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px]">
+                        <FormItem className="h-[40px] border-transparent hover:border-input">
                             <Select
                                 defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                                 onValueChange={(value) => {
@@ -726,7 +733,7 @@ const TimelineFormField = ({
                                 }}
                             >
                                 <FormControl>
-                                    <SelectTrigger className="h-[40px]">
+                                    <SelectTrigger className="h-[40px] border-transparent hover:border-input">
                                         <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
@@ -754,9 +761,9 @@ const TimelineFormField = ({
                     control={form.control}
                     name="startDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px]">
+                        <FormItem className="h-[40px] border-transparent hover:border-input">
                             <Input
-                                className="h-[40px]"
+                                className="h-[40px] border-transparent hover:border-input"
                                 placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
@@ -776,7 +783,7 @@ const TimelineFormField = ({
                     control={form.control}
                     name="endDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px]">
+                        <FormItem className="h-[40px] border-transparent hover:border-input">
                             <Select
                                 defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                                 onValueChange={(value) => {
@@ -787,7 +794,7 @@ const TimelineFormField = ({
                                 }}
                             >
                                 <FormControl>
-                                    <SelectTrigger className="h-[40px]">
+                                    <SelectTrigger className="h-[40px] border-transparent hover:border-input">
                                         <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
@@ -815,9 +822,9 @@ const TimelineFormField = ({
                     control={form.control}
                     name="endDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px]">
+                        <FormItem className="h-[40px] border-transparent hover:border-input">
                             <Input
-                                className="h-[40px]"
+                                className="h-[40px] border-transparent hover:border-input"
                                 placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
@@ -1264,12 +1271,12 @@ const EditTitle = ({form}: { form: any }) => {
             render={({field}) => (
                 <FormItem className="flex flex-col grow mr-10">
                     <FormControl>
-                        <AutosizeTextarea 
-                                className="overflow-hidden resize-none font-semibold text-3xl"
-                                id="title"
-                                placeholder={`Enter a title`}
-                                defaultValue={field.value}
-                                onChange={field.onChange}
+                        <AutosizeTextarea
+                            className="overflow-hidden resize-none font-semibold text-3xl border-transparent hover:border-input"
+                            id="title"
+                            placeholder={`Enter a title`}
+                            defaultValue={field.value}
+                            onChange={field.onChange}
                         />
                         {/* <span
                             className="flex flex-row gap-2 items-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
