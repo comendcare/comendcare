@@ -77,16 +77,17 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
                                     {milestone.title}
                                 </CardTitle>
 
-                                {status && (
-                                    <div
-                                        className={`h-8 px-2 py-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 flex-shrink-0 ${statusStyle}`}
-                                    >
-                                        {status}
-                                    </div>
-                                )}
+                                <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone?.nodeType))?.value || "PROJECT"}/>
                             </div>
                         </div>
-                        <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone?.nodeType))?.value || "PROJECT"}/>
+
+                        {status && (
+                            <div
+                                className={`w-fit h-8 px-2 py-1 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 flex-shrink-0 ${statusStyle}`}
+                            >
+                                {status}
+                            </div>
+                        )}
 
                         {/*<span className="w-full flex">*/}
                         {/*    {(milestoneType) && (*/}
@@ -98,9 +99,9 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
                     </CardHeader>
 
                     <CardContent className="flex flex-col items-start justify-center gap-4">
-                        <div className="line-clamp-3">
-                            {milestone.description}
-                        </div>
+                        {/*<div className="line-clamp-3">*/}
+                        {/*    {milestone.description}*/}
+                        {/*</div>*/}
 
                         {/*{milestone.budget &&*/}
                         {/*    <div className="m-0 flex items-center">*/}

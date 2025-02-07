@@ -714,7 +714,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'COMPLETED',
-            types: ['NATURALHISTORYSTUDY']
+            types: ['NATURALHISTORYSTUDY'],
+            nodeType: 'RFP'
         },
         {
             title: 'Literature Review',
@@ -725,7 +726,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'COMPLETED',
-            types: ['LITERATUREREVIEW']
+            types: ['LITERATUREREVIEW'],
+            nodeType: 'RFP'
         },
         {
             title: 'Identify Existing Disease Models',
@@ -736,7 +738,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'INPROGRESS',
-            types: ['OTHERANIMALMODEL']
+            types: ['OTHERANIMALMODEL'],
+            nodeType: 'PROJECT'
         },
         {
             title: 'Construct Mouse Models',
@@ -746,7 +749,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'INPROGRESS',
-            types: ['MOUSEMODEL']
+            types: ['MOUSEMODEL'],
+            nodeType: 'RFP'
         },
         {
             title: 'Construct Patient-Derived Cells',
@@ -756,7 +760,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'INPROGRESS',
-            types: ['PATIENTDERIVEDCELLLINE']
+            types: ['PATIENTDERIVEDCELLLINE'],
+            nodeType: 'ASSET'
         },
         {
             title: 'Design ASO Construct',
@@ -766,7 +771,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'COMPLETED',
-            types: ['CONSTRUCTDESIGN']
+            types: ['CONSTRUCTDESIGN'],
+            nodeType: 'ASSET'
         },
         {
             title: 'Produce Plasmid',
@@ -776,7 +782,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'PLANNED',
-            types: ['PLASMIDPRODUCTION']
+            types: ['PLASMIDPRODUCTION'],
+            nodeType: 'ASSET'
         },
         {
             title: 'Proof-Of-Concept Study',
@@ -786,7 +793,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'PLANNED',
-            types: ['PROOFOFCONCEPT']
+            types: ['PROOFOFCONCEPT'],
+            nodeType: 'ASSET'
         },
         {
             title: 'Animal Toxicology Study',
@@ -796,7 +804,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'PLANNED',
-            types: ['TOXICOLOGY']
+            types: ['TOXICOLOGY'],
+            nodeType: 'ASSET'
         }
     ]
 };
@@ -914,7 +923,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                 const node = await prisma.node.create({
                     data: {
                         roadmapId: roadmap.id,
-                        type: 'PROJECT',
+                        type: milestone.nodeType,
                         positionX: index * 500,
                         positionY: 0,
                         data: {
