@@ -18,7 +18,7 @@ function countNodeTypes(data: { node: { type: string } }[]): NodeTypeCount {
 }
 
 export function OrganizationMarketplaceCard({organization}: { organization: any }) {
-    const {subdomain, image, name, description, moneyRaised, condition} = organization;
+    const {subdomain, image, name, description, moneyDeployed, condition} = organization;
     const orgCondition = condition?.[0]?.condition || {};
     const {associatedGenes = [], numberOfPatientsEngaged} = orgCondition;
 
@@ -45,10 +45,10 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                         {name}
                     </CardTitle>
                     <div className="w-full grid gap-4 grid-cols-2">
-                        {moneyRaised && (
+                        {moneyDeployed && (
                             <div className="m-0 flex items-center">
                                 <FaCircleDollarToSlot className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
-                                {formatMoney(moneyRaised)} raised
+                                {formatMoney(moneyDeployed)} deployed
                             </div>
                         )}
                         {numberOfPatientsEngaged && (
@@ -60,9 +60,9 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                     </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-start justify-center space-y-4">
-                    <div className="line-clamp-3">
-                        {description}
-                    </div>
+                    {/*<div className="line-clamp-3">*/}
+                    {/*    {description}*/}
+                    {/*</div>*/}
                     <div className="flex flex-row space-x-2">
                         {nodeTypeLabels.map(({ key, icon: Icon, label }) => (
                         nodeTypeCount[key] ? (

@@ -1,6 +1,6 @@
 "use client"
-import { cn } from "@/lib/utils"
-import { FaBars, FaX } from "react-icons/fa6"
+import {cn} from "@/lib/utils"
+import {FaBars, FaX} from "react-icons/fa6"
 import {
     motion,
     AnimatePresence,
@@ -8,8 +8,8 @@ import {
     useMotionValueEvent
 } from "framer-motion"
 import Link from "next/link"
-import React, { useRef, useState } from "react"
-import { buttonVariants } from "@/components/ui/button"
+import React, {useRef, useState} from "react"
+import {buttonVariants} from "@/components/ui/button"
 import logo from "@/public/logos/comend-full-logo.png"
 import Image from "next/image"
 import {
@@ -17,8 +17,8 @@ import {
     MenuItem,
     ProductItem
 } from "@/components/layout/sections/navbar-menu"
-import { encode } from "qss"
-import { imgHeight, imgWidth } from "@/components/layout/sections/tabs-features"
+import {encode} from "qss"
+import {imgHeight, imgWidth} from "@/components/layout/sections/tabs-features"
 import {PulsatingButton} from "@/components/ui/pulsating-button";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
@@ -38,6 +38,8 @@ interface NavbarProps {
     navItems: NavbarItem[]
     visible: boolean
 }
+
+const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
 export const LandingNavbar: React.FC = () => {
     const navItems: NavbarItem[] = [
@@ -79,13 +81,25 @@ export const LandingNavbar: React.FC = () => {
         //     ]
         // },
         // { name: "Features", link: "/#features" },
-        { name: "About", link: "/about" },
-        { name: "FAQ", link: "/faq" },
-        { name: "Contact", link: "/contact" }
+        {
+            name: "About",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/about` : `http://${rootDomain}/about`
+        },
+        {
+            name: "FAQ",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/faq` : `http://${rootDomain}/faq`
+        },
+        {
+            name: "Contact",
+            link: process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/contact` : `http://${rootDomain}/contact`
+        },
     ]
 
     const ref = useRef<HTMLDivElement>(null)
-    const { scrollY } = useScroll({
+    const {scrollY} = useScroll({
         target: ref,
         offset: ["start start", "end start"]
     })
@@ -97,13 +111,13 @@ export const LandingNavbar: React.FC = () => {
 
     return (
         <motion.div ref={ref} className="w-full fixed top-0 inset-x-0 z-50">
-            <DesktopNav visible={visible} navItems={navItems} />
-            <MobileNav visible={visible} navItems={navItems} />
+            <DesktopNav visible={visible} navItems={navItems}/>
+            <MobileNav visible={visible} navItems={navItems}/>
         </motion.div>
     )
 }
 
-const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
+const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
     const session = useSession()
     const router = useRouter()
     const [hovered, setHovered] = useState<number | null>(null)
@@ -133,10 +147,13 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                 visible && "bg-white/80 dark:bg-neutral-950/80"
             )}
         >
-            <Link href="/">
-                <Image className="w-36 inline" src={logo} alt="Comend Logo" />
+            <Link href={process.env.NEXT_PUBLIC_VERCEL_ENV
+                ? `https://${rootDomain}/` : `http://${rootDomain}/`}
+            >
+                <Image className="w-36 inline" src={logo} alt="Comend Logo"/>
             </Link>
-            <motion.div className="lg:flex flex-row flex-1 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
+            <motion.div
+                className="lg:flex flex-row flex-1 hidden items-center justify-center space-x-2 lg:space-x-2 text-sm text-zinc-600 font-medium hover:text-zinc-800 transition duration-200">
                 {navItems.map((navItem, idx) =>
                     navItem.link ? (
                         <Link
@@ -202,7 +219,7 @@ const DesktopNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
     )
 }
 
-const MobileNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
+const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -253,9 +270,9 @@ const MobileNav: React.FC<NavbarProps> = ({ navItems, visible }) => {
                 <AnimatePresence>
                     {open && (
                         <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            exit={{opacity: 0}}
                             className="flex rounded-lg absolute top-16 bg-white dark:bg-neutral-950 inset-x-0 z-50 flex-col items-start justify-start gap-4 w-full px-4 py-8"
                         >
                             {navItems.map((navItem, idx) => (

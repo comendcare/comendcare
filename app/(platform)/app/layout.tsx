@@ -144,13 +144,7 @@ export default function AppLayout({children}: AppLayoutProps) {
         // Only run if the session data has changed
         console.log(`prevSession`, prevSessionRef?.current)
         console.log(`current session`, session)
-        if (
-            // JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user) ||
-            prevSessionRef?.current?.user.id !== session?.user.id || 
-            prevSessionRef?.current?.user.email !== session?.user.email || 
-            prevSessionRef?.current?.user.name !== session?.user.name || 
-            prevSessionRef?.current?.user.organizationId !== session?.user.organizationId
-        ) {
+        if (JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)) {
             handleSessionUpdate()
         }
 
