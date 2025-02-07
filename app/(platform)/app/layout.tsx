@@ -29,7 +29,6 @@ import { Button } from "@/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 
-
 export type MemberWithOrganization = Member & {
     organization: Organization
 };
@@ -89,7 +88,9 @@ export default function AppLayout({children}: AppLayoutProps) {
     const handleSessionUpdate = async () => {
         console.log(`session changed`, session)
         if (session) {
-            setIsLoading(true)
+            // if the roadmap is not defined, we use the loading visual
+            // if the roadmap is already initialized, we don't show the loading state as to not interrupt the user experience
+            if (!roadmapId) setIsLoading(true)
 
             if (!session.user.organizationId) {
                 console.error("Organization id is not set in the session... session data is ", session)
@@ -188,6 +189,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                     </header>
                     <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full">
                         {isLoading ? <Loading /> : (children)}
+                        {/* {children} */}
                     </div>
                 </SidebarInset>
             </SidebarProvider>
