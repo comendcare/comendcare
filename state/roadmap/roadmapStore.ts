@@ -146,25 +146,25 @@ export const useRoadmapStore = create<RoadmapState>()(
         setNodes: async (nodes: Node[]) => {
             console.log(`set nodes`)
             set({ nodes })
-            // const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
-            // if (response?.success && response?.data) {
-            //     const newNodes = response.data.nodes.map(n => ({
-            //         id: n.id,
-            //         type: n.type,
-            //         position: { x: n.positionX, y: n.positionY },
-            //         origin: n.origin
-            //     })) as Node[]
+            const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
+            if (response?.success && response?.data) {
+                const newNodes = response.data.nodes.map(n => ({
+                    id: n.id,
+                    type: n.type,
+                    position: { x: n.positionX, y: n.positionY },
+                    origin: n.origin
+                })) as Node[]
 
-            //     // special case here, we set the original nodes, so if nothing has changed zustand doesn't trigger a state change
-            //     // this keeps us from having an infinite loop when handling the nodes local state in private-flow.tsx
-            //     // local state is handled within the private-flow.tsx component, and debounced, because
-            //     // the RaectFlow spams position updates and we don't want to save all of them to the Database..
-            //     // set({ nodes })
-            //     return newNodes as Node[]
-            // } else {
-            //     console.error(`Error updating database nodes`, response?.error)
-            //     toast.success("Error updating node state... your node may node's position may not have been saved")
-            // }
+                // special case here, we set the original nodes, so if nothing has changed zustand doesn't trigger a state change
+                // this keeps us from having an infinite loop when handling the nodes local state in private-flow.tsx
+                // local state is handled within the private-flow.tsx component, and debounced, because
+                // the RaectFlow spams position updates and we don't want to save all of them to the Database..
+                // set({ nodes })
+                return newNodes as Node[]
+            } else {
+                console.error(`Error updating database nodes`, response?.error)
+                toast.success("Error updating node state... your node may node's position may not have been saved")
+            }
         },
         setEdges: async (edges: Edge[]) => {
             console.log(`set edges`)
