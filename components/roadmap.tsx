@@ -24,6 +24,9 @@ import { buttonVariants } from "./ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare } from "react-icons/fa6"
+import TemplatesPage from "@/app/(platform)/app/research-plan/templates/page"
+import NewRoadmapForm from "./new-roadmap"
+import RoadmapTemplates from "./roadmap-templates"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -35,7 +38,7 @@ const selector = (state: RoadmapState) => ({
     initState: state.initState
 })
 
-export function Roadmap({data}: {data: any}) {
+export function Roadmap() {
     // Zustand state management
     const { defaultLayout, setLayout } = useSidebarStore()
     const { 
@@ -91,6 +94,15 @@ export function Roadmap({data}: {data: any}) {
         router.push(`${pathname}?${params.toString()}`, { scroll: false })
     }
 
+    if (!roadmapId) {
+        return <NewRoadmapForm />
+    }
+
+    // if the user has no milestones, show them the template page
+    if (milestones && milestones.length === 0) {
+        return <RoadmapTemplates />
+    }
+
     return (
         <TooltipProvider delayDuration={0}>
             <ResizablePanelGroup
@@ -110,7 +122,8 @@ export function Roadmap({data}: {data: any}) {
                             </TabsList>
 
                             <Link
-                                href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
+                                href={"#"}
+                                // href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
                                 className={cn(
                                     buttonVariants({ variant: "secondary" }),
                                     "flex items-center"
