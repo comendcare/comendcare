@@ -104,13 +104,14 @@ export const PrivateFlowView = ({
         const newNodes = applyNodeChanges(changes, localNodes)
         setLocalNodes(newNodes)
 
-        debounceUpdateStore(newNodes)
+        const validChanges = changes.filter(change => change.type === "position")
+        if (validChanges.length > 0) debounceUpdateStore(newNodes) // only change zustand state if the user is updating the node position
     }
 
     const debounceUpdateStore = useCallback(
         debounce(
             (nodes: Node[]) => {
-                // setDbNodes(nodes)
+                setDbNodes(nodes)
             }, 500
         ),
         []
