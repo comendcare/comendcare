@@ -67,10 +67,10 @@ export const PagProfileAboutCard = ({organization}: {
                                         <h4 className="text-sm font-semibold">
                                             {member.user.name}
                                         </h4>
-                                        {member.user.title &&
+                                        {member.title &&
                                             <div className="flex items-center">
                                                 <span className="text-xs text-muted-foreground">
-                                                    {member.user.title}
+                                                    {member.title}
                                                 </span>
                                             </div>
                                         }
