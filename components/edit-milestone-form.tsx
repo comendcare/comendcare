@@ -403,7 +403,10 @@ export function EditMilestoneForm({
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                     className="flex flex-col gap-8 mt-2 px-1"
                 >
-                    <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={onClose}>
+                    <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
+                        e.preventDefault()
+                        onClose()
+                    }}>
                         <FaX/>
                     </Button>
 
@@ -501,9 +504,6 @@ export function EditMilestoneForm({
 
                             {milestoneData?.node?.type === "RFP" && (
                                 <>
-                                    {/* <FormLabel className="text-md mt-2">{`Start Date`}</FormLabel>
-                                    <StartDateFormField form={form} /> */}
-
                                     <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
                                     <BudgetFormField form={form}/>
 
