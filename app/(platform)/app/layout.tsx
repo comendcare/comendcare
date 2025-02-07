@@ -29,7 +29,6 @@ import { Button } from "@/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 
-
 export type MemberWithOrganization = Member & {
     organization: Organization
 };
@@ -84,12 +83,14 @@ export default function AppLayout({children}: AppLayoutProps) {
     }, [status])
 
     // Zustand state management
-    const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} = useNavStore()
+    // const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} = useNavStore()
 
     const handleSessionUpdate = async () => {
         console.log(`session changed`, session)
         if (session) {
-            setIsLoading(true)
+            // if the roadmap is not defined, we use the loading visual
+            // if the roadmap is already initialized, we don't show the loading state as to not interrupt the user experience
+            if (!roadmapId) setIsLoading(true)
 
             if (!session.user.organizationId) {
                 console.error("Organization id is not set in the session... session data is ", session)
@@ -152,14 +153,6 @@ export default function AppLayout({children}: AppLayoutProps) {
         prevSessionRef.current = session
     }, [session]);
 
-    // useEffect(() => {
-    //     handleSessionUpdate()
-    // }, [session])
-
-    // if (isLoading) {
-    //     return <Loading/>
-    // }
-
     if (status === "authenticated" && session) {
         return (
             <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
@@ -189,36 +182,14 @@ export default function AppLayout({children}: AppLayoutProps) {
                                     // disabled={true}
                                     className="pointer-events-none"
                                 >
-                                    <Image className="h-8 w-8 p-1" priority src={logo} alt="Comend logo" />
+                                <Image className="h-8 w-8 p-1" priority src={logo} alt="Comend logo" />
                                 </Button>
                             </div>
                         </div>
                     </header>
                     <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full">
-
-                        <ResizablePanelGroup
-                            direction="horizontal"
-                            onLayout={(sizes: number[]) => {
-                                setLayout(sizes) // Use Zustand's setLayout to save panel sizes
-                            }}
-                            className="w-full items-stretch"
-                        >
-
-                            {/* Main Content Panel */}
-                            {/*<ResizablePanel defaultSize={defaultLayout[1]} minSize={30} className="overflow-y-auto">*/}
-                            <ResizablePanel
-                                defaultSize={defaultLayout[0]}
-                                collapsedSize={4}
-                                collapsible={true}
-                                minSize={15}
-                                maxSize={20}
-                                onCollapse={() => setIsCollapsed(true)}
-                                onResize={() => setIsCollapsed(false)}
-                                className={isCollapsed ? "overflow-y-auto min-w-[50px] transition-all duration-300 ease-in-out" : "overflow-y-auto "}
-                            >
-                                {isLoading ? (<Loading />): (children)}
-                            </ResizablePanel>
-                        </ResizablePanelGroup>
+                        {isLoading ? <Loading /> : (children)}
+                        {/* {children} */}
                     </div>
                 </SidebarInset>
             </SidebarProvider>

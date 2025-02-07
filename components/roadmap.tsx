@@ -38,7 +38,7 @@ const selector = (state: RoadmapState) => ({
     initState: state.initState
 })
 
-export function Roadmap() {
+export function Roadmap({data}: {data: any}) {
     // Zustand state management
     const { defaultLayout, setLayout } = useSidebarStore()
     const { 
@@ -73,9 +73,9 @@ export function Roadmap() {
             router.push(`${pathname}?${params.toString()}`, { scroll: false })
         }
         if (open) {
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete("task")
-            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+            // const params = new URLSearchParams(searchParams.toString())
+            // params.delete("task")
+            // router.push(`${pathname}?${params.toString()}`, { scroll: false })
         }
     }
 
@@ -94,14 +94,14 @@ export function Roadmap() {
         router.push(`${pathname}?${params.toString()}`, { scroll: false })
     }
 
-    if (!roadmapId) {
-        return <NewRoadmapForm />
-    }
+    // if (!roadmapId) {
+    //     return <NewRoadmapForm />
+    // }
 
-    // if the user has no milestones, show them the template page
-    if (milestones && milestones.length === 0) {
-        return <RoadmapTemplates />
-    }
+    // // if the user has no milestones, show them the template page
+    // if (milestones && milestones.length === 0) {
+    //     return <RoadmapTemplates />
+    // }
 
     return (
         <TooltipProvider delayDuration={0}>
@@ -112,7 +112,7 @@ export function Roadmap() {
                 // }}
                 className="h-full items-stretch"
             >
-                <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
+                <ResizablePanel>
                     <Tabs defaultValue={urlView ? urlView : "flow"} onValueChange={handleTabChange}>
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-between">
                             <TabsList>
@@ -122,8 +122,7 @@ export function Roadmap() {
                             </TabsList>
 
                             <Link
-                                href={"#"}
-                                // href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
+                                href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
                                 className={cn(
                                     buttonVariants({ variant: "secondary" }),
                                     "flex items-center"
@@ -167,7 +166,7 @@ export function Roadmap() {
                         <ResizableHandle withHandle />
 
                         <ResizablePanel
-                            defaultSize={25}
+                            defaultSize={40}
                             minSize={25}
                             className="h-full flex flex-col"
                         >

@@ -96,21 +96,21 @@ export const PrivateFlowView = ({
         params.delete("milestone")
         params.set("milestone", node.id)
 
-        // router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        router.replace(`${pathname}?${params.toString()}`)
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        // router.replace(`${pathname}?${params.toString()}`)
     }
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes)
         setLocalNodes(newNodes)
 
-        debounceUpdateStore(newNodes)
+        const validChanges = changes.filter(change => change.type === "position")
+        if (validChanges.length > 0) debounceUpdateStore(newNodes) // only change zustand state if the user is updating the node position
     }
 
     const debounceUpdateStore = useCallback(
         debounce(
             (nodes: Node[]) => {
-                // updateDBFlow({ roadmapId, nodes, edges })
                 setDbNodes(nodes)
             }, 500
         ),
