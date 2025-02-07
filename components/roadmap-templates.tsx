@@ -94,7 +94,7 @@ export default function RoadmapTemplates() {
                             setIsLoading(true)
                             await addMilestones(selectedMilestones)
                             router.push('/app/research-plan')
-                            router.refresh()
+                            // router.refresh()
                         }}
                     >
                         Add selected milestones
@@ -107,7 +107,7 @@ export default function RoadmapTemplates() {
                             setIsLoading(true)
                             await addMilestones([{name: 'New Milestone'}])
                             router.push('/app/research-plan')
-                            router.refresh()
+                            // router.refresh()
                         }}
                     >
                         Add an empty milestone

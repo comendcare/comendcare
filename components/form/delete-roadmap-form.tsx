@@ -27,7 +27,7 @@ export default function DeleteRoadmapForm({
                         toast.error(res.error)
                     } else {
                         va.track("Deleted Roadmap")
-                        router.refresh()
+                        // router.refresh()
                         router.push(`/organization/${res.organizationId}`)
                         toast.success(`Successfully deleted roadmap!`)
                     }

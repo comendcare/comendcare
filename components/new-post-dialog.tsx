@@ -72,7 +72,7 @@ export default async function NewPostDialog() {
         try {
             await createPost(formData)
             toast.success("Post created successfully!");
-            router.refresh(); // Refresh the page to reflect changes
+            // router.refresh(); // Refresh the page to reflect changes
         } catch (error) {
             console.error("Error updating organization:", error);
             toast.error("Failed to update organization profile.");

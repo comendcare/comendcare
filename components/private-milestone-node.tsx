@@ -80,7 +80,8 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     }
 
     return (
-        <Card className={cn("w-[350px] text-wrap break-words", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", selectedNodeId === props?.id ? "border-black border-2" : "")}>
+        // <Card className={cn("w-[350px] text-wrap break-words", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", selectedNodeId === props?.id ? "border-black border-2" : "")}>
+        <Card className={cn("w-[350px] text-wrap break-words", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "")}>
             <CardHeader>
                 <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
                     <TypeBadge type={props.type}/>

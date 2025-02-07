@@ -257,35 +257,35 @@ export function EditMilestoneForm({
             openTo
         } = values;
 
-        setMilestone(milestoneData?.nodeId, {
-            nodeType,
-            title,
-            ...(description !== undefined && description !== null ? {description} : undefined),
-            // ...(startDate.month !== undefined || startDate.year !== undefined ? {
-            //     startDate: new Date(
-            //         startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
-            //         startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
-            //         1
-            //     )
-            // } : undefined),
-            // ...(endDate.month !== undefined || endDate.year !== undefined ? {
-            //     endDate: new Date(
-            //         endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
-            //         endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
-            //         1
-            //     )
-            // } : undefined),
-            ...(startDate ? {startDate} : undefined),
-            ...(endDate ? {endDate} : undefined),
-            ...(budget ? {budget} : undefined),
-            ...(attachments ? {attachments} : undefined),
-            ...(types ? { types: types.map(t => t?.value) } : undefined),
-            ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
-            status,
-            private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
-            ...(contacts ? {contacts} : undefined),
-            ...(openTo ? {openTo} : undefined)
-        })
+        // setMilestone(milestoneData?.nodeId, {
+        //     nodeType,
+        //     title,
+        //     ...(description !== undefined && description !== null ? {description} : undefined),
+        //     // ...(startDate.month !== undefined || startDate.year !== undefined ? {
+        //     //     startDate: new Date(
+        //     //         startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
+        //     //         startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
+        //     //         1
+        //     //     )
+        //     // } : undefined),
+        //     // ...(endDate.month !== undefined || endDate.year !== undefined ? {
+        //     //     endDate: new Date(
+        //     //         endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
+        //     //         endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
+        //     //         1
+        //     //     )
+        //     // } : undefined),
+        //     ...(startDate ? {startDate} : undefined),
+        //     ...(endDate ? {endDate} : undefined),
+        //     ...(budget ? {budget} : undefined),
+        //     ...(attachments ? {attachments} : undefined),
+        //     ...(types ? { types: types.map(t => t?.value) } : undefined),
+        //     ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
+        //     status,
+        //     private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
+        //     ...(contacts ? {contacts} : undefined),
+        //     ...(openTo ? {openTo} : undefined)
+        // })
 
         // setTasks(unionById(tasks || [], kanbanTasks).map(task => {
         //     const newTask = tasks?.find(t => t.id === task.id)
@@ -403,7 +403,10 @@ export function EditMilestoneForm({
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                     className="flex flex-col gap-8 mt-2 px-1"
                 >
-                    <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={onClose}>
+                    <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
+                        e.preventDefault()
+                        onClose()
+                    }}>
                         <FaX/>
                     </Button>
 
@@ -501,9 +504,6 @@ export function EditMilestoneForm({
 
                             {milestoneData?.node?.type === "RFP" && (
                                 <>
-                                    {/* <FormLabel className="text-md mt-2">{`Start Date`}</FormLabel>
-                                    <StartDateFormField form={form} /> */}
-
                                     <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
                                     <BudgetFormField form={form}/>
 
