@@ -181,13 +181,13 @@ export default function AppLayout({children}: AppLayoutProps) {
                                     // disabled={true}
                                     className="pointer-events-none"
                                 >
-                                    <Image className="h-8 w-8 p-1" priority src={logo} alt="Comend logo" />
+                                <Image className="h-8 w-8 p-1" priority src={logo} alt="Comend logo" />
                                 </Button>
                             </div>
                         </div>
                     </header>
                     <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full">
-                        {children}
+                        {isLoading ? <Loading /> : (children)}
                     </div>
                 </SidebarInset>
             </SidebarProvider>
