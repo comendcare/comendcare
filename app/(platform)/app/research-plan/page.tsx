@@ -1,6 +1,6 @@
 import NewRoadmapForm from "@/components/new-roadmap"
 import NoOrganization from "@/components/no-organization"
-import { getRoadmap, getRoadmapId } from "@/lib/fetchers"
+import { getRoadmap } from "@/lib/fetchers"
 import { getSession } from "@/lib/auth"
 import { Roadmap } from "@/components/roadmap"
 import RoadmapTemplates from "@/components/roadmap-templates"
