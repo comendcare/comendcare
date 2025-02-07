@@ -46,8 +46,8 @@ const router = useRouter()
         params.delete("milestone")
         params.set("milestone", nodeId)
 
-        // router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        router.replace(`${pathname}?${params.toString()}`)
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        // router.replace(`${pathname}?${params.toString()}`)
     }
 
     return (
