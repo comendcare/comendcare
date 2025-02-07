@@ -95,11 +95,11 @@ export function NavUser() {
                 setInvitations((prevInvitations) =>
                     prevInvitations?.filter((oldInvitation) => oldInvitation.id !== invitation.id)
                 );
-                // await update({
-                //     ...session,
-                //     organizationId: response.data.organizationId,
-                // })
-                // router.refresh()
+                await update({
+                    ...session,
+                    organizationId: response.data.organizationId,
+                })
+                router.refresh()
             } else {
                 toast.error(response.error || "Failed to accept the invitation.");
             }

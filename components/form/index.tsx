@@ -57,10 +57,10 @@ export default function Form({
                                 id ? { id } : {}
                             )
                             if (id) {
-                                // router.refresh()
+                                router.refresh()
                             } else {
                                 await update()
-                                // router.refresh()
+                                router.refresh()
                             }
                             toast.success(
                                 `Successfully updated ${inputAttrs.name}!`

@@ -128,11 +128,11 @@ export default function UserProfilePage() {
                 setInvitations((prevInvitations) =>
                     prevInvitations?.filter((invitation) => invitation.id !== invitationId)
                 );
-                // await update({
-                //     ...session,
-                //     organizationId: response.data.organizationId,
-                // })
-                // router.refresh()
+                await update({
+                    ...session,
+                    organizationId: response.data.organizationId,
+                })
+                router.refresh()
             } else {
                 toast.error(response.error || "Failed to accept the invitation.");
             }
