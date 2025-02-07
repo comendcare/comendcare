@@ -74,10 +74,14 @@ export function NavMain({
                                     asChild
                                     className={isActive ? "bg-muted text-primary" : ""}
                                 >
-                                    <Link href={item.url}>
+                                    {/* <Link href={item.url}>
                                         {item.icon && <item.icon className="mr-2 h-4 w-4"/>}
                                         {item.title}
-                                    </Link>
+                                    </Link> */}
+                                    <a href={item.url}>
+                                        {item.icon && <item.icon className="mr-2 h-4 w-4"/>}
+                                        {item.title}
+                                    </a>
                                 </SidebarMenuButton>
                             )}
                         </SidebarMenuItem>
