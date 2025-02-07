@@ -26,8 +26,8 @@ import { FeedbackSheet } from "@/components/feedback";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import { useOnborda } from "@/components/onborda/OnbordaContext";
 import { Button } from "@/components/ui/button";
-// import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
-// import { useShallow } from "zustand/react/shallow";
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
+import { useShallow } from "zustand/react/shallow";
 
 
 export type MemberWithOrganization = Member & {
@@ -38,36 +38,36 @@ interface AppLayoutProps {
     children: React.ReactNode
 }
 
-// const selector = (state: RoadmapState) => ({
-//     roadmapId: state.roadmapId,
-//     nodes: state.nodes,
-//     edges: state.edges,
-//     selectedNodeId: state.selectedNodeId,
-//     setSelectedNodeId: state.setSelectedNodeId,
-//     milestones: state.milestones,
-//     initState: state.initState
-// })
+const selector = (state: RoadmapState) => ({
+    roadmapId: state.roadmapId,
+    nodes: state.nodes,
+    edges: state.edges,
+    selectedNodeId: state.selectedNodeId,
+    setSelectedNodeId: state.setSelectedNodeId,
+    milestones: state.milestones,
+    initState: state.initState
+})
 
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
     const [isLoading, setIsLoading] = useState(true)
     const searchParams = useSearchParams()
-    // const prevSessionRef: any = useRef()
+    const prevSessionRef: any = useRef()
     const { startOnborda } = useOnborda()
     const pathname = usePathname()
-    // const { 
-    //     roadmapId,
-    //     nodes,
-    //     edges,
-    //     selectedNodeId, 
-    //     setSelectedNodeId, 
-    //     milestones, 
-    // } = useRoadmapStore(useShallow(selector))
-    // const [sidebarOpen, setSidebarOpen] = useState(selectedNodeId === null)
+    const { 
+        roadmapId,
+        nodes,
+        edges,
+        selectedNodeId, 
+        setSelectedNodeId, 
+        milestones, 
+    } = useRoadmapStore(useShallow(selector))
+    const [sidebarOpen, setSidebarOpen] = useState(selectedNodeId === null)
 
-    // useEffect(() => {
-    //     if (selectedNodeId !== null) setSidebarOpen(false)
-    // }, [selectedNodeId])
+    useEffect(() => {
+        if (selectedNodeId !== null) setSidebarOpen(false)
+    }, [selectedNodeId])
 
     useEffect(() => {
         // Handle loading state for the session
@@ -142,20 +142,19 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     useEffect(() => {
         // Only run if the session data has changed
-        // console.log(`prevSession`, prevSessionRef?.current)
-        // console.log(`current session`, session)
-        // if (JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)) {
-        //     handleSessionUpdate()
-        // }
-        handleSessionUpdate()
+        console.log(`prevSession`, prevSessionRef?.current)
+        console.log(`current session`, session)
+        if (JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)) {
+            handleSessionUpdate()
+        }
 
         // Update the ref to the latest session
-        // prevSessionRef.current = session
+        prevSessionRef.current = session
     }, [session]);
 
     if (status === "authenticated" && session) {
         return (
-            <SidebarProvider>
+            <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
                 <AppSidebar />
                 <SidebarInset>
                     <header className="sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full">
