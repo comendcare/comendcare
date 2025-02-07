@@ -45,7 +45,7 @@ export const useRoadmapStore = create<RoadmapState>()(
         onboardingActive: true,
         setOnboardingActive: (active: boolean) => {
             console.log(`set onboarding active`)
-            // set({ onboardingActive: active })
+            set({ onboardingActive: active })
         },
         roadmapId: null,
         setRoadmapId: (id: string) => {
