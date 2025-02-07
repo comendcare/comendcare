@@ -262,6 +262,7 @@ export const createOrganization = async (formData: FormData) => {
     const description = formData.get("description") as string;
     const subdomain = formData.get("subdomain") as string;
     const website = formData.get("website") as string | null;
+    const title = formData.get("title") as string | null;
     const founded = formData.get("founded") as string | null;
     const incorporationStatus = formData.get("incorporationStatus") as "YES" | "NO" | "INPROGRESS" | null;
     const address1 = formData.get("address1") as string | null;
@@ -330,18 +331,19 @@ export const createOrganization = async (formData: FormData) => {
                 userId: session.user.id,
                 email: session.user.email,
                 role: "admin", // Creator of organization is admin by default
+                title: title,
                 organizationId: response.id
             }
         })
 
         await addTypeSenseDocument(
-            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
             (
                 process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                     : process.env.TYPESENSE_ADMIN_API_KEY
-            )!, 
-            response, 
+            )!,
+            response,
             'organizations'
         );
 
@@ -446,13 +448,13 @@ export const updateOrganization = withOrganizationAuth(
             });
 
             await updateTypeSenseDocument(
-                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
                 (
                     process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
                         ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                         : process.env.TYPESENSE_ADMIN_API_KEY
                 )!,
-                response, 
+                response,
                 'organizations'
             );
 
@@ -1178,6 +1180,38 @@ export async function leaveOrganization(
     }
 }
 
+export async function updateMember(
+    membershipId: string,
+    data: Prisma.MemberUpdateInput
+) {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        const member = await prisma.member.update({
+            where: {
+                id: membershipId
+            },
+            data
+        })
+
+        if (!member) {
+            return {success: false, error: "Membership not found"};
+        }
+
+        revalidatePath("/app/dashboard")
+        revalidatePath("/app/profile")
+
+        return {success: true, data: member};
+    } catch (error: any) {
+        logError("Error deleting membership", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 // Invite user function with updated Organization model
 export async function deleteMember(
     membershipId: string
@@ -1559,7 +1593,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
     }
 
     const finalRoadmap = prisma.roadmap.findUnique({
-        where: { id: roadmap.id },
+        where: {id: roadmap.id},
         include: {
             milestones: {
                 include: {
@@ -1991,7 +2025,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                                     name: contact.name,
                                     email: contact.email,
                                     ...(contact.role ? {role: contact.role} : undefined),
-                                    ...(contact.affiliation ? {affiliation: contact.affiliation}: undefined)
+                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
                                 }))
                             }
                         },
@@ -2179,14 +2213,16 @@ export async function createTask(columnId: string, properties?: any) {
                 private: true,
                 // startDate: null,
                 // checklist: []
-                ...(properties?.stakeholders ? {stakeholders: {
-                    createMany: {
-                        data: (properties.stakeholders || []).map((stakeholder: any) => ({
-                            userId: stakeholder?.user?.id || stakeholder?.userId,
-                            // user: { connect: { id: stakeholder.id }},
-                        }))
+                ...(properties?.stakeholders ? {
+                    stakeholders: {
+                        createMany: {
+                            data: (properties.stakeholders || []).map((stakeholder: any) => ({
+                                userId: stakeholder?.user?.id || stakeholder?.userId,
+                                // user: { connect: { id: stakeholder.id }},
+                            }))
+                        }
                     }
-                }}: undefined)
+                } : undefined)
             }
         })
 

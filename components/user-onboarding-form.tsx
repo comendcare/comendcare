@@ -35,7 +35,6 @@ import LoadingDots from "@/components/icons/loading-dots";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
-    title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
     address1: z.string().optional(),
@@ -129,7 +128,6 @@ export default function UserOnboardingForm() {
                 if (userData) {
                     const fetchedValues = {
                         name: userData.name || "",
-                        title: userData.title || "",
                         notificationSettings: userData.notificationSettings ?? true,
                         consentSettings: userData.consentSettings ?? true,
                         address1: userData.address1 || "",
@@ -232,21 +230,6 @@ export default function UserOnboardingForm() {
                                 <FormItem>
                                     <FormLabel>Your Name (required)</FormLabel>
                                     {/*<FormDescription>This is your public display name.</FormDescription>*/}
-                                    <FormControl>
-                                        <Input type="text" {...field} />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="title"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Role</FormLabel>
-                                    <FormDescription>Your role or title at your patient organization.</FormDescription>
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>

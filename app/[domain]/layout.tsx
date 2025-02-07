@@ -45,7 +45,7 @@ export async function generateMetadata({
             title,
             description,
             images: [image],
-            creator: "@vercel"
+            creator: "@comendcare"
         },
         icons: [logo],
         metadataBase: new URL(`https://${domain}`)

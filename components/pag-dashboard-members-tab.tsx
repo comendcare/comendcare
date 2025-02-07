@@ -68,9 +68,13 @@ export default async function PAGDashboardMembersTab() {
                                         className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
                                         Name
                                     </th>
+                                    {/*<th scope="col"*/}
+                                    {/*    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">*/}
+                                    {/*    Status*/}
+                                    {/*</th>*/}
                                     <th scope="col"
                                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        Status
+                                        Title
                                     </th>
                                     <th scope="col"
                                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
@@ -108,12 +112,15 @@ export default async function PAGDashboardMembersTab() {
                                                 </div>
                                             </div>
                                         </td>
+                                        {/*<td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">*/}
+                                        {/*    <span*/}
+                                        {/*        className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20"*/}
+                                        {/*    >*/}
+                                        {/*        Active*/}
+                                        {/*    </span>*/}
+                                        {/*</td>*/}
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                            <span
-                                                className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20"
-                                            >
-                                                Active
-                                            </span>
+                                            {person.title}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                             {person.role}
