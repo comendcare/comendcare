@@ -96,8 +96,8 @@ export const PrivateFlowView = ({
         params.delete("milestone")
         params.set("milestone", node.id)
 
-        // router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        router.replace(`${pathname}?${params.toString()}`)
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        // router.replace(`${pathname}?${params.toString()}`)
     }
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {

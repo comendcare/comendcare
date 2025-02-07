@@ -73,9 +73,9 @@ export function Roadmap({data}: {data: any}) {
             router.push(`${pathname}?${params.toString()}`, { scroll: false })
         }
         if (open) {
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete("task")
-            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+            // const params = new URLSearchParams(searchParams.toString())
+            // params.delete("task")
+            // router.push(`${pathname}?${params.toString()}`, { scroll: false })
         }
     }
 
