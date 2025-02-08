@@ -39,6 +39,7 @@ import { MilestoneTemplateTabs } from "./roadmap-templates"
 const proOptions = { hideAttribution: true }
 
 const selector = (state: RoadmapState) => ({
+    isUpdating: state.isUpdating,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
@@ -56,6 +57,7 @@ export const PrivateFlowView = ({
     width: number
 }) => {
     const {
+        isUpdating,
         selectedNodeId,
         setSelectedNodeId,
         milestones,
@@ -90,6 +92,7 @@ export const PrivateFlowView = ({
     const [localEdges, setLocalEdges] = useState(edges)
 
     const handleEditClick = (event: React.MouseEvent, node: Node) => {
+        if (isUpdating) return
         setSelectedNodeId(node.id)
 
         const params = new URLSearchParams(searchParams.toString())
