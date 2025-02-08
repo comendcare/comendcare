@@ -170,9 +170,6 @@ export default function UserProfilePage() {
                                     {user.name}
                                 </h1>
                             </CardTitle>
-                            <h2 className="text-xl">
-                                {user.title}
-                            </h2>
                             <p>
                                 Joined {new Date(user.createdAt).toLocaleDateString(undefined, {
                                 year: 'numeric',

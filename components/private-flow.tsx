@@ -39,6 +39,7 @@ import { MilestoneTemplateTabs } from "./roadmap-templates"
 const proOptions = { hideAttribution: true }
 
 const selector = (state: RoadmapState) => ({
+    isUpdating: state.isUpdating,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
@@ -56,6 +57,7 @@ export const PrivateFlowView = ({
     width: number
 }) => {
     const {
+        isUpdating,
         selectedNodeId,
         setSelectedNodeId,
         milestones,
@@ -90,27 +92,28 @@ export const PrivateFlowView = ({
     const [localEdges, setLocalEdges] = useState(edges)
 
     const handleEditClick = (event: React.MouseEvent, node: Node) => {
+        if (isUpdating) return
         setSelectedNodeId(node.id)
 
         const params = new URLSearchParams(searchParams.toString())
         params.delete("milestone")
         params.set("milestone", node.id)
 
-        // router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        router.replace(`${pathname}?${params.toString()}`)
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        // router.replace(`${pathname}?${params.toString()}`)
     }
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes)
         setLocalNodes(newNodes)
 
-        debounceUpdateStore(newNodes)
+        const validChanges = changes.filter(change => change.type === "position")
+        if (validChanges.length > 0) debounceUpdateStore(newNodes) // only change zustand state if the user is updating the node position
     }
 
     const debounceUpdateStore = useCallback(
         debounce(
             (nodes: Node[]) => {
-                // updateDBFlow({ roadmapId, nodes, edges })
                 setDbNodes(nodes)
             }, 500
         ),
