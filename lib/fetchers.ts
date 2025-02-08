@@ -372,7 +372,6 @@ export async function getUnapprovedMemberRequestsWithUsers(organizationId: strin
             include: {user: true},
             where: {
                 organizationId,
-                accepted: false
             },
         })
 

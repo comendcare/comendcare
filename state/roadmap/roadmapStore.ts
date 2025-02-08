@@ -11,6 +11,7 @@ import { createNodes, deleteNode, Milestone, updateDBFlow, updateEdges, updateMi
 import { toast } from "sonner"
 
 export type RoadmapState = {
+    isUpdating: boolean,
     onboardingActive: boolean,
     setOnboardingActive: (active: boolean) => void,
     roadmapId: string | null
@@ -34,6 +35,7 @@ export type RoadmapState = {
 
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
+        isUpdating: false,
         initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
             console.log(`init roadmap state`)
             const edgesWithMarker = edges.map(edge => ({
@@ -144,6 +146,9 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         setNodes: async (nodes: Node[]) => {
+            if (get().isUpdating) return
+            set({isUpdating: true})
+
             console.log(`set nodes`)
             set({ nodes })
             const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
@@ -160,11 +165,12 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // local state is handled within the private-flow.tsx component, and debounced, because
                 // the RaectFlow spams position updates and we don't want to save all of them to the Database..
                 // set({ nodes })
-                return newNodes as Node[]
+                // return newNodes as Node[]
             } else {
                 console.error(`Error updating database nodes`, response?.error)
                 toast.success("Error updating node state... your node may node's position may not have been saved")
             }
+            set({ isUpdating: false })
         },
         setEdges: async (edges: Edge[]) => {
             console.log(`set edges`)

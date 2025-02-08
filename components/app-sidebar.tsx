@@ -55,17 +55,17 @@ const data = {
             url: "/app/marketplace/patient-groups",
         },
         {
+            title: "Dashboard",
+            icon: LayoutDashboard,
+            variant: "ghost",
+            url: "/app/dashboard",
+        },
+        {
             title: "Feed",
             icon: Newspaper,
             variant: "ghost",
             url: "/app/feed",
             comingSoon: true
-        },
-        {
-            title: "Dashboard",
-            icon: LayoutDashboard,
-            variant: "ghost",
-            url: "/app/dashboard",
         },
         {
             title: "Settings",

@@ -33,7 +33,6 @@ import { FormImageCropper } from "./edit-pag-profile-page-dialog";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
-    title: z.string().min(2, {message: "Your role must be at least 2 characters."}),
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
     address1: z.string().optional(),
@@ -123,7 +122,6 @@ export default function UserEditForm() {
                 if (userData) {
                     const fetchedValues = {
                         name: userData.name || "",
-                        title: userData.title || "",
                         notificationSettings: userData.notificationSettings ?? true,
                         consentSettings: userData.consentSettings ?? true,
                         address1: userData.address1 || "",
@@ -233,21 +231,6 @@ export default function UserEditForm() {
                                 <Input type="text" {...field} />
                             </FormControl>
                             {/*<FormDescription>This is your public display name.</FormDescription>*/}
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="title"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Role</FormLabel>
-                            <FormControl>
-                                <Input type="text" {...field} />
-                            </FormControl>
-                            <FormDescription>Your role or title at your patient organization.</FormDescription>
                             <FormMessage/>
                         </FormItem>
                     )}
