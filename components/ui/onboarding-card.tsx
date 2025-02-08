@@ -114,11 +114,11 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         if (step.selector === '.research-plan-tour-step2') {
             setSelectedNodeId(onboardingNodeId)
 
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete("milestone")
-            params.set("milestone", onboardingNodeId)
+            // const params = new URLSearchParams(searchParams.toString())
+            // params.delete("milestone")
+            // params.set("milestone", onboardingNodeId)
     
-            router.push(`${pathname}?${params.toString()}`, { scroll: false })
+            // router.push(`${pathname}?${params.toString()}`, { scroll: false })
         } else if (step.selector === '.research-plan-tour-step3') {
             const element = document.getElementById("edit-milestone-scroll-area")
             if (element) {

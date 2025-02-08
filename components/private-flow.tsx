@@ -39,7 +39,6 @@ import { MilestoneTemplateTabs } from "./roadmap-templates"
 const proOptions = { hideAttribution: true }
 
 const selector = (state: RoadmapState) => ({
-    isUpdating: state.isUpdating,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
@@ -57,7 +56,6 @@ export const PrivateFlowView = ({
     width: number
 }) => {
     const {
-        isUpdating,
         selectedNodeId,
         setSelectedNodeId,
         milestones,
@@ -71,9 +69,6 @@ export const PrivateFlowView = ({
     const { fitView } = useReactFlow()
     const store = useStoreApi()
     const router = useRouter()
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
-    // const { undo, redo, clear } = useRoadmapStore.temporal.getState()
     const nodeTypes = { PROJECT: PrivateMilestoneNode, ASSET: PrivateMilestoneNode, RFP: PrivateMilestoneNode }
     const edgeTypes = { DEFAULT: CustomEdge }
     const [milestoneData, setMilestoneData] = useState({})
@@ -92,15 +87,7 @@ export const PrivateFlowView = ({
     const [localEdges, setLocalEdges] = useState(edges)
 
     const handleEditClick = (event: React.MouseEvent, node: Node) => {
-        if (isUpdating) return
         setSelectedNodeId(node.id)
-
-        const params = new URLSearchParams(searchParams.toString())
-        params.delete("milestone")
-        params.set("milestone", node.id)
-
-        router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        // router.replace(`${pathname}?${params.toString()}`)
     }
 
     const onNodesChange = (changes: NodeChange<Node>[]) => {

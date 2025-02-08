@@ -24,15 +24,10 @@ import { buttonVariants } from "./ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare } from "react-icons/fa6"
-import TemplatesPage from "@/app/(platform)/app/research-plan/templates/page"
-import NewRoadmapForm from "./new-roadmap"
-import RoadmapTemplates from "./roadmap-templates"
 
 const selector = (state: RoadmapState) => ({
-    isUpdating: state.isUpdating,
-    roadmapId: state.roadmapId,
-    nodes: state.nodes,
-    edges: state.edges,
+    selectedView: state.selectedView,
+    setSelectedView: state.setSelectedView,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
@@ -41,12 +36,10 @@ const selector = (state: RoadmapState) => ({
 
 export function Roadmap({data}: {data: any}) {
     // Zustand state management
-    const { defaultLayout, setLayout } = useSidebarStore()
+    const { defaultLayout } = useSidebarStore()
     const { 
-        isUpdating,
-        roadmapId,
-        nodes,
-        edges,
+        selectedView,
+        setSelectedView,
         selectedNodeId, 
         setSelectedNodeId, 
         milestones, 
@@ -55,56 +48,34 @@ export function Roadmap({data}: {data: any}) {
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
-    // useEffect(() => {
-    //     if (data.id !== roadmapId || data.nodes.length !== nodes.length || data.milestones.length !== milestones.length || data.edges.length !== edges.length) {
-    //         // roadmap data doesn't match, refresh the page
-    //         console.log(`data does not match, refresh page...`)
-    //         router.refresh()
-    //     }
-    // }, [])
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams.toString())
 
-    const urlView = searchParams.get("view")
-    const [view, setView] = useState(urlView ? urlView : "flow")
+        if (selectedNodeId) {
+            params.set("milestone", selectedNodeId)
+        } else {
+            params.delete("milestone")
+        }
+
+        if (selectedView) {
+            params.set("view", selectedView)
+        } else {
+            params.delete("view")
+        }
+
+        // window.history.replaceState(null, "", `${pathname}?${params.toString()}`)
+        router.replace(`${pathname}?${params}`)
+    }, [selectedNodeId, selectedView])
+    
 
     const handleMilestonePanelChange = (open: boolean) => {
-        if (!open) {
-            if (isUpdating) return
-            setSelectedNodeId(null)
-
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete("milestone")
-            router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        }
-        if (open) {
-            // const params = new URLSearchParams(searchParams.toString())
-            // params.delete("task")
-            // router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        }
+        if (!open) { setSelectedNodeId(null) }
     }
 
     const handleTabChange = (value: string) => {
-        setView(value) // for the onboarding tutorial
-
-        // close all panels when switching tabs
-        setSelectedNodeId(null)
-
-        const params = new URLSearchParams(searchParams.toString())
-        params.delete("view")
-        params.delete("milestone")
-        params.delete("task")
-        params.set("view", value)
-
-        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        setSelectedView(value)
+        setSelectedNodeId(null) // deselect any selected milestones when switching tabs
     }
-
-    // if (!roadmapId) {
-    //     return <NewRoadmapForm />
-    // }
-
-    // // if the user has no milestones, show them the template page
-    // if (milestones && milestones.length === 0) {
-    //     return <RoadmapTemplates />
-    // }
 
     return (
         <TooltipProvider delayDuration={0}>
@@ -116,7 +87,7 @@ export function Roadmap({data}: {data: any}) {
                 className="h-full items-stretch"
             >
                 <ResizablePanel>
-                    <Tabs defaultValue={urlView ? urlView : "flow"} onValueChange={handleTabChange}>
+                    <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange}>
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-between">
                             <TabsList>
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
