@@ -29,6 +29,7 @@ import NewRoadmapForm from "./new-roadmap"
 import RoadmapTemplates from "./roadmap-templates"
 
 const selector = (state: RoadmapState) => ({
+    isUpdating: state.isUpdating,
     roadmapId: state.roadmapId,
     nodes: state.nodes,
     edges: state.edges,
@@ -42,6 +43,7 @@ export function Roadmap({data}: {data: any}) {
     // Zustand state management
     const { defaultLayout, setLayout } = useSidebarStore()
     const { 
+        isUpdating,
         roadmapId,
         nodes,
         edges,
@@ -66,6 +68,7 @@ export function Roadmap({data}: {data: any}) {
 
     const handleMilestonePanelChange = (open: boolean) => {
         if (!open) {
+            if (isUpdating) return
             setSelectedNodeId(null)
 
             const params = new URLSearchParams(searchParams.toString())
