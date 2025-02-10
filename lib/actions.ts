@@ -262,6 +262,7 @@ export const createOrganization = async (formData: FormData) => {
     const description = formData.get("description") as string;
     const subdomain = formData.get("subdomain") as string;
     const website = formData.get("website") as string | null;
+    const title = formData.get("title") as string | null;
     const founded = formData.get("founded") as string | null;
     const incorporationStatus = formData.get("incorporationStatus") as "YES" | "NO" | "INPROGRESS" | null;
     const address1 = formData.get("address1") as string | null;
@@ -330,18 +331,19 @@ export const createOrganization = async (formData: FormData) => {
                 userId: session.user.id,
                 email: session.user.email,
                 role: "admin", // Creator of organization is admin by default
+                title: title,
                 organizationId: response.id
             }
         })
 
         await addTypeSenseDocument(
-            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
             (
                 process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                     : process.env.TYPESENSE_ADMIN_API_KEY
-            )!, 
-            response, 
+            )!,
+            response,
             'organizations'
         );
 
@@ -429,6 +431,12 @@ export const updateOrganization = withOrganizationAuth(
             if (key === "yearFounded") {
                 data[key] = value.toString();
             }
+
+            if ((key === "image" || key === "headerImage") && !value) {
+                // remove image
+                data[key] = null
+            }
+
         });
 
         try {
@@ -440,13 +448,13 @@ export const updateOrganization = withOrganizationAuth(
             });
 
             await updateTypeSenseDocument(
-                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`, 
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
                 (
                     process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
                         ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                         : process.env.TYPESENSE_ADMIN_API_KEY
                 )!,
-                response, 
+                response,
                 'organizations'
             );
 
@@ -999,6 +1007,7 @@ export async function approveMemberRequestAndCreateMember(
         })
 
         revalidatePath("/app/dashboard")
+        revalidatePath("/app/profile")
 
         if (member) {
             return {success: false, error: "This member already exists in your organization."}
@@ -1011,12 +1020,9 @@ export async function approveMemberRequestAndCreateMember(
     try {
 
         const [, createdMember] = await Promise.all([
-            prisma.memberRequest.update({
+            prisma.memberRequest.delete({
                 where: {
                     id: memberRequest.id,
-                },
-                data: {
-                    accepted: true,
                 },
             }),
             prisma.member.create({
@@ -1026,6 +1032,9 @@ export async function approveMemberRequestAndCreateMember(
                     role: "admin",
                     userId: memberRequest.userId,
                 },
+                include: {
+                    user: true
+                }
             }),
         ]);
 
@@ -1167,6 +1176,38 @@ export async function leaveOrganization(
         return {success: true, data: member};
     } catch (error: any) {
         logError("Error fetching membership data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function updateMember(
+    membershipId: string,
+    data: Prisma.MemberUpdateInput
+) {
+    const session = await getSession()
+
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        const member = await prisma.member.update({
+            where: {
+                id: membershipId
+            },
+            data
+        })
+
+        if (!member) {
+            return {success: false, error: "Membership not found"};
+        }
+
+        revalidatePath("/app/dashboard")
+        revalidatePath("/app/profile")
+
+        return {success: true, data: member};
+    } catch (error: any) {
+        logError("Error deleting membership", error);
         return {success: false, error: "Internal server error"};
     }
 }
@@ -1487,7 +1528,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                             create: {
                                 roadmapId: roadmap.id,
                                 organizationId,
-                                type: milestone.type || 'NOTYPE',
+                                types: milestone.types || [],
                                 status: milestone.status || "PLANNED",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
@@ -1552,10 +1593,18 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
     }
 
     const finalRoadmap = prisma.roadmap.findUnique({
-        where: { id: roadmap.id },
+        where: {id: roadmap.id},
         include: {
-            milestones: true,
-            nodes: true
+            milestones: {
+                include: {
+                    attachments: true,
+                    contacts: true,
+                    tasks: true,
+                    node: true
+                }
+            },
+            nodes: true,
+            edges: true
         }
     })
 
@@ -1668,7 +1717,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                                     connect: {id: organizationId}
                                 },
                                 title: node.data?.title || "New Milestone",
-                                type: node.data?.type || undefined,
+                                types: node.data?.types || [],
                                 description: node.data?.description,
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
@@ -1780,7 +1829,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                     connect: {id: organizationId}
                                 },
                                 title: node.data?.title || "New Milestone",
-                                type: node.data?.type || undefined,
+                                types: node.data?.types || [],
                                 description: node.data?.description,
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
@@ -1954,7 +2003,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     },
                     data: {
                         title: milestone.title,
-                        type: milestone.type,
+                        types: milestone.types || [],
                         otherTypeDetails: milestone.otherTypeDetails,
                         description: milestone.description,
                         startDate: milestone.startDate,
@@ -1975,11 +2024,12 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                                 data: milestone.contacts.map((contact: any) => ({
                                     name: contact.name,
                                     email: contact.email,
-                                    ...(contact.role ? {role: contact.role} : undefined)
+                                    ...(contact.role ? {role: contact.role} : undefined),
+                                    ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
                                 }))
                             }
                         },
-                        openTo: milestone.openTo,
+                        openTo: milestone.openTo || [],
                         status: milestone.status || "PLANNED",
                         private: milestone.private || false,
                         node: {
@@ -2163,14 +2213,16 @@ export async function createTask(columnId: string, properties?: any) {
                 private: true,
                 // startDate: null,
                 // checklist: []
-                ...(properties?.stakeholders ? {stakeholders: {
-                    createMany: {
-                        data: (properties.stakeholders || []).map((stakeholder: any) => ({
-                            userId: stakeholder?.user?.id || stakeholder?.userId,
-                            // user: { connect: { id: stakeholder.id }},
-                        }))
+                ...(properties?.stakeholders ? {
+                    stakeholders: {
+                        createMany: {
+                            data: (properties.stakeholders || []).map((stakeholder: any) => ({
+                                userId: stakeholder?.user?.id || stakeholder?.userId,
+                                // user: { connect: { id: stakeholder.id }},
+                            }))
+                        }
                     }
-                }}: undefined)
+                } : undefined)
             }
         })
 

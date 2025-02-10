@@ -1,6 +1,6 @@
 import NewRoadmapForm from "@/components/new-roadmap"
 import NoOrganization from "@/components/no-organization"
-import { getRoadmap, getRoadmapId } from "@/lib/fetchers"
+import { getRoadmap } from "@/lib/fetchers"
 import { getSession } from "@/lib/auth"
 import { Roadmap } from "@/components/roadmap"
 import RoadmapTemplates from "@/components/roadmap-templates"
@@ -22,7 +22,7 @@ export default async function RoadmapPage() {
     if (response.success && response.data) {
         if (response.data.milestones && response.data.milestones.length > 0) {
             return (
-                <main className="flex flex-col items-center h-full mx-auto">
+                <main className="flex flex-col items-center h-full w-full mx-auto">
                     <Roadmap data={response.data}/>
                 </main>
             )

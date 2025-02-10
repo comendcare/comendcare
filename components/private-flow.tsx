@@ -9,14 +9,12 @@ import {
     useStoreApi,
     applyNodeChanges,
 } from "@xyflow/react"
-import type { ConnectionState, Edge, FinalConnectionState, Node, NodeChange } from "@xyflow/react"
+import type { Edge, Node, NodeChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
 
 import "@xyflow/react/dist/base.css"
 
 import PrivateMilestoneNode from "@/components/private-milestone-node"
-import PrivateAssetNode from "@/components/private-asset-node"
-import PrivateProjectNode from "@/components/private-project-node"
 import { Button } from "./ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
@@ -34,18 +32,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { toast } from "sonner"
 import { isOnboarded, setOnboarded} from "@/lib/utils"
-import { ScrollArea } from "./ui/scroll-area"
-import { Card, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { CheckBubble } from "./check-bubble"
-import { templateMilestones } from "@/lib/templates"
 import { debounce } from "lodash"
 import { CustomEdge } from "./custom-edge"
-import { Badge } from "./ui/badge"
-import { NODE_TYPE_OPTIONS } from "@/lib/types"
-import { MilestoneTemplateCard } from "./milestone-template-card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { FaInfoCircle } from "react-icons/fa";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { MilestoneTemplateTabs } from "./roadmap-templates"
 
 const proOptions = { hideAttribution: true }
@@ -81,9 +69,6 @@ export const PrivateFlowView = ({
     const { fitView } = useReactFlow()
     const store = useStoreApi()
     const router = useRouter()
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
-    // const { undo, redo, clear } = useRoadmapStore.temporal.getState()
     const nodeTypes = { PROJECT: PrivateMilestoneNode, ASSET: PrivateMilestoneNode, RFP: PrivateMilestoneNode }
     const edgeTypes = { DEFAULT: CustomEdge }
     const [milestoneData, setMilestoneData] = useState({})
@@ -101,17 +86,21 @@ export const PrivateFlowView = ({
     const [localNodes, setLocalNodes] = useState(nodes)
     const [localEdges, setLocalEdges] = useState(edges)
 
+    const handleEditClick = (event: React.MouseEvent, node: Node) => {
+        setSelectedNodeId(node.id)
+    }
+
     const onNodesChange = (changes: NodeChange<Node>[]) => {
         const newNodes = applyNodeChanges(changes, localNodes)
         setLocalNodes(newNodes)
 
-        debounceUpdateStore(newNodes)
+        const validChanges = changes.filter(change => change.type === "position")
+        if (validChanges.length > 0) debounceUpdateStore(newNodes) // only change zustand state if the user is updating the node position
     }
 
     const debounceUpdateStore = useCallback(
         debounce(
             (nodes: Node[]) => {
-                // updateDBFlow({ roadmapId, nodes, edges })
                 setDbNodes(nodes)
             }, 500
         ),
@@ -136,7 +125,7 @@ export const PrivateFlowView = ({
                     data: {
                         id: nanoid(),
                         nodeId: id,
-                        type: 'NOTYPE',
+                        types: [],
                         title: `New Milestone`,
                         status: "PLANNED"
                     },
@@ -188,7 +177,7 @@ export const PrivateFlowView = ({
             const id = nanoid()
             const newNode: Node = {
                 id: id,
-                type: defaultData?.nodeType || "PROJECT",
+                type: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
                 position: {
                     x: centerX,
                     y: centerY
@@ -197,7 +186,7 @@ export const PrivateFlowView = ({
                 data: {
                     id: nanoid(),
                     nodeId: id,
-                    type: defaultData?.type || 'NOTYPE',
+                    types: defaultData?.types || [],
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     status: defaultData?.status || "PLANNED"
@@ -231,16 +220,6 @@ export const PrivateFlowView = ({
         ...node,
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
-            handleEditClick: (nodeId: string) => {
-                setSelectedNodeId(nodeId)
-
-                const params = new URLSearchParams(searchParams.toString())
-                params.delete("milestone")
-                params.set("milestone", nodeId)
-        
-                // router.push(`${pathname}?${params.toString()}`, { scroll: false })
-                router.replace(`${pathname}?${params.toString()}`)
-            },
             handleDelete: (nodeId: string) => {
                 const nodesList = localNodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
                 const edgesList = edges.filter((edge: Edge) => edge.source === nodeId || edge.target === nodeId)
@@ -275,7 +254,7 @@ export const PrivateFlowView = ({
             if (selectedNodeId) {
                 fitView({ nodes: [{ id: selectedNodeId }], padding: 2 })
             } else {
-                fitView({ padding: 2 })
+                fitView({ nodes: localNodes.map(node => ({ id: node.id })), padding: 0.4 })
             }
         }, 1) // Delay by a short time to allow layout adjustment
 
@@ -300,6 +279,7 @@ export const PrivateFlowView = ({
             width={width}
             nodes={updatedNodes}
             edges={updatedEdges}
+            onNodeClick={handleEditClick}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
@@ -311,8 +291,7 @@ export const PrivateFlowView = ({
             fitViewOptions={{ padding: 2 }}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
-            // maxZoom={5}
-            // minZoom={0.1}
+            minZoom={0.1}
         >
             <MiniMap
                 nodeColor='#757575'
@@ -326,7 +305,7 @@ export const PrivateFlowView = ({
             if (!open) setSelectedMilestones([])
             setNewMilestoneIsOpen(open)
         }}>
-            <DialogContent className="min-w-fit h-[80vh] flex flex-col justify-start">
+            <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start">
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
                         Select from a milestone template

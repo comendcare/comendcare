@@ -35,19 +35,18 @@ export const PrivateTimelineView = () => {
         addNodes,
         onConnect,
     } = useRoadmapStore(useShallow(selector))
-    const router = useRouter()
+const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
     const handleEditClick = (nodeId: string) => {
         setSelectedNodeId(nodeId)
 
-        const params = new URLSearchParams(searchParams.toString())
-        params.delete("milestone")
-        params.set("milestone", nodeId)
+        // const params = new URLSearchParams(searchParams.toString())
+        // params.delete("milestone")
+        // params.set("milestone", nodeId)
 
-        // router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        router.replace(`${pathname}?${params.toString()}`)
+        // router.replace(`${pathname}?${params.toString()}`, { scroll: false })
     }
 
     return (
@@ -71,13 +70,13 @@ export const PrivateTimelineView = () => {
                                 <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white ">
                                     {milestone.title}
                                 </h3>
-                                {milestone.private && <PrivateBadge />}
+                                {milestone.private && <PrivateBadge iconOnly/>}
                                 <time
                                     className="ml-auto block font-semibold leading-none dark:text-gray-500">
                                     {getDates(milestone)}
                                 </time>
                             </div>
-                            <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
+                            <p className={"mb-4 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2"}>
                                 {milestone.description}
                             </p>
                             </>

@@ -14,13 +14,13 @@ import {
     FormDescription,
 } from "./ui/form"
 import {Input} from "./ui/input"
-import {Textarea} from "./ui/textarea"
+import {AutosizeTextarea, Textarea} from "./ui/textarea"
 import {Button} from "./ui/button"
 import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaCalendar, FaEllipsis, FaLinkSlash, FaTrash, FaX} from "react-icons/fa6"
+import {FaCalendar, FaEllipsis, FaLinkSlash, FaPlus, FaTrash, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -65,25 +65,33 @@ import {Prisma} from "@prisma/client"
 import {Separator} from "./ui/separator"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
-import { getKanbanFromOrganizationId, getOrganizationFromOrganizationId } from "@/lib/fetchers"
+import {getKanbanFromOrganizationId, getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
-import { useSession } from "next-auth/react"
-import { AttachmentsEditForm } from "./attachments-edit-form"
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
-import { ExternalContactField } from "./external-contact-field"
-import { ExternalAttachmentField } from "./external-attachment-field"
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
-import { Calendar } from "./ui/calendar"
-import { FaInfoCircle } from "react-icons/fa";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { PublicBadge } from "./public-badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import {useSession} from "next-auth/react"
+import {AttachmentsEditForm} from "./attachments-edit-form"
+import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
+import {ExternalContactField} from "./external-contact-field"
+import {ExternalAttachmentField} from "./external-attachment-field"
+import {Popover, PopoverContent, PopoverTrigger} from "./ui/popover"
+import {cn} from "@/lib/utils"
+import {format} from "date-fns"
+import {Calendar} from "./ui/calendar"
+import {FaInfoCircle} from "react-icons/fa";
+import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
+import {PublicBadge} from "./public-badge"
+import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "./ui/dropdown-menu"
+import MoneyInput from "@/components/money-input";
+import MultipleSelector from "./ui/multiple-selector"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 type TaskType = Prisma.TaskGetPayload<{}>
+
+export const optionSchema = z.object({
+    label: z.string(),
+    value: z.string(),
+    // disable: z.boolean().optional(),
+});
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
@@ -113,7 +121,7 @@ const editMilestoneForm = z.object({
         .string()
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
-    type: z.string(),
+    types: z.array(optionSchema).optional(),
     otherTypeDetails: z.string().optional(),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
@@ -131,7 +139,7 @@ const editMilestoneForm = z.object({
     status: z.string(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
-    openTo: z.string().optional(),
+    openTo: z.array(z.string()).optional(),
 })
 
 export function EditMilestoneForm({
@@ -163,7 +171,10 @@ export function EditMilestoneForm({
             nodeType: milestoneData?.node.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            type: milestoneData?.type || "NOTYPE",
+            types: (milestoneData?.types || []).map((type: any) => MILESTONE_TYPE_OPTIONS.find(option => option?.value === type) || {
+                label: 'Unknown',
+                value: "UNKNOWN"
+            }),
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
             startDate: milestoneData?.startDate,
             endDate: milestoneData?.endDate,
@@ -181,7 +192,7 @@ export function EditMilestoneForm({
             status: milestoneData?.status || "PLANNED",
             isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
-            openTo: milestoneData?.openTo || undefined
+            openTo: milestoneData?.openTo || []
         }
     })
 
@@ -189,7 +200,7 @@ export function EditMilestoneForm({
         nodeType: form.watch("nodeType"),
         title: form.watch("title"),
         description: form.watch("description"),
-        type: form.watch("type"),
+        types: form.watch("types"),
         otherTypeDetails: form.watch("otherTypeDetails"),
         startDate: form.watch("startDate"),
         endDate: form.watch("endDate"),
@@ -220,23 +231,23 @@ export function EditMilestoneForm({
 
     const unionById = (arr1: any[], arr2: any[]) => {
         const map = new Map();
-      
+
         // Add elements from the first array
         arr1.forEach((item) => map.set(item.id, item));
-      
+
         // Add elements from the second array (overwriting duplicates)
         arr2.forEach((item) => map.set(item.id, item));
-      
+
         // Convert the Map back to an array
         return Array.from(map.values());
-      };
+    };
 
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         const {
             nodeType,
             title,
             description,
-            type,
+            types,
             otherTypeDetails,
             startDate,
             endDate,
@@ -271,7 +282,7 @@ export function EditMilestoneForm({
             ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
             ...(attachments ? {attachments} : undefined),
-            ...(type ? {type} : {type: 'NOTYPE'}),
+            ...(types ? {types: types.map(t => t?.value)} : undefined),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
@@ -395,130 +406,139 @@ export function EditMilestoneForm({
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                     className="flex flex-col gap-8 mt-2 px-1"
                 >
-                    <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={onClose}>
+                    <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
+                        e.preventDefault()
+                        onClose()
+                    }}>
                         <FaX/>
                     </Button>
 
-                    <FormItem className="w-full flex flex-row gap-4 justify-start items-center mr-10">
-                        <FormLabel className="text-md mt-2">Private</FormLabel>
-                        <PrivatePublicFormField form={form} formData={formData} />
-                    </FormItem>
-
                     <EditTitle form={form}/>
 
-                    <FormField
-                        control={form.control}
-                        name="nodeType"
-                        render={({field}) => (
-                            <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
-                                <FormControl>
-                                    <ToggleGroup
-                                        type="single"
-                                        variant="outline"
-                                        value={field.value}
-                                        onValueChange={(value) => {
-                                            if (value) {
-                                                field.onChange(value)
-                                            }
-                                        }}
-                                        className="w-full flex flex-wrap gap-2 justify-between"
-                                    >
-                                        {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
-                                            <ToggleGroupItem
-                                                key={value}
-                                                value={value}
-                                                className={"text-md grow flex gap-2"}
-                                            >
-                                                {label}
-                                                <Tooltip>
-                                                    <TooltipTrigger>
-                                                        <FaInfoCircle />
-                                                    </TooltipTrigger>
-                                                    <TooltipContent className="max-w-80 text-wrap text-left">
-                                                        {description}
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </ToggleGroupItem>
-                                        ))}
-                                    </ToggleGroup>
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col grow">
-                                <FormLabel
-                                    className="text-2xl font-semibold leading-none tracking-tight">{`Description`}</FormLabel>
-                                <FormControl>
-                                    <Textarea
-                                        id="description"
-                                        placeholder={`Enter a description`}
-                                        defaultValue={field.value}
-                                        {...field}
-                                    />
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
-                        )}
-                    />
+                    <FormItem className="w-full flex flex-row gap-4 justify-start items-center mr-10">
+                        <FormLabel
+                            className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Private</FormLabel>
+                        <PrivatePublicFormField form={form} formData={formData}/>
+                    </FormItem>
 
                     <FormItem>
-                        <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Details`}</FormLabel>
-                        <FormItem className="w-full grid grid-cols-[120px_auto] gap-x-2 items-center">
+                        <FormLabel
+                            className="text-2xl font-semibold leading-none tracking-tight">{`Details`}
+                        </FormLabel>
+
+                        <FormField
+                            control={form.control}
+                            name="nodeType"
+                            render={({field}) => (
+                                <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
+                                    <FormControl>
+                                        <ToggleGroup
+                                            type="single"
+                                            variant="outline"
+                                            value={field.value}
+                                            onValueChange={(value) => {
+                                                if (value) {
+                                                    field.onChange(value)
+                                                }
+                                            }}
+                                            className="w-full flex flex-wrap gap-2 justify-between"
+                                        >
+                                            {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
+                                                <ToggleGroupItem
+                                                    key={value}
+                                                    value={value}
+                                                    className={"text-md grow flex gap-2"}
+                                                >
+                                                    {label}
+                                                    <Tooltip>
+                                                        <TooltipTrigger>
+                                                            <FaInfoCircle/>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                                            {description}
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </ToggleGroupItem>
+                                            ))}
+                                        </ToggleGroup>
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="description"
+                            render={({field}) => (
+                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                    <FormLabel className="text-md mt-2">
+                                        {`Description`}
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            id="description"
+                                            placeholder={`Enter a description`}
+                                            defaultValue={field.value}
+                                            {...field}
+                                            className="border-transparent hover:border-input"
+                                        />
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
                             <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
-                            <MilestoneTypeFormField form={form} />
+                            <MilestoneTypeFormField form={form}/>
 
                             {milestoneData?.node?.type === "ASSET" && (
                                 <>
-                                <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
-                                <BudgetFormField form={form} />
+                                    <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
+                                    <BudgetFormField form={form}/>
                                 </>
                             )}
 
                             {milestoneData?.node?.type === "PROJECT" && (
                                 <>
-                                <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
-                                <StatusFormField form={form} />
+                                    <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
+                                    <StatusFormField form={form}/>
 
-                                <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                <BudgetFormField form={form} />
+                                    <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                    <BudgetFormField form={form}/>
                                 </>
                             )}
 
                             {milestoneData?.node?.type === "RFP" && (
                                 <>
-                                <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
-                                <OpenToFormField form={form}/>
+                                    <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                    <BudgetFormField form={form}/>
 
-                                <FormLabel className="text-md mt-2">{`Start Date`}</FormLabel>
-                                <StartDateFormField form={form} />
-
-                                <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                <BudgetFormField form={form} />
+                                    <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
+                                    <OpenToFormField form={form}/>
                                 </>
                             )}
                         </FormItem>
+
+                        {milestoneData?.node?.type === "PROJECT" && (
+                            <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
+                        )}
+
+                        {milestoneData?.node?.type === "RFP" && (
+                            <TimelineFormField form={form} startLabel={"Request Opens"}
+                                               endLabel={"Deadline for Proposals"}/>
+                        )}
                     </FormItem>
 
-                    {milestoneData?.node?.type === "PROJECT" && (
-                        <TimelineFormField 
-                            form={form}
-                        />
-                    )}
-
-                    <ContactsFormField form={form} />
+                    <ContactsFormField form={form}/>
 
                     <AttachmentsFormField
                         form={form}
                         attachments={formData.attachments as AttachmentType[]}
                     />
 
-                    <TasksFormField 
+                    <TasksFormField
                         form={form}
                         formData={formData}
                         announcements={announcements}
@@ -539,8 +559,8 @@ export function EditMilestoneForm({
                             </DialogTrigger>
                             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
                         </Dialog>
-                        <Button 
-                            id="edit-milestone-scroll-area" 
+                        <Button
+                            id="edit-milestone-scroll-area"
                             className="research-plan-tour-step4"
                             onClick={() => {
                                 handleMilestoneFormSubmit(form.getValues())
@@ -556,16 +576,16 @@ export function EditMilestoneForm({
     )
 }
 
-const MilestoneTypeFormField = ({form}: {form: any}) => {
+const MilestoneTypeFormField = ({form}: { form: any }) => {
     return (
         <>
             <FormField
                 control={form.control}
-                name="type"
+                name="types"
                 render={({field}) => (
                     <FormItem className="w-full">
                         <FormControl>
-                            <Select
+                            {/* <Select
                                 defaultValue={field.value}
                                 onValueChange={field.onChange}
                             >
@@ -577,7 +597,20 @@ const MilestoneTypeFormField = ({form}: {form: any}) => {
                                         <SelectItem key={index} value={type.value}>{type.label}</SelectItem>
                                     ))}
                                 </SelectContent>
-                            </Select>
+                            </Select> */}
+                            <MultipleSelector
+                                {...field}
+                                defaultOptions={MILESTONE_TYPE_OPTIONS}
+                                hidePlaceholderWhenSelected={true}
+                                showHoverCard={false}
+                                placeholder="Milestone type"
+                                className="border-transparent hover:border-input"
+                                emptyIndicator={
+                                    <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                        no results found.
+                                    </p>
+                                }
+                            />
                         </FormControl>
                         <FormMessage/>
                     </FormItem>
@@ -586,50 +619,50 @@ const MilestoneTypeFormField = ({form}: {form: any}) => {
 
             {form.watch("type") === "OTHER" && (
                 <>
-                <div>
-                <FormLabel className="text-md">{`Type Description`}</FormLabel>
-                <FormDescription>{`This will be used to improve the platform.`}</FormDescription>
-                </div>
-                <FormField
-                    control={form.control}
-                    name="otherTypeDetails"
-                    render={({field}) => (
-                        <FormItem className="flex flex-col grow">
-                            <FormControl>
-                                <Textarea
-                                    id="otherTypeDetails"
-                                    placeholder={`Please enter a short description of your milestone type.`}
-                                    defaultValue={field.value}
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+                    <div>
+                        <FormLabel className="text-md">{`Type Description`}</FormLabel>
+                        <FormDescription>{`This will be used to improve the platform.`}</FormDescription>
+                    </div>
+                    <FormField
+                        control={form.control}
+                        name="otherTypeDetails"
+                        render={({field}) => (
+                            <FormItem className="flex flex-col grow">
+                                <FormControl>
+                                    <Textarea
+                                        id="otherTypeDetails"
+                                        placeholder={`Please enter a short description of your milestone type.`}
+                                        defaultValue={field.value}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
                 </>
             )}
         </>
     )
 }
 
-const PrivatePublicFormField = ({form, formData}: {form: any, formData: any}) => {
+const PrivatePublicFormField = ({form, formData}: { form: any, formData: any }) => {
     return (
         <FormField
             control={form.control}
             name="isPrivate"
             render={({field}) => (
                 <span className="h-full items-center flex flex-row justify-end gap-4">
+                    {formData.isPrivate
+                        ? <PrivateBadge className="mt-0"/>
+                        : <PublicBadge className="mt-0"/>
+                    }
                     <FormControl>
                         <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                         />
                     </FormControl>
-                    {formData.isPrivate 
-                        ? <PrivateBadge className="mt-0"/>
-                        : <PublicBadge className="mt-0" />
-                    }
                     <FormMessage/>
                 </span>
             )}
@@ -637,7 +670,7 @@ const PrivatePublicFormField = ({form, formData}: {form: any, formData: any}) =>
     )
 }
 
-const StatusFormField = ({form}: {form: any}) => {
+const StatusFormField = ({form}: { form: any }) => {
     return (
         <FormField
             control={form.control}
@@ -660,191 +693,174 @@ const StatusFormField = ({form}: {form: any}) => {
     )
 }
 
-const BudgetFormField = ({form}: {form: any}) => {
+const BudgetFormField = ({form}: { form: any }) => {
     return (
-        <FormField
-            control={form.control}
+        <MoneyInput
+            className="h-[40px] -mt-2 border-transparent hover:border-input"
+            form={form}
             name="budget"
-            render={({field}) => (
-                // <FormItem className="h-full flex items-center justify-end gap-4">
-                <>
-                    <FormControl className="grow w-full h-full">
-                        <Input
-                            className="h-full"
-                            id="budget"
-                            type="number"
-                            defaultValue={field.value}
-                            onChange={e =>
-                                field.onChange(
-                                    Number(e.target.value)
-                                )
-                            }
-                            variant={"currency"}
-                        />
-                    </FormControl>
-                    <FormMessage/>
-                </>
-                // </FormItem>
-            )}
         />
     )
 }
 
 const TimelineFormField = ({
-    form
-}: {
-    form: any
+                               form,
+                               startLabel,
+                               endLabel
+                           }: {
+    form: any,
+    startLabel?: string,
+    endLabel?: string
 }) => {
     return (
         <span className="flex flex-col gap-2 align-center">
-        <FormLabel
-            className="text-2xl font-semibold leading-none tracking-tight">{`Timeline`}</FormLabel>
 
-        <FormItem className="w-full grid grid-cols-[120px_120px_auto] gap-x-2 items-center">
-            <FormLabel className="text-md mt-2">{`Start`}</FormLabel>
-            <FormField
-                control={form.control}
-                name="startDate"
-                render={({field}) => (
-                    <FormItem className="h-full grow">
-                        <Select
-                            defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
-                            onValueChange={(value) => {
-                                const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
-                                const monthIndex = monthsList.indexOf(value)
-                                const newStartDate: Date = new Date(previousStartDate.setMonth(monthIndex))
-                                form.setValue('startDate', newStartDate)
-                            }}
-                        >
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a month"/>
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {monthsList.map(
-                                    (
-                                        month: string,
-                                        index: number
-                                    ) => (
-                                        <SelectItem
-                                            value={month}
-                                            key={index}
-                                        >
-                                            {month}
-                                        </SelectItem>
-                                    )
-                                )}
-                            </SelectContent>
-                        </Select>
-                    </FormItem>
-                )}
-            />
+            <FormItem
+                className="w-full grid grid-rows[auto_auto] grid-cols-[180px_120px_auto] space-y-0 gap-2 items-center">
+                <FormLabel className="text-md h-fit w-fit">{startLabel ? startLabel : `Start`}</FormLabel>
+                <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({field}) => (
+                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                            <Select
+                                defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
+                                onValueChange={(value) => {
+                                    const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                    const monthIndex = monthsList.indexOf(value)
+                                    const newStartDate: Date = new Date(previousStartDate.setMonth(monthIndex))
+                                    form.setValue('startDate', newStartDate)
+                                }}
+                            >
+                                <FormControl>
+                                    <SelectTrigger className="h-[40px] border-transparent hover:border-input">
+                                        <SelectValue placeholder="Month"/>
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {monthsList.map(
+                                        (
+                                            month: string,
+                                            index: number
+                                        ) => (
+                                            <SelectItem
+                                                value={month}
+                                                key={index}
+                                            >
+                                                {month}
+                                            </SelectItem>
+                                        )
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </FormItem>
+                    )}
+                />
 
-            <FormField
-                control={form.control}
-                name="startDate"
-                render={({field}) => (
-                    <FormItem className="h-full grow">
-                        <Input
-                            className="h-full"
-                            placeholder="Enter a year..."
-                            maxLength={4}
-                            defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
-                            onChange={(event) => {
-                                console.log(`start date year`, event.target.value)
-                                const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
-                                const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
-                                form.setValue('startDate', newStartDate)
-                            }}
-                        />
-                    </FormItem>
-                )}
-            />
+                <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({field}) => (
+                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                            <Input
+                                className="h-[40px] border-transparent hover:border-input w-fit"
+                                placeholder="Year"
+                                maxLength={4}
+                                defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
+                                onChange={(event) => {
+                                    console.log(`start date year`, event.target.value)
+                                    const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                    const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
+                                    form.setValue('startDate', newStartDate)
+                                }}
+                            />
+                        </FormItem>
+                    )}
+                />
 
-            <FormLabel className="text-md mt-2">{`End`}</FormLabel>
-            <FormField
-                control={form.control}
-                name="endDate"
-                render={({field}) => (
-                    <FormItem className="h-full grow">
-                        <Select
-                            defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
-                            onValueChange={(value) => {
-                                const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
-                                const monthIndex = monthsList.indexOf(value)
-                                const newEndDate: Date = new Date(previousEndDate.setMonth(monthIndex))
-                                form.setValue('endDate', newEndDate)
-                            }}
-                        >
-                            <FormControl>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a month"/>
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {monthsList.map(
-                                    (
-                                        month: string,
-                                        index: number
-                                    ) => (
-                                        <SelectItem
-                                            value={month}
-                                            key={index}
-                                        >
-                                            {month}
-                                        </SelectItem>
-                                    )
-                                )}
-                            </SelectContent>
-                        </Select>
-                    </FormItem>
-                )}
-            />
+                <FormLabel className="text-md h-fit w-fit">{endLabel ? endLabel : `End`}</FormLabel>
+                <FormField
+                    control={form.control}
+                    name="endDate"
+                    render={({field}) => (
+                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                            <Select
+                                defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
+                                onValueChange={(value) => {
+                                    const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
+                                    const monthIndex = monthsList.indexOf(value)
+                                    const newEndDate: Date = new Date(previousEndDate.setMonth(monthIndex))
+                                    form.setValue('endDate', newEndDate)
+                                }}
+                            >
+                                <FormControl>
+                                    <SelectTrigger className="h-[40px] border-transparent hover:border-input">
+                                        <SelectValue placeholder="Month"/>
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {monthsList.map(
+                                        (
+                                            month: string,
+                                            index: number
+                                        ) => (
+                                            <SelectItem
+                                                value={month}
+                                                key={index}
+                                            >
+                                                {month}
+                                            </SelectItem>
+                                        )
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </FormItem>
+                    )}
+                />
 
-            <FormField
-                control={form.control}
-                name="endDate"
-                render={({field}) => (
-                    <FormItem className="h-full grow">
-                        <Input
-                            className="h-full"
-                            placeholder="Enter a year..."
-                            maxLength={4}
-                            defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
-                            onChange={(event) => {
-                                console.log(`start date year`, event.target.value)
-                                const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
-                                const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
-                                form.setValue('endDate', newEndDate)
-                            }}
-                        />
-                    </FormItem>
-                )}
-            />
-            <FormMessage/>
-        </FormItem>
-    </span>
+                <FormField
+                    control={form.control}
+                    name="endDate"
+                    render={({field}) => (
+                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                            <Input
+                                className="h-[40px] border-transparent hover:border-input w-fit"
+                                placeholder="Year"
+                                maxLength={4}
+                                defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
+                                onChange={(event) => {
+                                    console.log(`start date year`, event.target.value)
+                                    const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
+                                    const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
+                                    form.setValue('endDate', newEndDate)
+                                }}
+                            />
+                        </FormItem>
+                    )}
+                />
+                <FormMessage/>
+            </FormItem>
+        </span>
     )
 }
 
-const StartDateFormField = ({form}: {form: any}) => {
+const StartDateFormField = ({form}: { form: any }) => {
     return (
-        <FormField 
+        <FormField
             control={form.control}
             name="startDate"
             render={({field}) => (
-                <Popover >
+                <Popover>
                     <PopoverTrigger asChild>
                         <Button
-                        variant={"outline"}
-                        className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                        )}
+                            variant={"outline"}
+                            className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                            )}
                         >
-                        <FaCalendar className="mr-2 h-4 w-4" />
-                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                            <FaCalendar className="mr-2 h-4 w-4"/>
+                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -861,53 +877,81 @@ const StartDateFormField = ({form}: {form: any}) => {
     )
 }
 
-const OpenToFormField = ({form}: {form: any}) => {
+const OpenToFormField = ({form}: { form: any }) => {
     return (
-        <FormField 
+        <FormField
             control={form.control}
             name="openTo"
             render={({field}) => (
-                <Select
-                    defaultValue={field.value}
-                    onValueChange={field.onChange}
+                <ToggleGroup
+                    type="multiple"
+                    variant="outline"
+                    value={field.value}
+                    onValueChange={
+                        field.onChange
+                    }
+                    className="w-fit flex flex-wrap gap-2 justify-start"
                 >
-                    <SelectTrigger>
-                        <SelectValue placeholder="Open to work from..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {RFP_OPEN_TO_TYPE_OPTIONS.map((type, index) => (
-                            <SelectItem key={index} value={type.value}>{type.label}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                    {RFP_OPEN_TO_TYPE_OPTIONS.map(type => (
+                        <ToggleGroupItem
+                            key={type.value}
+                            value={type.value}
+                        >
+                            {type.label}
+                        </ToggleGroupItem>
+                    ))}
+                </ToggleGroup>
+
+                // <Select
+                //     defaultValue={field.value}
+                //     onValueChange={field.onChange}
+                // >
+                //     <SelectTrigger>
+                //         <SelectValue placeholder="Open to work from..." />
+                //     </SelectTrigger>
+                //     <SelectContent>
+                //         {RFP_OPEN_TO_TYPE_OPTIONS.map((type, index) => (
+                //             <SelectItem key={index} value={type.value}>{type.label}</SelectItem>
+                //         ))}
+                //     </SelectContent>
+                // </Select>
             )}
         />
     )
 }
 
 const TasksFormField = ({
-    form, 
-    formData, 
-    announcements, 
-    sensors, 
-    milestoneData
-}: { 
-    form: any, 
+                            form,
+                            formData,
+                            announcements,
+                            sensors,
+                            milestoneData
+                        }: {
+    form: any,
     // formData: z.infer<typeof editMilestoneForm>,
-    formData: any, 
-    announcements: Announcements, 
-    sensors: SensorDescriptor<SensorOptions>[], 
+    formData: any,
+    announcements: Announcements,
+    sensors: SensorDescriptor<SensorOptions>[],
     milestoneData: any
 }) => {
     const {
         columns: kanbanColumns,
         tasks: kanbanTasks,
-        updateTask,
         setTasks,
         addTask,
         deleteTask,
         addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
+
+    const debounceSetTasks = useCallback(
+        debounce(async (updatedValues) => {
+            await setTasks(updatedValues)
+            // toast('Success!', {
+            //     position: "bottom-left",
+            //     description: 'The changes to your kanban tasks have been successfully saved.'
+            // })
+        }, 500), []
+    )
 
     return (
         <FormField
@@ -917,7 +961,106 @@ const TasksFormField = ({
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <>
-                            <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Tasks`}</FormLabel>
+                            <div className="flex flex-row justify-between items-center">
+                                <FormLabel
+                                    className="text-2xl font-semibold leading-none tracking-tight"
+                                >
+                                    {`Tasks`}
+                                </FormLabel>
+
+                                <div className="flex flex-row items-center space-x-2">
+                                    <LinkTask
+                                        milestoneId={milestoneData?.id}
+                                        kanbanTasks={kanbanTasks}
+                                        onLink={async (taskId) => {
+                                            const newTask = kanbanTasks?.find((task) => task.id === taskId)
+                                            form.setValue(
+                                                'tasks',
+                                                [...field?.value || [], {
+                                                    ...newTask,
+                                                    milestoneId: milestoneData?.id,
+                                                    milestone: {id: milestoneData?.id}
+                                                }]
+                                            )
+                                            debounceSetTasks(kanbanTasks.map(t => {
+                                                if (t.id === newTask.id) {
+                                                    return ({
+                                                        ...t,
+                                                        milestoneId: milestoneData?.id,
+                                                        milestone: {id: milestoneData?.id}
+                                                    })
+                                                }
+                                                return t
+                                            }))
+                                        }}
+                                    />
+
+                                    <Button
+                                        variant={'secondary'}
+                                        onClick={async (e) => {
+                                            e.preventDefault()
+                                            // if kanban doesn't exist or kanban has no columns
+                                            if (kanbanColumns.length === 0) {
+                                                const response = await getKanbanFromOrganizationId()
+
+                                                if (response.success && response.data) {
+                                                    // kanban found, add column
+                                                    const column = await addColumn({
+                                                        name: 'Unsorted Tasks'
+                                                    })
+
+                                                    if (!column) return
+
+                                                    const newTask = await addTask(column.id)
+                                                    if (newTask) {
+                                                        const updatedTasks = [...form.getValues().tasks || [], {
+                                                            ...newTask,
+                                                            milestoneId: milestoneData?.id,
+                                                            milestone: {id: milestoneData?.id}
+                                                        }]
+                                                        form.setValue('tasks', updatedTasks)
+                                                    }
+
+                                                    return
+                                                }
+                                            }
+
+                                            const columnId = kanbanColumns[0].id
+
+                                            const newTask = await addTask(columnId)
+                                            // if (newTask) {
+                                            //     const updatedTasks = [...form.getValues().tasks || [], {
+                                            //         ...newTask,
+                                            //         milestoneId: milestoneData?.id,
+                                            //         milestone: {id: milestoneData?.id}
+                                            //     }]
+                                            //     form.setValue('tasks', updatedTasks)
+                                            // }
+                                            const newTasks = await setTasks([
+                                                ...kanbanTasks,
+                                                {
+                                                    ...newTask,
+                                                    milestoneId: milestoneData?.id,
+                                                    milestone: {id: milestoneData?.id}
+                                                }
+                                            ].map(t => {
+                                                if (t.id === newTask?.id) {
+                                                    return ({
+                                                        ...t,
+                                                        milestoneId: milestoneData?.id,
+                                                        milestone: {id: milestoneData?.id}
+                                                    })
+                                                }
+                                                return t
+                                            }))
+                                            form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
+                                        }}
+                                    >
+                                        {`Add a new kanban task`}
+                                    </Button>
+                                </div>
+                            </div>
+
                             <DndContext
                                 accessibility={{
                                     announcements
@@ -945,9 +1088,8 @@ const TasksFormField = ({
                                                 index={index}
                                                 task={task}
                                                 onUnlink={async () => {
-                                                    // form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
-
-                                                    const newTasks = await setTasks(kanbanTasks.map(t => {
+                                                    form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
+                                                    debounceSetTasks(kanbanTasks.map(t => {
                                                         if (t.id === task.id) {
                                                             return ({
                                                                 ...t,
@@ -958,20 +1100,17 @@ const TasksFormField = ({
 
                                                         return t
                                                     }))
-
-                                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                                 }}
                                                 onDelete={async () => {
                                                     await deleteTask(task.id)
                                                     form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
                                                 }}
                                                 onNameChange={async (newName) => {
-                                                    // form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
-                                                    //     ...t,
-                                                    //     name: newName
-                                                    // } : t))
-
-                                                    const newTasks = await setTasks(kanbanTasks.map(t => {
+                                                    form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
+                                                        ...t,
+                                                        name: newName
+                                                    } : t))
+                                                    debounceSetTasks(kanbanTasks.map(t => {
                                                         if (t.id === task.id) {
                                                             return ({
                                                                 ...t,
@@ -981,16 +1120,13 @@ const TasksFormField = ({
 
                                                         return t
                                                     }))
-
-                                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                                 }}
                                                 onColumnChange={async (newColumnId) => {
-                                                    // form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
-                                                    //     ...t,
-                                                    //     columnId: newColumnId
-                                                    // } : t))
-
-                                                    const newTasks = await setTasks(kanbanTasks.map(t => {
+                                                    form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
+                                                        ...t,
+                                                        columnId: newColumnId
+                                                    } : t))
+                                                    debounceSetTasks(kanbanTasks.map(t => {
                                                         if (t.id === task.id) {
                                                             return ({
                                                                 ...t,
@@ -1000,8 +1136,6 @@ const TasksFormField = ({
 
                                                         return t
                                                     }))
-
-                                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                                 }}
                                                 kanbanColumns={kanbanColumns}
                                             />
@@ -1009,93 +1143,6 @@ const TasksFormField = ({
                                     </SortableContext>
                                 </ol>
                             </DndContext>
-
-                            <LinkTask
-                                milestoneId={milestoneData?.id}
-                                kanbanTasks={kanbanTasks}
-                                onLink={async (taskId) => {
-                                    const newTask = kanbanTasks?.find((task) => task.id === taskId)
-                                    // form.setValue(
-                                    //     'tasks',
-                                    //     [...field?.value || [], {
-                                    //         ...newTask,
-                                    //         milestoneId: milestoneData?.id,
-                                    //         milestone: {id: milestoneData?.id}
-                                    //     }]
-                                    // )
-                                    const newTasks = await setTasks(kanbanTasks.map(t => {
-                                        if (t.id === newTask.id) {
-                                            return ({
-                                                ...t,
-                                                milestoneId: milestoneData?.id,
-                                                milestone: {id: milestoneData?.id}
-                                            })
-                                        }
-                                        return t
-                                    }))
-                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
-                                }}
-                            />
-                            
-                            <Button
-                                variant={'secondary'}
-                                onClick={async (e) => {
-                                    e.preventDefault()
-                                    // if kanban doesn't exist or kanban has no columns
-                                    if (kanbanColumns.length === 0) {
-                                        const response = await getKanbanFromOrganizationId()
-
-                                        if (response.success && response.data) {
-                                            // kanban found, add column
-                                            const column = await addColumn({
-                                                name: 'Unsorted Tasks'
-                                            })
-
-                                            if (!column) return
-
-                                            const newTask = await addTask(column.id)
-                                            if (newTask) {
-                                                const updatedTasks = [...form.getValues().tasks || [], {
-                                                    ...newTask,
-                                                    milestoneId: milestoneData?.id,
-                                                    milestone: {id: milestoneData?.id}
-                                                }]
-                                                form.setValue('tasks', updatedTasks)
-                                            }
-
-                                            return
-                                        }
-                                    }
-
-                                    const columnId = kanbanColumns[0].id
-
-                                    const newTask = await addTask(columnId)
-                                    // if (newTask) {
-                                    //     const updatedTasks = [...form.getValues().tasks || [], {
-                                    //         ...newTask,
-                                    //         milestoneId: milestoneData?.id,
-                                    //         milestone: {id: milestoneData?.id}
-                                    //     }]
-                                    //     form.setValue('tasks', updatedTasks)
-                                    // }
-                                    const newTasks = await setTasks([
-                                        ...kanbanTasks,
-                                        { ...newTask, milestoneId: milestoneData?.id, milestone: {id: milestoneData?.id}}
-                                    ].map(t => {
-                                        if (t.id === newTask?.id) {
-                                            return ({
-                                                ...t,
-                                                milestoneId: milestoneData?.id,
-                                                milestone: {id: milestoneData?.id}
-                                            })
-                                        }
-                                        return t
-                                    }))
-                                    form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
-                                }}
-                            >
-                                {`Add a new kanban task`}
-                            </Button>
                         </>
                     </FormControl>
                     <FormMessage/>
@@ -1105,100 +1152,119 @@ const TasksFormField = ({
     )
 }
 
-export function AttachmentsFormField({ form, attachments }: { form: UseFormReturn<any>, attachments: AttachmentType[] }) {
+export function AttachmentsFormField({form, attachments}: { form: UseFormReturn<any>, attachments: AttachmentType[] }) {
     return (
         <FormField
             control={form.control}
             name="attachments"
-            render={({ field }) => (
+            render={({field}) => (
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <>
-                        <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Attachments`}</FormLabel>
-                        {field.value && field.value.length > 0 && (
-                            <ol className="flex flex-col gap-2">
-                                {field.value.map((paper: AttachmentType, index: number) => (
-                                    <ExternalAttachmentField 
-                                        key={index}
-                                        index={index}
-                                        value={paper}
-                                        onDelete={() => {
-                                            form.setValue(
-                                                "attachments",
-                                                field?.value?.filter((t: AttachmentType, i: number) => i !== index)
-                                            )
-                                        }}
-                                        onValueChange={newValue => {
-                                            form.setValue(
-                                                "attachments",
-                                                field?.value?.map((currentValue: AttachmentType, i: number) => i === index ? newValue : currentValue)
-                                            )
-                                        }}
-                                    />
-                                ))}
-                            </ol>
-                        )}
-                        <Button
-                            variant="secondary"
-                            onClick={(e: any) => {
-                                e.preventDefault()
-                                form.setValue("attachments", [
-                                    ...(field?.value || []),
-                                    { name: '', link: '' }
-                                ])
-                            }}
-                        >{`Add an attachment`}</Button>
+                            <div className="flex flex-row justify-between items-center">
+                                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">
+                                    {`Attachments`}
+                                </FormLabel>
+
+                                <Button
+                                    className="w-fit"
+                                    variant="secondary"
+                                    onClick={(e: any) => {
+                                        e.preventDefault()
+                                        form.setValue("attachments", [
+                                            ...(field?.value || []),
+                                            {name: '', link: ''}
+                                        ])
+                                    }}
+                                >
+                                    {`Add an attachment`}
+                                </Button>
+
+                            </div>
+
+                            {field.value && field.value.length > 0 && (
+                                <ol className="flex flex-col gap-2">
+                                    {field.value.map((paper: AttachmentType, index: number) => (
+                                        <ExternalAttachmentField
+                                            key={index}
+                                            index={index}
+                                            value={paper}
+                                            onDelete={() => {
+                                                form.setValue(
+                                                    "attachments",
+                                                    field?.value?.filter((t: AttachmentType, i: number) => i !== index)
+                                                )
+                                            }}
+                                            onValueChange={newValue => {
+                                                form.setValue(
+                                                    "attachments",
+                                                    field?.value?.map((currentValue: AttachmentType, i: number) => i === index ? newValue : currentValue)
+                                                )
+                                            }}
+                                        />
+                                    ))}
+                                </ol>
+                            )}
                         </>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage/>
                 </FormItem>
             )}
-            />
+        />
     )
 }
 
-const ContactsFormField = ({form}: {form: any}) => {
+const ContactsFormField = ({form}: { form: any }) => {
     return (
-        <FormField 
+        <FormField
             control={form.control}
             name="contacts"
             render={({field}) => (
                 <FormItem>
-                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">{`Contacts`}</FormLabel>
-                {field?.value && field.value.length > 0 && (
-                    <ol className="flex flex-col gap-2">
-                        {field.value.map((contact: ContactType, index: number) => (
-                            <ExternalContactField 
-                                key={index}
-                                index={index}
-                                value={contact}
-                                onDelete={() => {
-                                    form.setValue(
-                                        "contacts",
-                                        field?.value?.filter((t: ContactType, i: number) => i !== index)
-                                    )
-                                }}
-                                onValueChange={newValue => {
-                                    form.setValue(
-                                        "contacts",
-                                        field?.value?.map((currentValue: ContactType, i: number) => i === index ? newValue : currentValue)
-                                    )
-                                }}
-                            />
-                        ))}
-                    </ol>
-                )}
-                <Button
-                    variant="secondary"
-                    className="w-full"
-                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                        e.preventDefault()
-                        form.setValue("contacts", [
-                            ...(field.value || []),
-                            { name: "", email: "", role: null }
-                        ])
-                    }}
-                >{`Add a contact`}</Button>
+                    <div className="flex flex-row justify-between items-center">
+                        <FormLabel className="text-2xl font-semibold leading-none tracking-tight">
+                            {`Contacts`}
+                        </FormLabel>
+                        <Button
+                            variant="secondary"
+                            className="w-fit"
+                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                e.preventDefault()
+                                form.setValue("contacts", [
+                                    ...(field.value || []),
+                                    {name: "", email: "", role: null}
+                                ])
+                            }}
+                        >
+                            {/* <FaPlus /> */}
+                            {`Add a contact`}
+                        </Button>
+                    </div>
+
+                    {field?.value && field.value.length > 0 && (
+                        <ol className="flex flex-col gap-2">
+                            {field.value.map((contact: ContactType, index: number) => (
+                                <ExternalContactField
+                                    key={index}
+                                    index={index}
+                                    value={contact}
+                                    onDelete={() => {
+                                        form.setValue(
+                                            "contacts",
+                                            field?.value?.filter((t: ContactType, i: number) => i !== index)
+                                        )
+                                    }}
+                                    onValueChange={newValue => {
+                                        form.setValue(
+                                            "contacts",
+                                            field?.value?.map((currentValue: ContactType, i: number) => i === index ? newValue : currentValue)
+                                        )
+                                    }}
+                                />
+                            ))}
+                        </ol>
+                    )}
+
                 </FormItem>
             )}
         />
@@ -1206,43 +1272,44 @@ const ContactsFormField = ({form}: {form: any}) => {
 }
 
 const EditTitle = ({form}: { form: any }) => {
-    const contentRef = useRef<HTMLHeadingElement>(null);
+    // const contentRef = useRef<HTMLHeadingElement>(null);
 
-    const handleInput = (e: React.FormEvent<HTMLHeadingElement>) => {
-        const selection = window.getSelection();
-        const range = selection?.getRangeAt(0);
-        const cursorPosition = range ? range.startOffset : 0;
+    // const handleInput = (e: React.FormEvent<HTMLHeadingElement>) => {
+    //     const selection = window.getSelection();
+    //     const range = selection?.getRangeAt(0);
+    //     const cursorPosition = range ? range.startOffset : 0;
 
-        // Update the form value without causing a re-render
-        form.setValue("title", e.currentTarget.textContent || "");
+    //     // Update the form value without causing a re-render
+    //     form.setValue("title", e.currentTarget.textContent || "");
 
-        // Restore cursor position
-        if (range && selection) {
-            setTimeout(() => {
-                const newRange = document.createRange();
-                newRange.setStart(contentRef.current!.childNodes[0], cursorPosition);
-                newRange.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-            }, 0);
-        }
-    };
+    //     // Restore cursor position
+    //     if (range && selection) {
+    //         setTimeout(() => {
+    //             const newRange = document.createRange();
+    //             newRange.setStart(contentRef.current!.childNodes[0], cursorPosition);
+    //             newRange.collapse(true);
+    //             selection.removeAllRanges();
+    //             selection.addRange(newRange);
+    //         }, 0);
+    //     }
+    // };
 
     return (
         <FormField
             control={form.control}
             name="title"
             render={({field}) => (
-                <FormItem className="flex flex-col grow">
+                <FormItem className="flex flex-col grow mr-10">
                     <FormControl>
-                        {/* <Textarea
-                            className="min-h-fit max-h-fit font-semibold text-3xl"
+                        <AutosizeTextarea
+                            className="overflow-hidden font-semibold text-3xl border-transparent hover:border-input"
                             id="title"
                             placeholder={`Enter a title`}
                             defaultValue={field.value}
-                            {...field}
-                        /> */}
-                        <span className="flex flex-row gap-2 items-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" >
+                            onChange={field.onChange}
+                        />
+                        {/* <span
+                            className="flex flex-row gap-2 items-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
                             <h1
                                 id="title"
                                 ref={contentRef}
@@ -1253,7 +1320,7 @@ const EditTitle = ({form}: { form: any }) => {
                             >
                                 {field.value}
                             </h1>
-                        </span>
+                        </span> */}
                     </FormControl>
                     <FormMessage/>
                 </FormItem>
@@ -1388,12 +1455,18 @@ const TaskField = ({
 
             {/* select kanban column */}
             <Select onValueChange={(value: string) => columnChanged(value)} value={task.columnId}>
-                <SelectTrigger className="w-[100px]">
-                    <SelectValue className="text-left" />
+                <SelectTrigger className="w-[120px]">
+                    <SelectValue/>
                 </SelectTrigger>
                 <SelectContent>
                     {kanbanColumns.map(column => (
-                        <SelectItem key={column.id} value={column.id}>{column.name}</SelectItem>
+                        <SelectItem
+                            key={column.id}
+                            value={column.id}
+                            // defaultValue={column.id}
+                        >
+                            {column.name}
+                        </SelectItem>
                     ))}
                 </SelectContent>
             </Select>
@@ -1402,7 +1475,8 @@ const TaskField = ({
             <div className="grow">
                 <Input
                     placeholder={task.name}
-                    value={task.name}
+                    defaultValue={task.name}
+                    // value={task.name}
                     onChange={nameChanged}
                     className="h-full"
                 />
@@ -1420,7 +1494,7 @@ const TaskField = ({
                         Delete task
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={unlinkTask}>
-                        <FaLinkSlash />
+                        <FaLinkSlash/>
                         Unlink from milestone
                     </DropdownMenuItem>
                 </DropdownMenuContent>

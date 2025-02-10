@@ -9,13 +9,13 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import { FaArrowRight, FaBullhorn, FaCalendar, FaDollarSign, FaEllipsis, FaFileLines, FaPlus, FaStar, FaTrash, FaUser } from "react-icons/fa6"
+import { FaArrowRight, FaBullhorn, FaCalendar, FaDollarSign, FaEllipsis, FaFileLines, FaPaperclip, FaPlus, FaStar, FaTrash, FaUser } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
-import { truncate, cn } from "@/lib/utils"
+import { truncate, cn, formatMoney } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
 import { PrivateBadge } from "./private-badge"
 import {monthsList} from "@/lib/data";
-import { Badge } from "./ui/badge"
+import { Badge, badgeVariants } from "./ui/badge"
 import { MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, StatusType } from "@/lib/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
@@ -32,7 +32,7 @@ export type PrivateMilestoneNode = Node<
         node: any
         title: string
         description?: string
-        type?: string,
+        types?: string[],
         startDate?: Date,
         endDate?: Date,
         budget?: number
@@ -43,7 +43,7 @@ export type PrivateMilestoneNode = Node<
         dependencies?: string[]
         notes?: string
         status: StatusType
-        handleEditClick: (nodeId: string) => void,
+        // handleEditClick: (nodeId: string) => void,
         handleDelete: (nodeId: string) => void,
         handleDuplicate: (nodeId: string) => void,
         onboardingMilestone: boolean,
@@ -59,11 +59,18 @@ export interface TaskType {
     status: StatusType
 }
 
+const selector = (state: RoadmapState) => ({
+    selectedNodeId: state.selectedNodeId,
+    nodes: state.nodes,
+    edges: state.edges,
+    onEdgesChange: state.onEdgesChange,
+})
+
 function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
-    const handleEditClick = () => {
-        props.data?.handleEditClick(props?.id)
-    }
-    
+    const {
+        selectedNodeId,
+    } = useRoadmapStore(useShallow(selector))
+
     const handleDeleteClick = () => {
         props.data?.handleDelete(props?.id)
     }
@@ -73,25 +80,26 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     }
 
     return (
-        <Card className={cn("w-[350px] text-wrap break-words", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", props.selected ? "border-black border-2" : "")}>
+        <Card className={cn("w-[350px] text-wrap break-words", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", selectedNodeId === props?.id ? "border-black border-2" : "")}>
             <CardHeader>
                 <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
                     <TypeBadge type={props.type}/>
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
+                                onClick={(e) => e.stopPropagation()}
                                 variant="ghost"
-                                className="p-2 h-auto justify-end h-full"
+                                className="p-2 h-auto justify-end h-full z-20"
                             >
                                 <FaEllipsis />
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-40">
+                        <PopoverContent className="w-40 z-20">
                             <Card className="p-0 m-0">
                                 <CardContent className="p-2 m-0 flex flex-col gap-0">
                                     <Button 
                                         onClick={(e) => {
-                                            e.preventDefault()
+                                            e.stopPropagation()
                                             handleDeleteClick()
                                         }}
                                         variant="ghost"
@@ -100,7 +108,10 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                                         Delete
                                     </Button>
                                     <Button 
-                                        onClick={handleDuplicate}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleDuplicate()
+                                        }}
                                         variant="ghost"
                                         className="w-full h-full justify-start text-xl"
                                     >
@@ -115,31 +126,24 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             <CardContent className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                     <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
-                    <CardDescription>
+                    <CardDescription className="line-clamp-2">
                         {truncate(props.data?.description || "", 200)}
                     </CardDescription>
                 </div>
 
                 <CardContents props={props}/>
             </CardContent>
-            <CardFooter className="flex justify-end">
-                {props.data?.private && (
+            {props.data?.private && (
+                <CardFooter className="flex justify-end">
                     <PrivateBadge className="justify-start" />
-                )}
-                <Button onClick={handleEditClick} className="ml-auto">{`Details`}</Button>
-            </CardFooter>
+                </CardFooter>
+            )}
 
             <NodeHandle type="target" position={Position.Left} node={props as NodeProps<PrivateMilestoneNode>}/>
-            <NodeHandle type="source" position={Position.Right} node={props as NodeProps<PrivateMilestoneNode>}/>
+            <NodeHandle className={"research-plan-tour-step5"} type="source" position={Position.Right} node={props as NodeProps<PrivateMilestoneNode>}/>
         </Card> 
     )
 }
-
-const selector = (state: RoadmapState) => ({
-    nodes: state.nodes,
-    edges: state.edges,
-    onEdgesChange: state.onEdgesChange,
-})
 
 export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilestoneNode> }) => {
     const [isHovering, setIsHovering] = useState(false)
@@ -188,8 +192,9 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
             onMouseOver={() => setIsHovering(true)}
             onMouseOut={() => setIsHovering(false)}
             className={cn(
-                "research-plan-tour-step5 z-10 bg-white transition-all rounded-full border-solid border-black border-2",
-                isHovering ? "p-1 flex flex-col gap-1" : ""
+                "z-10 bg-white transition-all rounded-full border-solid border-black border-2",
+                isHovering ? "p-1 flex flex-col gap-1" : "",
+                props.className
             )}
         >
             <Button 
@@ -243,35 +248,11 @@ export const TypeBadge = ({type, iconOnly = false, className}: {type: string, ic
 }
 
 export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | PublicMilestoneNode>}) => {
-    if (props?.type === "PROJECT") {
-        return (
-            <>  
-            <ul className="flex flex-col gap-2 text-sm text-wrap">
-                {(props.data?.startDate && props.data?.endDate && props.data.startDate?.getMonth() || props.data?.endDate?.getFullYear()) && (
-                    <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
-                )}
-            </ul>
-            <span className="w-full flex gap-2 flex-wrap text-wrap">
-                <Badge className="flex text-sm">
-                    {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === props.data?.type))?.label || "No type"}
-                </Badge>
-                <StatusButton
-                    className="rounded-full h-8"
-                    disabled={true}
-                    status={props.data.status}
-                    onStatusChange={() => {}}
-                />
-            </span>
-            </>
-
-        )
-    }
-
     if (props?.type === "ASSET") {
-        if (props.data?.contacts && props.data.contacts.length > 0) {
             return (
+                <>
                 <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
-                    {(props.data?.contacts || []).map((contact, index) => {
+                    {props.data?.contacts && props.data.contacts.length > 0 && (props.data?.contacts || []).map((contact, index) => {
                         if (contact.name && contact.email) {
                             return (
                                 <li key={index} className="flex gap-2 items-center">
@@ -293,28 +274,102 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                         }
                     })}
                 </ul>
+
+                <span className="w-full flex gap-2 flex-wrap text-wrap">
+                    {props?.data?.attachments && props.data?.attachments?.length > 0 && (
+                        <AttachmentsTag attachments={props.data.attachments} />
+                    )}
+                    {/* <StatusButton
+                        className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
+                        disabled={true}
+                        status={props.data.status}
+                        onStatusChange={() => {}}
+                    /> */}
+                    {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                        <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
+                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                        </Badge>
+                    ))}
+                </span>
+                </>
             )
-        }
 
         return
     }
 
+    if (props?.type === "PROJECT") {
+        return (
+            <>  
+            <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
+                {(props.data?.contacts || []).map((contact, index) => {
+                    if (contact.affiliation) {
+                        return (
+                             <li key={index} className="flex gap-2 items-center">
+                                 <FaUser />
+                                 <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
+                             </li>
+                        )
+                    }
+                    // if (contact.name && contact.email) {
+                    //     return (
+                    //         <li key={index} className="flex gap-2 items-center">
+                    //             <FaUser />
+                    //             <p className="w-[90%] text-wrap break-words">{contact.name} &bull; {contact.email}</p>
+                    //         </li>)
+                    // } else if (contact.name) {
+                    //     return (
+                    //         <li key={index} className="flex gap-2 items-center w-full">
+                    //             <FaUser />
+                    //             <p className="w-[90%] text-wrap break-words">{contact.name}</p>
+                    //         </li>)
+                    // } else if (contact.email) {
+                    //     return (
+                    //         <li key={index} className="flex gap-2 items-center">
+                    //             <FaUser />
+                    //             <p className="w-[90%] text-wrap break-words">{contact.email}</p>
+                    //         </li>)
+                    // }
+                })}
+
+                {(props?.data?.startDate || props?.data?.endDate) && (
+                    <li>
+                    <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
+                    </li>
+                )}
+            </ul>
+            {/* <ul className="flex flex-col gap-2 text-sm text-wrap">
+                {(props?.data?.startDate || props?.data?.endDate) && (
+                    <li>
+                    <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
+                    </li>
+                )}
+            </ul> */}
+            <span className="w-full flex gap-2 flex-wrap text-wrap">
+                {/* {props?.data?.attachments && props.data?.attachments?.length > 0 && (
+                    <AttachmentsTag attachments={props.data.attachments} />
+                )} */}
+                <StatusButton
+                    className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
+                    disabled={true}
+                    status={props.data.status}
+                    onStatusChange={() => {}}
+                />
+                {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                    <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
+                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                    </Badge>
+                ))}
+            </span>
+            </>
+
+        )
+    }
+
     if (props?.type === "RFP") {
         return (
+            <>
             <ul className="flex flex-col gap-2 text-sm">
-                {props?.data?.startDate && (
-                    <li className="flex gap-2 items-center">
-                        <FaCalendar />
-                        <p>{props?.data.startDate.toDateString()}</p>
-                    </li>
-                )}
-                {props?.data?.budget && (
-                    <li className="flex gap-2 items-center">
-                        <FaDollarSign />
-                        <p>{`${props?.data.budget.toLocaleString()} USD`}</p>
-                    </li>
-                )}
-                {(props.data?.contacts || []).map((contact, index) => {
+                {/* {(props.data?.contacts || []).map((contact, index) => {
                     if (contact.name && contact.email) {
                         return (
                             <li key={index} className="flex gap-2 items-center">
@@ -334,13 +389,61 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                                 <p className="w-[90%] text-wrap break-words">{contact.email}</p>
                             </li>)
                     }
-                })}
+                })} */}
+                {(props?.data?.startDate || props?.data?.endDate) && (
+                    // <li className="flex gap-2 items-center">
+                    //     <FaCalendar />
+                    //     <p>{props?.data.startDate.toDateString()}</p>
+                    // </li>
+                    <li>
+                    <DateView startDate={props.data?.startDate} endDate={props.data?.endDate} startLabel={"Request Opens:"} endLabel={"Deadline for Proposals:"}/>
+                    </li>
+                )}
+                {props?.data?.budget && (
+                    <li className="flex gap-2 items-center">
+                        <FaDollarSign />
+                        {/* <p>{`${props?.data.budget.toLocaleString()} USD`}</p> */}
+                        {formatMoney(props?.data?.budget)} budget
+                    </li>
+                )}
             </ul>
+
+            <span className="w-full flex gap-2 flex-wrap text-wrap">
+                {/* {props?.data?.attachments && props.data?.attachments?.length > 0 && (
+                    <AttachmentsTag attachments={props.data.attachments} />
+                )}
+                <StatusButton
+                    className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
+                    disabled={true}
+                    status={props.data.status}
+                    onStatusChange={() => {}}
+                /> */}
+                {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                    <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
+                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                    </Badge>
+                ))}
+            </span>
+            </>
         )
     }
 
     return (
         <div>error</div>
+    )
+}
+
+const AttachmentsTag = ({attachments}: {attachments: any[]}) => {
+    return (
+        <div
+            className={cn(
+                badgeVariants({ variant: "secondary" }),
+                "text-sm w-min inline-flex flex-row justify-start items-center gap-x-2 truncate rounded-md px-2 py-1 font-medium"
+            )}
+        >
+            <FaPaperclip />
+            {attachments.length > 1 ? `${attachments.length} Attachments` : `${attachments.length} Attachment`}
+        </div>
     )
 }
 

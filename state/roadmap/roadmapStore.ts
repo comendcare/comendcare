@@ -11,10 +11,13 @@ import { createNodes, deleteNode, Milestone, updateDBFlow, updateEdges, updateMi
 import { toast } from "sonner"
 
 export type RoadmapState = {
+    isUpdating: boolean,
     onboardingActive: boolean,
     setOnboardingActive: (active: boolean) => void,
     roadmapId: string | null
     setRoadmapId: (id: string) => void
+    selectedView: string | null,
+    setSelectedView: (view: string | null) => void,
     selectedNodeId: string | null
     setSelectedNodeId: (id: string | null) => void
     milestones: any[]
@@ -28,19 +31,20 @@ export type RoadmapState = {
     setEdges: (edges: Edge[]) => Promise<Edge[] | void>
     addNodes: (node: Node[]) => Promise<Node[] | void>
     deleteNode: (nodeId: string) => Promise<any | void>
-    initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void
+    initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void
     saveState: () => void
 }
 
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
-        initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
+        isUpdating: false,
+        initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
             console.log(`init roadmap state`)
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
                 style: { stroke: 'black' }
             }))
-            set({ nodes, edges: edgesWithMarker, milestones, selectedNodeId, roadmapId })
+            set({ nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeId, roadmapId })
         },
         onboardingActive: true,
         setOnboardingActive: (active: boolean) => {
@@ -52,8 +56,25 @@ export const useRoadmapStore = create<RoadmapState>()(
             console.log(`set roadmap id`)
             set({ roadmapId: id })
         },
+        selectedView: null,
+        setSelectedView: (view: string | null) => {
+            // setting the selected roadmap view has an effect on the URL
+            // if the url is updated more than once while the DB call is still occurring next.js treats
+            // this as a full page reload, causing the loading state to show
+            // to avoid this we don't update the roadmap view if the database is currently updating
+            // NOTE: url is updated in roadmap.tsx
+            if (get().isUpdating) return
+            console.log(`set selected roadmap view`)
+            set({ selectedView: view })
+        },
         selectedNodeId: null,
         setSelectedNodeId: (id: string | null) => {
+            // setting the selected node id has an effect on the URL
+            // if the url is updated more than once while the DB call is still occurring next.js treats
+            // this as a full page reload, causing the loading state to show
+            // to avoid this we don't update the node id if the database is currently updating
+            // NOTE: url is updated in roadmap.tsx
+            if (get().isUpdating) return
             console.log(`set selected node id`)
             set({ selectedNodeId: id })
         },
@@ -144,6 +165,9 @@ export const useRoadmapStore = create<RoadmapState>()(
             }
         },
         setNodes: async (nodes: Node[]) => {
+            if (get().isUpdating) return
+            set({isUpdating: true})
+
             console.log(`set nodes`)
             set({ nodes })
             const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
@@ -160,11 +184,12 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // local state is handled within the private-flow.tsx component, and debounced, because
                 // the RaectFlow spams position updates and we don't want to save all of them to the Database..
                 // set({ nodes })
-                return newNodes as Node[]
+                // return newNodes as Node[]
             } else {
                 console.error(`Error updating database nodes`, response?.error)
                 toast.success("Error updating node state... your node may node's position may not have been saved")
             }
+            set({ isUpdating: false })
         },
         setEdges: async (edges: Edge[]) => {
             console.log(`set edges`)

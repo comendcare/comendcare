@@ -26,9 +26,8 @@ import Link from "next/link"
 import { FaArrowUpRightFromSquare } from "react-icons/fa6"
 
 const selector = (state: RoadmapState) => ({
-    roadmapId: state.roadmapId,
-    nodes: state.nodes,
-    edges: state.edges,
+    selectedView: state.selectedView,
+    setSelectedView: state.setSelectedView,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
@@ -37,11 +36,10 @@ const selector = (state: RoadmapState) => ({
 
 export function Roadmap({data}: {data: any}) {
     // Zustand state management
-    const { defaultLayout, setLayout } = useSidebarStore()
+    const { defaultLayout } = useSidebarStore()
     const { 
-        roadmapId,
-        nodes,
-        edges,
+        selectedView,
+        setSelectedView,
         selectedNodeId, 
         setSelectedNodeId, 
         milestones, 
@@ -50,58 +48,46 @@ export function Roadmap({data}: {data: any}) {
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
-    // useEffect(() => {
-    //     if (data.id !== roadmapId || data.nodes.length !== nodes.length || data.milestones.length !== milestones.length || data.edges.length !== edges.length) {
-    //         // roadmap data doesn't match, refresh the page
-    //         console.log(`data does not match, refresh page...`)
-    //         router.refresh()
-    //     }
-    // }, [])
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams.toString())
 
-    const urlView = searchParams.get("view")
-    const [view, setView] = useState(urlView ? urlView : "flow")
+        if (selectedNodeId) {
+            params.set("milestone", selectedNodeId)
+        } else {
+            params.delete("milestone")
+        }
+
+        if (selectedView) {
+            params.set("view", selectedView)
+        } else {
+            params.delete("view")
+        }
+
+        // window.history.replaceState(null, "", `${pathname}?${params.toString()}`)
+        router.replace(`${pathname}?${params}`)
+    }, [selectedNodeId, selectedView])
+    
 
     const handleMilestonePanelChange = (open: boolean) => {
-        if (!open) {
-            setSelectedNodeId(null)
-
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete("milestone")
-            router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        }
-        if (open) {
-            const params = new URLSearchParams(searchParams.toString())
-            params.delete("task")
-            router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        }
+        if (!open) { setSelectedNodeId(null) }
     }
 
     const handleTabChange = (value: string) => {
-        setView(value) // for the onboarding tutorial
-
-        // close all panels when switching tabs
-        setSelectedNodeId(null)
-
-        const params = new URLSearchParams(searchParams.toString())
-        params.delete("view")
-        params.delete("milestone")
-        params.delete("task")
-        params.set("view", value)
-
-        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+        setSelectedView(value)
+        setSelectedNodeId(null) // deselect any selected milestones when switching tabs
     }
 
     return (
         <TooltipProvider delayDuration={0}>
             <ResizablePanelGroup
                 direction="horizontal"
-                onLayout={(sizes: number[]) => {
-                    setLayout(sizes) // Use Zustand's setLayout to save panel sizes
-                }}
+                // onLayout={(sizes: number[]) => {
+                //     setLayout(sizes) // Use Zustand's setLayout to save panel sizes
+                // }}
                 className="h-full items-stretch"
             >
-                <ResizablePanel defaultSize={defaultLayout[0]} minSize={30}>
-                    <Tabs defaultValue={urlView ? urlView : "flow"} onValueChange={handleTabChange}>
+                <ResizablePanel>
+                    <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange}>
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-between">
                             <TabsList>
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
@@ -154,8 +140,8 @@ export function Roadmap({data}: {data: any}) {
                         <ResizableHandle withHandle />
 
                         <ResizablePanel
-                            defaultSize={defaultLayout[1]}
-                            minSize={30}
+                            defaultSize={40}
+                            minSize={25}
                             className="h-full flex flex-col"
                         >
                             <MilestoneDetailsPanel

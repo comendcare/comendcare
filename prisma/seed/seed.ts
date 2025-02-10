@@ -28,7 +28,6 @@ async function main() {
         create: {
             email: 'flawnsontong1@gmail.com',
             name: 'Flawnson Tong',
-            title: "Founder"
         },
     })
 
@@ -38,7 +37,6 @@ async function main() {
         create: {
             email: 'albert@comendcare.com',
             name: 'Albert Wang',
-            title: "Founder"
         },
     })
 
@@ -48,7 +46,6 @@ async function main() {
         create: {
             email: 'betty.trevino@comendcare.com',
             name: 'Betty Trevino',
-            title: "Founder"
         },
     })
 
@@ -58,7 +55,6 @@ async function main() {
         create: { 
             email: 'megan@comendcare.com',
             name: 'Megan McClure',
-            title: "Software developer"
         }
     })
 
@@ -68,7 +64,6 @@ async function main() {
         create: {
             email: 'alice@prisma.io',
             name: 'Alice',
-            title: "Founder"
         },
     })
 
@@ -78,7 +73,6 @@ async function main() {
         create: {
             email: 'bob@prisma.io',
             name: 'Bob',
-            title: "Founder"
         },
     })
 
@@ -88,7 +82,6 @@ async function main() {
         create: {
             email: 'charlie@prisma.io',
             name: 'Charlie',
-            title: "Founder"
         },
     });
 
@@ -98,7 +91,6 @@ async function main() {
         create: {
             email: 'dave@prisma.io',
             name: 'Dave',
-            title: "Researcher"
         },
     });
 
@@ -108,7 +100,6 @@ async function main() {
         create: {
             email: 'eve@prisma.io',
             name: 'Eve',
-            title: "Researcher"
         },
     });
 
@@ -118,7 +109,6 @@ async function main() {
         create: {
             email: 'frank@prisma.io',
             name: 'Frank',
-            title: "Chief Finance Officer"
         },
     });
 
@@ -128,7 +118,6 @@ async function main() {
         create: {
             email: 'grace@prisma.io',
             name: 'Grace',
-            title: "Chief Science Officer"
         },
     });
 
@@ -138,7 +127,6 @@ async function main() {
         create: {
             email: 'heidi@prisma.io',
             name: 'Heidi',
-            title: "Director of Research"
         },
     });
 
@@ -148,7 +136,6 @@ async function main() {
         create: {
             email: 'ivan@prisma.io',
             name: 'Ivan',
-            title: "Donor engagement lead"
         },
     });
 
@@ -584,6 +571,7 @@ async function main() {
         data: {
             role: "admin",
             email: "alice@prisma.io",
+            title: "Donor engagement lead",
             user: {
                 connect: {
                     email: "alice@prisma.io",
@@ -601,6 +589,7 @@ async function main() {
         data: {
             role: "admin",
             email: "flawnsontong1@gmail.com",
+            title: "Director of Research",
             user: {
                 connect: {
                     email: "flawnsontong1@gmail.com",
@@ -618,6 +607,7 @@ async function main() {
         data: {
             role: "admin",
             email: "albert@comendcare.com",
+            title: "Director of Research",
             user: {
                 connect: {
                     email: "albert@comendcare.com",
@@ -635,6 +625,7 @@ async function main() {
         data: {
             role: "admin",
             email: "betty.trevino@comendcare.com",
+            title: "Marketing Lead",
             user: {
                 connect: {
                     email: "betty.trevino@comendcare.com",
@@ -652,6 +643,7 @@ async function main() {
         data: {
             role: "admin",
             email: "megan@comendcare.com",
+            title: "Sofware Engineer",
             user: {
                 connect: {
                     email: "megan@comendcare.com",
@@ -669,6 +661,7 @@ async function main() {
         data: {
             role: "admin",
             email: "ivan@prisma.io",
+            title: "Patient Engagement Lead",
             user: {
                 connect: {
                     email: "ivan@prisma.io",
@@ -686,6 +679,7 @@ async function main() {
         data: {
             role: "admin",
             email: "heidi@prisma.io",
+            title: "Patient Engagement Lead",
             user: {
                 connect: {
                     email: "heidi@prisma.io",
@@ -714,7 +708,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'COMPLETED',
-            type: 'NATURALHISTORYSTUDY'
+            types: ['NATURALHISTORYSTUDY'],
+            nodeType: 'RFP'
         },
         {
             title: 'Literature Review',
@@ -725,7 +720,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'COMPLETED',
-            type: 'LITERATUREREVIEW'
+            types: ['LITERATUREREVIEW'],
+            nodeType: 'RFP'
         },
         {
             title: 'Identify Existing Disease Models',
@@ -736,7 +732,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'INPROGRESS',
-            type: 'OTHERANIMALMODEL'
+            types: ['OTHERANIMALMODEL'],
+            nodeType: 'PROJECT'
         },
         {
             title: 'Construct Mouse Models',
@@ -746,7 +743,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'INPROGRESS',
-            type: 'MOUSEMODEL'
+            types: ['MOUSEMODEL'],
+            nodeType: 'RFP'
         },
         {
             title: 'Construct Patient-Derived Cells',
@@ -756,7 +754,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'INPROGRESS',
-            type: 'PATIENTDERIVEDCELLLINE'
+            types: ['PATIENTDERIVEDCELLLINE'],
+            nodeType: 'ASSET'
         },
         {
             title: 'Design ASO Construct',
@@ -766,7 +765,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'COMPLETED',
-            type: 'CONSTRUCTDESIGN'
+            types: ['CONSTRUCTDESIGN'],
+            nodeType: 'ASSET'
         },
         {
             title: 'Produce Plasmid',
@@ -776,7 +776,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'PLANNED',
-            type: 'PLASMIDPRODUCTION'
+            types: ['PLASMIDPRODUCTION'],
+            nodeType: 'ASSET'
         },
         {
             title: 'Proof-Of-Concept Study',
@@ -786,7 +787,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'PLANNED',
-            type: 'PROOFOFCONCEPT'
+            types: ['PROOFOFCONCEPT'],
+            nodeType: 'ASSET'
         },
         {
             title: 'Animal Toxicology Study',
@@ -796,7 +798,8 @@ const exampleASORoadmap = {
             attachments: [],
             tasks: [],
             status: 'PLANNED',
-            type: 'TOXICOLOGY'
+            types: ['TOXICOLOGY'],
+            nodeType: 'ASSET'
         }
     ]
 };
@@ -914,7 +917,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                 const node = await prisma.node.create({
                     data: {
                         roadmapId: roadmap.id,
-                        type: 'PROJECT',
+                        type: milestone.nodeType,
                         positionX: index * 500,
                         positionY: 0,
                         data: {
@@ -927,7 +930,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                                 ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
                                 ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
                                 ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                type: milestone.type,
+                                types: milestone.types || [],
                                 private: milestone.private || false
                             }
                         }

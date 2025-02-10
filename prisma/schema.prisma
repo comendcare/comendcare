@@ -26,7 +26,6 @@ model User {
   notificationSettings Boolean           @default(false)
   postalCode           String?
   region               String?
-  title                String?
   lat                  Float?
   lng                  Float?
   consentSettings      Boolean           @default(false)
@@ -47,6 +46,7 @@ model User {
 model Member {
   id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   role           String
+  title          String?
   email          String
   userId         String
   invitedById    String?
@@ -80,7 +80,6 @@ model MemberRequest {
   email          String
   role           String       @db.VarChar
   organizationId String
-  accepted       Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -192,9 +191,9 @@ model Milestone {
   endDate          DateTime?
   startDate        DateTime?
   private          Boolean              @default(true)
-  type             String?              @default("NOTYPE")
+  types            String[]             @default([])
   otherTypeDetails String?
-  openTo           String?
+  openTo           String[]
   tasks            Task[]
   attachments      ExternalAttachment[]
   contacts         ExternalContact[]
@@ -280,7 +279,7 @@ model RFP {
   funding       Int
   description   String?
   researchFocus String               @default("NOTYPE")
-  openTo        String               @default("ALL")
+  openTo        String[]
   startDate     DateTime?
   endDate       DateTime?
   attachments   ExternalAttachment[]
@@ -311,10 +310,11 @@ model ExternalAttachment {
 }
 
 model ExternalContact {
-  id    String  @id @unique @default(uuid())
-  name  String
-  role  String?
-  email String
+  id          String  @id @unique @default(uuid())
+  name        String
+  role        String?
+  email       String
+  affiliation String?
 
   assetId     String?
   Asset       Asset?     @relation(fields: [assetId], references: [id])

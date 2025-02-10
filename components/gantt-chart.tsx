@@ -65,12 +65,6 @@ export function GanttChartView() {
 
   const handleEditClick = (nodeId: string) => {
     setSelectedNodeId(nodeId)
-
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete("milestone")
-    params.set("milestone", nodeId)
-
-    router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
   return (
@@ -238,12 +232,6 @@ const CustomBar = (props: any) => {
     const handleEditClick = (payload: DataPoint) => {
       const nodeId = payload.milestoneData.nodeId
       setSelectedNodeId(nodeId)
-
-      const params = new URLSearchParams(searchParams.toString())
-      params.delete("milestone")
-      params.set("milestone", nodeId)
-
-      router.push(`${pathname}?${params.toString()}`, { scroll: false })
     }
   
     return (

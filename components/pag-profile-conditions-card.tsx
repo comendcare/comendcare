@@ -14,7 +14,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
     if (conditions) {
         return (
             <TooltipProvider>
-                <Card className="organization-profile-tour-step3">
+                <Card className="organization-profile-tour-step2">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
                             Condition
@@ -73,8 +73,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                                             {condition.numberOfPatientsEngaged && (
                                                 <li>
                                                     <span
-                                                        className="font-bold">{condition.numberOfPatientsEngaged}</span> patients
-                                                    identified
+                                                        className="font-bold">{condition.numberOfPatientsEngaged}</span> patients engaged
                                                 </li>
                                             )}
                                             {condition.nationalEstimatedPopulation && (

@@ -22,7 +22,7 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {AddressType} from "@/lib/types";
 import {useCallback, useEffect, useState} from "react";
-import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
+import {FileWithPreview} from "@/components/image-cropper";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {cn, createDicebearAvatar, getPublicFile, nameToInitials} from "@/lib/utils";
@@ -32,11 +32,9 @@ import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
-import { FormImageCropper } from "./edit-pag-profile-page-dialog";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
-    title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
     address1: z.string().optional(),
@@ -130,7 +128,6 @@ export default function UserOnboardingForm() {
                 if (userData) {
                     const fetchedValues = {
                         name: userData.name || "",
-                        title: userData.title || "",
                         notificationSettings: userData.notificationSettings ?? true,
                         consentSettings: userData.consentSettings ?? true,
                         address1: userData.address1 || "",
@@ -233,21 +230,6 @@ export default function UserOnboardingForm() {
                                 <FormItem>
                                     <FormLabel>Your Name (required)</FormLabel>
                                     {/*<FormDescription>This is your public display name.</FormDescription>*/}
-                                    <FormControl>
-                                        <Input type="text" {...field} />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="title"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Role</FormLabel>
-                                    <FormDescription>Your role or title at your patient organization.</FormDescription>
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
