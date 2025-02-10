@@ -53,9 +53,6 @@ export default function LoginPage() {
                     <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
                         {`Sign in or create account`}
                     </h2>
-                    <p className="text-center text-sm">
-                        {`Create an account by email, logging in for the first time to access Comend's marketplace and research planner.`}
-                    </p>
                 </div>
 
                 <div className="mx-auto w-11/12 max-w-xs sm:w-full">
