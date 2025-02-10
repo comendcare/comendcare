@@ -61,13 +61,22 @@ export default async function ProfilePage() {
             where: {organizationId: organization?.id},
             include: {
                 nodes: {
-                    include: {data: true}
+                    include: {
+                        data: {
+                            include: {
+                                node: true,
+                                contacts: true,
+                                attachments: true
+                            }
+                        }
+                    }
                 },
                 edges: true,
                 milestones: {
                     include: {
                         node: true,
-                        contacts: true
+                        contacts: true,
+                        attachments: true
                     }
                 }
             }
