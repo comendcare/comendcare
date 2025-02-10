@@ -11,7 +11,7 @@ import {
 } from "./ui/card"
 import { FaArrowRight, FaBullhorn, FaCalendar, FaDollarSign, FaEllipsis, FaFileLines, FaPaperclip, FaPlus, FaStar, FaTrash, FaUser } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
-import { truncate, cn } from "@/lib/utils"
+import { truncate, cn, formatMoney } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
 import { PrivateBadge } from "./private-badge"
 import {monthsList} from "@/lib/data";
@@ -298,7 +298,7 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
             </ul> */}
             <span className="w-full flex gap-2 flex-wrap text-wrap">
                 <StatusButton
-                    className="rounded-full h-8"
+                    className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
                     disabled={true}
                     status={props.data.status}
                     onStatusChange={() => {}}
@@ -388,7 +388,8 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                 {props?.data?.budget && (
                     <li className="flex gap-2 items-center">
                         <FaDollarSign />
-                        <p>{`${props?.data.budget.toLocaleString()} USD`}</p>
+                        {/* <p>{`${props?.data.budget.toLocaleString()} USD`}</p> */}
+                        {formatMoney(props?.data?.budget)} Budget
                     </li>
                 )}
             </ul>
