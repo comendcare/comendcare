@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import { FaArrowRight, FaBullhorn, FaCalendar, FaDollarSign, FaEllipsis, FaFileLines, FaPlus, FaStar, FaTrash, FaUser } from "react-icons/fa6"
+import { FaArrowRight, FaBullhorn, FaCalendar, FaDollarSign, FaEllipsis, FaFileLines, FaPaperclip, FaPlus, FaStar, FaTrash, FaUser } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
 import { truncate, cn } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
@@ -126,7 +126,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             <CardContent className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                     <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
-                    <CardDescription>
+                    <CardDescription className={cn(props.type === "RFP" ? "line-clamp-4" : "line-clamp-2")}>
                         {truncate(props.data?.description || "", 200)}
                     </CardDescription>
                 </div>
@@ -252,25 +252,62 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
     if (props?.type === "PROJECT") {
         return (
             <>  
-            <ul className="flex flex-col gap-2 text-sm text-wrap">
+            <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
+                {(props.data?.contacts || []).map((contact, index) => {
+                    if (contact.affiliation) {
+                        return (
+                             <li key={index} className="flex gap-2 items-center">
+                                 <FaUser />
+                                 <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
+                             </li>
+                        )
+                    }
+                    // if (contact.name && contact.email) {
+                    //     return (
+                    //         <li key={index} className="flex gap-2 items-center">
+                    //             <FaUser />
+                    //             <p className="w-[90%] text-wrap break-words">{contact.name} &bull; {contact.email}</p>
+                    //         </li>)
+                    // } else if (contact.name) {
+                    //     return (
+                    //         <li key={index} className="flex gap-2 items-center w-full">
+                    //             <FaUser />
+                    //             <p className="w-[90%] text-wrap break-words">{contact.name}</p>
+                    //         </li>)
+                    // } else if (contact.email) {
+                    //     return (
+                    //         <li key={index} className="flex gap-2 items-center">
+                    //             <FaUser />
+                    //             <p className="w-[90%] text-wrap break-words">{contact.email}</p>
+                    //         </li>)
+                    // }
+                })}
+
                 {(props?.data?.startDate || props?.data?.endDate) && (
                     <li>
                     <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
                     </li>
                 )}
             </ul>
+            {/* <ul className="flex flex-col gap-2 text-sm text-wrap">
+                {(props?.data?.startDate || props?.data?.endDate) && (
+                    <li>
+                    <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
+                    </li>
+                )}
+            </ul> */}
             <span className="w-full flex gap-2 flex-wrap text-wrap">
-                {(props?.data?.types || []).map((milestoneType, index) => (
-                    <Badge className="flex text-sm" key={index}>
-                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
-                    </Badge>
-                ))}
                 <StatusButton
                     className="rounded-full h-8"
                     disabled={true}
                     status={props.data.status}
                     onStatusChange={() => {}}
                 />
+                {/* {(props?.data?.types || []).map((milestoneType, index) => (
+                    <Badge className="flex text-sm" key={index}>
+                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                    </Badge>
+                ))} */}
             </span>
             </>
 
@@ -280,6 +317,7 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
     if (props?.type === "ASSET") {
         if (props.data?.contacts && props.data.contacts.length > 0) {
             return (
+                <>
                 <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
                     {(props.data?.contacts || []).map((contact, index) => {
                         if (contact.name && contact.email) {
@@ -303,6 +341,11 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                         }
                     })}
                 </ul>
+
+                {props?.data?.attachments && props.data?.attachments?.length > 0 && (
+                    <AttachmentsTag attachments={props.data.attachments} />
+                )}
+                </>
             )
         }
 
@@ -312,22 +355,7 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
     if (props?.type === "RFP") {
         return (
             <ul className="flex flex-col gap-2 text-sm">
-                {(props?.data?.startDate || props?.data?.endDate) && (
-                    // <li className="flex gap-2 items-center">
-                    //     <FaCalendar />
-                    //     <p>{props?.data.startDate.toDateString()}</p>
-                    // </li>
-                    <li>
-                    <DateView startDate={props.data?.startDate} endDate={props.data?.endDate} startLabel={"Request Opens:"} endLabel={"Deadline for Proposals:"}/>
-                    </li>
-                )}
-                {props?.data?.budget && (
-                    <li className="flex gap-2 items-center">
-                        <FaDollarSign />
-                        <p>{`${props?.data.budget.toLocaleString()} USD`}</p>
-                    </li>
-                )}
-                {(props.data?.contacts || []).map((contact, index) => {
+                {/* {(props.data?.contacts || []).map((contact, index) => {
                     if (contact.name && contact.email) {
                         return (
                             <li key={index} className="flex gap-2 items-center">
@@ -347,13 +375,39 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                                 <p className="w-[90%] text-wrap break-words">{contact.email}</p>
                             </li>)
                     }
-                })}
+                })} */}
+                {(props?.data?.startDate || props?.data?.endDate) && (
+                    // <li className="flex gap-2 items-center">
+                    //     <FaCalendar />
+                    //     <p>{props?.data.startDate.toDateString()}</p>
+                    // </li>
+                    <li>
+                    <DateView startDate={props.data?.startDate} endDate={props.data?.endDate} startLabel={"Request Opens:"} endLabel={"Deadline for Proposals:"}/>
+                    </li>
+                )}
+                {props?.data?.budget && (
+                    <li className="flex gap-2 items-center">
+                        <FaDollarSign />
+                        <p>{`${props?.data.budget.toLocaleString()} USD`}</p>
+                    </li>
+                )}
             </ul>
         )
     }
 
     return (
         <div>error</div>
+    )
+}
+
+const AttachmentsTag = ({attachments}: {attachments: any[]}) => {
+    return (
+        <div
+            className="text-sm w-min inline-flex flex-row justify-start items-center gap-x-2 truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors dark:bg-stone-800 dark:text-stone-400"
+        >
+            <FaPaperclip />
+            {attachments.length > 1 ? `${attachments.length} Attachments` : `${attachments.length} Attachment`}
+        </div>
     )
 }
 
