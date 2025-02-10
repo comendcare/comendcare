@@ -25,7 +25,7 @@ export const RoadmapCard = ({roadmap, subdomain, isPublic}: { roadmap: any, subd
         params.delete("view")
         params.set("view", value)
 
-        router.push(`${pathname}?${params.toString()}`, {scroll: false})
+        // router.replace(`${pathname}?${params.toString()}`)
     }
 
     if (!roadmap) {

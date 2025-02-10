@@ -42,12 +42,11 @@ const router = useRouter()
     const handleEditClick = (nodeId: string) => {
         setSelectedNodeId(nodeId)
 
-        const params = new URLSearchParams(searchParams.toString())
-        params.delete("milestone")
-        params.set("milestone", nodeId)
+        // const params = new URLSearchParams(searchParams.toString())
+        // params.delete("milestone")
+        // params.set("milestone", nodeId)
 
-        router.push(`${pathname}?${params.toString()}`, { scroll: false })
-        // router.replace(`${pathname}?${params.toString()}`)
+        // router.replace(`${pathname}?${params.toString()}`, { scroll: false })
     }
 
     return (
