@@ -11,7 +11,7 @@ import OnboardingCard from "@/components/ui/onboarding-card"
 import { Tour } from "@/components/onborda/types"
 import gif1 from "@/public/onboarding-gif-1.gif"
 import Image from "next/image"
-import { FeedbackForm } from "@/components/feedback"
+import { FeedbackSheet } from "@/components/feedback"
 import { Suspense } from "react"
 
 // Set up Playfair Display and Source Sans 3 fonts
@@ -83,7 +83,7 @@ const steps: Tour[] = [
                 title: "Adding a Milestone",
                 content: <>{`Start building your research plan by adding a new milestone.`}</>,
                 selector: ".research-plan-tour-step1",
-                side: "top" as any,
+                side: "top-left" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10,
@@ -121,26 +121,29 @@ const steps: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Connecting Milestones",
-                content: <>{`Once you've created more than one milestone, you can create relationships between them by dragging from the + icon.`}</>,
-                selector: ".research-plan-tour-step5",
-                side: "left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10
-            },
-            {
-                icon: <>⭐</>,
-                title: "Re-Ordering Milestones",
                 content: <>
-                    {`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}
+                    {`Once you've created more than one milestone, you can create or remove relationships between them by clicking and dragging from the + icon.`}
                     <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
-                </>,
+                </>,                
                 selector: ".research-plan-tour-step5",
-                side: "left" as any,
+                side: "right" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10
             },
+            // {
+            //     icon: <>⭐</>,
+            //     title: "Re-Ordering Milestones",
+            //     content: <>
+            //         {`You can delete edges with the delete or backspace key on your keyboard. Re-connecting the milestones allows you to update their dependancy order.`}
+            //         <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
+            //     </>,
+            //     selector: ".research-plan-tour-step5",
+            //     side: "left" as any,
+            //     showControls: true,
+            //     pointerPadding: 10,
+            //     pointerRadius: 10
+            // },
         ]
     },
     {
@@ -157,24 +160,24 @@ const steps: Tour[] = [
                 pointerRadius: 10,
             },
             {
-                icon: <>👋</>,
-                title: "Updating your organization",
-                content: <>{`If you'd like to update your organization's information, click the "Edit profile" button.`}</>,
-                selector: ".organization-profile-tour-step2",
-                side: "left" as any,
-                showControls: true,
-                pointerPadding: 10,
-                pointerRadius: 10,
-            },
-            {
                 icon: <>⭐</>,
                 title: "About your condition",
                 content: <>{`Information about your condition will appear here.`}</>,
-                selector: ".organization-profile-tour-step3",
+                selector: ".organization-profile-tour-step2",
                 side: "top" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10
+            },
+            {
+                icon: <>👋</>,
+                title: "Updating your organization",
+                content: <>{`If you'd like to update your organization's information, click the "Edit profile" button.`}</>,
+                selector: ".organization-profile-tour-step3",
+                side: "left" as any,
+                showControls: true,
+                pointerPadding: 10,
+                pointerRadius: 10,
             },
             {
                 icon: <>⭐</>,

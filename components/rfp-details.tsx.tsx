@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "./ui/separator"
 import { FaArrowUpRightFromSquare, FaTrash } from "react-icons/fa6"
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import { PrivateBadge } from "./private-badge"
 
 type RFPType = Prisma.RFPGetPayload<{}>
 
@@ -46,24 +47,25 @@ const Details = ({ rfp }: { rfp: MilestoneType }) => {
     )
 }
 
-export function RFPDetails({ rfp }: { rfp: MilestoneType }) {
+export function RFPDetails({ rfp, isPublic }: { rfp: MilestoneType, isPublic: boolean }) {
     return (
         <HoverCard
             key={rfp?.id}
             openDelay={0}
             closeDelay={0}
         >
-            <HoverCardTrigger asChild>
-                <a href={"#"}>
+            {/* <HoverCardTrigger asChild> */}
+                <a href={isPublic ? `/research-plan?milestone=${rfp?.id}&view=flow` : `/app/research-plan?milestone=${rfp?.nodeId || rfp?.node?.id}`}>
                     <li
                         key={rfp?.id}
                         className="w-full flex items-center justify-between space-x-4 py-2 text-wrap"
                     >
-                        <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
-                            <div className="flex items-center gap-x-3">
-                                <h2 className="min-w-0 text-sm font-semibold">
-                                    <span className="truncate">{rfp?.title}</span>
+                        <div className="flex flex-col justify-between min-w-0 w-full">
+                            <div className="flex items-start gap-x-3 w-full">
+                                <h2 className="text-sm font-semibold truncate text-wrap break-words">
+                                    {rfp?.title}
                                 </h2>
+                                {rfp.private && <PrivateBadge />}
                             </div>
                             <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap">
                                 <Details rfp={rfp} />
@@ -71,8 +73,8 @@ export function RFPDetails({ rfp }: { rfp: MilestoneType }) {
                         </div>
                     </li>
                 </a>
-            </HoverCardTrigger>
-            <HoverCardContent
+            {/* </HoverCardTrigger> */}
+            {/* <HoverCardContent
                 side="top"
                 className="w-80"
             >
@@ -84,7 +86,7 @@ export function RFPDetails({ rfp }: { rfp: MilestoneType }) {
                         </p>
                     </div>
                 </div>
-            </HoverCardContent>
+            </HoverCardContent> */}
         </HoverCard>
 
 

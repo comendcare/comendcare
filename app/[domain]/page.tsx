@@ -3,7 +3,7 @@ import {notFound} from "next/navigation"
 import BlogCard from "@/components/blog-card"
 import {getRoadmapsForOrganization, getOrganizationData, getConditionsDataFromOrgId} from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {PublicRoadmapCard} from "@/components/public-roadmap-card";
+import {RoadmapCard} from "@/components/public-roadmap-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
@@ -22,7 +22,11 @@ import ShareDialog from "@/components/share-dialog";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
 import {Card, CardContent} from "@/components/ui/card";
 import Image from "next/image";
-import { PAGProfileAssetsAndRFPsHoverableCard } from "@/components/pag-profile-assets-and-projects-hoverable-card";
+import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
+import {FeedbackSheet} from "@/components/feedback";
+import FeedbackForm from "@/components/feedback-form";
+import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
+import React from "react";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -100,14 +104,14 @@ export default async function OrganizationHomePage({
     return (
         <>
             <main className="grid grid-cols-8 w-full max-w-7xl mx-auto mt-16 gap-4">
-                <div className="col-span-8 flex flex-col items-center space-y-8">
-                    <PAGPublicProfileHeader organization={organization} />
+                <div className="col-span-8 flex flex-col items-center space-y-8 px-4 lg:px-0">
+                    <PAGPublicProfileHeader organization={organization}/>
 
                     <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                         <div className="relative md:col-span-2 space-y-4">
                             <div className="sticky top-4 space-y-4">
-                                <PagProfileAboutCard organization={organization} />
-                                <PAGProfileConditionsCard conditions={conditions} />
+                                <PagProfileAboutCard organization={organization}/>
+                                <PAGProfileConditionsCard conditions={conditions}/>
                             </div>
                         </div>
 
@@ -120,9 +124,10 @@ export default async function OrganizationHomePage({
                                 // rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
                             />
                             {roadmaps.length > 0 ?
-                                <PublicRoadmapCard
+                                <RoadmapCard
                                     roadmap={roadmaps?.[0]}
                                     subdomain={organization?.subdomain || undefined}
+                                    isPublic={true}
                                 />
                                 : <Card>
                                     <CardContent>
@@ -135,7 +140,7 @@ export default async function OrganizationHomePage({
                                                 height={400}
                                             />
                                             <p className="text-lg text-stone-500">
-                                                {`${organization.name} doesn't have a roadmap yet.`}
+                                                {`${organization.name} doesn't have a research plan yet.`}
                                             </p>
                                         </div>
                                     </CardContent>
@@ -177,23 +182,12 @@ export default async function OrganizationHomePage({
                     {
                         title: "Report an issue",
                         icon: <IconFlag/>,
-                        dialog: (
-                            <>
-                                <DialogHeader>
-                                    <DialogTitle>Edit profile</DialogTitle>
-                                    <DialogDescription>
-                                        {`Make changes to your profile here. Click save when you're done.`}
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input id="name" defaultValue="John Doe"/>
-                                </div>
-                                <DialogFooter>
-                                    <Button type="submit">Save changes</Button>
-                                </DialogFooter>
-                            </>
-                        ),
+                        sheet: <>
+                            <SheetHeader>
+                                <SheetTitle>Send Feedback</SheetTitle>
+                            </SheetHeader>
+                            <FeedbackForm/>
+                        </>
                     }
                 ]}
                 orientation="vertical"

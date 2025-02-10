@@ -21,10 +21,10 @@ export type PostWithAuthorAndComments = Post & {
 export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 
 export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
-    {
-        label: 'All',
-        value: 'ALL',
-    },
+    // {
+    //     label: 'All',
+    //     value: 'ALL',
+    // },
     {
         label: 'CROs',
         value: 'CRO',
@@ -33,10 +33,10 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
         label: 'Academics',
         value: 'ACADEMIC',
     },
-    {
-        label: 'None',
-        value: 'NONE',
-    },
+    // {
+    //     label: 'None',
+    //     value: 'NONE',
+    // },
 ]
 
 export const MODALITIES: Option[] = [
@@ -255,9 +255,9 @@ export const MOLECULAR_MECHANISMS: Option[] = [
 
 export const NODE_TYPE_OPTIONS: Option[] = [
     { 
-        label: 'Asset', 
-        value: 'ASSET',
-        description: 'A milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
+        label: 'RFP (Request for Proposals)', 
+        value: 'RFP',
+        description: 'A milestone you’re interested in supporting through funding and/or other resources.'
     },
     { 
         label: 'Project', 
@@ -265,9 +265,9 @@ export const NODE_TYPE_OPTIONS: Option[] = [
         description: 'A milestone that is being planned or is under development.'
     },
     { 
-        label: 'RFP (Request for Proposal)', 
-        value: 'RFP',
-        description: 'A milestone you’re interested in supporting through funding and/or other resources.'
+        label: 'Asset', 
+        value: 'ASSET',
+        description: 'A milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
     },
 ]
 
@@ -308,7 +308,6 @@ export const MILESTONE_TYPE_OPTIONS: Option[] = [
     { label: 'IND submission', value: 'INDSUBMISSION' },
     { label: 'IND approval', value: 'INDAPPROVAL' },
     { label: 'Other', value: 'OTHER' },
-    { label: 'No type', value: 'NOTYPE'}
 ]
 
 export type StatusType = 'PLANNED' | 'INPROGRESS' | 'COMPLETED'

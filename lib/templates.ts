@@ -2,14 +2,15 @@ export const templateMilestones = [
     {
         title: 'Natural History Study',
         description: 'Our observational research effort that follows individuals with a specific disease over time, collecting data on how the disease develops and progresses without intervention.',
-        type: 'NATURALHISTORYSTUDY',
+        types: ['NATURALHISTORYSTUDY'],
         attachments: [],
-        nodeType: "ASSET"
+        // nodeType: "ASSET"
+        nodeType: "PROJECT"
     },
     {
         title: 'Literature Review',
         description: 'Examine existing research to better understand the disease, identify gaps in knowledge, and assess the latest findings on potential treatments.',
-        type: 'LITERATUREREVIEW',
+        types: ['LITERATUREREVIEW'],
         attachments: [],
         nodeType: "PROJECT"
     },
@@ -17,7 +18,7 @@ export const templateMilestones = [
         title: 'Identify Existing Disease Models',
         description: 'Research and evaluate lab models.',
         status: 'INPROGRESS',
-        // type: 'LITERATUREREVIEW',
+        // types: ['LITERATUREREVIEW'],
         attachments: [],
         nodeType: "PROJECT"
     },
@@ -25,44 +26,50 @@ export const templateMilestones = [
         title: 'Construct Mouse Models',
         description: 'Recommended tasks: Secure Funding, Ethical Standards Advocacy, and Prioritize Model Features.',
         status: 'INPROGRESS',
-        type: 'MOUSEMODEL',
+        types: ['MOUSEMODEL'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     },
     {
         title: 'Construct Patient-Derived Cells',
         description: 'Work with researchers to create cell lines that replicate disease characteristics.',
-        type: 'CELLLINE',
+        types: ['PATIENTDERIVEDCELLLINE'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     },
     {
         title: 'Design ASO Construct',
         description: 'Design an ASO (Antisense Oligonucleotide) construct that specifically targets the genetic mutations driving our disease.',
-        type: 'CONSTRUCTDESIGN',
+        types: ['CONSTRUCTDESIGN'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     },
     {
         title: 'Produce Plasmid',
         description: 'Create a DNA template essential for developing and testing therapies.',
-        type: 'PLASMIDPRODUCTION',
+        types: ['PLASMIDPRODUCTION'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     },
     {
         title: 'Proof-Of-Concept Study',
         description: 'Design and conduct initial experiments to demonstrate that a potential therapy or intervention can effectively target the disease.',
-        type: 'PROOFOFCONCEPTSTUDY',
+        types: ['PROOFOFCONCEPT'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     },
     {
         title: 'Animal Toxicology Study',
         description: 'Conduct preclinical trials to evaluate the safety and potential side effects of a therapy.',
-        type: 'TOXICOLOGYSTUDY',
+        types: ['TOXICOLOGY'],
         attachments: [],
-        nodeType: "RFP"
+        // nodeType: "RFP"
+        nodeType: "PROJECT"
     }
 ]
 
@@ -77,7 +84,7 @@ export const templateRoadmaps = [
 export const emptyMilestoneTemplate = {
     title: 'New Milestone',
     description: '',
-    type: 'NOTYPE',
+    types: [],
     attachments: [],
     tasks: []
 }

@@ -26,7 +26,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {toast} from "sonner";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
-import {PublicRoadmapCard} from "@/components/public-roadmap-card";
+import {RoadmapCard} from "@/components/public-roadmap-card";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import NoOrganizationPage from "@/components/no-organization-page";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
@@ -61,13 +61,22 @@ export default async function ProfilePage() {
             where: {organizationId: organization?.id},
             include: {
                 nodes: {
-                    include: {data: true}
+                    include: {
+                        data: {
+                            include: {
+                                node: true,
+                                contacts: true,
+                                attachments: true
+                            }
+                        }
+                    }
                 },
                 edges: true,
                 milestones: {
                     include: {
                         node: true,
-                        contacts: true
+                        contacts: true,
+                        attachments: true
                     }
                 }
             }
@@ -219,8 +228,11 @@ export default async function ProfilePage() {
                                 // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
                                 // rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                             />
-                            <PublicRoadmapCard roadmap={roadmaps[0]}
-                                               subdomain={organization?.subdomain || undefined}/>
+                            <RoadmapCard 
+                                roadmap={roadmaps[0]}
+                                subdomain={organization?.subdomain || undefined}
+                                isPublic={false}
+                            />
                             {/*    </TabsContent>*/}
                             {/*    <TabsContent value="activity" className="mt-0">*/}
                             {/*        <PAGProfileActivityCard/>*/}

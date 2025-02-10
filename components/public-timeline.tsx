@@ -6,6 +6,7 @@ import {PrivateBadge} from "./private-badge"
 import {FaArrowUpRightFromSquare} from "react-icons/fa6"
 import { TypeBadge } from "./private-milestone-node"
 import { cn } from "@/lib/utils"
+import { Card, CardContent } from "./ui/card"
 
 export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
     roadmap: any,
@@ -37,7 +38,7 @@ export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
                                 {item.title}
                             </h3>
                             {item.private ? (
-                                <PrivateBadge/>
+                                <PrivateBadge iconOnly={true}/>
                             ) : (
                                 <FaArrowUpRightFromSquare size={12}/>
                             )}
@@ -46,7 +47,7 @@ export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
                                 {getDates(item)}
                             </time>
                         </div>
-                        <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
+                        <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2">
                             {item.description}
                         </p>
                         {/* {item.hasDownload && (

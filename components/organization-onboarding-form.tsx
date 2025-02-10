@@ -23,7 +23,7 @@ import {AddressType} from "@/lib/types";
 import {useDebounce} from "use-debounce";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Bold, Italic} from "lucide-react";
-import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
+import {FileWithPreview} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
@@ -34,7 +34,6 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {checkSubdomainAvailability, getAllOrganizations, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
-import {FormImageCropper} from "./edit-pag-profile-page-dialog";
 import mixpanel from "mixpanel-browser";
 
 const optionSchema = z.object({
@@ -58,6 +57,7 @@ export const newOrgFormSchema = z.object({
     }).max(60, {
         message: "Your organization's nickname must be a maximum of 50 characters."
     }),
+    title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
     looking: z.string().min(0).optional(),
     founded: z.string().optional(),
     description: z.string().min(2, {
@@ -357,11 +357,20 @@ export default function OrganizationOnboardingForm(
                 }
 
                 if (organizationData) {
+                    // Find the current user's title from the members list
+                    const currentUserMember = organizationData.members?.find(
+                        (member) => member.userId === session.user.id
+                    );
+                    console.log(organizationData.members)
+                    console.log(currentUserMember)
+                    const currentUserTitle = currentUserMember?.title || "";
+
                     const fetchedValues = {
                         id: organizationData.id || "",
                         description: organizationData.description || "",
                         orgName: organizationData.name || "", // Map `name` to `orgName`
                         founded: organizationData.yearFounded ? organizationData.yearFounded.toString() : "",
+                        title: currentUserTitle,  // Title of the user at the org
                         subdomain: organizationData.subdomain || "",
                         website: organizationData.website || "",
                         address1: organizationData.address1 || "",
@@ -564,6 +573,21 @@ export default function OrganizationOnboardingForm(
                             {/*        </FormItem>*/}
                             {/*    )}*/}
                             {/*/>*/}
+
+                            <FormField
+                                control={newOrgForm.control}
+                                name="title"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Role</FormLabel>
+                                        <FormDescription>Your role or title at your patient organization.</FormDescription>
+                                        <FormControl>
+                                            <Input type="text" {...field} />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
                             <FormField
                                 control={newOrgForm.control}

@@ -17,6 +17,7 @@ import { Separator } from "./ui/separator"
 import { FaArrowUpRightFromSquare, FaTrash } from "react-icons/fa6"
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import { cn } from "@/lib/utils"
+import { PrivateBadge } from "./private-badge"
 
 type AssetType = Prisma.AssetGetPayload<{ 
     include: { 
@@ -37,24 +38,25 @@ type MilestoneType = Prisma.MilestoneGetPayload<{
     }
 }>
 
-export function AssetDetails({ asset }: { asset: MilestoneType }) {
+export function AssetDetails({ asset, isPublic }: { asset: MilestoneType, isPublic: boolean }) {
     return (
         <HoverCard
             key={asset?.id}
             openDelay={0}
             closeDelay={0}
         >
-            <HoverCardTrigger asChild>
-                <a href={"#"}>
+            {/* <HoverCardTrigger asChild> */}
+                <a href={isPublic ? `/research-plan?milestone=${asset?.id}&view=flow` : `/app/research-plan?milestone=${asset?.nodeId || asset?.node?.id}`}>
                     <li
                         key={asset?.id}
                         className="w-full flex items-center justify-between space-x-4 py-2"
                     >
                         <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
-                            <div className="flex items-center gap-x-3">
-                                <h2 className="min-w-0 text-sm font-semibold">
-                                    <span className="truncate">{asset?.title}</span>
+                            <div className="flex items-start gap-x-3 w-full">
+                                <h2 className="text-sm font-semibold truncate text-wrap break-words">
+                                    {asset?.title}
                                 </h2>
+                                {asset.private && <PrivateBadge />}
                             </div>
                             {asset?.contacts && asset.contacts.length > 0 ? (
                                 <div className={"w-full mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap"}>
@@ -90,8 +92,8 @@ export function AssetDetails({ asset }: { asset: MilestoneType }) {
                         </div>
                     </li>
                 </a>
-            </HoverCardTrigger>
-            <HoverCardContent
+            {/* </HoverCardTrigger> */}
+            {/* <HoverCardContent
                 side="top"
                 className="w-80"
             >
@@ -103,7 +105,7 @@ export function AssetDetails({ asset }: { asset: MilestoneType }) {
                         </p>
                     </div>
                 </div>
-            </HoverCardContent>
+            </HoverCardContent> */}
         </HoverCard>
     )
 }

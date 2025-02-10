@@ -38,7 +38,7 @@ export default async function DashboardPage() {
         }
         return (
             <TooltipProvider>
-                <main className="flex flex-col space-y-4 justify-center items-start w-full max-w-7xl mx-auto p-8">
+                <main className="flex flex-col space-y-4 justify-start items-start w-full h-full max-w-7xl mx-auto p-8">
                     <Tabs defaultValue="members" className="space-y-4 w-full">
                         <TabsList>
                             <Tooltip delayDuration={0}>

@@ -8,9 +8,11 @@ import {PublicTimelineView} from "./public-timeline";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "./ui/tabs";
 import Image from "next/image"
 import {Button} from "@/components/ui/button";
-import {FaArrowUpRightFromSquare} from "react-icons/fa6";
+import {FaArrowUpRightFromSquare, FaPlus} from "react-icons/fa6";
+import Link from "next/link";
+import { buttonVariants } from "./plate-ui/button";
 
-export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomain: string | undefined }) => {
+export const RoadmapCard = ({roadmap, subdomain, isPublic}: { roadmap: any, subdomain: string | undefined, isPublic: boolean }) => {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -23,11 +25,11 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
         params.delete("view")
         params.set("view", value)
 
-        router.push(`${pathname}?${params.toString()}`, {scroll: false})
+        // router.replace(`${pathname}?${params.toString()}`)
     }
 
     if (!roadmap) {
-        return <Card>
+        return <Card className="organization-profile-tour-step4">
             <CardContent>
                 <div className="flex flex-col items-center justify-center space-x-4 my-8">
                     <h1 className="font-cal text-4xl">No research plan yet</h1>
@@ -40,13 +42,78 @@ export const PublicRoadmapCard = ({roadmap, subdomain}: { roadmap: any, subdomai
                     <p className="text-lg text-stone-500">
                         You do not have any research plans yet. Create one to get started.
                     </p>
+                    {!isPublic && (
+                        <Link 
+                            href={"/app/research-plan"}
+                            className={cn(
+                                buttonVariants({ variant: "default" }),
+                                "h-10 mt-4"
+                            )}
+                        >
+                                <FaPlus />
+                                Create a research plan
+                        </Link>
+                    )}
                 </div>
             </CardContent>
         </Card>
     }
 
-    return (
+    if (roadmap?.milestones && roadmap.milestones.length <= 0) {
+        return (
+            <Card className="organization-profile-tour-step4">
+                <CardHeader className="w-full pt-6 pb-2 space-y-4">
+                    <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
+                        <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                            Research Plan
+                        </CardTitle>
+                        {!isPublic &&
+                            <Button
+                                variant="ghost"
+                                onClick={() => router.push("/app/research-plan")}
+                                className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
+                            >
+                                Edit research plan
+                                <FaArrowUpRightFromSquare/>
+                            </Button>
+                        }
+                    </div>
+                </CardHeader>
 
+                <CardContent className="px-8">
+                    <div className="flex flex-col items-center justify-center space-x-4 my-8 gap-2">
+                        <h1 className="font-cal text-4xl text-center">This research plan is under development</h1>
+                        <Image
+                            alt="missing roadmap"
+                            src="https://illustrations.popsy.co/gray/creative-work.svg"
+                            width={400}
+                            height={400}
+                        />
+                        <p className="text-lg text-stone-500">
+                            {isPublic 
+                                ? "This research plan does not have any public milestones."
+                                : "Your research plan does not have any milestones."
+                            }
+                        </p>
+                        {!isPublic && (
+                            <Link 
+                                href={"/app/research-plan"}
+                                className={cn(
+                                    buttonVariants({ variant: "default" }),
+                                    "h-10"
+                                )}
+                            >
+                                    <FaPlus />
+                                    Create a milestone
+                            </Link>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
+
+    return (
         <Tabs
             defaultValue={urlView === 'flow' ? 'flow' : 'timeline'}
             className="w-full"

@@ -22,7 +22,7 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {AddressType} from "@/lib/types";
 import {useCallback, useEffect, useState} from "react";
-import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
+import {FileWithPreview} from "@/components/image-cropper";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaUpload} from "react-icons/fa6";
@@ -33,7 +33,6 @@ import { FormImageCropper } from "./edit-pag-profile-page-dialog";
 
 const userFormSchema = z.object({
     name: z.string().min(2, {message: "Your name must be at least 2 characters."}),
-    title: z.string().min(2, {message: "Your role must be at least 2 characters."}),
     notificationSettings: z.boolean().default(false),
     consentSettings: z.boolean().default(false),
     address1: z.string().optional(),
@@ -123,7 +122,6 @@ export default function UserEditForm() {
                 if (userData) {
                     const fetchedValues = {
                         name: userData.name || "",
-                        title: userData.title || "",
                         notificationSettings: userData.notificationSettings ?? true,
                         consentSettings: userData.consentSettings ?? true,
                         address1: userData.address1 || "",
@@ -135,7 +133,7 @@ export default function UserEditForm() {
                         country: userData.country || "",
                         lat: userData.lat || 0,
                         lng: userData.lng || 0,
-                        image: userData.image || "",
+                        image: userData.image || undefined,
                     };
 
                     if (userData.image) {
@@ -183,10 +181,20 @@ export default function UserEditForm() {
             }
 
             for (const [key, value] of Object.entries(values)) {
-                const res: any = await editUser(session?.user?.id as string, {[key]: value});
-                if (res?.error) {
-                    toast.error(res.error);
-                    return;
+                if (key === "image" && !value) {
+                    // special case for images - in case the user wants to remove the image
+                    const res: any = await editUser(session?.user?.id as string, {[key]: null});
+                    if (res?.error) {
+                        toast.error(res.error);
+                        return;
+                    }
+                    
+                } else {
+                    const res: any = await editUser(session?.user?.id as string, {[key]: value});
+                    if (res?.error) {
+                        toast.error(res.error);
+                        return;
+                    }
                 }
             }
 
@@ -223,21 +231,6 @@ export default function UserEditForm() {
                                 <Input type="text" {...field} />
                             </FormControl>
                             {/*<FormDescription>This is your public display name.</FormDescription>*/}
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="title"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>Role</FormLabel>
-                            <FormControl>
-                                <Input type="text" {...field} />
-                            </FormControl>
-                            <FormDescription>Your role or title at your patient organization.</FormDescription>
                             <FormMessage/>
                         </FormItem>
                     )}
