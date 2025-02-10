@@ -36,7 +36,7 @@ import {
     sendMemberDeletedEmail,
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, MemberRequestWithUser} from "@/lib/types";
+import {ApiResponse, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser} from "@/lib/types";
 
 export type Node = Prisma.NodeGetPayload<{}>
 
@@ -2084,20 +2084,7 @@ export async function createKanban(orgId: string) {
             data: {
                 organization: {connect: {id: orgId}},
                 columns: {
-                    create: [
-                        {
-                            name: "To Do",
-                            kanbanPosition: 0
-                        },
-                        {
-                            name: 'In Progress',
-                            kanbanPosition: 1
-                        },
-                        {
-                            name: 'Done',
-                            kanbanPosition: 2
-                        }
-                    ]
+                    create: DEFAULT_KANBAN_COLUMNS
                 }
             }
         })
