@@ -229,19 +229,6 @@ export function EditMilestoneForm({
         return () => subscription.unsubscribe();
     }, [form.watch])
 
-    const unionById = (arr1: any[], arr2: any[]) => {
-        const map = new Map();
-
-        // Add elements from the first array
-        arr1.forEach((item) => map.set(item.id, item));
-
-        // Add elements from the second array (overwriting duplicates)
-        arr2.forEach((item) => map.set(item.id, item));
-
-        // Convert the Map back to an array
-        return Array.from(map.values());
-    };
-
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         const {
             nodeType,
@@ -264,20 +251,6 @@ export function EditMilestoneForm({
             nodeType,
             title,
             ...(description !== undefined && description !== null ? {description} : undefined),
-            // ...(startDate.month !== undefined || startDate.year !== undefined ? {
-            //     startDate: new Date(
-            //         startDate.year ? Number.parseInt(startDate.year) : now.getFullYear(),
-            //         startDate.month ? monthsList.findIndex(month => month === startDate.month) : 0,
-            //         1
-            //     )
-            // } : undefined),
-            // ...(endDate.month !== undefined || endDate.year !== undefined ? {
-            //     endDate: new Date(
-            //         endDate.year ? Number.parseInt(endDate.year) : now.getFullYear(),
-            //         endDate.month ? monthsList.findIndex(month => month === endDate.month) : 0,
-            //         1
-            //     )
-            // } : undefined),
             ...(startDate ? {startDate} : undefined),
             ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
@@ -290,43 +263,11 @@ export function EditMilestoneForm({
             ...(openTo ? {openTo} : undefined)
         })
 
-        // setTasks(unionById(tasks || [], kanbanTasks).map(task => {
-        //     const newTask = tasks?.find(t => t.id === task.id)
-
-        //     // link relevant tasks to this milestone
-        //     if (newTask) {
-        //         return {
-        //             ...task,
-        //             name: newTask.name,
-        //             columnId: newTask.columnId,
-        //             milestone: {id: milestoneData?.id},
-        //             milestoneId: milestoneData?.id,
-        //         }
-        //     }
-
-        //     // unlink tasks that are no longer attached to this milestone
-        //     if (!newTask && milestoneData?.id && task.milestoneId === milestoneData.id) {
-        //         return {
-        //             ...task,
-        //             milestone: undefined,
-        //             milestoneId: undefined
-        //         }
-        //     }
-
-        //     return task
-        // }))
-
         // Mixpanel tracking for "Other" field
         // only send to mixpanel if the details explaining the 'other' type have been updated
         if (otherTypeDetails && otherTypeDetails !== milestoneData?.otherTypeDetails && session?.user.organizationId) {
             const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
 
-            // console.log(`track mixpanel event`, {
-            //     name: "Milestone has other type",
-            //     orgName: response?.data?.name || "Unknown Org",
-            //     milestoneTitle: title,
-            //     milestoneType: otherTypeDetails,
-            // })
             mixpanel.track("Milestone has other type", {
                 orgName: response?.data?.name || "Unknown Org",
                 milestoneTitle: title,
@@ -660,7 +601,16 @@ const PrivatePublicFormField = ({form, formData}: { form: any, formData: any }) 
                     <FormControl>
                         <Switch
                             checked={field.value}
-                            onCheckedChange={field.onChange}
+                            onCheckedChange={(checked: boolean) => {
+                                field.onChange(checked)
+                                if (!checked) {
+                                    toast('Success!', {
+                                        position: "bottom-left",
+                                        duration: 6000, // default is 4000
+                                        description: 'This milestone is now visible on your public profile.'
+                                    })
+                                }
+                            }}
                         />
                     </FormControl>
                     <FormMessage/>
