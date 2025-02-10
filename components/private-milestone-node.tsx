@@ -389,7 +389,7 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                     <li className="flex gap-2 items-center">
                         <FaDollarSign />
                         {/* <p>{`${props?.data.budget.toLocaleString()} USD`}</p> */}
-                        {formatMoney(props?.data?.budget)} Budget
+                        {formatMoney(props?.data?.budget)} budget
                     </li>
                 )}
             </ul>
