@@ -41,6 +41,8 @@ const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
     nodes: state.nodes,
     edges: state.edges,
+    selectedView: state.selectedView,
+    setSelectedView: state.setSelectedView,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
@@ -56,8 +58,8 @@ export default function AppLayout({children}: AppLayoutProps) {
     const pathname = usePathname()
     const { 
         roadmapId,
-        nodes,
-        edges,
+        selectedView,
+        setSelectedView,
         selectedNodeId, 
         setSelectedNodeId, 
         milestones, 
@@ -104,13 +106,15 @@ export default function AppLayout({children}: AppLayoutProps) {
                 // setRoadmapId(response.data)
                 const nodesResponse = await getNodesEdgesAndMilestones(response.data)
                 const urlNode = searchParams.get("milestone")
+                const urlView = searchParams.get("view")
                 if (nodesResponse.success) {
                     initializeRoadmapState({
                         roadmapId: response.data,
                         nodes: nodesResponse.data.nodes,
                         edges: nodesResponse.data.edges,
                         milestones: nodesResponse.data.milestones,
-                        selectedNodeId: urlNode
+                        selectedView: urlView,
+                        selectedNodeId: urlNode 
                     })
                 }
             } else {
