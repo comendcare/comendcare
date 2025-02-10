@@ -76,7 +76,7 @@ const router = useRouter()
                                     {getDates(milestone)}
                                 </time>
                             </div>
-                            <p className={cn("mb-4 text-base font-normal text-gray-500 dark:text-gray-400", milestone.node.type === "RFP" ? "line-clamp-4" : "line-clamp-2")}>
+                            <p className={"mb-4 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2"}>
                                 {milestone.description}
                             </p>
                             </>

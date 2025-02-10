@@ -280,7 +280,7 @@ export default async function OrganizationRoadmapPage({
                                     />
                                 </div>
                                 <div className="col-span-1">
-                                    <PublicMilestoneDetails/>
+                                    <PublicMilestoneDetails />
                                 </div>
                             </div>
 

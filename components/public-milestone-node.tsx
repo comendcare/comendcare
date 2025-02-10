@@ -58,7 +58,7 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
                     '/'
             }
             className={cn(props.data?.private ? "pointer-events-none": "")}
-            // target="_blank"
+            target="_blank"
         >
         <Card 
             className={cn(
@@ -76,18 +76,18 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
             <CardContent className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                     <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
-                    <CardDescription className="text-wrap break-words">
+                    <CardDescription className="text-wrap break-words line-clamp-2">
                         {truncate(props.data?.description || "", 200)}
                     </CardDescription>
                 </div>
 
                 <CardContents props={props}/>
             </CardContent>
-            <CardFooter className="flex justify-start">
-                {props.data?.private && (
+            {props.data?.private && (
+                <CardFooter className="flex justify-end">
                     <PrivateBadge className="justify-start" />
-                )}
-            </CardFooter>
+                </CardFooter>
+            )}
 
             <Handle
                 type="target"

@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaCalendar, FaEllipsis, FaLinkSlash, FaTrash, FaX} from "react-icons/fa6"
+import {FaCalendar, FaEllipsis, FaLinkSlash, FaPlus, FaTrash, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -1236,6 +1236,7 @@ const ContactsFormField = ({form}: { form: any }) => {
                                 ])
                             }}
                         >
+                            {/* <FaPlus /> */}
                             {`Add a contact`}
                         </Button>
                     </div>

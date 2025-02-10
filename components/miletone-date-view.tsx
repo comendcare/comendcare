@@ -4,6 +4,9 @@ import {monthsList} from "@/lib/data";
 
 export function DateView({startDate, endDate, startLabel, endLabel}: {startDate: Date | undefined, endDate: Date | undefined, startLabel?: string | undefined, endLabel?: string | undefined}) {
     if (startDate && endDate) {
+        if (typeof startDate === 'string') startDate = new Date(startDate)
+        if (typeof endDate === 'string') endDate = new Date(endDate)
+
         return (
             <span className="flex items-center gap-2 text-bottom">
                 <FaCalendar 
@@ -13,6 +16,8 @@ export function DateView({startDate, endDate, startLabel, endLabel}: {startDate:
             </span>
         )
     } else if (startDate) {
+        if (typeof startDate === 'string') startDate = new Date(startDate)
+
         return (
             <span className="flex items-center gap-2 text-bottom">
                 <FaCalendar
@@ -22,6 +27,8 @@ export function DateView({startDate, endDate, startLabel, endLabel}: {startDate:
             </span>
         )
     } else if (endDate) {
+        if (typeof endDate === 'string') endDate = new Date(endDate)
+
         return (
             <span className="flex items-center gap-2 text-bottom">
                 <FaCalendar
