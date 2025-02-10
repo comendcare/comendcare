@@ -108,6 +108,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true, 
             .search(searchParameters);
 
         const typeSenseHits = results.hits || [];
+        console.log(`typesense hits`, typeSenseHits)
         // @ts-ignore
         const ids = typeSenseHits.map(hit => hit.document.id);
 
