@@ -102,7 +102,13 @@ export async function getRoadmapsForOrganization(domain: string) {
         include: {
             nodes: {
                 include: {
-                    data: true
+                    data: {
+                        include: {
+                            contacts: true,
+                            attachments: true,
+                            node: true
+                        }
+                    }
                 },
                 where: {
                     data: {private: false}
@@ -116,7 +122,6 @@ export async function getRoadmapsForOrganization(domain: string) {
                 include: {
                     contacts: true,
                     attachments: true,
-                    tasks: true,
                     node: true
                 }
             },

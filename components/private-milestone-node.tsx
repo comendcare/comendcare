@@ -15,7 +15,7 @@ import { truncate, cn, formatMoney } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
 import { PrivateBadge } from "./private-badge"
 import {monthsList} from "@/lib/data";
-import { Badge } from "./ui/badge"
+import { Badge, badgeVariants } from "./ui/badge"
 import { MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, StatusType } from "@/lib/types"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
@@ -133,12 +133,11 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
 
                 <CardContents props={props}/>
             </CardContent>
-            <CardFooter className="flex justify-end">
-                {props.data?.private && (
+            {props.data?.private && (
+                <CardFooter className="flex justify-end">
                     <PrivateBadge className="justify-start" />
-                )}
-                {/* <Button onClick={handleEditClick} className="ml-auto">{`Details`}</Button> */}
-            </CardFooter>
+                </CardFooter>
+            )}
 
             <NodeHandle type="target" position={Position.Left} node={props as NodeProps<PrivateMilestoneNode>}/>
             <NodeHandle className={"research-plan-tour-step5"} type="source" position={Position.Right} node={props as NodeProps<PrivateMilestoneNode>}/>
@@ -250,11 +249,10 @@ export const TypeBadge = ({type, iconOnly = false, className}: {type: string, ic
 
 export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | PublicMilestoneNode>}) => {
     if (props?.type === "ASSET") {
-        if (props.data?.contacts && props.data.contacts.length > 0) {
             return (
                 <>
                 <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
-                    {(props.data?.contacts || []).map((contact, index) => {
+                    {props.data?.contacts && props.data.contacts.length > 0 && (props.data?.contacts || []).map((contact, index) => {
                         if (contact.name && contact.email) {
                             return (
                                 <li key={index} className="flex gap-2 items-center">
@@ -288,14 +286,13 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                         onStatusChange={() => {}}
                     /> */}
                     {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
-                        <Badge className="text-sm h-7 rounded-md px-2 py-1 font-medium hover:bg-primary" key={index}>
+                        <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
                             {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
                         </Badge>
                     ))}
                 </span>
                 </>
             )
-        }
 
         return
     }
@@ -358,7 +355,7 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                     onStatusChange={() => {}}
                 />
                 {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
-                    <Badge className="text-sm h-7 rounded-md px-2 py-1 font-medium hover:bg-primary" key={index}>
+                    <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
                         {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
                     </Badge>
                 ))}
@@ -422,7 +419,7 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                     onStatusChange={() => {}}
                 /> */}
                 {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
-                    <Badge className="text-sm h-7 rounded-md px-2 py-1 font-medium hover:bg-primary" key={index}>
+                    <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
                         {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
                     </Badge>
                 ))}
@@ -439,7 +436,10 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
 const AttachmentsTag = ({attachments}: {attachments: any[]}) => {
     return (
         <div
-            className="text-sm w-min inline-flex flex-row justify-start items-center gap-x-2 truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors dark:bg-stone-800 dark:text-stone-400"
+            className={cn(
+                badgeVariants({ variant: "secondary" }),
+                "text-sm w-min inline-flex flex-row justify-start items-center gap-x-2 truncate rounded-md px-2 py-1 font-medium"
+            )}
         >
             <FaPaperclip />
             {attachments.length > 1 ? `${attachments.length} Attachments` : `${attachments.length} Attachment`}
