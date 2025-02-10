@@ -340,10 +340,18 @@ export function EditMilestoneForm({
         },
     }
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+        // Prevent form submission if Enter is pressed inside an input
+        if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
+            e.preventDefault();
+        }
+    };
+
     return (
         <Form {...form}>
             <ScrollArea className="research-plan-tour-step3 px-8 pb-4">
                 <form
+                    onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                     className="flex flex-col gap-8 mt-2 px-1"
                 >
