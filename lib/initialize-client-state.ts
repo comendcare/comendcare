@@ -15,7 +15,7 @@ export function initializeRoadmapState(initData: {
     nodes: any[]
     edges: any[]
     milestones: any[],
-    selectedView: string | null,
+    selectedView?: string | null,
     selectedNodeId: string | null
 }) {
     if (typeof window !== "undefined") {
@@ -23,7 +23,7 @@ export function initializeRoadmapState(initData: {
         const { roadmapId, nodes, edges, milestones, selectedView, selectedNodeId } = initData;
 
         // Call Zustand's initState directly
-        initRoadmapState(nodes, edges, milestones, selectedView, selectedNodeId, null, roadmapId || "");
+        initRoadmapState(nodes, edges, milestones, selectedView || null, selectedNodeId, null, roadmapId || "");
     }
 }
 
