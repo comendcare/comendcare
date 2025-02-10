@@ -126,7 +126,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             <CardContent className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                     <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
-                    <CardDescription className={cn(props.type === "RFP" ? "line-clamp-4" : "line-clamp-2")}>
+                    <CardDescription className="line-clamp-2">
                         {truncate(props.data?.description || "", 200)}
                     </CardDescription>
                 </div>
@@ -249,6 +249,57 @@ export const TypeBadge = ({type, iconOnly = false, className}: {type: string, ic
 }
 
 export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | PublicMilestoneNode>}) => {
+    if (props?.type === "ASSET") {
+        if (props.data?.contacts && props.data.contacts.length > 0) {
+            return (
+                <>
+                <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
+                    {(props.data?.contacts || []).map((contact, index) => {
+                        if (contact.name && contact.email) {
+                            return (
+                                <li key={index} className="flex gap-2 items-center">
+                                    <FaUser />
+                                    <p className="w-[90%] text-wrap break-words">{contact.name} &bull; {contact.email}</p>
+                                </li>)
+                        } else if (contact.name) {
+                            return (
+                                <li key={index} className="flex gap-2 items-center w-full">
+                                    <FaUser />
+                                    <p className="w-[90%] text-wrap break-words">{contact.name}</p>
+                                </li>)
+                        } else if (contact.email) {
+                            return (
+                                <li key={index} className="flex gap-2 items-center">
+                                    <FaUser />
+                                    <p className="w-[90%] text-wrap break-words">{contact.email}</p>
+                                </li>)
+                        }
+                    })}
+                </ul>
+
+                <span className="w-full flex gap-2 flex-wrap text-wrap">
+                    {props?.data?.attachments && props.data?.attachments?.length > 0 && (
+                        <AttachmentsTag attachments={props.data.attachments} />
+                    )}
+                    {/* <StatusButton
+                        className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
+                        disabled={true}
+                        status={props.data.status}
+                        onStatusChange={() => {}}
+                    /> */}
+                    {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                        <Badge className="text-sm h-7 rounded-md px-2 py-1 font-medium hover:bg-primary" key={index}>
+                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                        </Badge>
+                    ))}
+                </span>
+                </>
+            )
+        }
+
+        return
+    }
+
     if (props?.type === "PROJECT") {
         return (
             <>  
@@ -297,63 +348,29 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                 )}
             </ul> */}
             <span className="w-full flex gap-2 flex-wrap text-wrap">
+                {/* {props?.data?.attachments && props.data?.attachments?.length > 0 && (
+                    <AttachmentsTag attachments={props.data.attachments} />
+                )} */}
                 <StatusButton
                     className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
                     disabled={true}
                     status={props.data.status}
                     onStatusChange={() => {}}
                 />
-                {/* {(props?.data?.types || []).map((milestoneType, index) => (
-                    <Badge className="flex text-sm" key={index}>
+                {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                    <Badge className="text-sm h-7 rounded-md px-2 py-1 font-medium hover:bg-primary" key={index}>
                         {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
                     </Badge>
-                ))} */}
+                ))}
             </span>
             </>
 
         )
     }
 
-    if (props?.type === "ASSET") {
-        if (props.data?.contacts && props.data.contacts.length > 0) {
-            return (
-                <>
-                <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
-                    {(props.data?.contacts || []).map((contact, index) => {
-                        if (contact.name && contact.email) {
-                            return (
-                                <li key={index} className="flex gap-2 items-center">
-                                    <FaUser />
-                                    <p className="w-[90%] text-wrap break-words">{contact.name} &bull; {contact.email}</p>
-                                </li>)
-                        } else if (contact.name) {
-                            return (
-                                <li key={index} className="flex gap-2 items-center w-full">
-                                    <FaUser />
-                                    <p className="w-[90%] text-wrap break-words">{contact.name}</p>
-                                </li>)
-                        } else if (contact.email) {
-                            return (
-                                <li key={index} className="flex gap-2 items-center">
-                                    <FaUser />
-                                    <p className="w-[90%] text-wrap break-words">{contact.email}</p>
-                                </li>)
-                        }
-                    })}
-                </ul>
-
-                {props?.data?.attachments && props.data?.attachments?.length > 0 && (
-                    <AttachmentsTag attachments={props.data.attachments} />
-                )}
-                </>
-            )
-        }
-
-        return
-    }
-
     if (props?.type === "RFP") {
         return (
+            <>
             <ul className="flex flex-col gap-2 text-sm">
                 {/* {(props.data?.contacts || []).map((contact, index) => {
                     if (contact.name && contact.email) {
@@ -393,6 +410,24 @@ export const CardContents = ({props}: {props: NodeProps<PrivateMilestoneNode | P
                     </li>
                 )}
             </ul>
+
+            <span className="w-full flex gap-2 flex-wrap text-wrap">
+                {/* {props?.data?.attachments && props.data?.attachments?.length > 0 && (
+                    <AttachmentsTag attachments={props.data.attachments} />
+                )}
+                <StatusButton
+                    className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
+                    disabled={true}
+                    status={props.data.status}
+                    onStatusChange={() => {}}
+                /> */}
+                {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                    <Badge className="text-sm h-7 rounded-md px-2 py-1 font-medium hover:bg-primary" key={index}>
+                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                    </Badge>
+                ))}
+            </span>
+            </>
         )
     }
 
