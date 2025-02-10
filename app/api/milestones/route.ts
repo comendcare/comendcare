@@ -12,7 +12,10 @@ export async function POST(req: Request) {
             },
             include: {
                 organization: true,
-                node: true
+                node: true,
+                contacts: true,
+                attachments: true,
+                tasks: true
             }
         });
 

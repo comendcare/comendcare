@@ -5,12 +5,15 @@ import {Badge} from "./ui/badge";
 import {DateView} from "./miletone-date-view";
 import {getOrganizationFromOrganizationId, getOrganizationFromRoadmapId} from "@/lib/fetchers";
 import React, {useEffect, useState} from "react";
-import {FaMoneyBill} from "react-icons/fa6";
-import {formatMoney} from "@/lib/utils";
+import {FaArrowUpRightFromSquare, FaMoneyBill} from "react-icons/fa6";
+import {cn, formatMoney, truncate} from "@/lib/utils";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {Separator} from "@/components/ui/separator";
 import {BookCheck, Paperclip, TestTube, UserCheck} from "lucide-react";
-import {TypeBadge} from "@/components/private-milestone-node";
+import {CardContents, TypeBadge} from "@/components/private-milestone-node";
+import { PrivateBadge } from "./private-badge";
+import { PublicMilestoneNode } from "./public-milestone-node";
+import { NodeProps } from "@xyflow/react";
 
 const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
     PLANNED: {
@@ -56,6 +59,43 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
 
     const statusKey = milestone.status as keyof typeof StatusData;
     const statusStyle = StatusData[statusKey]?.styling || "bg-gray-100 text-gray-800";
+
+    return (
+        <Link href={getLink()}>
+            <Card 
+                className={cn("text-wrap break-words h-full w-full flex flex-col")}
+            >
+                <CardHeader className="flex gap-2">
+                    <CardDescription
+                        className="text-base flex flex-row justify-between items-center"
+                    >
+                        {organization?.name}
+                        <ProfilePhoto img={organization?.image} name={organization?.name} className="size-6"/>
+                    </CardDescription>
+                    <Separator className="my-2"/>
+                    <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
+                        <TypeBadge type={milestone.node.type}/>
+                        {!milestone.private && <FaArrowUpRightFromSquare className="h-[12px] w-[12px]"/>}
+                    </div>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-4 grow">
+                    <div className="flex flex-col gap-2">
+                        <CardTitle>{milestone.title || "New Milestone"}</CardTitle>
+                        <CardDescription className="text-wrap break-words line-clamp-2">
+                            {truncate(milestone.description || "", 200)}
+                        </CardDescription>
+                    </div>
+    
+                    <div className="flex flex-col gap-4 justify-end grow">
+                        <CardContents props={{
+                            type: milestone.node.type,
+                            data: milestone
+                        } as NodeProps<PublicMilestoneNode>}/>
+                    </div>
+                </CardContent>
+            </Card>
+        </Link>
+    )
 
     return (
         <Link
