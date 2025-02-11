@@ -136,11 +136,12 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                         <CardTitle className="text-lg">{task?.name}</CardTitle>
                     </CardHeader>
                     <CardContent className="p-7 py-4 text-left whitespace-pre-wrap flex flex-col gap-4">
-                        <div className="flex gap-4 flex-wrap">
+                        <div className="flex gap-2 flex-wrap">
                             <TooltipProvider>
                                 {task?.priority && <PriorityBadge value={task.priority}/>}
                                 {task?.milestone && (
-                                    <Badge className="w-fit h-8 rounded-sm truncate bg-[#3B3C40]">
+                                    // bg-[#3B3C40] 
+                                    <Badge variant={"secondary"} className="w-fit h-8 rounded-sm truncate text-sm h-7 w-min rounded-md px-2 py-1 font-medium">
                                         {truncate(task.milestone.title, 25)}
                                     </Badge>
                                 )}
@@ -156,7 +157,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                                 {task?.endDate && (
                                     <Tooltip>
                                         <TooltipTrigger>
-                                        <span className="flex gap-2 items-center text-muted-foreground">
+                                        <span className="flex gap-2 items-center">
                                             <FaCalendar className="mb-1"/>
                                             <p className="text-md">{task.endDate.toDateString().split(" ").slice(1).join(" ")}</p>
                                         </span>
@@ -169,7 +170,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                                 {task?.checklist && task.checklist.length > 0 && (
                                     <Tooltip>
                                         <TooltipTrigger>
-                                        <span className="flex gap-2 items-center text-muted-foreground">
+                                        <span className="flex gap-2 items-center">
                                             <FaCheckSquare />
                                             <p className="text-md">{`${task.checklist.filter(item => item.complete).length}/${task.checklist.length}`}</p>
                                         </span>
@@ -219,22 +220,34 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
 
 const PriorityBadge = ({value}: {value: PriorityType}) => {
     const options = {
-        'HIGH': {
-            text: 'High',
-            style: 'bg-red-600 w-fit h-8 rounded-sm'
+        // 'HIGH': {
+        //     text: 'High',
+        //     style: 'bg-red-600 text-sm h-7 rounded-md px-2 py-1 font-medium'
+        // },
+        // 'MEDIUM': {
+        //     text: 'Medium',
+        //     style: 'bg-yellow-600 text-sm h-7 rounded-md px-2 py-1 font-medium'
+        // },
+        // 'LOW': {
+        //     text: 'Low',
+        //     style: 'bg-green-600 text-sm h-7 rounded-md px-2 py-1 font-medium'
+        // }
+        HIGH: {
+            text: "High",
+            styling: "bg-red-100 text-red-800 hover-red-400 disabled:opacity-100 hover:bg-red-200 text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
         },
-        'MEDIUM': {
-            text: 'Medium',
-            style: 'bg-yellow-600 w-fit h-8 rounded-sm'
+        MEDIUM: {
+            text: "Medium",
+            styling: "bg-yellow-100 text-yellow-800 disabled:opacity-100 hover:bg-yellow-200 text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
         },
-        'LOW': {
-            text: 'Low',
-            style: 'bg-green-600 w-fit h-8 rounded-sm'
+        LOW: {
+            text: "Low",
+            styling: "bg-green-100 text-green-800 disabled:opacity-100 hover:bg-green-200 text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
         }
     }
 
     return (
-        <Badge className={options[value].style || ''}>
+        <Badge className={options[value].styling || ''}>
             {options[value].text || 'priority'}
         </Badge>
     )
