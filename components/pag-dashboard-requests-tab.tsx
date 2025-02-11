@@ -1,6 +1,6 @@
 import {getSession} from "@/lib/auth";
 import Image from "next/image";
-import {getUnapprovedMemberRequestsWithUsers, getNodesEdgesAndMilestones} from "@/lib/fetchers";
+import {getMemberRequestsWithUsers, getNodesEdgesAndMilestones} from "@/lib/fetchers";
 import {toast} from "sonner";
 import {ProfilePhoto} from "./profile-photo";
 import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button";
@@ -38,7 +38,7 @@ export default async function PAGDashboardRequestsTab() {
 
     let fetchedMemberRequests: any[] = []; // Initialize the variable with an empty array
 
-    const response = await getUnapprovedMemberRequestsWithUsers(session.user.organizationId);
+    const response = await getMemberRequestsWithUsers(session.user.organizationId);
 
     if (response.success) {
         fetchedMemberRequests = response.data?.fetchedMemberRequests ?? []; // Access the nested data properly and default to an empty array if undefined
