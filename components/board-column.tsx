@@ -125,7 +125,7 @@ export function BoardColumn({ column, tasks, isOverlay, filter }: BoardColumnPro
                         </Button>
                         <h1 className="text-xl">{column.name}</h1>
                     </div>
-                    <DropdownMenu>
+                    {/* <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost">
                                 <FaEllipsis/>
@@ -140,7 +140,7 @@ export function BoardColumn({ column, tasks, isOverlay, filter }: BoardColumnPro
                                 Delete column
                             </DropdownMenuItem>
                         </DropdownMenuContent>
-                    </DropdownMenu>
+                    </DropdownMenu> */}
                 </CardTitle>
             </CardHeader>
             <ScrollArea className="h-full">
@@ -178,7 +178,7 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
         >
             {/* calculate the same height as the parent TabsContent - because scroll areas don't like h-full >:( */}
             <div className="h-[calc(100vh-10rem)] flex gap-4 items-start flex-row justify-start">
-                <NewColumnDialog/>
+                {/* <NewColumnDialog/> */}
                 {children}
             </div>
             <ScrollBar orientation="horizontal" />
