@@ -20,6 +20,25 @@ export type PostWithAuthorAndComments = Post & {
 
 export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 
+export const DEFAULT_KANBAN_COLUMNS = [
+    {
+        name: 'Not started',
+        kanbanPosition: 0
+    },
+    {
+        name: 'Stuck',
+        kanbanPosition: 1
+    },
+    {
+        name: 'Working on it',
+        kanbanPosition: 2
+    },
+    {
+        name: 'Done',
+        kanbanPosition: 3
+    }
+]
+
 export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     // {
     //     label: 'All',

@@ -31,7 +31,12 @@ import {cn, createDicebearAvatar, formatMoney, getPublicFile, nameToInitials, ye
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {checkSubdomainAvailability, getAllOrganizations, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {
+    checkSubdomainAvailability,
+    getAllNonMemberOrganizations,
+    getAllOrganizations,
+    getOrganizationFromOrganizationId
+} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 import mixpanel from "mixpanel-browser";
@@ -179,7 +184,7 @@ export default function OrganizationOnboardingForm(
 
         const fetchOrganizations = async () => {
             try {
-                await getAllOrganizations().then((response) => {
+                await getAllNonMemberOrganizations().then((response) => {
                     if (response.success && response.data) {
                         const options: Option[] = response.data.map((org, index) => ({
                             value: org.id || index.toString(),

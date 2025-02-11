@@ -1,6 +1,7 @@
 // This seed script is meant to help during development, and not to be used to seed production databases
 import {PrismaClient} from '@prisma/client'
 import {addTypeSenseDocument, createTypeSenseCollection, sendTypeSenseRequest} from "@/lib/utils";
+import { DEFAULT_KANBAN_COLUMNS } from '@/lib/types';
 
 const prisma = new PrismaClient()
 
@@ -877,23 +878,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
     })
 
     const newColumns = await prisma.column.createMany({
-        data: [
-            {
-                name: "To Do",
-                kanbanId: kanbanId,
-                kanbanPosition: 0
-            },
-            {
-                name: "In Progress",
-                kanbanId: kanbanId,
-                kanbanPosition: 1
-            },
-            {
-                name: "Done",
-                kanbanId: kanbanId,
-                kanbanPosition: 2
-            }
-        ],
+        data: DEFAULT_KANBAN_COLUMNS.map(col => ({...col, kanbanId})),
         skipDuplicates: true, // Optional: Skips rows with duplicate values for unique fields
     })
 
