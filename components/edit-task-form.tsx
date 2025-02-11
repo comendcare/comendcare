@@ -190,9 +190,8 @@ export function EditTaskForm({
         return () => subscription.unsubscribe();
     }, [form.watch])
 
-    const handleFormSubmit = (values: z.infer<typeof editTaskForm>) => {
+    const handleFormSubmit = async (values: z.infer<typeof editTaskForm>) => {
         const {
-
             name,
             status,
             description,
@@ -203,6 +202,10 @@ export function EditTaskForm({
             priority,
             private: isPrivate
         } = values;
+
+        const response = await getMembers(session?.user?.organizationId || undefined)
+        let fetchedMembers: any[] = []
+        if (response.success && response.data) fetchedMembers = response.data
 
         const stakeholderIds = stakeholders?.map(stakeholder => stakeholder.value)
 
@@ -218,9 +221,9 @@ export function EditTaskForm({
                 ...(stakeholders ? 
                     { 
                         stakeholders: 
-                            fetchedMembers?.filter(member => stakeholderIds?.includes(member.id)).map(member => ({
-                                userId: member.id,
-                                user: member
+                            fetchedMembers?.filter(member => stakeholderIds?.includes(member.userId)).map(member => ({
+                                userId: member.userId,
+                                user: member.user
                             }))
                     } : 
                     undefined
