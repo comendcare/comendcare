@@ -4,7 +4,7 @@ import {CSS} from "@dnd-kit/utilities"
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
 import {Button} from "@/components/ui/button"
 import {cva} from "class-variance-authority"
-import {GripVertical} from "lucide-react"
+import {ArrowUpLeft, CornerLeftUp, GripVertical} from "lucide-react"
 import {Badge} from "@/components/ui/badge"
 import {
     Dialog,
@@ -133,18 +133,31 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                             <span className="sr-only">Move task</span>
                             <GripVertical/>
                         </Button>
-                        <CardTitle className="text-lg">{task?.name}</CardTitle>
+                        <div className="flex flex-col gap-2">
+                            {task?.milestone && (
+                                <a 
+                                    onClick={(e) => {e.stopPropagation()}}
+                                    
+                                    href={`/app/research-plan?milestone=${task?.milestone.nodeId}`} 
+                                    className="text-sm pointer-events-auto flex gap-1 items-center text-primary/70 hover:text-primary"
+                                >
+                                    <CornerLeftUp size={14}/>
+                                    <p className="underline">{truncate(task.milestone.title, 25)}</p>
+                                </a>
+                            )}
+                            <CardTitle className="text-lg">{task?.name}</CardTitle>
+                        </div>
                     </CardHeader>
                     <CardContent className="p-7 py-4 text-left whitespace-pre-wrap flex flex-col gap-4">
                         <div className="flex gap-2 flex-wrap">
                             <TooltipProvider>
                                 {task?.priority && <PriorityBadge value={task.priority}/>}
-                                {task?.milestone && (
+                                {/* {task?.milestone && (
                                     // bg-[#3B3C40] 
                                     <Badge variant={"secondary"} className="w-fit h-8 rounded-sm truncate text-sm h-7 w-min rounded-md px-2 py-1 font-medium">
                                         {truncate(task.milestone.title, 25)}
                                     </Badge>
-                                )}
+                                )} */}
 
                                 <Tooltip>
                                     <TooltipTrigger asChild>

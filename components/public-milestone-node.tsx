@@ -36,9 +36,10 @@ export type PublicMilestoneNode = Node<
         // handleEditClick: (nodeId: string) => void,
         onboardingMilestone: boolean
         private: boolean
-        subdomain: string | undefined
+        subdomain: string | undefined,
+        externalLink: boolean,
         focused: boolean
-        contacts: any[]
+        contacts: any[],
     },
     "PROJECT" | "ASSET" | "RFP"
 >
@@ -58,7 +59,7 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
                     '/'
             }
             className={cn(props.data?.private ? "pointer-events-none": "")}
-            target="_blank"
+            target={props.data.externalLink ? "_blank" : ""}
         >
         <Card 
             className={cn(
@@ -70,7 +71,7 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
             <CardHeader>
                 <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
                     <TypeBadge type={props.type}/>
-                    {!props.data?.private && <FaArrowUpRightFromSquare className="h-[20px] w-[20px]"/>}
+                    {!props.data?.private && props.data.externalLink && <FaArrowUpRightFromSquare className="h-[20px] w-[20px]"/>}
                 </div>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">

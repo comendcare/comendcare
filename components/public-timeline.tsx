@@ -8,10 +8,11 @@ import { TypeBadge } from "./private-milestone-node"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "./ui/card"
 
-export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
+export const PublicTimelineView = ({roadmap, subdomain, urlMilestone, externalLinks}: {
     roadmap: any,
     subdomain: string | undefined,
-    urlMilestone: string | undefined
+    urlMilestone: string | undefined,
+    externalLinks: boolean
 }) => {
 
     return (
@@ -27,7 +28,7 @@ export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
                     }
                     key={index}
                     className={cn("group", item.private ? "pointer-events-none": "")}
-                    // target="_blank"
+                    target={externalLinks ? "_blank" : ""}
                 >
                     <li key={index} className="ms-6">
                         <span className="absolute flex items-center justify-center bg-white rounded-full -start-4">
@@ -37,11 +38,13 @@ export const PublicTimelineView = ({roadmap, subdomain, urlMilestone}: {
                             <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white ">
                                 {item.title}
                             </h3>
-                            {item.private ? (
+                            {item.private && <PrivateBadge iconOnly={true}/>}
+                            {!item.private && externalLinks && <FaArrowUpRightFromSquare size={12}/>}
+                            {/* {item.private ? (
                                 <PrivateBadge iconOnly={true}/>
                             ) : (
                                 <FaArrowUpRightFromSquare size={12}/>
-                            )}
+                            )} */}
                             <time
                                 className="ml-auto block font-semibold leading-none dark:text-gray-500">
                                 {getDates(item)}
