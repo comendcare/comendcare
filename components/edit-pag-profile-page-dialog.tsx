@@ -5,7 +5,7 @@ import {z} from "zod";
 import {useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {updateOrganization, updateCondition} from "@/lib/actions";
 import {AddressType, ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
 import {Input} from "@/components/ui/input";
@@ -34,7 +34,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {cn, formatMoney, formatNumberWithCommas, getPublicFile, years} from "@/lib/utils";
+import {cn, formatMoney, formatNumberWithCommas, getPublicFile, sleep, years} from "@/lib/utils";
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
@@ -1414,6 +1414,14 @@ export const FormImageCropper = ({
     setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>
 }) => {
     const [isDialogOpen, setDialogOpen] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [inputKey, setInputKey] = useState(0); // Initial key for the input
+
+    const setFileInputRef = (node: HTMLInputElement | null) => {
+        if (node) {
+            fileInputRef.current = node;
+        }
+    };
 
     const onDrop = useCallback(
         (acceptedFiles: FileWithPath[]) => {
@@ -1453,8 +1461,16 @@ export const FormImageCropper = ({
     const {getRootProps, getInputProps} = useDropzone({
         onDrop: onDrop,
         accept,
+        noClick: true
     });
 
+
+    const handleClick = async () => {
+        setSelectedFile(null) // de-select any previously selected file
+        await sleep(100) // allow file de-select to take effect
+    
+        fileInputRef.current?.click() // Open file dialog
+    };
 
     return (
         <FormField
@@ -1479,7 +1495,7 @@ export const FormImageCropper = ({
                                     setDialogOpen={setDialogOpen}
                                     selectedFile={selectedFile}
                                     setSelectedFile={(file: FileWithPreview | null) => {
-                                        console.log(`set selected file`, file)
+                                        // console.log(`set selected file`, file)
                                         if (!file) {
                                             setSelectedFile(null)
                                         } else {
@@ -1489,14 +1505,23 @@ export const FormImageCropper = ({
                                         field.onChange(file?.preview) // Update form field value
                                     }}
                                     className={className}
+                                    handleFileSelectOpen={handleClick}
                                 />
                             ) : (
                                 <Avatar
                                     {...getRootProps()}
                                     className={cn("size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200", className)}
                                 >
-                                    <input {...getInputProps()} />
+                                    <input
+                                        type="file" 
+                                        accept="image/jpg, image/jpeg, image/png"
+                                        // callback ref, so we can trigger opening the file select dialog from inside ImageCropper
+                                        ref={setFileInputRef}
+                                        className="hidden"
+                                        onChange={(e: any) => onDrop([...e.target.files] as FileWithPath[])}
+                                    />
                                     <AvatarFallback
+                                        onClick={handleClick}
                                         className={cn("text-center flex flex-col justify-center gap-y-4", className)}>
                                         <FaUpload/>
                                         Click or drop!
