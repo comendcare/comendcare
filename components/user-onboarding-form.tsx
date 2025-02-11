@@ -228,7 +228,7 @@ export default function UserOnboardingForm() {
                             name="name"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>Your Name (required)</FormLabel>
+                                    <FormLabel>Your Full Name (required)</FormLabel>
                                     {/*<FormDescription>This is your public display name.</FormDescription>*/}
                                     <FormControl>
                                         <Input type="text" {...field} />

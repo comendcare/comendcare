@@ -541,9 +541,41 @@ export const getConditionsFromOrganizationId = async (organizationId: string) =>
     }
 };
 
+export const getAllNonMemberOrganizations = async () => {
+    const session = await getSession()
+    try {
+        if (!session) {
+            return {success: false, error: "Session not found."};
+        }
+
+        const organizations = await prisma.organization.findMany({
+            where: {
+                members: {
+                    none: {
+                        userId: session.user.id,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: "asc"
+            },
+        })
+
+        if (!organizations) {
+            return {success: false, error: "organizations not found"};
+        }
+
+        return {success: true, data: organizations};
+    } catch (error: any) {
+        logError("Error fetching membership data", error);
+        return {success: false, error: "Internal server error"};
+    }
+};
+
 export const getAllOrganizations = async () => {
     try {
         const organizations = await prisma.organization.findMany({
+
             orderBy: {
                 createdAt: "asc"
             },
