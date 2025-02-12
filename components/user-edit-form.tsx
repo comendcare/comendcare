@@ -226,7 +226,7 @@ export default function UserEditForm() {
                     name="name"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>Your name (required)</FormLabel>
+                            <FormLabel>Your Full Name (required)</FormLabel>
                             <FormControl>
                                 <Input type="text" {...field} />
                             </FormControl>

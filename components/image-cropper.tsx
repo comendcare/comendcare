@@ -22,6 +22,7 @@ import "react-image-crop/dist/ReactCrop.css"
 import { CropIcon, Trash2Icon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import { FaPencil } from "react-icons/fa6"
 
 export type FileWithPreview = File & { preview: string }
 
@@ -31,7 +32,8 @@ interface ImageCropperProps {
     selectedFile: FileWithPreview | null
     setSelectedFile: (file: FileWithPreview | null) => void,
     aspect: number,
-    className?: string
+    className?: string,
+    handleFileSelectOpen: () => any
 }
 
 export function ImageCropper({
@@ -40,7 +42,8 @@ export function ImageCropper({
                                  selectedFile,
                                  setSelectedFile,
                                  aspect,
-                                 className = ""
+                                 className = "",
+                                 handleFileSelectOpen
                              }: ImageCropperProps) {
     const imgRef = React.useRef<HTMLImageElement | null>(null)
 
@@ -192,9 +195,19 @@ export function ImageCropper({
                             }}
                         >
                             <Trash2Icon className="mr-1.5 size-4" />
-                            Cancel
+                            Delete
                         </Button>
                     </DialogClose>
+                    <Button
+                        size={"sm"}
+                        type="reset"
+                        className="w-fit"
+                        variant={"outline"}
+                        onClick={handleFileSelectOpen}
+                    >
+                        <FaPencil />
+                        Select New Photo
+                    </Button>
                     <Button type="submit" size={"sm"} className="w-fit" onClick={onCrop}>
                         <CropIcon className="mr-1.5 size-4" />
                         Crop

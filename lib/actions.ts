@@ -36,7 +36,7 @@ import {
     sendMemberDeletedEmail,
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, MemberRequestWithUser} from "@/lib/types";
+import {ApiResponse, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser} from "@/lib/types";
 
 export type Node = Prisma.NodeGetPayload<{}>
 
@@ -70,6 +70,20 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
     }
 
     try {
+        // Check if a member request already exists
+        const existingRequest = await prisma.memberRequest.findUnique({
+            where: {
+                userId_organizationId: {
+                    userId: session.user.id,
+                    organizationId: organizationId,
+                }
+            }
+        });
+
+        if (existingRequest) {
+            return { success: false, error: "You have already sent a request to join this organization." };
+        }
+
         const memberRequest = await prisma.memberRequest.create({
             data: {
                 email: session.user.email,
@@ -867,10 +881,34 @@ export async function inviteUser(
         }
 
         if (email === session.user.email) {
-            throw new Error("Cannot send invitation to yourself")
+            return {success: false, error: "Cannot send invitation to yourself."}
         }
 
         const lowerCaseEmail = email.toLowerCase()
+
+        // Check if the user is already a member of the organization
+        const existingMember = await prisma.member.findFirst({
+            where: {
+                email: lowerCaseEmail,
+                organizationId: organization.organizationId
+            }
+        });
+
+        if (existingMember) {
+            return {success: false, error: "User is already a member of this organization."}
+        }
+
+        // Check if an invitation has already been sent to this email for the same organization
+        const existingInvitation = await prisma.invitation.findFirst({
+            where: {
+                email: lowerCaseEmail,
+                organizationId: organization.organizationId
+            }
+        });
+
+        if (existingInvitation) {
+            return {success: false, error: "An invitation has already been sent to this email."}
+        }
 
         let invitationId: string | undefined
         const invitation = await prisma.invitation.create({
@@ -2084,20 +2122,7 @@ export async function createKanban(orgId: string) {
             data: {
                 organization: {connect: {id: orgId}},
                 columns: {
-                    create: [
-                        {
-                            name: "To Do",
-                            kanbanPosition: 0
-                        },
-                        {
-                            name: 'In Progress',
-                            kanbanPosition: 1
-                        },
-                        {
-                            name: 'Done',
-                            kanbanPosition: 2
-                        }
-                    ]
+                    create: DEFAULT_KANBAN_COLUMNS
                 }
             }
         })
