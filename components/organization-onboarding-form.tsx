@@ -27,7 +27,7 @@ import {FileWithPreview} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
-import {cn, createDicebearAvatar, formatMoney, getPublicFile, nameToInitials, years} from "@/lib/utils";
+import {acceptedFiletypes, getPublicFile, nameToInitials, years} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
@@ -87,10 +87,6 @@ export const newOrgFormSchema = z.object({
     lng: z.number().optional(),
     image: z.string().optional(),
 })
-
-const accept = {
-    "image/*": [".jpg", ".jpeg", ".png"],
-};
 
 const OPTIONS: Option[] = [
     {
@@ -177,7 +173,7 @@ export default function OrganizationOnboardingForm(
 
     const {getRootProps, getInputProps} = useDropzone({
         onDrop,
-        accept,
+        accept: acceptedFiletypes,
     });
 
     useEffect(() => {

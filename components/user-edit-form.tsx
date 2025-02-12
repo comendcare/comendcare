@@ -27,7 +27,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
-import { getPublicFile } from "@/lib/utils";
+import { acceptedFiletypes, getPublicFile } from "@/lib/utils";
 import { handleImageUpload } from "@/lib/upload";
 import { FormImageCropper } from "./edit-pag-profile-page-dialog";
 
@@ -46,10 +46,6 @@ const userFormSchema = z.object({
     lng: z.number().optional(),
     image: z.string().optional(),
 });
-
-const accept = {
-    "image/*": [".jpg", ".jpeg", ".png"],
-};
 
 export default function UserEditForm() {
     const router = useRouter();
@@ -84,7 +80,7 @@ export default function UserEditForm() {
 
     const {getRootProps, getInputProps} = useDropzone({
         onDrop,
-        accept,
+        accept: acceptedFiletypes,
     });
 
     const [address, setAddress] = useState<AddressType>({

@@ -49,10 +49,6 @@ const userFormSchema = z.object({
     image: z.string().optional(),
 });
 
-const accept = {
-    "image/*": [".jpg", ".jpeg", ".png"],
-};
-
 export default function UserOnboardingForm() {
     const router = useRouter();
     const {data: session} = useSession();

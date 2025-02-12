@@ -34,7 +34,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {cn, formatMoney, formatNumberWithCommas, getPublicFile, sleep, years} from "@/lib/utils";
+import {acceptedFiletypes, cn, formatMoney, formatNumberWithCommas, getPublicFile, sleep, years} from "@/lib/utils";
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
@@ -70,10 +70,6 @@ const OPTIONS: Option[] = [
         strengths: 'Provides full-stack capabilities with SSR, optimized for caching and streaming, and excellent support for nested routing.',
     },
 ];
-
-const accept = {
-    "image/*": [".jpg", ".jpeg", ".png"],
-};
 
 const optionSchema = z.object({
     label: z.string(),
@@ -1469,7 +1465,7 @@ export const FormImageCropper = ({
 
     const {getRootProps, getInputProps} = useDropzone({
         onDrop: onDrop,
-        accept,
+        accept: acceptedFiletypes,
         noClick: true
     });
 
