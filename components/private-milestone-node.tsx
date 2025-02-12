@@ -80,7 +80,12 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     }
 
     return (
-        <Card className={cn("w-[350px] text-wrap break-words", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", selectedNodeId === props?.id ? "border-black border-2" : "")}>
+        <Card className={cn(
+            "w-[350px] text-wrap break-words", 
+            props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", 
+            selectedNodeId === props?.id ? "border-black border-2" : "", 
+            props?.id ? "" : "opacity-50"
+        )}>
             <CardHeader>
                 <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
                     <TypeBadge type={props.type}/>
@@ -196,6 +201,7 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
                 isHovering ? "p-1 flex flex-col gap-1" : "",
                 props.className
             )}
+            onClick={(e) => e.stopPropagation()}
         >
             <Button 
                 variant="ghost" 

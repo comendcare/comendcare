@@ -53,7 +53,6 @@ export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
     const [isLoading, setIsLoading] = useState(true)
     const searchParams = useSearchParams()
-    const prevSessionRef: any = useRef()
     const { startOnborda } = useOnborda()
     const pathname = usePathname()
     const { 
@@ -146,15 +145,7 @@ export default function AppLayout({children}: AppLayoutProps) {
     }
 
     useEffect(() => {
-        // Only run if the session data has changed
-        console.log(`prevSession`, prevSessionRef?.current)
-        console.log(`current session`, session)
-        if (JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)) {
-            handleSessionUpdate()
-        }
-
-        // Update the ref to the latest session
-        prevSessionRef.current = session
+        handleSessionUpdate()
     }, [session]);
 
     if (status === "authenticated" && session) {

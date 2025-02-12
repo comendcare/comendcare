@@ -1547,7 +1547,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
         }
     })
 
-    // await sleep(5000)
+    await sleep(5000)
 
     // if a roadmap template was provided, create the relevant nodes, milestones, and edges
     if (roadmapTemplate?.milestones) {
