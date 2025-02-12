@@ -1,6 +1,6 @@
 import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
-import {FaCircleDollarToSlot, FaUsers} from "react-icons/fa6";
+import {FaBullhorn, FaCircleDollarToSlot, FaFileLines, FaStar, FaUsers} from "react-icons/fa6";
 import {formatMoney} from "@/lib/utils";
 import {Badge} from "./ui/badge";
 import {ProfilePhoto} from "./profile-photo";
@@ -25,9 +25,9 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
     const nodeTypeCount = countNodeTypes(organization.Milestone);
 
     const nodeTypeLabels = [
-        { key: "ASSET", icon: BookCheck, label: "Assets" },
-        { key: "RFP", icon: Search, label: "RFPs" },
-        { key: "PROJECT", icon: TestTube, label: "Projects" }
+        { key: "ASSET", icon: FaStar, label: "Assets" },
+        { key: "RFP", icon: FaBullhorn, label: "RFPs" },
+        { key: "PROJECT", icon: FaFileLines, label: "Projects" }
     ];
 
     return (
@@ -40,7 +40,7 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
         >
             <Card className="h-full w-full text-left flex flex-col justify-start">
                 <CardHeader className="gap-2">
-                    <CardTitle className="text-xl font-normal flex flex-row gap-2 items-center">
+                    <CardTitle className="text-xl flex flex-row gap-2 items-center">
                         <ProfilePhoto img={image} name={name} className="h-10 w-10"/>
                         {name}
                     </CardTitle>
@@ -60,27 +60,25 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                     </div>
                 </CardHeader>
                 <CardContent className="flex flex-col items-start justify-center space-y-4">
-                    {/*<div className="line-clamp-3">*/}
-                    {/*    {description}*/}
-                    {/*</div>*/}
-                    <div className="flex flex-row space-x-2">
-                        {nodeTypeLabels.map(({ key, icon: Icon, label }) => (
-                        nodeTypeCount[key] ? (
-                            <div
-                                key={key}
-                                className="text-sm w-min inline-flex flex-row justify-start items-center gap-x-2 truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors dark:bg-stone-800 dark:text-stone-400"
-                            >
-                                <Icon className="size-4" />
-                                {nodeTypeCount[key]} {label}
-                            </div>
-                        ) : null
-                    ))}
+                    <div className="grid w-full gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+                        {nodeTypeLabels
+                            .filter(({ key }) => nodeTypeCount[key]) // Only show non-zero items
+                            .map(({ key, icon: Icon, label }, index) => (
+                                <div
+                                    key={key}
+                                    className={`text-xs flex flex-row justify-start items-center gap-x-2
+                        ${index !== 0 ? "border-l border-gray-300 pl-2" : ""}`} // Add vertical separator except for first item
+                                >
+                                    <Icon className="size-4" />
+                                    {nodeTypeCount[key]} {label}
+                                </div>
+                            ))}
                     </div>
                 </CardContent>
                 {Object.keys(orgCondition).length === 0 ||
                     <>
                         <Separator className="mb-4"/>
-                        <CardFooter>
+                        <CardFooter className="space-x-4">
                             <h2 className="text-base">
                                 {orgCondition.name}
                             </h2>
