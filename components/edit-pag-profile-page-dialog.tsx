@@ -963,6 +963,9 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Causal genes</FormLabel>
+                                                <FormDescription>
+                                                    Select all that apply.
+                                                </FormDescription>
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
@@ -985,6 +988,9 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Associated genes</FormLabel>
+                                                <FormDescription>
+                                                    Select all that apply.
+                                                </FormDescription>
                                                 {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <MultipleSelector
@@ -1011,7 +1017,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                     Mechanisms of action
                                                 </FormLabel>
                                                 <FormDescription className="flex items-center">
-                                                    {`What types of genetic effects are you investigating?`}
+                                                    {`What types of genetic effects are you investigating? Select all that apply.`}
                                                 </FormDescription>
                                                 <FormControl>
                                                     <MultipleSelector
@@ -1049,7 +1055,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Associated systems</FormLabel>
-                                                <FormDescription>{`The systems affected by your condition.`}</FormDescription>
+                                                <FormDescription>{`The systems affected by your condition. Select all that apply.`}</FormDescription>
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
@@ -1088,6 +1094,9 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                 <FormLabel>
                                                     Therapeutics under development
                                                 </FormLabel>
+                                                <FormDescription>
+                                                    Select all that apply.
+                                                </FormDescription>
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
@@ -1127,7 +1136,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                     Therapeutics of interest
                                                 </FormLabel>
                                                 <FormDescription className="flex items-center">
-                                                    {`The treatment modalities of interest of your organization.`}
+                                                    {`The treatment modalities of interest of your organization. Select all that apply.`}
                                                     <Tooltip delayDuration={0}>
                                                         <TooltipTrigger>
                                                             <FaQuestionCircle
