@@ -61,7 +61,7 @@ export function LogoCloud() {
             <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
                 Partnered with:
             </h2>
-            <div className="grid grid-cols-4 gap-10 w-full max-w-3xl mx-auto  relative">
+            <div className="grid grid-cols-3 gap-10 w-full max-w-3xl mx-auto  relative">
                 {logos.map(logo => (
                     <div
                         key={logo.name}

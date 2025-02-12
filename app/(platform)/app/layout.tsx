@@ -161,8 +161,8 @@ export default function AppLayout({children}: AppLayoutProps) {
         return (
             <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
                 <AppSidebar />
-                <SidebarInset>
-                    <header className="sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50">
+                <SidebarInset className="w-full max-w-full overflow-hidden">
+                    <header className="sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden">
                         <div className="w-full flex items-center justify-between gap-4 px-4">
                             <SidebarTrigger className="-ml-1" />
                             <div className="flex items-center">
@@ -191,7 +191,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                             </div>
                         </div>
                     </header>
-                    <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full">
+                    <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full overflow-hidden overflow-y-auto">
                         {isLoading ? <Loading /> : (children)}
                         {/* {children} */}
                     </div>
