@@ -618,7 +618,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                         Edit profile
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="max-h-[800px] overflow-y-auto">
+                <DialogContent className="max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
                             Edit organization profile
