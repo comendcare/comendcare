@@ -50,11 +50,12 @@ export const PublicFlowView = ({ roadmap, subdomain, urlMilestone, externalLinks
         nodesConnectable={false}
         draggable={false}
         fitView
+        minZoom={0.1}
     >
-        <MiniMap
+        {/* <MiniMap
             nodeColor='#757575'
             maskColor='rgb(200, 200, 200, 0.8)' 
-        />
+        /> */}
     </ReactFlow>
     )
 }
