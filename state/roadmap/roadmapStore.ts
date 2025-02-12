@@ -27,7 +27,7 @@ export type RoadmapState = {
     edges: Edge[]
     onEdgesChange: (changes: EdgeChange[]) => Promise<Edge[] | void>
     onConnect: (connection: any) => Promise<Edge[] | void>
-    setNodes: (nodes: Node[]) => Promise<Node[] | void>
+    setNodes: (nodes: Node[]) => void
     setEdges: (edges: Edge[]) => Promise<Edge[] | void>
     addNodes: (node: Node[]) => Promise<Node[] | void>
     deleteNode: (nodeId: string) => Promise<any | void>
@@ -63,7 +63,6 @@ export const useRoadmapStore = create<RoadmapState>()(
             // this as a full page reload, causing the loading state to show
             // to avoid this we don't update the roadmap view if the database is currently updating
             // NOTE: url is updated in roadmap.tsx
-            if (get().isUpdating) return
             console.log(`set selected roadmap view`)
             set({ selectedView: view })
         },
@@ -74,7 +73,6 @@ export const useRoadmapStore = create<RoadmapState>()(
             // this as a full page reload, causing the loading state to show
             // to avoid this we don't update the node id if the database is currently updating
             // NOTE: url is updated in roadmap.tsx
-            if (get().isUpdating) return
             console.log(`set selected node id`)
             set({ selectedNodeId: id })
         },
@@ -164,32 +162,29 @@ export const useRoadmapStore = create<RoadmapState>()(
                 console.error(`Error updating Flow Edges`, response?.error)
             }
         },
-        setNodes: async (nodes: Node[]) => {
-            if (get().isUpdating) return
-            set({isUpdating: true})
-
+        setNodes: (nodes: Node[]) => {
             console.log(`set nodes`)
             set({ nodes })
-            const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
-            if (response?.success && response?.data) {
-                const newNodes = response.data.nodes.map(n => ({
-                    id: n.id,
-                    type: n.type,
-                    position: { x: n.positionX, y: n.positionY },
-                    origin: n.origin
-                })) as Node[]
+            updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
+            // const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
+            // if (response?.success && response?.data) {
+            //     const newNodes = response.data.nodes.map(n => ({
+            //         id: n.id,
+            //         type: n.type,
+            //         position: { x: n.positionX, y: n.positionY },
+            //         origin: n.origin
+            //     })) as Node[]
 
-                // special case here, we set the original nodes, so if nothing has changed zustand doesn't trigger a state change
-                // this keeps us from having an infinite loop when handling the nodes local state in private-flow.tsx
-                // local state is handled within the private-flow.tsx component, and debounced, because
-                // the RaectFlow spams position updates and we don't want to save all of them to the Database..
-                // set({ nodes })
-                // return newNodes as Node[]
-            } else {
-                console.error(`Error updating database nodes`, response?.error)
-                toast.success("Error updating node state... your node may node's position may not have been saved")
-            }
-            set({ isUpdating: false })
+            //     // special case here, we set the original nodes, so if nothing has changed zustand doesn't trigger a state change
+            //     // this keeps us from having an infinite loop when handling the nodes local state in private-flow.tsx
+            //     // local state is handled within the private-flow.tsx component, and debounced, because
+            //     // the RaectFlow spams position updates and we don't want to save all of them to the Database..
+            //     // set({ nodes })
+            //     // return newNodes as Node[]
+            // } else {
+            //     console.error(`Error updating database nodes`, response?.error)
+            //     toast.success("Error updating node state... your node may node's position may not have been saved")
+            // }
         },
         setEdges: async (edges: Edge[]) => {
             console.log(`set edges`)

@@ -34,7 +34,7 @@ const selector = (state: RoadmapState) => ({
     initState: state.initState
 })
 
-export function Roadmap({data}: {data: any}) {
+export function Roadmap({data}: {data?: any}) {
     // Zustand state management
     const { defaultLayout } = useSidebarStore()
     const { 
@@ -63,8 +63,7 @@ export function Roadmap({data}: {data: any}) {
             params.delete("view")
         }
 
-        // window.history.replaceState(null, "", `${pathname}?${params.toString()}`)
-        router.replace(`${pathname}?${params}`)
+        router.push(`${pathname}?${params}`)
     }, [selectedNodeId, selectedView])
     
 
