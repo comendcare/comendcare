@@ -200,7 +200,10 @@ export default async function ProfilePage() {
                         <div className="relative col-span-2 space-y-4">
                             <div className="sticky top-4 space-y-4">
                                 <PagProfileAboutCard organization={organization}/>
-                                <PAGProfileConditionsCard conditions={conditions}/>
+                                <PAGProfileConditionsCard
+                                    conditions={conditions}
+                                    organization={organization}
+                                />
                             </div>
                             {/*<PAGProfileAssetsCard/>*/}
                             {/*<PAGProfileOpenRFPsCard/>*/}
