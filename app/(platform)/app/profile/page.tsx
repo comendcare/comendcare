@@ -10,7 +10,6 @@ import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {cn, formatMoney, standardizeYear} from "@/lib/utils";
 import PrivateProfileDropdown from "@/components/private-profile-dropdown";
-import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {getSession} from "@/lib/auth";
 import Image from "next/image"
@@ -173,7 +172,6 @@ export default async function ProfilePage() {
                             <div
                                 className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
                                 <div className="flex flex-row space-x-2">
-                                    {/*<EditPAGProfileHeaderDialog/>*/}
                                     <EditPAGProfileDialog organization={organization}/>
                                     {/*<Button*/}
                                     {/*    className="gap-x-2"*/}

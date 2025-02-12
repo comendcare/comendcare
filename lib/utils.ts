@@ -7,6 +7,10 @@ import {identicon, personas} from "@dicebear/collection";
 import {createAvatar} from "@dicebear/core";
 import {formatDistanceToNowStrict} from "date-fns";
 
+export const acceptedFiletypes = {
+    "image/*": [".jpg", ".jpeg", ".png"],
+};
+
 export function standardizeYear(dateString: string): string {
     const match = dateString.match(/^(\d{4})/);
     return match ? match[1] : "";
