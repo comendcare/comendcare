@@ -23,7 +23,6 @@ export type RoadmapState = {
     setSelectedNodeId: (id: string | null) => void
     milestones: any[]
     setMilestone: (id: string, newProperties: any) => Promise<Milestone[] | void>
-    // setMilestones: (milestones: any[]) => Promise<Milestone[] | void>
     nodes: Node[]
     edges: Edge[]
     onEdgesChange: (changes: EdgeChange[]) => Promise<Edge[] | void>
@@ -85,184 +84,103 @@ export const useRoadmapStore = create<RoadmapState>()(
                     ? { ...milestone, ...newProperties }
                     : milestone
             )
-            // const nodes = get().nodes.map(node => (
-            //     node.id === nodeId && newProperties.nodeType
-            //         ? { ...node, type: newProperties.nodeType}
-            //         : node
-            // ))
-            // set({ milestones, nodes })
-            // updateMilestones({ milestones })
+            if (newProperties.nodeType) {
+                // if the type has been updated, we also update the node type
+                const nodes = get().nodes.map(node => (
+                    node.id === nodeId 
+                        ? { ...node, type: newProperties.nodeType }
+                        : node
+                ))
+                set({ milestones, nodes })
+            } else {
+                set({ milestones })
+            }
 
-            set({ milestones })
-
+            // update DB milestones
             const response = await updateMilestones({ milestones })
             if (response?.success && response?.data) {
-                // if task was created successfully, update zustand state
-                if (newProperties.nodeType) {
-                    // if the type has been updated, we also update the node type
-                    const nodes = get().nodes.map(node => (
-                        node.id === nodeId 
-                            ? { ...node, type: newProperties.nodeType }
-                            : node
-                    ))
-
-                    set({ milestones: response.data as Milestone[], nodes })
-                } else {
-                    set({ milestones: response.data as Milestone[] })
-                }
-
-                // toast.success("Milestone updated successfully!")
                 return response.data as Milestone[]
             } else {
-                toast.error("Could not update milestones")
+                toast.error("Could not update milestones", {position: "bottom-left"})
                 console.error(`Error updating milestones`, response?.error)
             }
         },
-        // setMilestones: async (milestones: any[]) => {
-        //     console.log(`set milestones`)
-        //     set({ milestones })
-
-        //     const response = await updateMilestones({ milestones })
-        //     if (response?.success && response?.data) {
-        //         // if task was created successfully, update zustand state
-        //         // set({ milestones: response.data as Milestone[] })
-
-        //         // toast.success("Milestone updated successfully!")
-        //         return response.data as Milestone[]
-        //     } else {
-        //         console.error(`Error updating milestones`, response?.error)
-        //     }
-        // },
         nodes: [],
         edges: [],
         onEdgesChange: async (changes: EdgeChange[]) => {
             console.log(`on edges change`)
             const edges = applyEdgeChanges(changes, get().edges)
             set({ edges })
-            updateEdges({ roadmapId: get().roadmapId, edges }) // update DB edges
 
-            // const response = await updateEdges({ roadmapId: get().roadmapId, edges })
-            // if (response?.success && response?.data) {
-            //     // set({ edges })
-            //     return response.data as Edge[]
-            // } else {
-            //     console.error(`Error updating Flow Edges`, response?.error)
-            // }
+            // update DB edges
+            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            if (response?.success && response?.data) {
+                return response.data as Edge[]
+            } else {
+                toast.error("Could not update edges", {position: "bottom-left"})
+                console.error(`Error updating Flow Edges`, response?.error)
+            }
         },
         onConnect: async (connection: any) => {
             console.log(`on connect`)
             const edges = addEdge(
-                {
-                    ...connection,
-                    style: { stroke: 'black' }
-                },
+                {...connection, style: { stroke: 'black' }},
                 get().edges
             )
             set({ edges })
-            updateEdges({ roadmapId: get().roadmapId, edges }) // update DB edges
 
-            // const response = await updateEdges({ roadmapId: get().roadmapId, edges })
-            // if (response?.success && response?.data) {
-            //     // set({ edges })
-            //     return response.data as Edge[]
-            // } else {
-            //     console.error(`Error updating Flow Edges`, response?.error)
-            // }
+            // update DB edges
+            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            if (response?.success && response?.data) {
+                return response.data as Edge[]
+            } else {
+                toast.error("Could not update edges", {position: "bottom-left"})
+                console.error(`Error updating Flow Edges`, response?.error)
+            }
         },
         setNodes: async (nodes: Node[]) => {
             console.log(`set nodes`)
             set({ nodes })
-            updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
 
-            // const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
-            // if (response?.success && response?.data) {
-            //     const newNodes = response.data.nodes.map(n => ({
-            //         id: n.id,
-            //         type: n.type,
-            //         position: { x: n.positionX, y: n.positionY },
-            //         origin: n.origin
-            //     })) as Node[]
+            const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
+            if (response?.success && response?.data) {
+                const newNodes = response.data.nodes.map(n => ({
+                    id: n.id,
+                    type: n.type,
+                    position: { x: n.positionX, y: n.positionY },
+                    origin: n.origin
+                })) as Node[]
 
-            //     // special case here, we set the original nodes, so if nothing has changed zustand doesn't trigger a state change
-            //     // this keeps us from having an infinite loop when handling the nodes local state in private-flow.tsx
-            //     // local state is handled within the private-flow.tsx component, and debounced, because
-            //     // the RaectFlow spams position updates and we don't want to save all of them to the Database..
-            //     // set({ nodes })
-            //     // return newNodes as Node[]
-            // } else {
-            //     console.error(`Error updating database nodes`, response?.error)
-            //     toast.success("Error updating node state... your node may node's position may not have been saved")
-            // }
+                return newNodes as Node[]
+            } else {
+                console.error(`Error updating database nodes`, response?.error)
+                toast.success("Error updating node state... your node may node's position may not have been saved")
+            }
         },
         setEdges: async (edges: Edge[]) => {
             console.log(`set edges`)
             set({ edges })
-            updateEdges({ roadmapId: get().roadmapId, edges }) // update DB edges
 
-            // const response = await updateEdges({ roadmapId: get().roadmapId, edges })
-            // if (response?.success && response?.data) {
-            //     // set({ edges })
-
-            //     return response.data as Edge[]
-            // } else {
-            //     console.error(`Error updating Flow Edges`, response?.error)
-            // }
+            // update DB edges
+            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            if (response?.success && response?.data) {
+                return response.data as Edge[]
+            } else {
+                console.error(`Error updating Flow Edges`, response?.error)
+            }
         },
         addNodes: async (nodes: Node[]) => {
             console.log(`add nodes`)
             set({ nodes: [...get().nodes, ...nodes], milestones: [...get().milestones, ...nodes.map(node => node.data)] })
-            // createNodes({ roadmapId: get().roadmapId, nodes }) // update DB Nodes
             
+            // update DB Nodes
             const response = await createNodes({ roadmapId: get().roadmapId, nodes })
-            // if (response?.success && response?.data && response.data.nodes && response.data.milestones) {
-            //     // const updatedNodes = get().nodes.map(n => {
-            //     //     if (response.data.nodes.find(node => node.id === n.id)) {
-            //     //         return response.data.nodes.find(nd => nd.id === n.id)
-            //     //     }
-
-            //     //     return n
-            //     // })
-            //     // const updatedMilestones  = get().milestones.map(zustandMilestone => {
-            //     //     if (response.data.milestones.find(dbMilestone => dbMilestone.id === zustandMilestone.id)) {
-            //     //         // if the milestone has been updated it, return with new properties
-            //     //         return response.data.milestones.find(dbMilestone => dbMilestone.id === zustandMilestone.id)
-            //     //     }
-
-            //     //     return zustandMilestone
-            //     // })
-
-
-
-            //     // const updatedNodes = [
-            //     //     ...get().nodes, 
-            //     //     ...response.data.nodes.map(n => ({
-            //     //         id: n.id,
-            //     //         type: n.type,
-            //     //         position: {
-            //     //             x: n.positionX,
-            //     //             y: n.positionY
-            //     //         },
-            //     //         origin: n.origin,
-            //     //         data: n.data
-            //     //     })) as Node[]
-            //     // ]
-            //     // const updatedMilestone = [
-            //     //     ...get().milestones,
-            //     //     ...response.data.milestones as Milestone[]
-            //     // ]
-
-            //     // set again to ensure we get the proper IDs
-            //     set({ 
-            //         nodes: updatedNodes,
-            //         milestones: updatedMilestone
-            //     })
-
-            //     toast.success("Milestones added successfully!")
-            //     return response.data.nodes
-            // } else {
-            //     console.error(`Error adding nodes`, response?.error)
-            //     toast.error(`Error adding milestones: ${response?.error}`)
-            // }
+            if (response?.success && response?.data && response.data.nodes && response.data.milestones) {
+                return response.data.nodes
+            } else {
+                console.error(`Error adding nodes`, response?.error)
+                toast.error(`Error adding milestones: ${response?.error}`)
+            }
         },
         deleteNode: async (nodeId: string | undefined) => {
             console.log(`delete nodes`)
@@ -271,21 +189,15 @@ export const useRoadmapStore = create<RoadmapState>()(
                 milestone.nodeId !== nodeId
             )
             set({ nodes, milestones, selectedNodeId: null })
-            deleteNode(nodeId) // update DB nodes
 
-            // const response = await deleteNode(nodeId)
-            // if (response?.success && response?.data) {
-            //     const nodes = [...get().nodes].filter(({ id }) => id !== response.data.id)
-            //     const milestones = get().milestones.filter(milestone =>
-            //         milestone.nodeId !== response.data.id
-            //     )
-            //     set({ nodes, milestones })
-
-            //     return response.data
-            // } else {
-            //     console.error(`Error deleting nodes`, response?.error)
-            //     toast.error(`Error deleting your milestone: ${response?.error}`)
-            // }
+            // update DB nodes
+            const response = await deleteNode(nodeId)
+            if (response?.success && response?.data) {
+                return response.data
+            } else {
+                console.error(`Error deleting nodes`, response?.error)
+                toast.error(`Error deleting milestone: ${response?.error}`)
+            }
         },
         saveState: () => {
             console.log(`save state`)
@@ -302,10 +214,4 @@ export const useRoadmapStore = create<RoadmapState>()(
             return
         },
     })
-)
-
-export const debounceUpdateFlow = debounce(
-    (roadmapId: string | null, nodes: Node[], edges: Edge[]) => {
-        updateDBFlow({ roadmapId, nodes, edges })
-    }, 500
 )
