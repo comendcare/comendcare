@@ -96,7 +96,7 @@ export default function AppLayout({children}: AppLayoutProps) {
 
             if (!session.user.organizationId) {
                 console.error("Organization id is not set in the session... session data is ", session)
-                toast.error("Error, the organization id is not set.")
+                // toast.error("Error, the organization id is not set.")
                 setIsLoading(false)
                 return
             }

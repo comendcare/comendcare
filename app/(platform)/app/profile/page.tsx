@@ -27,7 +27,7 @@ import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-ass
 import {ProfilePhoto} from "@/components/profile-photo";
 import {RoadmapCard} from "@/components/public-roadmap-card";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
-import NoOrganizationPage from "@/components/no-organization-page";
+import NoOrganization from "@/components/no-organization";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
 
 export default async function ProfilePage() {
@@ -246,7 +246,7 @@ export default async function ProfilePage() {
         );
     } else {
         return (
-            <NoOrganizationPage/>
+            <NoOrganization/>
         );
     }
 }

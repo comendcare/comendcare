@@ -3,7 +3,7 @@
 import {useState} from "react";
 import {getSession} from "@/lib/auth"
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
-import NoOrganizationPage from "@/components/no-organization-page";
+import NoOrganization from "@/components/no-organization";
 import {getOrganizationFromOrganizationId, getRoadmapId} from "@/lib/fetchers";
 import {
     AlertDialog,
@@ -180,7 +180,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
         )
     } else {
         return (
-            <NoOrganizationPage/>
+            <NoOrganization/>
         );
     }
 }
