@@ -83,8 +83,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
         <Card className={cn(
             "w-[350px] text-wrap break-words", 
             props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", 
-            selectedNodeId === props?.id ? "border-black border-2" : "", 
-            props?.id ? "" : "opacity-50"
+            selectedNodeId === props?.id ? "border-black border-2" : ""
         )}>
             <CardHeader>
                 <div className="h-fit flex flex-row align-center items-center justify-between gap-4">

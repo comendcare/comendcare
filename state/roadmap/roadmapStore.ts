@@ -9,7 +9,6 @@ import {
 } from "@xyflow/react"
 import { createNodes, deleteNode, Milestone, updateDBFlow, updateEdges, updateMilestones} from "@/lib/actions"
 import { toast } from "sonner"
-import { debounce } from "lodash"
 
 export type RoadmapState = {
     isUpdating: boolean,

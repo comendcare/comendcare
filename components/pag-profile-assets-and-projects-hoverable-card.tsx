@@ -146,12 +146,11 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                             const response = await getRoadmap(session.user.organizationId)
                                             if (response.success && response.data && response.data?.id) {
                                                 const newRFP = await addMilestone("RFP", "New RFP")
-        
-                                                if (newRFP) {
-                                                    // don't do onboarding if the user starts from 'New RFP' button
-                                                    setOnboarded('research-plan-tour')
+
+                                                if (newRFP?.id) {
+                                                    await sleep(100)
                                                     router.push(`/app/research-plan?milestone=${newRFP.id}`)
-                                                    // router.refresh()
+                                                    router.refresh()
                                                 }
                                             } else {
                                                 // no roadmap found, create roadmap first
@@ -183,13 +182,10 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                     toast.error(response.error)
                                                 }
 
-                                                console.log(`created roadmap`, roadmap)
-
                                                 if (roadmap && roadmap?.nodes?.[0]?.id) {
-                                                    // don't do onboarding if the user starts from 'New RFP' button
-                                                    setOnboarded('research-plan-tour')
+                                                    await sleep(100)
                                                     router.push(`/app/research-plan?milestone=${roadmap.nodes[0].id}`)
-                                                    // router.refresh()
+                                                    router.refresh()
                                                 }
                                             }
                                         }
@@ -242,10 +238,9 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                 const newAsset = await addMilestone("ASSET", "New Asset")
         
                                                 if (newAsset) {
-                                                    // don't do onboarding if the user starts from 'New Asset' button
-                                                    setOnboarded('research-plan-tour')
+                                                    await sleep(100)
                                                     router.push(`/app/research-plan?milestone=${newAsset.id}`)
-                                                    // router.refresh()
+                                                    router.refresh()
                                                 }
                                             } else {
                                                 // no roadmap found, create roadmap first
@@ -280,10 +275,9 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                 console.log(`created roadmap`, roadmap)
 
                                                 if (roadmap && roadmap?.nodes?.[0]?.id) {
-                                                    // don't do onboarding if the user starts from 'New Asset' button
-                                                    setOnboarded('research-plan-tour')
+                                                    await sleep(100)
                                                     router.push(`/app/research-plan?milestone=${roadmap.nodes[0].id}`)
-                                                    // router.refresh()
+                                                    router.refresh()
                                                 }
                                             }
                                         }

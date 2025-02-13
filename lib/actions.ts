@@ -1547,8 +1547,6 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
         }
     })
 
-    await sleep(5000)
-
     // if a roadmap template was provided, create the relevant nodes, milestones, and edges
     if (roadmapTemplate?.milestones) {
         const milestones = roadmapTemplate.milestones
@@ -1581,15 +1579,15 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
 
                 // grab milestone so we can add tasks
                 // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
-                const newMilestone = await prisma.milestone.findUnique({
-                    where: {nodeId: node.id},
-                    include: {
-                        attachments: true,
-                        contacts: true,
-                        tasks: true,
-                        node: true
-                    }
-                })
+                // const newMilestone = await prisma.milestone.findUnique({
+                //     where: {nodeId: node.id},
+                //     include: {
+                //         attachments: true,
+                //         contacts: true,
+                //         tasks: true,
+                //         node: true
+                //     }
+                // })
 
                 // create tasks for relevant milestone
                 // if (newMilestone) {
@@ -2013,8 +2011,6 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
     try {
         let updatedMilestones: Milestone[] = []
 
-        console.log(`milestones`, milestones)
-
         await Promise.all(
             milestones.map(async (milestone: any) => {
                 const previousMilestone = await prisma.milestone.findUnique({
@@ -2108,8 +2104,6 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         //         )
         //     })
         // )
-
-        console.log(`updated milestones`, updatedMilestones)
 
         console.log(`Successfully updated Milestone`)
         return {success: true, data: updatedMilestones}

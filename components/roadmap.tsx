@@ -34,7 +34,7 @@ const selector = (state: RoadmapState) => ({
     initState: state.initState
 })
 
-export function Roadmap({data}: {data?: any}) {
+export function Roadmap({data}: {data: any}) {
     // Zustand state management
     const { defaultLayout } = useSidebarStore()
     const { 
@@ -63,10 +63,8 @@ export function Roadmap({data}: {data?: any}) {
             params.delete("view")
         }
 
-        // router.push(`${pathname}?${params}`)
-
-        const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
         // ensure shallow url update
+        const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
         window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
     }, [selectedNodeId, selectedView])
     

@@ -1,5 +1,3 @@
-// "use client"
-
 import NewRoadmapForm from "@/components/new-roadmap"
 import NoOrganization from "@/components/no-organization"
 import { getRoadmap } from "@/lib/fetchers"
