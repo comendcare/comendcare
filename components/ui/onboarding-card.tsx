@@ -89,7 +89,8 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
                 types: [],
                 nodeId: id,
                 title: `New Milestone`,
-                status: "PLANNED"
+                status: "PLANNED",
+                private: true
             }
         }
 

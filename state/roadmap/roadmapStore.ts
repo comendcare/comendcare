@@ -85,6 +85,15 @@ export const useRoadmapStore = create<RoadmapState>()(
                     ? { ...milestone, ...newProperties }
                     : milestone
             )
+            // const nodes = get().nodes.map(node => (
+            //     node.id === nodeId && newProperties.nodeType
+            //         ? { ...node, type: newProperties.nodeType}
+            //         : node
+            // ))
+            // set({ milestones, nodes })
+            // updateMilestones({ milestones })
+
+            set({ milestones })
 
             const response = await updateMilestones({ milestones })
             if (response?.success && response?.data) {
@@ -105,6 +114,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 // toast.success("Milestone updated successfully!")
                 return response.data as Milestone[]
             } else {
+                toast.error("Could not update milestones")
                 console.error(`Error updating milestones`, response?.error)
             }
         },
@@ -201,27 +211,45 @@ export const useRoadmapStore = create<RoadmapState>()(
         addNodes: async (nodes: Node[]) => {
             console.log(`add nodes`)
             set({ nodes: [...get().nodes, ...nodes], milestones: [...get().milestones, ...nodes.map(node => node.data)] })
-            createNodes({ roadmapId: get().roadmapId, nodes }) // update DB Nodes
+            // createNodes({ roadmapId: get().roadmapId, nodes }) // update DB Nodes
             
-            // const response = await createNodes({ roadmapId: null, nodes: newNodes })
+            const response = await createNodes({ roadmapId: get().roadmapId, nodes })
             // if (response?.success && response?.data && response.data.nodes && response.data.milestones) {
-            //     const updatedNodes = [
-            //         ...get().nodes, 
-            //         ...response.data.nodes.map(n => ({
-            //             id: n.id,
-            //             type: n.type,
-            //             position: {
-            //                 x: n.positionX,
-            //                 y: n.positionY
-            //             },
-            //             origin: n.origin,
-            //             data: n.data
-            //         })) as Node[]
-            //     ]
-            //     const updatedMilestone = [
-            //         ...get().milestones,
-            //         ...response.data.milestones as Milestone[]
-            //     ]
+            //     // const updatedNodes = get().nodes.map(n => {
+            //     //     if (response.data.nodes.find(node => node.id === n.id)) {
+            //     //         return response.data.nodes.find(nd => nd.id === n.id)
+            //     //     }
+
+            //     //     return n
+            //     // })
+            //     // const updatedMilestones  = get().milestones.map(zustandMilestone => {
+            //     //     if (response.data.milestones.find(dbMilestone => dbMilestone.id === zustandMilestone.id)) {
+            //     //         // if the milestone has been updated it, return with new properties
+            //     //         return response.data.milestones.find(dbMilestone => dbMilestone.id === zustandMilestone.id)
+            //     //     }
+
+            //     //     return zustandMilestone
+            //     // })
+
+
+
+            //     // const updatedNodes = [
+            //     //     ...get().nodes, 
+            //     //     ...response.data.nodes.map(n => ({
+            //     //         id: n.id,
+            //     //         type: n.type,
+            //     //         position: {
+            //     //             x: n.positionX,
+            //     //             y: n.positionY
+            //     //         },
+            //     //         origin: n.origin,
+            //     //         data: n.data
+            //     //     })) as Node[]
+            //     // ]
+            //     // const updatedMilestone = [
+            //     //     ...get().milestones,
+            //     //     ...response.data.milestones as Milestone[]
+            //     // ]
 
             //     // set again to ensure we get the proper IDs
             //     set({ 

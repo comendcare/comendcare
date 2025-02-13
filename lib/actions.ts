@@ -2013,11 +2013,13 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
     try {
         let updatedMilestones: Milestone[] = []
 
+        console.log(`milestones`, milestones)
+
         await Promise.all(
             milestones.map(async (milestone: any) => {
                 const previousMilestone = await prisma.milestone.findUnique({
-                    where: {nodeId: milestone.nodeId},
-                    // where: {id: milestone.id},
+                    // where: {nodeId: milestone.nodeId},
+                    where: {id: milestone.id},
                     include: {
                         attachments: true,
                         contacts: true,
@@ -2032,7 +2034,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                 }
 
                 let m = await prisma.milestone.update({
-                    where: {nodeId: milestone.nodeId},
+                    // where: {nodeId: milestone.nodeId},
+                    where: {id: milestone.id},
                     include: {
                         attachments: true,
                         contacts: true,
@@ -2050,7 +2053,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         attachments: {
                             deleteMany: {}, // clear all existing attachments
                             createMany: {
-                                data: milestone.attachments.map((attachment: any) => ({
+                                data: (milestone?.attachments || []).map((attachment: any) => ({
                                     link: attachment.link,
                                     ...(attachment.name ? {name: attachment.name} : undefined)
                                 }))
@@ -2059,7 +2062,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         contacts: {
                             deleteMany: {},
                             createMany: {
-                                data: milestone.contacts.map((contact: any) => ({
+                                data: (milestone?.contacts || []).map((contact: any) => ({
                                     name: contact.name,
                                     email: contact.email,
                                     ...(contact.role ? {role: contact.role} : undefined),
@@ -2080,7 +2083,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
 
                 console.log(`updated milestone`, m)
 
-                updatedMilestones.push(m)
+                updatedMilestones = [...updatedMilestones, m]
             })
         )
 
@@ -2105,6 +2108,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         //         )
         //     })
         // )
+
+        console.log(`updated milestones`, updatedMilestones)
 
         console.log(`Successfully updated Milestone`)
         return {success: true, data: updatedMilestones}
