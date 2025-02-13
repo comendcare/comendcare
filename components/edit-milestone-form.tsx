@@ -178,14 +178,6 @@ export function EditMilestoneForm({
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
             startDate: milestoneData?.startDate,
             endDate: milestoneData?.endDate,
-            // startDate: {
-            //     month: milestoneData?.startDate?.getMonth() ? monthsList[milestoneData?.startDate?.getMonth()] : undefined,
-            //     year: milestoneData?.startDate?.getFullYear()?.toString() || undefined
-            // },
-            // endDate: {
-            //     month: milestoneData?.endDate?.getMonth() ? monthsList[milestoneData?.endDate?.getMonth()] : undefined,
-            //     year: milestoneData?.endDate?.getFullYear()?.toString() || undefined
-            // },
             budget: milestoneData?.budget || undefined,
             attachments: milestoneData?.attachments || undefined,
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
@@ -442,14 +434,14 @@ export function EditMilestoneForm({
                             <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
                             <MilestoneTypeFormField form={form}/>
 
-                            {milestoneData?.node?.type === "ASSET" && (
+                            {formData.nodeType === "ASSET" && (
                                 <>
                                     <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
                                     <BudgetFormField form={form}/>
                                 </>
                             )}
 
-                            {milestoneData?.node?.type === "PROJECT" && (
+                            {formData.nodeType === "PROJECT" && (
                                 <>
                                     <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
                                     <StatusFormField form={form}/>
@@ -459,7 +451,7 @@ export function EditMilestoneForm({
                                 </>
                             )}
 
-                            {milestoneData?.node?.type === "RFP" && (
+                            {formData.nodeType === "RFP" && (
                                 <>
                                     <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
                                     <BudgetFormField form={form}/>
@@ -470,11 +462,11 @@ export function EditMilestoneForm({
                             )}
                         </FormItem>
 
-                        {milestoneData?.node?.type === "PROJECT" && (
+                        {formData.nodeType === "PROJECT" && (
                             <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
                         )}
 
-                        {milestoneData?.node?.type === "RFP" && (
+                        {formData.nodeType === "RFP" && (
                             <TimelineFormField form={form} startLabel={"Request Opens"}
                                                endLabel={"Deadline for Proposals"}/>
                         )}
