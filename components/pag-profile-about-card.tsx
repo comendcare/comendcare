@@ -10,6 +10,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {toast} from "sonner";
 import {useOnborda} from "@/components/onborda/OnbordaContext";
 import {usePathname} from "next/navigation";
+import {Button} from "@/components/ui/button";
 
 export const PagProfileAboutCard = ({organization}: {
     organization: Organization & { members: (Member & { user: User })[] } | null
@@ -21,7 +22,28 @@ export const PagProfileAboutCard = ({organization}: {
     useEffect(() => {
         // Only start tour if user is new and is on the /app/profile page
         if (pathname === "/app/profile" && !isOnboarded('organization-profile-tour')) {
-            startOnbordaAndRemoveToast()
+            toast("Welcome to Comend!", {
+                id: "onborda",
+                duration: 300000,
+                description: `Would you like to take a quick tour?`,
+                action: (
+                    <div className="flex flex-col space-y-2 ml-4">
+                        <Button
+                            onClick={startOnbordaAndRemoveToast}
+                        >
+                            {`Yes please!`}
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                toast.dismiss()
+                                setOnboarded('organization-profile-tour')
+                            }}
+                        >
+                            {`No thanks!`}
+                        </Button>
+                    </div>
+                )
+            })
         }
     }, [])
 
