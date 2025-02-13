@@ -49,7 +49,8 @@ export function DeleteMilestoneDialogContent({
                     {`Your milestone had been deleted successfully.`}
                 </p>
                 <Button className="self-end mt-4" onClick={handleUndo}>Undo Delete</Button>
-            </div>
+            </div>,
+            {position: "bottom-left"}
         )
     }
 
