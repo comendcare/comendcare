@@ -669,7 +669,7 @@ export default function OrganizationOnboardingForm(
                                                         <RadioGroupItem value="YES"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
-                                                        Yes I have a 501c3
+                                                        {`Yes, I have a 501c3`}
                                                     </FormLabel>
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
@@ -685,7 +685,7 @@ export default function OrganizationOnboardingForm(
                                                         <RadioGroupItem value="NO"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
-                                                        {`No I don't have a 501c3`}
+                                                        {`No, I don't have a 501c3`}
                                                     </FormLabel>
                                                 </FormItem>
                                             </RadioGroup>

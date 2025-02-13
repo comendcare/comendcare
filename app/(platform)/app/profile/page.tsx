@@ -101,7 +101,7 @@ export default async function ProfilePage() {
                             )}
                         </div>
 
-                        <div className="flex flex-row justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        <div className="flex flex-row justify-between mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 gap-x-4">
                             <div className="-mt-12 sm:-mt-16 sm:flex sm:items-end sm:space-x-5">
                                 <div className="flex bg-white rounded-full">
                                     {/* <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
@@ -171,7 +171,7 @@ export default async function ProfilePage() {
                             </div>
                             <div
                                 className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
-                                <div className="flex flex-row space-x-2">
+                                <div className="hidden xl:flex xl:flex-row xl:space-x-2">
                                     <EditPAGProfileDialog organization={organization}/>
                                     {/*<Button*/}
                                     {/*    className="gap-x-2"*/}
@@ -188,8 +188,8 @@ export default async function ProfilePage() {
                                         <FaEye/>
                                         <span>Public view</span>
                                     </a>
-                                    {/*<PrivateProfileDropdown subdomain={organization.subdomain}/>*/}
                                 </div>
+                                <PrivateProfileDropdown subdomain={organization.subdomain}/>
                             </div>
                             <div className="mt-6 hidden min-w-0 flex-1 sm:block md:hidden">
                                 <h1 className="truncate text-2xl font-bold text-gray-900">{organization?.name}</h1>

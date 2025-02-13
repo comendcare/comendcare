@@ -1484,6 +1484,8 @@ export async function acceptInvitation(invitationId: string) {
             }),
         ]);
 
+        revalidatePath("/app/profile")
+
         return {success: true, data: invitation};
     } catch (error) {
         console.error();
