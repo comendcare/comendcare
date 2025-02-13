@@ -797,7 +797,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                                 <RadioGroupItem value="YES"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
-                                                                Yes I have a 501c3
+                                                                {`Yes, I have a 501c3`}
                                                             </FormLabel>
                                                         </FormItem>
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
@@ -813,7 +813,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                                 <RadioGroupItem value="NO"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
-                                                                {`No I don't have a 501c3`}
+                                                                {`No, I don't have a 501c3`}
                                                             </FormLabel>
                                                         </FormItem>
                                                     </RadioGroup>
@@ -1473,7 +1473,7 @@ export const FormImageCropper = ({
     const handleClick = async () => {
         setSelectedFile(null) // de-select any previously selected file
         await sleep(100) // allow file de-select to take effect
-    
+
         fileInputRef.current?.click() // Open file dialog
     };
 
@@ -1518,7 +1518,7 @@ export const FormImageCropper = ({
                                     className={cn("size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200", className)}
                                 >
                                     <input
-                                        type="file" 
+                                        type="file"
                                         accept="image/jpg, image/jpeg, image/png"
                                         // callback ref, so we can trigger opening the file select dialog from inside ImageCropper
                                         ref={setFileInputRef}

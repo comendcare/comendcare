@@ -302,7 +302,7 @@ export default function UserOnboardingForm() {
                                                 {`Allow us to contact you regarding platform changes and notifications.`}
                                             </FormLabel>
                                             <FormDescription>
-                                                {`You can manage your mobile notifications in your user settings page.`}
+                                                {`You can manage your notifications in your user settings page.`}
                                             </FormDescription>
                                         </div>
                                     </FormItem>
