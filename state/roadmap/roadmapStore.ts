@@ -129,46 +129,40 @@ export const useRoadmapStore = create<RoadmapState>()(
             console.log(`on edges change`)
             const edges = applyEdgeChanges(changes, get().edges)
             set({ edges })
+            updateEdges({ roadmapId: get().roadmapId, edges }) // update DB edges
 
-            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
-            if (response?.success && response?.data) {
-                // set({ edges })
-                return response.data as Edge[]
-            } else {
-                console.error(`Error updating Flow Edges`, response?.error)
-            }
+            // const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            // if (response?.success && response?.data) {
+            //     // set({ edges })
+            //     return response.data as Edge[]
+            // } else {
+            //     console.error(`Error updating Flow Edges`, response?.error)
+            // }
         },
         onConnect: async (connection: any) => {
             console.log(`on connect`)
             const edges = addEdge(
                 {
                     ...connection,
-                    // markerEnd: {
-                    //     type: MarkerType.ArrowClosed,
-                    //     width: 20,
-                    //     height: 20,
-                    //     color: 'black'
-                    // },
                     style: { stroke: 'black' }
                 },
                 get().edges
             )
             set({ edges })
+            updateEdges({ roadmapId: get().roadmapId, edges }) // update DB edges
 
-            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
-            if (response?.success && response?.data) {
-                // set({ edges })
-                return response.data as Edge[]
-            } else {
-                console.error(`Error updating Flow Edges`, response?.error)
-            }
+            // const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            // if (response?.success && response?.data) {
+            //     // set({ edges })
+            //     return response.data as Edge[]
+            // } else {
+            //     console.error(`Error updating Flow Edges`, response?.error)
+            // }
         },
         setNodes: async (nodes: Node[]) => {
             console.log(`set nodes`)
             set({ nodes })
-
-            // updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
-            debounceUpdateFlow( get().roadmapId, nodes, get().edges )
+            updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
 
             // const response = await updateDBFlow({ roadmapId: get().roadmapId, nodes, edges: get().edges })
             // if (response?.success && response?.data) {
@@ -193,21 +187,22 @@ export const useRoadmapStore = create<RoadmapState>()(
         setEdges: async (edges: Edge[]) => {
             console.log(`set edges`)
             set({ edges })
+            updateEdges({ roadmapId: get().roadmapId, edges }) // update DB edges
 
-            const response = await updateEdges({ roadmapId: get().roadmapId, edges })
-            if (response?.success && response?.data) {
-                // set({ edges })
+            // const response = await updateEdges({ roadmapId: get().roadmapId, edges })
+            // if (response?.success && response?.data) {
+            //     // set({ edges })
 
-                return response.data as Edge[]
-            } else {
-                console.error(`Error updating Flow Edges`, response?.error)
-            }
+            //     return response.data as Edge[]
+            // } else {
+            //     console.error(`Error updating Flow Edges`, response?.error)
+            // }
         },
         addNodes: async (nodes: Node[]) => {
             console.log(`add nodes`)
             set({ nodes: [...get().nodes, ...nodes], milestones: [...get().milestones, ...nodes.map(node => node.data)] })
+            createNodes({ roadmapId: get().roadmapId, nodes }) // update DB Nodes
             
-            const response = await createNodes({ roadmapId: get().roadmapId, nodes })
             // const response = await createNodes({ roadmapId: null, nodes: newNodes })
             // if (response?.success && response?.data && response.data.nodes && response.data.milestones) {
             //     const updatedNodes = [
@@ -247,10 +242,10 @@ export const useRoadmapStore = create<RoadmapState>()(
             const milestones = get().milestones.filter(milestone =>
                 milestone.nodeId !== nodeId
             )
-            set({ nodes, milestones })
+            set({ nodes, milestones, selectedNodeId: null })
+            deleteNode(nodeId) // update DB nodes
 
-            const response = await deleteNode(nodeId)
-
+            // const response = await deleteNode(nodeId)
             // if (response?.success && response?.data) {
             //     const nodes = [...get().nodes].filter(({ id }) => id !== response.data.id)
             //     const milestones = get().milestones.filter(milestone =>
