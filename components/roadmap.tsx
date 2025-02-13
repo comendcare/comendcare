@@ -63,8 +63,9 @@ export function Roadmap({data}: {data: any}) {
             params.delete("view")
         }
 
-        // window.history.replaceState(null, "", `${pathname}?${params.toString()}`)
-        router.replace(`${pathname}?${params}`)
+        // ensure shallow url update
+        const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
+        window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
     }, [selectedNodeId, selectedView])
     
 
