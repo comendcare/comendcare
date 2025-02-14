@@ -276,17 +276,17 @@ export const NODE_TYPE_OPTIONS: Option[] = [
     { 
         label: 'RFP (Request for Proposals)', 
         value: 'RFP',
-        description: 'A milestone you’re interested in supporting through funding and/or other resources.'
+        description: 'An RFP is a milestone you’re interested in supporting through funding and/or other resources.'
     },
     { 
         label: 'Project', 
         value: 'PROJECT',
-        description: 'A milestone that is being planned or is under development.'
+        description: 'A project is a milestone that is being planned or is under development.'
     },
     { 
         label: 'Asset', 
         value: 'ASSET',
-        description: 'A milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
+        description: 'An asset is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
     },
 ]
 
