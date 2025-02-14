@@ -77,6 +77,7 @@ export const PrivateFlowView = ({
     const { startOnborda } = useOnborda()
     const { screenToFlowPosition } = useReactFlow()
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+    const pathname = usePathname()
 
     useEffect(() => {
         setLocalNodes(nodes)
@@ -240,8 +241,8 @@ export const PrivateFlowView = ({
                     }])
                 }
             },
-            // first node is the onboarding node
-            onboardingMilestone: index === 0
+            // last node is the onboarding node
+            onboardingMilestone: index === (localNodes.length - 1)
         }
     }))
 
@@ -264,8 +265,35 @@ export const PrivateFlowView = ({
     // }, [width, selectedNodeId])
 
     useEffect(() => {
-        if (!isOnboarded('research-plan-tour')) {
-            startOnbordaAndRemoveToast()
+        // if (!isOnboarded('research-plan-tour')) {
+        //     startOnbordaAndRemoveToast()
+        // }
+
+        // Only start tour if user is new and is on the /app/profile page
+        if (pathname === '/app/research-plan' && !isOnboarded('research-plan-tour')) {
+            toast("Welcome to Comend!", {
+                id: "onborda",
+                duration: 300000,
+                position: "bottom-left",
+                description: `Would you like to take a quick tour?`,
+                action: (
+                    <div className="flex flex-col space-y-2 ml-4">
+                        <Button
+                            onClick={() => startOnbordaAndRemoveToast()}
+                        >
+                            {`Yes please!`}
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                toast.dismiss()
+                                setOnboarded('research-plan-tour')
+                            }}
+                        >
+                            {`No thanks!`}
+                        </Button>
+                    </div>
+                )
+            })
         }
     }, [localNodes])
 
