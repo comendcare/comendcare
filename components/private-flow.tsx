@@ -66,7 +66,7 @@ export const PrivateFlowView = ({
         addNodes,
         onConnect,
     } = useRoadmapStore(useShallow(selector))
-    const { fitView } = useReactFlow()
+    // const { fitView } = useReactFlow()
     const store = useStoreApi()
     const router = useRouter()
     const nodeTypes = { PROJECT: PrivateMilestoneNode, ASSET: PrivateMilestoneNode, RFP: PrivateMilestoneNode }
@@ -251,17 +251,17 @@ export const PrivateFlowView = ({
     }))
 
     // when the handle is adjusted (width changes) or a node is selected (details panel opens), fit the view
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (selectedNodeId) {
-                fitView({ nodes: [{ id: selectedNodeId }], padding: 2 })
-            } else {
-                fitView({ nodes: localNodes.map(node => ({ id: node.id })), padding: 0.4 })
-            }
-        }, 1) // Delay by a short time to allow layout adjustment
+    // useEffect(() => {
+    //     const timer = setTimeout(() => {
+    //         if (selectedNodeId) {
+    //             fitView({ nodes: [{ id: selectedNodeId }], padding: 2 })
+    //         } else {
+    //             fitView({ nodes: localNodes.map(node => ({ id: node.id })), padding: 0.4 })
+    //         }
+    //     }, 1) // Delay by a short time to allow layout adjustment
 
-        return () => clearTimeout(timer)
-    }, [width, selectedNodeId])
+    //     return () => clearTimeout(timer)
+    // }, [width, selectedNodeId])
 
     useEffect(() => {
         if (!isOnboarded('research-plan-tour')) {
@@ -290,7 +290,7 @@ export const PrivateFlowView = ({
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             fitView
-            fitViewOptions={{ padding: 2 }}
+            fitViewOptions={{ padding: 0.2 }}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
             minZoom={0.1}
