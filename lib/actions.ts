@@ -1484,6 +1484,8 @@ export async function acceptInvitation(invitationId: string) {
             }),
         ]);
 
+        revalidatePath("/app/profile")
+
         return {success: true, data: invitation};
     } catch (error) {
         console.error();
@@ -1547,8 +1549,6 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
         }
     })
 
-    // await sleep(5000)
-
     // if a roadmap template was provided, create the relevant nodes, milestones, and edges
     if (roadmapTemplate?.milestones) {
         const milestones = roadmapTemplate.milestones
@@ -1581,15 +1581,15 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
 
                 // grab milestone so we can add tasks
                 // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
-                const newMilestone = await prisma.milestone.findUnique({
-                    where: {nodeId: node.id},
-                    include: {
-                        attachments: true,
-                        contacts: true,
-                        tasks: true,
-                        node: true
-                    }
-                })
+                // const newMilestone = await prisma.milestone.findUnique({
+                //     where: {nodeId: node.id},
+                //     include: {
+                //         attachments: true,
+                //         contacts: true,
+                //         tasks: true,
+                //         node: true
+                //     }
+                // })
 
                 // create tasks for relevant milestone
                 // if (newMilestone) {
@@ -2016,8 +2016,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         await Promise.all(
             milestones.map(async (milestone: any) => {
                 const previousMilestone = await prisma.milestone.findUnique({
-                    where: {nodeId: milestone.nodeId},
-                    // where: {id: milestone.id},
+                    // where: {nodeId: milestone.nodeId},
+                    where: {id: milestone.id},
                     include: {
                         attachments: true,
                         contacts: true,
@@ -2032,7 +2032,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                 }
 
                 let m = await prisma.milestone.update({
-                    where: {nodeId: milestone.nodeId},
+                    // where: {nodeId: milestone.nodeId},
+                    where: {id: milestone.id},
                     include: {
                         attachments: true,
                         contacts: true,
@@ -2050,7 +2051,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         attachments: {
                             deleteMany: {}, // clear all existing attachments
                             createMany: {
-                                data: milestone.attachments.map((attachment: any) => ({
+                                data: (milestone?.attachments || []).map((attachment: any) => ({
                                     link: attachment.link,
                                     ...(attachment.name ? {name: attachment.name} : undefined)
                                 }))
@@ -2059,7 +2060,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         contacts: {
                             deleteMany: {},
                             createMany: {
-                                data: milestone.contacts.map((contact: any) => ({
+                                data: (milestone?.contacts || []).map((contact: any) => ({
                                     name: contact.name,
                                     email: contact.email,
                                     ...(contact.role ? {role: contact.role} : undefined),
@@ -2080,7 +2081,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
 
                 console.log(`updated milestone`, m)
 
-                updatedMilestones.push(m)
+                updatedMilestones = [...updatedMilestones, m]
             })
         )
 
@@ -2129,7 +2130,7 @@ export async function createKanban(orgId: string) {
 
         return {success: true, data: newKanban}
     } catch (error: any) {
-        logError(`Error creating kanban task for ${orgId}`, error)
+        logError(`Error creating task for ${orgId}`, error)
         return {success: false, error: "Internal server error"}
     }
 }
@@ -2138,7 +2139,7 @@ export async function createKanban(orgId: string) {
 export async function createColumn(column: Partial<Column>) {
     try {
         const {data: kanban} = await getKanbanFromOrganizationId()
-        if (!kanban) return {success: false, error: "failed to find associated kanban board"}
+        if (!kanban) return {success: false, error: "failed to find associated task board"}
 
         const newColumn = await prisma.column.create({
             data: {
@@ -2152,14 +2153,14 @@ export async function createColumn(column: Partial<Column>) {
         })
 
         if (!newColumn) {
-            return {success: false, error: "failed to create kanban column"};
+            return {success: false, error: "failed to create column"};
         }
 
         // Typesense - if updating typesense, update here...
 
         return {success: true, data: newColumn};
     } catch (error: any) {
-        logError("Error creating kanban column", error);
+        logError("Error creating column", error);
         return {success: false, error: "Internal server error"};
     }
 }
@@ -2204,14 +2205,14 @@ export async function deleteColumn(columnId: string) {
         })
 
         if (!deletedColumn) {
-            return {success: false, error: "failed to delete kanban column"};
+            return {success: false, error: "failed to delete column"};
         }
 
         // Typesense - if updating typesense, update here...
 
         return {success: true, data: deletedColumn};
     } catch (error: any) {
-        logError("Error deleting kanban column", error);
+        logError("Error deleting column", error);
         return {success: false, error: "Internal server error"};
     }
 }
@@ -2344,14 +2345,14 @@ export async function deleteTask(taskId: string) {
         })
 
         if (!deletedTask) {
-            return {success: false, error: "failed to delete kanban task"};
+            return {success: false, error: "failed to delete task"};
         }
 
         // Typesense - if updating typesense, update here...
 
         return {success: true, data: deletedTask};
     } catch (error: any) {
-        logError("Error deleting kanban task", error);
+        logError("Error deleting task", error);
         return {success: false, error: "Internal server error"};
     }
 }

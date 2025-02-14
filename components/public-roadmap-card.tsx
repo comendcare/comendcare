@@ -152,7 +152,7 @@ export const RoadmapCard = ({roadmap, subdomain, isPublic}: { roadmap: any, subd
                                             urlMilestone={urlMilestone || undefined} externalLinks={!isPublic}/>
                     </TabsContent>
                     <TabsContent value="flow" className="space-y-4 w-full">
-                        <div className="h-[800px] w-full">
+                        <div className="h-[40vh] w-full">
                             <PublicFlowView roadmap={roadmap} subdomain={subdomain}
                                             urlMilestone={urlMilestone || undefined} externalLinks={!isPublic}/>
                         </div>

@@ -41,21 +41,21 @@ export default function OnboardingWelcomePage() {
             <div className="grid grid-cols-2 gap-8">
                 {/* Left side: Form */}
                 <div className="col-span-1 space-y-6">
-                    <h1 className="text-xl font-semibold">
-                        {`We'll ask you questions here.`}
-                    </h1>
-                    <div className="flex flex-col space-y-4">
-                        {/* Form header */}
-                        <div className="h-6 w-1/3 border-dashed border-2 border-gray-400 rounded"></div>
-                        {/* Form inputs */}
-                        <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>
-                        <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>
-                        <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>
-                        <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>
-                        <div className="h-10 w-2/3 border-dashed border-2 border-gray-400 rounded-md"></div>
-                        {/* Button */}
-                        <div className="h-10 w-1/4 border-dashed border-2 border-gray-400 rounded-md"></div>
-                    </div>
+                    {/*<h1 className="text-xl font-semibold">*/}
+                    {/*    {`We'll ask you questions here.`}*/}
+                    {/*</h1>*/}
+                    {/*<div className="flex flex-col space-y-4">*/}
+                    {/*    /!* Form header *!/*/}
+                    {/*    <div className="h-6 w-1/3 border-dashed border-2 border-gray-400 rounded"></div>*/}
+                    {/*    /!* Form inputs *!/*/}
+                    {/*    <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>*/}
+                    {/*    <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>*/}
+                    {/*    <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>*/}
+                    {/*    <div className="h-10 w-full border-dashed border-2 border-gray-400 rounded-md"></div>*/}
+                    {/*    <div className="h-10 w-2/3 border-dashed border-2 border-gray-400 rounded-md"></div>*/}
+                    {/*    /!* Button *!/*/}
+                    {/*    <div className="h-10 w-1/4 border-dashed border-2 border-gray-400 rounded-md"></div>*/}
+                    {/*</div>*/}
                     <Button
                         variant="default"
                         onClick={() => router.push("/onboarding/user")}
@@ -64,28 +64,28 @@ export default function OnboardingWelcomePage() {
                     </Button>
                 </div>
 
-                {/* Right side: Platform preview */}
-                {/*<div className="col-span-1 space-y-6">*/}
-                {/*    <h1 className="text-xl font-semibold">*/}
-                {/*        {`We'll show you how your information will be used here.`}*/}
-                {/*    </h1>*/}
-                {/*    <div className="space-y-4">*/}
-                {/*        /!* Image preview *!/*/}
-                {/*        <div className="h-[150px] w-full border-dashed border-2 border-gray-400 rounded-xl"></div>*/}
-                {/*        /!* Information section *!/*/}
-                {/*        <div className="space-y-2">*/}
-                {/*            <div className="h-6 w-1/2 border-dashed border-2 border-gray-400 rounded"></div>*/}
-                {/*            <div className="h-4 w-3/4 border-dashed border-2 border-gray-400 rounded"></div>*/}
-                {/*            <div className="h-4 w-1/2 border-dashed border-2 border-gray-400 rounded"></div>*/}
-                {/*        </div>*/}
-                {/*        /!* Additional example data *!/*/}
-                {/*        <div className="space-y-2">*/}
-                {/*            <div className="h-6 w-2/3 border-dashed border-2 border-gray-400 rounded"></div>*/}
-                {/*            <div className="h-4 w-full border-dashed border-2 border-gray-400 rounded"></div>*/}
-                {/*            <div className="h-4 w-3/4 border-dashed border-2 border-gray-400 rounded"></div>*/}
-                {/*        </div>*/}
-                {/*    </div>*/}
-                {/*</div>*/}
+            {/*     Right side: Platform preview */}
+            {/*    <div className="col-span-1 space-y-6">*/}
+            {/*        <h1 className="text-xl font-semibold">*/}
+            {/*            {`We'll show you how your information will be used here.`}*/}
+            {/*        </h1>*/}
+            {/*        <div className="space-y-4">*/}
+            {/*            /!* Image preview *!/*/}
+            {/*            <div className="h-[150px] w-full border-dashed border-2 border-gray-400 rounded-xl"></div>*/}
+            {/*            /!* Information section *!/*/}
+            {/*            <div className="space-y-2">*/}
+            {/*                <div className="h-6 w-1/2 border-dashed border-2 border-gray-400 rounded"></div>*/}
+            {/*                <div className="h-4 w-3/4 border-dashed border-2 border-gray-400 rounded"></div>*/}
+            {/*                <div className="h-4 w-1/2 border-dashed border-2 border-gray-400 rounded"></div>*/}
+            {/*            </div>*/}
+            {/*            /!* Additional example data *!/*/}
+            {/*            <div className="space-y-2">*/}
+            {/*                <div className="h-6 w-2/3 border-dashed border-2 border-gray-400 rounded"></div>*/}
+            {/*                <div className="h-4 w-full border-dashed border-2 border-gray-400 rounded"></div>*/}
+            {/*                <div className="h-4 w-3/4 border-dashed border-2 border-gray-400 rounded"></div>*/}
+            {/*            </div>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
             </div>
         </main>
     );

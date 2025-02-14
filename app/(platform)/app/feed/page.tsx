@@ -2,7 +2,7 @@ import NewPostDialog from "@/components/new-post-dialog";
 import {getSession} from "@/lib/auth";
 import {getOrganizationFromOrganizationId, getPosts} from "@/lib/fetchers";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
-import NoOrganizationPage from "@/components/no-organization-page";
+import NoOrganization from "@/components/no-organization";
 import Image from "next/image";
 import {PostList} from "@/components/post-list";
 
@@ -63,7 +63,7 @@ export default async function FeedPage() {
         }
     } else {
         return (
-            <NoOrganizationPage/>
+            <NoOrganization/>
         );
     }
 }

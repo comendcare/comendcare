@@ -49,10 +49,6 @@ const userFormSchema = z.object({
     image: z.string().optional(),
 });
 
-const accept = {
-    "image/*": [".jpg", ".jpeg", ".png"],
-};
-
 export default function UserOnboardingForm() {
     const router = useRouter();
     const {data: session} = useSession();
@@ -306,7 +302,7 @@ export default function UserOnboardingForm() {
                                                 {`Allow us to contact you regarding platform changes and notifications.`}
                                             </FormLabel>
                                             <FormDescription>
-                                                {`You can manage your mobile notifications in your user settings page.`}
+                                                {`You can manage your notifications in your user settings page.`}
                                             </FormDescription>
                                         </div>
                                     </FormItem>

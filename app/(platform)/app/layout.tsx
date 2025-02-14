@@ -57,12 +57,7 @@ export default function AppLayout({children}: AppLayoutProps) {
     const { startOnborda } = useOnborda()
     const pathname = usePathname()
     const { 
-        roadmapId,
-        selectedView,
-        setSelectedView,
         selectedNodeId, 
-        setSelectedNodeId, 
-        milestones, 
     } = useRoadmapStore(useShallow(selector))
     const [sidebarOpen, setSidebarOpen] = useState(selectedNodeId === null)
 
@@ -84,26 +79,20 @@ export default function AppLayout({children}: AppLayoutProps) {
         }
     }, [status])
 
-    // Zustand state management
-    // const {defaultLayout, isCollapsed, setIsCollapsed, setLayout} = useNavStore()
-
     const handleSessionUpdate = async () => {
         console.log(`session changed`, session)
         if (session) {
-            // if the roadmap is not defined, we use the loading visual
-            // if the roadmap is already initialized, we don't show the loading state as to not interrupt the user experience
-            if (!roadmapId) setIsLoading(true)
+            setIsLoading(true)
 
             if (!session.user.organizationId) {
                 console.error("Organization id is not set in the session... session data is ", session)
-                toast.error("Error, the organization id is not set.")
+                // toast.error("Error, the organization id is not set.")
                 setIsLoading(false)
                 return
             }
 
             const response = await getRoadmapId(session.user.organizationId)
             if (response.success) {
-                // setRoadmapId(response.data)
                 const nodesResponse = await getNodesEdgesAndMilestones(response.data)
                 const urlNode = searchParams.get("milestone")
                 const urlView = searchParams.get("view")
@@ -147,8 +136,6 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     useEffect(() => {
         // Only run if the session data has changed
-        console.log(`prevSession`, prevSessionRef?.current)
-        console.log(`current session`, session)
         if (JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)) {
             handleSessionUpdate()
         }

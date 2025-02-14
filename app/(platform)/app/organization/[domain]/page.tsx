@@ -87,7 +87,7 @@ export default async function OrganizationHomePage({
 
     return (
         <div
-            className="flex flex-col items-start justify-center w-full max-w-7xl mx-auto mt-8 gap-4"
+            className="flex flex-col w-full max-w-7xl mx-auto p-4 gap-4"
         >
             <Link
                 href={
@@ -95,7 +95,7 @@ export default async function OrganizationHomePage({
                         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/patient-groups`
                         : `http://localhost:3000/app/marketplace/patient-groups`
                 }
-                className="inline-flex items-center gap-x-2"
+                className="inline-flex items-center gap-x-2 hover:underline"
             >
                 <FaArrowLeftLong/>
                 Back to marketplace
@@ -107,8 +107,13 @@ export default async function OrganizationHomePage({
                     <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                         <div className="relative md:col-span-2 space-y-4">
                             <div className="sticky top-4 space-y-4">
-                                <PagProfileAboutCard organization={organization}/>
-                                <PAGProfileConditionsCard conditions={conditions}/>
+                                <PagProfileAboutCard
+                                    organization={organization}
+                                />
+                                <PAGProfileConditionsCard
+                                    conditions={conditions}
+                                    organization={organization}
+                                />
                             </div>
                         </div>
 

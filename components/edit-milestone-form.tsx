@@ -168,7 +168,7 @@ export function EditMilestoneForm({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
-            nodeType: milestoneData?.node.type || "PROJECT",
+            nodeType: milestoneData?.node?.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
             types: (milestoneData?.types || []).map((type: any) => MILESTONE_TYPE_OPTIONS.find(option => option?.value === type) || {
@@ -178,14 +178,6 @@ export function EditMilestoneForm({
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
             startDate: milestoneData?.startDate,
             endDate: milestoneData?.endDate,
-            // startDate: {
-            //     month: milestoneData?.startDate?.getMonth() ? monthsList[milestoneData?.startDate?.getMonth()] : undefined,
-            //     year: milestoneData?.startDate?.getFullYear()?.toString() || undefined
-            // },
-            // endDate: {
-            //     month: milestoneData?.endDate?.getMonth() ? monthsList[milestoneData?.endDate?.getMonth()] : undefined,
-            //     year: milestoneData?.endDate?.getFullYear()?.toString() || undefined
-            // },
             budget: milestoneData?.budget || undefined,
             attachments: milestoneData?.attachments || undefined,
             tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
@@ -442,14 +434,14 @@ export function EditMilestoneForm({
                             <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
                             <MilestoneTypeFormField form={form}/>
 
-                            {milestoneData?.node?.type === "ASSET" && (
+                            {formData.nodeType === "ASSET" && (
                                 <>
                                     <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
                                     <BudgetFormField form={form}/>
                                 </>
                             )}
 
-                            {milestoneData?.node?.type === "PROJECT" && (
+                            {formData.nodeType === "PROJECT" && (
                                 <>
                                     <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
                                     <StatusFormField form={form}/>
@@ -459,7 +451,7 @@ export function EditMilestoneForm({
                                 </>
                             )}
 
-                            {milestoneData?.node?.type === "RFP" && (
+                            {formData.nodeType === "RFP" && (
                                 <>
                                     <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
                                     <BudgetFormField form={form}/>
@@ -470,11 +462,11 @@ export function EditMilestoneForm({
                             )}
                         </FormItem>
 
-                        {milestoneData?.node?.type === "PROJECT" && (
+                        {formData.nodeType === "PROJECT" && (
                             <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
                         )}
 
-                        {milestoneData?.node?.type === "RFP" && (
+                        {formData.nodeType === "RFP" && (
                             <TimelineFormField form={form} startLabel={"Request Opens"}
                                                endLabel={"Deadline for Proposals"}/>
                         )}
@@ -906,7 +898,7 @@ const TasksFormField = ({
             await setTasks(updatedValues)
             // toast('Success!', {
             //     position: "bottom-left",
-            //     description: 'The changes to your kanban tasks have been successfully saved.'
+            //     description: 'The changes to your tasks have been successfully saved.'
             // })
         }, 500), []
     )
@@ -1014,7 +1006,7 @@ const TasksFormField = ({
                                             form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                         }}
                                     >
-                                        {`Add a new kanban task`}
+                                        {`Add a new task`}
                                     </Button>
                                 </div>
                             </div>
@@ -1323,9 +1315,9 @@ const LinkTask = ({milestoneId, kanbanTasks, onLink}: {
             }}
         >
             {kanbanTasks?.filter((task: any) => task.milestoneId === milestoneId).length === 0 ? (
-                `Link kanban task`
+                `Link task`
             ) : (
-                `Link another kanban task`
+                `Link another task`
             )}
         </Button>
     )

@@ -43,10 +43,10 @@ const data = {
             url: `/app/research-plan`
         },
         {
-            title: "Kanban",
+            title: "Task Board",
             icon: Pin,
             variant: "ghost",
-            url: "/app/kanban"
+            url: "/app/task-board"
         },
         {
             title: "Marketplace",
