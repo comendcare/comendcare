@@ -67,7 +67,7 @@ export function KanbanView() {
                 </div>
                 <NewColumnDialog />
             </div>
-            <ScrollArea type="always" className="pr-4 pb-4">
+            <ScrollArea className="pr-4 pb-4">
                 <div>
                     <TabsContent value="team" className="mt-0">
                         <Kanban
