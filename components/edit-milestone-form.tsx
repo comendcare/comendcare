@@ -541,6 +541,7 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                             </Select> */}
                             <MultipleSelector
                                 {...field}
+                                maxSelected={3}
                                 defaultOptions={MILESTONE_TYPE_OPTIONS}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
