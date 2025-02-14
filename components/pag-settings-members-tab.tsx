@@ -7,7 +7,7 @@ import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog";
 import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button";
 import MembersDropdown from "@/components/members-dropdown";
 
-export default async function PAGDashboardMembersTab() {
+export default async function PAGSettingsMembersTab() {
     const session = await getSession()
 
     if (!session?.user?.organizationId) {
