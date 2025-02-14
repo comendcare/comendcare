@@ -170,18 +170,21 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
     })
 
     return (
-        <ScrollArea
-            className={variations({
-                dragging: dndContext.active ? "active" : "default"
-            })}
-            type="auto"
-        >
-            {/* calculate the same height as the parent TabsContent - because scroll areas don't like h-full >:( */}
-            <div className="h-[calc(100vh-10rem)] flex gap-4 items-start flex-row justify-start">
-                <NewColumnDialog/>
-                {children}
-            </div>
-            <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+        // <ScrollArea
+        //     className={variations({
+        //         dragging: dndContext.active ? "active" : "default"
+        //     })}
+        //     type="auto"
+        // >
+        //     {/* calculate the same height as the parent TabsContent - because scroll areas don't like h-full >:( */}
+        //     <div className="h-[calc(100vh-10rem)] flex gap-4 items-start flex-row justify-start">
+        //         {children}
+        //     </div>
+        //     <ScrollBar orientation="horizontal" />
+        // </ScrollArea>
+
+        <div className="h-[calc(100vh-10rem)] flex gap-4 items-start flex-row justify-start">
+            {children}
+        </div>
     )
 }
