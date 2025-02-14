@@ -134,7 +134,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
                                 Delete Organization
                             </span>
                             <span className="text-sm text-gray-500">
-                                This will delete all memberships, roadmaps, and kanban tasks from this organization.
+                                This will delete all memberships, roadmaps, and tasks from this organization.
                                 This organization will then be permanently deleted.
                             </span>
                         </span>
