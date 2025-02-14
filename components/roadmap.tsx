@@ -111,7 +111,7 @@ export function Roadmap({data}: {data: any}) {
                         {/* Flow View */}
                         <TabsContent
                             value="flow"
-                            className="mt-0 h-[calc(100vh-6rem)]"
+                            className="m-0 h-[calc(100vh-6rem)]"
                         >
                             <PrivateFlowView
                                 width={defaultLayout[0]}

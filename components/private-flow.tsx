@@ -305,7 +305,7 @@ export const PrivateFlowView = ({
     }
 
     return (
-        <>
+        <div className="h-full w-full pb-6">
         <ReactFlow
             width={width}
             nodes={updatedNodes}
@@ -410,6 +410,6 @@ export const PrivateFlowView = ({
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
         </Dialog>
-        </>
+        </div>
     )
 }
