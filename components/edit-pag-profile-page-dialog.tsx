@@ -34,7 +34,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {cn, formatMoney, formatNumberWithCommas, getPublicFile, sleep, years} from "@/lib/utils";
+import {acceptedFiletypes, cn, formatNumberWithCommas, getPublicFile, sleep, years} from "@/lib/utils";
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
@@ -70,10 +70,6 @@ const OPTIONS: Option[] = [
         strengths: 'Provides full-stack capabilities with SSR, optimized for caching and streaming, and excellent support for nested routing.',
     },
 ];
-
-const accept = {
-    "image/*": [".jpg", ".jpeg", ".png"],
-};
 
 const optionSchema = z.object({
     label: z.string(),
@@ -515,6 +511,8 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
                 numberOfPatientsEngaged: values.engaged ? parseInt(values.engaged, 10) : null,
+                nationalEstimatedPopulation: values.engaged ? parseInt(values.national ?? "0", 10) : null,
+                globalEstimatedPopulation: values.engaged ? parseInt(values.global ?? "0", 10) : null,
                 relevantDiseaseMechanisms: values.mechanisms || [],
                 causalGenes: values.causal?.map((item) => item.label) || [],
                 associatedGenes: values.genes?.map((item) => item.label) || [],
@@ -622,7 +620,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                         Edit profile
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="max-h-[800px] overflow-y-auto">
+                <DialogContent className="max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
                             Edit organization profile
@@ -801,7 +799,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                                 <RadioGroupItem value="YES"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
-                                                                Yes I have a 501c3
+                                                                {`Yes, I have a 501c3`}
                                                             </FormLabel>
                                                         </FormItem>
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
@@ -817,7 +815,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                                 <RadioGroupItem value="NO"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
-                                                                {`No I don't have a 501c3`}
+                                                                {`No, I don't have a 501c3`}
                                                             </FormLabel>
                                                         </FormItem>
                                                     </RadioGroup>
@@ -963,6 +961,9 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Causal genes</FormLabel>
+                                                <FormDescription>
+                                                    Select all that apply.
+                                                </FormDescription>
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
@@ -985,6 +986,9 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Associated genes</FormLabel>
+                                                <FormDescription>
+                                                    Select all that apply.
+                                                </FormDescription>
                                                 {/*<FormDescription>{`The genes associated with your condition.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <MultipleSelector
@@ -1011,7 +1015,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                     Mechanisms of action
                                                 </FormLabel>
                                                 <FormDescription className="flex items-center">
-                                                    {`What types of genetic effects are you investigating?`}
+                                                    {`What types of genetic effects are you investigating? Select all that apply.`}
                                                 </FormDescription>
                                                 <FormControl>
                                                     <MultipleSelector
@@ -1049,7 +1053,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         render={({field}) => (
                                             <FormItem>
                                                 <FormLabel>Associated systems</FormLabel>
-                                                <FormDescription>{`The systems affected by your condition.`}</FormDescription>
+                                                <FormDescription>{`The systems affected by your condition. Select all that apply.`}</FormDescription>
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
@@ -1088,6 +1092,9 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                 <FormLabel>
                                                     Therapeutics under development
                                                 </FormLabel>
+                                                <FormDescription>
+                                                    Select all that apply.
+                                                </FormDescription>
                                                 <FormControl>
                                                     <MultipleSelector
                                                         {...field}
@@ -1127,7 +1134,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                     Therapeutics of interest
                                                 </FormLabel>
                                                 <FormDescription className="flex items-center">
-                                                    {`The treatment modalities of interest of your organization.`}
+                                                    {`The treatment modalities of interest of your organization. Select all that apply.`}
                                                     <Tooltip delayDuration={0}>
                                                         <TooltipTrigger>
                                                             <FaQuestionCircle
@@ -1218,7 +1225,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         name="engaged"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Number of patients engaged`} - {formatNumberWithCommas(field.value)}</FormLabel>
+                                                <FormLabel>{`Number of patients engaged`}</FormLabel>
                                                 <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
                                                 <FormControl>
                                                     <Input
@@ -1237,7 +1244,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         name="national"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Estimated number of patients in the US`} - {formatNumberWithCommas(field.value)}</FormLabel>
+                                                <FormLabel>{`Estimated number of patients in the US`}</FormLabel>
                                                 {/*<FormDescription>{`The estimated number of patients in the US.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
@@ -1256,7 +1263,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         name="global"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Estimated number of patients in the world`} - {formatNumberWithCommas(field.value)}</FormLabel>
+                                                <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
                                                 {/*<FormDescription>{`The estimated number of patients in the world.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
@@ -1460,7 +1467,7 @@ export const FormImageCropper = ({
 
     const {getRootProps, getInputProps} = useDropzone({
         onDrop: onDrop,
-        accept,
+        accept: acceptedFiletypes,
         noClick: true
     });
 
@@ -1468,7 +1475,7 @@ export const FormImageCropper = ({
     const handleClick = async () => {
         setSelectedFile(null) // de-select any previously selected file
         await sleep(100) // allow file de-select to take effect
-    
+
         fileInputRef.current?.click() // Open file dialog
     };
 
@@ -1513,7 +1520,7 @@ export const FormImageCropper = ({
                                     className={cn("size-36 cursor-pointer ring-offset-2 ring-2 ring-slate-200", className)}
                                 >
                                     <input
-                                        type="file" 
+                                        type="file"
                                         accept="image/jpg, image/jpeg, image/png"
                                         // callback ref, so we can trigger opening the file select dialog from inside ImageCropper
                                         ref={setFileInputRef}

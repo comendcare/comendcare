@@ -29,6 +29,8 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {useSession} from "next-auth/react"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "./ui/select"
 import {Column} from "@/lib/actions"
+import NewColumnDialog from "./new-column-dialog"
+import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 
 export type ColumnId = string
 
@@ -44,8 +46,8 @@ export function KanbanView() {
     const [sortBy, setSortBy] = useState<string>('default')
 
     return (
-        <Tabs defaultValue="team" className="w-full">
-            <div className="flex flex-row gap-4 items-center justify-between">
+        <Tabs defaultValue="team" className="w-full p-4 flex flex-col gap-4">
+            <div className="flex flex-row gap-4 items-center justify-start">
                 <TabsList className="grid w-[400px] grid-cols-2">
                     <TabsTrigger value="team">Team Tasks</TabsTrigger>
                     <TabsTrigger value="personal">My Tasks</TabsTrigger>
@@ -63,23 +65,30 @@ export function KanbanView() {
                         </SelectContent>
                     </Select>
                 </div>
+                <NewColumnDialog />
             </div>
-            <TabsContent value="team">
-                <Kanban
-                    initColumns={columns}
-                    initTasks={tasks}
-                    filter={"team"}
-                    sortBy={sortBy}
-                />
-            </TabsContent>
-            <TabsContent value="personal">
-                <Kanban
-                    initColumns={columns}
-                    initTasks={tasks}
-                    filter={"personal"}
-                    sortBy={sortBy}
-                />
-            </TabsContent>
+            <ScrollArea className="pr-4 pb-4">
+                <div>
+                    <TabsContent value="team" className="mt-0">
+                        <Kanban
+                            initColumns={columns}
+                            initTasks={tasks}
+                            filter={"team"}
+                            sortBy={sortBy}
+                        />
+                    </TabsContent>
+                    <TabsContent value="personal" className="mt-0">
+                        <Kanban
+                            initColumns={columns}
+                            initTasks={tasks}
+                            filter={"personal"}
+                            sortBy={sortBy}
+                        />
+                    </TabsContent>
+                </div>
+                <ScrollBar orientation="horizontal"/>
+                <ScrollBar orientation="vertical"/>
+            </ScrollArea>
         </Tabs>
     )
 }
@@ -97,9 +106,7 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
         setTasks: setDbTasks,
         setColumns: setDbColumns
     } = useKanbanStore(useShallow(kanbanSelector))
-    const [columns, setColumns] = useState<Column[]>([])
     const pickedUpTaskColumn = useRef<ColumnId | null>(null)
-    const columnsId = useMemo(() => columns?.map(col => col.id), [columns])
 
     const sensors = useSensors(
         useSensor(MouseSensor),
@@ -146,11 +153,25 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
         return taskList
     }
 
+    const sortKanbanColumns = (columnList: Column[]) => {
+        // columns are always sorted by default order (manually set by user)
+        columnList = columnList?.sort((a: Column, b: Column) => {
+            if (a.kanbanPosition !== undefined && b.kanbanPosition !== undefined && a.kanbanPosition !== b.kanbanPosition) {
+                return a.kanbanPosition - b.kanbanPosition
+            }
+            return 0
+        })
+
+        return columnList
+    }
+
     // kanban requires its own state outside of the zustand state, so we can move things around properly
     const [tasks, setTasks] = useState<Task[]>(sortKanbanTasks(initTasks))
+    const [columns, setColumns] = useState<Column[]>(sortKanbanColumns(initColumns))
+
+    const columnIds = useMemo(() => { return columns.map(col => col.id) }, [columns])
 
     const [activeColumn, setActiveColumn] = useState<Column | null>(null)
-
     const [activeTask, setActiveTask] = useState<Task | null>(null)
 
     useEffect(() => {
@@ -175,13 +196,13 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
         onDragStart({active}) {
             if (!hasDraggableData(active)) return
             if (active.data.current?.type === "Column") {
-                const startColumnIdx = columnsId.findIndex(
+                const startColumnIdx = columnIds.findIndex(
                     id => id === active.id
                 )
                 const startColumn = columns[startColumnIdx]
                 return `Picked up Column ${startColumn?.name} at position: ${
                     startColumnIdx + 1
-                } of ${columnsId.length}`
+                } of ${columnIds.length}`
             } else if (active.data.current?.type === "Task") {
                 pickedUpTaskColumn.current = active.data.current.task.columnId
                 const {tasksInColumn, taskPosition, column} =
@@ -200,10 +221,10 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
                 active.data.current?.type === "Column" &&
                 over.data.current?.type === "Column"
             ) {
-                const overColumnIdx = columnsId.findIndex(id => id === over.id)
+                const overColumnIdx = columnIds.findIndex(id => id === over.id)
                 return `Column ${active.data.current.column.name} was moved over ${
                     over.data.current.column.name
-                } at position ${overColumnIdx + 1} of ${columnsId.length}`
+                } at position ${overColumnIdx + 1} of ${columnIds.length}`
             } else if (
                 active.data.current?.type === "Task" &&
                 over.data.current?.type === "Task"
@@ -237,14 +258,14 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
                 active.data.current?.type === "Column" &&
                 over.data.current?.type === "Column"
             ) {
-                const overColumnPosition = columnsId.findIndex(
+                const overColumnPosition = columnIds.findIndex(
                     id => id === over.id
                 )
 
                 return `Column ${
                     active.data.current.column.name
                 } was dropped into position ${overColumnPosition + 1} of ${
-                    columnsId.length
+                    columnIds.length
                 }`
             } else if (
                 active.data.current?.type === "Task" &&
@@ -296,35 +317,19 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
         setActiveColumn(null)
         setActiveTask(null)
 
-        setDbTasks(tasks.map((task, index) => (
-            {...task, kanbanPosition: index}
-        )))
+        if (event?.active?.data?.current?.type === "Column") {
+            setDbColumns(columns.map((col, index) => (
+                {...col, kanbanPosition: index}
+            )))
+            return
+        }
 
-        const {active, over} = event
-        if (!over) return
-
-        const activeId = active.id
-        const overId = over.id
-
-        if (!hasDraggableData(active)) return
-
-        const activeData = active.data.current
-
-        if (activeId === overId) return
-
-        const isActiveAColumn = activeData?.type === "Column"
-        if (!isActiveAColumn) return
-
-        const activeColumnIndex = columns.findIndex(
-            col => col.id === activeId
-        )
-
-        const overColumnIndex = columns.findIndex(col => col.id === overId)
-
-        setDbColumns(
-            arrayMove(columns, activeColumnIndex, overColumnIndex)
-                .map((col, index) => ({...col, kanbanPosition: index}))
-        )
+        if (event?.active?.data?.current?.type === "Task") {
+            setDbTasks(tasks.map((task, index) => (
+                {...task, kanbanPosition: index}
+            )))
+            return
+        }
     }
 
     function onDragOver(event: DragOverEvent) {
@@ -342,13 +347,30 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
         const overData = over.data.current
 
         const isActiveATask = activeData?.type === "Task"
+        const isActiveAColumn = activeData?.type === "Column"
         const isOverATask = overData?.type === "Task"
+        const isOverAColumn = overData?.type === "Column"
 
-        if (!isActiveATask) return
+        if (isActiveATask) {
+            // Im dropping a Task over another Task
+            if (isActiveATask && isOverATask) {
+                setTasks(tasks => {
+                    const activeIndex = tasks.findIndex((t: any) => t.id === activeId)
+                    const overIndex = tasks.findIndex((t: any) => t.id === overId)
+                    const activeTask = tasks[activeIndex]
+                    const overTask = tasks[overIndex]
+                    if (
+                        activeTask &&
+                        overTask &&
+                        activeTask.columnId !== overTask.columnId
+                    ) {
+                        activeTask.columnId = overTask.columnId
+                        return arrayMove(tasks, activeIndex, overIndex - 1)
+                    }
 
-        // Im dropping a Task over another Task
-        if (isActiveATask && isOverATask) {
-            setTasks(tasks => {
+                    return arrayMove(tasks, activeIndex, overIndex)
+                })
+
                 const activeIndex = tasks.findIndex((t: any) => t.id === activeId)
                 const overIndex = tasks.findIndex((t: any) => t.id === overId)
                 const activeTask = tasks[activeIndex]
@@ -363,29 +385,22 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
                 }
 
                 return arrayMove(tasks, activeIndex, overIndex)
-            })
-
-            const activeIndex = tasks.findIndex((t: any) => t.id === activeId)
-            const overIndex = tasks.findIndex((t: any) => t.id === overId)
-            const activeTask = tasks[activeIndex]
-            const overTask = tasks[overIndex]
-            if (
-                activeTask &&
-                overTask &&
-                activeTask.columnId !== overTask.columnId
-            ) {
-                activeTask.columnId = overTask.columnId
-                return arrayMove(tasks, activeIndex, overIndex - 1)
             }
 
-            return arrayMove(tasks, activeIndex, overIndex)
-        }
+            const isOverAColumn = overData?.type === "Column"
 
-        const isOverAColumn = overData?.type === "Column"
+            // Im dropping a Task over a column
+            if (isActiveATask && isOverAColumn) {
+                setTasks(tasks => {
+                    const activeIndex = tasks.findIndex(t => t.id === activeId)
+                    const activeTask = tasks[activeIndex]
+                    if (activeTask) {
+                        activeTask.columnId = overId as ColumnId
+                        return arrayMove(tasks, activeIndex, activeIndex)
+                    }
+                    return tasks
+                })
 
-        // Im dropping a Task over a column
-        if (isActiveATask && isOverAColumn) {
-            setTasks(tasks => {
                 const activeIndex = tasks.findIndex(t => t.id === activeId)
                 const activeTask = tasks[activeIndex]
                 if (activeTask) {
@@ -393,15 +408,22 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
                     return arrayMove(tasks, activeIndex, activeIndex)
                 }
                 return tasks
-            })
-
-            const activeIndex = tasks.findIndex(t => t.id === activeId)
-            const activeTask = tasks[activeIndex]
-            if (activeTask) {
-                activeTask.columnId = overId as ColumnId
-                return arrayMove(tasks, activeIndex, activeIndex)
             }
-            return tasks
+        } else if (isActiveAColumn) {
+            // Im dropping a Column over another Column
+            if (isActiveAColumn && isOverAColumn) {
+                setColumns(columns => {
+                    const activeIndex = columns.findIndex((c: any) => c.id === activeId)
+                    const overIndex = columns.findIndex((c: any) => c.id === overId)
+
+                    return arrayMove(columns, activeIndex, overIndex)
+                })
+
+                const activeIndex = columns.findIndex((c: any) => c.id === activeId)
+                const overIndex = columns.findIndex((c: any) => c.id === overId)
+
+                return arrayMove(columns, activeIndex, overIndex)
+            }
         }
     }
 
@@ -416,10 +438,10 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
             onDragOver={onDragOver}
         >
             <BoardContainer>
-                <SortableContext items={columnsId}>
+                <SortableContext items={columnIds}>
                     {columns.length > 0 ? columns?.map((col, index) => (
                         <BoardColumn
-                            key={index}
+                            key={col.id}
                             column={col}
                             tasks={tasks?.filter(task => {
                                 if (filter == "personal" && session?.user.id && !task.stakeholders?.map(stakeholder => stakeholder.userId).includes(session?.user.id)) return false

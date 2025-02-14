@@ -11,7 +11,7 @@ import PAGDashboardRequestsTab from "@/components/pag-dashboard-requests-tab";
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {getSession} from "@/lib/auth";
-import NoOrganizationPage from "@/components/no-organization-page";
+import NoOrganization from "@/components/no-organization";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import React from "react";
 
@@ -79,7 +79,7 @@ export default async function DashboardPage() {
         )
     } else {
         return (
-            <NoOrganizationPage/>
+            <NoOrganization/>
         );
     }
 }

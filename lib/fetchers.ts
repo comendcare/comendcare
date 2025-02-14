@@ -684,7 +684,7 @@ export async function getKanbanFromOrganizationId() {
 
         return {success: true, data: kanban}
     } catch (error: any) {
-        console.error("Database error finding kanban details:", error)
+        console.error("Database error finding task board details:", error)
         return {success: false, error: "Database error. please try again later."}
     }
 }
@@ -780,7 +780,7 @@ export async function getColumns(orgId: string | null | undefined): Promise<ApiR
 
             return { success: true, data: { columns: dbColumns } }
         } catch (error: any) {
-            console.error("Database error finding kanban column details:", error)
+            console.error("Database error finding column details:", error)
             return { success: false, error: "Database error. please try again later." }
         }
     }

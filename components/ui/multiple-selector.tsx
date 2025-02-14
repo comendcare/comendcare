@@ -632,6 +632,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                     onSelect={() => {
                                                                         if (selected.length >= maxSelected) {
                                                                             onMaxSelected?.(selected.length);
+                                                                            setOpen(false)
                                                                             return;
                                                                         }
                                                                         setInputValue('');
@@ -646,6 +647,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                     setSelected={setSelected}
                                                                     onChange={onChange}
                                                                     onPeek={(option) => setPeekedModel(option)}
+                                                                    setOpen={setOpen}
                                                                 />
                                                             );
                                                         })}
@@ -677,6 +679,7 @@ interface ModelItemProps {
     setSelected: any
     onChange: any
     onPeek: (option: Option) => void
+    setOpen: (open: boolean) => void
 }
 
 function SelectorItem({
@@ -687,7 +690,8 @@ function SelectorItem({
                           setInputValue,
                           setSelected,
                           onChange,
-                          onPeek
+                          onPeek,
+                          setOpen
                       }: ModelItemProps) {
     const ref = React.useRef<HTMLDivElement>(null)
 
@@ -716,12 +720,17 @@ function SelectorItem({
             onSelect={() => {
                 if (selected.length >= maxSelected) {
                     onMaxSelected?.(selected.length);
+                    setOpen(false)
                     return;
                 }
                 setInputValue('');
                 const newOptions = [...selected, option];
                 setSelected(newOptions);
                 onChange?.(newOptions);
+
+                if (newOptions.length >= maxSelected) {
+                    setOpen(false);
+                }
             }}
             className={cn(
                 'cursor-pointer',

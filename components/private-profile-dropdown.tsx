@@ -19,7 +19,7 @@ export default function PrivateProfileDropdown({subdomain}: { subdomain: string 
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="outline"
-                    className="gap-x-2"
+                    className="block xl:hidden gap-x-2"
                 >
                     <FaEllipsis className="size-6"/>
                 </Button>
