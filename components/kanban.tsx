@@ -29,6 +29,8 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {useSession} from "next-auth/react"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "./ui/select"
 import {Column} from "@/lib/actions"
+import NewColumnDialog from "./new-column-dialog"
+import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 
 export type ColumnId = string
 
@@ -44,8 +46,8 @@ export function KanbanView() {
     const [sortBy, setSortBy] = useState<string>('default')
 
     return (
-        <Tabs defaultValue="team" className="w-full">
-            <div className="flex flex-row gap-4 items-center justify-between">
+        <Tabs defaultValue="team" className="w-full p-4 flex flex-col gap-4">
+            <div className="flex flex-row gap-4 items-center justify-start">
                 <TabsList className="grid w-[400px] grid-cols-2">
                     <TabsTrigger value="team">Team Tasks</TabsTrigger>
                     <TabsTrigger value="personal">My Tasks</TabsTrigger>
@@ -63,23 +65,30 @@ export function KanbanView() {
                         </SelectContent>
                     </Select>
                 </div>
+                <NewColumnDialog />
             </div>
-            <TabsContent value="team">
-                <Kanban
-                    initColumns={columns}
-                    initTasks={tasks}
-                    filter={"team"}
-                    sortBy={sortBy}
-                />
-            </TabsContent>
-            <TabsContent value="personal">
-                <Kanban
-                    initColumns={columns}
-                    initTasks={tasks}
-                    filter={"personal"}
-                    sortBy={sortBy}
-                />
-            </TabsContent>
+            <ScrollArea type="always" className="pr-4 pb-4">
+                <div>
+                    <TabsContent value="team" className="mt-0">
+                        <Kanban
+                            initColumns={columns}
+                            initTasks={tasks}
+                            filter={"team"}
+                            sortBy={sortBy}
+                        />
+                    </TabsContent>
+                    <TabsContent value="personal" className="mt-0">
+                        <Kanban
+                            initColumns={columns}
+                            initTasks={tasks}
+                            filter={"personal"}
+                            sortBy={sortBy}
+                        />
+                    </TabsContent>
+                </div>
+                <ScrollBar orientation="horizontal"/>
+                <ScrollBar orientation="vertical"/>
+            </ScrollArea>
         </Tabs>
     )
 }

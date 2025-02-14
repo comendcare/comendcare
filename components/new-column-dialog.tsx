@@ -63,13 +63,19 @@ export default function NewColumnDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger
+            {/* <DialogTrigger
                 className={cn(
                     buttonVariants({variant: "default"}),
                     "h-full w-6 p-1 transition ease-in-out bg-gray-200 hover:translate-x-1 hover:scale-x-105 hover:bg-black duration-300"
                 )}
             >
                 <FaPlus className="h-4 w-4"/>
+            </DialogTrigger> */}
+            <DialogTrigger asChild>
+                <Button className="ml-auto">
+                    <FaPlus />
+                    Add new column
+                </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
