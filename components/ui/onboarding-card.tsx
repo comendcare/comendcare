@@ -17,6 +17,7 @@ const selector = (state: RoadmapState) => ({
     setOnboardingActive: state.setOnboardingActive,
     nodes: state.nodes,
     addNodes: state.addNodes,
+    selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId
 })
 
@@ -35,6 +36,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         setOnboardingActive,
         nodes,
         addNodes,
+        selectedNodeId,
         setSelectedNodeId
     } = useRoadmapStore(useShallow(selector))
 
@@ -100,7 +102,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
 
     const handleNextStep = async (e: any) => {
         e.preventDefault()
-        let onboardingNodeId: string | undefined = nodes[0]?.id
+        let onboardingNodeId = selectedNodeId || nodes[0]?.id
 
         // execute any actions that need to occur before we move to the next step
         if (step.selector === '.research-plan-tour-step1') {
@@ -110,16 +112,10 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
                 onboardingNodeId = newNode.id
             }
 
-            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2 })
+            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
         }
         if (step.selector === '.research-plan-tour-step2') {
             setSelectedNodeId(onboardingNodeId)
-
-            // const params = new URLSearchParams(searchParams.toString())
-            // params.delete("milestone")
-            // params.set("milestone", onboardingNodeId)
-    
-            // router.push(`${pathname}?${params.toString()}`, { scroll: false })
         } else if (step.selector === '.research-plan-tour-step3') {
             const element = document.getElementById("edit-milestone-scroll-area")
             if (element) {
