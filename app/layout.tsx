@@ -91,9 +91,9 @@ const steps: Tour[] = [
             {
                 icon: <>⭐</>,
                 title: "Milestones",
-                content: <>{`Milestones are the goals and projects that make up your research plan. You can click the 'Details' button to edit the contents of each milestone.`}</>,
+                content: <>{`Milestones are the assets, projects, and RFPs that make up your research plan. You can click on a milestone to edit the contents.`}</>,
                 selector: ".research-plan-tour-step2",
-                side: "left" as any,
+                side: "top-left" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10
@@ -122,7 +122,7 @@ const steps: Tour[] = [
                 icon: <>⭐</>,
                 title: "Connecting Milestones",
                 content: <>
-                    {`Once you've created more than one milestone, you can create or remove relationships between them by clicking and dragging from the + icon.`}
+                    {`Once you've created more than one milestone, you can create relationships between them by clicking and dragging from the + icon. You can remove relationships by clicking the trash icon.`}
                     <Image src={gif1} alt="Short animation. Shows deleting an edge, from between two notes, then re-connecting a node in the middle."/>
                 </>,                
                 selector: ".research-plan-tour-step5",
