@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import { FaArrowRight, FaBullhorn, FaCalendar, FaDollarSign, FaEllipsis, FaFileLines, FaPaperclip, FaPlus, FaStar, FaTrash, FaUser } from "react-icons/fa6"
+import { FaArrowRight, FaArrowUpRightFromSquare, FaBullhorn, FaCalendar, FaDollarSign, FaEllipsis, FaFileLines, FaPaperclip, FaPlus, FaStar, FaTrash, FaUser } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
 import { truncate, cn, formatMoney } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
@@ -446,8 +446,9 @@ const AttachmentsTag = ({attachments}: {attachments: any[]}) => {
                 "text-sm w-min inline-flex flex-row justify-start items-center gap-x-2 truncate rounded-md px-2 py-1 font-medium"
             )}
         >
-            <FaPaperclip />
-            {attachments.length > 1 ? `${attachments.length} Attachments` : `${attachments.length} Attachment`}
+            {/* <FaPaperclip /> */}
+            <FaArrowUpRightFromSquare />
+            {attachments.length > 1 ? `${attachments.length} Links` : `${attachments.length} Link`}
         </div>
     )
 }

@@ -90,13 +90,14 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                 {milestone.attachments && milestone.attachments.length > 0 && (
                     <div className="flex flex-col gap-4">
                         <Separator/>
-                        <h2 className="font-semibold text-xl">{`Attachments`}</h2>
+                        <h2 className="font-semibold text-xl">{`Links`}</h2>
                         <ol className="flex flex-row gap-4 flex-wrap">
                             {milestone?.attachments?.map((attachment: any, index: number) => (
                                 <Link href={attachment.link} key={index} target="_blank">
                                     <Button variant="secondary">
+                                        {/* <FaPaperclip/> */}
+                                        <FaArrowUpRightFromSquare />
                                         {attachment.name || attachment.link}
-                                        <FaPaperclip/>
                                     </Button>
                                 </Link>
                             ))}
