@@ -592,7 +592,7 @@ export default function ResearchOnboardingForm(
                                 name="engaged"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>{`Number of patients engaged`} - {formatNumberWithCommas(field.value)}</FormLabel>
+                                        <FormLabel>{`Number of patients engaged`}</FormLabel>
                                         <FormDescription>{`An estimated number of diagnosed patients engaged with your organization.`}</FormDescription>
                                         <FormControl>
                                             <Input

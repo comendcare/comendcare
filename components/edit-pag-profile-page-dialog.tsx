@@ -34,7 +34,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {acceptedFiletypes, cn, formatMoney, formatNumberWithCommas, getPublicFile, sleep, years} from "@/lib/utils";
+import {acceptedFiletypes, cn, formatNumberWithCommas, getPublicFile, sleep, years} from "@/lib/utils";
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
@@ -511,6 +511,8 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
                 numberOfPatientsEngaged: values.engaged ? parseInt(values.engaged, 10) : null,
+                nationalEstimatedPopulation: values.engaged ? parseInt(values.national ?? "0", 10) : null,
+                globalEstimatedPopulation: values.engaged ? parseInt(values.global ?? "0", 10) : null,
                 relevantDiseaseMechanisms: values.mechanisms || [],
                 causalGenes: values.causal?.map((item) => item.label) || [],
                 associatedGenes: values.genes?.map((item) => item.label) || [],
@@ -1223,7 +1225,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         name="engaged"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Number of patients engaged`} - {formatNumberWithCommas(field.value)}</FormLabel>
+                                                <FormLabel>{`Number of patients engaged`}</FormLabel>
                                                 <FormDescription>{`The number of patients your organization has been in touch with.`}</FormDescription>
                                                 <FormControl>
                                                     <Input
@@ -1242,7 +1244,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         name="national"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Estimated number of patients in the US`} - {formatNumberWithCommas(field.value)}</FormLabel>
+                                                <FormLabel>{`Estimated number of patients in the US`}</FormLabel>
                                                 {/*<FormDescription>{`The estimated number of patients in the US.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
@@ -1261,7 +1263,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         name="global"
                                         render={({field}) => (
                                             <FormItem>
-                                                <FormLabel>{`Estimated number of patients in the world`} - {formatNumberWithCommas(field.value)}</FormLabel>
+                                                <FormLabel>{`Estimated number of patients in the world`}</FormLabel>
                                                 {/*<FormDescription>{`The estimated number of patients in the world.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <Input
