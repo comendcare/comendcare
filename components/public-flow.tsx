@@ -15,18 +15,19 @@ export const PublicFlowView = ({ roadmap, subdomain, urlMilestone, externalLinks
 
     console.log(roadmap)
 
-    // useEffect(() => {
-    //     if (urlMilestone && roadmap?.nodes) {
-    //         const timer = setTimeout(() => {
-    //             fitView({
-    //                 nodes: roadmap?.nodes?.filter((node: any) => node?.data?.id == urlMilestone).map((node: any) => ({ id: node.id })),
-    //                 padding: 2
-    //             })
-    //         }, 1) // Delay by a short time to allow layout adjustment
+    useEffect(() => {
+        if (urlMilestone && roadmap?.nodes) {
+            const timer = setTimeout(() => {
+                fitView({
+                    nodes: roadmap?.nodes?.filter((node: any) => node?.data?.id == urlMilestone).map((node: any) => ({ id: node.id })),
+                    padding: 2,
+                    duration: 500
+                })
+            }, 1) // Delay by a short time to allow layout adjustment
     
-    //         return () => clearTimeout(timer)
-    //     }
-    // }, [urlMilestone])
+            return () => clearTimeout(timer)
+        }
+    }, [urlMilestone])
 
     return (
     <ReactFlow

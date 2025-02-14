@@ -112,7 +112,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
                 onboardingNodeId = newNode.id
             }
 
-            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2 })
+            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
         }
         if (step.selector === '.research-plan-tour-step2') {
             setSelectedNodeId(onboardingNodeId)
