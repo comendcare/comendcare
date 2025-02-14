@@ -3,7 +3,7 @@
 import {useState} from "react";
 import {getSession} from "@/lib/auth"
 import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
-import NoOrganizationPage from "@/components/no-organization-page";
+import NoOrganization from "@/components/no-organization";
 import {getOrganizationFromOrganizationId, getRoadmapId} from "@/lib/fetchers";
 import {
     AlertDialog,
@@ -134,7 +134,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
                                 Delete Organization
                             </span>
                             <span className="text-sm text-gray-500">
-                                This will delete all memberships, roadmaps, and kanban tasks from this organization.
+                                This will delete all memberships, roadmaps, and tasks from this organization.
                                 This organization will then be permanently deleted.
                             </span>
                         </span>
@@ -180,7 +180,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
         )
     } else {
         return (
-            <NoOrganizationPage/>
+            <NoOrganization/>
         );
     }
 }

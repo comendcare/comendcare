@@ -30,11 +30,12 @@ import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
 
 const kanbanSelector = (state: KanbanState) => ({
+    columns: state.columns,
     addColumn: state.addColumn
 })
 
 export default function NewColumnDialog() {
-    const { addColumn } = useKanbanStore(useShallow(kanbanSelector))
+    const { columns, addColumn } = useKanbanStore(useShallow(kanbanSelector))
     const [open, setOpen] = useState(false)
     const newMonitorFormSchema = getNewColumnFormSchema([])
 
@@ -54,7 +55,7 @@ export default function NewColumnDialog() {
             addColumn({
                 name: values.keyword,
                 tasks: [],
-                kanbanPosition: 0
+                kanbanPosition: columns.length - 1
             })
         } catch (error) {
             console.error(error);
@@ -63,13 +64,11 @@ export default function NewColumnDialog() {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger
-                className={cn(
-                    buttonVariants({variant: "default"}),
-                    "h-full w-6 p-1 transition ease-in-out bg-gray-200 hover:translate-x-1 hover:scale-x-105 hover:bg-black duration-300"
-                )}
-            >
-                <FaPlus className="h-4 w-4"/>
+            <DialogTrigger asChild>
+                <Button className="ml-auto">
+                    <FaPlus />
+                    Add new column
+                </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>

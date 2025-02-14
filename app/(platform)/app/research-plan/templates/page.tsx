@@ -1,18 +1,16 @@
 import NewRoadmapForm from "@/components/new-roadmap"
-import NoOrganization from "@/components/no-organization"
 import RoadmapTemplates from "@/components/roadmap-templates"
-import { getRoadmapData, getRoadmapId } from "@/lib/fetchers"
-import { getSession } from "@/lib/auth"
+import {getRoadmapData, getRoadmapId} from "@/lib/fetchers"
+import {getSession} from "@/lib/auth"
+import NoOrganization from "@/components/no-organization";
 
 export default async function TemplatesPage() {
     const session = await getSession();
     const orgId = session?.user.organizationId;
-    
+
     if (!orgId) {
         return (
-            <main className="flex gap-8 flex-col w-full h-screen justify-center items-center mx-auto">
-                <NoOrganization />
-            </main>
+            <NoOrganization/>
         )
     }
 
@@ -21,14 +19,14 @@ export default async function TemplatesPage() {
     if (response.success && typeof response.data === 'string') {
         return (
             <main className="flex flex-col items-center h-full mx-auto">
-               <RoadmapTemplates />
+                <RoadmapTemplates/>
             </main>
         )
     }
 
     return (
         <main className="flex gap-8 flex-col w-full h-screen justify-center items-center mx-auto">
-            <NewRoadmapForm />
+            <NewRoadmapForm/>
         </main>
     )
 }

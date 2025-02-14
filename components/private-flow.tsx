@@ -127,7 +127,8 @@ export const PrivateFlowView = ({
                         nodeId: id,
                         types: [],
                         title: `New Milestone`,
-                        status: "PLANNED"
+                        status: "PLANNED",
+                        private: true
                     },
                     origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.5] : [0.0, 0.5],
                 }
@@ -189,7 +190,8 @@ export const PrivateFlowView = ({
                     types: defaultData?.types || [],
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                    status: defaultData?.status || "PLANNED"
+                    status: defaultData?.status || "PLANNED",
+                    private: true
                 }
             }
 

@@ -27,7 +27,7 @@ import {FileWithPreview} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
-import {cn, createDicebearAvatar, formatMoney, getPublicFile, nameToInitials, years} from "@/lib/utils";
+import {acceptedFiletypes, getPublicFile, nameToInitials, years} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
@@ -87,10 +87,6 @@ export const newOrgFormSchema = z.object({
     lng: z.number().optional(),
     image: z.string().optional(),
 })
-
-const accept = {
-    "image/*": [".jpg", ".jpeg", ".png"],
-};
 
 const OPTIONS: Option[] = [
     {
@@ -177,7 +173,7 @@ export default function OrganizationOnboardingForm(
 
     const {getRootProps, getInputProps} = useDropzone({
         onDrop,
-        accept,
+        accept: acceptedFiletypes,
     });
 
     useEffect(() => {
@@ -673,7 +669,7 @@ export default function OrganizationOnboardingForm(
                                                         <RadioGroupItem value="YES"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
-                                                        Yes I have a 501c3
+                                                        {`Yes, I have a 501c3`}
                                                     </FormLabel>
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
@@ -689,7 +685,7 @@ export default function OrganizationOnboardingForm(
                                                         <RadioGroupItem value="NO"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
-                                                        {`No I don't have a 501c3`}
+                                                        {`No, I don't have a 501c3`}
                                                     </FormLabel>
                                                 </FormItem>
                                             </RadioGroup>
