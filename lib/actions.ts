@@ -1511,6 +1511,7 @@ export async function updateCondition(formData: FormData, organizationId: string
                 data[key] = value;
             }
         });
+        console.log(data)
 
         // Find the first condition associated with the organization
         const conditions = await prisma.conditionToOrganization.findMany({

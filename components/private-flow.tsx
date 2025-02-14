@@ -66,7 +66,7 @@ export const PrivateFlowView = ({
         addNodes,
         onConnect,
     } = useRoadmapStore(useShallow(selector))
-    const { fitView } = useReactFlow()
+    // const { fitView } = useReactFlow()
     const store = useStoreApi()
     const router = useRouter()
     const nodeTypes = { PROJECT: PrivateMilestoneNode, ASSET: PrivateMilestoneNode, RFP: PrivateMilestoneNode }
@@ -77,6 +77,8 @@ export const PrivateFlowView = ({
     const { startOnborda } = useOnborda()
     const { screenToFlowPosition } = useReactFlow()
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+    const pathname = usePathname()
+    const { fitView } = useReactFlow()
 
     useEffect(() => {
         setLocalNodes(nodes)
@@ -240,8 +242,8 @@ export const PrivateFlowView = ({
                     }])
                 }
             },
-            // first node is the onboarding node
-            onboardingMilestone: index === 0
+            // last node is the onboarding node
+            onboardingMilestone: index === (localNodes.length - 1)
         }
     }))
 
@@ -254,9 +256,9 @@ export const PrivateFlowView = ({
     useEffect(() => {
         const timer = setTimeout(() => {
             if (selectedNodeId) {
-                fitView({ nodes: [{ id: selectedNodeId }], padding: 2 })
+                fitView({ nodes: [{ id: selectedNodeId }], padding: 2, duration: 500 })
             } else {
-                fitView({ nodes: localNodes.map(node => ({ id: node.id })), padding: 0.4 })
+                fitView({ nodes: localNodes.map(node => ({ id: node.id })), padding: 0.4, duration: 500 })
             }
         }, 1) // Delay by a short time to allow layout adjustment
 
@@ -264,8 +266,35 @@ export const PrivateFlowView = ({
     }, [width, selectedNodeId])
 
     useEffect(() => {
-        if (!isOnboarded('research-plan-tour')) {
-            startOnbordaAndRemoveToast()
+        // if (!isOnboarded('research-plan-tour')) {
+        //     startOnbordaAndRemoveToast()
+        // }
+
+        // Only start tour if user is new and is on the /app/profile page
+        if (pathname === '/app/research-plan' && !isOnboarded('research-plan-tour')) {
+            toast("Welcome to Comend!", {
+                id: "onborda",
+                duration: 300000,
+                position: "bottom-left",
+                description: `Would you like to take a quick tour?`,
+                action: (
+                    <div className="flex flex-col space-y-2 ml-4">
+                        <Button
+                            onClick={() => startOnbordaAndRemoveToast()}
+                        >
+                            {`Yes please!`}
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                toast.dismiss()
+                                setOnboarded('research-plan-tour')
+                            }}
+                        >
+                            {`No thanks!`}
+                        </Button>
+                    </div>
+                )
+            })
         }
     }, [localNodes])
 
@@ -276,7 +305,7 @@ export const PrivateFlowView = ({
     }
 
     return (
-        <>
+        <div className="h-full w-full pb-6">
         <ReactFlow
             width={width}
             nodes={updatedNodes}
@@ -290,7 +319,7 @@ export const PrivateFlowView = ({
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             fitView
-            fitViewOptions={{ padding: 2 }}
+            fitViewOptions={{ padding: 0.2, duration: 500 }}
             style={{ width: '100%', height: '100%' }}
             proOptions={proOptions}
             minZoom={0.1}
@@ -381,6 +410,6 @@ export const PrivateFlowView = ({
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
         </Dialog>
-        </>
+        </div>
     )
 }
