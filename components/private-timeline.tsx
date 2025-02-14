@@ -10,6 +10,7 @@ import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "./ui/button"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { ScrollArea } from "./ui/scroll-area"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
@@ -50,8 +51,8 @@ const router = useRouter()
     }
 
     return (
-        <div className="w-full h-full p-10">
-            <ol className="relative border-s border-gray-200 dark:border-gray-700">
+        <ScrollArea className="w-full h-full p-10 pt-0">
+            <ol className="ml-4 relative border-s border-gray-200 dark:border-gray-700">
                 {milestones?.sort((a, b) => {
                     return a.startDate - b.startDate
                 }).map((milestone: any, index: number) => (
@@ -84,6 +85,6 @@ const router = useRouter()
                     </li>
                 ))}
             </ol>
-        </div>
+        </ScrollArea>
     )
 }
