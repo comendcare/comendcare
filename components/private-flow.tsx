@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
     ReactFlow,
     MiniMap,
@@ -75,10 +75,9 @@ export const PrivateFlowView = ({
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     const { startOnborda } = useOnborda()
-    const { screenToFlowPosition } = useReactFlow()
+    const { screenToFlowPosition, getIntersectingNodes, fitView } = useReactFlow()
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const pathname = usePathname()
-    const { fitView } = useReactFlow()
 
     useEffect(() => {
         setLocalNodes(nodes)
@@ -87,6 +86,69 @@ export const PrivateFlowView = ({
 
     const [localNodes, setLocalNodes] = useState(nodes)
     const [localEdges, setLocalEdges] = useState(edges)
+
+    const [previewNode, setPreviewNode] = useState<Node | null>(null);
+    const previewNodeRef = useRef(previewNode);
+    useEffect(() => {
+        previewNodeRef.current = previewNode;
+    }, [previewNode]);
+
+    const [startConnectNode, setStartConnectNode] = useState<any | null>(null);
+
+    const PREVIEW_NODE_HEIGHT = 240
+    const PREVIEW_NODE_WIDTH = 348
+
+    // const PREVIEW_NODE_HEIGHT = 80
+    // const PREVIEW_NODE_WIDTH = 120
+
+    const handleConnectStart = useCallback((event: any, node: any) => {
+        setStartConnectNode(node)
+        setPreviewNode({ 
+            id: "preview", 
+            position: { x: 0, y: 0 }, 
+            data: { 
+                title: "New Milestone",
+                private: true,
+                handleType: node.handleType
+             }, 
+            type: "PROJECT",
+        });
+      }, [previewNode, startConnectNode]);
+    
+      const handleMouseMove = useCallback((event: any) => {
+        if (startConnectNode) {
+            let position = screenToFlowPosition({ x: event.clientX, y: event.clientY });
+            const width = 40
+
+            const intersectingNodes = getIntersectingNodes({
+                x: position.x - (width/2),
+                y: position.y,
+                width: width,
+                height: 1
+            }).filter(node => node.id !== "preview");
+
+            if (intersectingNodes.length > 0) {
+                setPreviewNode(null); // Hide preview if hovering over a node
+            } else {
+                setPreviewNode({ 
+                    id: "preview", 
+                    position: {
+                        x: previewNodeRef?.current?.data?.handleType === "target" ? position.x - PREVIEW_NODE_WIDTH : position.x,
+                        y: previewNodeRef?.current?.data?.handleType === "source" || previewNodeRef?.current?.data?.handleType === "target" ? position.y - (PREVIEW_NODE_HEIGHT/2) : position.y
+                    }, 
+                    data: { 
+                        title: "New Milestone",
+                        private: true,
+                        handleType: startConnectNode?.handleType
+                     }, 
+                    type: "PROJECT",
+                });
+            }
+        } else {
+            setStartConnectNode(null)
+            setPreviewNode(null)
+        }
+      }, [previewNode, startConnectNode, screenToFlowPosition]);
 
     const handleEditClick = (event: React.MouseEvent, node: Node) => {
         setSelectedNodeId(node.id)
@@ -112,7 +174,7 @@ export const PrivateFlowView = ({
     const onConnectEnd = useCallback(
         (event: any, connectionState: any) => {
             // when a connection is dropped on the pane it's not valid
-            if (!connectionState.isValid) {
+            if (!connectionState.isValid && previewNodeRef.current) {
                 // we need to remove the wrapper bounds, in order to get the correct position
                 const id = nanoid();
                 const { clientX, clientY } =
@@ -125,12 +187,9 @@ export const PrivateFlowView = ({
                         y: clientY,
                     }),
                     data: {
+                        ...previewNodeRef.current.data,
                         id: nanoid(),
                         nodeId: id,
-                        types: [],
-                        title: `New Milestone`,
-                        status: "PLANNED",
-                        private: true
                     },
                     origin: connectionState.fromHandle?.position === 'left' ? [1.0, 0.5] : [0.0, 0.5],
                 }
@@ -153,8 +212,11 @@ export const PrivateFlowView = ({
                     target,
                 })
             }
+
+            setPreviewNode(null)
+            setStartConnectNode(null)
         },
-        [screenToFlowPosition],
+        [previewNode, startConnectNode, screenToFlowPosition],
     );
 
     // Add a empty milestone node
@@ -305,16 +367,17 @@ export const PrivateFlowView = ({
     }
 
     return (
-        <div className="h-full w-full pb-6">
+        <div className="h-full w-full pb-6" onMouseMove={handleMouseMove}>
         <ReactFlow
             width={width}
-            nodes={updatedNodes}
+            nodes={previewNode ? [...updatedNodes, previewNode] : updatedNodes}
             edges={updatedEdges}
             onNodeClick={handleEditClick}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onConnectEnd={onConnectEnd}
+            onConnectStart={handleConnectStart}
             onBeforeDelete={handleDelete}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
