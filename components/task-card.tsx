@@ -85,14 +85,17 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
         transform: CSS.Translate.toString(transform)
     }
 
-    const variants = cva("hover:cursor-pointer hover:bg-slate-100", {
-        variants: {
-            dragging: {
-                over: "ring-2 opacity-30",
-                overlay: "ring-2 ring-primary"
+    const variants = cva(
+        "hover:cursor-pointer hover:bg-slate-100", 
+        {
+            variants: {
+                dragging: {
+                    over: "ring-2 opacity-30",
+                    overlay: "ring-2 ring-primary"
+                }
             }
         }
-    })
+    )
 
     const [description, setDescription] = useState(null)
 
