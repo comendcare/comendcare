@@ -66,7 +66,6 @@ export const PrivateFlowView = ({
         addNodes,
         onConnect,
     } = useRoadmapStore(useShallow(selector))
-    // const { fitView } = useReactFlow()
     const store = useStoreApi()
     const router = useRouter()
     const nodeTypes = { PROJECT: PrivateMilestoneNode, ASSET: PrivateMilestoneNode, RFP: PrivateMilestoneNode }
@@ -78,6 +77,21 @@ export const PrivateFlowView = ({
     const { screenToFlowPosition, getIntersectingNodes, fitView } = useReactFlow()
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const pathname = usePathname()
+    const { undo } = useRoadmapStore.temporal.getState()
+
+    useEffect(() => {
+        const handleUndo = (event: KeyboardEvent) => {
+          if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+            event.preventDefault(); // Prevent default undo behavior (optional)
+            console.log("Undo action triggered")
+            undo()
+            return
+          }
+        };
+    
+        document.addEventListener("keydown", handleUndo);
+        return () => document.removeEventListener("keydown", handleUndo);
+      }, []);
 
     useEffect(() => {
         setLocalNodes(nodes)
@@ -97,9 +111,6 @@ export const PrivateFlowView = ({
 
     const PREVIEW_NODE_HEIGHT = 240
     const PREVIEW_NODE_WIDTH = 348
-
-    // const PREVIEW_NODE_HEIGHT = 80
-    // const PREVIEW_NODE_WIDTH = 120
 
     const handleConnectStart = useCallback((event: any, node: any) => {
         setStartConnectNode(node)
