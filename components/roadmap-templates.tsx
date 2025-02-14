@@ -50,7 +50,8 @@ export default function RoadmapTemplates() {
                     types: defaultData?.types || [],
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                    status: defaultData?.status || "PLANNED"
+                    status: defaultData?.status || "PLANNED",
+                    private: true
                 }
             }
 

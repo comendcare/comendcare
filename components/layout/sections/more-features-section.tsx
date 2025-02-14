@@ -7,7 +7,7 @@ import {FaCircleCheck} from "react-icons/fa6";
 const features = [
     "Multi-tenancy and member controls",
     "Analytics and data insights",
-    "Kanban and project management",
+    "Task board and project management",
     "Research plan and milestone templates",
     "Sharable research plans",
     "Privacy controls",

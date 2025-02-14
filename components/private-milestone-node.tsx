@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import { FaArrowRight, FaBullhorn, FaCalendar, FaDollarSign, FaEllipsis, FaFileLines, FaPaperclip, FaPlus, FaStar, FaTrash, FaUser } from "react-icons/fa6"
+import { FaArrowRight, FaArrowUpRightFromSquare, FaBullhorn, FaCalendar, FaDollarSign, FaEllipsis, FaFileLines, FaPaperclip, FaPlus, FaStar, FaTrash, FaUser } from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
 import { truncate, cn, formatMoney } from "@/lib/utils"
 import { DateView } from "./miletone-date-view"
@@ -80,7 +80,11 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     }
 
     return (
-        <Card className={cn("w-[350px] text-wrap break-words", props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", selectedNodeId === props?.id ? "border-black border-2" : "")}>
+        <Card className={cn(
+            "w-[350px] text-wrap break-words", 
+            props.data?.onboardingMilestone ? "research-plan-tour-step2" : "", 
+            selectedNodeId === props?.id ? "border-black border-2" : ""
+        )}>
             <CardHeader>
                 <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
                     <TypeBadge type={props.type}/>
@@ -140,7 +144,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             )}
 
             <NodeHandle type="target" position={Position.Left} node={props as NodeProps<PrivateMilestoneNode>}/>
-            <NodeHandle className={"research-plan-tour-step5"} type="source" position={Position.Right} node={props as NodeProps<PrivateMilestoneNode>}/>
+            <NodeHandle className={cn(props.data?.onboardingMilestone ? "research-plan-tour-step5" : "")} type="source" position={Position.Right} node={props as NodeProps<PrivateMilestoneNode>}/>
         </Card> 
     )
 }
@@ -196,6 +200,7 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
                 isHovering ? "p-1 flex flex-col gap-1" : "",
                 props.className
             )}
+            onClick={(e) => e.stopPropagation()}
         >
             <Button 
                 variant="ghost" 
@@ -441,8 +446,9 @@ const AttachmentsTag = ({attachments}: {attachments: any[]}) => {
                 "text-sm w-min inline-flex flex-row justify-start items-center gap-x-2 truncate rounded-md px-2 py-1 font-medium"
             )}
         >
-            <FaPaperclip />
-            {attachments.length > 1 ? `${attachments.length} Attachments` : `${attachments.length} Attachment`}
+            {/* <FaPaperclip /> */}
+            <FaArrowUpRightFromSquare />
+            {attachments.length > 1 ? `${attachments.length} Links` : `${attachments.length} Link`}
         </div>
     )
 }

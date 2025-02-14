@@ -1,6 +1,6 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Condition} from "@prisma/client";
+import {Condition, Organization} from "@prisma/client";
 import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 import Link from "next/link";
 import {Badge} from "@/components/ui/badge";
@@ -8,8 +8,9 @@ import {concat} from "lodash";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {FaQuestionCircle} from "react-icons/fa";
 import React from "react";
+import EditPAGProfileConditionCardDialog from "@/components/edit-pag-profile-condition-card-dialog";
 
-export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[] | null }) => {
+export const PAGProfileConditionsCard = ({conditions, organization}: { conditions: Condition[] | null, organization: Organization }) => {
 
     if (conditions) {
         return (
@@ -19,6 +20,7 @@ export const PAGProfileConditionsCard = ({conditions}: { conditions: Condition[]
                         <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
                             Condition
                         </CardTitle>
+                        <EditPAGProfileConditionCardDialog organization={organization}/>
                     </CardHeader>
 
                     <CardContent>

@@ -20,7 +20,8 @@ export const PublicFlowView = ({ roadmap, subdomain, urlMilestone, externalLinks
             const timer = setTimeout(() => {
                 fitView({
                     nodes: roadmap?.nodes?.filter((node: any) => node?.data?.id == urlMilestone).map((node: any) => ({ id: node.id })),
-                    padding: 2
+                    padding: 2,
+                    duration: 500
                 })
             }, 1) // Delay by a short time to allow layout adjustment
     
@@ -50,11 +51,13 @@ export const PublicFlowView = ({ roadmap, subdomain, urlMilestone, externalLinks
         nodesConnectable={false}
         draggable={false}
         fitView
+        fitViewOptions={{ padding: 0.2 }}
+        minZoom={0.1}
     >
-        <MiniMap
+        {/* <MiniMap
             nodeColor='#757575'
             maskColor='rgb(200, 200, 200, 0.8)' 
-        />
+        /> */}
     </ReactFlow>
     )
 }
