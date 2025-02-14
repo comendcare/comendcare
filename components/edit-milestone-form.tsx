@@ -1114,7 +1114,7 @@ export function AttachmentsFormField({form, attachments}: { form: UseFormReturn<
                         <>
                             <div className="flex flex-row justify-between items-center">
                                 <FormLabel className="text-2xl font-semibold leading-none tracking-tight">
-                                    {`Attachments`}
+                                    {`Links`}
                                 </FormLabel>
 
                                 <Button
@@ -1128,7 +1128,7 @@ export function AttachmentsFormField({form, attachments}: { form: UseFormReturn<
                                         ])
                                     }}
                                 >
-                                    {`Add an attachment`}
+                                    {`Add a link`}
                                 </Button>
 
                             </div>
