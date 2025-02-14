@@ -2130,7 +2130,7 @@ export async function createKanban(orgId: string) {
 
         return {success: true, data: newKanban}
     } catch (error: any) {
-        logError(`Error creating kanban task for ${orgId}`, error)
+        logError(`Error creating task for ${orgId}`, error)
         return {success: false, error: "Internal server error"}
     }
 }
@@ -2139,7 +2139,7 @@ export async function createKanban(orgId: string) {
 export async function createColumn(column: Partial<Column>) {
     try {
         const {data: kanban} = await getKanbanFromOrganizationId()
-        if (!kanban) return {success: false, error: "failed to find associated kanban board"}
+        if (!kanban) return {success: false, error: "failed to find associated task board"}
 
         const newColumn = await prisma.column.create({
             data: {
@@ -2153,14 +2153,14 @@ export async function createColumn(column: Partial<Column>) {
         })
 
         if (!newColumn) {
-            return {success: false, error: "failed to create kanban column"};
+            return {success: false, error: "failed to create column"};
         }
 
         // Typesense - if updating typesense, update here...
 
         return {success: true, data: newColumn};
     } catch (error: any) {
-        logError("Error creating kanban column", error);
+        logError("Error creating column", error);
         return {success: false, error: "Internal server error"};
     }
 }
@@ -2205,14 +2205,14 @@ export async function deleteColumn(columnId: string) {
         })
 
         if (!deletedColumn) {
-            return {success: false, error: "failed to delete kanban column"};
+            return {success: false, error: "failed to delete column"};
         }
 
         // Typesense - if updating typesense, update here...
 
         return {success: true, data: deletedColumn};
     } catch (error: any) {
-        logError("Error deleting kanban column", error);
+        logError("Error deleting column", error);
         return {success: false, error: "Internal server error"};
     }
 }
@@ -2345,14 +2345,14 @@ export async function deleteTask(taskId: string) {
         })
 
         if (!deletedTask) {
-            return {success: false, error: "failed to delete kanban task"};
+            return {success: false, error: "failed to delete task"};
         }
 
         // Typesense - if updating typesense, update here...
 
         return {success: true, data: deletedTask};
     } catch (error: any) {
-        logError("Error deleting kanban task", error);
+        logError("Error deleting task", error);
         return {success: false, error: "Internal server error"};
     }
 }

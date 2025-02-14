@@ -898,7 +898,7 @@ const TasksFormField = ({
             await setTasks(updatedValues)
             // toast('Success!', {
             //     position: "bottom-left",
-            //     description: 'The changes to your kanban tasks have been successfully saved.'
+            //     description: 'The changes to your tasks have been successfully saved.'
             // })
         }, 500), []
     )
@@ -1006,7 +1006,7 @@ const TasksFormField = ({
                                             form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
                                         }}
                                     >
-                                        {`Add a new kanban task`}
+                                        {`Add a new task`}
                                     </Button>
                                 </div>
                             </div>
@@ -1315,9 +1315,9 @@ const LinkTask = ({milestoneId, kanbanTasks, onLink}: {
             }}
         >
             {kanbanTasks?.filter((task: any) => task.milestoneId === milestoneId).length === 0 ? (
-                `Link kanban task`
+                `Link task`
             ) : (
-                `Link another kanban task`
+                `Link another task`
             )}
         </Button>
     )
