@@ -438,10 +438,15 @@ export function EditTaskForm({
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <Button variant="secondary" size="icon" onClick={(e) => {
-                                        e.preventDefault()
-                                        form.setValue('milestone', undefined)
-                                    }}>
+                                    <Button 
+                                        variant="secondary" 
+                                        size="icon" 
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            form.setValue('milestone', undefined)
+                                        }}
+                                        disabled={!field.value}
+                                    >
                                         <FaLinkSlash />
                                     </Button>
                                 </div>
