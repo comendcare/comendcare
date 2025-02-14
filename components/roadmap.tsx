@@ -9,9 +9,7 @@ import {
     ResizablePanelGroup,
     ResizableHandle
 } from "@/components/ui/resizable"
-import {
-    TooltipProvider,
-  } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
 import { PrivateFlowView } from "@/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
@@ -20,10 +18,11 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { GanttChartView } from "./gantt-chart"
 import { getRoadmapId } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
-import { buttonVariants } from "./ui/button"
+import { Button, buttonVariants } from "./ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare } from "react-icons/fa6"
+import { FaUndo } from "react-icons/fa"
 
 const selector = (state: RoadmapState) => ({
     selectedView: state.selectedView,
@@ -47,6 +46,7 @@ export function Roadmap({data}: {data: any}) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
+    const { undo } = useRoadmapStore.temporal.getState()
 
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString())
@@ -89,18 +89,28 @@ export function Roadmap({data}: {data: any}) {
             >
                 <ResizablePanel>
                     <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange} className="flex flex-col gap-4">
-                        <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-between">
+                        <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-start">
                             <TabsList>
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
                                 <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                                 {/* <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger> */}
                             </TabsList>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button onClick={() => undo()} size={"icon"} variant={"ghost"}>
+                                        <FaUndo />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80">
+                                    <p>{`Undo`}</p>
+                                </TooltipContent>
+                            </Tooltip>
 
                             <Link
                                 href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
                                 className={cn(
                                     buttonVariants({ variant: "secondary" }),
-                                    "flex items-center"
+                                    "flex items-center ml-auto"
                                 )}
                             >
                                 {`View public research plan`}
