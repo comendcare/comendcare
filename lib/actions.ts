@@ -950,7 +950,7 @@ export async function inviteUser(
             return {success: false, error: "Database error. please try again later."}
         }
 
-        revalidatePath("/app/dashboard")
+        revalidatePath("/app/analytics")
 
         return {success: true, data: invitation}
     } catch (error: any) {
@@ -1044,7 +1044,7 @@ export async function approveMemberRequestAndCreateMember(
             }
         })
 
-        revalidatePath("/app/dashboard")
+        revalidatePath("/app/analytics")
         revalidatePath("/app/profile")
 
         if (member) {
@@ -1149,7 +1149,7 @@ export async function deleteMemberRequest(
             return {success: false, error: "Failed to send denial email."};
         }
 
-        revalidatePath("/app/dashboard")
+        revalidatePath("/app/analytics")
 
         return {success: true, data: deletedMemberRequest};
 
@@ -1178,7 +1178,7 @@ export async function deleteInvitation(
             return {success: false, error: "Failed to delete invitation. Request not found."};
         }
 
-        revalidatePath("/app/dashboard")
+        revalidatePath("/app/analytics")
 
         return {success: true, data: deletedInvitation};
 
@@ -1240,7 +1240,7 @@ export async function updateMember(
             return {success: false, error: "Membership not found"};
         }
 
-        revalidatePath("/app/dashboard")
+        revalidatePath("/app/analytics")
         revalidatePath("/app/profile")
 
         return {success: true, data: member};
@@ -1288,7 +1288,7 @@ export async function deleteMember(
             })
         }
 
-        revalidatePath("/app/dashboard")
+        revalidatePath("/app/analytics")
 
         return {success: true, data: member};
     } catch (error: any) {
