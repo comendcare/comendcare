@@ -69,7 +69,7 @@ const data = {
             comingSoon: true
         },
         {
-            title: "Settings",
+            title: "Organization Settings",
             icon: Cog,
             variant: "ghost",
             url: "/app/settings"
