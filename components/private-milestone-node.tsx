@@ -144,7 +144,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             )}
 
             <NodeHandle type="target" position={Position.Left} node={props as NodeProps<PrivateMilestoneNode>}/>
-            <NodeHandle className={"research-plan-tour-step5"} type="source" position={Position.Right} node={props as NodeProps<PrivateMilestoneNode>}/>
+            <NodeHandle className={cn(props.data?.onboardingMilestone ? "research-plan-tour-step5" : "")} type="source" position={Position.Right} node={props as NodeProps<PrivateMilestoneNode>}/>
         </Card> 
     )
 }
