@@ -6,7 +6,7 @@ import {ProfilePhoto} from "./profile-photo";
 import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button";
 import MemberRequestsDropdown from "@/components/member-requests-dropdown";
 
-export default async function PAGDashboardRequestsTab() {
+export default async function PAGSettingsRequestsTab() {
     const session = await getSession();
 
     if (!session?.user?.organizationId) {

@@ -55,10 +55,11 @@ const data = {
             url: "/app/marketplace/patient-groups",
         },
         {
-            title: "Dashboard",
+            title: "Analytics",
             icon: LayoutDashboard,
             variant: "ghost",
-            url: "/app/dashboard",
+            url: "/app/analytics",
+            comingSoon: true
         },
         {
             title: "Feed",
@@ -68,7 +69,7 @@ const data = {
             comingSoon: true
         },
         {
-            title: "Settings",
+            title: "Organization Settings",
             icon: Cog,
             variant: "ghost",
             url: "/app/settings"
