@@ -112,6 +112,7 @@ export function Roadmap({data}: {data: any}) {
                                     buttonVariants({ variant: "secondary" }),
                                     "flex items-center ml-auto"
                                 )}
+                                target={"_blank"}
                             >
                                 {`View public research plan`}
                                 <FaArrowUpRightFromSquare size={12}/>
