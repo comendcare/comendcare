@@ -567,6 +567,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                                 type="number"
                                                 id="engaged"
                                                 {...field}
+                                                min={0}
                                             />
                                         </FormControl>
                                         <FormMessage/>
@@ -586,6 +587,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                                 type="number"
                                                 id="national"
                                                 {...field}
+                                                min={0}
                                             />
                                         </FormControl>
                                         <FormMessage/>
@@ -605,6 +607,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                                 type="number"
                                                 id="global"
                                                 {...field}
+                                                min={0}
                                             />
                                         </FormControl>
                                         <FormMessage/>
