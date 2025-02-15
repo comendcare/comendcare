@@ -219,9 +219,6 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                 {/* <div className="bg-white h-[80vh] w-[50vw] z-60"> */}
                     <DialogHeader>
                         <DialogTitle>Edit Task Details</DialogTitle>
-                        <DialogDescription>
-                            {`Make changes to your profile here. Click save when you're done.`}
-                        </DialogDescription>
                     </DialogHeader>
                     <EditTaskForm
                         taskData={task}

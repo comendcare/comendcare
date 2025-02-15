@@ -599,6 +599,7 @@ export default function ResearchOnboardingForm(
                                                 type="number"
                                                 id="engaged"
                                                 {...field}
+                                                min={0}
                                             />
                                         </FormControl>
                                         <FormMessage/>

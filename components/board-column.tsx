@@ -24,6 +24,17 @@ import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
 import EditColumnDialog from "./edit-column-dialog"
 import { useSession } from "next-auth/react"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 
 export type ColumnType = "Column"
@@ -133,12 +144,37 @@ export function BoardColumn({ column, tasks, isOverlay, filter }: BoardColumnPro
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <EditColumnDialog column={column}/>
-                            <DropdownMenuItem
-                                onClick={handleDelete}
-                            >
-                                <FaTrash/>
-                                Delete column
-                            </DropdownMenuItem>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem
+                                        onSelect={(e) => e.preventDefault()}
+                                    >
+                                        <FaTrash/>
+                                        Delete column
+                                    </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                            Are you absolutely sure?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action cannot be undone. This will delete all the tasks in this column.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction asChild>
+                                            <Button
+                                                variant="destructive"
+                                                onClick={handleDelete}
+                                            >
+                                                Confirm
+                                            </Button>
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </CardTitle>
