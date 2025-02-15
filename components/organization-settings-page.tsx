@@ -1,10 +1,7 @@
 "use client"
 
 import {useState} from "react";
-import {getSession} from "@/lib/auth"
-import UnverifiedOrganizationPage from "@/components/unverified-organization-page";
-import NoOrganization from "@/components/no-organization";
-import {getOrganizationFromOrganizationId, getRoadmapId} from "@/lib/fetchers";
+import {getRoadmapId} from "@/lib/fetchers";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -21,7 +18,6 @@ import {Organization} from "@prisma/client";
 import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
 import {deleteOrganization, deleteOrgRoadmap} from "@/lib/actions";
-import DeleteOrganizationForm from "@/components/form/delete-organization-form";
 
 export default function OrganizationSettingsPage({organization}: { organization: Organization }) {
     const {data: session, update} = useSession()
@@ -72,21 +68,20 @@ export default function OrganizationSettingsPage({organization}: { organization:
         }
     }
 
-    if (organization) {
-        return (
-            <main className="flex flex-col items-start w-full h-screen mx-auto p-8 space-y-8">
-                <div className="w-full flex flex-col space-y-4">
-                    <div>
-                        <h2 className="text-md font-semibold leading-6 text-gray-900">
-                            Permanent Settings
-                        </h2>
-                        <p className="text-sm leading-6 text-gray-500">
-                            Anything you change here cannot be undone.
-                        </p>
-                    </div>
+    return (
+        <main className="flex flex-col items-start w-full h-screen mx-auto p-4 space-y-8">
+            <div className="w-full flex flex-col space-y-4">
+                <div>
+                    <h2 className="text-xl font-semibold leading-6 text-gray-900">
+                        Permanent Settings
+                    </h2>
+                    <p className="text-sm leading-6 text-gray-500">
+                        Anything you change here cannot be undone.
+                    </p>
+                </div>
 
 
-                    <div className="mt-10 border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between">
+                <div className="mt-10 border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between">
                         <span className="flex flex-grow flex-col">
                             <span className="text-sm font-medium leading-6 text-gray-900">
                                 Delete Organization Research Plan
@@ -96,39 +91,39 @@ export default function OrganizationSettingsPage({organization}: { organization:
                             </span>
                         </span>
 
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button variant="destructive">
-                                    Delete research plan
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                        Are you absolutely sure?
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        This action cannot be undone. This will permanently delete
-                                        your account and remove your data from our servers.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction asChild>
-                                        <Button
-                                            variant="destructive"
-                                            onClick={handleDeleteRoadmap}
-                                        >
-                                            {"Continue"}
-                                        </Button>
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    </div>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive">
+                                Delete research plan
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete
+                                    your account and remove your data from our servers.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction asChild>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={handleDeleteRoadmap}
+                                    >
+                                        {"Continue"}
+                                    </Button>
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
 
-                    <div
-                        className="w-full border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between gap-4">
+                <div
+                    className="w-full border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between gap-4">
                         <span className="flex flex-grow flex-col">
                             <span className="text-sm font-medium leading-6 text-gray-900">
                                 Delete Organization
@@ -139,48 +134,43 @@ export default function OrganizationSettingsPage({organization}: { organization:
                             </span>
                         </span>
 
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button variant="destructive">
-                                    Delete organization
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>
-                                        Are you absolutely sure?
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        This action cannot be undone. This will remove all memberships
-                                        from this organization, delete all associated roadmaps,
-                                        then delete the organization.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction asChild>
-                                        <Button
-                                            variant="destructive"
-                                            onClick={handleDeleteOrganization}
-                                            disabled={isDeleting}
-                                        >
-                                            {isDeleting ? "Deleting..." : "Continue"}
-                                        </Button>
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-
-                    </div>
-
-                    {/*<DeleteOrganizationForm organization={organization}/>*/}
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive">
+                                Delete organization
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                    Are you absolutely sure?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will remove all memberships
+                                    from this organization, delete all associated roadmaps,
+                                    then delete the organization.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction asChild>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={handleDeleteOrganization}
+                                        disabled={isDeleting}
+                                    >
+                                        {isDeleting ? "Deleting..." : "Continue"}
+                                    </Button>
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
 
                 </div>
-            </main>
-        )
-    } else {
-        return (
-            <NoOrganization/>
-        );
-    }
+
+                {/*<DeleteOrganizationForm organization={organization}/>*/}
+
+            </div>
+        </main>
+    )
 }

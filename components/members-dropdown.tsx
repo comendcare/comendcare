@@ -32,7 +32,9 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
     const form = useForm<z.infer<typeof formSchema>>({
         mode: "onChange",
         resolver: zodResolver(formSchema),
-        // defaultValues: defaultOrganizationValues
+        defaultValues: {
+            title: member.title || "",
+        }
     })
 
     async function onEditMembershipSubmit(values: z.infer<typeof formSchema>) {
@@ -63,7 +65,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
 
     return (
         <Dialog>
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
                 <DropdownMenuTrigger>
                     <FaEllipsis/>
                 </DropdownMenuTrigger>
