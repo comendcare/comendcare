@@ -1,4 +1,4 @@
-import { defaultFilters, OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
+import { defaultFilters, CROSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore"
 import { useShallow } from "zustand/react/shallow"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -20,7 +20,7 @@ import { ASSOCIATED_SYSTEMS, MILESTONE_TYPE_OPTIONS, MODALITIES, MOLECULAR_MECHA
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import type { Option } from "./ui/multiple-selector"
 
-const selector = (state: OrganizationSearchState) => ({
+const selector = (state: CROSearchState) => ({
     filters: state.filters,
     allResults: state.allResults,
     setFilters: state.setFilters

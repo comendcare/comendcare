@@ -2,11 +2,11 @@
 
 import React, {useEffect, useState} from "react";
 import {Input} from "@/components/ui/input";
-import {OrganizationSearchState, useOrganizationSearchStore, ViewType} from "@/state/search/organizationSearchStore";
+import {CROSearchState, useOrganizationSearchStore, ViewType} from "@/state/search/organizationSearchStore";
 import {useShallow} from "zustand/react/shallow"
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "./ui/select";
 
-const selector = (state: OrganizationSearchState) => ({
+const selector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
     sortBy: state.sortBy,
     setSortBy: state.setSortBy,

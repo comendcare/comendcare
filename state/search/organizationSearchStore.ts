@@ -134,7 +134,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
     }
 };
 
-export interface OrganizationSearchState {
+export interface CROSearchState {
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | undefined,
@@ -151,7 +151,7 @@ export interface OrganizationSearchState {
     setFilters: (updatedFilters: FiltersType) => void
 }
 
-export const useOrganizationSearchStore = create<OrganizationSearchState>()(
+export const useOrganizationSearchStore = create<CROSearchState>()(
     temporal((set, get) => ({
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
