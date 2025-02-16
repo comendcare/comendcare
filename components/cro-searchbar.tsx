@@ -2,9 +2,9 @@
 
 import React, {useEffect, useState} from "react";
 import {Input} from "@/components/ui/input";
-import {CROSearchState, useOrganizationSearchStore, ViewType} from "@/state/search/organizationSearchStore";
 import {useShallow} from "zustand/react/shallow"
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "./ui/select";
+import {CROSearchState, useCROSearchStore, ViewType} from "@/state/search/croSearchStore";
 
 const selector = (state: CROSearchState) => ({
     setSearchTerm: state.setSearchTerm,
@@ -22,7 +22,7 @@ export default function CROSearchBar() {
         setSortBy,
         view,
         setView,
-    } = useOrganizationSearchStore(useShallow(selector))
+    } = useCROSearchStore(useShallow(selector))
 
     useEffect(() => {
         setSearchTerm("") // initial fetch on page load
