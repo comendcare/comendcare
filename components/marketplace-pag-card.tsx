@@ -39,49 +39,52 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                     : `http://localhost:3000/app/organization/${subdomain}`
             }
         >
-            <Card className="h-full w-full text-left flex flex-col justify-start">
+            <Card className="h-full w-full text-left flex flex-col justify-between">
                 <CardHeader className="gap-2">
                     <CardTitle className="text-xl flex flex-row gap-2 items-center">
                         <ProfilePhoto img={image} name={name} className="h-10 w-10"/>
                         {name}
                     </CardTitle>
-                    {description && description.trim() && (
-                        <CardDescription className="text-wrap break-words line-clamp-2">
-                            {truncate(description, 200)}
-                        </CardDescription>
-                    )}
                     {(moneyDeployed || numberOfPatientsEngaged) && (
-                        <div className="w-full grid gap-4 grid-cols-2">
+                        <div className="w-full grid gap-2 grid-cols-2">
                             {moneyDeployed && (
-                                <div className="m-0 flex items-center">
+                                <div className="text-sm text-gray-700 m-0 flex items-center">
                                     <FaCircleDollarToSlot className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
                                     {formatMoney(moneyDeployed)} deployed
                                 </div>
                             )}
                             {numberOfPatientsEngaged && (
-                                <div className="m-0 flex items-center">
+                                <div className="text-sm text-gray-700 m-0 flex items-center">
                                     <FaUsers className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
                                     {numberOfPatientsEngaged} patients
                                 </div>
                             )}
                         </div>
                     )}
+                    {description && description.trim() && (
+                        <CardDescription className="text-wrap break-words line-clamp-2">
+                            {truncate(description, 200)}
+                        </CardDescription>
+                    )}
                 </CardHeader>
                 {Object.keys(nodeTypeCount).length > 0 && (
                     <CardContent className="flex flex-col items-start justify-center">
-                        <div className="grid w-full gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+                        <div className="flex w-full gap-4">
                             {nodeTypeLabels
-                                .filter(({key}) => nodeTypeCount[key])
-                                .map(({key, icon: Icon, label}, index) => {
+                                .filter(({ key }) => nodeTypeCount[key])
+                                .map(({ key, icon: Icon, label }, index) => {
                                     const count = nodeTypeCount[key];
                                     return (
                                         <div
                                             key={key}
-                                            className={`text-xs flex flex-row justify-start items-center gap-x-2
-                    ${index !== 0 ? "border-l border-gray-300 pl-2" : ""}`}
+                                            className={`text-xs flex flex-row justify-start items-center gap-x-1 
+                        ${index !== 0 ? "border-l border-gray-300 pl-2" : ""}`}
                                         >
-                                            <Icon className="size-4"/>
-                                            {count} {label}{count > 1 ? "s" : ""}
+                                            <Icon className="size-4" />
+                                            <span className="flex flex-row items-center gap-x-1 whitespace-nowrap">
+                                                <div className="text-sm">{count}</div>{label}
+                                                {count > 1 ? "s" : ""}
+                                            </span>
                                         </div>
                                     );
                                 })}
