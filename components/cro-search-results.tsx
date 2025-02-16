@@ -20,13 +20,14 @@ export function CROSearchResults() {
     const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useCROSearchStore(useShallow(selector))
 
     if (!searchResults) return <ComendLoadingSpinner />
+    console.log(searchResults)
 
     const ResultsView = () => {
         if (view === "list") {
             return (
                 <ol className="w-full flex flex-col gap-4">
                     {searchResults.map((cro, index) => (
-                        <CROMarketplaceListElement organization={cro} key={index}/>
+                        <CROMarketplaceListElement cro={cro} key={index}/>
                     ))}
                 </ol>
             )
@@ -36,7 +37,7 @@ export function CROSearchResults() {
         return (
             <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
                 {searchResults.map((cro, index) => (
-                    <CROMarketplaceCard organization={cro} key={index} />
+                    <CROMarketplaceCard cro={cro} key={index} />
                 ))}
             </div>
         )

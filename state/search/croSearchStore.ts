@@ -94,17 +94,19 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
     try {
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "name",
+            query_by: "title",
             per_page: 10,
             page: state.lastFetchedPage,
-            ...(generateFiltersString(state.filters) ? { filter_by: generateFiltersString(state.filters) } : undefined),
-            ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
+            // ...(generateFiltersString(state.filters) ? { filter_by: generateFiltersString(state.filters) } : undefined),
+            // ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
         };
 
         const results = await typesense
-            .collections("organizations")
+            .collections("companies")
             .documents()
             .search(searchParameters);
+        console.log("testing")
+        console.log("results", results)
 
         // return isNewSearch ? results.hits : state.searchResults
 
@@ -116,7 +118,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             return isNewSearch ? [] : state.searchResults;
         }
 
-        const prismaResponse = await fetch('/api/organizations', {
+        const prismaResponse = await fetch('/api/companies', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ids }),
@@ -124,7 +126,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
 
         const prismaResults = await prismaResponse.json();
 
-        const enrichedResults = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
+        const enrichedResults = ids.map(id => prismaResults.find((company: any) => company.id === id) || null).filter(Boolean);
 
         return isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults];
 
