@@ -20,7 +20,6 @@ export function CROSearchResults() {
     const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useCROSearchStore(useShallow(selector))
 
     if (!searchResults) return <ComendLoadingSpinner />
-    console.log(searchResults)
 
     const ResultsView = () => {
         if (view === "list") {

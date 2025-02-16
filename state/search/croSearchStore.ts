@@ -105,8 +105,6 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             .collections("companies")
             .documents()
             .search(searchParameters);
-        console.log("testing")
-        console.log("results", results)
 
         // return isNewSearch ? results.hits : state.searchResults
 
