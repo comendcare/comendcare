@@ -2,14 +2,14 @@
 
 import React from "react"
 import { OrganizationMarketplaceCard } from "@/components/marketplace-pag-card";
-import { OrganizationSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
+import { CROSearchState, useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import { OrganizationMarketplaceListElement } from "./marketplace-pag-list-element";
 import InfiniteScroll from "./ui/infinite-scroll";
 import Image from "next/image";
 import ComendLoadingSpinner from "./comend-loading-spinner";
 
-const selector = (state: OrganizationSearchState) => ({
+const selector = (state: CROSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
     setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
