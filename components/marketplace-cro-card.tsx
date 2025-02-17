@@ -27,7 +27,7 @@ function countCategories(cro: any): NodeTypeCount {
     };
 }
 
-const companyTypeMap: Record<string, string> = {
+export const companyTypeMap: Record<string, string> = {
     "Mid-Sized Business (10-100M TTM Revenue)": "Mid-Sized Business",
     "Small Business (1-10M TTM Revenue)": "Small Business",
     "Academic Core Facility": "Academic Core Facility",
