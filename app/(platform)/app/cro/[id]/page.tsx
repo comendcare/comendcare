@@ -11,7 +11,7 @@ import {
     FaIndustry,
     FaRocket,
     FaUserTie,
-    FaArrowUpRightFromSquare,
+    FaArrowUpRightFromSquare, FaBriefcase, FaPencil, FaFileContract, FaMap, FaUsers, FaListCheck, FaLocationPin,
 } from "react-icons/fa6";
 import {companyTypeMap} from "@/components/marketplace-cro-card";
 import {FaUniversity} from "react-icons/fa";
@@ -23,6 +23,8 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs"
+import {cn} from "@/lib/utils";
+import CROMarketplaceProfileServicesTab from "@/components/cro-marketplace-profile-services-tab";
 
 const companyTypeIcons: Record<string, JSX.Element> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
@@ -98,7 +100,7 @@ export default async function OrganizationHomePage({
                             className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                             {cro.headquarters &&
                                 <div className="mt-2 flex items-center text-gray-500">
-                                    <FaCircleDollarToSlot
+                                    <FaLocationPin
                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                         aria-hidden="true"
                                     />
@@ -132,27 +134,63 @@ export default async function OrganizationHomePage({
                         className={buttonVariants({variant: "default"})}
                         target="_blank"
                     >
-                        <FaArrowUpRightFromSquare />
+                        <FaArrowUpRightFromSquare/>
                         Visit website
                     </Link>
                 </div>
                 <Tabs defaultValue="services" className="space-y-4 w-full">
                     <TabsList variant="outline">
                         <TabsTrigger value="services" variant="outline" className="px-8">
+                            <FaBriefcase className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                             Services
+                            {cro.services.length && (
+                                <div
+                                    className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
+                                >
+                                    {cro.services.length}
+                                </div>
+                            )}
                         </TabsTrigger>
                         <TabsTrigger value="sites" variant="outline" className="px-8">
+                            <FaMap className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                             Sites
+                            {cro.sites.length && (
+                                <div
+                                    className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
+                                >
+                                    {cro.sites.length}
+                                </div>
+                            )}
                         </TabsTrigger>
                         <TabsTrigger value="rfis" variant="outline" className="px-8">
+                            <FaFileContract className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                             RFIs
+                            {cro.rfis.length && (
+                                <div
+                                    className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
+                                >
+                                    {cro.rfis.length}
+                                </div>
+                            )}
+                        </TabsTrigger>
+                        <TabsTrigger value="certifications" variant="outline" className="px-8">
+                            <FaListCheck className="mr-1.5 h-4 w-4 flex-shrink-0"/>
+                            Certifications
+                            {cro.certifications.length && (
+                                <div
+                                    className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
+                                >
+                                    {cro.certifications.length}
+                                </div>
+                            )}
                         </TabsTrigger>
                         <TabsTrigger value="reviews" variant="outline" className="px-8">
+                            <FaUsers className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                             Reviews
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="services" className="space-y-4 w-full">
-
+                        <CROMarketplaceProfileServicesTab croServices={cro.services}/>
                     </TabsContent>
                 </Tabs>
             </main>
