@@ -84,7 +84,11 @@ export async function getCROData(id: string) {
         include: {
             services: true,
             sites: true,
-            certifications: true,
+            certifications: {
+                include: {
+                    files: true
+                }
+            },
             rfis: true,
         }
     })

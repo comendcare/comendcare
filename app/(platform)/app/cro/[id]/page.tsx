@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma"
 import {notFound} from "next/navigation"
-import {getRoadmapsForOrganization, getOrganizationData, getConditionsDataFromOrgId, getCROData} from "@/lib/fetchers"
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import {getCROData} from "@/lib/fetchers"
 import Link from "next/link";
 import {
     FaArrowLeftLong,
@@ -23,8 +22,10 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs"
-import {cn} from "@/lib/utils";
 import CROMarketplaceProfileServicesTab from "@/components/cro-marketplace-profile-services-tab";
+import CROMarketplaceProfileSitesTab from "@/components/cro-marketplace-profile-sites-tab";
+import CROMarketplaceProfileRFIsTab from "@/components/cro-marketplace-profile-rfis-tab";
+import CROMarketplaceProfileCertificationsTab from "@/components/cro-marketplace-profile-certifications-tab";
 
 const companyTypeIcons: Record<string, JSX.Element> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
@@ -36,32 +37,7 @@ const companyTypeIcons: Record<string, JSX.Element> = {
     "Consultant (<5 employees)": <FaUserTie className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
 };
 
-export async function generateStaticParams() {
-    const allOrganizations = await prisma.organization.findMany({
-        select: {
-            subdomain: true,
-            customDomain: true
-        }
-        // feel free to remove this filter if you want to generate paths for all organizations
-        // where: {
-        //     subdomain: "demo",
-        // },
-    })
-
-    const allPaths = allOrganizations
-        .flatMap(({subdomain, customDomain}) => [
-            subdomain && {
-                domain: `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-            },
-            customDomain && {
-                domain: customDomain
-            }
-        ])
-        .filter(Boolean)
-    return allPaths
-}
-
-export default async function OrganizationHomePage({
+export default async function CompanyHomePage({
                                                        params
                                                    }: {
     params: { id: string }
@@ -192,9 +168,17 @@ export default async function OrganizationHomePage({
                     <TabsContent value="services" className="space-y-4 w-full">
                         <CROMarketplaceProfileServicesTab croServices={cro.services}/>
                     </TabsContent>
+                    <TabsContent value="sites" className="space-y-4 w-full">
+                        <CROMarketplaceProfileSitesTab croSites={cro.sites}/>
+                    </TabsContent>
+                    <TabsContent value="rfis" className="space-y-4 w-full">
+                        <CROMarketplaceProfileRFIsTab croRFIs={cro.rfis}/>
+                    </TabsContent>
+                    <TabsContent value="certifications" className="space-y-4 w-full">
+                        <CROMarketplaceProfileCertificationsTab croCertifications={cro.certifications}/>
+                    </TabsContent>
                 </Tabs>
             </main>
-
         </div>
     )
 }
