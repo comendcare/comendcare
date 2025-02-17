@@ -1,4 +1,6 @@
-import { RFI } from "@prisma/client";
+"use client"
+
+import { useState } from "react";
 import {
     Table,
     TableBody,
@@ -8,7 +10,7 @@ import {
     TableHeader,
     TableRow
 } from "@/components/ui/table";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 
@@ -18,6 +20,8 @@ interface Certification {
 }
 
 export default function CROMarketplaceProfileCertificationsTab({ croCertifications }: { croCertifications: Certification[] }) {
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+
     return (
         <div>
             <Table>
@@ -30,15 +34,23 @@ export default function CROMarketplaceProfileCertificationsTab({ croCertificatio
                 </TableHeader>
                 <TableBody>
                     {croCertifications.map((certification, index) => (
-                        <TableRow key={index}>
-                            <TableCell className="w-full font-medium">{certification.name}</TableCell>
-                            <TableCell className="whitespace-nowrap">
-                                {certification.files && certification.files.length > 0 ? (
-                                    <Accordion type="single" collapsible>
-                                        <AccordionItem value={`cert-${index}`}>
-                                            <AccordionTrigger>View Files</AccordionTrigger>
-                                            <AccordionContent>
-                                                <div className="space-y-2">
+                        <>
+                            <TableRow key={index} onClick={() => setOpenIndex(openIndex === index ? null : index)} className="cursor-pointer">
+                                <TableCell className="w-full font-medium">{certification.name}</TableCell>
+                                <TableCell className="whitespace-nowrap">
+                                    {certification.files && certification.files.length > 0 ? (
+                                        <div>View Files</div>
+                                    ) : (
+                                        <span className="text-gray-500">No files</span>
+                                    )}
+                                </TableCell>
+                            </TableRow>
+                            {certification.files && certification.files.length > 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={2} className="p-0">
+                                        <Collapsible open={openIndex === index} onOpenChange={() => setOpenIndex(openIndex === index ? null : index)}>
+                                            <CollapsibleContent>
+                                                <div className="p-4 space-y-2 border-t">
                                                     {certification.files.map((file, fileIndex) => (
                                                         <Button
                                                             key={fileIndex}
@@ -52,14 +64,12 @@ export default function CROMarketplaceProfileCertificationsTab({ croCertificatio
                                                         </Button>
                                                     ))}
                                                 </div>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    </Accordion>
-                                ) : (
-                                    <span className="text-gray-500">No files</span>
-                                )}
-                            </TableCell>
-                        </TableRow>
+                                            </CollapsibleContent>
+                                        </Collapsible>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </>
                     ))}
                 </TableBody>
             </Table>
