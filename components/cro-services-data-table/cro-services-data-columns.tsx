@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 
 // Assuming your data shape looks like this:
 export type StrainData = {
-    name: strin | null
+    name: string | null
     description: string | null
 }
 
