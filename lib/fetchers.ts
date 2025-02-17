@@ -76,6 +76,20 @@ export async function getOrganizationData(domain: string) {
     )()
 }
 
+export async function getCROData(id: string) {
+    return prisma.company.findUnique({
+        where: {
+            id: id
+        },
+        include: {
+            services: true,
+            sites: true,
+            certifications: true,
+            rfis: true,
+        }
+    })
+}
+
 export async function getRoadmapsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
@@ -297,7 +311,7 @@ export async function getMilestones(organizationId: string | undefined) {
     try {
         const fetchedMilestones = await prisma?.milestone.findMany({
             // include: {user: true},
-            where: { organizationId }
+            where: {organizationId}
         })
 
         if (!fetchedMilestones) {
@@ -464,7 +478,7 @@ export async function getRoadmap(orgId: string | null | undefined) {
         }
 
         const roadmap = await prisma.roadmap.findFirst({
-            where: { organizationId: organization.id },
+            where: {organizationId: organization.id},
             include: {
                 nodes: true,
                 milestones: true,
@@ -531,13 +545,13 @@ export const getConditionsFromOrganizationId = async (organizationId: string) =>
         });
 
         if (!conditions || conditions.length === 0) {
-            return { success: false, error: "No conditions found for the organization" };
+            return {success: false, error: "No conditions found for the organization"};
         }
 
-        return { success: true, data: conditions };
+        return {success: true, data: conditions};
     } catch (error: any) {
         logError("Error fetching conditions for organization", error);
-        return { success: false, error: "Internal server error" };
+        return {success: false, error: "Internal server error"};
     }
 };
 
@@ -764,24 +778,24 @@ export async function getColumns(orgId: string | null | undefined): Promise<ApiR
                     }
                 },
                 orderBy: [
-                    { kanbanPosition: 'asc' },
+                    {kanbanPosition: 'asc'},
                 ],
                 include: {
                     tasks: {
-                        orderBy: [ { kanbanPosition: 'asc' } ],
+                        orderBy: [{kanbanPosition: 'asc'}],
                         include: {
                             checklist: true,
-                            stakeholders: { include: {user: true} },
+                            stakeholders: {include: {user: true}},
                             milestone: true
                         }
                     }
                 }
             })
 
-            return { success: true, data: { columns: dbColumns } }
+            return {success: true, data: {columns: dbColumns}}
         } catch (error: any) {
             console.error("Database error finding column details:", error)
-            return { success: false, error: "Database error. please try again later." }
+            return {success: false, error: "Database error. please try again later."}
         }
     }
 

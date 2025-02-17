@@ -49,7 +49,7 @@ const companyTypeIcons: Record<string, JSX.Element> = {
 
 export function CROMarketplaceCard({cro}: { cro: Company }) {
     console.log(cro);
-    const {title, description, companyType} = cro;
+    const {id, title, description, companyType} = cro;
 
     const categoryCounts = countCategories(cro);
 
@@ -64,8 +64,8 @@ export function CROMarketplaceCard({cro}: { cro: Company }) {
         <Link
             href={
                 process.env.NEXT_PUBLIC_VERCEL_ENV
-                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${title}`
-                    : `http://localhost:3000/app/organization/${title}`
+                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
+                    : `http://localhost:3000/app/cro/${id}`
             }
         >
             <Card className="h-full w-full text-left flex flex-col justify-between">
