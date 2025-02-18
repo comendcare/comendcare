@@ -65,7 +65,7 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
             <Card 
                 className={cn("text-wrap break-words h-full w-full flex flex-col")}
             >
-                <CardHeader className="flex gap-2">
+                <CardHeader className="flex gap-2 pb-4">
                     <CardDescription
                         className="text-base flex flex-row justify-between items-center"
                     >
@@ -80,7 +80,9 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4 grow">
                     <div className="flex flex-col gap-2">
-                        <CardTitle>{milestone.title || "New Milestone"}</CardTitle>
+                        <CardTitle className="text-xl">
+                            {milestone.title || "New Milestone"}
+                        </CardTitle>
                         <CardDescription className="text-wrap break-words line-clamp-2">
                             {truncate(milestone.description || "", 200)}
                         </CardDescription>
