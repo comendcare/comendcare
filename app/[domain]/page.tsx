@@ -27,6 +27,7 @@ import {FeedbackSheet} from "@/components/feedback";
 import FeedbackForm from "@/components/feedback-form";
 import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import React from "react";
+import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -98,6 +99,13 @@ export default async function OrganizationHomePage({
         // Render unverified organization state
         return (
             <UnverifiedOrganizationPage organization={organization}/>
+        );
+    }
+
+    if (!organization.published) {
+        // Render unpublished organization state
+        return (
+            <UnpublishedOrganizationPage organization={organization}/>
         );
     }
 
