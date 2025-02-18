@@ -30,7 +30,7 @@ export function VerifyOrganizationSwitch({organization}: { organization: Organiz
     })
 
     // Handle toggling the 'verified' state
-    async function handleToggle(checked: boolean) {
+    async function handleToggle() {
         // Call the toggleOrganizationVerified function with the organization
         try {
             const result = await toggleOrganizationVerified(organization.id)
@@ -68,10 +68,10 @@ export function VerifyOrganizationSwitch({organization}: { organization: Organiz
                                 <FormControl>
                                     <Switch
                                         checked={field.value}
-                                        onCheckedChange={(checked) => handleToggle(checked)}
+                                        onCheckedChange={() => handleToggle()}
                                     />
                                 </FormControl>
-                                <FormLabel htmlFor="airplane-mode">
+                                <FormLabel htmlFor="verified">
                                     Verified status
                                 </FormLabel>
                             </div>
