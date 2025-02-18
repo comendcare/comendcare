@@ -7,7 +7,6 @@ import MDX from "@/components/mdx"
 import {cn, createDicebearAvatar, formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
 import {Button} from "@/components/ui/button"
-import {RoadmapCard} from "@/components/public-roadmap-card"
 import {PublicMilestoneDetails} from "@/components/public-milestone-details"
 import {FaArrowLeft, FaCalendar, FaCircleDollarToSlot, FaCity, FaPeopleGroup, FaPlus} from "react-icons/fa6"
 import {BackButton} from "@/components/back-button"
@@ -32,129 +31,130 @@ import {Label} from "@/components/ui/label"
 import ShareDialog from "@/components/share-dialog";
 import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import FeedbackForm from "@/components/feedback-form";
-import React from "react";
+import React, { useState } from "react";
+import { PublicRoadmapContent } from "@/components/public-roadmap-content"
 
-export async function generateMetadata({
-                                           params
-                                       }: {
-    params: { domain: string; slug: string }
-}) {
-    const domain = decodeURIComponent(params.domain)
-    const slug = decodeURIComponent(params.slug)
+// export async function generateMetadata({
+//                                            params
+//                                        }: {
+//     params: { domain: string; slug: string }
+// }) {
+//     const domain = decodeURIComponent(params.domain)
+//     const slug = decodeURIComponent(params.slug)
 
-    const organizationData = await getOrganizationData(domain)
+//     const organizationData = await getOrganizationData(domain)
 
-    // Fallback to avoid passing null to title or description
-    const title = organizationData?.name || "Default Title" // Use a fallback title
-    const description = organizationData?.description || "Default description" // Use a fallback description
+//     // Fallback to avoid passing null to title or description
+//     const title = organizationData?.name || "Default Title" // Use a fallback title
+//     const description = organizationData?.description || "Default description" // Use a fallback description
 
-    console.log("organizationData", organizationData)
-    if (!organizationData) {
-        return {
-            title: "Page Not Found",
-            description: "The page you are looking for does not exist."
-        }
-    }
+//     console.log("organizationData", organizationData)
+//     if (!organizationData) {
+//         return {
+//             title: "Page Not Found",
+//             description: "The page you are looking for does not exist."
+//         }
+//     }
 
-    return {
-        title,
-        description,
-        openGraph: {
-            title: title || undefined, // Ensure it's not null
-            description: description || undefined // Ensure it's not null
-        },
-        twitter: {
-            card: "summary_large_image",
-            title: title || undefined, // Ensure it's not null
-            description: description || undefined, // Ensure it's not null
-            creator: "@vercel"
-        },
-        ...(organizationData.customDomain && {
-            alternates: {
-                canonical: `https://${organizationData.customDomain}/${params.slug}`
-            }
-        })
-    }
-}
+//     return {
+//         title,
+//         description,
+//         openGraph: {
+//             title: title || undefined, // Ensure it's not null
+//             description: description || undefined // Ensure it's not null
+//         },
+//         twitter: {
+//             card: "summary_large_image",
+//             title: title || undefined, // Ensure it's not null
+//             description: description || undefined, // Ensure it's not null
+//             creator: "@vercel"
+//         },
+//         ...(organizationData.customDomain && {
+//             alternates: {
+//                 canonical: `https://${organizationData.customDomain}/${params.slug}`
+//             }
+//         })
+//     }
+// }
 
-export async function generateStaticParams() {
-    const allRoadmaps = await prisma.roadmap.findMany({
-        select: {
-            slug: true,
-            organization: {
-                select: {
-                    subdomain: true,
-                    customDomain: true
-                }
-            }
-        }
-        // feel free to remove this filter if you want to generate paths for all roadmaps
-        // where: {
-        //     organization: {
-        //         subdomain: "demo",
-        //     },
-        // },
-    })
+// export async function generateStaticParams() {
+//     const allRoadmaps = await prisma.roadmap.findMany({
+//         select: {
+//             slug: true,
+//             organization: {
+//                 select: {
+//                     subdomain: true,
+//                     customDomain: true
+//                 }
+//             }
+//         }
+//         // feel free to remove this filter if you want to generate paths for all roadmaps
+//         // where: {
+//         //     organization: {
+//         //         subdomain: "demo",
+//         //     },
+//         // },
+//     })
 
-    const allPaths = allRoadmaps
-        .flatMap(({organization, slug}) => [
-            organization?.subdomain && {
-                domain: `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
-                slug
-            },
-            organization?.customDomain && {
-                domain: organization.customDomain,
-                slug
-            }
-        ])
-        .filter(Boolean)
-    return allPaths
-}
+//     const allPaths = allRoadmaps
+//         .flatMap(({organization, slug}) => [
+//             organization?.subdomain && {
+//                 domain: `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
+//                 slug
+//             },
+//             organization?.customDomain && {
+//                 domain: organization.customDomain,
+//                 slug
+//             }
+//         ])
+//         .filter(Boolean)
+//     return allPaths
+// }
 
-const posts: Post[] = [
-    {
-        id: '1',
-        user: {
-            name: 'John Doe',
-            username: '@johndoe',
-            avatar: '/placeholder.svg?height=40&width=40'
-        },
-        content: 'Just finished a great hike! The view was breathtaking. 🏞️ #NatureLover',
-        image: '/placeholder.png',
-        likes: 120,
-        comments: 18,
-        shares: 5,
-        timestamp: '2 hours ago'
-    },
-    {
-        id: '2',
-        user: {
-            name: 'Jane Smith',
-            username: '@janesmith',
-            avatar: '/placeholder.svg?height=40&width=40'
-        },
-        content: 'Excited to announce my new project! Stay tuned for more details. 🚀 #NewBeginnings',
-        image: '/placeholder.png',
-        likes: 89,
-        comments: 32,
-        shares: 12,
-        timestamp: '5 hours ago'
-    },
-    {
-        id: '3',
-        user: {
-            name: 'Bob Jackson',
-            username: '@bobby',
-            avatar: '/placeholder.svg?height=40&width=40'
-        },
-        content: 'Hello!. 🚀 #NewBeginnings',
-        image: '/placeholder.png',
-        likes: 29,
-        comments: 32,
-        shares: 1,
-        timestamp: '5 hours ago'
-    }
-]
+// const posts: Post[] = [
+//     {
+//         id: '1',
+//         user: {
+//             name: 'John Doe',
+//             username: '@johndoe',
+//             avatar: '/placeholder.svg?height=40&width=40'
+//         },
+//         content: 'Just finished a great hike! The view was breathtaking. 🏞️ #NatureLover',
+//         image: '/placeholder.png',
+//         likes: 120,
+//         comments: 18,
+//         shares: 5,
+//         timestamp: '2 hours ago'
+//     },
+//     {
+//         id: '2',
+//         user: {
+//             name: 'Jane Smith',
+//             username: '@janesmith',
+//             avatar: '/placeholder.svg?height=40&width=40'
+//         },
+//         content: 'Excited to announce my new project! Stay tuned for more details. 🚀 #NewBeginnings',
+//         image: '/placeholder.png',
+//         likes: 89,
+//         comments: 32,
+//         shares: 12,
+//         timestamp: '5 hours ago'
+//     },
+//     {
+//         id: '3',
+//         user: {
+//             name: 'Bob Jackson',
+//             username: '@bobby',
+//             avatar: '/placeholder.svg?height=40&width=40'
+//         },
+//         content: 'Hello!. 🚀 #NewBeginnings',
+//         image: '/placeholder.png',
+//         likes: 29,
+//         comments: 32,
+//         shares: 1,
+//         timestamp: '5 hours ago'
+//     }
+// ]
 
 export default async function OrganizationRoadmapPage({
                                                           params
@@ -173,7 +173,6 @@ export default async function OrganizationRoadmapPage({
     if (!organization) {
         notFound()
     }
-    console.log(roadmaps[0])
 
     return (
         <>
@@ -271,18 +270,10 @@ export default async function OrganizationRoadmapPage({
                             </p>
 
                             {/*<div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">*/}
-                            <div className="flex flex-col-reverse md:grid md:grid-cols-3 m-auto w-full gap-4">
-                                <div className="md:col-span-2">
-                                    <RoadmapCard
-                                        roadmap={roadmaps[0]}
-                                        subdomain={organization?.subdomain || undefined}
-                                        isPublic={true}
-                                    />
-                                </div>
-                                <div className="col-span-1">
-                                    <PublicMilestoneDetails />
-                                </div>
-                            </div>
+                            <PublicRoadmapContent 
+                                roadmap={roadmaps[0]}
+                                subdomain={organization?.subdomain || undefined}
+                            />
 
                             {/*<div className="mt-8 w-full space-y-8">*/}
                             {/*    <h2 className="text-center text-3xl md:text-4xl font-bold">*/}

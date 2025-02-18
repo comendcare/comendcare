@@ -274,10 +274,14 @@ export default async function OrganizationRoadmapPage({
                                         roadmap={roadmaps[0]}
                                         subdomain={organization?.subdomain || undefined}
                                         isPublic={true}
+                                        externalLinks={false}
                                     />
                                 </div>
                                 <div className="col-span-1">
-                                    <PublicMilestoneDetails/>
+                                    <PublicMilestoneDetails
+                                        roadmap={roadmaps[0]}
+                                        urlMilestone={null}
+                                    />
                                 </div>
                             </div>
 

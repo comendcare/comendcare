@@ -233,6 +233,7 @@ export default async function ProfilePage() {
                                 roadmap={roadmaps[0]}
                                 subdomain={organization?.subdomain || undefined}
                                 isPublic={false}
+                                externalLinks={true}
                             />
                             {/*    </TabsContent>*/}
                             {/*    <TabsContent value="activity" className="mt-0">*/}
