@@ -9,6 +9,7 @@ import {LandingNavbar} from "@/components/layout/sections/landing-navbar";
 import PublicPageFooter from "@/components/public-page-footer"
 import {Button} from "@/components/ui/button"
 import {TooltipProvider} from "@radix-ui/react-tooltip"
+import {PublicPageNavbar} from "@/components/public-page-navbar";
 
 export async function generateMetadata({
                                            params
@@ -85,7 +86,7 @@ export default async function SiteLayout({
     return (
         <div className={fontMapper[data.font]}>
             <TooltipProvider>
-                <LandingNavbar/>
+                <PublicPageNavbar/>
                 <div>
                     {children}
                 </div>
