@@ -556,3 +556,60 @@ model Gene {
 
   @@index([symbol], map: "idx_symbol") // Index for faster search by symbol
 }
+
+model Company {
+  id                 String  @id @default(uuid())
+  url                String
+  scientistDotComURL String?
+  title              String
+  description        String?
+  yearEstablished    Int?
+  website            String?
+  headquarters       String?
+  companyType        String?
+
+  sites          Site[]
+  services       Service[]
+  certifications Certification[]
+  rfis           RFI[]
+}
+
+model Site {
+  id        String  @id @default(uuid())
+  name      String
+  address   String
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+}
+
+model Service {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  company     Company @relation(fields: [companyId], references: [id])
+  companyId   String
+}
+
+model Certification {
+  id        String  @id @default(uuid())
+  name      String
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+  files     File[]
+}
+
+model File {
+  id              String        @id @default(uuid())
+  fileName        String
+  fileUrl         String
+  certification   Certification @relation(fields: [certificationId], references: [id])
+  certificationId String
+}
+
+model RFI {
+  id          String    @id @default(uuid())
+  name        String
+  submittedOn DateTime?
+  company     Company   @relation(fields: [companyId], references: [id])
+  companyId   String
+}

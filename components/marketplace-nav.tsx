@@ -30,7 +30,7 @@ const links = [
     },
     {
         name: "CROs",
-        href: "#",
+        href: "/cro",
         comingSoon: false
     },
 ]
