@@ -113,10 +113,12 @@ const selector = (state: KanbanState) => ({
 
 export function EditTaskForm({
     taskData,
-    onClose
+    onClose,
+    setSelectIsOpen,
 }: {
     taskData: any
     onClose: () => void
+    setSelectIsOpen: (open: boolean) => void
 }) {
     const initializing = useRef(true)
     const { data: session } = useSession()
@@ -354,11 +356,12 @@ export function EditTaskForm({
                         control={form.control}
                         name="priority"
                         render={({ field }) => (
-                            <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
+                            <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full" onClick={(e) => e.preventDefault()}>
                                 <FormLabel className="text-md mt-2">{`Priority`}</FormLabel>
                                 <Select
                                     defaultValue={field.value}
                                     onValueChange={field.onChange}
+                                    onOpenChange={setSelectIsOpen}
                                 >
                                     <FormControl>
                                         <SelectTrigger>
@@ -424,6 +427,7 @@ export function EditTaskForm({
                                     <Select
                                         value={formData.milestone || ''}
                                         onValueChange={field.onChange}
+                                        onOpenChange={setSelectIsOpen}
                                     >
                                         <FormControl>
                                             <SelectTrigger>
