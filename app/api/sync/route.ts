@@ -328,7 +328,10 @@ const syncToTypesense = async (env: {
                     include: { node: true }
                 })
 
-                if (!milestone) return null;
+                // don't upload milestone data to typesense if
+                // 1. milestone doesn't exist
+                // 2. milestone is private
+                if (!milestone || milestone.private) return null;
 
                 return {
                     ...milestone,
