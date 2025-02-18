@@ -29,6 +29,7 @@ import {RoadmapCard} from "@/components/public-roadmap-card";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import NoOrganization from "@/components/no-organization";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
+import {PublishOrganizationSwitch} from "@/components/publish-organization-switch";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -84,7 +85,8 @@ export default async function ProfilePage() {
         // Existing verified organization rendering logic
         return (
             <main className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
-                <div className="w-full flex flex-col space-y-8 my-8">
+                <div className="w-full flex flex-col space-y-4 my-4">
+                    <PublishOrganizationSwitch organization={organization} />
                     <div>
                         <div>
                             {/* <img className="h-32 w-full object-cover lg:h-48"
