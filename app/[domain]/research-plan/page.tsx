@@ -34,82 +34,82 @@ import FeedbackForm from "@/components/feedback-form";
 import React, { useEffect, useState } from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
 
-// export async function generateMetadata({
-//                                            params
-//                                        }: {
-//     params: { domain: string; slug: string }
-// }) {
-//     const domain = decodeURIComponent(params.domain)
-//     const slug = decodeURIComponent(params.slug)
+export async function generateMetadata({
+                                           params
+                                       }: {
+    params: { domain: string; slug: string }
+}) {
+    const domain = decodeURIComponent(params.domain)
+    const slug = decodeURIComponent(params.slug)
 
-//     const organizationData = await getOrganizationData(domain)
+    const organizationData = await getOrganizationData(domain)
 
-//     // Fallback to avoid passing null to title or description
-//     const title = organizationData?.name || "Default Title" // Use a fallback title
-//     const description = organizationData?.description || "Default description" // Use a fallback description
+    // Fallback to avoid passing null to title or description
+    const title = organizationData?.name || "Default Title" // Use a fallback title
+    const description = organizationData?.description || "Default description" // Use a fallback description
 
-//     console.log("organizationData", organizationData)
-//     if (!organizationData) {
-//         return {
-//             title: "Page Not Found",
-//             description: "The page you are looking for does not exist."
-//         }
-//     }
+    console.log("organizationData", organizationData)
+    if (!organizationData) {
+        return {
+            title: "Page Not Found",
+            description: "The page you are looking for does not exist."
+        }
+    }
 
-//     return {
-//         title,
-//         description,
-//         openGraph: {
-//             title: title || undefined, // Ensure it's not null
-//             description: description || undefined // Ensure it's not null
-//         },
-//         twitter: {
-//             card: "summary_large_image",
-//             title: title || undefined, // Ensure it's not null
-//             description: description || undefined, // Ensure it's not null
-//             creator: "@vercel"
-//         },
-//         ...(organizationData.customDomain && {
-//             alternates: {
-//                 canonical: `https://${organizationData.customDomain}/${params.slug}`
-//             }
-//         })
-//     }
-// }
+    return {
+        title,
+        description,
+        openGraph: {
+            title: title || undefined, // Ensure it's not null
+            description: description || undefined // Ensure it's not null
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: title || undefined, // Ensure it's not null
+            description: description || undefined, // Ensure it's not null
+            creator: "@vercel"
+        },
+        ...(organizationData.customDomain && {
+            alternates: {
+                canonical: `https://${organizationData.customDomain}/${params.slug}`
+            }
+        })
+    }
+}
 
-// export async function generateStaticParams() {
-//     const allRoadmaps = await prisma.roadmap.findMany({
-//         select: {
-//             slug: true,
-//             organization: {
-//                 select: {
-//                     subdomain: true,
-//                     customDomain: true
-//                 }
-//             }
-//         }
-//         // feel free to remove this filter if you want to generate paths for all roadmaps
-//         // where: {
-//         //     organization: {
-//         //         subdomain: "demo",
-//         //     },
-//         // },
-//     })
+export async function generateStaticParams() {
+    const allRoadmaps = await prisma.roadmap.findMany({
+        select: {
+            slug: true,
+            organization: {
+                select: {
+                    subdomain: true,
+                    customDomain: true
+                }
+            }
+        }
+        // feel free to remove this filter if you want to generate paths for all roadmaps
+        // where: {
+        //     organization: {
+        //         subdomain: "demo",
+        //     },
+        // },
+    })
 
-//     const allPaths = allRoadmaps
-//         .flatMap(({organization, slug}) => [
-//             organization?.subdomain && {
-//                 domain: `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
-//                 slug
-//             },
-//             organization?.customDomain && {
-//                 domain: organization.customDomain,
-//                 slug
-//             }
-//         ])
-//         .filter(Boolean)
-//     return allPaths
-// }
+    const allPaths = allRoadmaps
+        .flatMap(({organization, slug}) => [
+            organization?.subdomain && {
+                domain: `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
+                slug
+            },
+            organization?.customDomain && {
+                domain: organization.customDomain,
+                slug
+            }
+        ])
+        .filter(Boolean)
+    return allPaths
+}
 
 // const posts: Post[] = [
 //     {

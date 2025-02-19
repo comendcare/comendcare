@@ -51,68 +51,8 @@ export interface TaskType {
     status: StatusType
 }
 
-function PublicMilestoneNodeButton(props: NodeProps<PublicMilestoneNode>) {
-    return(
-        <div onClick={() => {
-            if (props.data.setUrlMilestone) {
-                props.data.setUrlMilestone(props.data.id)
-            }
-        }}>
-            <Card 
-                className={cn(
-                    "w-[350px] text-wrap break-words", 
-                    props.data?.onboardingMilestone ? "research-plan-tour-step2" : "",
-                    props.data?.focused ? "border-2 border-black" : ""
-                )}
-            >
-                <CardHeader>
-                    <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
-                        <TypeBadge type={props.type}/>
-                        {!props.data?.private && props.data.externalLink && <FaArrowUpRightFromSquare className="h-[20px] w-[20px]"/>}
-                    </div>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                        <CardTitle>{props.data?.title || "New Milestone"}</CardTitle>
-                        <CardDescription className="text-wrap break-words line-clamp-2">
-                            {truncate(props.data?.description || "", 200)}
-                        </CardDescription>
-                    </div>
-
-                    <CardContents props={props}/>
-                </CardContent>
-                {props.data?.private && (
-                    <CardFooter className="flex justify-end">
-                        <PrivateBadge className="justify-start" />
-                    </CardFooter>
-                )}
-
-                <Handle
-                    type="target"
-                    position={Position.Left}
-                    className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
-                />
-                <Handle
-                    type="source"
-                    position={Position.Right}
-                    className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
-                />
-            </Card>
-        </div>
-    )
-}
-
-function PublicMilestoneNodeLink(props: NodeProps<PublicMilestoneNode>) {
+function PublicMilestoneNodeContents({props}: {props: NodeProps<PublicMilestoneNode>}) {
     return (
-        <a 
-            href={
-                props?.data?.subdomain && !props.data?.private ? 
-                    `http://${props.data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${props?.data?.id}&view=flow` :
-                    '/'
-            }
-            className={cn(props.data?.private ? "pointer-events-none": "")}
-            target={props.data.externalLink ? "_blank" : ""}
-        >
         <Card 
             className={cn(
                 "w-[350px] text-wrap break-words", 
@@ -153,6 +93,33 @@ function PublicMilestoneNodeLink(props: NodeProps<PublicMilestoneNode>) {
                 className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
             />
         </Card>
+    )
+}
+
+function PublicMilestoneNodeButton(props: NodeProps<PublicMilestoneNode>) {
+    return(
+        <div onClick={() => {
+            if (props.data.setUrlMilestone) {
+                props.data.setUrlMilestone(props.data.id)
+            }
+        }}>
+            <PublicMilestoneNodeContents props={props} />
+        </div>
+    )
+}
+
+function PublicMilestoneNodeLink(props: NodeProps<PublicMilestoneNode>) {
+    return (
+        <a 
+            href={
+                props?.data?.subdomain && !props.data?.private ? 
+                    `http://${props.data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${props?.data?.id}&view=flow` :
+                    '/'
+            }
+            className={cn(props.data?.private ? "pointer-events-none": "")}
+            target={props.data.externalLink ? "_blank" : ""}
+        >
+            <PublicMilestoneNodeContents props={props} />
         </a>
     )
 }
