@@ -121,7 +121,17 @@ export function Roadmap({data}: {data: any}) {
                             </TabsList>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button onClick={() => undo()} size={"icon"} variant={"ghost"}>
+                                    <Button onClick={() => {
+                                        console.log("Undo action triggered")
+                                        undo() // undo updates zustand state
+                                        saveState() // save state to update database
+                        
+                                        if (selectedNodeId) {
+                                            // if there is a node selected, remount the milestone form
+                                            // to update the form data after the undo was triggered
+                                            setMilestoneRemountKey(prevKey => prevKey + 1)
+                                        }
+                                    }} size={"icon"} variant={"ghost"}>
                                         <FaUndo />
                                     </Button>
                                 </TooltipTrigger>
