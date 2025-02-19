@@ -169,7 +169,7 @@ export const useKanbanStore = create<KanbanState>()(
             saveState: () => {
                 console.log(`save state`)
                 const state = get()
-                // kanbanSync({ kanbanId: state.kanbanId, columns: state.columns, tasks: state.tasks })
+                kanbanSync({ kanbanId: state.kanbanId, columns: state.columns, tasks: state.tasks })
             }
         }),
         {

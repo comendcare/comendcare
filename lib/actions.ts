@@ -2175,6 +2175,9 @@ export async function kanbanSync({kanbanId, columns, tasks}: {kanbanId: string |
     try {
         if (!kanbanId) return
 
+        console.log(`kanban id`, kanbanId)
+        // return
+
         await prisma.column.deleteMany({
             where: { kanbanId }
         })
@@ -2187,30 +2190,25 @@ export async function kanbanSync({kanbanId, columns, tasks}: {kanbanId: string |
                     data: {
                         ...column,
                         kanbanId,
-                        // kanban: { connect: { id: kanbanId } },
                         tasks: {
-                            createMany: {
-                                data: tasks.filter(t => t.columnId === column.id).map(task => ({
-                                    ...task,
-                                    checklist: {
-                                        createMany: {
-                                            data: (task.checklist || []).map((item: any) => ({
-                                                ...item
-                                            }))
-                                        }
-                                    },
-                                    milestoneId: task.milestoneId,
-                                    // milestone: { connect: { id: task.milestoneId } },
-                                    stakeholders: {
-                                        createMany: {
-                                            data: (task.stakeholders || []).map((stakeholder: any) => ({
-                                                userId: stakeholder?.user?.id || stakeholder?.userId,
-                                                // user: { connect: { id: stakeholder.id }},
-                                            }))
-                                        }
-                                    }
-                                }))
-                            }
+                            create: tasks.filter(t => t.columnId === column.id).map(task => ({
+                                ...task,
+                                columnId: undefined,
+                                column: undefined,
+                                checklist: {
+                                    create: (task.checklist || []).map((item: any) => ({
+                                        ...item,
+                                        taskId: undefined
+                                    }))
+                                },
+                                milestoneId: task.milestoneId,
+                                milestone: undefined,
+                                stakeholders: {
+                                    create: (task.stakeholders || []).map((stakeholder: any) => ({
+                                        userId: stakeholder?.user?.id || stakeholder?.userId,
+                                    }))
+                                }
+                            }))
                         }
                     }
                 })
