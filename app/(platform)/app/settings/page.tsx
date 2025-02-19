@@ -17,7 +17,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import OrganizationSettingsPage from "@/components/organization-settings-page";
 import {Organization} from "@prisma/client";
 
-export default async function DashboardPage() {
+export default async function SettingsPage() {
     const session = await getSession()
 
     let organization = null
