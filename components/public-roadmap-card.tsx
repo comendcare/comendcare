@@ -33,17 +33,6 @@ export const RoadmapCard = ({
 }) => {
     const router = useRouter()
     const pathname = usePathname()
-    // const searchParams = useSearchParams()
-    // const urlView = searchParams.get("view")
-
-    // const handleTabChange = (value: string) => {
-    //     const params = new URLSearchParams(searchParams.toString())
-
-    //     params.delete("view")
-    //     params.set("view", value)
-
-    //     // router.replace(`${pathname}?${params.toString()}`)
-    // }
 
     if (!roadmap) {
         return <Card className="organization-profile-tour-step4">
@@ -169,6 +158,8 @@ export const RoadmapCard = ({
                             roadmap={roadmap} 
                             subdomain={subdomain}
                             externalLinks={externalLinks}
+                            urlMilestone={urlMilestone}
+                            setUrlMilestone={setUrlMilestone}
                         />
                     </TabsContent>
                     <TabsContent value="flow" className="space-y-4 w-full">
@@ -177,6 +168,7 @@ export const RoadmapCard = ({
                                 roadmap={roadmap} 
                                 subdomain={subdomain}
                                 urlMilestone={urlMilestone || undefined} 
+                                setUrlMilestone={setUrlMilestone || undefined}
                                 externalLinks={externalLinks}
                             />
                         </div>
