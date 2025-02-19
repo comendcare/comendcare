@@ -7,10 +7,26 @@ import {
     useReactFlow,
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
-import PublicMilestoneNode from "./public-milestone-node"
+import {MemoPublicMilestoneNodeLink, MemoPublicMilestoneNodeButton} from "./public-milestone-node"
 
-export const PublicFlowView = ({ roadmap, subdomain, urlMilestone, externalLinks }: { roadmap: any, subdomain: string | undefined, urlMilestone: string | undefined, externalLinks: boolean }) => {
-    const nodeTypes = { PROJECT: PublicMilestoneNode, ASSET: PublicMilestoneNode, RFP: PublicMilestoneNode }
+export const PublicFlowView = ({ 
+    roadmap, 
+    subdomain, 
+    urlMilestone, 
+    setUrlMilestone, 
+    externalLinks 
+}: { 
+    roadmap: any, 
+    subdomain: string | undefined, 
+    urlMilestone: string | undefined, 
+    setUrlMilestone?: (id: string) => void | undefined,
+    externalLinks: boolean 
+}) => {
+    const nodeTypes = { 
+        PROJECT: externalLinks ? MemoPublicMilestoneNodeLink: MemoPublicMilestoneNodeButton, 
+        ASSET: externalLinks ? MemoPublicMilestoneNodeLink: MemoPublicMilestoneNodeButton, 
+        RFP: externalLinks ? MemoPublicMilestoneNodeLink: MemoPublicMilestoneNodeButton
+    }
     const { fitView } = useReactFlow()
 
     console.log(roadmap)
@@ -39,7 +55,8 @@ export const PublicFlowView = ({ roadmap, subdomain, urlMilestone, externalLinks
                 ...node.data,
                 subdomain: subdomain,
                 focused: urlMilestone === node?.data?.id,
-                externalLink: externalLinks
+                externalLink: externalLinks,
+                setUrlMilestone: setUrlMilestone
             }
         })) || []}
         edges={roadmap?.edges || []}

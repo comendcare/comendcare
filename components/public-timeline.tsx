@@ -10,10 +10,12 @@ import { Card, CardContent } from "./ui/card"
 import { Button } from "./ui/button"
 import { usePathname } from "next/navigation"
 
-export const PublicTimelineView = ({roadmap, subdomain, externalLinks}: {
+export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilestone, setUrlMilestone}: {
     roadmap: any,
     subdomain: string | undefined,
-    externalLinks: boolean
+    externalLinks: boolean,
+    urlMilestone?: string | undefined,
+    setUrlMilestone?: (id: string) => void | undefined
 }) => {
     return (
         <ol className="relative border-s border-gray-200 dark:border-gray-700 space-y-8">
@@ -22,7 +24,7 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks}: {
                 }).map((item: any, index: number) => (
                     externalLinks 
                         ? <TimelineElementLink key={index} subdomain={subdomain} item={item}/> 
-                        : <TimelineElementButton key={index} item={item} />
+                        : <TimelineElementButton key={index} item={item} setUrlMilestone={setUrlMilestone}/>
             ))}
         </ol>
     )
@@ -30,37 +32,48 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks}: {
 
 const TimelineElementLink = ({key, subdomain, item}: {key: number, subdomain: string | undefined, item: any}) => {
     return (
-        <a
-            href={
-                subdomain ?
-                    `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${item?.id}&view=timeline` :
-                    ''
-            }
-            className={cn("group", item.private ? "pointer-events-none": "")}
-            target="_blank"
-        >
-            <TimelineElementContent 
-                item={item}
-                externalLinkIcon={true}
-            />
-        </a>
+        <li className="ms-6">
+            <a
+                href={
+                    subdomain ?
+                        `http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${item?.id}&view=timeline` :
+                        ''
+                }
+                className={cn("group", item.private ? "pointer-events-none": "")}
+                target="_blank"
+            >
+                <TimelineElementContent 
+                    item={item}
+                    externalLinkIcon={true}
+                />
+            </a>
+        </li>
     )
 }
 
-const TimelineElementButton = ({key, item}: {key: number, item: any}) => {
+const TimelineElementButton = ({key, item, setUrlMilestone}: {key: number, item: any, setUrlMilestone?: (id: string) => void | undefined}) => {
     return (
-        <Button asChild>
-            <TimelineElementContent 
-                item={item}
-                externalLinkIcon={false}
-            />
-        </Button>
+        <li className="ms-6">
+            <div 
+                className="hover:cursor-pointer"
+                onClick={() => {
+                    if (setUrlMilestone !== undefined) {
+                        setUrlMilestone(item.id)
+                    }
+                }}
+            >
+                <TimelineElementContent 
+                    item={item}
+                    externalLinkIcon={false}
+                />
+            </div>
+        </li>
     )
 }
 
 const TimelineElementContent = ({item, externalLinkIcon}: {item: any, externalLinkIcon: boolean}) => {
     return (
-        <li className="ms-6">
+        <>
             <span className="absolute flex items-center justify-center bg-white rounded-full -start-4">
                 <TypeBadge className="w-8 p-2" iconOnly={true} type={item?.node?.type || "PROJECT"}/>
             </span>
@@ -78,6 +91,6 @@ const TimelineElementContent = ({item, externalLinkIcon}: {item: any, externalLi
             <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2">
                 {item.description}
             </p>
-        </li>
+        </>
     )
 }

@@ -1,4 +1,4 @@
-import {notFound, useSearchParams} from "next/navigation"
+import {notFound, usePathname, useSearchParams} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getRoadmapData, getOrganizationData, getRoadmapsForOrganization, getMilestoneDetails} from "@/lib/fetchers"
 import BlogCard from "@/components/blog-card"
@@ -31,7 +31,7 @@ import {Label} from "@/components/ui/label"
 import ShareDialog from "@/components/share-dialog";
 import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import FeedbackForm from "@/components/feedback-form";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
 
 // export async function generateMetadata({
