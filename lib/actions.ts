@@ -2051,8 +2051,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         await Promise.all(
             milestones.map(async (milestone: any) => {
                 const previousMilestone = await prisma.milestone.findUnique({
-                    // where: {nodeId: milestone.nodeId},
-                    where: {id: milestone.id},
+                    where: {nodeId: milestone.nodeId},
+                    // where: {id: milestone.id},
                     include: {
                         attachments: true,
                         contacts: true,
@@ -2063,12 +2063,12 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
 
                 if (!previousMilestone) {
                     // milestone doesn't exist, throw error
-                    throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`);
+                    throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`)
                 }
 
                 let m = await prisma.milestone.update({
-                    // where: {nodeId: milestone.nodeId},
-                    where: {id: milestone.id},
+                    where: {nodeId: milestone.nodeId},
+                    // where: {id: milestone.id},
                     include: {
                         attachments: true,
                         contacts: true,

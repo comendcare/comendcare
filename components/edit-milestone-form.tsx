@@ -168,7 +168,7 @@ export function EditMilestoneForm({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
-            nodeType: milestoneData?.node?.type || "PROJECT",
+            nodeType: milestoneData?.nodeType || milestoneData?.node?.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
             types: (milestoneData?.types || []).map((type: any) => MILESTONE_TYPE_OPTIONS.find(option => option?.value === type) || {
