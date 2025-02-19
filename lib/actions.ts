@@ -344,7 +344,7 @@ export const createOrganization = async (formData: FormData) => {
             data: {
                 userId: session.user.id,
                 email: session.user.email,
-                role: "admin", // Creator of organization is admin by default
+                role: "owner", // Creator of organization is owner by default
                 title: title,
                 organizationId: response.id
             }
@@ -390,6 +390,40 @@ export const createOrganization = async (formData: FormData) => {
             return {
                 error: error.message
             }
+        }
+    }
+}
+
+export const toggleOrganizationPublished = async (organizationId: string) => {
+    try {
+        const organization = await prisma.organization.findUnique({
+            where: {
+                id: organizationId,
+            }
+        })
+
+        if (organization) {
+            // Toggle the 'published' attribute
+            const updatedOrganization = await prisma.organization.update({
+                where: {
+                    id: organization.id
+                },
+                data: {
+                    published: !organization.published
+                }
+            })
+
+            // Log or revalidate if necessary
+            console.log("Toggled published status for organization", organization.id)
+            await revalidateTag(
+                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+            )
+
+            return updatedOrganization
+        }
+    } catch (error: any) {
+        return {
+            error: error.message
         }
     }
 }

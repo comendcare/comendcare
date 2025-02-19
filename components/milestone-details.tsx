@@ -30,41 +30,27 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
         <Card>
             <CardHeader className="flex flex-row gap-4">
                 <span className="flex flex-col gap-4 grow">
-                    <CardTitle
-                        className="flex flex-row gap-4 items-center scroll-m-20 text-2xl font-bold tracking-tight">
-                        {milestone.title}
+                    <div className="flex flex-row gap-4 items-center justify-between">
+                        <CardTitle
+                            className="scroll-m-20 text-2xl font-bold tracking-tight">
+                            {milestone.title}
+                        </CardTitle>
 
-                        <StatusButton
-                            disabled={true}
-                            status={milestone.status}
-                            onStatusChange={() => {
-                            }}
-                            className="w-fit font-normal"
-                        />
-                    </CardTitle>
-
-                    {milestone.node.type && (
-                        <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone.node.type))?.value || "PROJECT"}/>
-                    )}
-
-                    {(milestone.types || []).map((type: string, index: number) => (
-                        <Badge className="flex text-sm h-[30px] w-fit" key={index}>
-                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === type))?.label || "No type"}
-                        </Badge>
-                    ))}
+                        {milestone.node.type && (
+                            <TypeBadge className="w-fit"
+                                       type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone.node.type))?.value || "PROJECT"}/>
+                        )}
+                    </div>
 
                     <CardDescription className="text-base">
                         {milestone.description}
                     </CardDescription>
 
-                    <DateView startDate={milestone.startDate} endDate={milestone.endDate}/>
                 </span>
             </CardHeader>
-            <CardContent className="flex flex-col gap-8">
-                <div className="flex flex-col gap-4 text-gray-500">
-
-                    <BudgetView budget={milestone.budget}/>
-                </div>
+            <CardContent className="flex flex-col gap-4">
+                <DateView startDate={milestone.startDate} endDate={milestone.endDate}/>
+                <BudgetView budget={milestone.budget}/>
 
                 {/* {(milestone?.asset || milestone?.RFP) && (
                     <>
@@ -87,6 +73,29 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                     </>
                 )} */}
 
+                <span className="w-full flex gap-2 flex-wrap text-wrap">
+                    {milestone.status &&
+                        <StatusButton
+                            className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
+                            disabled={true}
+                            status={milestone.status}
+                            onStatusChange={() => {
+                            }}
+                        />
+                    }
+                    {(milestone.types || []).sort((a: any, b: any) => a.length - b.length).map((milestoneType: any, index: number) => (
+                        <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
+                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                        </Badge>
+                    ))}
+                </span>
+
+                {/*{(milestone.types || []).map((type: string, index: number) => (*/}
+                {/*    <Badge className="flex text-sm h-[30px] w-fit" key={index}>*/}
+                {/*        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === type))?.label || "No type"}*/}
+                {/*    </Badge>*/}
+                {/*))}*/}
+
                 {milestone.attachments && milestone.attachments.length > 0 && (
                     <div className="flex flex-col gap-4">
                         <Separator/>
@@ -96,7 +105,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                                 <Link href={attachment.link} key={index} target="_blank">
                                     <Button variant="secondary">
                                         {/* <FaPaperclip/> */}
-                                        <FaArrowUpRightFromSquare />
+                                        <FaArrowUpRightFromSquare/>
                                         {attachment.name || attachment.link}
                                     </Button>
                                 </Link>

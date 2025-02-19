@@ -45,7 +45,7 @@ model User {
 
 model Member {
   id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  role           String
+  role           String       @default("admin") @db.VarChar
   title          String?
   email          String
   userId         String
@@ -64,7 +64,7 @@ model Member {
 model Invitation {
   id             String       @id @default(cuid())
   email          String
-  role           String       @db.VarChar
+  role           String       @default("admin") @db.VarChar
   organizationId String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
@@ -78,7 +78,7 @@ model MemberRequest {
   id             String       @id @default(cuid())
   userId         String
   email          String
-  role           String       @db.VarChar
+  role           String       @default("admin") @db.VarChar
   organizationId String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
@@ -338,6 +338,7 @@ model Organization {
   id                  String                    @id @default(cuid())
   public              Boolean                   @default(true)
   verified            Boolean                   @default(false)
+  published           Boolean                   @default(false)
   name                String?
   description         String?                   @db.Text
   logo                String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text

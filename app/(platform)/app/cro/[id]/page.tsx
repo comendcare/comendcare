@@ -63,8 +63,8 @@ export default async function CompanyHomePage({
                 <Link
                     href={
                         process.env.NEXT_PUBLIC_VERCEL_ENV
-                            ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/patient-groups`
-                            : `http://localhost:3000/app/marketplace/patient-groups`
+                            ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/cro`
+                            : `http://localhost:3000/app/marketplace/cro`
                     }
                     className="inline-flex items-center gap-x-2 hover:underline"
                 >
