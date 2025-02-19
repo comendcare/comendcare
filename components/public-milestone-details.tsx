@@ -18,7 +18,6 @@ import { MilestoneDetails } from "./milestone-details"
 
 export function PublicMilestoneDetails({roadmap, urlMilestone}: {roadmap: any, urlMilestone: string | null}) {
     const searchParams = useSearchParams()
-    // const urlMilestone = searchParams.get("milestone")
     const [milestone, setMilestone] = useState<any>()
 
     useEffect(() => {
