@@ -121,6 +121,7 @@ export default async function OrganizationHomePage({
                                 <PAGProfileConditionsCard
                                     conditions={conditions}
                                     organization={organization}
+                                    showEditDialog={false}
                                 />
                             </div>
                         </div>

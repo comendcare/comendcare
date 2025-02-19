@@ -10,7 +10,7 @@ import {FaQuestionCircle} from "react-icons/fa";
 import React from "react";
 import EditPAGProfileConditionCardDialog from "@/components/edit-pag-profile-condition-card-dialog";
 
-export const PAGProfileConditionsCard = ({conditions, organization}: { conditions: Condition[] | null, organization: Organization }) => {
+export const PAGProfileConditionsCard = ({conditions, organization, showEditDialog}: { conditions: Condition[] | null, organization: Organization, showEditDialog: boolean }) => {
 
     if (conditions) {
         return (
@@ -20,7 +20,9 @@ export const PAGProfileConditionsCard = ({conditions, organization}: { condition
                         <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
                             Condition
                         </CardTitle>
-                        <EditPAGProfileConditionCardDialog organization={organization}/>
+                        {showEditDialog &&
+                            <EditPAGProfileConditionCardDialog organization={organization}/>
+                        }
                     </CardHeader>
 
                     <CardContent>
