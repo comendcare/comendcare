@@ -38,7 +38,7 @@ export default async function PAGSettingsMembersTab() {
     }
 
     let fetchedMembers: any[] | undefined = []
-    const response = await getMembers(session?.user.organizationId);
+    const response = await getMembers(session.user.organizationId);
     if (response.success) {
         fetchedMembers = response.data
     } else {
