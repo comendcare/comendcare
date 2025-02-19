@@ -2171,6 +2171,58 @@ export async function createKanban(orgId: string) {
 }
 
 /* HANDLE KANBAN COLUMNS - create, update, delete ------------------------------------------------------------------------ */
+export async function kanbanSync({kanbanId, columns, tasks}: {kanbanId: string | undefined, columns: Column[], tasks: Task[]}) {
+    try {
+        if (!kanbanId) return
+
+        await prisma.column.deleteMany({
+            where: { kanbanId }
+        })
+
+        // Save or update nodes
+        await Promise.all(
+            columns.map(async (column: Column) => {
+                const c = await prisma.column.create({
+                    // here we have to re-connect all the previously created connections
+                    data: {
+                        ...column,
+                        kanbanId,
+                        // kanban: { connect: { id: kanbanId } },
+                        tasks: {
+                            createMany: {
+                                data: tasks.filter(t => t.columnId === column.id).map(task => ({
+                                    ...task,
+                                    checklist: {
+                                        createMany: {
+                                            data: (task.checklist || []).map((item: any) => ({
+                                                ...item
+                                            }))
+                                        }
+                                    },
+                                    milestoneId: task.milestoneId,
+                                    // milestone: { connect: { id: task.milestoneId } },
+                                    stakeholders: {
+                                        createMany: {
+                                            data: (task.stakeholders || []).map((stakeholder: any) => ({
+                                                userId: stakeholder?.user?.id || stakeholder?.userId,
+                                                // user: { connect: { id: stakeholder.id }},
+                                            }))
+                                        }
+                                    }
+                                }))
+                            }
+                        }
+                    }
+                })
+            })
+        )
+
+    } catch (error: any) {
+        logError("Error syncing kanban", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 export async function createColumn(column: Partial<Column>) {
     try {
         const {data: kanban} = await getKanbanFromOrganizationId()

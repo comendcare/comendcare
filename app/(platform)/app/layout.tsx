@@ -120,7 +120,8 @@ export default function AppLayout({children}: AppLayoutProps) {
                 const kanbanResponse = await getColumns(session.user.organizationId)
                 if (kanbanResponse.success) {
                     initializeKanbanState({
-                        columns: kanbanResponse.data.columns
+                        columns: kanbanResponse.data.columns,
+                        kanbanId: kanban?.data?.id
                     })
                 }
             } else {

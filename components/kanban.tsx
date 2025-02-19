@@ -33,6 +33,9 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "./u
 import {Column} from "@/lib/actions"
 import NewColumnDialog from "./new-column-dialog"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "./ui/button"
+import { FaUndo } from "react-icons/fa"
 
 export type ColumnId = string
 
@@ -40,12 +43,30 @@ const kanbanSelector = (state: KanbanState) => ({
     columns: state.columns,
     tasks: state.tasks,
     setTasks: state.setTasks,
-    setColumns: state.setColumns
+    setColumns: state.setColumns,
+    saveState: state.saveState
 })
 
 export function KanbanView() {
-    const {columns, tasks} = useKanbanStore(useShallow(kanbanSelector))
+    const { undo } = useKanbanStore.temporal.getState()
+    const {columns, tasks, saveState} = useKanbanStore(useShallow(kanbanSelector))
     const [sortBy, setSortBy] = useState<string>('default')
+    const [mountKey, setMountKey] = useState(1)
+
+    useEffect(() => {
+        const handleUndo = (event: KeyboardEvent) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+                event.preventDefault(); // Prevent default undo behavior (optional)
+                console.log("Undo action triggered")
+                undo() // undo updates zustand state
+                saveState() // save state to update database
+                setMountKey(prev => prev + 1)
+            }
+        };
+    
+        document.addEventListener("keydown", handleUndo);
+        return () => document.removeEventListener("keydown", handleUndo);
+    }, []);
 
     return (
         <Tabs defaultValue="team" className="w-full p-4 flex flex-col gap-4">
@@ -67,6 +88,21 @@ export function KanbanView() {
                         </SelectContent>
                     </Select>
                 </div>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button onClick={() => {
+                            console.log("Undo action triggered")
+                            undo() // undo updates zustand state
+                            saveState() // save state to update database
+                            setMountKey(prev => prev + 1)
+                        }} size={"icon"} variant={"ghost"}>
+                            <FaUndo />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-80">
+                        <p>{`Undo`}</p>
+                    </TooltipContent>
+                </Tooltip>
                 <NewColumnDialog />
             </div>
             <ScrollArea className="pr-4 pb-4">
@@ -182,6 +218,10 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
         setColumns(initColumns)
         setTasks(sortKanbanTasks(initTasks))
     }, [initTasks, initColumns, filter, sortBy])
+
+    useEffect(() => {
+        console.log(`tasks changed`, tasks)
+    }, [tasks])
 
     function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
         const tasksInColumn = tasks?.filter(task => task.columnId === columnId)
@@ -410,14 +450,12 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
                     activeTask.columnId = overId as ColumnId
                     return arrayMove(tasks, activeIndex, activeIndex)
                 }
+
                 return tasks
             }
         } else if (isActiveAColumn) {
-            console.log(`is active column`, isActiveAColumn)
-            console.log(`is over a column`, isOverAColumn)
             // Im dropping a Column over another Column
             if (isActiveAColumn && isOverAColumn) {
-                console.log(`GOT HERE`)
                 setColumns(columns => {
                     const activeIndex = columns.findIndex((c: any) => c.id === activeId)
                     const overIndex = columns.findIndex((c: any) => c.id === overId)
