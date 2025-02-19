@@ -570,7 +570,7 @@ async function main() {
 
     await prisma.member.create({
         data: {
-            role: "admin",
+            role: "owner",
             email: "alice@prisma.io",
             title: "Donor engagement lead",
             user: {
@@ -588,7 +588,7 @@ async function main() {
 
     await prisma.member.create({
         data: {
-            role: "admin",
+            role: "owner",
             email: "flawnsontong1@gmail.com",
             title: "Director of Research",
             user: {
@@ -606,7 +606,7 @@ async function main() {
 
     await prisma.member.create({
         data: {
-            role: "admin",
+            role: "owner",
             email: "albert@comendcare.com",
             title: "Director of Research",
             user: {
@@ -624,7 +624,7 @@ async function main() {
 
     await prisma.member.create({
         data: {
-            role: "admin",
+            role: "owner",
             email: "betty.trevino@comendcare.com",
             title: "Marketing Lead",
             user: {
@@ -642,7 +642,7 @@ async function main() {
 
     await prisma.member.create({
         data: {
-            role: "admin",
+            role: "owner",
             email: "megan@comendcare.com",
             title: "Sofware Engineer",
             user: {
@@ -660,7 +660,7 @@ async function main() {
 
     await prisma.member.create({
         data: {
-            role: "admin",
+            role: "owner",
             email: "ivan@prisma.io",
             title: "Patient Engagement Lead",
             user: {
@@ -678,7 +678,7 @@ async function main() {
 
     await prisma.member.create({
         data: {
-            role: "admin",
+            role: "owner",
             email: "heidi@prisma.io",
             title: "Patient Engagement Lead",
             user: {

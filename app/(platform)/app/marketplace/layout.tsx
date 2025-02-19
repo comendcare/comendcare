@@ -1,11 +1,16 @@
 "use client"
-// import {Metadata} from "next"
 import {MarketplaceNav} from "@/components/marketplace-nav"
 import {MilestoneFilters} from "@/components/milestone-filters"
 import {PAGFilters} from "@/components/pag-filters"
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable"
 import {useFiltersStore} from "@/state/nav/navStore"
 import {usePathname} from "next/navigation"
+import {useEffect, useState} from "react";
+import {Organization} from "@prisma/client";
+import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {toast} from "sonner";
+import {useSession} from "next-auth/react";
+import Image from "next/image"
 
 // export const metadata: Metadata = {
 //     title: "Comend",
@@ -18,7 +23,46 @@ interface ProjectLayoutProps {
 
 export default function ProjectLayout({children}: ProjectLayoutProps) {
     // Zustand state management
+    const {data: session} = useSession()
     const {defaultLayout, setLayout} = useFiltersStore()
+    const [organization, setOrganization] = useState<Organization | null>();
+
+    useEffect(() => {
+        session?.user?.organizationId ? getOrganizationFromOrganizationId(session.user?.organizationId).then((response) => {
+            if (response.success) {
+                const organization = response.data
+                setOrganization(organization)
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
+            }
+        }) : toast.error("No organizationId provided")
+    }, [session?.user?.organizationId, setOrganization]);
+
+    if (organization && !organization?.published) {
+        return <div className="h-full flex flex-col mx-auto items-center justify-center py-20">
+            <Image
+                alt="Organization not published"
+                src="https://illustrations.popsy.co/gray/meditation-girl.svg"
+                width={400}
+                height={400}
+                className="dark:hidden"
+            />
+            <Image
+                alt="Organization not published"
+                src="https://illustrations.popsy.co/white/meditation-girl.svg"
+                width={400}
+                height={400}
+                className="hidden dark:block"
+            />
+            <p className="text-center font-title text-2xl text-stone-600 dark:text-stone-400">
+                {`Your organization isn't published yet.`}
+            </p>
+            <p className="text-center mt-4 text-stone-500 dark:text-stone-300 max-w-xl">
+                {`To access the marketplace you need to publish your organization. Only published organizations can view and be shown in the marketplace.`}
+            </p>
+        </div>
+    }
 
     return (
         <ResizablePanelGroup

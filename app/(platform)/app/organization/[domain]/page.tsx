@@ -11,6 +11,7 @@ import Image from "next/image";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import Link from "next/link";
 import {FaArrowLeftLong} from "react-icons/fa6";
+import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -85,6 +86,13 @@ export default async function OrganizationHomePage({
         );
     }
 
+    if (!organization.published) {
+        // Render unpublished organization state
+        return (
+            <UnpublishedOrganizationPage organization={organization}/>
+        );
+    }
+
     return (
         <div
             className="flex flex-col w-full max-w-7xl mx-auto p-4 gap-4"
@@ -113,6 +121,7 @@ export default async function OrganizationHomePage({
                                 <PAGProfileConditionsCard
                                     conditions={conditions}
                                     organization={organization}
+                                    showEditDialog={false}
                                 />
                             </div>
                         </div>
