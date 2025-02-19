@@ -139,6 +139,7 @@ export default async function OrganizationHomePage({
                                     roadmap={roadmaps?.[0]}
                                     subdomain={organization?.subdomain || undefined}
                                     isPublic={true}
+                                    externalLinks={true}
                                 />
                                 : <Card>
                                     <CardContent>

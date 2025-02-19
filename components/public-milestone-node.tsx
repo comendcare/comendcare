@@ -40,6 +40,7 @@ export type PublicMilestoneNode = Node<
         externalLink: boolean,
         focused: boolean
         contacts: any[],
+        setUrlMilestone?: (id: string) => void | undefined
     },
     "PROJECT" | "ASSET" | "RFP"
 >
@@ -50,17 +51,8 @@ export interface TaskType {
     status: StatusType
 }
 
-function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
+function PublicMilestoneNodeContents({props}: {props: NodeProps<PublicMilestoneNode>}) {
     return (
-        <a 
-            href={
-                props?.data?.subdomain && !props.data?.private ? 
-                    `http://${props.data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${props?.data?.id}&view=flow` :
-                    '/'
-            }
-            className={cn(props.data?.private ? "pointer-events-none": "")}
-            target={props.data.externalLink ? "_blank" : ""}
-        >
         <Card 
             className={cn(
                 "w-[350px] text-wrap break-words", 
@@ -101,8 +93,37 @@ function PublicMilestoneNode(props: NodeProps<PublicMilestoneNode>) {
                 className="z-10 bg-black p-1 rounded-full border-solid border-black border-2"
             />
         </Card>
+    )
+}
+
+function PublicMilestoneNodeButton(props: NodeProps<PublicMilestoneNode>) {
+    return(
+        <div onClick={() => {
+            if (props.data.setUrlMilestone) {
+                props.data.setUrlMilestone(props.data.id)
+            }
+        }}>
+            <PublicMilestoneNodeContents props={props} />
+        </div>
+    )
+}
+
+function PublicMilestoneNodeLink(props: NodeProps<PublicMilestoneNode>) {
+    return (
+        <a 
+            href={
+                props?.data?.subdomain && !props.data?.private ? 
+                    `http://${props.data.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${props?.data?.id}&view=flow` :
+                    '/'
+            }
+            className={cn(props.data?.private ? "pointer-events-none": "")}
+            target={props.data.externalLink ? "_blank" : ""}
+        >
+            <PublicMilestoneNodeContents props={props} />
         </a>
     )
 }
 
-export default memo(PublicMilestoneNode)
+// export default memo(PublicMilestoneNodeLink)
+export const MemoPublicMilestoneNodeLink = memo(PublicMilestoneNodeLink)
+export const MemoPublicMilestoneNodeButton = memo(PublicMilestoneNodeButton)
