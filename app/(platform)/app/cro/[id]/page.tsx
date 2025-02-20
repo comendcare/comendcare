@@ -145,17 +145,17 @@ export default async function CompanyHomePage({
                                     </div>
                                 )}
                             </TabsTrigger>
-                            <TabsTrigger value="rfis" variant="outline" className="px-8">
-                                <FaFileContract className="mr-1.5 h-4 w-4 flex-shrink-0"/>
-                                RFIs
-                                {cro.rfis.length && (
-                                    <div
-                                        className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
-                                    >
-                                        {cro.rfis.length}
-                                    </div>
-                                )}
-                            </TabsTrigger>
+                            {/*<TabsTrigger value="rfis" variant="outline" className="px-8">*/}
+                            {/*    <FaFileContract className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
+                            {/*    RFIs*/}
+                            {/*    {cro.rfis.length && (*/}
+                            {/*        <div*/}
+                            {/*            className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'*/}
+                            {/*        >*/}
+                            {/*            {cro.rfis.length}*/}
+                            {/*        </div>*/}
+                            {/*    )}*/}
+                            {/*</TabsTrigger>*/}
                             <TabsTrigger value="certifications" variant="outline" className="px-8">
                                 <FaListCheck className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                                 Certifications
@@ -185,9 +185,9 @@ export default async function CompanyHomePage({
                         <TabsContent value="sites" className="space-y-4 w-full">
                             <CROMarketplaceProfileSitesTab croSites={cro.sites}/>
                         </TabsContent>
-                        <TabsContent value="rfis" className="space-y-4 w-full">
-                            <CROMarketplaceProfileRFIsTab croRFIs={cro.rfis}/>
-                        </TabsContent>
+                        {/*<TabsContent value="rfis" className="space-y-4 w-full">*/}
+                        {/*    <CROMarketplaceProfileRFIsTab croRFIs={cro.rfis}/>*/}
+                        {/*</TabsContent>*/}
                         <TabsContent value="certifications" className="space-y-4 w-full">
                             <CROMarketplaceProfileCertificationsTab croCertifications={cro.certifications}/>
                         </TabsContent>
