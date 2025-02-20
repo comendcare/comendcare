@@ -21,12 +21,12 @@ import {
 } from "@/components/ui/sidebar"
 import {
     getAllMembershipsFromUserId,
-    getAllNotifications
 } from "@/lib/fetchers";
 import {toast} from "sonner";
 import {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
 import {MemberWithOrganization} from "@/app/(platform)/app/layout";
+import { KANBAN_NOTIFICATIONS } from "@/lib/types"
 
 // This is sample data.
 const data = {
@@ -48,7 +48,7 @@ const data = {
             icon: Pin,
             variant: "ghost",
             url: "/app/task-board",
-            notificationKeys: ["NEW_TASK"]
+            notificationKeys: KANBAN_NOTIFICATIONS
         },
         {
             title: "Marketplace",
