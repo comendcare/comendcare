@@ -291,7 +291,7 @@ export const createOrganization = async (formData: FormData) => {
     const image = formData.get("image") as string | null;
 
     try {
-        const response = await prisma.organization.upsert({
+        const organization = await prisma.organization.upsert({
             where: {
                 subdomain,
             },
@@ -340,13 +340,13 @@ export const createOrganization = async (formData: FormData) => {
             },
         });
 
-        await prisma.member.create({
+        const membership = await prisma.member.create({
             data: {
                 userId: session.user.id,
                 email: session.user.email,
                 role: "owner", // Creator of organization is owner by default
                 title: title,
-                organizationId: response.id
+                organizationId: organization.id
             }
         })
 
@@ -357,7 +357,7 @@ export const createOrganization = async (formData: FormData) => {
                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                     : process.env.TYPESENSE_ADMIN_API_KEY
             )!,
-            response,
+            organization,
             'organizations'
         );
 
@@ -372,15 +372,15 @@ export const createOrganization = async (formData: FormData) => {
                     email: session.user.email
                 },
                 organization: {
-                    name: response.name,
-                    subdomain: response.subdomain
+                    name: organization.name,
+                    subdomain: organization.subdomain
                 }
             }
         ).then(() => {
             console.log("email sent")
         })
 
-        return response
+        return { organization, membership };
     } catch (error: any) {
         if (error.code === "P2002") {
             return {

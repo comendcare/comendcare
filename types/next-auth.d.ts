@@ -9,6 +9,7 @@ declare module "next-auth" {
             id: string
             bio?: string | null | undefined
             organizationId?: string | null | undefined
+            membership?: any
         } & DefaultSession["user"]
         terminate?: boolean
     }
@@ -16,5 +17,6 @@ declare module "next-auth" {
         id: string
         bio?: string | null | undefined
         organizationId?: string | null | undefined
+        membership?: any
     }
 }

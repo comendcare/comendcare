@@ -33,7 +33,7 @@ import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 
 export default function EditPAGProfileConditionCardDialog({organization}: { organization: Organization }) {
-    const {data: session, update} = useSession()
+    const {data: session} = useSession()
     const router = useRouter()
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
