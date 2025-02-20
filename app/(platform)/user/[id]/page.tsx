@@ -1,7 +1,7 @@
 "use client"
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
-import {Organization, User, Invitation} from "@prisma/client";
+import {Organization, User, Invitation, Member} from "@prisma/client";
 import {cn} from "@/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Loading from "@/app/loading";
@@ -28,11 +28,15 @@ type InvitationWithOrganization = Invitation & {
     organization?: Organization | null; // Optional because the organization might be null if not fetched
 };
 
+type MembershipWithOrganization = Member & {
+    organization?: Organization | null; // Optional because the organization might be null if not fetched
+};
+
 export default function UserProfilePage() {
     const router = useRouter();
     const {data: session, update, status} = useSession()
     const [user, setUser] = useState<User>();
-    const [orgs, setOrgs] = useState<Organization[]>();
+    const [memberships, setMemberships] = useState<MembershipWithOrganization[]>();
     const [invitations, setInvitations] = useState<InvitationWithOrganization[]>();
 
     useEffect(() => {
@@ -55,11 +59,8 @@ export default function UserProfilePage() {
                     const response = await getAllMembershipsFromUserId(session.user.id);
 
                     // Map the response to the correct structure if needed
-                    if (response.success) {
-                        const organizations = response.data?.map((item: {
-                            organization: Organization
-                        }) => item.organization)
-                        setOrgs(organizations);
+                    if (response.success && response.data) {
+                        setMemberships(response.data);
                     } else {
                         console.error(response.error)
                         toast.error(response.error)
@@ -185,9 +186,9 @@ export default function UserProfilePage() {
                                     Organizations
                                 </h2>
                                 <div className="flex flex-col items-start gap-4">
-                                    {orgs && (
-                                        orgs.length > 0 ? orgs?.map((org) =>
-                                            <div key={org.id} className="flex items-center gap-4">
+                                    {memberships && (
+                                        memberships.length > 0 ? memberships?.map((membership) =>
+                                            <div key={membership.id} className="flex items-center gap-4">
                                                 <Avatar className="hidden h-9 w-9 sm:flex">
                                                     <AvatarImage src="/avatars/01.png" alt="Avatar"/>
                                                     <AvatarFallback>OM</AvatarFallback>
@@ -195,10 +196,10 @@ export default function UserProfilePage() {
                                                 <div className="grid gap-1">
                                                     <>
                                                         <p className="text-sm font-medium leading-none">
-                                                            {org.name}
+                                                            {membership.organization?.name}
                                                         </p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {`${org.subdomain}.comend.io`}
+                                                        <p className="text-sm text-muted-foreground capitalize">
+                                                            {membership.role}
                                                         </p>
                                                     </>
                                                 </div>
@@ -242,14 +243,10 @@ export default function UserProfilePage() {
                                                     Accept
                                                 </Button>
                                             </>
-                                        ) : <div className="flex flex-col space-y-2 text-left">
-                                            <h3 className="scroll-m-20 text-md tracking-tight font-semibold">
-                                                {`No Invitations Yet`}
-                                            </h3>
-                                            <p>
+                                        ) :
+                                            <p className="text-muted-foreground text-sm">
                                                 {`You don't have any pending invitations.`}
                                             </p>
-                                        </div>
                                     )}
                                 </div>
                             </div>
