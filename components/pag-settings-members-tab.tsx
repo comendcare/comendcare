@@ -122,7 +122,7 @@ export default async function PAGSettingsMembersTab() {
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                             {person.title}
                                         </td>
-                                        <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
+                                        <td className="capitalize whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                             {person.role}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">

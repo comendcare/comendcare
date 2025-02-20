@@ -575,7 +575,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                         </div>
                     </div>
                     <div className="relative">
-                        {open && (
+                        {open && selected.length < maxSelected && (
                             <CommandList
                                 className="absolute top-1 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in overflow-y-scroll"
                                 onMouseLeave={() => {
