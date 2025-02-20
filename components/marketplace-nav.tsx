@@ -26,12 +26,12 @@ const links = [
     {
         name: "Academics",
         href: "#",
-        comingSoon: false
+        comingSoon: true
     },
     {
         name: "CROs",
         href: "#",
-        comingSoon: false
+        comingSoon: true
     },
 ]
 
@@ -51,8 +51,8 @@ export function MarketplaceNav({
             <div className={cn("mx-auto my-4 flex items-center", className)} {...props}>
                 {links.map((link, index) => (
                     link.comingSoon ?
-                        <Tooltip key={link.href} delayDuration={0}>
-                            <TooltipTrigger asChild>
+                        <Tooltip key={link.href} delayDuration={0} disableHoverableContent>
+                            <TooltipTrigger asChild disabled>
                                 <div
                                     className="flex h-7 items-center justify-center rounded-full px-4 text-center text-sm text-muted-foreground transition-colors"
                                 >
