@@ -69,7 +69,7 @@ export function OrganizationSwitcher({
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <div className="flex size-8 items-center justify-center">
+                            <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
                                 {activeOrganization &&
                                     <ProfilePhoto
                                         img={activeOrganization?.organization?.image}
