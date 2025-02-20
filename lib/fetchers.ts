@@ -632,9 +632,18 @@ export const getAllMembershipsFromUserId = async (userId: string) => {
     }
 };
 
-export const getAllNotifications = async (userId: string, orgId: string) => {
+export const getAllNotifications = async (userId: string, orgId: string | null | undefined) => {
     try {
+        if (!orgId) throw Error("No organization id provided.")
+            
+        const notifications = await prisma.platformNotification.findMany({
+            where: {
+                userId,
+                organizationId: orgId
+            }
+        })
 
+        return {success: true, data: notifications}
     } catch (error: any) {
         logError("Error fetching notifications data", error);
         return {success: false, error: "Internal server error"};
