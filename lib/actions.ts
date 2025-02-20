@@ -2325,6 +2325,31 @@ export async function createTask(columnId: string, properties?: any) {
     }
 }
 
+export async function notificationsViewed({notifications}: {notifications: PlatformNotification[]}) {
+    try {
+        const updatedNotifications: PlatformNotification[] = []
+
+        await Promise.all(
+            notifications.map(async (notification: PlatformNotification) => {
+                if (!notification) return
+                let updatedNotification = await prisma.platformNotification.update({
+                    where: {id: notification.id},
+                    data: {
+                        lastViewedAt: new Date()
+                    }
+                })
+
+                updatedNotifications.push(updatedNotification)
+            })
+        )
+        console.log(`Successfully updated notifications`)
+        return {success: true, data: updatedNotifications}
+    } catch (error) {
+        logError("Could not update notifications", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 export async function updateTasks({tasks}: { tasks: Task[] }) {
     try {
         let updatedTasks: Task[] = []
@@ -2382,14 +2407,18 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                     select: { id: true },
                 });
 
+                const session = await getSession()
                 const prevStakeholderUserIds = prevTask?.stakeholders.map(stakeholder => stakeholder.user.id)
-                const notifications = newTask.stakeholders.filter(newStakeholder => !prevStakeholderUserIds?.includes(newStakeholder.user.id))
+                const notifications = newTask.stakeholders
+                    .filter(newStakeholder => !prevStakeholderUserIds?.includes(newStakeholder.user.id))
 
                 // if a new stakeholder has been added to this task, we create a notification for them
                 if (organizations.length === 1 && notifications.length > 0) {
                     await Promise.all(
                         notifications.map(async (stakeholder: any) => {
                             if (!stakeholder) return
+                            // don't create a notification for the user creating the task
+                            if (stakeholder.userId === session?.user.id) return
             
                             let n = await prisma.platformNotification.create({
                                 data: {
