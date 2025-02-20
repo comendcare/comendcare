@@ -79,12 +79,12 @@ export default function OrganizationSettingsPage({organization}: { organization:
                         Permanent Settings
                     </h2>
                     <p className="text-sm leading-6 text-gray-500">
-                        Anything you change here cannot be undone.
+                        {`Only organization members with the "Owner" role can use these settings. Anything you change here cannot be undone.`}
                     </p>
                 </div>
 
-
-                <div className="mt-10 border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between">
+                <div className={`${session?.user.membership.role !== "owner" ? "mt-8 opacity-50 cursor-not-allowed space-y-4" : ""}`}>
+                    <div className={`border rounded-md p-8 border-red-200 flex items-center justify-between `}>
                         <span className="flex flex-grow flex-col">
                             <span className="text-sm font-medium leading-6 text-gray-900">
                                 Delete Organization Research Plan
@@ -94,39 +94,39 @@ export default function OrganizationSettingsPage({organization}: { organization:
                             </span>
                         </span>
 
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="destructive">
-                                Delete research plan
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Are you absolutely sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete
-                                    your account and remove your data from our servers.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction asChild>
-                                    <Button
-                                        variant="destructive"
-                                        onClick={handleDeleteRoadmap}
-                                    >
-                                        {"Continue"}
-                                    </Button>
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                </div>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild disabled={session?.user.membership.role !== "owner"}>
+                                <Button variant="destructive">
+                                    Delete research plan
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you absolutely sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete
+                                        your account and remove your data from our servers.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction asChild>
+                                        <Button
+                                            variant="destructive"
+                                            onClick={handleDeleteRoadmap}
+                                        >
+                                            {"Continue"}
+                                        </Button>
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
 
-                <div
-                    className="w-full border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between gap-4">
+                    <div
+                        className="w-full border rounded-md p-8 border-red-200 flex items-center justify-between gap-4">
                         <span className="flex flex-grow flex-col">
                             <span className="text-sm font-medium leading-6 text-gray-900">
                                 Delete Organization
@@ -137,38 +137,39 @@ export default function OrganizationSettingsPage({organization}: { organization:
                             </span>
                         </span>
 
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="destructive">
-                                Delete organization
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                    Are you absolutely sure?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. This will remove all memberships
-                                    from this organization, delete all associated roadmaps,
-                                    then delete the organization.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction asChild>
-                                    <Button
-                                        variant="destructive"
-                                        onClick={handleDeleteOrganization}
-                                        disabled={isDeleting}
-                                    >
-                                        {isDeleting ? "Deleting..." : "Continue"}
-                                    </Button>
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild disabled={session?.user.membership.role !== "owner"}>
+                                <Button variant="destructive">
+                                    Delete organization
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you absolutely sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will remove all memberships
+                                        from this organization, delete all associated roadmaps,
+                                        then delete the organization.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction asChild>
+                                        <Button
+                                            variant="destructive"
+                                            onClick={handleDeleteOrganization}
+                                            disabled={isDeleting}
+                                        >
+                                            {isDeleting ? "Deleting..." : "Continue"}
+                                        </Button>
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
 
+                    </div>
                 </div>
 
                 {/*<DeleteOrganizationForm organization={organization}/>*/}

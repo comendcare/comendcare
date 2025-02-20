@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaCalendar, FaEllipsis, FaLinkSlash, FaPlus, FaTrash, FaX} from "react-icons/fa6"
+import {FaCalendar, FaEllipsis, FaGlobe, FaLinkSlash, FaLock, FaPlus, FaTrash, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -82,6 +82,8 @@ import {PublicBadge} from "./public-badge"
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "./ui/dropdown-menu"
 import MoneyInput from "@/components/money-input";
 import MultipleSelector from "./ui/multiple-selector"
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -107,6 +109,10 @@ const kanbanSelector = (state: KanbanState) => ({
     addTask: state.addTask,
     deleteTask: state.deleteTask,
     addColumn: state.addColumn
+})
+
+const notificationsSelector = (state: NotificationsState) => ({
+    addNotification: state.addNotification
 })
 
 const editMilestoneForm = z.object({
@@ -356,7 +362,7 @@ export function EditMilestoneForm({
 
                     <EditTitle form={form}/>
 
-                    <FormItem className="w-full flex flex-row gap-4 justify-start items-center mr-10">
+                    <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
                         <FormLabel
                             className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Private</FormLabel>
                         <PrivatePublicFormField form={form} formData={formData}/>
@@ -584,24 +590,47 @@ const PrivatePublicFormField = ({form, formData}: { form: any, formData: any }) 
             name="isPrivate"
             render={({field}) => (
                 <span className="h-full items-center flex flex-row justify-end gap-4">
-                    {formData.isPrivate
-                        ? <PrivateBadge className="mt-0"/>
-                        : <PublicBadge className="mt-0"/>
-                    }
                     <FormControl>
-                        <Switch
-                            checked={field.value}
-                            onCheckedChange={(checked: boolean) => {
-                                field.onChange(checked)
-                                if (!checked) {
-                                    toast('Success!', {
-                                        position: "bottom-left",
-                                        duration: 6000, // default is 4000
-                                        description: 'This milestone is now visible on your public profile.'
-                                    })
-                                }
+                        <RadioGroup
+                            onValueChange={(value)=> {
+                                form.setValue("isPrivate", value === "PRIVATE")
                             }}
-                        />
+                            defaultValue={field.value ? "PRIVATE" : "PUBLISHED"}
+                            className="flex flex-col space-y-0 w-full"
+                        >
+                            <FormItem className="flex items-center space-x-3 space-y-0 flex-1">
+                                <FormControl>
+                                    <div className="h-full w-full border rounded-md p-2 flex items-start justify-between gap-4">
+                                        <RadioGroupItem value="PRIVATE" />
+                                        <span className="flex flex-grow flex-col gap-2">
+                                            <FormLabel className="font-normal flex gap-1 items-center">
+                                                <FaLock />
+                                                {`Private`}
+                                            </FormLabel>
+                                            <span className="text-sm text-gray-500">
+                                            Only visible to your team.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </FormControl>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0 flex-1">
+                                <FormControl>
+                                    <div className="h-full w-full border rounded-md p-2 flex items-start justify-between gap-4">
+                                        <RadioGroupItem value="PUBLISHED" />
+                                        <span className="flex flex-grow flex-col gap-2">
+                                            <FormLabel className="font-normal flex gap-1 items-center">
+                                                <FaGlobe />
+                                                {`Published`}
+                                            </FormLabel>
+                                            <span className="text-sm text-gray-500">
+                                                Visible on your profile and discoverable in the marketplace.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </FormControl>
+                            </FormItem>
+                        </RadioGroup>
                     </FormControl>
                     <FormMessage/>
                 </span>
@@ -882,6 +911,8 @@ const TasksFormField = ({
         deleteTask,
         addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
+    const { addNotification } = useNotificationsStore(useShallow(notificationsSelector))
+    const {data: session} = useSession()
 
     const debounceSetTasks = useCallback(
         debounce(async (updatedValues) => {
@@ -901,19 +932,25 @@ const TasksFormField = ({
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <>
-                            <div className="flex flex-row justify-between items-center">
+                            <div className="flex flex-row justify-between items-center gap-4">
                                 <FormLabel
-                                    className="text-2xl font-semibold leading-none tracking-tight"
+                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex flex-col justify-start items-start flex-wrap gap-1"
                                 >
                                     {`Tasks`}
+                                    <PrivateBadge className="font-normal text-gray-500"/>
                                 </FormLabel>
 
-                                <div className="flex flex-row items-center space-x-2">
+                                <div className="h-full flex flex-row flex-wrap justify-end items-end gap-2">
                                     <LinkTask
                                         milestoneId={milestoneData?.id}
                                         kanbanTasks={kanbanTasks}
                                         onLink={async (taskId) => {
                                             const newTask = kanbanTasks?.find((task) => task.id === taskId)
+                                            addNotification({
+                                                type: "NEW_TASK",
+                                                title: "New task assigned",
+                                                message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+                                            })
                                             form.setValue(
                                                 'tasks',
                                                 [...field?.value || [], {
@@ -952,11 +989,17 @@ const TasksFormField = ({
                                                     if (!column) return
 
                                                     const newTask = await addTask(column.id)
+                                                    addNotification({
+                                                        type: "NEW_TASK",
+                                                        title: "New task assigned",
+                                                        message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+                                                    })
                                                     if (newTask) {
                                                         const updatedTasks = [...form.getValues().tasks || [], {
                                                             ...newTask,
                                                             milestoneId: milestoneData?.id,
-                                                            milestone: {id: milestoneData?.id}
+                                                            milestone: {id: milestoneData?.id},
+                                                            stakeholders: [{userId: session?.user.id}]
                                                         }]
                                                         form.setValue('tasks', updatedTasks)
                                                     }
@@ -976,24 +1019,31 @@ const TasksFormField = ({
                                             //     }]
                                             //     form.setValue('tasks', updatedTasks)
                                             // }
+                                            addNotification({
+                                                type: "NEW_TASK",
+                                                title: "New task assigned",
+                                                message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+                                            })
                                             const newTasks = await setTasks([
                                                 ...kanbanTasks,
                                                 {
                                                     ...newTask,
                                                     milestoneId: milestoneData?.id,
-                                                    milestone: {id: milestoneData?.id}
+                                                    milestone: {id: milestoneData?.id},
+                                                    stakeholders: [{userId: session?.user.id}]
                                                 }
                                             ].map(t => {
                                                 if (t.id === newTask?.id) {
                                                     return ({
                                                         ...t,
                                                         milestoneId: milestoneData?.id,
-                                                        milestone: {id: milestoneData?.id}
+                                                        stakeholders: [{userId: session?.user.id}]
                                                     })
                                                 }
                                                 return t
                                             }))
                                             form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
+
                                         }}
                                     >
                                         {`Add a new task`}
