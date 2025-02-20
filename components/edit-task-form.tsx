@@ -59,10 +59,10 @@ import {debounce} from "lodash"
 import {SettingsProvider} from "@/components/editor/settings";
 import {PlateEditor} from "@/components/editor/plate-editor";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
-import { getMembers, getMilestones, getOrganizationData } from "@/lib/fetchers"
+import { getColumns, getMembers, getMilestones, getOrganizationData } from "@/lib/fetchers"
 import MultiSelect from "./multi-select"
 import MultipleSelector from "./ui/multiple-selector"
-import { Member, Milestone, TaskStakeholder, User } from "@prisma/client"
+import { Column, Member, Milestone, TaskStakeholder, User } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "./ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
@@ -91,6 +91,7 @@ const editTaskForm = z.object({
         })
         .min(1, "Name is required")
         .max(100, "Name must be less than 100 characters"),
+    column: z.string(),
     status: statusTypeSchema,
     description: z.array(z.record(z.any())),
     checklist: z.array(
@@ -128,6 +129,7 @@ export function EditTaskForm({
         resolver: zodResolver(editTaskForm),
         defaultValues: {
             name: taskData?.name,
+            column: taskData?.columnId,
             status: taskData?.status || 'PLANNED',
             description: JSON.parse(taskData?.description || "[]") || [],
             checklist: taskData?.checklist || undefined,
@@ -141,6 +143,7 @@ export function EditTaskForm({
 
     const [fetchedMembers, setFetchedMembers] = useState<User[]>([])
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
+    const [fetchedColumns, setFetchedColumns] = useState<Column[]>([])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -157,6 +160,14 @@ export function EditTaskForm({
             } else {
                 console.error(milestonesResponse.error)
             }
+
+            const columnResponse = await getColumns(session?.user?.organizationId || undefined)
+            if (columnResponse.success) {
+                setFetchedColumns(columnResponse?.data.columns as Column[])
+            } else {
+                console.error(columnResponse.error)
+            }
+
             // Allow update once form is initialized
             initializing.current = false;
         }
@@ -166,6 +177,7 @@ export function EditTaskForm({
 
     const formData = {
         name: form.watch("name"),
+        column: form.watch("column"),
         status: form.watch("status"),
         description: form.watch("description"),
         checklist: form.watch("checklist"),
@@ -195,6 +207,7 @@ export function EditTaskForm({
     const handleFormSubmit = async (values: z.infer<typeof editTaskForm>) => {
         const {
             name,
+            column,
             status,
             description,
             checklist,
@@ -234,7 +247,9 @@ export function EditTaskForm({
                 milestoneId: milestone,
                 ...(targetDate ? { endDate: targetDate } : undefined),
                 ...(priority ? { priority } : undefined),
-                private: isPrivate || false
+                private: isPrivate || false,
+                column: { id: column },
+                columnId: column
             }
         )
         // toast('Success!', {
@@ -453,6 +468,36 @@ export function EditTaskForm({
                                     >
                                         <FaLinkSlash />
                                     </Button>
+                                </div>
+                            </FormItem>
+                        )}
+                    /> 
+
+                    <FormField 
+                        control={form.control}
+                        name="column"
+                        render={({ field }) => (
+                            <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
+                                <FormLabel className="text-md mt-2">{`Column`}</FormLabel>
+                                <div className="flex flex-row gap-4">
+                                    <Select
+                                        value={formData.column || ''}
+                                        onValueChange={field.onChange}
+                                        onOpenChange={setSelectIsOpen}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Change column" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {fetchedColumns.map((m: Column, index: number) => (
+                                                <SelectItem value={m.id} key={index}>
+                                                    {m.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </FormItem>
                         )}
