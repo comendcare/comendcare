@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaCalendar, FaEllipsis, FaLinkSlash, FaPlus, FaTrash, FaX} from "react-icons/fa6"
+import {FaCalendar, FaEllipsis, FaGlobe, FaLinkSlash, FaLock, FaPlus, FaTrash, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -82,6 +82,7 @@ import {PublicBadge} from "./public-badge"
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "./ui/dropdown-menu"
 import MoneyInput from "@/components/money-input";
 import MultipleSelector from "./ui/multiple-selector"
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -356,7 +357,7 @@ export function EditMilestoneForm({
 
                     <EditTitle form={form}/>
 
-                    <FormItem className="w-full flex flex-row gap-4 justify-start items-center mr-10">
+                    <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
                         <FormLabel
                             className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Private</FormLabel>
                         <PrivatePublicFormField form={form} formData={formData}/>
@@ -584,24 +585,47 @@ const PrivatePublicFormField = ({form, formData}: { form: any, formData: any }) 
             name="isPrivate"
             render={({field}) => (
                 <span className="h-full items-center flex flex-row justify-end gap-4">
-                    {formData.isPrivate
-                        ? <PrivateBadge className="mt-0"/>
-                        : <PublicBadge className="mt-0"/>
-                    }
                     <FormControl>
-                        <Switch
-                            checked={field.value}
-                            onCheckedChange={(checked: boolean) => {
-                                field.onChange(checked)
-                                if (!checked) {
-                                    toast('Success!', {
-                                        position: "bottom-left",
-                                        duration: 6000, // default is 4000
-                                        description: 'This milestone is now visible on your public profile.'
-                                    })
-                                }
+                        <RadioGroup
+                            onValueChange={(value)=> {
+                                form.setValue("isPrivate", value === "PRIVATE")
                             }}
-                        />
+                            defaultValue={field.value ? "PRIVATE" : "PUBLISHED"}
+                            className="flex flex-col space-y-0 w-full"
+                        >
+                            <FormItem className="flex items-center space-x-3 space-y-0 flex-1">
+                                <FormControl>
+                                    <div className="h-full w-full border rounded-md p-2 flex items-start justify-between gap-4">
+                                        <RadioGroupItem value="PRIVATE" />
+                                        <span className="flex flex-grow flex-col gap-2">
+                                            <FormLabel className="font-normal flex gap-1 items-center">
+                                                <FaLock />
+                                                {`Private`}
+                                            </FormLabel>
+                                            <span className="text-sm text-gray-500">
+                                            Only visible to your team.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </FormControl>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-3 space-y-0 flex-1">
+                                <FormControl>
+                                    <div className="h-full w-full border rounded-md p-2 flex items-start justify-between gap-4">
+                                        <RadioGroupItem value="PUBLISHED" />
+                                        <span className="flex flex-grow flex-col gap-2">
+                                            <FormLabel className="font-normal flex gap-1 items-center">
+                                                <FaGlobe />
+                                                {`Published`}
+                                            </FormLabel>
+                                            <span className="text-sm text-gray-500">
+                                                Visible on your profile and discoverable in the marketplace.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </FormControl>
+                            </FormItem>
+                        </RadioGroup>
                     </FormControl>
                     <FormMessage/>
                 </span>
