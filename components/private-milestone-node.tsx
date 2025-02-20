@@ -46,7 +46,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger
 } from "./ui/dropdown-menu"
-import {PopoverContent, PopoverTrigger} from "@radix-ui/react-popover"
+import {PopoverClose, PopoverContent, PopoverTrigger} from "@radix-ui/react-popover"
 import {Popover} from "./plate-ui/popover"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
@@ -71,7 +71,7 @@ export type PrivateMilestoneNode = Node<
         dependencies?: string[]
         notes?: string
         status: StatusType
-        // handleEditClick: (nodeId: string) => void,
+        handleEditClick: (nodeId: string) => void,
         handleDelete: (nodeId: string) => void,
         handleDuplicate: (nodeId: string) => void,
         onboardingMilestone: boolean,
@@ -98,6 +98,10 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
     const {
         selectedNodeId,
     } = useRoadmapStore(useShallow(selector))
+
+    const handleEditClick = () => {
+        props.data?.handleEditClick(props?.id)
+    }
 
     const handleDeleteClick = () => {
         props.data?.handleDelete(props?.id)
@@ -130,6 +134,18 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                         <PopoverContent className="w-40 z-20">
                             <Card className="p-0 m-0">
                                 <CardContent className="p-2 m-0 flex flex-col gap-0">
+                                    <PopoverClose>
+                                        <Button
+                                            onClick={(e) => {
+                                                // e.stopPropagation()
+                                                handleEditClick()
+                                            }}
+                                            variant="ghost"
+                                            className="w-full h-full justify-start text-xl"
+                                        >
+                                            Edit
+                                        </Button>
+                                    </PopoverClose>
                                     <Button
                                         onClick={(e) => {
                                             e.stopPropagation()

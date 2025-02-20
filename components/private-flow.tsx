@@ -284,6 +284,9 @@ export const PrivateFlowView = ({
         ...node,
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
+            handleEditClick: (nodeId: string) => {
+                setSelectedNodeId(node.id)
+            },
             handleDelete: (nodeId: string) => {
                 const nodesList = localNodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
                 const edgesList = edges.filter((edge: Edge) => edge.source === nodeId || edge.target === nodeId)
