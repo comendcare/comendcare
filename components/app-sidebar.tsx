@@ -20,7 +20,8 @@ import {
     SidebarRail,
 } from "@/components/ui/sidebar"
 import {
-    getAllMembershipsFromUserId
+    getAllMembershipsFromUserId,
+    getAllNotifications
 } from "@/lib/fetchers";
 import {toast} from "sonner";
 import {useEffect, useState} from "react";
@@ -97,8 +98,16 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
 
     const fetchNotificationData = async () => {
         if (session) {
-            setNotifications({ tasks: 2 })
-            
+            const response = await getAllNotifications(session.user.id, session.user.organizationId)
+            if (response.success && response.data) {
+                const n = {
+                    tasks: response.data.filter(notification => notification.type === "NEW_TASK" && notification.lastViewedAt === null).length
+                }
+                setNotifications(n || [])
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
+            }
         }
     }
 
