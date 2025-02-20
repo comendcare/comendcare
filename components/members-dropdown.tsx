@@ -21,19 +21,23 @@ import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@/components/ui/input";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 const formSchema = z.object({
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
+    role: z.enum(["admin", "owner"], { message: "Role must be either Admin or Owner." }),
 })
 
 export default async function MembersDropdown({member}: { member: MemberWithUser }) {
     const session = useSession()
+    console.log(session)
 
     const form = useForm<z.infer<typeof formSchema>>({
         mode: "onChange",
         resolver: zodResolver(formSchema),
         defaultValues: {
             title: member.title || "",
+            role: member.role || "" as any,
         }
     })
 
@@ -71,13 +75,14 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     {
-                        session.data?.user.id === member.user.id &&
-                        <DialogTrigger asChild>
-                            <DropdownMenuItem>
-                                <FaUserPen/>
-                                Edit membership
-                            </DropdownMenuItem>
-                        </DialogTrigger>
+                        (session.data?.user.id === member.user.id || session.data?.user.membership.role === "owner") && (
+                            <DialogTrigger asChild>
+                                <DropdownMenuItem>
+                                    <FaUserPen/>
+                                    Edit membership
+                                </DropdownMenuItem>
+                            </DialogTrigger>
+                        )
                     }
 
                     <DropdownMenuItem
@@ -90,23 +95,25 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                 </DropdownMenuContent>
             </DropdownMenu>
             <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>
-                        Edit membership
-                    </DialogTitle>
-                    <DialogDescription>
-                        Edit your membership details here.
-                    </DialogDescription>
+                <DialogHeader className="flex flex-col space-y-4">
+                    <div>
+                        <DialogTitle>
+                            Edit membership
+                        </DialogTitle>
+                        <DialogDescription>
+                            Edit your membership details here.
+                        </DialogDescription>
+                    </div>
 
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onEditMembershipSubmit)} className="space-y-8">
+                        <form onSubmit={form.handleSubmit(onEditMembershipSubmit)} className="space-y-4">
                             <FormField
                                 control={form.control}
                                 name="title"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Role</FormLabel>
-                                        <FormDescription>Your role or title at your patient organization.</FormDescription>
+                                        <FormLabel>Title</FormLabel>
+                                        <FormDescription>Your title at your patient organization.</FormDescription>
                                         <FormControl>
                                             <Input type="text" {...field} />
                                         </FormControl>
@@ -114,6 +121,34 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                                     </FormItem>
                                 )}
                             />
+
+                            {
+                                session.data?.user.membership.role === "owner" &&
+                                <FormField
+                                    control={form.control}
+                                    name="role"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Role</FormLabel>
+                                            <FormDescription>
+                                                Choose the role for this organization member.
+                                            </FormDescription>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a role" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectItem value="admin">Admin</SelectItem>
+                                                    <SelectItem value="owner">Owner</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            }
 
                             <Button type="submit">Save</Button>
                         </form>
