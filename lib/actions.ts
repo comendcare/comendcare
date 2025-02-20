@@ -10,6 +10,7 @@ import {
     User,
     Condition,
     TaskStakeholder, Invitation,
+    PlatformNotification,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
@@ -37,6 +38,7 @@ import {
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser} from "@/lib/types";
+import { includes } from "lodash"
 
 export type Node = Prisma.NodeGetPayload<{}>
 
@@ -2291,6 +2293,29 @@ export async function createTask(columnId: string, properties?: any) {
             }
         })
 
+        // const organizations = await prisma.organization.findMany({
+        //     where: {Kanban: {columns: {some: {id: columnId}}}},
+        //     select: { id: true },
+        // });
+
+        // // create notifications for assigned stakeholders
+        // if (properties.stakeholders && organizations.length == 1) {
+        //     await Promise.all(
+        //         properties.stakeholders.map(async (stakeholder: any) => {
+        //             if (!stakeholder) return
+    
+        //             let n = await prisma.platformNotification.create({
+        //                 data: {
+        //                     type: "TASK_ASSIGN",
+        //                     title: "You've been assigned a task.",
+        //                     user: { connect: {id: stakeholder.userId} },
+        //                     organization: { connect: {id: organizations[0].id}}
+        //                 }
+        //             })
+        //         })
+        //     )
+        // }
+
         if (!newTask) {
             return {success: false, error: "Could not create task"}
         }
@@ -2304,6 +2329,51 @@ export async function createTask(columnId: string, properties?: any) {
     }
 }
 
+export async function notificationsViewed({notifications}: {notifications: PlatformNotification[]}) {
+    try {
+        const updatedNotifications: PlatformNotification[] = []
+
+        await Promise.all(
+            notifications.map(async (notification: PlatformNotification) => {
+                if (!notification) return
+                let updatedNotification = await prisma.platformNotification.update({
+                    where: {id: notification.id},
+                    data: {
+                        lastViewedAt: new Date()
+                    }
+                })
+
+                updatedNotifications.push(updatedNotification)
+            })
+        )
+        console.log(`Successfully updated notifications`)
+        return {success: true, data: updatedNotifications}
+    } catch (error) {
+        logError("Could not update notifications", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
+export async function createNotification({notificationData}: {notificationData: any}) {
+    try {
+        const session = await getSession()
+        if (!session) throw new Error("No session data")
+
+        const notification = await prisma.platformNotification.create({
+            data: {
+                ...notificationData,
+                user: { connect: {id: session?.user.id} },
+                organization: { connect: {id: session.user.organizationId}}
+            }
+        })
+
+        return {success: true, data: notification}
+    } catch (error) {
+        logError("Could not create notification", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 export async function updateTasks({tasks}: { tasks: Task[] }) {
     try {
         let updatedTasks: Task[] = []
@@ -2311,8 +2381,12 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
         await Promise.all(
             tasks.map(async (task: any) => {
                 if (!task) return
+                let prevTask = await prisma.task.findUnique({
+                    where: {id: task.id},
+                    include: {stakeholders: {include: {user: true}}}
+                })
 
-                let t = await prisma.task.update({
+                let newTask = await prisma.task.update({
                     where: {id: task?.id},
                     include: {milestone: true, checklist: true, stakeholders: {include: {user: true}}},
                     data: {
@@ -2340,10 +2414,6 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                                 }))
                             }
                         },
-                        // stakeholders: {
-                        //     set: [],
-                        //     connect: task.stakeholders?.map((stakeholder: User) => ({id: stakeholder?.id})) || []
-                        // },
                         milestone: task.milestoneId
                             ? {connect: {id: task.milestoneId}} // Connect if milestoneId exists
                             : {disconnect: true}, // Disconnect if milestoneId is undefined
@@ -2356,10 +2426,41 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                     }
                 })
 
-                if (!t) {
+                const organizations = await prisma.organization.findMany({
+                    where: {Kanban: {columns: {some: {tasks: {some: {id: newTask.id}}}}}},
+                    select: { id: true },
+                });
+
+                const session = await getSession()
+                const prevStakeholderUserIds = prevTask?.stakeholders.map(stakeholder => stakeholder.user.id)
+                const notifications = newTask.stakeholders
+                    .filter(newStakeholder => !prevStakeholderUserIds?.includes(newStakeholder.user.id))
+
+                // if a new stakeholder has been added to this task, we create a notification for them
+                if (organizations.length === 1 && notifications.length > 0) {
+                    await Promise.all(
+                        notifications.map(async (stakeholder: any) => {
+                            if (!stakeholder) return
+                            // don't create a notification for the user creating the task
+                            if (stakeholder.userId === session?.user.id) return
+            
+                            let n = await prisma.platformNotification.create({
+                                data: {
+                                    type: "NEW_TASK",
+                                    title: "New task assigned",
+                                    message: `${newTask.name} was assigned to you.`,
+                                    user: { connect: {id: stakeholder.userId} },
+                                    organization: { connect: {id: organizations[0].id}}
+                                }
+                            })
+                        })
+                    )
+                }
+
+                if (!newTask) {
                     logError("Could not update task", task)
                 } else {
-                    updatedTasks.push(t)
+                    updatedTasks.push(newTask)
                 }
             })
         )

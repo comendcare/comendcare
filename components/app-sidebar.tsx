@@ -20,12 +20,13 @@ import {
     SidebarRail,
 } from "@/components/ui/sidebar"
 import {
-    getAllMembershipsFromUserId
+    getAllMembershipsFromUserId,
 } from "@/lib/fetchers";
 import {toast} from "sonner";
 import {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
 import {MemberWithOrganization} from "@/app/(platform)/app/layout";
+import { KANBAN_NOTIFICATIONS } from "@/lib/types"
 
 // This is sample data.
 const data = {
@@ -46,7 +47,8 @@ const data = {
             title: "Task Board",
             icon: Pin,
             variant: "ghost",
-            url: "/app/task-board"
+            url: "/app/task-board",
+            notificationKeys: KANBAN_NOTIFICATIONS
         },
         {
             title: "Marketplace",
