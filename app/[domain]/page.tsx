@@ -27,6 +27,7 @@ import {FeedbackSheet} from "@/components/feedback";
 import FeedbackForm from "@/components/feedback-form";
 import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import React from "react";
+import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -101,6 +102,13 @@ export default async function OrganizationHomePage({
         );
     }
 
+    if (!organization.published) {
+        // Render unpublished organization state
+        return (
+            <UnpublishedOrganizationPage organization={organization}/>
+        );
+    }
+
     return (
         <>
             <main className="grid grid-cols-8 w-full max-w-7xl mx-auto mt-16 gap-4">
@@ -114,6 +122,7 @@ export default async function OrganizationHomePage({
                                 <PAGProfileConditionsCard
                                     conditions={conditions}
                                     organization={organization}
+                                    showEditDialog={false}
                                 />
                             </div>
                         </div>
@@ -131,6 +140,7 @@ export default async function OrganizationHomePage({
                                     roadmap={roadmaps?.[0]}
                                     subdomain={organization?.subdomain || undefined}
                                     isPublic={true}
+                                    externalLinks={true}
                                 />
                                 : <Card>
                                     <CardContent>

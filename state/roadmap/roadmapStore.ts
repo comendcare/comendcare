@@ -202,7 +202,6 @@ export const useRoadmapStore = create<RoadmapState>()(
         saveState: () => {
             console.log(`save state`)
             const state = get()
-            set(state)
             updateDBFlow({ roadmapId: state.roadmapId, nodes: state.nodes, edges: state.edges })
             updateMilestones({ milestones: state.milestones })
         }
@@ -210,8 +209,13 @@ export const useRoadmapStore = create<RoadmapState>()(
     {
         limit: 100, // limit the stored history states to 100
         onSave: (pastState, currentState) => {
+            console.log(`Past state`, pastState)
             console.log(`Saved Roadmap State: `, currentState)
             return
+        },
+        partialize: (state) => {
+            const { selectedNodeId, nodes, edges, milestones, ...rest } = state;
+            return { selectedNodeId, nodes, edges, milestones };
         },
     })
 )

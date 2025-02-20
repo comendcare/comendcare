@@ -168,7 +168,7 @@ export function EditMilestoneForm({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
-            nodeType: milestoneData?.node?.type || "PROJECT",
+            nodeType: milestoneData?.nodeType || milestoneData?.node?.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
             types: (milestoneData?.types || []).map((type: any) => MILESTONE_TYPE_OPTIONS.find(option => option?.value === type) || {
@@ -518,6 +518,8 @@ export function EditMilestoneForm({
 }
 
 const MilestoneTypeFormField = ({form}: { form: any }) => {
+    const types = form.watch("types")
+
     return (
         <>
             <FormField
@@ -526,19 +528,6 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                 render={({field}) => (
                     <FormItem className="w-full">
                         <FormControl>
-                            {/* <Select
-                                defaultValue={field.value}
-                                onValueChange={field.onChange}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a milestone type..."/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {MILESTONE_TYPE_OPTIONS.map((type, index) => (
-                                        <SelectItem key={index} value={type.value}>{type.label}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select> */}
                             <MultipleSelector
                                 {...field}
                                 maxSelected={3}
@@ -559,7 +548,7 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                 )}
             />
 
-            {form.watch("type") === "OTHER" && (
+            {types.map((type: any) => type.value).includes("OTHER") && (
                 <>
                     <div>
                         <FormLabel className="text-md">{`Type Description`}</FormLabel>

@@ -1,5 +1,12 @@
 "use client"
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -27,6 +34,7 @@ const invitationFormSchema = z.object({
     email: z.string().min(3, {
         message: "Email must be at least 3 characters.",
     }),
+    role: z.enum(["admin", "owner"], { message: "Role must be either Admin or Owner." }),
 })
 
 export default function InviteUserToOrgDialog() {
@@ -51,6 +59,9 @@ export default function InviteUserToOrgDialog() {
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(invitationFormSchema),
+        defaultValues: {
+            role: "admin"
+        }
     })
 
     async function onSubmit(values: z.infer<typeof invitationFormSchema>) {
@@ -58,7 +69,7 @@ export default function InviteUserToOrgDialog() {
             const response = await inviteUser(
                 session.data,
                 form.getValues("email"),
-                "admin",
+                form.getValues("role"),
                 await getIp(),
                 {
                     organizationId: organization?.id as string,
@@ -119,6 +130,32 @@ export default function InviteUserToOrgDialog() {
                                 </FormItem>
                             )}
                         />
+
+                        <FormField
+                            control={form.control}
+                            name="role"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Role</FormLabel>
+                                    <FormDescription>
+                                        Choose the role for the invited user.
+                                    </FormDescription>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select a role" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            <SelectItem value="admin">Admin</SelectItem>
+                                            <SelectItem value="owner">Owner</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
                         <Button type="submit">Submit</Button>
                     </form>
                 </Form>

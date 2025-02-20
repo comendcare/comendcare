@@ -40,6 +40,7 @@ import {
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 import mixpanel from "mixpanel-browser";
+import {Member, Organization } from "@prisma/client";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -254,10 +255,11 @@ export default function OrganizationOnboardingForm(
         newOrgForm.setValue("lng", address.lng);
     }, [address, newOrgForm]);
 
-    async function updateSession(organizationId: string) {
+    async function updateSession(response: {organization: Organization, membership: Member}) {
         await update({
             ...session,
-            organizationId: organizationId,
+            organizationId: response.organization.id,
+            membership: response.membership
         })
     }
 
@@ -332,7 +334,7 @@ export default function OrganizationOnboardingForm(
                     }
 
                     // Update the session object with the newly created organizationId
-                    updateSession(res.id)
+                    updateSession(res)
                     router.refresh()
                     router.push(nextLink)
                     toast.success(`Successfully created organization!`)

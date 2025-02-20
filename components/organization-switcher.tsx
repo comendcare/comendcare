@@ -32,6 +32,7 @@ export function OrganizationSwitcher({
     const router = useRouter();
     const {data: session, update} = useSession();
     const [activeOrganization, setActiveOrganization] = React.useState<MemberWithOrganization | null>(null);
+    console.log(session)
 
     React.useEffect(() => {
         if (!memberships || memberships.length === 0) return;
@@ -44,9 +45,17 @@ export function OrganizationSwitcher({
 
     const handleOrganizationChange = async (membership: MemberWithOrganization) => {
         setActiveOrganization(membership);
+        // await update({
+        //     ...session,
+        //     organizationId: membership.organizationId,
+        //     membership: membership,
+        // });
         await update({
-            ...session,
-            organizationId: membership.organizationId,
+            user: {
+                ...session?.user,
+                organizationId: membership.organization.id, // Ensure the correct org ID is set
+                membership: membership, // Explicitly set membership
+            }
         });
         router.refresh();
     };
@@ -60,7 +69,7 @@ export function OrganizationSwitcher({
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
-                            <div className="flex size-8 items-center justify-center">
+                            <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
                                 {activeOrganization &&
                                     <ProfilePhoto
                                         img={activeOrganization?.organization?.image}
@@ -86,10 +95,10 @@ export function OrganizationSwitcher({
                         <DropdownMenuLabel className="text-xs text-muted-foreground">
                             Organizations
                         </DropdownMenuLabel>
-                        {memberships.map((organization, index) => (
+                        {memberships.map((membership, index) => (
                             <DropdownMenuItem
-                                key={organization.id}
-                                onClick={() => handleOrganizationChange(organization)}
+                                key={membership.id}
+                                onClick={() => handleOrganizationChange(membership)}
                                 className="gap-2 p-2"
                             >
                                 <div className="flex size-6 items-center justify-center">
@@ -101,8 +110,8 @@ export function OrganizationSwitcher({
                                         />
                                     }
                                 </div>
-                                {organization.organization.name}
-                                {activeOrganization?.id === organization.id && (
+                                {membership.organization.name}
+                                {activeOrganization?.id === membership.id && (
                                     <Check className="ml-auto opacity-100"/>
                                 )}
                             </DropdownMenuItem>

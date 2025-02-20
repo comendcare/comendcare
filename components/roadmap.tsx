@@ -30,7 +30,7 @@ const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
-    initState: state.initState
+    saveState: state.saveState
 })
 
 export function Roadmap({data}: {data: any}) {
@@ -42,11 +42,35 @@ export function Roadmap({data}: {data: any}) {
         selectedNodeId, 
         setSelectedNodeId, 
         milestones, 
+        saveState
     } = useRoadmapStore(useShallow(selector))
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const { undo } = useRoadmapStore.temporal.getState()
+    const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
+
+    useEffect(() => {
+        const handleUndo = (event: KeyboardEvent) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+                event.preventDefault(); // Prevent default undo behavior (optional)
+                console.log("Undo action triggered")
+                undo() // undo updates zustand state
+                saveState() // save state to update database
+
+                if (selectedNodeId) {
+                    // if there is a node selected, remount the milestone form
+                    // to update the form data after the undo was triggered
+                    setMilestoneRemountKey(prevKey => prevKey + 1)
+                }
+
+                return
+            }
+        };
+    
+        document.addEventListener("keydown", handleUndo);
+        return () => document.removeEventListener("keydown", handleUndo);
+    }, []);
 
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString())
@@ -97,7 +121,17 @@ export function Roadmap({data}: {data: any}) {
                             </TabsList>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button onClick={() => undo()} size={"icon"} variant={"ghost"}>
+                                    <Button onClick={() => {
+                                        console.log("Undo action triggered")
+                                        undo() // undo updates zustand state
+                                        saveState() // save state to update database
+                        
+                                        if (selectedNodeId) {
+                                            // if there is a node selected, remount the milestone form
+                                            // to update the form data after the undo was triggered
+                                            setMilestoneRemountKey(prevKey => prevKey + 1)
+                                        }
+                                    }} size={"icon"} variant={"ghost"}>
                                         <FaUndo />
                                     </Button>
                                 </TooltipTrigger>
@@ -157,6 +191,7 @@ export function Roadmap({data}: {data: any}) {
                             className="h-full flex flex-col"
                         >
                             <MilestoneDetailsPanel
+                                key={milestoneRemountKey}
                                 milestone={milestones.find(
                                     milestone =>
                                         milestone.nodeId === selectedNodeId
@@ -172,28 +207,26 @@ export function Roadmap({data}: {data: any}) {
 }
 
 const MilestoneDetailsPanel = ({
+    key,
     milestone,
     handlePanelChange
 }: {
+    key: number,
     milestone: any
     handlePanelChange: (open: boolean) => void
 }) => {
     const { 
         selectedNodeId, 
-        setSelectedNodeId
     } = useRoadmapStore(useShallow(selector))
-    // const [isEditing, setIsEditing] = useState(false)
-    const [isEditing, setIsEditing] = useState(true)
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
     
     useEffect(() => {
         if (selectedNodeId) {
             // remount if the selected node has changed, this will re-initialize the form data
             // without closing the side panel since we're now editing a new node
-            const remountkey = milestoneRemountKey
-            setMilestoneRemountKey(remountkey + 1)
+            setMilestoneRemountKey(prevKey => prevKey + 1)
         }
-    }, [selectedNodeId])
+    }, [selectedNodeId, key])
 
     const handleClose = () => {
         handlePanelChange(false)
