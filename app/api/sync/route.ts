@@ -355,7 +355,12 @@ const syncToTypesense = async (env: {
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companySchema);
 
-        const organizations = await prisma.organization.findMany();
+        const organizations = await prisma.organization.findMany({
+            where: {
+                verified: true,
+                published: true
+            }
+        });
         const milestones = await prisma.milestone.findMany();
         const companies = await prisma.company.findMany({
             select: {

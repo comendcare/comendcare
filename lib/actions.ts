@@ -350,16 +350,18 @@ export const createOrganization = async (formData: FormData) => {
             }
         })
 
-        await addTypeSenseDocument(
-            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-            (
-                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                    : process.env.TYPESENSE_ADMIN_API_KEY
-            )!,
-            organization,
-            'organizations'
-        );
+        if (organization.verified && organization.published) {
+            await addTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!,
+                organization,
+                'organizations'
+            );
+        }
 
         await revalidateTag(
             `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
@@ -495,16 +497,18 @@ export const updateOrganization = withOrganizationAuth(
                 data,
             });
 
-            await updateTypeSenseDocument(
-                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-                (
-                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                        : process.env.TYPESENSE_ADMIN_API_KEY
-                )!,
-                response,
-                'organizations'
-            );
+            if (response.verified && response.published) {
+                await updateTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    response,
+                    'organizations'
+                );
+            }
 
             return response;
         } catch (error: any) {

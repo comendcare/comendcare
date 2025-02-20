@@ -95,7 +95,7 @@ export default function UserProfilePage() {
                             } else {
                                 console.error(orgResponse.error);
                                 toast.error(`Could not fetch organization details for ID ${invitation.organizationId}`);
-                                return { ...invitation, organization: null };
+                                return {...invitation, organization: null};
                             }
                         })
                     );
@@ -243,10 +243,9 @@ export default function UserProfilePage() {
                                                     Accept
                                                 </Button>
                                             </>
-                                        ) :
-                                            <p className="text-muted-foreground text-sm">
-                                                {`You don't have any pending invitations.`}
-                                            </p>
+                                        ) : <p className="text-muted-foreground text-sm">
+                                            {`You don't have any pending invitations.`}
+                                        </p>
                                     )}
                                 </div>
                             </div>
