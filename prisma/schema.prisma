@@ -18,6 +18,7 @@ model User {
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   deletedAt            DateTime?
+  kanbanLastVisit     DateTime @default(now())
   address1             String?
   address2             String?
   city                 String?

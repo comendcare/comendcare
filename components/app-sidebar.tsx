@@ -80,6 +80,7 @@ const data = {
 export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const {data: session} = useSession()
     const [memberships, setMemberships] = useState<MemberWithOrganization[]>([]);
+    const [notifications, setNotifications] = useState<any>([])
 
     const fetchOrganizations = async () => {
         if (session) {
@@ -94,8 +95,16 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         }
     };
 
+    const fetchNotificationData = async () => {
+        if (session) {
+            setNotifications({ tasks: 2 })
+            
+        }
+    }
+
     useEffect(() => {
         fetchOrganizations()
+        fetchNotificationData()
     }, [session])
 
     return (
@@ -104,7 +113,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                 <OrganizationSwitcher memberships={memberships}/>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={data.navMain}/>
+                <NavMain items={data.navMain} notifications={notifications}/>
             </SidebarContent>
             <SidebarFooter>
                 <NavUser/>

@@ -24,21 +24,26 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import Link from "next/link"
+import { FaBell, FaCircle, FaPlus } from "react-icons/fa6"
+
+type Item = {
+    title: string
+    url: string
+    icon?: LucideIcon
+    isActive?: boolean
+    comingSoon?: boolean
+    items?: {
+        title: string
+        url: string
+    }[]
+}
 
 export function NavMain({
                             items,
+                            notifications
                         }: {
-    items: {
-        title: string
-        url: string
-        icon?: LucideIcon
-        isActive?: boolean
-        comingSoon?: boolean
-        items?: {
-            title: string
-            url: string
-        }[]
-    }[]
+    items: Item[],
+    notifications: any
 }) {
     const pathname = usePathname()
 
@@ -81,6 +86,7 @@ export function NavMain({
                                     <a href={item.url}>
                                         {item.icon && <item.icon className="mr-2 h-4 w-4"/>}
                                         {item.title}
+                                        <Notification item={item} notifications={notifications}/>
                                     </a>
                                 </SidebarMenuButton>
                             )}
@@ -90,4 +96,20 @@ export function NavMain({
             </SidebarMenu>
         </TooltipProvider>
     )
+}
+
+const Notification = ({item, notifications}: {item: Item, notifications: any}) => {
+    // handle kanban
+    if (item.title === "Task Board" && notifications.tasks) {
+        return (
+            <div className="ml-auto flex items-center gap-1 text-red-500 text-sm">
+                {/* <FaBell className="h-3 w-3"/> */}
+                <FaPlus className="h-2 w-2"/>
+                <p className="text-sm">{`${notifications.tasks}`}</p>
+                {/* <div className="h-2 w-2 p-1 bg-red-500 rounded-full">
+                    <FaBell className="text-white h-3 w-3"/>
+                </div> */}
+            </div>
+        )
+    }
 }
