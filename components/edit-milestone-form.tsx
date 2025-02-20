@@ -83,6 +83,7 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import MoneyInput from "@/components/money-input";
 import MultipleSelector from "./ui/multiple-selector"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -108,6 +109,10 @@ const kanbanSelector = (state: KanbanState) => ({
     addTask: state.addTask,
     deleteTask: state.deleteTask,
     addColumn: state.addColumn
+})
+
+const notificationsSelector = (state: NotificationsState) => ({
+    addNotification: state.addNotification
 })
 
 const editMilestoneForm = z.object({
@@ -906,6 +911,8 @@ const TasksFormField = ({
         deleteTask,
         addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
+    const { addNotification } = useNotificationsStore(useShallow(notificationsSelector))
+    const {data: session} = useSession()
 
     const debounceSetTasks = useCallback(
         debounce(async (updatedValues) => {
@@ -939,6 +946,11 @@ const TasksFormField = ({
                                         kanbanTasks={kanbanTasks}
                                         onLink={async (taskId) => {
                                             const newTask = kanbanTasks?.find((task) => task.id === taskId)
+                                            addNotification({
+                                                type: "NEW_TASK",
+                                                title: "New task assigned",
+                                                message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+                                            })
                                             form.setValue(
                                                 'tasks',
                                                 [...field?.value || [], {
@@ -977,11 +989,17 @@ const TasksFormField = ({
                                                     if (!column) return
 
                                                     const newTask = await addTask(column.id)
+                                                    addNotification({
+                                                        type: "NEW_TASK",
+                                                        title: "New task assigned",
+                                                        message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+                                                    })
                                                     if (newTask) {
                                                         const updatedTasks = [...form.getValues().tasks || [], {
                                                             ...newTask,
                                                             milestoneId: milestoneData?.id,
-                                                            milestone: {id: milestoneData?.id}
+                                                            milestone: {id: milestoneData?.id},
+                                                            stakeholders: [{userId: session?.user.id}]
                                                         }]
                                                         form.setValue('tasks', updatedTasks)
                                                     }
@@ -1001,24 +1019,31 @@ const TasksFormField = ({
                                             //     }]
                                             //     form.setValue('tasks', updatedTasks)
                                             // }
+                                            addNotification({
+                                                type: "NEW_TASK",
+                                                title: "New task assigned",
+                                                message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+                                            })
                                             const newTasks = await setTasks([
                                                 ...kanbanTasks,
                                                 {
                                                     ...newTask,
                                                     milestoneId: milestoneData?.id,
-                                                    milestone: {id: milestoneData?.id}
+                                                    milestone: {id: milestoneData?.id},
+                                                    stakeholders: [{userId: session?.user.id}]
                                                 }
                                             ].map(t => {
                                                 if (t.id === newTask?.id) {
                                                     return ({
                                                         ...t,
                                                         milestoneId: milestoneData?.id,
-                                                        milestone: {id: milestoneData?.id}
+                                                        stakeholders: [{userId: session?.user.id}]
                                                     })
                                                 }
                                                 return t
                                             }))
                                             form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
+
                                         }}
                                     >
                                         {`Add a new task`}

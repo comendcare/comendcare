@@ -20,6 +20,10 @@ export type PostWithAuthorAndComments = Post & {
 
 export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 
+export type NotificationType = 'NEW_TASK'
+
+export const KANBAN_NOTIFICATIONS: NotificationType[] = ["NEW_TASK"]
+
 export const DEFAULT_KANBAN_COLUMNS = [
     {
         name: 'Not started',
