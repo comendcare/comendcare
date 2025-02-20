@@ -25,16 +25,6 @@ export default async function KanbanPage({params}: {
     }
 
     if (response.success && response.data) {
-        // set all kanban notifications to viewed
-        const response = await getAllNotifications(session.user.id, session.user.organizationId)
-        if (response.success && response.data) {
-            const taskNotifications = response.data.filter(notification => notification.type === "NEW_TASK")
-            await notificationsViewed({notifications: taskNotifications})
-        } else {
-            console.error(response.error)
-            // toast.error(response.error)
-        }
-        
         return (
             <main className="flex flex-col w-full h-full">
                 <KanbanView />

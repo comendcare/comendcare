@@ -632,14 +632,14 @@ export const getAllMembershipsFromUserId = async (userId: string) => {
     }
 };
 
-export const getAllNotifications = async (userId: string, orgId: string | null | undefined) => {
+export const getAllNotifications = async () => {
     try {
-        if (!orgId) throw Error("No organization id provided.")
-            
+        const session = await getSession()
+        if (!session?.user.id) throw new Error("User ID or Organization ID not in session")
+        
         const notifications = await prisma.platformNotification.findMany({
             where: {
-                userId,
-                organizationId: orgId
+                userId: session.user.id,
             }
         })
 
