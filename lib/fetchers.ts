@@ -632,6 +632,15 @@ export const getAllMembershipsFromUserId = async (userId: string) => {
     }
 };
 
+export const getAllNotifications = async (userId: string, orgId: string) => {
+    try {
+
+    } catch (error: any) {
+        logError("Error fetching notifications data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 export const getOrganizationFromRoadmapId = async (roadmapId: string): Promise<ApiResponse<any>> => {
     try {
         const roadmap = await prisma.roadmap.findUnique({
