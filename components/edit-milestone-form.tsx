@@ -925,14 +925,15 @@ const TasksFormField = ({
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <>
-                            <div className="flex flex-row justify-between items-center">
+                            <div className="flex flex-row justify-between items-center gap-4">
                                 <FormLabel
-                                    className="text-2xl font-semibold leading-none tracking-tight"
+                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex flex-col justify-start items-start flex-wrap gap-1"
                                 >
                                     {`Tasks`}
+                                    <PrivateBadge className="font-normal text-gray-500"/>
                                 </FormLabel>
 
-                                <div className="flex flex-row items-center space-x-2">
+                                <div className="h-full flex flex-row flex-wrap justify-end items-end gap-2">
                                     <LinkTask
                                         milestoneId={milestoneData?.id}
                                         kanbanTasks={kanbanTasks}
