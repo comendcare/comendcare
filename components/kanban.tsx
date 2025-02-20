@@ -33,6 +33,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "./u
 import {Column} from "@/lib/actions"
 import NewColumnDialog from "./new-column-dialog"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
+import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 
 export type ColumnId = string
 

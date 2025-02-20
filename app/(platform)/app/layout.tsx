@@ -12,13 +12,14 @@ import {Member, Organization} from "@prisma/client";
 import {redirect, usePathname, useRouter, useSearchParams} from "next/navigation";
 import Loading from "@/app/loading";
 import {
+    getAllNotifications,
     getColumns,
     getKanbanFromOrganizationId,
     getNodesEdgesAndMilestones,
     getRoadmapId
 } from "@/lib/fetchers";
 import {toast} from "sonner";
-import {initializeKanbanState, initializeRoadmapState} from "@/lib/initialize-client-state";
+import {initializeKanbanState, initializeNotificationsState, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import { createKanban } from "@/lib/actions";
@@ -28,6 +29,7 @@ import { useOnborda } from "@/components/onborda/OnbordaContext";
 import { Button } from "@/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
+import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -48,6 +50,10 @@ const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
 })
 
+const notificationsSelector = (state: NotificationsState) => ({
+    setNotificationsViewed: state.setNotificationsViewed
+})
+
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
     const [isLoading, setIsLoading] = useState(true)
@@ -58,6 +64,7 @@ export default function AppLayout({children}: AppLayoutProps) {
     const { 
         selectedNodeId, 
     } = useRoadmapStore(useShallow(selector))
+    const { setNotificationsViewed } = useNotificationsStore(useShallow(notificationsSelector))
     const [sidebarOpen, setSidebarOpen] = useState(selectedNodeId === null)
 
     useEffect(() => {
@@ -110,6 +117,18 @@ export default function AppLayout({children}: AppLayoutProps) {
                 toast.error(response.error)
             }
 
+            let notifications = await getAllNotifications()
+            if (notifications.success && notifications.data) {
+                initializeNotificationsState({
+                    notifications: notifications.data
+                })
+
+                // if we're going to the kanban set notifications to viewed
+                if (pathname === '/app/task-board') {
+                    setNotificationsViewed(notifications.data.filter(notification => notification.type === "NEW_TASK"))
+                }
+            }
+
             let kanban = await getKanbanFromOrganizationId()
             if (!kanban.data && session.user.organizationId) {
                 // kanban was not found, create it
@@ -128,7 +147,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                 toast.error(kanban.error)
             }
 
-            console.log(`Research plan and kanban zustand states initialized successfully!`)
+            console.log(`Research plan, kanban, and notifications zustand states initialized successfully!`)
             setIsLoading(false)
         }
     }

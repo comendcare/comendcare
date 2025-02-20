@@ -2350,6 +2350,26 @@ export async function notificationsViewed({notifications}: {notifications: Platf
     }
 }
 
+export async function createNotification({notificationData}: {notificationData: any}) {
+    try {
+        const session = await getSession()
+        if (!session) throw new Error("No session data")
+
+        const notification = await prisma.platformNotification.create({
+            data: {
+                ...notificationData,
+                user: { connect: {id: session?.user.id} },
+                organization: { connect: {id: session.user.organizationId}}
+            }
+        })
+
+        return {success: true, data: notification}
+    } catch (error) {
+        logError("Could not create notification", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 export async function updateTasks({tasks}: { tasks: Task[] }) {
     try {
         let updatedTasks: Task[] = []

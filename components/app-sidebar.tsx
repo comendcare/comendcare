@@ -47,7 +47,8 @@ const data = {
             title: "Task Board",
             icon: Pin,
             variant: "ghost",
-            url: "/app/task-board"
+            url: "/app/task-board",
+            notificationKeys: ["NEW_TASK"]
         },
         {
             title: "Marketplace",
@@ -81,7 +82,6 @@ const data = {
 export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const {data: session} = useSession()
     const [memberships, setMemberships] = useState<MemberWithOrganization[]>([]);
-    const [notifications, setNotifications] = useState<any>([])
 
     const fetchOrganizations = async () => {
         if (session) {
@@ -96,24 +96,8 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
         }
     };
 
-    const fetchNotificationData = async () => {
-        if (session) {
-            const response = await getAllNotifications(session.user.id, session.user.organizationId)
-            if (response.success && response.data) {
-                const n = {
-                    tasks: response.data.filter(notification => notification.type === "NEW_TASK" && notification.lastViewedAt === null).length
-                }
-                setNotifications(n || [])
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
-        }
-    }
-
     useEffect(() => {
         fetchOrganizations()
-        fetchNotificationData()
     }, [session])
 
     return (
@@ -122,7 +106,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
                 <OrganizationSwitcher memberships={memberships}/>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={data.navMain} notifications={notifications}/>
+                <NavMain items={data.navMain}/>
             </SidebarContent>
             <SidebarFooter>
                 <NavUser/>
