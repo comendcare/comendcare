@@ -138,14 +138,16 @@ export const authOptions: NextAuthOptions = {
                     .map((membership) => membership.organizationId)
                     .filter((id): id is string => !!id) || []
 
+                const membership = dbUser?.memberships[0]
+
                 token.user = user;
                 token.organizationId = organizationIds[0] || null; // Default to the first ID, if any
+                token.membership = membership || null;
             }
             return token
         },
 
         session: async ({session, token}) => {
-            // Check if the user still exists in the database
             // Check if the user still exists in the database
             const dbUser = await prisma.user.findUnique({
                 where: {id: token.sub},
@@ -154,8 +156,10 @@ export const authOptions: NextAuthOptions = {
 
             const organizationIds = dbUser?.memberships.map((m) => m.organizationId);
 
-
+            // Storing both the current organizationId AND the membership object is redundant
+            // The membership object has the organizationId
             let activeOrganizationId = token.organizationId as string | null;
+            let membership = token.membership as any
 
             if (organizationIds) {
                 // If activeOrganizationId is null but the user has memberships, use the first membership
@@ -169,6 +173,19 @@ export const authOptions: NextAuthOptions = {
                 }
             }
 
+            if (dbUser) {
+                if (!membership && dbUser.memberships.length > 0) {
+                    // Assign the first membership if none exists
+                    membership = dbUser.memberships[0];
+                } else if (
+                    membership &&
+                    !dbUser.memberships.some((m) => m.id === membership.id)
+                ) {
+                    // If membership exists but isn't in the user's memberships, reset it
+                    membership = null;
+                }
+            }
+
             if (!dbUser) {
                 // Continue with your existing session logic
                 session.user = {
@@ -178,6 +195,7 @@ export const authOptions: NextAuthOptions = {
                     // @ts-expect-error
                     username: token?.user?.username || token?.user?.gh_username,
                     organizationId: token.organizationId as string | null, // Ensure type matches
+                    membership: token.membership as any
                 };
 
                 // If user cannot be found, assume they've been deleted and forcibly sign them out in the frontend.
@@ -194,7 +212,8 @@ export const authOptions: NextAuthOptions = {
                 id: token.sub,
                 // @ts-expect-error
                 username: token?.user?.username || token?.user?.gh_username,
-                organizationId: activeOrganizationId
+                organizationId: activeOrganizationId,
+                membership: membership
             };
 
             return session;
@@ -214,6 +233,7 @@ export function getSession() {
             email: string
             image: string
             organizationId: string
+            membership: any
         }
     } | null>
 }

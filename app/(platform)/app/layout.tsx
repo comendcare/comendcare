@@ -46,7 +46,6 @@ const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
-    initState: state.initState
 })
 
 export default function AppLayout({children}: AppLayoutProps) {

@@ -91,11 +91,11 @@ export function BetaSignup({
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(handleBetaSignupSubmit)}
-                    className="flex flex-col justify-center items-center space-y-2"
+                    className="flex flex-row justify-center items-center space-x-2"
                 >
                     {!isSubscribed && (
                         <div
-                            className={`w-full flex ${inline ? "flex-col" : "flex-col md:flex-row md:space-y-0 md:space-x-2"} space-y-2`}
+                            className={`w-full flex items-center ${inline ? "items-center flex-row" : "items-center flex-row"}`}
                         >
                             <FormField
                                 control={form.control}

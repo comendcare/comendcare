@@ -12,21 +12,27 @@ import {FaArrowUpRightFromSquare, FaPlus} from "react-icons/fa6";
 import Link from "next/link";
 import { buttonVariants } from "./plate-ui/button";
 
-export const RoadmapCard = ({roadmap, subdomain, isPublic}: { roadmap: any, subdomain: string | undefined, isPublic: boolean }) => {
+export const RoadmapCard = ({
+    roadmap, 
+    urlMilestone, 
+    setUrlMilestone, 
+    urlView,
+    setUrlView,
+    subdomain, 
+    isPublic,
+    externalLinks
+}: { 
+    roadmap: any, 
+    urlMilestone?: string | undefined,
+    setUrlMilestone?: (id: string | undefined) => void,
+    urlView?: string | undefined,
+    setUrlView?: (view: string | undefined) => void,
+    subdomain: string | undefined, 
+    isPublic: boolean ,
+    externalLinks: boolean
+}) => {
     const router = useRouter()
     const pathname = usePathname()
-    const searchParams = useSearchParams()
-    const urlView = searchParams.get("view")
-    const urlMilestone = searchParams.get("milestone")
-
-    const handleTabChange = (value: string) => {
-        const params = new URLSearchParams(searchParams.toString())
-
-        params.delete("view")
-        params.set("view", value)
-
-        // router.replace(`${pathname}?${params.toString()}`)
-    }
 
     if (!roadmap) {
         return <Card className="organization-profile-tour-step4">
@@ -117,7 +123,7 @@ export const RoadmapCard = ({roadmap, subdomain, isPublic}: { roadmap: any, subd
         <Tabs
             defaultValue={urlView === 'flow' ? 'flow' : 'timeline'}
             className="w-full"
-            onValueChange={handleTabChange}
+            onValueChange={setUrlView ? setUrlView: () => {}}
         >
             <Card className="organization-profile-tour-step4">
                 <CardHeader className="w-full pt-6 pb-2 space-y-4">
@@ -148,13 +154,23 @@ export const RoadmapCard = ({roadmap, subdomain, isPublic}: { roadmap: any, subd
 
                 <CardContent className="px-8">
                     <TabsContent value="timeline" className="space-y-4 w-full">
-                        <PublicTimelineView roadmap={roadmap} subdomain={subdomain}
-                                            urlMilestone={urlMilestone || undefined} externalLinks={!isPublic}/>
+                        <PublicTimelineView 
+                            roadmap={roadmap} 
+                            subdomain={subdomain}
+                            externalLinks={externalLinks}
+                            urlMilestone={urlMilestone}
+                            setUrlMilestone={setUrlMilestone}
+                        />
                     </TabsContent>
                     <TabsContent value="flow" className="space-y-4 w-full">
                         <div className="h-[40vh] w-full">
-                            <PublicFlowView roadmap={roadmap} subdomain={subdomain}
-                                            urlMilestone={urlMilestone || undefined} externalLinks={!isPublic}/>
+                            <PublicFlowView 
+                                roadmap={roadmap} 
+                                subdomain={subdomain}
+                                urlMilestone={urlMilestone || undefined} 
+                                setUrlMilestone={setUrlMilestone || undefined}
+                                externalLinks={externalLinks}
+                            />
                         </div>
                     </TabsContent>
                 </CardContent>

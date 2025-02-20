@@ -45,7 +45,7 @@ model User {
 
 model Member {
   id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  role           String
+  role           String       @default("admin") @db.VarChar
   title          String?
   email          String
   userId         String
@@ -64,7 +64,7 @@ model Member {
 model Invitation {
   id             String       @id @default(cuid())
   email          String
-  role           String       @db.VarChar
+  role           String       @default("admin") @db.VarChar
   organizationId String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
@@ -78,7 +78,7 @@ model MemberRequest {
   id             String       @id @default(cuid())
   userId         String
   email          String
-  role           String       @db.VarChar
+  role           String       @default("admin") @db.VarChar
   organizationId String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
@@ -338,6 +338,7 @@ model Organization {
   id                  String                    @id @default(cuid())
   public              Boolean                   @default(true)
   verified            Boolean                   @default(false)
+  published           Boolean                   @default(false)
   name                String?
   description         String?                   @db.Text
   logo                String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
@@ -555,4 +556,61 @@ model Gene {
   lsdb                 String[] // Locus-Specific Database links
 
   @@index([symbol], map: "idx_symbol") // Index for faster search by symbol
+}
+
+model Company {
+  id                 String  @id @default(uuid())
+  url                String
+  scientistDotComURL String?
+  title              String
+  description        String?
+  yearEstablished    Int?
+  website            String?
+  headquarters       String?
+  companyType        String?
+
+  sites          Site[]
+  services       Service[]
+  certifications Certification[]
+  rfis           RFI[]
+}
+
+model Site {
+  id        String  @id @default(uuid())
+  name      String
+  address   String
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+}
+
+model Service {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  company     Company @relation(fields: [companyId], references: [id])
+  companyId   String
+}
+
+model Certification {
+  id        String  @id @default(uuid())
+  name      String
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+  files     File[]
+}
+
+model File {
+  id              String        @id @default(uuid())
+  fileName        String
+  fileUrl         String
+  certification   Certification @relation(fields: [certificationId], references: [id])
+  certificationId String
+}
+
+model RFI {
+  id          String    @id @default(uuid())
+  name        String
+  submittedOn DateTime?
+  company     Company   @relation(fields: [companyId], references: [id])
+  companyId   String
 }

@@ -16,7 +16,9 @@ import {
     UniqueIdentifier,
     TouchSensor,
     MouseSensor,
-    closestCorners
+    closestCorners,
+    CollisionDetection,
+    pointerWithin
 } from "@dnd-kit/core"
 import {SortableContext, arrayMove} from "@dnd-kit/sortable"
 import {type Task, TaskCard} from "@/components/task-card"
@@ -333,11 +335,12 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
     }
 
     function onDragOver(event: DragOverEvent) {
+        console.log(`drag over`, event)
         const {active, over} = event
         if (!over) return
 
         const activeId = active.id
-        const overId = over.id
+        let overId = over.id
 
         if (activeId === overId) return
 
@@ -410,8 +413,11 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
                 return tasks
             }
         } else if (isActiveAColumn) {
+            console.log(`is active column`, isActiveAColumn)
+            console.log(`is over a column`, isOverAColumn)
             // Im dropping a Column over another Column
             if (isActiveAColumn && isOverAColumn) {
+                console.log(`GOT HERE`)
                 setColumns(columns => {
                     const activeIndex = columns.findIndex((c: any) => c.id === activeId)
                     const overIndex = columns.findIndex((c: any) => c.id === overId)
@@ -427,15 +433,36 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
         }
     }
 
+    // Custom collision detection that ignores tasks when dragging a column
+    const customCollisionDetection: CollisionDetection = (args) => {
+        const { active } = args
+
+        // Get the active item's type
+        const activeData = active?.data?.current
+        const isActiveAColumn = activeData?.type === "Column"
+
+        // Run a default detection method (e.g., pointerWithin)
+        let collisions = pointerWithin(args)
+
+        // If dragging a column, ignore tasks
+        if (isActiveAColumn) {
+            collisions = collisions.filter(({ id }) => {
+                const overElement = document.getElementById(String(id))
+                return overElement?.dataset.type !== "Task" // Only allow columns as drop targets
+            })
+        }
+
+        return collisions
+    }
+
     return (
         <DndContext
-            accessibility={{
-                announcements
-            }}
+            accessibility={{ announcements }}
             sensors={sensors}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
+            collisionDetection={customCollisionDetection} // Use custom collision detection
         >
             <BoardContainer>
                 <SortableContext items={columnIds}>

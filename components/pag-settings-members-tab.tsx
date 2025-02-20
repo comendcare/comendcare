@@ -38,7 +38,7 @@ export default async function PAGSettingsMembersTab() {
     }
 
     let fetchedMembers: any[] | undefined = []
-    const response = await getMembers(session?.user.organizationId);
+    const response = await getMembers(session.user.organizationId);
     if (response.success) {
         fetchedMembers = response.data
     } else {
@@ -122,7 +122,7 @@ export default async function PAGSettingsMembersTab() {
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                             {person.title}
                                         </td>
-                                        <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
+                                        <td className="capitalize whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                             {person.role}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">

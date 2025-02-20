@@ -47,7 +47,7 @@ import ConditionProfilePatientGroupCard from "@/components/condition-profile-pat
 import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
 import PublicPageFooter from "@/components/public-page-footer";
 import Link from "next/link";
-import { FloatingDock } from "@/components/floating-dock";
+import {FloatingDock} from "@/components/floating-dock";
 import {IconBrandGithub, IconEdit, IconFlag, IconHome, IconShare, IconShare2, IconShare3} from "@tabler/icons-react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
@@ -425,7 +425,7 @@ export default async function ConditionPage({
                                     href={`http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/admin`}
                                     className="md:basis-1/2 lg:basis-1/3"
                                 >
-                                    <CarouselItem >
+                                    <CarouselItem>
                                         <ConditionProfilePatientGroupCard organization={organization.organization}/>
                                     </CarouselItem>
                                 </Link>
@@ -521,7 +521,7 @@ export default async function ConditionPage({
                 items={[
                     {
                         title: "Edit condition page",
-                        icon: <IconEdit />,
+                        icon: <IconEdit/>,
                         dialog: (
                             <>
                                 <DialogHeader>
@@ -532,7 +532,7 @@ export default async function ConditionPage({
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
                                     <Label htmlFor="name">Name</Label>
-                                    <Input id="name" defaultValue="John Doe" />
+                                    <Input id="name" defaultValue="John Doe"/>
                                 </div>
                                 <DialogFooter>
                                     <Button type="submit">Save changes</Button>
@@ -547,12 +547,12 @@ export default async function ConditionPage({
                     // },
                     {
                         title: "Share on social media",
-                        icon: <IconShare />,
-                        dialog: <ShareDialog url={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${slug}`} />
+                        icon: <IconShare/>,
+                        dialog: <ShareDialog url={`${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/condition/${slug}`}/>
                     },
                     {
                         title: "Report an issue",
-                        icon: <IconFlag />,
+                        icon: <IconFlag/>,
                         dialog: (
                             <>
                                 <DialogHeader>
@@ -563,7 +563,7 @@ export default async function ConditionPage({
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
                                     <Label htmlFor="name">Name</Label>
-                                    <Input id="name" defaultValue="John Doe" />
+                                    <Input id="name" defaultValue="John Doe"/>
                                 </div>
                                 <DialogFooter>
                                     <Button type="submit">Save changes</Button>

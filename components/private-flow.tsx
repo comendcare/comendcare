@@ -48,6 +48,7 @@ const selector = (state: RoadmapState) => ({
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
     addNodes: state.addNodes,
+    saveState: state.saveState,
 })
 
 export const PrivateFlowView = ({
@@ -65,6 +66,7 @@ export const PrivateFlowView = ({
         onEdgesChange,
         addNodes,
         onConnect,
+        saveState,
     } = useRoadmapStore(useShallow(selector))
     const store = useStoreApi()
     const router = useRouter()
@@ -77,21 +79,6 @@ export const PrivateFlowView = ({
     const { screenToFlowPosition, getIntersectingNodes, fitView } = useReactFlow()
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const pathname = usePathname()
-    const { undo } = useRoadmapStore.temporal.getState()
-
-    useEffect(() => {
-        const handleUndo = (event: KeyboardEvent) => {
-          if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-            event.preventDefault(); // Prevent default undo behavior (optional)
-            console.log("Undo action triggered")
-            undo()
-            return
-          }
-        };
-    
-        document.addEventListener("keydown", handleUndo);
-        return () => document.removeEventListener("keydown", handleUndo);
-      }, []);
 
     useEffect(() => {
         setLocalNodes(nodes)

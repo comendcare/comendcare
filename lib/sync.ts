@@ -276,18 +276,102 @@ export const syncToTypesense = async (env: {
                 },
             ],
         };
+        const companySchema = {
+            name: 'companies',
+            enable_nested_fields: true,
+            fields: [
+                {
+                    name: "id",
+                    facet: false,
+                    index: true,
+                    infix: false,
+                    locale: "",
+                    optional: true,
+                    sort: false,
+                    stem: false,
+                    store: true,
+                    type: "string"
+                },
+                {
+                    name: "title",
+                    type: "string",
+                    index: true,
+                    sort: true,
+                    store: true,
+                    optional: true
+                },
+                {
+                    name: "description",
+                    type: "string",
+                    index: true,
+                    store: true,
+                    optional: true
+                },
+                {
+                    name: "url",
+                    type: "string",
+                    index: true,
+                    store: true,
+                    optional: true
+                },
+                {
+                    name: "yearEstablished",
+                    type: "int32",
+                    index: true,
+                    sort: true,
+                    store: true,
+                    optional: true
+                },
+                {
+                    name: "website",
+                    type: "string",
+                    index: true,
+                    store: true,
+                    optional: true
+                },
+                {
+                    name: "headquarters",
+                    type: "string",
+                    index: true,
+                    store: true,
+                    optional: true
+                },
+                {
+                    name: "companyType",
+                    type: "string",
+                    index: true,
+                    store: true,
+                    optional: true
+                }
+            ],
+        };
 
         console.log('Organization Schema:', JSON.stringify(organizationSchema, null, 2));
         console.log('Milestone Schema:', JSON.stringify(milestoneSchema, null, 2));
+        console.log('CRO Schema:', JSON.stringify(companySchema, null, 2));
 
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'organizations', organizationSchema);
         await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', milestoneSchema);
+        await manageCollection(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companySchema);
 
         const organizations = await prisma.organization.findMany();
         const milestones = await prisma.milestone.findMany();
+        const companies = await prisma.company.findMany({
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                url: true,
+                yearEstablished: true,
+                website: true,
+                headquarters: true,
+                companyType: true
+            }
+        });
 
         console.log('Raw organizations data:', organizations);
         console.log('Raw milestones data:', milestones);
+        console.log('Raw companies data:', companies);
 
         if (organizations.length > 0) {
             console.log('Validating organization data...');
@@ -330,7 +414,10 @@ export const syncToTypesense = async (env: {
                     include: { node: true }
                 })
 
-                if (!milestone) return null;
+                // don't upload milestone data to typesense if
+                // 1. milestone doesn't exist
+                // 2. milestone is private
+                if (!milestone || milestone.private) return null;
 
                 return {
                     ...milestone,
@@ -344,6 +431,12 @@ export const syncToTypesense = async (env: {
             await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'milestones', validMilestones);
         } else {
             console.log('No milestones to import.');
+        }
+
+        if (companies.length > 0) {
+            await bulkImportDocuments(env.TYPESENSE_URL, env.TYPESENSE_ADMIN_API_KEY, 'companies', companies);
+        } else {
+            console.log('No companies to import.');
         }
 
         console.log('Sync job completed successfully.');

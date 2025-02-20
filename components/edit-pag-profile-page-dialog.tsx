@@ -113,7 +113,7 @@ const editOrgFormSchema = z.object({
 })
 
 export default function EditPAGProfileDialog({organization}: { organization: Organization }) {
-    const {data: session, update} = useSession()
+    const {data: session} = useSession()
     const router = useRouter()
     const [searchInput, setSearchInput] = useState("");
     const [selectedFileProfile, setSelectedFileProfile] = useState<FileWithPreview | null>(null);
@@ -145,13 +145,6 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
     })
 
     const [debouncedNickname] = useDebounce(editOrgForm.watch("subdomain"), 500); // Extract just the debounced value
-
-    async function updateSession(organizationId: string) {
-        await update({
-            ...session,
-            organizationId: organizationId,
-        })
-    }
 
     useEffect(() => {
         if (debouncedNickname) {

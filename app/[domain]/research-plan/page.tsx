@@ -1,4 +1,4 @@
-import {notFound, useSearchParams} from "next/navigation"
+import {notFound, usePathname, useSearchParams} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getRoadmapData, getOrganizationData, getRoadmapsForOrganization, getMilestoneDetails} from "@/lib/fetchers"
 import BlogCard from "@/components/blog-card"
@@ -7,7 +7,6 @@ import MDX from "@/components/mdx"
 import {cn, createDicebearAvatar, formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
 import {Button} from "@/components/ui/button"
-import {RoadmapCard} from "@/components/public-roadmap-card"
 import {PublicMilestoneDetails} from "@/components/public-milestone-details"
 import {FaArrowLeft, FaCalendar, FaCircleDollarToSlot, FaCity, FaPeopleGroup, FaPlus} from "react-icons/fa6"
 import {BackButton} from "@/components/back-button"
@@ -32,7 +31,8 @@ import {Label} from "@/components/ui/label"
 import ShareDialog from "@/components/share-dialog";
 import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import FeedbackForm from "@/components/feedback-form";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { PublicRoadmapContent } from "@/components/public-roadmap-content"
 
 export async function generateMetadata({
                                            params
@@ -111,50 +111,50 @@ export async function generateStaticParams() {
     return allPaths
 }
 
-const posts: Post[] = [
-    {
-        id: '1',
-        user: {
-            name: 'John Doe',
-            username: '@johndoe',
-            avatar: '/placeholder.svg?height=40&width=40'
-        },
-        content: 'Just finished a great hike! The view was breathtaking. 🏞️ #NatureLover',
-        image: '/placeholder.png',
-        likes: 120,
-        comments: 18,
-        shares: 5,
-        timestamp: '2 hours ago'
-    },
-    {
-        id: '2',
-        user: {
-            name: 'Jane Smith',
-            username: '@janesmith',
-            avatar: '/placeholder.svg?height=40&width=40'
-        },
-        content: 'Excited to announce my new project! Stay tuned for more details. 🚀 #NewBeginnings',
-        image: '/placeholder.png',
-        likes: 89,
-        comments: 32,
-        shares: 12,
-        timestamp: '5 hours ago'
-    },
-    {
-        id: '3',
-        user: {
-            name: 'Bob Jackson',
-            username: '@bobby',
-            avatar: '/placeholder.svg?height=40&width=40'
-        },
-        content: 'Hello!. 🚀 #NewBeginnings',
-        image: '/placeholder.png',
-        likes: 29,
-        comments: 32,
-        shares: 1,
-        timestamp: '5 hours ago'
-    }
-]
+// const posts: Post[] = [
+//     {
+//         id: '1',
+//         user: {
+//             name: 'John Doe',
+//             username: '@johndoe',
+//             avatar: '/placeholder.svg?height=40&width=40'
+//         },
+//         content: 'Just finished a great hike! The view was breathtaking. 🏞️ #NatureLover',
+//         image: '/placeholder.png',
+//         likes: 120,
+//         comments: 18,
+//         shares: 5,
+//         timestamp: '2 hours ago'
+//     },
+//     {
+//         id: '2',
+//         user: {
+//             name: 'Jane Smith',
+//             username: '@janesmith',
+//             avatar: '/placeholder.svg?height=40&width=40'
+//         },
+//         content: 'Excited to announce my new project! Stay tuned for more details. 🚀 #NewBeginnings',
+//         image: '/placeholder.png',
+//         likes: 89,
+//         comments: 32,
+//         shares: 12,
+//         timestamp: '5 hours ago'
+//     },
+//     {
+//         id: '3',
+//         user: {
+//             name: 'Bob Jackson',
+//             username: '@bobby',
+//             avatar: '/placeholder.svg?height=40&width=40'
+//         },
+//         content: 'Hello!. 🚀 #NewBeginnings',
+//         image: '/placeholder.png',
+//         likes: 29,
+//         comments: 32,
+//         shares: 1,
+//         timestamp: '5 hours ago'
+//     }
+// ]
 
 export default async function OrganizationRoadmapPage({
                                                           params
@@ -173,7 +173,6 @@ export default async function OrganizationRoadmapPage({
     if (!organization) {
         notFound()
     }
-    console.log(roadmaps[0])
 
     return (
         <>
@@ -271,18 +270,10 @@ export default async function OrganizationRoadmapPage({
                             </p>
 
                             {/*<div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">*/}
-                            <div className="flex flex-col-reverse md:grid md:grid-cols-3 m-auto w-full gap-4">
-                                <div className="md:col-span-2">
-                                    <RoadmapCard
-                                        roadmap={roadmaps[0]}
-                                        subdomain={organization?.subdomain || undefined}
-                                        isPublic={true}
-                                    />
-                                </div>
-                                <div className="col-span-1">
-                                    <PublicMilestoneDetails />
-                                </div>
-                            </div>
+                            <PublicRoadmapContent 
+                                roadmap={roadmaps[0]}
+                                subdomain={organization?.subdomain || undefined}
+                            />
 
                             {/*<div className="mt-8 w-full space-y-8">*/}
                             {/*    <h2 className="text-center text-3xl md:text-4xl font-bold">*/}

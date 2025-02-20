@@ -291,7 +291,7 @@ export const createOrganization = async (formData: FormData) => {
     const image = formData.get("image") as string | null;
 
     try {
-        const response = await prisma.organization.upsert({
+        const organization = await prisma.organization.upsert({
             where: {
                 subdomain,
             },
@@ -340,13 +340,13 @@ export const createOrganization = async (formData: FormData) => {
             },
         });
 
-        await prisma.member.create({
+        const membership = await prisma.member.create({
             data: {
                 userId: session.user.id,
                 email: session.user.email,
-                role: "admin", // Creator of organization is admin by default
+                role: "owner", // Creator of organization is owner by default
                 title: title,
-                organizationId: response.id
+                organizationId: organization.id
             }
         })
 
@@ -357,7 +357,7 @@ export const createOrganization = async (formData: FormData) => {
                     ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
                     : process.env.TYPESENSE_ADMIN_API_KEY
             )!,
-            response,
+            organization,
             'organizations'
         );
 
@@ -372,15 +372,15 @@ export const createOrganization = async (formData: FormData) => {
                     email: session.user.email
                 },
                 organization: {
-                    name: response.name,
-                    subdomain: response.subdomain
+                    name: organization.name,
+                    subdomain: organization.subdomain
                 }
             }
         ).then(() => {
             console.log("email sent")
         })
 
-        return response
+        return { organization, membership };
     } catch (error: any) {
         if (error.code === "P2002") {
             return {
@@ -390,6 +390,40 @@ export const createOrganization = async (formData: FormData) => {
             return {
                 error: error.message
             }
+        }
+    }
+}
+
+export const toggleOrganizationPublished = async (organizationId: string) => {
+    try {
+        const organization = await prisma.organization.findUnique({
+            where: {
+                id: organizationId,
+            }
+        })
+
+        if (organization) {
+            // Toggle the 'published' attribute
+            const updatedOrganization = await prisma.organization.update({
+                where: {
+                    id: organization.id
+                },
+                data: {
+                    published: !organization.published
+                }
+            })
+
+            // Log or revalidate if necessary
+            console.log("Toggled published status for organization", organization.id)
+            await revalidateTag(
+                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+            )
+
+            return updatedOrganization
+        }
+    } catch (error: any) {
+        return {
+            error: error.message
         }
     }
 }
@@ -2017,8 +2051,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
         await Promise.all(
             milestones.map(async (milestone: any) => {
                 const previousMilestone = await prisma.milestone.findUnique({
-                    // where: {nodeId: milestone.nodeId},
-                    where: {id: milestone.id},
+                    where: {nodeId: milestone.nodeId},
+                    // where: {id: milestone.id},
                     include: {
                         attachments: true,
                         contacts: true,
@@ -2029,12 +2063,12 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
 
                 if (!previousMilestone) {
                     // milestone doesn't exist, throw error
-                    throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`);
+                    throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`)
                 }
 
                 let m = await prisma.milestone.update({
-                    // where: {nodeId: milestone.nodeId},
-                    where: {id: milestone.id},
+                    where: {nodeId: milestone.nodeId},
+                    // where: {id: milestone.id},
                     include: {
                         attachments: true,
                         contacts: true,

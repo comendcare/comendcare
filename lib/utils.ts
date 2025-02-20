@@ -175,14 +175,19 @@ export function abbreviateNumber(num: number | null | undefined) {
 export const formatMoney = (moneyRaised: number | undefined) => {
     if (moneyRaised === undefined) return "$0";
 
+    const formatNumber = (num: number, divisor: number, suffix: string) => {
+        const formatted = (num / divisor).toFixed(1);
+        return formatted.endsWith(".0") ? `${Math.round(num / divisor)}${suffix}` : `${formatted}${suffix}`;
+    };
+
     if (moneyRaised >= 1_000_000) {
-        return `${(moneyRaised / 1_000_000).toFixed(1)}M`;
+        return formatNumber(moneyRaised, 1_000_000, "M");
     } else if (moneyRaised >= 1_000) {
-        return `${(moneyRaised / 1_000).toFixed(1)}K`;
+        return formatNumber(moneyRaised, 1_000, "K");
     } else {
-        return `${moneyRaised.toLocaleString()}`;
+        return moneyRaised.toLocaleString();
     }
-}
+};
 
 export function formatDate(dateString: string): string {
     const date = new Date(dateString);
