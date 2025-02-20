@@ -640,6 +640,7 @@ export const getAllNotifications = async () => {
         const notifications = await prisma.platformNotification.findMany({
             where: {
                 userId: session.user.id,
+                organizationId: session.user.organizationId
             }
         })
 
