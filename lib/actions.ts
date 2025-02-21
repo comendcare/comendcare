@@ -2116,7 +2116,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                             update: {
                                 type: milestone.nodeType
                             }
-                        }
+                        },
+                        notes: milestone.notes
                     }
                 })
 
