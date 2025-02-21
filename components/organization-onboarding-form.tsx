@@ -12,7 +12,7 @@ import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {usePathname, useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
+import MultipleSelector, {FancyMultiSelect, Option} from "@/components/ui/multiple-selector";
 import {useCallback, useEffect, useState} from "react";
 import {Label} from "@/components/ui/label";
 import {Switch} from "@/components/ui/switch";
