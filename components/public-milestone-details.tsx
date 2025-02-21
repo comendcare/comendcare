@@ -38,7 +38,7 @@ export function PublicMilestoneDetails({roadmap, urlMilestone}: {roadmap: any, u
     }
 
     return (
-        <Card>
+        <Card className="border-2 border-black">
             <CardHeader>
                 <CardTitle>
                     Select a Milestone!
