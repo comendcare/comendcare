@@ -84,6 +84,8 @@ import MoneyInput from "@/components/money-input";
 import MultipleSelector from "./ui/multiple-selector"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
+import { SettingsProvider } from "./editor/settings"
+import { PlateEditor } from "./editor/plate-editor"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -146,6 +148,7 @@ const editMilestoneForm = z.object({
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.array(z.string()).optional(),
+    notes: z.array(z.record(z.any()))
 })
 
 export function EditMilestoneForm({
@@ -190,7 +193,8 @@ export function EditMilestoneForm({
             status: milestoneData?.status || "PLANNED",
             isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
-            openTo: milestoneData?.openTo || []
+            openTo: milestoneData?.openTo || [],
+            notes: JSON.parse(milestoneData?.notes || "[]") || [],
         }
     })
 
@@ -208,7 +212,8 @@ export function EditMilestoneForm({
         status: form.watch("status"),
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
-        openTo: form.watch("openTo")
+        openTo: form.watch("openTo"),
+        notes: form.watch("notes")
     }
 
     // callback ensures we're not creating a new debounce every time this is called
@@ -242,7 +247,8 @@ export function EditMilestoneForm({
             status,
             isPrivate,
             contacts,
-            openTo
+            openTo,
+            notes
         } = values;
 
         setMilestone(milestoneData?.nodeId, {
@@ -258,7 +264,8 @@ export function EditMilestoneForm({
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
-            ...(openTo ? {openTo} : undefined)
+            ...(openTo ? {openTo} : undefined),
+            ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)}: undefined)
         })
 
         // Mixpanel tracking for "Other" field
@@ -425,7 +432,7 @@ export function EditMilestoneForm({
                                     <FormControl>
                                         <Textarea
                                             id="description"
-                                            placeholder={`Enter a description`}
+                                            placeholder={`Enter a description...`}
                                             defaultValue={field.value}
                                             {...field}
                                             className="border-transparent hover:border-input"
@@ -479,6 +486,36 @@ export function EditMilestoneForm({
                             <TimelineFormField form={form} startLabel={"Request Opens"}
                                                endLabel={"Deadline for Proposals"}/>
                         )}
+
+                        <FormField
+                            control={form.control}
+                            name="notes"
+                            render={({field}) => (
+                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                    <FormLabel className="text-md mt-2">
+                                        {`Internal Notes`}
+                                    </FormLabel>
+                                    <FormControl>
+                                        {/* <Textarea
+                                            id="notes"
+                                            placeholder={`Enter notes...`}
+                                            defaultValue={field.value}
+                                            {...field}
+                                            className="border-transparent hover:border-input"
+                                        /> */}
+                                        <div className="w-full col-span-2" data-registry="plate">
+                                            <SettingsProvider>
+                                                <PlateEditor
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                />
+                                            </SettingsProvider>
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
                     </FormItem>
 
                     <ContactsFormField form={form}/>
