@@ -27,7 +27,7 @@ import {Button} from "./ui/button"
 
 export function MilestoneDetails({milestone}: { milestone: any }) {
     return (
-        <Card>
+        <Card className="border-2 border-black">
             <CardHeader className="flex flex-row gap-4">
                 <span className="flex flex-col gap-4 grow">
                     <div className="flex flex-row gap-4 items-center justify-between">
