@@ -3,7 +3,7 @@ import {temporal} from 'zundo'
 import { Column, createColumn, createTask, deleteColumn, deleteTask, Task, updateColumns, updateTasks } from "@/lib/actions";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
-import { PlatformNotification } from "@prisma/client";
+// import { PlatformNotification } from "@prisma/client";
 import { NotificationsState, useNotificationsStore } from "../notifications/notificationsStore";
 import { useShallow } from "zustand/react/shallow";
 
