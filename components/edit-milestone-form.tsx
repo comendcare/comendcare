@@ -84,6 +84,8 @@ import MoneyInput from "@/components/money-input";
 import MultipleSelector from "./ui/multiple-selector"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
+import { SettingsProvider } from "./editor/settings"
+import { PlateEditor } from "./editor/plate-editor"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -146,6 +148,7 @@ const editMilestoneForm = z.object({
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.array(z.string()).optional(),
+    notes: z.array(z.record(z.any()))
 })
 
 export function EditMilestoneForm({
@@ -190,7 +193,8 @@ export function EditMilestoneForm({
             status: milestoneData?.status || "PLANNED",
             isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
-            openTo: milestoneData?.openTo || []
+            openTo: milestoneData?.openTo || [],
+            notes: JSON.parse(milestoneData?.notes || "[]") || [],
         }
     })
 
@@ -208,7 +212,8 @@ export function EditMilestoneForm({
         status: form.watch("status"),
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
-        openTo: form.watch("openTo")
+        openTo: form.watch("openTo"),
+        notes: form.watch("notes")
     }
 
     // callback ensures we're not creating a new debounce every time this is called
@@ -242,7 +247,8 @@ export function EditMilestoneForm({
             status,
             isPrivate,
             contacts,
-            openTo
+            openTo,
+            notes
         } = values;
 
         setMilestone(milestoneData?.nodeId, {
@@ -258,7 +264,8 @@ export function EditMilestoneForm({
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
-            ...(openTo ? {openTo} : undefined)
+            ...(openTo ? {openTo} : undefined),
+            ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)}: undefined)
         })
 
         // Mixpanel tracking for "Other" field
@@ -364,7 +371,7 @@ export function EditMilestoneForm({
 
                     <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
                         <FormLabel
-                            className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Private</FormLabel>
+                            className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Visibility</FormLabel>
                         <PrivatePublicFormField form={form} formData={formData}/>
                     </FormItem>
 
@@ -425,7 +432,7 @@ export function EditMilestoneForm({
                                     <FormControl>
                                         <Textarea
                                             id="description"
-                                            placeholder={`Enter a description`}
+                                            placeholder={`Enter a description...`}
                                             defaultValue={field.value}
                                             {...field}
                                             className="border-transparent hover:border-input"
@@ -436,8 +443,11 @@ export function EditMilestoneForm({
                             )}
                         />
 
-                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
+                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-4 items-center">
+                            <div>
                             <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
+                            {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
+                            </div>
                             <MilestoneTypeFormField form={form}/>
 
                             {formData.nodeType === "ASSET" && (
@@ -476,6 +486,36 @@ export function EditMilestoneForm({
                             <TimelineFormField form={form} startLabel={"Request Opens"}
                                                endLabel={"Deadline for Proposals"}/>
                         )}
+
+                        <FormField
+                            control={form.control}
+                            name="notes"
+                            render={({field}) => (
+                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                    <FormLabel className="text-md mt-2">
+                                        {`Internal Notes`}
+                                    </FormLabel>
+                                    <FormControl>
+                                        {/* <Textarea
+                                            id="notes"
+                                            placeholder={`Enter notes...`}
+                                            defaultValue={field.value}
+                                            {...field}
+                                            className="border-transparent hover:border-input"
+                                        /> */}
+                                        <div className="w-full col-span-2" data-registry="plate">
+                                            <SettingsProvider>
+                                                <PlateEditor
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                />
+                                            </SettingsProvider>
+                                        </div>
+                                    </FormControl>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
                     </FormItem>
 
                     <ContactsFormField form={form}/>
@@ -549,7 +589,7 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                                 }
                             />
                         </FormControl>
-                        <FormMessage/>
+                        <FormMessage className="text-primary"/>
                     </FormItem>
                 )}
             />
@@ -595,39 +635,43 @@ const PrivatePublicFormField = ({form, formData}: { form: any, formData: any }) 
                             onValueChange={(value)=> {
                                 form.setValue("isPrivate", value === "PRIVATE")
                             }}
-                            defaultValue={field.value ? "PRIVATE" : "PUBLISHED"}
-                            className="flex flex-col space-y-0 w-full"
+                            defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
+                            className="flex flex-wrap space-y-0 gap-x-8"
                         >
-                            <FormItem className="flex items-center space-x-3 space-y-0 flex-1">
+                            <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                    <div className="h-full w-full border rounded-md p-2 flex items-start justify-between gap-4">
-                                        <RadioGroupItem value="PRIVATE" />
-                                        <span className="flex flex-grow flex-col gap-2">
-                                            <FormLabel className="font-normal flex gap-1 items-center">
-                                                <FaLock />
-                                                {`Private`}
-                                            </FormLabel>
-                                            <span className="text-sm text-gray-500">
-                                            Only visible to your team.
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <span className="flex gap-2">
+                                                <RadioGroupItem value="PRIVATE" />
+                                                <FormLabel className="font-normal flex gap-1 items-center">
+                                                    <FaLock />
+                                                    {`Private`}
+                                                </FormLabel>
                                             </span>
-                                        </span>
-                                    </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                            {`Private milestones are only visible to your team.`}
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </FormControl>
                             </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0 flex-1">
+                            <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                    <div className="h-full w-full border rounded-md p-2 flex items-start justify-between gap-4">
-                                        <RadioGroupItem value="PUBLISHED" />
-                                        <span className="flex flex-grow flex-col gap-2">
-                                            <FormLabel className="font-normal flex gap-1 items-center">
-                                                <FaGlobe />
-                                                {`Published`}
-                                            </FormLabel>
-                                            <span className="text-sm text-gray-500">
-                                                Visible on your profile and discoverable in the marketplace.
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <span className="flex gap-2">
+                                                <RadioGroupItem value="PUBLIC" />
+                                                <FormLabel className="font-normal flex gap-1 items-center">
+                                                    <FaGlobe />
+                                                    {`Public`}
+                                                </FormLabel>
                                             </span>
-                                        </span>
-                                    </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                            {`Public milestones are visible on your profile and discoverable in the marketplace.`}
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </FormControl>
                             </FormItem>
                         </RadioGroup>
@@ -934,10 +978,10 @@ const TasksFormField = ({
                         <>
                             <div className="flex flex-row justify-between items-center gap-4">
                                 <FormLabel
-                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex flex-col justify-start items-start flex-wrap gap-1"
+                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
                                 >
                                     {`Tasks`}
-                                    <PrivateBadge className="font-normal text-gray-500"/>
+                                    <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
                                 </FormLabel>
 
                                 <div className="h-full flex flex-row flex-wrap justify-end items-end gap-2">
