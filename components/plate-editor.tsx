@@ -284,16 +284,11 @@ export function PlateEditor() {
         <TooltipProvider>
             <DndProvider backend={HTML5Backend}>
                 <Plate editor={plateEditor}>
-                    <FixedToolbar>
+                    <FixedToolbar className="w-full">
                         <FixedToolbarButtons />
                     </FixedToolbar>
 
                     <Editor />
-                    {/* 
-                    <FloatingToolbar>
-                        <FloatingToolbarButtons />
-                    </FloatingToolbar> */}
-                    {/* <CommentsPopover /> */}
                 </Plate>
             </DndProvider>
         </TooltipProvider>
