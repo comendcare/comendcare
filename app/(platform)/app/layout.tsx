@@ -63,6 +63,7 @@ export default function AppLayout({children}: AppLayoutProps) {
     const pathname = usePathname()
     const { 
         selectedNodeId, 
+        setSelectedNodeId
     } = useRoadmapStore(useShallow(selector))
     const { setNotificationsViewed } = useNotificationsStore(useShallow(notificationsSelector))
     const [sidebarOpen, setSidebarOpen] = useState(selectedNodeId === null)
@@ -179,6 +180,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                                         if (pathname.includes('app/profile')) {
                                             startOnborda('organization-profile-tour')
                                         } else if (pathname.includes('app/research-plan')) {
+                                            setSelectedNodeId(null)
                                             startOnborda('research-plan-tour')
                                         }
                                     }}>

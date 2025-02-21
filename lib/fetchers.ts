@@ -736,7 +736,7 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                         include: {data: true}
                     })
                 ).map(async node => {
-                    const {id, type, positionX, positionY, origin} = node
+                    const {id, type, positionX, positionY, origin, createdAt, updatedAt} = node
 
                     return {
                         id,
@@ -745,7 +745,9 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                             x: positionX,
                             y: positionY
                         },
-                        origin
+                        origin,
+                        createdAt,
+                        updatedAt
                     }
                 })
             )
