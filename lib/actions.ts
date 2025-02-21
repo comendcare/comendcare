@@ -405,6 +405,7 @@ export const toggleOrganizationPublished = async (organizationId: string) => {
                 id: organizationId,
             }
         })
+        const newPublished = !organization?.published
 
         if (organization) {
             // Toggle the 'published' attribute
@@ -413,9 +414,21 @@ export const toggleOrganizationPublished = async (organizationId: string) => {
                     id: organization.id
                 },
                 data: {
-                    published: !organization.published
+                    published: newPublished
                 }
             })
+
+            // if the org is being published, don't change milestone types
+            // if the org is being unpublished, change all the org's milestones to private
+            if (!newPublished) {
+                const updatedMilestones = await prisma.milestone.updateMany({
+                    where: {organizationId: organization.id},
+                    data: {
+                        private: true
+                    }
+                })
+            }
+
 
             // Log or revalidate if necessary
             console.log("Toggled published status for organization", organization.id)

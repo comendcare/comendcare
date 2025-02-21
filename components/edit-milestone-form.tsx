@@ -66,7 +66,7 @@ import {Separator} from "./ui/separator"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
 import {getKanbanFromOrganizationId, getOrganizationFromOrganizationId} from "@/lib/fetchers"
-import mixpanel from "mixpanel-browser"
+import mixpanel, { disable } from "mixpanel-browser"
 import {useSession} from "next-auth/react"
 import {AttachmentsEditForm} from "./attachments-edit-form"
 import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
@@ -172,6 +172,7 @@ export function EditMilestoneForm({
     } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
+    const [orgIsPublished, setOrgIsPublished] = useState(false)
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -223,7 +224,18 @@ export function EditMilestoneForm({
 
     // Allow update once form is initialized
     useEffect(() => {
-        initializing.current = false;
+        const init = async () => {
+            if (session?.user.organizationId) {
+                const response = await getOrganizationFromOrganizationId(session.user.organizationId)
+                if (response.success && response.data) {
+                    setOrgIsPublished(response.data.published)
+                }
+            }
+
+            initializing.current = false
+        }
+
+        init()
     }, []);
 
     // Watch form changes, don't watch while initializing
@@ -372,7 +384,7 @@ export function EditMilestoneForm({
                     <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
                         <FormLabel
                             className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Visibility</FormLabel>
-                        <PrivatePublicFormField form={form} formData={formData}/>
+                        <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
                     </FormItem>
 
                     <FormItem>
@@ -619,7 +631,7 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
     )
 }
 
-const PrivatePublicFormField = ({form, formData}: { form: any, formData: any }) => {
+const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any, formData: any, disabled?: boolean }) => {
     return (
         <FormField
             control={form.control}
@@ -627,50 +639,64 @@ const PrivatePublicFormField = ({form, formData}: { form: any, formData: any }) 
             render={({field}) => (
                 <span className="h-full items-center flex flex-row justify-end gap-4">
                     <FormControl>
-                        <RadioGroup
-                            onValueChange={(value)=> {
-                                form.setValue("isPrivate", value === "PRIVATE")
-                            }}
-                            defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
-                            className="flex flex-wrap space-y-0 gap-x-8"
-                        >
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                <FormControl>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <span className="flex gap-2">
-                                                <RadioGroupItem value="PRIVATE" />
-                                                <FormLabel className="font-normal flex gap-1 items-center">
-                                                    <FaLock />
-                                                    {`Private`}
-                                                </FormLabel>
-                                            </span>
-                                        </TooltipTrigger>
-                                        <TooltipContent className="max-w-80 text-wrap text-left">
-                                            {`Private milestones are only visible to your team.`}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </FormControl>
-                            </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
-                                <FormControl>
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <span className="flex gap-2">
-                                                <RadioGroupItem value="PUBLIC" />
-                                                <FormLabel className="font-normal flex gap-1 items-center">
-                                                    <FaGlobe />
-                                                    {`Public`}
-                                                </FormLabel>
-                                            </span>
-                                        </TooltipTrigger>
-                                        <TooltipContent className="max-w-80 text-wrap text-left">
-                                            {`Public milestones are visible on your profile and discoverable in the marketplace.`}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </FormControl>
-                            </FormItem>
-                        </RadioGroup>
+                     <Tooltip disableHoverableContent={disabled}>
+                        <TooltipTrigger disabled={disabled}>
+                            <RadioGroup
+                                onValueChange={(value)=> {
+                                    form.setValue("isPrivate", value === "PRIVATE")
+                                }}
+                                defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
+                                className={cn("flex flex-wrap space-y-0 gap-x-8", disabled ? "opacity-50": "")}
+                                disabled={disabled}
+                            >
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Tooltip disableHoverableContent={disabled}>
+                                            <TooltipTrigger disabled={disabled}>
+                                                <span className="flex gap-2">
+                                                    <RadioGroupItem value="PRIVATE" />
+                                                    <FormLabel className="font-normal flex gap-1 items-center">
+                                                        <FaLock />
+                                                        {`Private`}
+                                                    </FormLabel>
+                                                </span>
+                                            </TooltipTrigger>
+                                            {!disabled && (
+                                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                                    {`Private milestones are only visible to your team.`}
+                                                </TooltipContent>
+                                            )}
+                                        </Tooltip>
+                                    </FormControl>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Tooltip disableHoverableContent={disabled}>
+                                            <TooltipTrigger disabled={disabled}>
+                                                <span className="flex gap-2">
+                                                    <RadioGroupItem value="PUBLIC" />
+                                                    <FormLabel className="font-normal flex gap-1 items-center">
+                                                        <FaGlobe />
+                                                        {`Public`}
+                                                    </FormLabel>
+                                                </span>
+                                            </TooltipTrigger>
+                                            {!disabled && (
+                                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                                    {`Public milestones are visible on your profile and discoverable in the marketplace.`}
+                                                </TooltipContent>
+                                            )}
+                                        </Tooltip>
+                                    </FormControl>
+                                </FormItem>
+                            </RadioGroup>
+                        </TooltipTrigger>
+                        {disabled && (
+                            <TooltipContent className="max-w-80 text-wrap text-left">
+                                {`Publish your organization to create public milestones.`}
+                            </TooltipContent>
+                        )}
+                    </Tooltip>
                     </FormControl>
                     <FormMessage/>
                 </span>
