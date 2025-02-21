@@ -528,7 +528,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                 {...inputProps}
                                 ref={inputRef}
                                 value={inputValue}
-                                disabled={disabled}
+                                disabled={disabled || selected.length === maxSelected}
                                 onValueChange={(value) => {
                                     setInputValue(value);
                                     inputProps?.onValueChange?.(value);
@@ -540,9 +540,16 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                     inputProps?.onBlur?.(event);
                                 }}
                                 onFocus={(event) => {
-                                    setOpen(true);
-                                    triggerSearchOnFocus && onSearch?.(debouncedSearchTerm);
-                                    inputProps?.onFocus?.(event);
+                                    if (selected.length < maxSelected) {
+                                        setOpen(true);
+                                        triggerSearchOnFocus && onSearch?.(debouncedSearchTerm);
+                                        inputProps?.onFocus?.(event);
+                                    }
+                                }}
+                                onClick={() => {
+                                    if (selected.length < maxSelected) {
+                                        setOpen(true)
+                                    }
                                 }}
                                 placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? '' : placeholder}
                                 className={cn(
@@ -612,12 +619,19 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                 //     onSelect={() => {
                                                                 //         if (selected.length >= maxSelected) {
                                                                 //             onMaxSelected?.(selected.length);
+                                                                //             setOpen(false)
                                                                 //             return;
                                                                 //         }
                                                                 //         setInputValue('');
                                                                 //         const newOptions = [...selected, option];
                                                                 //         setSelected(newOptions);
                                                                 //         onChange?.(newOptions);
+
+                                                                //         // if (newOptions.length >= maxSelected) {
+                                                                //         //     onMaxSelected?.(selected.length);
+                                                                //         //     setOpen(false)
+                                                                //         //     return;
+                                                                //         // }
                                                                 //     }}
                                                                 //     className={cn(
                                                                 //         'cursor-pointer',
@@ -626,6 +640,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                 // >
                                                                 //     {option.label}
                                                                 // </CommandItem>
+
                                                                 <SelectorItem
                                                                     key={option.value}
                                                                     option={option}
