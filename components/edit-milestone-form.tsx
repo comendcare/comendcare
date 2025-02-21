@@ -486,36 +486,6 @@ export function EditMilestoneForm({
                             <TimelineFormField form={form} startLabel={"Request Opens"}
                                                endLabel={"Deadline for Proposals"}/>
                         )}
-
-                        <FormField
-                            control={form.control}
-                            name="notes"
-                            render={({field}) => (
-                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
-                                    <FormLabel className="text-md mt-2">
-                                        {`Internal Notes`}
-                                    </FormLabel>
-                                    <FormControl>
-                                        {/* <Textarea
-                                            id="notes"
-                                            placeholder={`Enter notes...`}
-                                            defaultValue={field.value}
-                                            {...field}
-                                            className="border-transparent hover:border-input"
-                                        /> */}
-                                        <div className="w-full col-span-2" data-registry="plate">
-                                            <SettingsProvider>
-                                                <PlateEditor
-                                                    value={field.value}
-                                                    onChange={field.onChange}
-                                                />
-                                            </SettingsProvider>
-                                        </div>
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
                     </FormItem>
 
                     <ContactsFormField form={form}/>
@@ -531,6 +501,32 @@ export function EditMilestoneForm({
                         announcements={announcements}
                         sensors={sensors}
                         milestoneData={milestoneData}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({field}) => (
+                            <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                <FormLabel
+                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
+                                >
+                                    {`Notes`}
+                                    <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
+                                </FormLabel>
+                                <FormControl>
+                                    <div className="w-full col-span-2" data-registry="plate">
+                                        <SettingsProvider>
+                                            <PlateEditor
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                            />
+                                        </SettingsProvider>
+                                    </div>
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
                     />
 
                     <span className="h-4">
