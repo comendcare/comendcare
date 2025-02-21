@@ -436,8 +436,11 @@ export function EditMilestoneForm({
                             )}
                         />
 
-                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
+                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-4 items-center">
+                            <div>
                             <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
+                            {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
+                            </div>
                             <MilestoneTypeFormField form={form}/>
 
                             {formData.nodeType === "ASSET" && (
@@ -549,7 +552,7 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                                 }
                             />
                         </FormControl>
-                        <FormMessage/>
+                        <FormMessage className="text-primary"/>
                     </FormItem>
                 )}
             />

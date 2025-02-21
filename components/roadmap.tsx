@@ -191,7 +191,7 @@ export function Roadmap({data}: {data: any}) {
                             className="h-full flex flex-col"
                         >
                             <MilestoneDetailsPanel
-                                key={milestoneRemountKey}
+                                remountKey={milestoneRemountKey}
                                 milestone={milestones.find(
                                     milestone =>
                                         milestone.nodeId === selectedNodeId
@@ -207,11 +207,11 @@ export function Roadmap({data}: {data: any}) {
 }
 
 const MilestoneDetailsPanel = ({
-    key,
+    remountKey,
     milestone,
     handlePanelChange
 }: {
-    key: number,
+    remountKey: number,
     milestone: any
     handlePanelChange: (open: boolean) => void
 }) => {
@@ -226,7 +226,7 @@ const MilestoneDetailsPanel = ({
             // without closing the side panel since we're now editing a new node
             setMilestoneRemountKey(prevKey => prevKey + 1)
         }
-    }, [selectedNodeId, key])
+    }, [selectedNodeId, remountKey])
 
     const handleClose = () => {
         handlePanelChange(false)
