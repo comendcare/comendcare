@@ -81,7 +81,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import {PublicBadge} from "./public-badge"
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "./ui/dropdown-menu"
 import MoneyInput from "@/components/money-input";
-import MultipleSelector from "./ui/multiple-selector"
+import MultipleSelector, { FancyMultiSelect } from "./ui/multiple-selector"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 import { SettingsProvider } from "./editor/settings"
@@ -582,10 +582,12 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                 render={({field}) => (
                     <FormItem className="w-full">
                         <FormControl>
-                            <MultipleSelector
+                            {/* <MultipleSelector */}
+                            <FancyMultiSelect
                                 {...field}
                                 maxSelected={3}
                                 defaultOptions={MILESTONE_TYPE_OPTIONS}
+                                options={MILESTONE_TYPE_OPTIONS}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Milestone type"
