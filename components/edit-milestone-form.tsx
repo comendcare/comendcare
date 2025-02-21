@@ -598,39 +598,43 @@ const PrivatePublicFormField = ({form, formData}: { form: any, formData: any }) 
                             onValueChange={(value)=> {
                                 form.setValue("isPrivate", value === "PRIVATE")
                             }}
-                            defaultValue={field.value ? "PRIVATE" : "PUBLISHED"}
-                            className="flex flex-col space-y-0 w-full"
+                            defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
+                            className="flex flex-wrap space-y-0 gap-x-8"
                         >
-                            <FormItem className="flex items-center space-x-3 space-y-0 flex-1">
+                            <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                    <div className="h-full w-full border rounded-md p-2 flex items-start justify-between gap-4">
-                                        <RadioGroupItem value="PRIVATE" />
-                                        <span className="flex flex-grow flex-col gap-2">
-                                            <FormLabel className="font-normal flex gap-1 items-center">
-                                                <FaLock />
-                                                {`Private`}
-                                            </FormLabel>
-                                            <span className="text-sm text-gray-500">
-                                            Only visible to your team.
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <span className="flex gap-2">
+                                                <RadioGroupItem value="PRIVATE" />
+                                                <FormLabel className="font-normal flex gap-1 items-center">
+                                                    <FaLock />
+                                                    {`Private`}
+                                                </FormLabel>
                                             </span>
-                                        </span>
-                                    </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                            {`Private milestones are only visible to your team.`}
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </FormControl>
                             </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0 flex-1">
+                            <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                    <div className="h-full w-full border rounded-md p-2 flex items-start justify-between gap-4">
-                                        <RadioGroupItem value="PUBLISHED" />
-                                        <span className="flex flex-grow flex-col gap-2">
-                                            <FormLabel className="font-normal flex gap-1 items-center">
-                                                <FaGlobe />
-                                                {`Published`}
-                                            </FormLabel>
-                                            <span className="text-sm text-gray-500">
-                                                Visible on your profile and discoverable in the marketplace.
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <span className="flex gap-2">
+                                                <RadioGroupItem value="PUBLIC" />
+                                                <FormLabel className="font-normal flex gap-1 items-center">
+                                                    <FaGlobe />
+                                                    {`Public`}
+                                                </FormLabel>
                                             </span>
-                                        </span>
-                                    </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                            {`Public milestones are visible on your profile and discoverable in the marketplace.`}
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </FormControl>
                             </FormItem>
                         </RadioGroup>
