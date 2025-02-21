@@ -364,7 +364,7 @@ export function EditMilestoneForm({
 
                     <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
                         <FormLabel
-                            className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Private</FormLabel>
+                            className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Visibility</FormLabel>
                         <PrivatePublicFormField form={form} formData={formData}/>
                     </FormItem>
 
@@ -941,10 +941,10 @@ const TasksFormField = ({
                         <>
                             <div className="flex flex-row justify-between items-center gap-4">
                                 <FormLabel
-                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex flex-col justify-start items-start flex-wrap gap-1"
+                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
                                 >
                                     {`Tasks`}
-                                    <PrivateBadge className="font-normal text-gray-500"/>
+                                    <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
                                 </FormLabel>
 
                                 <div className="h-full flex flex-row flex-wrap justify-end items-end gap-2">
