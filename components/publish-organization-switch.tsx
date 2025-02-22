@@ -41,7 +41,7 @@ export function PublishOrganizationSwitch({organization}: { organization: Organi
                 // Update the form value to reflect the latest state
                 form.setValue('published', result.published)
 
-                toast(`Organization is now ${result.published ? "published" : "unpublished"}`)
+                toast.success(`Organization is now ${result.published ? "published" : "unpublished"}`)
             } else {
                 toast.error("Failed to update the organization published status.")
             }
