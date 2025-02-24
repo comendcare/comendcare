@@ -41,7 +41,7 @@ export function MilestoneTemplateCard({ milestoneData, selectedMilestones, setSe
                         }
                     }
                 }/>
-                <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestoneData?.nodeType))?.value || "PROJECT"}/>
+                {/* <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestoneData?.nodeType))?.value || "PROJECT"}/> */}
             </CardHeader>
             <CardContent className="flex flex-col gap-2 overflow-visible">
                 <CardTitle>{milestoneData.title}</CardTitle>

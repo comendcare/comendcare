@@ -3,7 +3,7 @@
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
 import { ScrollArea} from "./ui/scroll-area";
-import { SetStateAction, useState } from "react";
+import { MouseEventHandler, SetStateAction, useState } from "react";
 import { templateMilestones } from '@/lib/templates'
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
@@ -12,9 +12,11 @@ import type { Node } from "@xyflow/react"
 import ComendLoadingSpinner from "./comend-loading-spinner";
 import { MilestoneTemplateCard } from "./milestone-template-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { FaInfoCircle } from "react-icons/fa";
+import { FaInfoCircle, FaPlus } from "react-icons/fa";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { NODE_TYPE_OPTIONS } from "@/lib/types";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { DialogClose } from "./ui/dialog";
 
 const selector = (state: RoadmapState) => ({
     addNodes: state.addNodes,
@@ -75,19 +77,25 @@ export default function RoadmapTemplates() {
         <div className="w-full h-full flex flex-col justify-left gap-12 p-14">
             <span className="flex flex-col gap-2">
                 <h1 className="text-3xl font-bold text-primary">
-                    {`Expand your Research Plan faster with an Asset, Project, or RFP (Request for Proposals) template`}
+                    {`Browse our milestone library`}
                 </h1>
                 <p className="text-muted-foreground">
-                    {`Assets, Projects, and RFPs (Requests for Proposals) are the milestones that make up your Research Plan. We've put together some templates to get you started.`}
+                    {`Milestones are the pieces that make up your research plan. Add a template to your plan to see more information on milestones like recommended steps.`}
                 </p>
             </span>
 
             <MilestoneTemplateTabs 
                 selectedMilestones={selectedMilestones}
                 setSelectedMilestones={setSelectedMilestones}
+                createEmpty={async () => {
+                    setIsLoading(true)
+                    await addMilestones([{name: 'New Milestone'}])
+                    router.push('/app/research-plan')
+                    router.refresh()
+                }}
             />
 
-            <span className="flex flex-col sm:flex-row gap-4">
+            <span className="flex flex-col justify-end sm:flex-row gap-4">
                 <div className="flex flex-row space-x-2">
                     <Button
                         disabled={selectedMilestones.length === 0}
@@ -101,7 +109,7 @@ export default function RoadmapTemplates() {
                         Add selected milestones
                     </Button>
                 </div>
-                <div className="flex flex-row space-x-2">
+                {/* <div className="flex flex-row space-x-2">
                     <Button 
                         variant="secondary"
                         onClick={async () => {
@@ -111,15 +119,16 @@ export default function RoadmapTemplates() {
                             router.refresh()
                         }}
                     >
-                        Add an empty milestone
+                        <FaPlus />
+                        Create an empty milestone
                     </Button>
-                </div>
+                </div> */}
             </span>
         </div>
     )
 }
 
-export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestones }: {selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void}) => {
+export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestones, createEmpty, inDialog = false }: {selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void, createEmpty: () => void, inDialog?: boolean}) => {
     const [filter, setFilter] = useState("PROJECT")
 
     return (
@@ -145,6 +154,7 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                     <TabsContent value="ASSET" className="flex-1 flex flex-col min-h-0">
                         <ScrollArea className="h-0 flex-1 w-full" type="always">
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                                <EmptyMilestoneCard handleClick={(e) => createEmpty()} inDialog={inDialog}/>
                                 {templateMilestones.filter((template) => template.nodeType === "ASSET").map((milestoneData, index) => (
                                     <MilestoneTemplateCard 
                                         key={index} 
@@ -162,6 +172,7 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                     <TabsContent value="PROJECT" className="flex-1 flex flex-col min-h-0">
                         <ScrollArea className="h-0 flex-1 w-full" type="always">
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                                <EmptyMilestoneCard handleClick={(e) => createEmpty()} inDialog={inDialog}/>
                                 {templateMilestones.filter((template) => template.nodeType === "PROJECT").map((milestoneData, index) => (
                                     <MilestoneTemplateCard 
                                         key={index} 
@@ -179,6 +190,7 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                     <TabsContent value="RFP" className="flex-1 flex flex-col min-h-0">
                         <ScrollArea className="h-0 flex-1 w-full" type="always">
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                                <EmptyMilestoneCard handleClick={(e) => createEmpty()} inDialog={inDialog}/>
                                 {templateMilestones.filter((template) => template.nodeType === "RFP").map((milestoneData, index) => (
                                     <MilestoneTemplateCard 
                                         key={index} 
@@ -193,5 +205,41 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                 )}
             </Tabs>
         </div>
+    )
+}
+
+const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) => void, inDialog: boolean}) => {
+    if (inDialog) {
+        return (
+            <DialogClose className="p-0 m-0">
+                <Button 
+                    variant="secondary"
+                    onClick={handleClick}
+                    asChild
+                >
+                    <Card className="h-full w-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
+                        <CardContent className="flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
+                            <CardTitle>{`Create an empty milestone`}</CardTitle>
+                            <FaPlus />
+                        </CardContent>
+                    </Card>
+                </Button>
+            </DialogClose>
+        )
+    }
+
+    return (
+        <Button 
+            variant="secondary"
+            onClick={handleClick}
+            asChild
+        >
+            <Card className="h-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
+                <CardContent className="flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
+                    <CardTitle>{`Create an empty milestone`}</CardTitle>
+                    <FaPlus />
+                </CardContent>
+            </Card>
+        </Button>
     )
 }

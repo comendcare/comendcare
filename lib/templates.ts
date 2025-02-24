@@ -17,7 +17,6 @@ export const templateMilestones = [
     {
         title: 'Identify Existing Disease Models',
         description: 'Research and evaluate lab models.',
-        status: 'INPROGRESS',
         // types: ['LITERATUREREVIEW'],
         attachments: [],
         nodeType: "PROJECT"
@@ -25,7 +24,6 @@ export const templateMilestones = [
     {
         title: 'Construct Mouse Models',
         description: 'Recommended tasks: Secure Funding, Ethical Standards Advocacy, and Prioritize Model Features.',
-        status: 'INPROGRESS',
         types: ['MOUSEMODEL'],
         attachments: [],
         // nodeType: "RFP"
