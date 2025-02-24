@@ -38,7 +38,7 @@ import {
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser} from "@/lib/types";
-import { includes } from "lodash"
+import {includes} from "lodash"
 
 export type Node = Prisma.NodeGetPayload<{}>
 
@@ -83,7 +83,7 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
         });
 
         if (existingRequest) {
-            return { success: false, error: "You have already sent a request to join this organization." };
+            return {success: false, error: "You have already sent a request to join this organization."};
         }
 
         const memberRequest = await prisma.memberRequest.create({
@@ -384,7 +384,7 @@ export const createOrganization = async (formData: FormData) => {
             console.log("email sent")
         })
 
-        return { organization, membership };
+        return {organization, membership};
     } catch (error: any) {
         if (error.code === "P2002") {
             return {
@@ -429,6 +429,36 @@ export const toggleOrganizationPublished = async (organizationId: string) => {
                 })
             }
 
+            if (newPublished) {
+                await addTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    {
+                        id: organization.id,
+                        name: organization.name,
+                        description: organization.description,
+                        published: newPublished,
+                        subdomain: organization.subdomain,
+                    },
+                    'organizations'
+                );
+            } else {
+                // Delete from TypeSense
+                await deleteTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    organization.id,
+                    'organizations'
+                );
+            }
 
             // Log or revalidate if necessary
             console.log("Toggled published status for organization", organization.id)
@@ -2317,7 +2347,7 @@ export async function createTask(columnId: string, properties?: any) {
         //     await Promise.all(
         //         properties.stakeholders.map(async (stakeholder: any) => {
         //             if (!stakeholder) return
-    
+
         //             let n = await prisma.platformNotification.create({
         //                 data: {
         //                     type: "TASK_ASSIGN",
@@ -2343,7 +2373,7 @@ export async function createTask(columnId: string, properties?: any) {
     }
 }
 
-export async function notificationsViewed({notifications}: {notifications: PlatformNotification[]}) {
+export async function notificationsViewed({notifications}: { notifications: PlatformNotification[] }) {
     try {
         const updatedNotifications: PlatformNotification[] = []
 
@@ -2368,7 +2398,7 @@ export async function notificationsViewed({notifications}: {notifications: Platf
     }
 }
 
-export async function createNotification({notificationData}: {notificationData: any}) {
+export async function createNotification({notificationData}: { notificationData: any }) {
     try {
         const session = await getSession()
         if (!session) throw new Error("No session data")
@@ -2376,8 +2406,8 @@ export async function createNotification({notificationData}: {notificationData: 
         const notification = await prisma.platformNotification.create({
             data: {
                 ...notificationData,
-                user: { connect: {id: session?.user.id} },
-                organization: { connect: {id: session.user.organizationId}}
+                user: {connect: {id: session?.user.id}},
+                organization: {connect: {id: session.user.organizationId}}
             }
         })
 
@@ -2442,7 +2472,7 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
 
                 const organizations = await prisma.organization.findMany({
                     where: {Kanban: {columns: {some: {tasks: {some: {id: newTask.id}}}}}},
-                    select: { id: true },
+                    select: {id: true},
                 });
 
                 const session = await getSession()
@@ -2457,14 +2487,14 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                             if (!stakeholder) return
                             // don't create a notification for the user creating the task
                             if (stakeholder.userId === session?.user.id) return
-            
+
                             let n = await prisma.platformNotification.create({
                                 data: {
                                     type: "NEW_TASK",
                                     title: "New task assigned",
                                     message: `${newTask.name} was assigned to you.`,
-                                    user: { connect: {id: stakeholder.userId} },
-                                    organization: { connect: {id: organizations[0].id}}
+                                    user: {connect: {id: stakeholder.userId}},
+                                    organization: {connect: {id: organizations[0].id}}
                                 }
                             })
                         })
