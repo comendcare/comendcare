@@ -63,13 +63,13 @@ export function FixedToolbarButtons() {
   const readOnly = useEditorReadOnly();
 
   return (
-    <div className="flex w-full">
+    <div className="flex w-full flex-wrap">
       {!readOnly && (
         <>
-          <ToolbarGroup>
+          {/* <ToolbarGroup> */}
             <UndoToolbarButton />
             <RedoToolbarButton />
-          </ToolbarGroup>
+          {/* </ToolbarGroup> */}
 
           {/*<ToolbarGroup>*/}
           {/*  <AIToolbarButton tooltip="AI commands">*/}
@@ -88,7 +88,7 @@ export function FixedToolbarButtons() {
             <TurnIntoDropdownMenu />
           </ToolbarGroup> */}
 
-          <ToolbarGroup>
+          {/* <ToolbarGroup> */}
             <MarkToolbarButton nodeType={BoldPlugin.key} tooltip="Bold (⌘+B)">
               <BoldIcon />
             </MarkToolbarButton>
@@ -135,22 +135,22 @@ export function FixedToolbarButtons() {
             >
               <PaintBucketIcon />
             </ColorDropdownMenu> */}
-          </ToolbarGroup>
+          {/* </ToolbarGroup> */}
 
-          <ToolbarGroup>
+          {/* <ToolbarGroup> */}
             {/* <AlignDropdownMenu /> */}
 
             <IndentListToolbarButton nodeType={ListStyleType.Disc} />
             <IndentListToolbarButton nodeType={ListStyleType.Decimal} />
             <IndentTodoToolbarButton />
             <ToggleToolbarButton />
-          </ToolbarGroup>
+          {/* </ToolbarGroup> */}
 
-          <ToolbarGroup>
+          {/* <ToolbarGroup> */}
             <LinkToolbarButton />
             <TableDropdownMenu />
             <EmojiDropdownMenu />
-          </ToolbarGroup>
+          {/* </ToolbarGroup> */}
 
           {/* <ToolbarGroup>
             <MediaToolbarButton nodeType={ImagePlugin.key} />

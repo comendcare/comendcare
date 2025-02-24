@@ -81,7 +81,7 @@ export const PrivateFlowView = ({
     const pathname = usePathname()
 
     useEffect(() => {
-        setLocalNodes(nodes)
+        setLocalNodes(nodes.sort((a: any, b: any) => b.createdAt - a.createdAt))
         setLocalEdges(edges)
     }, [nodes, edges])
 
@@ -305,8 +305,8 @@ export const PrivateFlowView = ({
                     }])
                 }
             },
-            // last node is the onboarding node
-            onboardingMilestone: index === (localNodes.length - 1)
+            // last node is the onboarding node, localNodes are sorted by their creation date
+            onboardingMilestone: index === 0
         }
     }))
 
@@ -362,6 +362,7 @@ export const PrivateFlowView = ({
     }, [localNodes])
 
     const startOnbordaAndRemoveToast = () => {
+        setSelectedNodeId(null)
         startOnborda('research-plan-tour')
         setOnboarded('research-plan-tour')
         toast.dismiss()
