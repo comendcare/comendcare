@@ -71,22 +71,22 @@ export default function OrganizationSearchBar() {
                 </SelectContent>
             </Select>
 
-            <Select
-                onValueChange={(view: string) => {
-                    setView(view as ViewType)
-                }}
-                defaultValue={view}
-            >
-                <SelectTrigger className="w-[150px] h-full">
-                    <SelectValue placeholder="View"/>
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectGroup>
-                        <SelectItem value="grid">Grid View</SelectItem>
-                        <SelectItem value="list">List View</SelectItem>
-                    </SelectGroup>
-                </SelectContent>
-            </Select>
+            {/*<Select*/}
+            {/*    onValueChange={(view: string) => {*/}
+            {/*        setView(view as ViewType)*/}
+            {/*    }}*/}
+            {/*    defaultValue={view}*/}
+            {/*>*/}
+            {/*    <SelectTrigger className="w-[150px] h-full">*/}
+            {/*        <SelectValue placeholder="View"/>*/}
+            {/*    </SelectTrigger>*/}
+            {/*    <SelectContent>*/}
+            {/*        <SelectGroup>*/}
+            {/*            <SelectItem value="grid">Grid View</SelectItem>*/}
+            {/*            <SelectItem value="list">List View</SelectItem>*/}
+            {/*        </SelectGroup>*/}
+            {/*    </SelectContent>*/}
+            {/*</Select>*/}
         </div>
     )
 }
