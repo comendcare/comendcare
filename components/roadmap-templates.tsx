@@ -216,6 +216,7 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
                     variant="secondary"
                     onClick={handleClick}
                     asChild
+                    className="hover:cursor-pointer"
                 >
                     <Card className="h-full w-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
                         <CardContent className="flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
@@ -233,6 +234,7 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
             variant="secondary"
             onClick={handleClick}
             asChild
+            className="hover:cursor-pointer"
         >
             <Card className="h-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
                 <CardContent className="flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
