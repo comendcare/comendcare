@@ -183,7 +183,6 @@ export function MultipleSelector({
 
         const exec = async () => {
             // if (!onSearchSync || !open) return;
-            console.log(`debounced search term`, debouncedSearchTerm)
             if (!open) return;
 
             if (triggerSearchOnFocus) {
@@ -211,7 +210,6 @@ export function MultipleSelector({
 
         const exec = async () => {
             // if (!onSearch || !open) return;
-            console.log(`debounced search term`, debouncedSearchTerm)
             if (!open) return;
 
             if (triggerSearchOnFocus) {
@@ -251,8 +249,8 @@ export function MultipleSelector({
 
     return (
         <Command
-        onKeyDown={handleKeyDown}
-        className="overflow-visible bg-transparent"
+            onKeyDown={handleKeyDown}
+            className="overflow-visible bg-transparent"
         >
         <div 
             className={cn(
@@ -367,8 +365,12 @@ export function MultipleSelector({
                                 <>{loadingIndicator}</>
                             )}
                             {!isLoading ? (
-                                <CommandGroup className="h-full">
-                                    {selectables.length > 0 ? (
+                                <>
+                                <CommandEmpty>{emptyIndicator}</CommandEmpty>
+                                <CommandGroup 
+                                    className="h-full"
+                                >
+                                    {selectables.length > 0 && (
                                         selectables.map((framework) => {
                                             return (
                                                 <HoverCard openDelay={0} closeDelay={0}>
@@ -384,7 +386,7 @@ export function MultipleSelector({
                                                         setSelected((prev) => [...prev, framework]);
                                                             if (selected.length + 1 >= maxSelected) setOpen(false)
                                                         }}
-                                                        className={"cursor-pointer"}
+                                                        className={"cursor-pointer multiselect-item"}
                                                     >
                                                         {framework.label}
                                                     </CommandItem>
@@ -416,12 +418,9 @@ export function MultipleSelector({
                                                 </HoverCard>
                                             );
                                         })
-                                    ) : (
-                                        <CommandItem value="-" disabled>
-                                            {emptyIndicator}
-                                        </CommandItem>
                                     )}
                                 </CommandGroup>
+                                </>
                             ) : (
                                 <CommandGroup className="h-full">
                                     <CommandItem value="-" disabled>
