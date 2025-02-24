@@ -117,6 +117,7 @@ export default async function OrganizationHomePage({
                             <div className="sticky top-4 space-y-4">
                                 <PagProfileAboutCard
                                     organization={organization}
+                                    editable={false}
                                 />
                                 <PAGProfileConditionsCard
                                     conditions={conditions}
