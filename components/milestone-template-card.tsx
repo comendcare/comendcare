@@ -1,4 +1,4 @@
-import React, { memo, SetStateAction, useState } from "react"
+import React, { memo, SetStateAction, useEffect, useState } from "react"
 import { Handle, Position, Node, NodeProps, HandleProps, getIncomers, getOutgoers, getConnectedEdges } from "@xyflow/react"
 import { Button } from "./ui/button"
 import {
@@ -26,37 +26,33 @@ import { CheckBubble } from "./check-bubble"
 import { TypeBadge } from "./private-milestone-node"
 
 export function MilestoneTemplateCard({ milestoneData, selectedMilestones, setSelectedMilestones }: {milestoneData: any, selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void}) {
+    const [isChecked, setIsChecked] = useState(false);
+
+    useEffect(() => {
+        if (isChecked) {
+            setSelectedMilestones([...selectedMilestones, milestoneData])
+        } else {
+            setSelectedMilestones(selectedMilestones.filter(m => (
+                m.title !== milestoneData.title &&
+                m.description !== milestoneData.description
+            )))
+        }
+    }, [isChecked])
+    
     return (
-        <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
-            <CardHeader>
-                <CheckBubble data={milestoneData} onCheckedChanged={
-                    (checked: boolean) => {
-                        if (checked) {
-                            setSelectedMilestones([...selectedMilestones, milestoneData])
-                        } else {
-                            setSelectedMilestones(selectedMilestones.filter(m => (
-                                m.title !== milestoneData.title &&
-                                m.description !== milestoneData.description
-                            )))
-                        }
-                    }
-                }/>
-                {/* <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestoneData?.nodeType))?.value || "PROJECT"}/> */}
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2 overflow-visible">
-                <CardTitle>{milestoneData.title}</CardTitle>
-                <CardDescription>
-                    {milestoneData.description}
-                </CardDescription>
-                {/* <ul className="flex flex-col gap-2">
-                    {milestoneData.tasks?.map((task: Task, index) => (
-                        <li key={index} className="flex flex-row gap-2 items-center">
-                            <FaCheck size={20} className="h-4 w-4 text-green-500"/>
-                            <p className="grow">{task.name}</p>
-                        </li>
-                    ))}
-                </ul> */}
-            </CardContent>
-        </Card>
+        <button onClick={() => {setIsChecked(prev => !prev)}}>
+            <Card className="relative bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
+                <CardHeader>
+                    <CheckBubble isChecked={isChecked} onCheckedChanged={(event: any) => setIsChecked(event.value)}/>
+                    {/* <TypeBadge className="w-fit" type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestoneData?.nodeType))?.value || "PROJECT"}/> */}
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2 overflow-visible">
+                    <CardTitle>{milestoneData.title}</CardTitle>
+                    <CardDescription>
+                        {milestoneData.description}
+                    </CardDescription>
+                </CardContent>
+            </Card>
+        </button>
     )
 }
