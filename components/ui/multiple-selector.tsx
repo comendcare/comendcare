@@ -183,7 +183,6 @@ export function MultipleSelector({
 
         const exec = async () => {
             // if (!onSearchSync || !open) return;
-            console.log(`debounced search term`, debouncedSearchTerm)
             if (!open) return;
 
             if (triggerSearchOnFocus) {
@@ -211,7 +210,6 @@ export function MultipleSelector({
 
         const exec = async () => {
             // if (!onSearch || !open) return;
-            console.log(`debounced search term`, debouncedSearchTerm)
             if (!open) return;
 
             if (triggerSearchOnFocus) {
