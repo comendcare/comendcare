@@ -32,7 +32,6 @@ export function OrganizationSwitcher({
     const router = useRouter();
     const {data: session, update} = useSession();
     const [activeOrganization, setActiveOrganization] = React.useState<MemberWithOrganization | null>(null);
-    console.log(session)
 
     React.useEffect(() => {
         if (!memberships || memberships.length === 0) return;

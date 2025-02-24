@@ -31,7 +31,7 @@ import {Label} from "@/components/ui/label"
 import ShareDialog from "@/components/share-dialog";
 import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import FeedbackForm from "@/components/feedback-form";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
 
 export async function generateMetadata({
