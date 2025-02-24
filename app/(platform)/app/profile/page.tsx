@@ -30,6 +30,7 @@ import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hov
 import NoOrganization from "@/components/no-organization";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
 import {PublishOrganizationSwitch} from "@/components/publish-organization-switch";
+import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -160,6 +161,8 @@ export default async function ProfilePage() {
                                                 </HoverCard>
 
                                                 <ComendVerifiedBadge verified={organization.verified}/>
+
+                                                <EditPAGProfileHeaderDialog organization={organization}/>
 
                                             </div>
                                             <div
