@@ -16,6 +16,9 @@ import {
 import {Switch} from "@/components/ui/switch"
 import {toggleOrganizationPublished} from "@/lib/actions"
 import {Organization} from "@prisma/client";
+import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
+import {FaInfoCircle} from "react-icons/fa";
+import React from "react";
 
 const FormSchema = z.object({
     published: z.boolean().default(false).optional(),
@@ -51,28 +54,38 @@ export function PublishOrganizationSwitch({organization}: { organization: Organi
     }
 
     return (
-        <Form {...form}>
-            <form>
-                <FormField
-                    control={form.control}
-                    name="published"
-                    render={({field}) => (
-                        <FormItem>
-                            <div className="flex items-center space-x-2">
-                                <FormControl>
-                                    <Switch
-                                        checked={field.value}
-                                        onCheckedChange={() => handleToggle()}
-                                    />
-                                </FormControl>
-                                <FormLabel htmlFor="published">
-                                    {field.value ? "Published" : "Unpublished"}
-                                </FormLabel>
-                            </div>
-                        </FormItem>
-                    )}
-                />
-            </form>
-        </Form>
+        <TooltipProvider>
+            <Form {...form}>
+                <form>
+                    <FormField
+                        control={form.control}
+                        name="published"
+                        render={({field}) => (
+                            <FormItem>
+                                <div className="flex items-center space-x-2">
+                                    <FormControl>
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={() => handleToggle()}
+                                        />
+                                    </FormControl>
+                                    <FormLabel htmlFor="published" className="inline-flex items-center gap-1">
+                                        {field.value ? "Published" : "Unpublished"}
+                                        <Tooltip delayDuration={0}>
+                                            <TooltipTrigger>
+                                                <FaInfoCircle/>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="max-w-80 text-wrap text-left">
+                                                {`Published organizations have public pages and are visible in the marketplace.`}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </FormLabel>
+                                </div>
+                            </FormItem>
+                        )}
+                    />
+                </form>
+            </Form>
+        </TooltipProvider>
     )
 }
