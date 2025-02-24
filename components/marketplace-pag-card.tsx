@@ -94,14 +94,14 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                 {Object.keys(orgCondition).length > 0 && (
                     <>
                         <Separator className="mb-4"/>
-                        <CardFooter className="space-x-4">
-                            <h2 className="text-base">
+                        <CardFooter className="flex flex-col items-start space-y-2">
+                            <h2 className="text-base font-semibold">
                                 {orgCondition.name}
                             </h2>
                             {associatedGenes.length > 0 && (
                                 <span className="w-full flex flex-row gap-2 flex-wrap">
                                     {associatedGenes.map((gene: string, index: number) => (
-                                        <Badge key={index} className="flex text-sm">
+                                        <Badge key={index} className="text-xs flex">
                                             {gene}
                                         </Badge>
                                     ))}

@@ -28,8 +28,8 @@ export function PublicRoadmapContent({roadmap, subdomain}: {roadmap: any, subdom
     }, [milestone, view])
     
     return (
-        <div className="flex flex-col-reverse md:grid md:grid-cols-3 m-auto w-full gap-4">
-            <div className="md:col-span-2">
+        <div className="flex flex-col-reverse md:grid md:grid-cols-2 m-auto w-full gap-4">
+            <div className="">
                 <RoadmapCard
                     roadmap={roadmap}
                     subdomain={subdomain || undefined}

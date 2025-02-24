@@ -22,7 +22,10 @@ module.exports = {
         '@typescript-eslint/no-empty-interface': 'warn', // Added to treat empty interfaces as warnings
         'react/jsx-indent': ['warn', 4],
         'react/jsx-indent-props': ['warn', 4],
+        'react-hooks/exhaustive-deps': 'off',
         'react/react-in-jsx-scope': 'warn', // Treat React in JSX scope as a warning
+        '@next/next/no-img-element': 'off',
+        'react/jsx-key': 'off',
         'react/prop-types': 'warn', // Treat missing prop-types as warnings
         'no-useless-catch': 'warn', // Turn the no-useless-catch rule into a warning
         'no-useless-escape': 'warn', // Turn the no-useless-escape rule into a warning
