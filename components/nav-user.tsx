@@ -47,6 +47,7 @@ export function NavUser() {
     const [userData, setUserData] = useState<any>(null);
     const [invitations, setInvitations] = useState<any[]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    console.log(session?.user.membership.role)
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -184,8 +185,11 @@ export function NavUser() {
                                 {!isMobile && (
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <div className="inline">
-                                            <span className="truncate font-semibold">{name}</span> - <span
-                                            className="capitalize">{session?.user.membership.role}</span>
+                                            <span className="truncate font-semibold">{name}</span>
+                                            {session?.user.membership?.role && (
+                                                <> - <span
+                                                    className="capitalize">{session.user.membership.role}</span></>
+                                            )}
                                         </div>
                                         <span className="truncate text-xs">{email}</span>
                                     </div>
