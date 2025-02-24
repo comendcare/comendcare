@@ -78,9 +78,13 @@ export default function NewRoadmapForm() {
             <MilestoneTemplateTabs 
                 selectedMilestones={selectedMilestones}
                 setSelectedMilestones={setSelectedMilestones}
+                createEmpty={() => createTemplateRoadmap({
+                    ...emptyRoadmapTemplate,
+                    milestones: [emptyMilestoneTemplate]
+                })}
             />
 
-            <span className="flex flex-col sm:flex-row gap-4">
+            <span className="flex flex-col justify-end sm:flex-row gap-4">
                 <div className="flex flex-row space-x-2">
                     <Button
                         disabled={selectedMilestones.length === 0}
@@ -95,7 +99,7 @@ export default function NewRoadmapForm() {
                         Create a Research Plan with selected milestones
                     </Button>
                 </div>
-                <div className="flex flex-row space-x-2">
+                {/* <div className="flex flex-row space-x-2">
                     <Button 
                         variant="secondary"
                         onClick={() => createTemplateRoadmap({
@@ -105,7 +109,7 @@ export default function NewRoadmapForm() {
                     >
                         Create an empty milestone
                     </Button>
-                </div>
+                </div> */}
             </span>
         </div>
     )
