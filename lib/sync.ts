@@ -360,7 +360,14 @@ export const syncToTypesense = async (env: {
                 published: true
             }
         });
-        const milestones = await prisma.milestone.findMany();
+        const milestones = await prisma.milestone.findMany({
+            where: {
+                organization: {
+                    published: true,
+                    verified: true
+                }
+            }
+        });
         const companies = await prisma.company.findMany({
             select: {
                 id: true,
