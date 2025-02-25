@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
 import { PrivateFlowView } from "@/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { GanttChartView } from "./gantt-chart"
 import { getRoadmapId } from "@/lib/fetchers"
@@ -48,26 +48,29 @@ export function Roadmap({data}: {data: any}) {
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const { undo, redo } = useRoadmapStore.temporal.getState()
-    const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
-
-    // useEffect(() => {
-    //     const handleUndo = (event: KeyboardEvent) => {
-    //         if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-    //             console.log("Undo action triggered")
-    //             undo() // undo updates zustand state
-    //             saveState() // save state to update database
-
-    //             if (selectedNodeId) {
-    //                 // if there is a node selected, remount the milestone form
-    //                 // to update the form data after the undo was triggered
-    //                 setMilestoneRemountKey(prevKey => prevKey + 1)
-    //             }
-    //         }
-    //     };
+    const [milestoneRemountKey, setMilestoneRemountKey] = useState(1);
+    const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     
-    //     document.addEventListener("keydown", handleUndo);
-    //     return () => document.removeEventListener("keydown", handleUndo);
-    // }, []);
+    useEffect(() => {
+        milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
+    
+        const handleUndo = (event: KeyboardEvent) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+                console.log("Undo action triggered");
+                undo(); // undo updates zustand state
+                saveState(); // save state to update database
+    
+                if (selectedNodeId) {
+                    // Remount the milestone form and update the milestoneRemountKey
+                    // using the ref to get the most recent value
+                    setMilestoneRemountKey(milestoneRemountKeyRef.current + 1);
+                }
+            }
+        };
+    
+        document.addEventListener("keydown", handleUndo);
+        return () => document.removeEventListener("keydown", handleUndo);
+    }, [selectedNodeId, milestoneRemountKey]);
 
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString())
