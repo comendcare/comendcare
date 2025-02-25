@@ -81,7 +81,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import {PublicBadge} from "./public-badge"
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "./ui/dropdown-menu"
 import MoneyInput from "@/components/money-input";
-import MultipleSelector, { FancyMultiSelect } from "./ui/multiple-selector"
+import MultipleSelector from "./ui/multiple-selector"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 import { SettingsProvider } from "./editor/settings"
@@ -372,7 +372,7 @@ export function EditMilestoneForm({
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                     className="flex flex-col gap-8 mt-2 px-1"
                 >
-                    <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
+                    <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
                         e.preventDefault()
                         onClose()
                     }}>
@@ -545,7 +545,7 @@ export function EditMilestoneForm({
 
                     </span>
 
-                    <span className="z-[9999] flex justify-end gap-4 flex-wrap absolute bottom-0 right-0 mx-4 my-2">
+                    <span className="flex justify-end gap-4 flex-wrap absolute bottom-0 right-0 mx-4 my-2">
                         <Dialog>
                             <DialogTrigger>
                                 <Button type="button" variant="destructive">
@@ -582,8 +582,7 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                 render={({field}) => (
                     <FormItem className="w-full">
                         <FormControl>
-                            {/* <MultipleSelector */}
-                            <FancyMultiSelect
+                            <MultipleSelector
                                 {...field}
                                 maxSelected={3}
                                 defaultOptions={MILESTONE_TYPE_OPTIONS}
