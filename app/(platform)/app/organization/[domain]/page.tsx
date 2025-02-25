@@ -12,6 +12,7 @@ import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-ass
 import Link from "next/link";
 import {FaArrowLeftLong} from "react-icons/fa6";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
+import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -94,20 +95,11 @@ export default async function OrganizationHomePage({
     }
 
     return (
-        <div
-            className="flex flex-col w-full max-w-7xl mx-auto p-4 gap-4"
-        >
-            <Link
-                href={
-                    process.env.NEXT_PUBLIC_VERCEL_ENV
-                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/marketplace/patient-groups`
-                        : `http://localhost:3000/app/marketplace/patient-groups`
-                }
-                className="inline-flex items-center gap-x-2 hover:underline"
-            >
-                <FaArrowLeftLong/>
-                Back to marketplace
-            </Link>
+        <div className="flex flex-col w-full max-w-7xl mx-auto p-4 gap-4">
+            <MarketplaceBreadcrumb
+                organization={organization}
+                marketplaceDomain={"/app/marketplace/patient-groups"}
+            />
             <main className="grid grid-cols-8 w-full max-w-7xl mx-auto">
                 <div className="col-span-8 flex flex-col items-center space-y-8">
                     <PAGPublicProfileHeader organization={organization}/>
