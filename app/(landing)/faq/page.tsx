@@ -86,7 +86,7 @@ export default function FAQ() {
                         </h2>
                         <p className="mt-2 text-2xl text-gray-500">{`How can we help?`}</p>
                     </div>
-                    <Link href="/contact" className={cn("w-fit")}>
+                    <Link href="/contact" className={cn(buttonVariants({variant: "default"}), "w-fit")}>
                         {`Contact us`}
                     </Link>
                 </div>

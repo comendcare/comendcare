@@ -64,35 +64,6 @@ export const cards = [
             }
         ]
     },
-    // {
-    //     heading: "Safety and Security",
-    //     description: "Answers to questions about information protection.",
-    //     prompts: [
-    //         {
-    //             prompt: "Private and public collections",
-    //             href: "",
-    //         },
-    //         {
-    //             prompt: "Comments and replies",
-    //             href: "",
-    //         },
-    //     ]
-    // },
-    // {
-    //     icon: <FaHandshakeSimple />,
-    //     heading: "Working with Librarey",
-    //     description: "Integrations, collaborations, and more.",
-    //     prompts: [
-    //         {
-    //             prompt: "Embed Librarey on your own website",
-    //             href: "/faq/how-to-embed-librarey"
-    //         }
-    //         // {
-    //         //     prompt: "Collaborating with Librarey for content creation",
-    //         //     href: "/faq/collaborating-for-content-creation",
-    //         // },
-    //     ]
-    // }
     {
         icon: <FaFloppyDisk />,
         heading: "Create Collection and Embed",
