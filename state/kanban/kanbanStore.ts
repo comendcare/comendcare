@@ -4,6 +4,9 @@ import { Column, createColumn, createTask, deleteColumn, deleteTask, kanbanSync,
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
 import { string } from "zod";
+// import { PlatformNotification } from "@prisma/client";
+import { NotificationsState, useNotificationsStore } from "../notifications/notificationsStore";
+import { useShallow } from "zustand/react/shallow";
 
 export type KanbanState = {
     kanbanId: string | undefined,
@@ -176,6 +179,8 @@ export const useKanbanStore = create<KanbanState>()(
             limit: 100, // limit the stored history states to 100
             onSave: (pastState, currentState) => {
                 console.log(`Saved Kanban State: `, currentState)
+                const fetchNotifications = useNotificationsStore.getState().fetchNotifications
+                fetchNotifications()
                 return
             },
             // partialize: (state) => {

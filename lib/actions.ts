@@ -10,6 +10,7 @@ import {
     User,
     Condition,
     TaskStakeholder, Invitation,
+    PlatformNotification,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
@@ -37,6 +38,7 @@ import {
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
 import {ApiResponse, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser} from "@/lib/types";
+import {includes} from "lodash"
 
 export type Node = Prisma.NodeGetPayload<{}>
 
@@ -81,7 +83,7 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
         });
 
         if (existingRequest) {
-            return { success: false, error: "You have already sent a request to join this organization." };
+            return {success: false, error: "You have already sent a request to join this organization."};
         }
 
         const memberRequest = await prisma.memberRequest.create({
@@ -291,7 +293,7 @@ export const createOrganization = async (formData: FormData) => {
     const image = formData.get("image") as string | null;
 
     try {
-        const response = await prisma.organization.upsert({
+        const organization = await prisma.organization.upsert({
             where: {
                 subdomain,
             },
@@ -340,26 +342,28 @@ export const createOrganization = async (formData: FormData) => {
             },
         });
 
-        await prisma.member.create({
+        const membership = await prisma.member.create({
             data: {
                 userId: session.user.id,
                 email: session.user.email,
                 role: "owner", // Creator of organization is owner by default
                 title: title,
-                organizationId: response.id
+                organizationId: organization.id
             }
         })
 
-        await addTypeSenseDocument(
-            `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-            (
-                process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                    ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                    : process.env.TYPESENSE_ADMIN_API_KEY
-            )!,
-            response,
-            'organizations'
-        );
+        if (organization.verified && organization.published) {
+            await addTypeSenseDocument(
+                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                (
+                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                        : process.env.TYPESENSE_ADMIN_API_KEY
+                )!,
+                organization,
+                'organizations'
+            );
+        }
 
         await revalidateTag(
             `${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
@@ -372,15 +376,15 @@ export const createOrganization = async (formData: FormData) => {
                     email: session.user.email
                 },
                 organization: {
-                    name: response.name,
-                    subdomain: response.subdomain
+                    name: organization.name,
+                    subdomain: organization.subdomain
                 }
             }
         ).then(() => {
             console.log("email sent")
         })
 
-        return response
+        return {organization, membership};
     } catch (error: any) {
         if (error.code === "P2002") {
             return {
@@ -401,6 +405,7 @@ export const toggleOrganizationPublished = async (organizationId: string) => {
                 id: organizationId,
             }
         })
+        const newPublished = !organization?.published
 
         if (organization) {
             // Toggle the 'published' attribute
@@ -409,9 +414,51 @@ export const toggleOrganizationPublished = async (organizationId: string) => {
                     id: organization.id
                 },
                 data: {
-                    published: !organization.published
+                    published: newPublished
                 }
             })
+
+            // if the org is being published, don't change milestone types
+            // if the org is being unpublished, change all the org's milestones to private
+            if (!newPublished) {
+                const updatedMilestones = await prisma.milestone.updateMany({
+                    where: {organizationId: organization.id},
+                    data: {
+                        private: true
+                    }
+                })
+            }
+
+            if (newPublished) {
+                await addTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    {
+                        id: organization.id,
+                        name: organization.name,
+                        description: organization.description,
+                        published: newPublished,
+                        subdomain: organization.subdomain,
+                    },
+                    'organizations'
+                );
+            } else {
+                // Delete from TypeSense
+                await deleteTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    organization.id,
+                    'organizations'
+                );
+            }
 
             // Log or revalidate if necessary
             console.log("Toggled published status for organization", organization.id)
@@ -495,16 +542,18 @@ export const updateOrganization = withOrganizationAuth(
                 data,
             });
 
-            await updateTypeSenseDocument(
-                `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
-                (
-                    process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
-                        ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
-                        : process.env.TYPESENSE_ADMIN_API_KEY
-                )!,
-                response,
-                'organizations'
-            );
+            if (response.verified && response.published) {
+                await updateTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    response,
+                    'organizations'
+                );
+            }
 
             return response;
         } catch (error: any) {
@@ -2110,7 +2159,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                             update: {
                                 type: milestone.nodeType
                             }
-                        }
+                        },
+                        notes: milestone.notes
                     }
                 })
 
@@ -2337,6 +2387,29 @@ export async function createTask(columnId: string, properties?: any) {
             }
         })
 
+        // const organizations = await prisma.organization.findMany({
+        //     where: {Kanban: {columns: {some: {id: columnId}}}},
+        //     select: { id: true },
+        // });
+
+        // // create notifications for assigned stakeholders
+        // if (properties.stakeholders && organizations.length == 1) {
+        //     await Promise.all(
+        //         properties.stakeholders.map(async (stakeholder: any) => {
+        //             if (!stakeholder) return
+
+        //             let n = await prisma.platformNotification.create({
+        //                 data: {
+        //                     type: "TASK_ASSIGN",
+        //                     title: "You've been assigned a task.",
+        //                     user: { connect: {id: stakeholder.userId} },
+        //                     organization: { connect: {id: organizations[0].id}}
+        //                 }
+        //             })
+        //         })
+        //     )
+        // }
+
         if (!newTask) {
             return {success: false, error: "Could not create task"}
         }
@@ -2350,6 +2423,51 @@ export async function createTask(columnId: string, properties?: any) {
     }
 }
 
+export async function notificationsViewed({notifications}: { notifications: PlatformNotification[] }) {
+    try {
+        const updatedNotifications: PlatformNotification[] = []
+
+        await Promise.all(
+            notifications.map(async (notification: PlatformNotification) => {
+                if (!notification) return
+                let updatedNotification = await prisma.platformNotification.update({
+                    where: {id: notification.id},
+                    data: {
+                        lastViewedAt: new Date()
+                    }
+                })
+
+                updatedNotifications.push(updatedNotification)
+            })
+        )
+        console.log(`Successfully updated notifications`)
+        return {success: true, data: updatedNotifications}
+    } catch (error) {
+        logError("Could not update notifications", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
+export async function createNotification({notificationData}: { notificationData: any }) {
+    try {
+        const session = await getSession()
+        if (!session) throw new Error("No session data")
+
+        const notification = await prisma.platformNotification.create({
+            data: {
+                ...notificationData,
+                user: {connect: {id: session?.user.id}},
+                organization: {connect: {id: session.user.organizationId}}
+            }
+        })
+
+        return {success: true, data: notification}
+    } catch (error) {
+        logError("Could not create notification", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 export async function updateTasks({tasks}: { tasks: Task[] }) {
     try {
         let updatedTasks: Task[] = []
@@ -2357,8 +2475,12 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
         await Promise.all(
             tasks.map(async (task: any) => {
                 if (!task) return
+                let prevTask = await prisma.task.findUnique({
+                    where: {id: task.id},
+                    include: {stakeholders: {include: {user: true}}}
+                })
 
-                let t = await prisma.task.update({
+                let newTask = await prisma.task.update({
                     where: {id: task?.id},
                     include: {milestone: true, checklist: true, stakeholders: {include: {user: true}}},
                     data: {
@@ -2386,10 +2508,6 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                                 }))
                             }
                         },
-                        // stakeholders: {
-                        //     set: [],
-                        //     connect: task.stakeholders?.map((stakeholder: User) => ({id: stakeholder?.id})) || []
-                        // },
                         milestone: task.milestoneId
                             ? {connect: {id: task.milestoneId}} // Connect if milestoneId exists
                             : {disconnect: true}, // Disconnect if milestoneId is undefined
@@ -2402,10 +2520,41 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                     }
                 })
 
-                if (!t) {
+                const organizations = await prisma.organization.findMany({
+                    where: {Kanban: {columns: {some: {tasks: {some: {id: newTask.id}}}}}},
+                    select: {id: true},
+                });
+
+                const session = await getSession()
+                const prevStakeholderUserIds = prevTask?.stakeholders.map(stakeholder => stakeholder.user.id)
+                const notifications = newTask.stakeholders
+                    .filter(newStakeholder => !prevStakeholderUserIds?.includes(newStakeholder.user.id))
+
+                // if a new stakeholder has been added to this task, we create a notification for them
+                if (organizations.length === 1 && notifications.length > 0) {
+                    await Promise.all(
+                        notifications.map(async (stakeholder: any) => {
+                            if (!stakeholder) return
+                            // don't create a notification for the user creating the task
+                            if (stakeholder.userId === session?.user.id) return
+
+                            let n = await prisma.platformNotification.create({
+                                data: {
+                                    type: "NEW_TASK",
+                                    title: "New task assigned",
+                                    message: `${newTask.name} was assigned to you.`,
+                                    user: {connect: {id: stakeholder.userId}},
+                                    organization: {connect: {id: organizations[0].id}}
+                                }
+                            })
+                        })
+                    )
+                }
+
+                if (!newTask) {
                     logError("Could not update task", task)
                 } else {
-                    updatedTasks.push(t)
+                    updatedTasks.push(newTask)
                 }
             })
         )

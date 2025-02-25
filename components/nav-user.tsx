@@ -183,7 +183,13 @@ export function NavUser() {
                                 </Avatar>
                                 {!isMobile && (
                                     <div className="grid flex-1 text-left text-sm leading-tight">
-                                        <span className="truncate font-semibold">{name}</span>
+                                        <div className="inline">
+                                            <span className="truncate font-semibold">{name}</span>
+                                            {session?.user.membership?.role && (
+                                                <> - <span
+                                                    className="capitalize">{session.user.membership.role}</span></>
+                                            )}
+                                        </div>
                                         <span className="truncate text-xs">{email}</span>
                                     </div>
                                 )}

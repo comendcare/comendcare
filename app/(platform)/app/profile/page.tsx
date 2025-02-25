@@ -30,6 +30,7 @@ import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hov
 import NoOrganization from "@/components/no-organization";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
 import {PublishOrganizationSwitch} from "@/components/publish-organization-switch";
+import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -140,7 +141,7 @@ export default async function ProfilePage() {
                                         className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                                         <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
                                             <div
-                                                className="flex flex-row items-baseline mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900 max-w-2xl gap-x-2">
+                                                className="flex flex-row items-baseline mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900 gap-x-2">
                                                 <HoverCard openDelay={0} closeDelay={0}>
                                                     <HoverCardTrigger asChild>
                                                         <h1 className="truncate">
@@ -160,6 +161,8 @@ export default async function ProfilePage() {
                                                 </HoverCard>
 
                                                 <ComendVerifiedBadge verified={organization.verified}/>
+
+                                                <EditPAGProfileHeaderDialog organization={organization}/>
 
                                             </div>
                                             <div
@@ -201,7 +204,10 @@ export default async function ProfilePage() {
                         <div className="grid grid-cols-6 gap-4 pb-8">
                             <div className="relative col-span-2 space-y-4">
                                 <div className="sticky top-4 space-y-4">
-                                    <PagProfileAboutCard organization={organization}/>
+                                    <PagProfileAboutCard
+                                        organization={organization}
+                                        editable={true}
+                                    />
                                     <PAGProfileConditionsCard
                                         conditions={conditions}
                                         organization={organization}
@@ -236,6 +242,7 @@ export default async function ProfilePage() {
                                     roadmap={roadmaps[0]}
                                     subdomain={organization?.subdomain || undefined}
                                     isPublic={false}
+                                    externalLinks={true}
                                 />
                                 {/*    </TabsContent>*/}
                                 {/*    <TabsContent value="activity" className="mt-0">*/}

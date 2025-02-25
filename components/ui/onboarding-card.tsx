@@ -102,7 +102,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
 
     const handleNextStep = async (e: any) => {
         e.preventDefault()
-        let onboardingNodeId = selectedNodeId || nodes[0]?.id
+        let onboardingNodeId = nodes.sort((a: any, b: any) => b.createdAt - a.createdAt)[0]?.id
 
         // execute any actions that need to occur before we move to the next step
         if (step.selector === '.research-plan-tour-step1') {
@@ -116,6 +116,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         }
         if (step.selector === '.research-plan-tour-step2') {
             setSelectedNodeId(onboardingNodeId)
+            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
         } else if (step.selector === '.research-plan-tour-step3') {
             const element = document.getElementById("edit-milestone-scroll-area")
             if (element) {

@@ -3,7 +3,7 @@ import {notFound} from "next/navigation"
 import BlogCard from "@/components/blog-card"
 import {getRoadmapsForOrganization, getOrganizationData, getConditionsDataFromOrgId} from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
-import {RoadmapCard} from "@/components/public-roadmap-card";
+import {RoadmapCard, UnderDevelopmentCard} from "@/components/public-roadmap-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
@@ -118,7 +118,10 @@ export default async function OrganizationHomePage({
                     <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                         <div className="relative md:col-span-2 space-y-4">
                             <div className="sticky top-4 space-y-4">
-                                <PagProfileAboutCard organization={organization}/>
+                                <PagProfileAboutCard
+                                    organization={organization}
+                                    editable={false}
+                                />
                                 <PAGProfileConditionsCard
                                     conditions={conditions}
                                     organization={organization}
@@ -140,23 +143,9 @@ export default async function OrganizationHomePage({
                                     roadmap={roadmaps?.[0]}
                                     subdomain={organization?.subdomain || undefined}
                                     isPublic={true}
+                                    externalLinks={true}
                                 />
-                                : <Card>
-                                    <CardContent>
-                                        <div className="flex flex-col items-center justify-center space-x-4 my-8">
-                                            <h1 className="font-cal text-4xl">No research plan yet</h1>
-                                            <Image
-                                                alt="missing roadmap"
-                                                src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                                width={400}
-                                                height={400}
-                                            />
-                                            <p className="text-lg text-stone-500">
-                                                {`${organization.name} doesn't have a research plan yet.`}
-                                            </p>
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                : <UnderDevelopmentCard isPublic={true} />
                             }
                         </div>
                     </div>

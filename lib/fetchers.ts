@@ -632,6 +632,25 @@ export const getAllMembershipsFromUserId = async (userId: string) => {
     }
 };
 
+export const getAllNotifications = async () => {
+    try {
+        const session = await getSession()
+        if (!session?.user.id) throw new Error("User ID or Organization ID not in session")
+        
+        const notifications = await prisma.platformNotification.findMany({
+            where: {
+                userId: session.user.id,
+                organizationId: session.user.organizationId
+            }
+        })
+
+        return {success: true, data: notifications}
+    } catch (error: any) {
+        logError("Error fetching notifications data", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
 export const getOrganizationFromRoadmapId = async (roadmapId: string): Promise<ApiResponse<any>> => {
     try {
         const roadmap = await prisma.roadmap.findUnique({
@@ -717,7 +736,7 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                         include: {data: true}
                     })
                 ).map(async node => {
-                    const {id, type, positionX, positionY, origin} = node
+                    const {id, type, positionX, positionY, origin, createdAt, updatedAt} = node
 
                     return {
                         id,
@@ -726,7 +745,9 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                             x: positionX,
                             y: positionY
                         },
-                        origin
+                        origin,
+                        createdAt,
+                        updatedAt
                     }
                 })
             )

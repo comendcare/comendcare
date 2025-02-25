@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaCalendar, FaEllipsis, FaLinkSlash, FaPlus, FaTrash, FaX} from "react-icons/fa6"
+import {FaCalendar, FaEllipsis, FaGlobe, FaLinkSlash, FaLock, FaPlus, FaTrash, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -66,7 +66,7 @@ import {Separator} from "./ui/separator"
 import {FaEdit} from "react-icons/fa"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
 import {getKanbanFromOrganizationId, getOrganizationFromOrganizationId} from "@/lib/fetchers"
-import mixpanel from "mixpanel-browser"
+import mixpanel, { disable } from "mixpanel-browser"
 import {useSession} from "next-auth/react"
 import {AttachmentsEditForm} from "./attachments-edit-form"
 import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
@@ -82,6 +82,10 @@ import {PublicBadge} from "./public-badge"
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "./ui/dropdown-menu"
 import MoneyInput from "@/components/money-input";
 import MultipleSelector from "./ui/multiple-selector"
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
+import { SettingsProvider } from "./editor/settings"
+import { PlateEditor } from "./editor/plate-editor"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -107,6 +111,10 @@ const kanbanSelector = (state: KanbanState) => ({
     addTask: state.addTask,
     deleteTask: state.deleteTask,
     addColumn: state.addColumn
+})
+
+const notificationsSelector = (state: NotificationsState) => ({
+    addNotification: state.addNotification
 })
 
 const editMilestoneForm = z.object({
@@ -140,6 +148,7 @@ const editMilestoneForm = z.object({
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.array(z.string()).optional(),
+    notes: z.array(z.record(z.any()))
 })
 
 export function EditMilestoneForm({
@@ -163,6 +172,7 @@ export function EditMilestoneForm({
     } = useKanbanStore(useShallow(kanbanSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
+    const [orgIsPublished, setOrgIsPublished] = useState(false)
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -184,7 +194,8 @@ export function EditMilestoneForm({
             status: milestoneData?.status || "PLANNED",
             isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
-            openTo: milestoneData?.openTo || []
+            openTo: milestoneData?.openTo || [],
+            notes: JSON.parse(milestoneData?.notes || "[]") || [],
         }
     })
 
@@ -202,7 +213,8 @@ export function EditMilestoneForm({
         status: form.watch("status"),
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
-        openTo: form.watch("openTo")
+        openTo: form.watch("openTo"),
+        notes: form.watch("notes")
     }
 
     // callback ensures we're not creating a new debounce every time this is called
@@ -212,7 +224,18 @@ export function EditMilestoneForm({
 
     // Allow update once form is initialized
     useEffect(() => {
-        initializing.current = false;
+        const init = async () => {
+            if (session?.user.organizationId) {
+                const response = await getOrganizationFromOrganizationId(session.user.organizationId)
+                if (response.success && response.data) {
+                    setOrgIsPublished(response.data.published)
+                }
+            }
+
+            initializing.current = false
+        }
+
+        init()
     }, []);
 
     // Watch form changes, don't watch while initializing
@@ -236,7 +259,8 @@ export function EditMilestoneForm({
             status,
             isPrivate,
             contacts,
-            openTo
+            openTo,
+            notes
         } = values;
 
         setMilestone(milestoneData?.nodeId, {
@@ -252,7 +276,8 @@ export function EditMilestoneForm({
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
-            ...(openTo ? {openTo} : undefined)
+            ...(openTo ? {openTo} : undefined),
+            ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)}: undefined)
         })
 
         // Mixpanel tracking for "Other" field
@@ -347,7 +372,7 @@ export function EditMilestoneForm({
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
                     className="flex flex-col gap-8 mt-2 px-1"
                 >
-                    <Button className="z-[9999] absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
+                    <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
                         e.preventDefault()
                         onClose()
                     }}>
@@ -356,10 +381,10 @@ export function EditMilestoneForm({
 
                     <EditTitle form={form}/>
 
-                    <FormItem className="w-full flex flex-row gap-4 justify-start items-center mr-10">
+                    <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
                         <FormLabel
-                            className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Private</FormLabel>
-                        <PrivatePublicFormField form={form} formData={formData}/>
+                            className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Visibility</FormLabel>
+                        <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
                     </FormItem>
 
                     <FormItem>
@@ -419,7 +444,7 @@ export function EditMilestoneForm({
                                     <FormControl>
                                         <Textarea
                                             id="description"
-                                            placeholder={`Enter a description`}
+                                            placeholder={`Enter a description...`}
                                             defaultValue={field.value}
                                             {...field}
                                             className="border-transparent hover:border-input"
@@ -430,8 +455,11 @@ export function EditMilestoneForm({
                             )}
                         />
 
-                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
+                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-4 items-center">
+                            <div>
                             <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
+                            {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
+                            </div>
                             <MilestoneTypeFormField form={form}/>
 
                             {formData.nodeType === "ASSET" && (
@@ -487,11 +515,37 @@ export function EditMilestoneForm({
                         milestoneData={milestoneData}
                     />
 
+                    <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({field}) => (
+                            <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                <FormLabel
+                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
+                                >
+                                    {`Notes`}
+                                    <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
+                                </FormLabel>
+                                <FormControl>
+                                    <div className="w-full col-span-2" data-registry="plate">
+                                        <SettingsProvider>
+                                            <PlateEditor
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                            />
+                                        </SettingsProvider>
+                                    </div>
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
                     <span className="h-4">
 
                     </span>
 
-                    <span className="z-[9999] flex justify-end gap-4 flex-wrap absolute bottom-0 right-0 mx-4 my-2">
+                    <span className="flex justify-end gap-4 flex-wrap absolute bottom-0 right-0 mx-4 my-2">
                         <Dialog>
                             <DialogTrigger>
                                 <Button type="button" variant="destructive">
@@ -518,6 +572,8 @@ export function EditMilestoneForm({
 }
 
 const MilestoneTypeFormField = ({form}: { form: any }) => {
+    const types = form.watch("types")
+
     return (
         <>
             <FormField
@@ -526,23 +582,11 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                 render={({field}) => (
                     <FormItem className="w-full">
                         <FormControl>
-                            {/* <Select
-                                defaultValue={field.value}
-                                onValueChange={field.onChange}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a milestone type..."/>
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {MILESTONE_TYPE_OPTIONS.map((type, index) => (
-                                        <SelectItem key={index} value={type.value}>{type.label}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select> */}
                             <MultipleSelector
                                 {...field}
                                 maxSelected={3}
                                 defaultOptions={MILESTONE_TYPE_OPTIONS}
+                                options={MILESTONE_TYPE_OPTIONS}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Milestone type"
@@ -554,12 +598,12 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                                 }
                             />
                         </FormControl>
-                        <FormMessage/>
+                        <FormMessage className="text-primary"/>
                     </FormItem>
                 )}
             />
 
-            {form.watch("type") === "OTHER" && (
+            {types.map((type: any) => type.value).includes("OTHER") && (
                 <>
                     <div>
                         <FormLabel className="text-md">{`Type Description`}</FormLabel>
@@ -588,31 +632,72 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
     )
 }
 
-const PrivatePublicFormField = ({form, formData}: { form: any, formData: any }) => {
+const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any, formData: any, disabled?: boolean }) => {
     return (
         <FormField
             control={form.control}
             name="isPrivate"
             render={({field}) => (
                 <span className="h-full items-center flex flex-row justify-end gap-4">
-                    {formData.isPrivate
-                        ? <PrivateBadge className="mt-0"/>
-                        : <PublicBadge className="mt-0"/>
-                    }
                     <FormControl>
-                        <Switch
-                            checked={field.value}
-                            onCheckedChange={(checked: boolean) => {
-                                field.onChange(checked)
-                                if (!checked) {
-                                    toast('Success!', {
-                                        position: "bottom-left",
-                                        duration: 6000, // default is 4000
-                                        description: 'This milestone is now visible on your public profile.'
-                                    })
-                                }
-                            }}
-                        />
+                     <Tooltip disableHoverableContent={disabled}>
+                        <TooltipTrigger disabled={disabled}>
+                            <RadioGroup
+                                onValueChange={(value)=> {
+                                    form.setValue("isPrivate", value === "PRIVATE")
+                                }}
+                                defaultValue={field.value ? "PRIVATE" : "PUBLIC"}
+                                className={cn("flex flex-wrap space-y-0 gap-x-8", disabled ? "opacity-50": "")}
+                                disabled={disabled}
+                            >
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Tooltip disableHoverableContent={disabled}>
+                                            <TooltipTrigger disabled={disabled}>
+                                                <span className="flex gap-2">
+                                                    <RadioGroupItem value="PRIVATE" />
+                                                    <FormLabel className="font-normal flex gap-1 items-center">
+                                                        <FaLock />
+                                                        {`Private`}
+                                                    </FormLabel>
+                                                </span>
+                                            </TooltipTrigger>
+                                            {!disabled && (
+                                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                                    {`Private milestones are only visible to your team.`}
+                                                </TooltipContent>
+                                            )}
+                                        </Tooltip>
+                                    </FormControl>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <Tooltip disableHoverableContent={disabled}>
+                                            <TooltipTrigger disabled={disabled}>
+                                                <span className="flex gap-2">
+                                                    <RadioGroupItem value="PUBLIC" />
+                                                    <FormLabel className="font-normal flex gap-1 items-center">
+                                                        <FaGlobe />
+                                                        {`Public`}
+                                                    </FormLabel>
+                                                </span>
+                                            </TooltipTrigger>
+                                            {!disabled && (
+                                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                                    {`Public milestones are visible on your profile and discoverable in the marketplace.`}
+                                                </TooltipContent>
+                                            )}
+                                        </Tooltip>
+                                    </FormControl>
+                                </FormItem>
+                            </RadioGroup>
+                        </TooltipTrigger>
+                        {disabled && (
+                            <TooltipContent className="max-w-80 text-wrap text-left">
+                                {`Publish your organization to create public milestones.`}
+                            </TooltipContent>
+                        )}
+                    </Tooltip>
                     </FormControl>
                     <FormMessage/>
                 </span>
@@ -893,6 +978,8 @@ const TasksFormField = ({
         deleteTask,
         addColumn
     } = useKanbanStore(useShallow(kanbanSelector))
+    const { addNotification } = useNotificationsStore(useShallow(notificationsSelector))
+    const {data: session} = useSession()
 
     const debounceSetTasks = useCallback(
         debounce(async (updatedValues) => {
@@ -912,19 +999,25 @@ const TasksFormField = ({
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <>
-                            <div className="flex flex-row justify-between items-center">
+                            <div className="flex flex-row justify-between items-center gap-4">
                                 <FormLabel
-                                    className="text-2xl font-semibold leading-none tracking-tight"
+                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
                                 >
                                     {`Tasks`}
+                                    <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
                                 </FormLabel>
 
-                                <div className="flex flex-row items-center space-x-2">
+                                <div className="h-full flex flex-row flex-wrap justify-end items-end gap-2">
                                     <LinkTask
                                         milestoneId={milestoneData?.id}
                                         kanbanTasks={kanbanTasks}
                                         onLink={async (taskId) => {
                                             const newTask = kanbanTasks?.find((task) => task.id === taskId)
+                                            addNotification({
+                                                type: "NEW_TASK",
+                                                title: "New task assigned",
+                                                message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+                                            })
                                             form.setValue(
                                                 'tasks',
                                                 [...field?.value || [], {
@@ -963,11 +1056,17 @@ const TasksFormField = ({
                                                     if (!column) return
 
                                                     const newTask = await addTask(column.id)
+                                                    addNotification({
+                                                        type: "NEW_TASK",
+                                                        title: "New task assigned",
+                                                        message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+                                                    })
                                                     if (newTask) {
                                                         const updatedTasks = [...form.getValues().tasks || [], {
                                                             ...newTask,
                                                             milestoneId: milestoneData?.id,
-                                                            milestone: {id: milestoneData?.id}
+                                                            milestone: {id: milestoneData?.id},
+                                                            stakeholders: [{userId: session?.user.id}]
                                                         }]
                                                         form.setValue('tasks', updatedTasks)
                                                     }
@@ -987,24 +1086,31 @@ const TasksFormField = ({
                                             //     }]
                                             //     form.setValue('tasks', updatedTasks)
                                             // }
+                                            addNotification({
+                                                type: "NEW_TASK",
+                                                title: "New task assigned",
+                                                message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+                                            })
                                             const newTasks = await setTasks([
                                                 ...kanbanTasks,
                                                 {
                                                     ...newTask,
                                                     milestoneId: milestoneData?.id,
-                                                    milestone: {id: milestoneData?.id}
+                                                    milestone: {id: milestoneData?.id},
+                                                    stakeholders: [{userId: session?.user.id}]
                                                 }
                                             ].map(t => {
                                                 if (t.id === newTask?.id) {
                                                     return ({
                                                         ...t,
                                                         milestoneId: milestoneData?.id,
-                                                        milestone: {id: milestoneData?.id}
+                                                        stakeholders: [{userId: session?.user.id}]
                                                     })
                                                 }
                                                 return t
                                             }))
                                             form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
+
                                         }}
                                     >
                                         {`Add a new task`}

@@ -1,3 +1,4 @@
+import React from "react";
 import {notFound, useSearchParams} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getRoadmapData, getOrganizationData, getRoadmapsForOrganization, getMilestoneDetails} from "@/lib/fetchers"
@@ -30,6 +31,8 @@ import {
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import ShareDialog from "@/components/share-dialog";
+import {PublicRoadmapContent} from "@/components/public-roadmap-content";
+import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
 
 export async function generateMetadata({
                                            params
@@ -159,7 +162,6 @@ export default async function OrganizationRoadmapPage({
     params: { domain: string; slug: string }
 }) {
     const domain = decodeURIComponent(params.domain)
-    const slug = decodeURIComponent(params.slug)
 
     // const data = await getRoadmapData(domain, slug)
     const [organization, roadmaps] = await Promise.all([
@@ -170,18 +172,18 @@ export default async function OrganizationRoadmapPage({
     if (!organization) {
         notFound()
     }
-    console.log(roadmaps[0])
 
     return (
         <>
             {roadmaps.length > 0 ? (
                     <>
                         <div
-                            className="flex flex-col items-start justify-center my-8 gap-8 max-w-7xl m-auto w-full text-left p-2"
+                            className="flex flex-col items-start justify-center gap-4 max-w-7xl mx-auto w-full text-left p-4"
                         >
-                            <PAGPublicRoadmapBreadcrumb
+                            <MarketplaceBreadcrumb
                                 organization={organization}
                                 roadmap={roadmaps[0]}
+                                marketplaceDomain={"/app/marketplace/milestones"}
                             />
 
                             {/*<h1 className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">*/}
@@ -267,19 +269,10 @@ export default async function OrganizationRoadmapPage({
                                 {roadmaps[0].description}
                             </p>
 
-                            {/*<div className="m-auto w-full text-left max-w-7xl flex flex-col gap-8">*/}
-                            <div className="flex flex-col-reverse md:grid md:grid-cols-3 m-auto w-full gap-4">
-                                <div className="md:col-span-2">
-                                    <RoadmapCard
-                                        roadmap={roadmaps[0]}
-                                        subdomain={organization?.subdomain || undefined}
-                                        isPublic={true}
-                                    />
-                                </div>
-                                <div className="col-span-1">
-                                    <PublicMilestoneDetails/>
-                                </div>
-                            </div>
+                            <PublicRoadmapContent
+                                roadmap={roadmaps[0]}
+                                subdomain={organization?.subdomain || undefined}
+                            />
 
                             {/*<div className="mt-8 w-full space-y-8">*/}
                             {/*    <h2 className="text-center text-3xl md:text-4xl font-bold">*/}

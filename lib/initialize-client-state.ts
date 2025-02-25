@@ -2,7 +2,8 @@
 
 import { useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useKanbanStore } from "@/state/kanban/kanbanStore";
-import { Prisma } from "@prisma/client";
+import { PlatformNotification, Prisma } from "@prisma/client";
+import { useNotificationsStore } from "@/state/notifications/notificationsStore";
 
 type ColumnType = Prisma.ColumnGetPayload<{ 
     include: { 
@@ -43,5 +44,17 @@ export function initializeKanbanState(initData: {
         // Call Zustand's initState directly
         initKanbanState(columns, columns.flatMap(column => column.tasks) || [], kanbanId)
         clear() // clear first/uninitialized state from history, so undo doesn't apply the un-initialized state
+    }
+}
+
+export function initializeNotificationsState(initData: {
+    notifications: PlatformNotification[]
+}) {
+    if (typeof window !== "undefined") {
+        const initNotificationsState = useNotificationsStore.getState().initState
+        const { notifications } = initData
+
+        // Call Zustand's initState directly
+        initNotificationsState(notifications)
     }
 }

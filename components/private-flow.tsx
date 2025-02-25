@@ -35,6 +35,7 @@ import { isOnboarded, setOnboarded} from "@/lib/utils"
 import { debounce } from "lodash"
 import { CustomEdge } from "./custom-edge"
 import { MilestoneTemplateTabs } from "./roadmap-templates"
+import { FaPlus } from "react-icons/fa6"
 
 const proOptions = { hideAttribution: true }
 
@@ -81,7 +82,7 @@ export const PrivateFlowView = ({
     const pathname = usePathname()
 
     useEffect(() => {
-        setLocalNodes(nodes)
+        setLocalNodes(nodes.sort((a: any, b: any) => b.createdAt - a.createdAt))
         setLocalEdges(edges)
     }, [nodes, edges])
 
@@ -284,6 +285,9 @@ export const PrivateFlowView = ({
         ...node,
         data: {
             ...milestones.find(milestone => milestone.nodeId === node.id),
+            handleEditClick: (nodeId: string) => {
+                setSelectedNodeId(node.id)
+            },
             handleDelete: (nodeId: string) => {
                 const nodesList = localNodes.filter(node => node.id === nodeId).map(node => ({...node, data: {...milestones.find(milestone => milestone.nodeId === node.id)}}))
                 const edgesList = edges.filter((edge: Edge) => edge.source === nodeId || edge.target === nodeId)
@@ -302,8 +306,8 @@ export const PrivateFlowView = ({
                     }])
                 }
             },
-            // last node is the onboarding node
-            onboardingMilestone: index === (localNodes.length - 1)
+            // last node is the onboarding node, localNodes are sorted by their creation date
+            onboardingMilestone: index === 0
         }
     }))
 
@@ -359,6 +363,7 @@ export const PrivateFlowView = ({
     }, [localNodes])
 
     const startOnbordaAndRemoveToast = () => {
+        setSelectedNodeId(null)
         startOnborda('research-plan-tour')
         setOnboarded('research-plan-tour')
         toast.dismiss()
@@ -389,8 +394,20 @@ export const PrivateFlowView = ({
                 nodeColor='#757575'
                 maskColor='rgb(200, 200, 200, 0.8)' 
             />
-            <Controls>
-                <Button className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>Add Milestone</Button>
+            <Controls className="flex flex-col gap-2">
+                <Button
+                    variant="secondary"
+                    type="button"
+                    onClick={() => {
+                        router.push('/app/research-plan/templates')
+                    }}
+                >
+                    Browse milestone librarey
+                </Button>
+                <Button className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>
+                    <FaPlus />
+                    Create milestone
+                </Button>
             </Controls>
         </ReactFlow>
         <Dialog open={newMilestoneIsOpen} onOpenChange={(open: boolean) => {
@@ -423,6 +440,8 @@ export const PrivateFlowView = ({
                 <MilestoneTemplateTabs 
                     selectedMilestones={selectedMilestones}
                     setSelectedMilestones={setSelectedMilestones}
+                    createEmpty={() => addMilestones([{name: 'New Milestone'}])}
+                    inDialog={true}
                 />
 
                 <DialogFooter>
@@ -439,19 +458,20 @@ export const PrivateFlowView = ({
                             router.push('/app/research-plan/templates')
                         }}
                     >
-                        See all templates
+                        Browse milestone librarey
                     </Button>
 
-                    <DialogClose>
+                    {/* <DialogClose>
                         <Button
                             variant="secondary"
                             type="button"
                             // onClick={handleAddEmptyMilestone}
                             onClick={() => addMilestones([{name: 'New Milestone'}])}
                         >
-                            Create empty Milestone
+                            <FaPlus />
+                            Create empty milestone
                         </Button>
-                    </DialogClose>
+                    </DialogClose> */}
                     
                     <DialogClose>
                         <Button
@@ -462,7 +482,8 @@ export const PrivateFlowView = ({
                                 addMilestones(selectedMilestones)
                             }}
                         >
-                            Create selected Milestones
+                            <FaPlus />
+                            Create selected milestones
                         </Button>
                     </DialogClose>
                 </DialogFooter>

@@ -381,7 +381,7 @@ export const mechanisms = [
 
 export default function EditConditionProfileDialog() {
     // This component is only meant to be used within the floating dock. The rest of the dialog component is there.
-    const {data: session, update} = useSession()
+    const {data: session} = useSession()
     const [loading, setLoading] = useState(false);
 
     const conditionProfileForm = useForm<z.infer<typeof researchFormSchema>>({
