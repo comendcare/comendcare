@@ -1,3 +1,4 @@
+import React from "react";
 import {notFound, useSearchParams} from "next/navigation"
 import prisma from "@/lib/prisma"
 import {getRoadmapData, getOrganizationData, getRoadmapsForOrganization, getMilestoneDetails} from "@/lib/fetchers"
@@ -31,7 +32,7 @@ import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import ShareDialog from "@/components/share-dialog";
 import {PublicRoadmapContent} from "@/components/public-roadmap-content";
-import React from "react";
+import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
 
 export async function generateMetadata({
                                            params
@@ -177,11 +178,12 @@ export default async function OrganizationRoadmapPage({
             {roadmaps.length > 0 ? (
                     <>
                         <div
-                            className="flex flex-col items-start justify-center my-8 gap-8 max-w-7xl m-auto w-full text-left p-2"
+                            className="flex flex-col items-start justify-center gap-4 max-w-7xl mx-auto w-full text-left p-4"
                         >
-                            <PAGPublicRoadmapBreadcrumb
+                            <MarketplaceBreadcrumb
                                 organization={organization}
                                 roadmap={roadmaps[0]}
+                                marketplaceDomain={"/app/marketplace/milestones"}
                             />
 
                             {/*<h1 className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">*/}

@@ -118,7 +118,10 @@ export default async function OrganizationHomePage({
                     <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                         <div className="relative md:col-span-2 space-y-4">
                             <div className="sticky top-4 space-y-4">
-                                <PagProfileAboutCard organization={organization}/>
+                                <PagProfileAboutCard
+                                    organization={organization}
+                                    editable={false}
+                                />
                                 <PAGProfileConditionsCard
                                     conditions={conditions}
                                     organization={organization}
