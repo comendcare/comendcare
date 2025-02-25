@@ -17,7 +17,6 @@ export default function PAGPublicRoadmapBreadcrumb({ organization, roadmap }: {
     organization?: Organization,
     roadmap?: Roadmap,
 }) {
-    console.log(roadmap)
 
     const searchParams = useSearchParams();
     const urlMilestone = searchParams.get("milestone");
