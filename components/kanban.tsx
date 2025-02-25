@@ -219,10 +219,6 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
         setTasks(sortKanbanTasks(initTasks))
     }, [initTasks, initColumns, filter, sortBy])
 
-    useEffect(() => {
-        console.log(`tasks changed`, tasks)
-    }, [tasks])
-
     function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
         const tasksInColumn = tasks?.filter(task => task.columnId === columnId)
         const taskPosition = tasksInColumn.findIndex(task => task.id === taskId)
