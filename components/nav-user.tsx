@@ -47,7 +47,6 @@ export function NavUser() {
     const [userData, setUserData] = useState<any>(null);
     const [invitations, setInvitations] = useState<any[]>([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    console.log(session?.user.membership.role)
 
     useEffect(() => {
         const fetchUserData = async () => {
