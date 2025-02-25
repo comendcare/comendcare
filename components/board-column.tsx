@@ -48,14 +48,15 @@ interface BoardColumnProps {
     column: Column
     tasks: Task[]
     isOverlay?: boolean
-    filter?: string
+    filter?: string,
+    mountKey: number
 }
 
 const selector = (state: KanbanState) => ({
     deleteColumn: state.deleteColumn
 })
 
-export function BoardColumn({ column, tasks, isOverlay, filter }: BoardColumnProps) {
+export function BoardColumn({ column, tasks, isOverlay, filter, mountKey }: BoardColumnProps) {
     const {data: session} = useSession()
     const {deleteColumn} = useKanbanStore(useShallow(selector))
     const tasksIds = useMemo(() => {
@@ -183,7 +184,7 @@ export function BoardColumn({ column, tasks, isOverlay, filter }: BoardColumnPro
                 <CardContent className="rounded-b-md flex flex-grow flex-col gap-2 p-2">
                     <SortableContext items={tasksIds}>
                         {tasks.map(task => (
-                            <TaskCard key={task.id} task={task} />
+                            <TaskCard key={task.id} task={task} mountKey={mountKey}/>
                         ))}
                     </SortableContext>
                     <NewKanbanTaskButton column={column} assignTo={session?.user?.id && filter === 'personal' ? session.user.id : undefined}/>
