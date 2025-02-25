@@ -35,7 +35,7 @@ import NewColumnDialog from "./new-column-dialog"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "./ui/button"
-import { FaUndo } from "react-icons/fa"
+import { FaRedo, FaUndo } from "react-icons/fa"
 
 export type ColumnId = string
 
@@ -48,25 +48,25 @@ const kanbanSelector = (state: KanbanState) => ({
 })
 
 export function KanbanView() {
-    const { undo } = useKanbanStore.temporal.getState()
+    const { undo, redo } = useKanbanStore.temporal.getState()
     const {columns, tasks, saveState} = useKanbanStore(useShallow(kanbanSelector))
     const [sortBy, setSortBy] = useState<string>('default')
     const [mountKey, setMountKey] = useState(1)
 
-    useEffect(() => {
-        const handleUndo = (event: KeyboardEvent) => {
-            if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-                event.preventDefault(); // Prevent default undo behavior (optional)
-                console.log("Undo action triggered")
-                undo() // undo updates zustand state
-                saveState() // save state to update database
-                setMountKey(prev => prev + 1)
-            }
-        };
+    // useEffect(() => {
+    //     const handleUndo = (event: KeyboardEvent) => {
+    //         if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+    //             event.preventDefault(); // Prevent default undo behavior (optional)
+    //             console.log("Undo action triggered")
+    //             undo() // undo updates zustand state
+    //             saveState() // save state to update database
+    //             setMountKey(prev => prev + 1)
+    //         }
+    //     };
     
-        document.addEventListener("keydown", handleUndo);
-        return () => document.removeEventListener("keydown", handleUndo);
-    }, []);
+    //     document.addEventListener("keydown", handleUndo);
+    //     return () => document.removeEventListener("keydown", handleUndo);
+    // }, []);
 
     return (
         <Tabs defaultValue="team" className="w-full p-4 flex flex-col gap-4">
@@ -103,12 +103,28 @@ export function KanbanView() {
                         <p>{`Undo`}</p>
                     </TooltipContent>
                 </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button onClick={() => {
+                            console.log("Redo action triggered")
+                            redo() // undo updates zustand state
+                            saveState() // save state to update database
+                            setMountKey(prev => prev + 1)
+                        }} size={"icon"} variant={"ghost"}>
+                            <FaRedo />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-80">
+                        <p>{`Redo`}</p>
+                    </TooltipContent>
+                </Tooltip>
                 <NewColumnDialog />
             </div>
             <ScrollArea className="pr-4 pb-4">
                 <div>
                     <TabsContent value="team" className="mt-0">
                         <Kanban
+                            mountKey={mountKey}
                             initColumns={columns}
                             initTasks={tasks}
                             filter={"team"}
@@ -117,6 +133,7 @@ export function KanbanView() {
                     </TabsContent>
                     <TabsContent value="personal" className="mt-0">
                         <Kanban
+                            mountKey={mountKey}
                             initColumns={columns}
                             initTasks={tasks}
                             filter={"personal"}
@@ -131,11 +148,12 @@ export function KanbanView() {
     )
 }
 
-function Kanban({initColumns, initTasks, filter, sortBy}: {
+function Kanban({initColumns, initTasks, filter, sortBy, mountKey}: {
     initColumns: Column[],
     initTasks: Task[],
     filter: 'team' | 'personal' | undefined,
-    sortBy?: string | undefined
+    sortBy?: string | undefined,
+    mountKey: number
 }) {
     const {data: session} = useSession()
     const {
@@ -502,6 +520,7 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
                 <SortableContext items={columnIds}>
                     {columns.length > 0 ? columns?.map((col, index) => (
                         <BoardColumn
+                            mountKey={mountKey}
                             key={col.id}
                             column={col}
                             tasks={tasks?.filter(task => {
@@ -519,12 +538,13 @@ function Kanban({initColumns, initTasks, filter, sortBy}: {
                     <DragOverlay>
                         {activeColumn && (
                             <BoardColumn
+                                mountKey={mountKey}
                                 isOverlay
                                 column={activeColumn}
                                 tasks={tasks?.filter(task => task?.columnId === activeColumn.id)}
                             />
                         )}
-                        {activeTask && <TaskCard task={activeTask} isOverlay/>}
+                        {activeTask && <TaskCard task={activeTask} isOverlay mountKey={mountKey} />}
                     </DragOverlay>,
                     document.body
                 )}
