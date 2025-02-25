@@ -549,7 +549,10 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 <CommandList>
                     {open && (
                         <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
-                            <ScrollArea className="max-h-[300px] overflow-auto">
+                            <ScrollArea 
+                                className="max-h-[300px] overflow-auto"
+                                onMouseDown={(e) => e.preventDefault()} // Prevent focus loss on input
+                            >
                                 {isLoading && (
                                     <>{loadingIndicator}</>
                                 )}
