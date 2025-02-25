@@ -19,7 +19,7 @@ export default function OnboardingWelcomePage() {
             <div className="w-full space-y-4">
                 <div className="space-y-2">
                     <h1 className="text-xl font-semibold">
-                        Welcome to Comend, {session?.user.name?.split(" ")[0]}!
+                        Welcome to Comend{session?.user.name ? `, ${session.user.name.split(" ")[0]}!` : "!"}
                     </h1>
                     <p>
                         {`To create your profile and help us understand how we can best support you, we have some questions.`}

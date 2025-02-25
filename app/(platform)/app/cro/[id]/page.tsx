@@ -32,6 +32,8 @@ import CROMarketplaceProfileServicesTab from "@/components/cro-marketplace-profi
 import CROMarketplaceProfileSitesTab from "@/components/cro-marketplace-profile-sites-tab";
 import CROMarketplaceProfileRFIsTab from "@/components/cro-marketplace-profile-rfis-tab";
 import CROMarketplaceProfileCertificationsTab from "@/components/cro-marketplace-profile-certifications-tab";
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible";
+import {CRODescription} from "@/components/cro-description";
 
 const companyTypeIcons: Record<string, JSX.Element> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
@@ -108,7 +110,7 @@ export default async function CompanyHomePage({
                             </div>
                             {cro.description && cro.description.trim() && (
                                 <div className="w-1/2">
-                                    {cro.description}
+                                    <CRODescription text={cro.description}/>
                                 </div>
                             )}
                         </div>
