@@ -22,7 +22,7 @@ import { Button, buttonVariants } from "./ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare } from "react-icons/fa6"
-import { FaUndo } from "react-icons/fa"
+import { FaRedo, FaUndo } from "react-icons/fa"
 
 const selector = (state: RoadmapState) => ({
     selectedView: state.selectedView,
@@ -47,30 +47,27 @@ export function Roadmap({data}: {data: any}) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
-    const { undo } = useRoadmapStore.temporal.getState()
+    const { undo, redo } = useRoadmapStore.temporal.getState()
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
 
-    useEffect(() => {
-        const handleUndo = (event: KeyboardEvent) => {
-            if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-                event.preventDefault(); // Prevent default undo behavior (optional)
-                console.log("Undo action triggered")
-                undo() // undo updates zustand state
-                saveState() // save state to update database
+    // useEffect(() => {
+    //     const handleUndo = (event: KeyboardEvent) => {
+    //         if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+    //             console.log("Undo action triggered")
+    //             undo() // undo updates zustand state
+    //             saveState() // save state to update database
 
-                if (selectedNodeId) {
-                    // if there is a node selected, remount the milestone form
-                    // to update the form data after the undo was triggered
-                    setMilestoneRemountKey(prevKey => prevKey + 1)
-                }
-
-                return
-            }
-        };
+    //             if (selectedNodeId) {
+    //                 // if there is a node selected, remount the milestone form
+    //                 // to update the form data after the undo was triggered
+    //                 setMilestoneRemountKey(prevKey => prevKey + 1)
+    //             }
+    //         }
+    //     };
     
-        document.addEventListener("keydown", handleUndo);
-        return () => document.removeEventListener("keydown", handleUndo);
-    }, []);
+    //     document.addEventListener("keydown", handleUndo);
+    //     return () => document.removeEventListener("keydown", handleUndo);
+    // }, []);
 
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString())
@@ -137,6 +134,26 @@ export function Roadmap({data}: {data: any}) {
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
                                     <p>{`Undo`}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button onClick={() => {
+                                        console.log("Redo action triggered")
+                                        redo() // undo updates zustand state
+                                        saveState() // save state to update database
+                        
+                                        if (selectedNodeId) {
+                                            // if there is a node selected, remount the milestone form
+                                            // to update the form data after the undo was triggered
+                                            setMilestoneRemountKey(prevKey => prevKey + 1)
+                                        }
+                                    }} size={"icon"} variant={"ghost"}>
+                                        <FaRedo />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80">
+                                    <p>{`Redo`}</p>
                                 </TooltipContent>
                             </Tooltip>
 
