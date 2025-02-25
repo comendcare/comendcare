@@ -38,8 +38,8 @@ export function DeleteMilestoneDialogContent({
 
     const handleDeleteMilestone = async (e: React.MouseEvent<HTMLElement>) => {
         console.log(`handle Milestone delete...`, milestoneData?.nodeId)
-        await deleteNode(milestoneData?.nodeId)
         await setSelectedNodeId(null)
+        await deleteNode(milestoneData?.nodeId)
         toast(
             <div className="relative p-2 flex flex-col">
                 <p className="font-semibold text-gray-900">
