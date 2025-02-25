@@ -11,9 +11,11 @@ import {toast} from "sonner";
 import {useOnborda} from "@/components/onborda/OnbordaContext";
 import {usePathname} from "next/navigation";
 import {Button} from "@/components/ui/button";
+import EditPagProfileAboutCardDialog from "@/components/edit-pag-profile-about-card-dialog";
 
-export const PagProfileAboutCard = ({organization}: {
+export const PagProfileAboutCard = ({organization, editable}: {
     organization: Organization & { members: (Member & { user: User })[] } | null
+    editable: boolean
 }) => {
     faker.seed(235)
     const { startOnborda } = useOnborda()
@@ -59,7 +61,9 @@ export const PagProfileAboutCard = ({organization}: {
                 <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
                     About
                 </CardTitle>
-                {/*<EditProfileAboutDialog/>*/}
+                {(organization && editable) &&
+                    <EditPagProfileAboutCardDialog organization={organization}/>
+                }
             </CardHeader>
 
             <CardContent>
@@ -71,9 +75,21 @@ export const PagProfileAboutCard = ({organization}: {
                     </div>
 
                     <div className="space-y-2">
-                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
-                            Members
-                        </h3>
+                        <div
+                            className="flex flex-row justify-between"
+                        >
+                            <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
+                                Members
+                            </h3>
+                            {editable &&
+                                <Link
+                                    href="/app/settings"
+                                    className="font-normal text-base hover:underline"
+                                >
+                                    View all
+                                </Link>
+                            }
+                        </div>
                         {organization?.members ? organization?.members.map((member, index) =>
                                 <div
                                     key={index}

@@ -465,7 +465,7 @@ export function EditTaskForm({
                             <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
                                 <FormLabel className="text-md mt-2">{`Assignees`}</FormLabel>
                                 <FormControl>
-                                    <MultipleSelector 
+                                    <MultipleSelector
                                         {...field}
                                         showHoverCard={false}
                                         placeholder="Select assignees..."
@@ -473,6 +473,11 @@ export function EditTaskForm({
                                             value: member.id || "",
                                             label: member.name || ""
                                         })): []}
+                                        emptyIndicator={
+                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                no results found.
+                                            </p>
+                                        }
                                     />
                                 </FormControl>
                                 <FormMessage/>
