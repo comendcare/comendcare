@@ -574,9 +574,12 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                 e.stopPropagation();
                                                             }}
                                                             onSelect={(value) => {
-                                                            setInputValue("");
-                                                            setSelected((prev) => [...prev, framework]);
-                                                                if (selected.length + 1 >= maxSelected) setOpen(false)
+                                                                setInputValue("")
+                                                                setSelected((prev) => {
+                                                                    if (selected.length + 1 >= maxSelected) setOpen(false)
+                                                                    onChange?.([...prev, framework])
+                                                                    return [...prev, framework]
+                                                                });
                                                             }}
                                                             className={"cursor-pointer multiselect-item"}
                                                         >
