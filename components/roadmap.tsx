@@ -54,7 +54,21 @@ export function Roadmap({data}: {data: any}) {
     useEffect(() => {
         milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
     
-        const handleUndo = (event: KeyboardEvent) => {
+        const handleUndoRedo = (event: KeyboardEvent) => {
+            console.log(event)
+            if (event.shiftKey && (event.metaKey || event.ctrlKey) && event.key === "z") {
+                console.log("Redo action triggered")
+                redo() // undo updates zustand state
+                saveState() // save state to update database
+
+                if (selectedNodeId) {
+                    // if there is a node selected, remount the milestone form
+                    // to update the form data after the undo was triggered
+                    setMilestoneRemountKey(prevKey => prevKey + 1)
+                }
+
+                return
+            }
             if ((event.metaKey || event.ctrlKey) && event.key === "z") {
                 console.log("Undo action triggered");
                 undo(); // undo updates zustand state
@@ -68,8 +82,8 @@ export function Roadmap({data}: {data: any}) {
             }
         };
     
-        document.addEventListener("keydown", handleUndo);
-        return () => document.removeEventListener("keydown", handleUndo);
+        document.addEventListener("keydown", handleUndoRedo);
+        return () => document.removeEventListener("keydown", handleUndoRedo);
     }, [selectedNodeId, milestoneRemountKey]);
 
     useEffect(() => {
