@@ -51,22 +51,35 @@ export function KanbanView() {
     const { undo, redo } = useKanbanStore.temporal.getState()
     const {columns, tasks, saveState} = useKanbanStore(useShallow(kanbanSelector))
     const [sortBy, setSortBy] = useState<string>('default')
-    const [mountKey, setMountKey] = useState(1)
-
+    const [mountKey, setMountKey] = useState(1);
+    const mountKeyRef = useRef(mountKey);
+    
     // useEffect(() => {
-    //     const handleUndo = (event: KeyboardEvent) => {
-    //         if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-    //             event.preventDefault(); // Prevent default undo behavior (optional)
-    //             console.log("Undo action triggered")
-    //             undo() // undo updates zustand state
+    //     mountKeyRef.current = mountKey;  // Always sync ref with the latest state
+    
+    //     const handleUndoRedo = (event: KeyboardEvent) => {
+    //         console.log(event)
+    //         if (event.shiftKey && (event.metaKey || event.ctrlKey) && event.key === "z") {
+    //             console.log("Redo action triggered")
+    //             redo() // undo updates zustand state
     //             saveState() // save state to update database
-    //             setMountKey(prev => prev + 1)
+
+    //             setMountKey(prevKey => prevKey + 1)
+
+    //             return
+    //         }
+    //         if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+    //             console.log("Undo action triggered");
+    //             undo(); // undo updates zustand state
+    //             saveState(); // save state to update database
+    
+    //             setMountKey(prevKey => prevKey + 1)
     //         }
     //     };
     
-    //     document.addEventListener("keydown", handleUndo);
-    //     return () => document.removeEventListener("keydown", handleUndo);
-    // }, []);
+    //     document.addEventListener("keydown", handleUndoRedo);
+    //     return () => document.removeEventListener("keydown", handleUndoRedo);
+    // }, [mountKey]);
 
     return (
         <Tabs defaultValue="team" className="w-full p-4 flex flex-col gap-4">
