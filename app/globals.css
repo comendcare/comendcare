@@ -179,6 +179,18 @@ h6 {
         --sidebar-accent-foreground: 240 5.9% 10%;
         --sidebar-border: 220 13% 91%;
         --sidebar-ring: 217.2 91.2% 59.8%;
+        --asset: 214, 100%, 97%;
+        --asset-foreground: 224, 76%, 48%;
+        --project: 55, 92%, 95%;
+        --project-foreground: 35, 92%, 33%;
+        --rfp: 33, 100%, 96%;
+        --rfp-foreground: 17, 88%, 40%;
+        --planned: 0, 93%, 94%;
+        --planned-foreground: 0, 74%, 42%;
+        --inprogress: 55, 97%, 88%;
+        --inprogress-foreground: 35, 92%, 33%;
+        --completed: 141, 84%, 93%;
+        --completed-foreground: 142, 72%, 29%;
     }
     .dark {
         --background: 0 0% 3.9%;
