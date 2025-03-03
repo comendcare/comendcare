@@ -402,7 +402,7 @@ export const PrivateFlowView = ({
                         router.push('/app/research-plan/templates')
                     }}
                 >
-                    Browse milestone librarey
+                    Browse milestone library
                 </Button>
                 <Button className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>
                     <FaPlus />
@@ -458,7 +458,7 @@ export const PrivateFlowView = ({
                             router.push('/app/research-plan/templates')
                         }}
                     >
-                        Browse milestone librarey
+                        Browse milestone library
                     </Button>
 
                     {/* <DialogClose>
