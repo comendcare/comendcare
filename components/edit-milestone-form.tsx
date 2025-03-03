@@ -261,7 +261,6 @@ export function EditMilestoneForm({
                     <EditTitle form={form}/>
 
                     <FormItem>
-
                         {/* <FormField
                             control={form.control}
                             name="nodeType"

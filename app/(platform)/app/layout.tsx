@@ -62,15 +62,9 @@ export default function AppLayout({children}: AppLayoutProps) {
     const { startOnborda } = useOnborda()
     const pathname = usePathname()
     const { 
-        selectedNodeId, 
         setSelectedNodeId
     } = useRoadmapStore(useShallow(selector))
     const { setNotificationsViewed } = useNotificationsStore(useShallow(notificationsSelector))
-    const [sidebarOpen, setSidebarOpen] = useState(selectedNodeId === null)
-
-    useEffect(() => {
-        if (selectedNodeId !== null) setSidebarOpen(false)
-    }, [selectedNodeId])
 
     useEffect(() => {
         // Handle loading state for the session
@@ -166,7 +160,7 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     if (status === "authenticated" && session) {
         return (
-            <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
+            <SidebarProvider>
                 <AppSidebar />
                 <SidebarInset className="w-full max-w-full overflow-hidden">
                     <header className="sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden">
