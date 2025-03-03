@@ -260,18 +260,9 @@ export function EditMilestoneForm({
 
                     <EditTitle form={form}/>
 
-                    <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
-                        <FormLabel
-                            className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Visibility</FormLabel>
-                        <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                    </FormItem>
-
                     <FormItem>
-                        <FormLabel
-                            className="text-2xl font-semibold leading-none tracking-tight">{`Details`}
-                        </FormLabel>
 
-                        <FormField
+                        {/* <FormField
                             control={form.control}
                             name="nodeType"
                             render={({field}) => (
@@ -310,7 +301,12 @@ export function EditMilestoneForm({
                                     <FormMessage/>
                                 </FormItem>
                             )}
-                        />
+                        /> */}
+
+                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
+                            <FormLabel className="text-md mt-2">Visibility</FormLabel>
+                            <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
+                        </FormItem>
 
                         <FormField
                             control={form.control}
