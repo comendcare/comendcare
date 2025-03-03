@@ -334,7 +334,7 @@ export const PrivateFlowView = ({
         //     startOnbordaAndRemoveToast()
         // }
 
-        // Only start tour if user is new and is on the /app/profile page
+        // Only start tour if user is new and is on the /app/research-plan page
         if (pathname === '/app/research-plan' && !isOnboarded('research-plan-tour')) {
             toast("Welcome to Comend!", {
                 id: "onborda",

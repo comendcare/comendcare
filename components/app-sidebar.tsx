@@ -32,10 +32,10 @@ import { KANBAN_NOTIFICATIONS } from "@/lib/types"
 const data = {
     navMain: [
         {
-            title: "Organization Profile",
-            icon: User,
+            title: "Marketplace",
+            icon: Store,
             variant: "ghost",
-            url: "/app/profile"
+            url: "/app/marketplace/cro",
         },
         {
             title: "Research Planner",
@@ -44,18 +44,18 @@ const data = {
             url: `/app/research-plan`
         },
         {
-            title: "Task Board",
-            icon: Pin,
+            title: "Organization Profile",
+            icon: User,
             variant: "ghost",
-            url: "/app/task-board",
-            notificationKeys: KANBAN_NOTIFICATIONS
+            url: "/app/profile"
         },
-        {
-            title: "Marketplace",
-            icon: Store,
-            variant: "ghost",
-            url: "/app/marketplace/patient-groups",
-        },
+        // {
+        //     title: "Task Board",
+        //     icon: Pin,
+        //     variant: "ghost",
+        //     url: "/app/task-board",
+        //     notificationKeys: KANBAN_NOTIFICATIONS
+        // },
         // {
         //     title: "Analytics",
         //     icon: LayoutDashboard,
