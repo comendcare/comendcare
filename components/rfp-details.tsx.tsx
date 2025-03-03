@@ -55,7 +55,7 @@ export function RFPDetails({ rfp, isPublic }: { rfp: MilestoneType, isPublic: bo
             closeDelay={0}
         >
             {/* <HoverCardTrigger asChild> */}
-                <a href={isPublic ? `/research-plan?milestone=${rfp?.id}&view=flow` : `/app/research-plan?milestone=${rfp?.nodeId || rfp?.node?.id}`}>
+                <a href={isPublic ? `/research-plan?milestone=${rfp?.id}` : `/app/research-plan?milestone=${rfp?.nodeId || rfp?.node?.id}`}>
                     <li
                         key={rfp?.id}
                         className="w-full flex items-center justify-between space-x-4 py-2 text-wrap"

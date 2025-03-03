@@ -19,7 +19,7 @@ import {
     getRoadmapId
 } from "@/lib/fetchers";
 import {toast} from "sonner";
-import {initializeKanbanState, initializeNotificationsState, initializeRoadmapState} from "@/lib/initialize-client-state";
+import {initializeNotificationsState, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import { createKanban } from "@/lib/actions";
@@ -130,24 +130,24 @@ export default function AppLayout({children}: AppLayoutProps) {
                 }
             }
 
-            let kanban = await getKanbanFromOrganizationId()
-            if (!kanban.data && session.user.organizationId) {
-                // kanban was not found, create it
-                kanban = await createKanban(session.user.organizationId)
-            }
+            // let kanban = await getKanbanFromOrganizationId()
+            // if (!kanban.data && session.user.organizationId) {
+            //     // kanban was not found, create it
+            //     kanban = await createKanban(session.user.organizationId)
+            // }
 
-            if (kanban.success) {
-                const kanbanResponse = await getColumns(session.user.organizationId)
-                if (kanbanResponse.success) {
-                    initializeKanbanState({
-                        columns: kanbanResponse.data.columns,
-                        kanbanId: kanban?.data?.id
-                    })
-                }
-            } else {
-                console.error(kanban.error)
-                toast.error(kanban.error)
-            }
+            // if (kanban.success) {
+            //     const kanbanResponse = await getColumns(session.user.organizationId)
+            //     if (kanbanResponse.success) {
+            //         initializeKanbanState({
+            //             columns: kanbanResponse.data.columns,
+            //             kanbanId: kanban?.data?.id
+            //         })
+            //     }
+            // } else {
+            //     console.error(kanban.error)
+            //     toast.error(kanban.error)
+            // }
 
             console.log(`Research plan, kanban, and notifications zustand states initialized successfully!`)
             setIsLoading(false)

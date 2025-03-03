@@ -126,11 +126,11 @@ export function Roadmap({data}: {data: any}) {
                 className="h-full items-stretch"
             >
                 <ResizablePanel>
-                    <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange} className="flex flex-col gap-4">
+                    <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-start">
                             <TabsList>
-                                <TabsTrigger value="flow">Flow View</TabsTrigger>
                                 <TabsTrigger value="timeline">Timeline View</TabsTrigger>
+                                <TabsTrigger value="flow">Flow View</TabsTrigger>
                                 {/* <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger> */}
                             </TabsList>
                             <Tooltip>
