@@ -34,6 +34,8 @@ import CROMarketplaceProfileRFIsTab from "@/components/cro-marketplace-profile-r
 import CROMarketplaceProfileCertificationsTab from "@/components/cro-marketplace-profile-certifications-tab";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible";
 import {CRODescription} from "@/components/cro-description";
+import {CertificationBadge} from "@/components/certification-badge";
+import CROMarketplaceProfileReviewsTab from "@/components/cro-marketplace-profile-reviews-tab";
 
 const companyTypeIcons: Record<string, JSX.Element> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
@@ -56,6 +58,25 @@ export default async function CompanyHomePage({
     if (!cro) {
         notFound()
     }
+
+    const allowedCertifications = new Set([
+        "Good Clinical Practice (GCP)",
+        "Good Laboratory Practice (GLP)",
+        "Good Manufacturing Practice (GMP)",
+        "Clinical Laboratory Improvement Amendments (CLIA)",
+        "Good Clinical Laboratory Practice (GCLP)",
+        "College of American Pathologists (CAP)",
+        "American Society for Clinical Pathology (ASCP)",
+        "Diplomate of the American Board of Toxicology (DABT)",
+        "Assessment and Accreditation of Laboratory Animal Care (AAALAC)",
+        "Institutional animal care and use committee (IACUC)",
+        "Office of Laboratory Animal Welfare (OLAW)",
+        "United States Department of Agriculture (USDA)",
+    ]);
+
+    const filteredCertifications = cro.certifications.filter(certification =>
+        allowedCertifications.has(certification.name)
+    );
 
     return (
         <TooltipProvider>
@@ -82,9 +103,9 @@ export default async function CompanyHomePage({
                                 </h1>
                             </div>
                             <div
-                                className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
+                                className="flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
                                 {cro.headquarters &&
-                                    <div className="mt-2 flex items-center text-gray-500">
+                                    <div className="flex items-center text-gray-500">
                                         <FaLocationPin
                                             className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                             aria-hidden="true"
@@ -93,14 +114,13 @@ export default async function CompanyHomePage({
                                     </div>
                                 }
                                 {cro.yearEstablished && (
-                                    <div className="mt-2 flex items-center text-gray-500">
-                                        <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                    <div className="flex items-center text-gray-500"> <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                     aria-hidden="true"/>
                                         Founded in {cro.yearEstablished}
                                     </div>
                                 )}
                                 {cro.companyType && (
-                                    <div className="mt-2 flex items-center text-gray-500">
+                                    <div className="flex items-center text-gray-500">
                                         {companyTypeIcons[cro.companyType] ||
                                             <FaBuilding className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"/>}
@@ -108,9 +128,18 @@ export default async function CompanyHomePage({
                                     </div>
                                 )}
                             </div>
+                            <div className="flex flex-wrap gap-2 w-5/6">
+                                {filteredCertifications.map((certification, index) => (
+                                    <CertificationBadge
+                                        key={index}
+                                        certificationName={certification.name}
+                                    />
+                                ))}
+                            </div>
                             {cro.description && cro.description.trim() && (
-                                <div className="w-1/2">
-                                    <CRODescription text={cro.description}/>
+                                <div className="w-5/6">
+                                    {/*<CRODescription text={cro.description}/>*/}
+                                    {cro.description}
                                 </div>
                             )}
                         </div>
@@ -128,7 +157,7 @@ export default async function CompanyHomePage({
                             <TabsTrigger value="services" variant="outline" className="px-8">
                                 <FaBriefcase className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                                 Services
-                                {cro.services.length && (
+                                {cro.services.length !== undefined && (
                                     <div
                                         className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
                                     >
@@ -136,17 +165,17 @@ export default async function CompanyHomePage({
                                     </div>
                                 )}
                             </TabsTrigger>
-                            <TabsTrigger value="sites" variant="outline" className="px-8">
-                                <FaMap className="mr-1.5 h-4 w-4 flex-shrink-0"/>
-                                Sites
-                                {cro.sites.length && (
-                                    <div
-                                        className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
-                                    >
-                                        {cro.sites.length}
-                                    </div>
-                                )}
-                            </TabsTrigger>
+                            {/*<TabsTrigger value="sites" variant="outline" className="px-8">*/}
+                            {/*    <FaMap className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
+                            {/*    Sites*/}
+                            {/*    {cro.sites.length && (*/}
+                            {/*        <div*/}
+                            {/*            className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'*/}
+                            {/*        >*/}
+                            {/*            {cro.sites.length}*/}
+                            {/*        </div>*/}
+                            {/*    )}*/}
+                            {/*</TabsTrigger>*/}
                             {/*<TabsTrigger value="rfis" variant="outline" className="px-8">*/}
                             {/*    <FaFileContract className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
                             {/*    RFIs*/}
@@ -158,40 +187,43 @@ export default async function CompanyHomePage({
                             {/*        </div>*/}
                             {/*    )}*/}
                             {/*</TabsTrigger>*/}
-                            <TabsTrigger value="certifications" variant="outline" className="px-8">
-                                <FaListCheck className="mr-1.5 h-4 w-4 flex-shrink-0"/>
-                                Certifications
-                                {cro.certifications.length && (
+                            {/*<TabsTrigger value="certifications" variant="outline" className="px-8">*/}
+                            {/*    <FaListCheck className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
+                            {/*    Certifications*/}
+                            {/*    {cro.certifications.length && (*/}
+                            {/*        <div*/}
+                            {/*            className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'*/}
+                            {/*        >*/}
+                            {/*            {cro.certifications.length}*/}
+                            {/*        </div>*/}
+                            {/*    )}*/}
+                            {/*</TabsTrigger>*/}
+                            <TabsTrigger value="reviews" variant="outline" className="px-8">
+                                <FaUsers className="mr-1.5 h-4 w-4 flex-shrink-0"/>
+                                Reviews
+                                {cro.reviews.length !== undefined && (
                                     <div
                                         className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
                                     >
-                                        {cro.certifications.length}
+                                        {cro.reviews.length}
                                     </div>
                                 )}
                             </TabsTrigger>
-                            <Tooltip delayDuration={0}>
-                                <TooltipTrigger>
-                                    <TabsTrigger value="reviews" variant="outline" className="px-8" disabled>
-                                        <FaUsers className="mr-1.5 h-4 w-4 flex-shrink-0"/>
-                                        Reviews
-                                    </TabsTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    Coming soon!
-                                </TooltipContent>
-                            </Tooltip>
                         </TabsList>
                         <TabsContent value="services" className="space-y-4 w-full">
                             <CROMarketplaceProfileServicesTab croServices={cro.services}/>
                         </TabsContent>
-                        <TabsContent value="sites" className="space-y-4 w-full">
-                            <CROMarketplaceProfileSitesTab croSites={cro.sites}/>
-                        </TabsContent>
+                        {/*<TabsContent value="sites" className="space-y-4 w-full">*/}
+                        {/*    <CROMarketplaceProfileSitesTab croSites={cro.sites}/>*/}
+                        {/*</TabsContent>*/}
                         {/*<TabsContent value="rfis" className="space-y-4 w-full">*/}
                         {/*    <CROMarketplaceProfileRFIsTab croRFIs={cro.rfis}/>*/}
                         {/*</TabsContent>*/}
-                        <TabsContent value="certifications" className="space-y-4 w-full">
-                            <CROMarketplaceProfileCertificationsTab croCertifications={cro.certifications}/>
+                        {/*<TabsContent value="certifications" className="space-y-4 w-full">*/}
+                        {/*    <CROMarketplaceProfileCertificationsTab croCertifications={cro.certifications}/>*/}
+                        {/*</TabsContent>*/}
+                        <TabsContent value="reviews" className="space-y-4 w-full">
+                            <CROMarketplaceProfileReviewsTab cro={cro}/>
                         </TabsContent>
                     </Tabs>
                 </main>

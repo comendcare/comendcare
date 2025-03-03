@@ -2590,3 +2590,58 @@ export async function deleteTask(taskId: string) {
         return {success: false, error: "Internal server error"};
     }
 }
+
+export const createReview = async (companyId: string, formData: FormData): Promise<ApiResponse<any>> => {
+    const session = await getSession()
+    if (!session?.user.id) {
+        throw new Error("You must be signed in to perform this action")
+    }
+
+    try { // Check if a member request already exists
+        const existingReview = await prisma.review.findUnique({
+            where: {
+                authorId_companyId: {
+                    authorId: session.user.id,
+                    companyId: companyId, // Use the correct variable name for company ID
+                },
+            },
+        });
+
+        if (existingReview) {
+            return {success: false, error: "You have already created a review for this company."};
+        }
+
+        const title = formData.get("title") as string;
+        const body = formData.get("body") as string;
+
+        const review = await prisma.review.create({
+            data: {
+                title: title,
+                body: body,
+                author: {
+                    connect: {
+                        id: session.user.id
+                    }
+                },
+                company: {
+                    connect: {
+                        id: companyId
+                    }
+                }
+            }
+        })
+
+        if (!review) {
+            console.error("Error creating review.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        revalidatePath("app/cro/")
+
+        return {success: true, data: review}
+    } catch (error: any) {
+        console.error("Error creating member request:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
