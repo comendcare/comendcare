@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Company" ADD COLUMN     "avgRating" DOUBLE PRECISION DEFAULT 0.0;
+
+-- AlterTable
+ALTER TABLE "Review" ADD COLUMN     "rating" DOUBLE PRECISION NOT NULL DEFAULT 0.0;

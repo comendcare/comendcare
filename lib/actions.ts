@@ -2593,9 +2593,10 @@ export const createReview = async (companyId: string, formData: FormData): Promi
     try { // Check if a member request already exists
         const existingReview = await prisma.review.findUnique({
             where: {
-                authorId_companyId: {
+                authorId_companyId_organizationId: {
                     authorId: session.user.id,
                     companyId: companyId, // Use the correct variable name for company ID
+                    organizationId: session.user.organizationId
                 },
             },
         });
@@ -2619,6 +2620,11 @@ export const createReview = async (companyId: string, formData: FormData): Promi
                 company: {
                     connect: {
                         id: companyId
+                    }
+                },
+                organization: {
+                    connect: {
+                        id: session.user.organizationId
                     }
                 }
             }

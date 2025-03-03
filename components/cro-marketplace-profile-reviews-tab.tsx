@@ -1,9 +1,13 @@
-import {Company, Review} from "@prisma/client";
+import {Company, Review, User} from "@prisma/client";
 import {CROReviewCard} from "@/components/cro-review-card";
 import CROReviewForm from "@/components/cro-review-form";
 
+interface ReviewWithAuthor extends Review {
+    author: User;
+}
+
 interface CompanyWithReviews extends Company {
-    reviews: Review[];
+    reviews: ReviewWithAuthor[];
 }
 
 export default function CROMarketplaceProfileReviewsTab({cro}: {cro: CompanyWithReviews}) {

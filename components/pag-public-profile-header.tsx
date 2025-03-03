@@ -1,7 +1,6 @@
 import {formatMoney, standardizeYear} from "@/lib/utils";
 import {FaCity, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup} from "react-icons/fa6";
 import {Organization} from "@prisma/client";
-import PublicProfileDropdown from "@/components/public-profile-dropdown";
 import {ProfilePhoto} from "./profile-photo";
 import {BackButton} from "./back-button";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
@@ -98,7 +97,7 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                             className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
                             <div className="flex flex-row space-x-2">
                                 {/*<PAGFollowButton organizationId={organization.id} />*/}
-                                <PublicProfileDropdown website={organization?.website}/>
+                                {/*<PublicProfileDropdown website={organization?.website}/>*/}
                             </div>
                         </div>
 
