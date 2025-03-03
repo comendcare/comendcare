@@ -46,7 +46,7 @@ export function AssetDetails({ asset, isPublic }: { asset: MilestoneType, isPubl
             closeDelay={0}
         >
             {/* <HoverCardTrigger asChild> */}
-                <a href={isPublic ? `/research-plan?milestone=${asset?.id}&view=flow` : `/app/research-plan?milestone=${asset?.nodeId || asset?.node?.id}`}>
+                <a href={isPublic ? `/research-plan?milestone=${asset?.id}` : `/app/research-plan?milestone=${asset?.nodeId || asset?.node?.id}`}>
                     <li
                         key={asset?.id}
                         className="w-full flex items-center justify-between space-x-4 py-2"
