@@ -280,7 +280,7 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
     if (type === "ASSET") {
         return (
             <Badge variant="outline"
-                   className={cn("h-8 text-sm flex gap-2 border-green-500 text-green-800", className)}>
+                   className={cn("h-8 text-sm flex gap-2 border-asset-foreground text-asset-foreground bg-asset", className)}>
                 <FaStar/>
                 {!iconOnly && "Asset"}
             </Badge>
@@ -290,7 +290,7 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
     if (type === "PROJECT") {
         return (
             <Badge variant="outline"
-                   className={cn("h-8 text-sm flex gap-2 border-yellow-500 text-yellow-800", className)}>
+                   className={cn("h-8 text-sm flex gap-2 border-project-foreground text-project-foreground bg-project", className)}>
                 <FaFileLines/>
                 {!iconOnly && "Project"}
             </Badge>
@@ -299,7 +299,7 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
 
     if (type === "RFP") {
         return (
-            <Badge variant="outline" className={cn("h-8 text-sm flex gap-2 border-red-500 text-red-800", className)}>
+            <Badge variant="outline" className={cn("h-8 text-sm flex gap-2 border-rfp-foreground text-rfp-foreground bg-rfp", className)}>
                 <FaBullhorn/>
                 {!iconOnly && "RFP"}
             </Badge>

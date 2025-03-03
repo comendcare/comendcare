@@ -78,6 +78,30 @@ const config: Config = {
     			highlight: {
     				DEFAULT: 'hsl(var(--highlight))',
     				foreground: 'hsl(var(--highlight-foreground))'
+    			},
+				asset: {
+    				DEFAULT: 'hsl(var(--asset))',
+    				foreground: 'hsl(var(--asset-foreground))'
+    			},
+				project: {
+    				DEFAULT: 'hsl(var(--project))',
+    				foreground: 'hsl(var(--project-foreground))'
+    			},
+				rfp: {
+    				DEFAULT: 'hsl(var(--rfp))',
+    				foreground: 'hsl(var(--rfp-foreground))'
+    			},
+				planned: {
+    				DEFAULT: 'hsl(var(--planned))',
+    				foreground: 'hsl(var(--planned-foreground))'
+    			},
+				inprogress: {
+    				DEFAULT: 'hsl(var(--inprogress))',
+    				foreground: 'hsl(var(--inprogress-foreground))'
+    			},
+				completed: {
+    				DEFAULT: 'hsl(var(--completed))',
+    				foreground: 'hsl(var(--completed-foreground))'
     			}
     		},
     		boxShadow: {
