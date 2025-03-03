@@ -453,7 +453,6 @@ async function createRoadmap(organizationId: string, roadmapTemplate?: any | und
                         // RFP: {
                         //     include: { contacts: true, attachments: true }
                         // },
-                        tasks: true,
                         node: true
                     }
                 })

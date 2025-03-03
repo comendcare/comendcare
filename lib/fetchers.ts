@@ -693,7 +693,6 @@ export async function getMilestoneDetails(id: string) {
         const milestone = await prisma.milestone.findUnique({
             where: {id},
             include: {
-                tasks: true,
                 attachments: true,
                 contacts: true,
                 node: true

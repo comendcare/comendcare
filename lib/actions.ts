@@ -48,7 +48,6 @@ export type Milestone = Prisma.MilestoneGetPayload<{
     include: {
         attachments: true,
         contacts: true
-        tasks: true
     }
 }>
 
@@ -1670,7 +1669,6 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 //     include: {
                 //         attachments: true,
                 //         contacts: true,
-                //         tasks: true,
                 //         node: true
                 //     }
                 // })
@@ -1721,7 +1719,6 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 include: {
                     attachments: true,
                     contacts: true,
-                    tasks: true,
                     node: true
                 }
             },
@@ -1889,7 +1886,6 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
             include: {
                 attachments: true,
                 contacts: true,
-                tasks: true,
                 node: true
             },
             where: {roadmapId}
@@ -1980,7 +1976,6 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
             include: {
                 attachments: true,
                 contacts: true,
-                tasks: true,
                 node: true
             },
             where: {roadmapId}
@@ -2105,7 +2100,6 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     include: {
                         attachments: true,
                         contacts: true,
-                        tasks: true,
                         node: true
                     }
                 })
@@ -2121,7 +2115,6 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     include: {
                         attachments: true,
                         contacts: true,
-                        tasks: true,
                         node: true
                     },
                     data: {
