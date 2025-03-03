@@ -7,6 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ReviewReplyReportReason {
+  HARASSMENT
+  FALSE
+  SPAM
+  SALES
+  HATE
+  OTHER
+}
+
 model User {
   id                    String                 @id @default(cuid())
   name                  String?
@@ -43,6 +52,10 @@ model User {
   sessions              Session[]
   stakeholders          TaskStakeholder[]
   platformNotifications PlatformNotification[]
+  reviews               Review[]
+  repliess              Reply[]
+  reportOnReviews       ReportOnReview[]
+  reportOnReplys        ReportOnReply[]
 }
 
 model PlatformNotification {
@@ -593,6 +606,7 @@ model Company {
   services       Service[]
   certifications Certification[]
   rfis           RFI[]
+  reviews        Review[]
 }
 
 model Site {
@@ -633,4 +647,54 @@ model RFI {
   submittedOn DateTime?
   company     Company   @relation(fields: [companyId], references: [id])
   companyId   String
+}
+
+model Review {
+  id        String           @id @default(uuid())
+  title     String
+  body      String
+  authorId  String
+  author    User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  companyId String
+  company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  replies   Reply[]          @relation("ReviewToReply")
+  reports   ReportOnReview[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@unique([authorId, companyId]) // Ensures one review per user per company
+}
+
+model Reply {
+  id        String          @id @default(uuid())
+  body      String
+  authorId  String
+  author    User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reviewId  String
+  review    Review          @relation("ReviewToReply", fields: [reviewId], references: [id], onDelete: Cascade)
+  reports   ReportOnReply[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model ReportOnReview {
+  id          String                  @id @default(uuid())
+  userId      String
+  reviewId    String
+  reason      ReviewReplyReportReason
+  description String?
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  review      Review                  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt   DateTime                @default(now())
+}
+
+model ReportOnReply {
+  id          String                  @id @default(uuid())
+  userId      String
+  replyId     String
+  reason      ReviewReplyReportReason
+  description String?
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reply       Reply                   @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime                @default(now())
 }

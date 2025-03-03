@@ -55,9 +55,9 @@ export function CROMarketplaceCard({cro}: { cro: Company }) {
 
     const categoryLabels = [
         {key: "services", icon: FaFileLines, label: "Services"},
-        {key: "certifications", icon: FaUsers, label: "Certifications"},
-        {key: "rfis", icon: FaBullhorn, label: "RFIs"},
-        {key: "sites", icon: FaLocationDot, label: "Sites"}
+        // {key: "certifications", icon: FaUsers, label: "Certifications"},
+        // {key: "rfis", icon: FaBullhorn, label: "RFIs"},
+        // {key: "sites", icon: FaLocationDot, label: "Sites"}
     ];
 
     return (

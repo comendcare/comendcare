@@ -56,20 +56,20 @@ const data = {
             variant: "ghost",
             url: "/app/marketplace/patient-groups",
         },
-        {
-            title: "Analytics",
-            icon: LayoutDashboard,
-            variant: "ghost",
-            url: "/app/analytics",
-            comingSoon: true
-        },
-        {
-            title: "Feed",
-            icon: Newspaper,
-            variant: "ghost",
-            url: "/app/feed",
-            comingSoon: true
-        },
+        // {
+        //     title: "Analytics",
+        //     icon: LayoutDashboard,
+        //     variant: "ghost",
+        //     url: "/app/analytics",
+        //     comingSoon: true
+        // },
+        // {
+        //     title: "Feed",
+        //     icon: Newspaper,
+        //     variant: "ghost",
+        //     url: "/app/feed",
+        //     comingSoon: true
+        // },
         {
             title: "Organization Settings",
             icon: Cog,
