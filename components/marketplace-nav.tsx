@@ -9,30 +9,20 @@ import {Button} from "@/components/ui/button";
 
 const links = [
     {
-        name: "Patient groups",
-        href: "/patient-groups",
-        comingSoon: false
-    },
-    {
-        name: "Milestones",
-        href: "/milestones",
-        comingSoon: false
-    },
-    // {
-    //     name: "Researchers",
-    //     href: "/researchers",
-    //     comingSoon: true
-    // },
-    {
-        name: "Academics",
-        href: "#",
-        comingSoon: false
-    },
-    {
         name: "CROs",
         href: "/cro",
         comingSoon: false
     },
+    {
+        name: "Patient groups",
+        href: "/patient-groups",
+        comingSoon: false
+    },
+    // {
+    //     name: "Milestones",
+    //     href: "/milestones",
+    //     comingSoon: false
+    // },
 ]
 
 interface ExamplesNavProps extends React.HTMLAttributes<HTMLDivElement> {

@@ -760,7 +760,7 @@ export default function OrganizationOnboardingForm(
                                     </Button>
                                 </div>
                                 {showSkip &&
-                                    <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                    <Button variant="ghost" onClick={() => router.push("/app/marketplace/cro")}>
                                         Skip for now
                                     </Button>
                                 }
@@ -814,7 +814,7 @@ export default function OrganizationOnboardingForm(
                                         Join Organization
                                     </Button>
                                     {showSkip &&
-                                        <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                        <Button variant="ghost" onClick={() => router.push("/app/marketplace/cro")}>
                                             Skip for now
                                         </Button>
                                     }

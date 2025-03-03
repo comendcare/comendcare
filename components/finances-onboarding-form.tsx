@@ -77,7 +77,7 @@ export default function FinancesOnboardingForm(
         try {
             const response = await updateOrganization(formData, session.data.user.organizationId);
             toast.success("Organization updated successfully!");
-            router.push("/app/profile");
+            router.push("/app/marketplace/cro");
         } catch (error) {
             toast.error("Failed to update organization.");
         }
