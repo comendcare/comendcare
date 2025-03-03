@@ -1,35 +1,34 @@
+"use client"
 import React from "react";
-import {Review} from "@prisma/client";
+import {Review, User, Organization} from "@prisma/client";
+import {StarRatingIndicator} from "@/components/star-rating-indicator";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 
-export const CROReviewCard = ({review}: {review: Review}) => {
+interface ReviewWithAuthor extends Review {
+    author: User;
+    organization: Organization;
+}
+
+export const CROReviewCard = ({review}: {review: ReviewWithAuthor}) => {
     return (
         <article className="md:gap-8 md:grid md:grid-cols-3">
             <div>
                 <div className="flex items-center mb-6">
-                    <img
-                        className="w-10 h-10 rounded-full"
-                        src="/docs/images/people/profile-picture-5.jpg"
-                        alt="Jese Leos"
-                    />
+                    <Avatar className="h-10 w-10 rounded-full">
+                        <AvatarImage
+                            src={review.author.image || ""}
+                            alt={review.author.name || "Author name"}
+                        />
+                        <AvatarFallback className="rounded-lg">
+                            {review.author.name?.[0]}
+                        </AvatarFallback>
+                    </Avatar>
                     <div className="ms-4 font-medium dark:text-white">
-                        <p>Jese Leos</p>
+                        <p>
+                            {review.author.name}
+                        </p>
                         <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                            <svg
-                                aria-hidden="true"
-                                className="w-5 me-1.5"
-                                viewBox="0 0 18 13"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <rect x="0.053" width="17" height="12.143" rx="2" fill="white" />
-                                <path
-                                    fillRule="evenodd"
-                                    clipRule="evenodd"
-                                    d="M17.053 0H0.053V12.143H17.053V0Z"
-                                    fill="#D02F44"
-                                />
-                            </svg>
-                            United States
+                            {review.organization?.name}
                         </div>
                     </div>
                 </div>
@@ -61,6 +60,7 @@ export const CROReviewCard = ({review}: {review: Review}) => {
                 </ul>
             </div>
             <div className="col-span-2 mt-6 md:mt-0">
+                <StarRatingIndicator rating={4.3} />
                 <div className="flex items-start mb-5">
                     <div className="pe-4">
                         <footer>
@@ -69,7 +69,7 @@ export const CROReviewCard = ({review}: {review: Review}) => {
                             </p>
                         </footer>
                         <h4 className="text-xl font-bold text-gray-900 dark:text-white">
-                            Spotless, good appliances, excellent layout, host was genuinely nice and helpful.
+                            {review.title}
                         </h4>
                     </div>
                     <p className="bg-blue-700 text-white text-sm font-semibold inline-flex items-center p-1.5 rounded-sm">
@@ -77,10 +77,7 @@ export const CROReviewCard = ({review}: {review: Review}) => {
                     </p>
                 </div>
                 <p className="mb-2 text-gray-500 dark:text-gray-400">
-                    The flat was spotless, very comfortable, and the host was amazing. I highly recommend this accommodation for anyone visiting New York city centre.
-                </p>
-                <p className="mb-5 text-gray-500 dark:text-gray-400">
-                    It is obviously not the same build quality as those very expensive watches. But that is like comparing a Citroën to a Ferrari. This watch was well under £100! An absolute bargain.
+                    {review.body}
                 </p>
                 <aside className="flex items-center mt-3">
                     <a href="#" className="inline-flex items-center text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">

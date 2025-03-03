@@ -14,7 +14,6 @@ import PAGPublicRoadmapBreadcrumb from "@/components/pag-public-roadmap-breadcru
 import {Organization} from "@prisma/client";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
-import PublicProfileDropdown from "@/components/public-profile-dropdown";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
 import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
 import {Post} from "@/app/condition/[slug]/page";

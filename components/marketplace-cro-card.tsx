@@ -48,7 +48,6 @@ const companyTypeIcons: Record<string, JSX.Element> = {
 };
 
 export function CROMarketplaceCard({cro}: { cro: Company }) {
-    console.log(cro);
     const {id, title, description, companyType} = cro;
 
     const categoryCounts = countCategories(cro);

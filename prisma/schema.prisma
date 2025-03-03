@@ -370,7 +370,7 @@ model Organization {
   id                   String                    @id @default(cuid())
   public               Boolean                   @default(true)
   verified             Boolean                   @default(false)
-  published            Boolean                   @default(false)
+  published            Boolean                   @default(true)
   name                 String?
   description          String?                   @db.Text
   logo                 String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
@@ -410,6 +410,7 @@ model Organization {
   Kanban               Kanban?
   Milestone            Milestone[]
   PlatformNotification PlatformNotification[]
+  reviews              Review[]
 
   @@index([userId])
 }
@@ -607,6 +608,7 @@ model Company {
   certifications Certification[]
   rfis           RFI[]
   reviews        Review[]
+  avgRating      Float?          @default(0.0) // Stores the average rating of the company
 }
 
 model Site {
@@ -650,19 +652,22 @@ model RFI {
 }
 
 model Review {
-  id        String           @id @default(uuid())
-  title     String
-  body      String
-  authorId  String
-  author    User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  companyId String
-  company   Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  replies   Reply[]          @relation("ReviewToReply")
-  reports   ReportOnReview[]
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
+  id             String           @id @default(uuid())
+  title          String
+  body           String
+  rating         Float            @default(0.0) // Stores the rating given by the user (can be 1-5, 1-10, etc.)
+  authorId       String
+  author         User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  companyId      String
+  company        Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization?    @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  replies        Reply[]          @relation("ReviewToReply")
+  reports        ReportOnReview[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
-  @@unique([authorId, companyId]) // Ensures one review per user per company
+  @@unique([authorId, companyId, organizationId]) // Ensures one review per user per company per organization
 }
 
 model Reply {

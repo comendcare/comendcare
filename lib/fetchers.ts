@@ -90,7 +90,12 @@ export async function getCROData(id: string) {
                 }
             },
             rfis: true,
-            reviews: true
+            reviews: {
+                include: {
+                    author: true,
+                    organization: true
+                },
+            }
         }
     })
 }
