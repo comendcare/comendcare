@@ -8,6 +8,8 @@ import { OrganizationMarketplaceListElement } from "./marketplace-pag-list-eleme
 import InfiniteScroll from "./ui/infinite-scroll";
 import Image from "next/image";
 import ComendLoadingSpinner from "./comend-loading-spinner";
+import { useRoadmapStore } from "@/state/roadmap/roadmapStore";
+import { NoResultsView } from "./cro-search-results";
 
 const selector = (state: OrganizationSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -34,39 +36,22 @@ export function OrganizationSearchResults() {
 
         // default to grid view
         return (
-            <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
-                {searchResults.map((organization, index) => (
-                    <OrganizationMarketplaceCard organization={organization} key={index} />
-                ))}
-            </div>
-        )
-    }
-    
-    const NoResultsView = () => {
-        return (
-            <div className="h-full w-full flex flex-col mx-auto justify-center items-center align-center">
-                <Image
-                    alt="No organization"
-                    src="https://illustrations.popsy.co/gray/question-mark.svg"
-                    width={400}
-                    height={400}
-                    className="dark:hidden"
-                />
-                <Image
-                    alt="No organization"
-                    src="https://illustrations.popsy.co/white/question-mark.svg"
-                    width={400}
-                    height={400}
-                    className="hidden dark:block"
-                />
-                <p className="text-3xl p-10">
-                    {`Sorry, we don't have any results for that search`}
-                </p>
+            <div className="w-full flex flex-col gap-4">
+                <h1 className="text-xl">Results</h1>
+                {(!searchResults || searchResults.length === 0) ? (
+                    <NoResultsView />
+                ): (
+                    <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
+                        {searchResults.map((organization, index) => (
+                            <OrganizationMarketplaceCard organization={organization} key={index} />
+                        ))}
+                    </div>
+                )}
             </div>
         )
     }
 
-    return searchResults && (searchResults.length > 0) ? (
+    return (
         <>
             <ResultsView />
             <InfiniteScroll 
@@ -74,7 +59,5 @@ export function OrganizationSearchResults() {
                 setLastFetchedPage={setLastFetchedPage}
             />
         </>
-    ):(
-        <NoResultsView />
     )
 }
