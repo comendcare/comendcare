@@ -107,13 +107,13 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
     if (assets && rfps) {
         return (
             <Card className="organization-profile-tour-step5">
-                <CardHeader className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                    <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
-                        Milestones
-                    </CardTitle>
-                </CardHeader>
+                {/*<CardHeader className="flex flex-col md:flex-row items-center justify-between space-y-0">*/}
+                {/*    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">*/}
+                {/*        Milestones*/}
+                {/*    </CardTitle>*/}
+                {/*</CardHeader>*/}
 
-                <CardContent className="grid md:grid-cols-2 gap-4">
+                <CardContent className="grid md:grid-cols-2 gap-4 mt-8">
                     <div className="flex flex-col space-y-4">
                         <span className="flex gap-2">
                             <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
