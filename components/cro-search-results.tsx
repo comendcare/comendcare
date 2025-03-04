@@ -164,25 +164,51 @@ export function CROSearchResults() {
     
     const NoResultsView = () => {
         return (
-            <div className="h-full w-full flex flex-col mx-auto justify-center items-center align-center">
-                <Image
-                    alt="No organization"
-                    src="https://illustrations.popsy.co/gray/question-mark.svg"
-                    width={400}
-                    height={400}
-                    className="dark:hidden"
-                />
-                <Image
-                    alt="No organization"
-                    src="https://illustrations.popsy.co/white/question-mark.svg"
-                    width={400}
-                    height={400}
-                    className="hidden dark:block"
-                />
-                <p className="text-3xl p-10">
-                    {`Sorry, we don't have any results for that search`}
-                </p>
-            </div>
+            // <div className="h-full w-full flex flex-col mx-auto justify-center items-center align-center">
+            //     <Image
+            //         alt="No organization"
+            //         src="https://illustrations.popsy.co/gray/question-mark.svg"
+            //         width={400}
+            //         height={400}
+            //         className="dark:hidden"
+            //     />
+            //     <Image
+            //         alt="No organization"
+            //         src="https://illustrations.popsy.co/white/question-mark.svg"
+            //         width={400}
+            //         height={400}
+            //         className="hidden dark:block"
+            //     />
+            //     <p className="text-3xl p-10">
+            //         {`Sorry, we don't have any results for that search`}
+            //     </p>
+            // </div>
+            <Card className="w-full flex flex-col mx-auto justify-center items-center align-center">
+                <CardContent className="flex gap-4 p-4">
+                    <div>
+                        <Image
+                            alt="No recommendations"
+                            src="https://illustrations.popsy.co/white/question-mark.svg"
+                            width={300}
+                            height={300}
+                            className="dark:hidden"
+                        />
+                        <Image
+                            alt="No recommendations"
+                            src="https://illustrations.popsy.co/white/question-mark.svg"
+                            width={300}
+                            height={300}
+                            className="hidden dark:block"
+                        />
+                    </div>
+                    <div className="flex flex-col justify-center gap-4 items-start">
+                        <h2 className="text-xl">{`Sorry, we don't have any results for that search`}</h2>
+                        <p className="text-md">
+                            {`Please try another search.`}
+                        </p>
+                    </div>
+                </CardContent>
+            </Card>
         )
     }
 
