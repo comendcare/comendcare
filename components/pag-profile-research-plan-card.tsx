@@ -45,7 +45,7 @@ export const PAGProfileResearchPlanCard = ({ roadmapItems }: { roadmapItems: any
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
                     Research Plan
                 </CardTitle>
                 <Button

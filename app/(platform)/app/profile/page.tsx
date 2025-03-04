@@ -31,6 +31,7 @@ import NoOrganization from "@/components/no-organization";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
 import {PublishOrganizationSwitch} from "@/components/publish-organization-switch";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
+import {ProfileCompletionCard} from "@/components/profile-completion-card";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -141,7 +142,7 @@ export default async function ProfilePage() {
                                         className="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
                                         <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
                                             <div
-                                                className="flex flex-row items-baseline mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900 gap-x-2">
+                                                className="flex flex-row items-baseline mt-6 min-w-0 flex-1 truncate text-3xl font-bold text-gray-900 gap-x-2">
                                                 <HoverCard openDelay={0} closeDelay={0}>
                                                     <HoverCardTrigger asChild>
                                                         <h1 className="truncate">
@@ -231,6 +232,10 @@ export default async function ProfilePage() {
                                 {/*        </TabsTrigger>*/}
                                 {/*    </TabsList>*/}
                                 {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
+                                <ProfileCompletionCard
+                                    milestones={["Test", "Test 2", "Test 3", "Test 4", "Test 5", "Test 2"]}
+                                    completedCount={4}
+                                />
                                 <PAGProfileAssetsAndRFPsHoverableCard
                                     isPrivate={true}
                                     assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "ASSET")}
