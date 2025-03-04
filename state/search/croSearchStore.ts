@@ -147,6 +147,8 @@ export interface CROSearchState {
     setAllResults: (results: any[]) => void,
     searchResults: any[] | undefined
     setSearchResults: (results: any[]) => void
+    recommendations: any[] | undefined
+    setRecommendations: (results: any[]) => void
     filters: FiltersType,
     setFilters: (updatedFilters: FiltersType) => void
 }
@@ -177,7 +179,8 @@ export const useCROSearchStore = create<CROSearchState>()(
                     ...get(),
                     lastFetchedPage: page
                 }, false)
-                set({ lastFetchedPage: page, searchResults: updateSearchResults })
+                // TEMPORARY SOLUTION HERE: to add something to the recommendations section, remove setting recommendations here when fully implementing recommendations
+                set({ lastFetchedPage: page, searchResults: updateSearchResults, recommendations: updateSearchResults.slice(0, 6) })
             },
             view: 'grid',
             setView: (view: ViewType) => set({ view }),
@@ -185,6 +188,8 @@ export const useCROSearchStore = create<CROSearchState>()(
             setAllResults: (results: any[]) => set({ allResults: results }),
             searchResults: undefined,
             setSearchResults: (results: any[]) => set({ searchResults: results }),
+            recommendations: undefined,
+            setRecommendations: (results: any[]) => set({ recommendations: results }),
             filters: defaultFilters,
             setFilters: async (updatedFilters: FiltersType) => {
                 const newFilters = {
