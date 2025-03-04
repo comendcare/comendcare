@@ -148,11 +148,16 @@ export function CROSearchResults() {
                 <Separator />
 
                 <h1 className="text-xl">Results</h1>
-                <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
-                    {searchResults.map((cro, index) => (
-                        <CROMarketplaceCard cro={cro} key={index} />
-                    ))}
-                </div>
+
+                {(!searchResults || searchResults.length === 0) ? (
+                    <NoResultsView />
+                ): (
+                    <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
+                        {searchResults.map((cro, index) => (
+                            <CROMarketplaceCard cro={cro} key={index} />
+                        ))}
+                    </div>
+                )}
             </div>
         )
     }
@@ -181,7 +186,7 @@ export function CROSearchResults() {
         )
     }
 
-    return searchResults && (searchResults.length > 0) ? (
+    return (
         <>
             <ResultsView />
             <InfiniteScroll 
@@ -189,7 +194,5 @@ export function CROSearchResults() {
                 setLastFetchedPage={setLastFetchedPage}
             />
         </>
-    ):(
-        <NoResultsView />
     )
 }

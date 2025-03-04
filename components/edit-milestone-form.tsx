@@ -55,6 +55,11 @@ import MultipleSelector from "./ui/multiple-selector"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { SettingsProvider } from "./editor/settings"
 import { PlateEditor } from "./editor/plate-editor"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
+import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
+import { Card, CardContent } from "./ui/card"
+import Image from "next/image"
+import { CRORecommendationCard } from "./marketplace-cro-card"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -67,6 +72,10 @@ export const optionSchema = z.object({
 
 const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone
+})
+
+const CROSearchStoreSelector = (state: CROSearchState) => ({
+    recommendations: state.recommendations
 })
 
 const editMilestoneForm = z.object({
@@ -110,6 +119,7 @@ export function EditMilestoneForm({
     onClose: () => void
 }) {
     const {setMilestone} = useRoadmapStore(useShallow(selector))
+    const { recommendations } = useCROSearchStore(useShallow(CROSearchStoreSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
@@ -249,7 +259,7 @@ export function EditMilestoneForm({
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                    className="flex flex-col gap-8 mt-2 px-1"
+                    className="flex flex-col gap-4 mt-2 px-1"
                 >
                     <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
                         e.preventDefault()
@@ -260,156 +270,204 @@ export function EditMilestoneForm({
 
                     <EditTitle form={form}/>
 
-                    <FormItem>
-                        {/* <FormField
-                            control={form.control}
-                            name="nodeType"
-                            render={({field}) => (
-                                <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
-                                    <FormControl>
-                                        <ToggleGroup
-                                            type="single"
-                                            variant="outline"
-                                            value={field.value}
-                                            onValueChange={(value) => {
-                                                if (value) {
-                                                    field.onChange(value)
-                                                }
-                                            }}
-                                            className="w-full flex flex-wrap gap-2 justify-between"
-                                        >
-                                            {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
-                                                <ToggleGroupItem
-                                                    key={value}
-                                                    value={value}
-                                                    className={"text-md grow flex gap-2"}
-                                                >
-                                                    {label}
-                                                    <Tooltip>
-                                                        <TooltipTrigger>
-                                                            <FaInfoCircle/>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent className="max-w-80 text-wrap text-left">
-                                                            {description}
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </ToggleGroupItem>
-                                            ))}
-                                        </ToggleGroup>
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        /> */}
+                    <Tabs defaultValue="edit" className="space-y-4 w-full">
+                        <TabsList>
+                            <TabsTrigger value="edit">
+                                Edit
+                            </TabsTrigger>
+                            <TabsTrigger value="recommendations">
+                                Recommendations
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="edit" className="space-y-4 w-full">
+                            <FormItem>
+                            {/* <FormField
+                                control={form.control}
+                                name="nodeType"
+                                render={({field}) => (
+                                    <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
+                                        <FormControl>
+                                            <ToggleGroup
+                                                type="single"
+                                                variant="outline"
+                                                value={field.value}
+                                                onValueChange={(value) => {
+                                                    if (value) {
+                                                        field.onChange(value)
+                                                    }
+                                                }}
+                                                className="w-full flex flex-wrap gap-2 justify-between"
+                                            >
+                                                {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
+                                                    <ToggleGroupItem
+                                                        key={value}
+                                                        value={value}
+                                                        className={"text-md grow flex gap-2"}
+                                                    >
+                                                        {label}
+                                                        <Tooltip>
+                                                            <TooltipTrigger>
+                                                                <FaInfoCircle/>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent className="max-w-80 text-wrap text-left">
+                                                                {description}
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </ToggleGroupItem>
+                                                ))}
+                                            </ToggleGroup>
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            /> */}
 
-                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
-                            <FormLabel className="text-md mt-2">Visibility</FormLabel>
-                            <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                        </FormItem>
+                            <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
+                                <FormLabel className="text-md mt-2">Visibility</FormLabel>
+                                <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
+                            </FormItem>
 
-                        <FormField
-                            control={form.control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
-                                    <FormLabel className="text-md mt-2">
-                                        {`Description`}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            id="description"
-                                            placeholder={`Enter a description...`}
-                                            defaultValue={field.value}
-                                            {...field}
-                                            className="border-transparent hover:border-input"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                            <FormField
+                                control={form.control}
+                                name="description"
+                                render={({field}) => (
+                                    <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                        <FormLabel className="text-md mt-2">
+                                            {`Description`}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                id="description"
+                                                placeholder={`Enter a description...`}
+                                                defaultValue={field.value}
+                                                {...field}
+                                                className="border-transparent hover:border-input"
+                                            />
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
 
-                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-4 items-center">
-                            <div>
-                            <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
-                            {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
-                            </div>
-                            <MilestoneTypeFormField form={form}/>
+                            <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-4 items-center">
+                                <div>
+                                <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
+                                {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
+                                </div>
+                                <MilestoneTypeFormField form={form}/>
 
-                            {formData.nodeType === "ASSET" && (
-                                <>
-                                    <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
-                                    <BudgetFormField form={form}/>
-                                </>
-                            )}
+                                {formData.nodeType === "ASSET" && (
+                                    <>
+                                        <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
+                                        <BudgetFormField form={form}/>
+                                    </>
+                                )}
+
+                                {formData.nodeType === "PROJECT" && (
+                                    <>
+                                        <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
+                                        <StatusFormField form={form}/>
+
+                                        <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                        <BudgetFormField form={form}/>
+                                    </>
+                                )}
+
+                                {formData.nodeType === "RFP" && (
+                                    <>
+                                        <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                        <BudgetFormField form={form}/>
+
+                                        <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
+                                        <OpenToFormField form={form}/>
+                                    </>
+                                )}
+                            </FormItem>
 
                             {formData.nodeType === "PROJECT" && (
-                                <>
-                                    <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
-                                    <StatusFormField form={form}/>
-
-                                    <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                    <BudgetFormField form={form}/>
-                                </>
+                                <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
                             )}
 
                             {formData.nodeType === "RFP" && (
-                                <>
-                                    <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                    <BudgetFormField form={form}/>
-
-                                    <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
-                                    <OpenToFormField form={form}/>
-                                </>
+                                <TimelineFormField form={form} startLabel={"Request Opens"}
+                                                endLabel={"Deadline for Proposals"}/>
                             )}
-                        </FormItem>
-
-                        {formData.nodeType === "PROJECT" && (
-                            <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
-                        )}
-
-                        {formData.nodeType === "RFP" && (
-                            <TimelineFormField form={form} startLabel={"Request Opens"}
-                                               endLabel={"Deadline for Proposals"}/>
-                        )}
-                    </FormItem>
-
-                    <ContactsFormField form={form}/>
-
-                    <AttachmentsFormField
-                        form={form}
-                        attachments={formData.attachments as AttachmentType[]}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="notes"
-                        render={({field}) => (
-                            <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
-                                <FormLabel
-                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
-                                >
-                                    {`Notes`}
-                                    <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
-                                </FormLabel>
-                                <FormControl>
-                                    <div className="w-full col-span-2" data-registry="plate">
-                                        <SettingsProvider>
-                                            <PlateEditor
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                            />
-                                        </SettingsProvider>
-                                    </div>
-                                </FormControl>
-                                <FormMessage/>
                             </FormItem>
-                        )}
-                    />
 
-                    <span className="h-4">
+                            <ContactsFormField form={form}/>
 
-                    </span>
+                            <AttachmentsFormField
+                                form={form}
+                                attachments={formData.attachments as AttachmentType[]}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="notes"
+                                render={({field}) => (
+                                    <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                        <FormLabel
+                                            className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
+                                        >
+                                            {`Notes`}
+                                            <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
+                                        </FormLabel>
+                                        <FormControl>
+                                            <div className="w-full col-span-2" data-registry="plate">
+                                                <SettingsProvider>
+                                                    <PlateEditor
+                                                        value={field.value}
+                                                        onChange={field.onChange}
+                                                    />
+                                                </SettingsProvider>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                        </TabsContent>
+                        <TabsContent value="recommendations" className="space-y-4 w-full">
+                            {(!recommendations || recommendations.length === 0) && (
+                                <Card className="w-full flex flex-col mx-auto justify-center items-center align-center">
+                                    <CardContent className="flex flex-col gap-4 p-4">
+                                        <h2 className="text-xl">{`Sorry, we don't have any recommendations for this milestone`}</h2>
+                                        <div className="flex justify-center">
+                                            <Image
+                                                alt="No recommendations"
+                                                src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                                width={300}
+                                                height={300}
+                                                className="dark:hidden"
+                                            />
+                                            <Image
+                                                alt="No recommendations"
+                                                src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                                width={300}
+                                                height={300}
+                                                className="hidden dark:block"
+                                            />
+                                        </div>
+                                        <p className="text-md">
+                                            {`Please add more information to your milestone to generate some recommendations.`}
+                                        </p>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* {recommendations && recommendations.length > 0 && (
+                                <>
+                                    <div className={cn("w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3")}>
+                                        {(recommendations || []).map((result, index) => (
+                                            <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
+                                        ))}
+                                    </div>
+                                </>
+                            )} */}
+                        </TabsContent>
+                    </Tabs>
+
+                    <span className="h-8" />
 
                     <span className="flex justify-end gap-4 flex-wrap absolute bottom-0 right-0 mx-4 my-2">
                         <Dialog>
