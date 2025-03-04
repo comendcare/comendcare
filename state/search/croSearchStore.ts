@@ -180,6 +180,7 @@ export const useCROSearchStore = create<CROSearchState>()(
                             nodeType: "PROJECT"
                         }
                     })) 
+                    // recommendations: []
                 })
             },
             sortBy: undefined,
