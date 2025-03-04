@@ -163,6 +163,7 @@ export const useCROSearchStore = create<CROSearchState>()(
     temporal((set, get) => ({
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
+                console.log(`set search term`)
                 const newSearchResults = await getUpdatedSearchResults({
                     ...get(),
                     searchTerm: newSearch,
