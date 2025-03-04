@@ -157,9 +157,6 @@ export default function UserProfilePage() {
 
                     <Card>
                         <CardHeader>
-                            {/* <img className="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32"
-                                 src={getUserPhoto(user, session)}
-                                 alt=""/> */}
                             <ProfilePhoto
                                 img={user?.image}
                                 name={user?.name}
