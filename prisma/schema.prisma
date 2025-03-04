@@ -615,7 +615,7 @@ model Site {
   id        String  @id @default(uuid())
   name      String
   address   String
-  company   Company @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
 }
 
@@ -623,14 +623,14 @@ model Service {
   id          String  @id @default(uuid())
   name        String
   description String?
-  company     Company @relation(fields: [companyId], references: [id])
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId   String
 }
 
 model Certification {
   id        String  @id @default(uuid())
   name      String
-  company   Company @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
   files     File[]
 }
@@ -639,7 +639,7 @@ model File {
   id              String        @id @default(uuid())
   fileName        String
   fileUrl         String
-  certification   Certification @relation(fields: [certificationId], references: [id])
+  certification   Certification @relation(fields: [certificationId], references: [id], onDelete: Cascade)
   certificationId String
 }
 
@@ -647,7 +647,7 @@ model RFI {
   id          String    @id @default(uuid())
   name        String
   submittedOn DateTime?
-  company     Company   @relation(fields: [companyId], references: [id])
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId   String
 }
 
