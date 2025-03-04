@@ -81,7 +81,7 @@ export default async function CompanyHomePage({
     return (
         <TooltipProvider>
             <div
-                className="flex flex-col w-full max-w-7xl mx-auto p-4 gap-4"
+                className="flex flex-col w-full max-w-7xl mx-auto p-8 gap-4"
             >
                 <Link
                     href={
@@ -223,7 +223,7 @@ export default async function CompanyHomePage({
                         {/*    <CROMarketplaceProfileCertificationsTab croCertifications={cro.certifications}/>*/}
                         {/*</TabsContent>*/}
                         <TabsContent value="reviews" className="space-y-4 w-full">
-                            <CROMarketplaceProfileReviewsTab cro={cro}/>
+                            <CROMarketplaceProfileReviewsTab cro={cro as any}/>
                         </TabsContent>
                     </Tabs>
                 </main>

@@ -229,10 +229,10 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 <DialogContent className="max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
-                            Edit organization profile
+                            Edit condition
                         </DialogTitle>
                         <DialogDescription>
-                            {`Make changes to your profile here. Click save when you're done.`}
+                            {`Make changes to your condition here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
                     <Form {...editResearchForm}>

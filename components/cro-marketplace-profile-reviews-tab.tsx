@@ -14,7 +14,7 @@ interface CompanyWithReviews extends Company {
 
 export default function CROMarketplaceProfileReviewsTab({cro}: { cro: CompanyWithReviews }) {
     return (
-        <div>
+        <div className="pt-4 pb-8">
             <div className="grid grid-cols-3 gap-8">
                 <div className="col-span-1">
                     <CRORatingSection/>
