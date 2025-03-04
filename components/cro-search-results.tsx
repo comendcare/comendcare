@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import InfiniteScroll from "./ui/infinite-scroll";
@@ -8,6 +8,13 @@ import Image from "next/image";
 import ComendLoadingSpinner from "./comend-loading-spinner";
 import {CROMarketplaceCard} from "@/components/marketplace-cro-card";
 import {CROMarketplaceListElement} from "@/components/marketplace-cro-list-element";
+import { Separator } from "./ui/separator";
+import { cn } from "@/lib/utils";
+import { Button, buttonVariants } from "./ui/button";
+import Link from "next/link";
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import { FaQuestion } from "react-icons/fa6";
 
 const selector = (state: CROSearchState) => ({
     lastFetchedPage: state.lastFetchedPage,
@@ -16,8 +23,21 @@ const selector = (state: CROSearchState) => ({
     searchResults: state.searchResults
 })
 
+const researchPlanSelector = (state: RoadmapState) => ({
+    roadmapId: state.roadmapId
+})
+
 export function CROSearchResults() {
-    const { lastFetchedPage, setLastFetchedPage, view, searchResults } = useCROSearchStore(useShallow(selector))
+    const { 
+        lastFetchedPage, 
+        setLastFetchedPage, 
+        view, 
+        searchResults 
+    } = useCROSearchStore(useShallow(selector))
+    const {
+        roadmapId
+    } = useRoadmapStore(useShallow(researchPlanSelector))
+    const [recommendationsIsExpanded, setRecommendationsIsExpanded] = useState(false)
 
     if (!searchResults) return <ComendLoadingSpinner />
 
@@ -34,10 +54,71 @@ export function CROSearchResults() {
 
         // default to grid view
         return (
-            <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
-                {searchResults.map((cro, index) => (
-                    <CROMarketplaceCard cro={cro} key={index} />
-                ))}
+            <div className="w-full flex flex-col gap-4">
+                <h1 className="text-3xl">Recommendations</h1>
+                <div className="relative flex flex-col gap-2 items-start">
+                    <div className={cn(
+                        "w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3"
+                        
+                    )}>
+                        {(recommendationsIsExpanded ? searchResults : searchResults.slice(0, 2)).map((cro, index) => (
+                            <CROMarketplaceCard cro={cro} key={index} />
+                        ))}
+                    </div>
+                    {recommendationsIsExpanded ? (
+                        <Button 
+                            variant={"link"} 
+                            onClick={() => setRecommendationsIsExpanded(false)}
+                            className="text-lg"
+                        >
+                            Show less...
+                        </Button>
+                    ): (
+                        <Button 
+                            variant={"link"} 
+                            onClick={() => setRecommendationsIsExpanded(true)}
+                            className="text-lg"
+                        >
+                            See all recommendations...
+                        </Button>
+                    )}
+
+                    {!roadmapId && (
+                        <div className="absolute inset-0 bg-black/10 backdrop-blur flex items-center justify-center p-4 rounded-md">
+                            <div className="grid w-full max-w-xl p-4 gap-4 rounded-lg bg-white shadow-lg">
+                                <div className="flex flex-col gap-4 justify-center items-center">
+                                    {/* <h2 className="text-lg">Create your research plan to unlock recommendations.</h2> */}
+                                    <h2 className="text-lg">
+                                        Start a research plan to view recommendations
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <FaQuestion />
+                                            </TooltipTrigger>
+                                            <TooltipContent className="max-w-80">
+                                                <p>
+                                                    {`In order to generate quality recommendations, Comend needs to know a bit about you! Create your research plan to unlock the full marketplace functionality.`}
+                                                </p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </h2>
+                                    {/* <p className="text-sm">In order to generate quality recommendations, Comend needs to know a bit about you! Create your research plan to unlock the full marketplace functionality.</p> */}
+                                    <Link href="/app/research-plan">
+                                        <Button className="text-lg">Create research plan</Button>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <Separator />
+
+                <h1 className="text-3xl">Results</h1>
+                <div className="w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3">
+                    {searchResults.map((cro, index) => (
+                        <CROMarketplaceCard cro={cro} key={index} />
+                    ))}
+                </div>
             </div>
         )
     }
