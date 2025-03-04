@@ -19,41 +19,41 @@ import { FaInfoCircle } from "react-icons/fa";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { nanoid } from "nanoid";
 
-const sampleCROs = [
-    {
-        content: {
-            id: nanoid(),
-            title: "Sample CRO 1",
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-            url: "comend.io",
-            scientistDotComURL: null,
-            yearEstablished: 2023,
-            website: "https://comend.io/",
-            headquarters: "Austin, Texas",
-            companyType: "startup",
-        },
-        milestone: {
-            nodeType: "RFP",
-            title: "Sample Milestone 1"
-        }
-    },
-    {
-        content: {
-            id: nanoid(),
-            title: "Sample CRO 2",
-            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-            url: "comend.io",
-            scientistDotComURL: null,
-            yearEstablished: 2023,
-            website: "https://comend.io/",
-            headquarters: "Toronto, Ontario",
-            companyType: "startup",
-        },
-        milestone: {
-            nodeType: "PROJECT",
-            title: "Sample Milestone 2"
-        }
-    }
+const sampleCROs: any[] = [
+    // {
+    //     content: {
+    //         id: nanoid(),
+    //         title: "Sample CRO 1",
+    //         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    //         url: "comend.io",
+    //         scientistDotComURL: null,
+    //         yearEstablished: 2023,
+    //         website: "https://comend.io/",
+    //         headquarters: "Austin, Texas",
+    //         companyType: "startup",
+    //     },
+    //     milestone: {
+    //         nodeType: "RFP",
+    //         title: "Sample Milestone 1"
+    //     }
+    // },
+    // {
+    //     content: {
+    //         id: nanoid(),
+    //         title: "Sample CRO 2",
+    //         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    //         url: "comend.io",
+    //         scientistDotComURL: null,
+    //         yearEstablished: 2023,
+    //         website: "https://comend.io/",
+    //         headquarters: "Toronto, Ontario",
+    //         companyType: "startup",
+    //     },
+    //     milestone: {
+    //         nodeType: "PROJECT",
+    //         title: "Sample Milestone 2"
+    //     }
+    // }
 ]
 
 const selector = (state: CROSearchState) => ({
