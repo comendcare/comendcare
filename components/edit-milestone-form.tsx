@@ -74,9 +74,9 @@ const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone
 })
 
-const CROSearchStoreSelector = (state: CROSearchState) => ({
-    recommendations: state.recommendations
-})
+// const CROSearchStoreSelector = (state: CROSearchState) => ({
+//     recommendations: state.recommendations
+// })
 
 const editMilestoneForm = z.object({
     nodeType: z.string(),
@@ -119,7 +119,7 @@ export function EditMilestoneForm({
     onClose: () => void
 }) {
     const {setMilestone} = useRoadmapStore(useShallow(selector))
-    const { recommendations } = useCROSearchStore(useShallow(CROSearchStoreSelector))
+    // const { recommendations } = useCROSearchStore(useShallow(CROSearchStoreSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
@@ -427,7 +427,7 @@ export function EditMilestoneForm({
                                 )}
                             />
                         </TabsContent>
-                        <TabsContent value="recommendations" className="space-y-4 w-full">
+                        {/* <TabsContent value="recommendations" className="space-y-4 w-full">
                             {(!recommendations || recommendations.length === 0) && (
                                 <Card className="w-full flex flex-col mx-auto justify-center items-center align-center">
                                     <CardContent className="flex flex-col gap-4 p-4">
@@ -455,7 +455,7 @@ export function EditMilestoneForm({
                                 </Card>
                             )}
 
-                            {/* {recommendations && recommendations.length > 0 && (
+                            {recommendations && recommendations.length > 0 && (
                                 <>
                                     <div className={cn("w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3")}>
                                         {(recommendations || []).map((result, index) => (
@@ -463,8 +463,8 @@ export function EditMilestoneForm({
                                         ))}
                                     </div>
                                 </>
-                            )} */}
-                        </TabsContent>
+                            )}
+                        </TabsContent> */}
                     </Tabs>
 
                     <span className="h-8" />
