@@ -6,7 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 import InfiniteScroll from "./ui/infinite-scroll";
 import Image from "next/image";
 import ComendLoadingSpinner from "./comend-loading-spinner";
-import {CROMarketplaceCard} from "@/components/marketplace-cro-card";
+import {CROMarketplaceCard, CRORecommendationCard} from "@/components/marketplace-cro-card";
 import {CROMarketplaceListElement} from "@/components/marketplace-cro-list-element";
 import { Separator } from "./ui/separator";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,7 @@ import { FaQuestion } from "react-icons/fa6";
 import { FaInfoCircle } from "react-icons/fa";
 
 const selector = (state: CROSearchState) => ({
+    recommendations: state.recommendations,
     lastFetchedPage: state.lastFetchedPage,
     setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
@@ -30,6 +31,7 @@ const researchPlanSelector = (state: RoadmapState) => ({
 
 export function CROSearchResults() {
     const { 
+        recommendations,
         lastFetchedPage, 
         setLastFetchedPage, 
         view, 
@@ -62,8 +64,8 @@ export function CROSearchResults() {
                         "w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3"
                         
                     )}>
-                        {(recommendationsIsExpanded ? searchResults : searchResults.slice(0, 2)).map((cro, index) => (
-                            <CROMarketplaceCard cro={cro} key={index} />
+                        {(recommendationsIsExpanded ? recommendations || [] : (recommendations || []).slice(0, 2)).map((result, index) => (
+                            <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
                         ))}
                     </div>
                     {recommendationsIsExpanded ? (

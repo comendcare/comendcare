@@ -10,10 +10,11 @@ import {cn, formatMoney, truncate} from "@/lib/utils";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {Separator} from "@/components/ui/separator";
 import {BookCheck, Paperclip, TestTube, UserCheck} from "lucide-react";
-import {CardContents, TypeBadge} from "@/components/private-milestone-node";
+import {CardContents} from "@/components/private-milestone-node";
 import { PrivateBadge } from "./private-badge";
 import { PublicMilestoneNode } from "./public-milestone-node";
 import { NodeProps } from "@xyflow/react";
+import { TypeBadge } from "./type-badge";
 
 const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
     PLANNED: {

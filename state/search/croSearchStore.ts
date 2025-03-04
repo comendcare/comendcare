@@ -1,4 +1,5 @@
 import { typesense } from '@/lib/typesense';
+import { Milestone } from '@prisma/client';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 
@@ -134,6 +135,11 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
     }
 };
 
+export type Recommendation = {
+    content: any
+    milestone: Milestone
+}
+
 export interface CROSearchState {
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
@@ -147,7 +153,7 @@ export interface CROSearchState {
     setAllResults: (results: any[]) => void,
     searchResults: any[] | undefined
     setSearchResults: (results: any[]) => void
-    recommendations: any[] | undefined
+    recommendations: Recommendation[] | undefined
     setRecommendations: (results: any[]) => void
     filters: FiltersType,
     setFilters: (updatedFilters: FiltersType) => void
@@ -162,7 +168,19 @@ export const useCROSearchStore = create<CROSearchState>()(
                     searchTerm: newSearch,
                     lastFetchedPage: 1,
                 }, true)
-                set({ searchTerm: newSearch, searchResults: newSearchResults, lastFetchedPage: 1 })
+                set({ 
+                    searchTerm: newSearch, 
+                    searchResults: newSearchResults, 
+                    lastFetchedPage: 1,
+                    // TEMPORARY SOLUTION HERE: to add something to the recommendations section, remove setting recommendations here when fully implementing recommendations
+                    recommendations: newSearchResults.slice(0, 6).map((result: any) => ({
+                        content: result,
+                        milestone: {
+                            title: "Sample milestone",
+                            nodeType: "PROJECT"
+                        }
+                    })) 
+                })
             },
             sortBy: undefined,
             setSortBy: async (sortBy: string | undefined) => {
@@ -179,8 +197,7 @@ export const useCROSearchStore = create<CROSearchState>()(
                     ...get(),
                     lastFetchedPage: page
                 }, false)
-                // TEMPORARY SOLUTION HERE: to add something to the recommendations section, remove setting recommendations here when fully implementing recommendations
-                set({ lastFetchedPage: page, searchResults: updateSearchResults, recommendations: updateSearchResults.slice(0, 6) })
+                set({ lastFetchedPage: page, searchResults: updateSearchResults })
             },
             view: 'grid',
             setView: (view: ViewType) => set({ view }),

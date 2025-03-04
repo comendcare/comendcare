@@ -4,13 +4,13 @@ import React from "react"
 import {getDates} from "./pag-profile-research-plan-card"
 import {PrivateBadge} from "./private-badge"
 import {FaArrowUpRightFromSquare} from "react-icons/fa6"
-import { TypeBadge } from "./private-milestone-node"
 import { cn } from "@/lib/utils"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "./ui/button"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { ScrollArea } from "./ui/scroll-area"
+import { TypeBadge } from "./type-badge"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
