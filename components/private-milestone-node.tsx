@@ -51,6 +51,7 @@ import {Popover} from "./plate-ui/popover"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {PublicMilestoneNode} from "./public-milestone-node"
+import { TypeBadge } from "./type-badge"
 // import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export type PrivateMilestoneNode = Node<
@@ -270,43 +271,6 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
             )}
         </Handle>
     )
-}
-
-export const TypeBadge = ({type, iconOnly = false, className}: {
-    type: string,
-    iconOnly?: boolean,
-    className?: string
-}) => {
-    if (type === "ASSET") {
-        return (
-            <Badge variant="outline"
-                   className={cn("h-8 text-sm flex gap-2 border-asset-foreground text-asset-foreground bg-asset", className)}>
-                <FaStar/>
-                {!iconOnly && "Asset"}
-            </Badge>
-        )
-    }
-
-    if (type === "PROJECT") {
-        return (
-            <Badge variant="outline"
-                   className={cn("h-8 text-sm flex gap-2 border-project-foreground text-project-foreground bg-project", className)}>
-                <FaFileLines/>
-                {!iconOnly && "Project"}
-            </Badge>
-        )
-    }
-
-    if (type === "RFP") {
-        return (
-            <Badge variant="outline" className={cn("h-8 text-sm flex gap-2 border-rfp-foreground text-rfp-foreground bg-rfp", className)}>
-                <FaBullhorn/>
-                {!iconOnly && "RFP"}
-            </Badge>
-        )
-    }
-
-    return
 }
 
 export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | PublicMilestoneNode> }) => {

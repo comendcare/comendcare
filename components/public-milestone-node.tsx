@@ -14,7 +14,8 @@ import { truncate, cn } from "@/lib/utils"
 import { PrivateBadge } from "./private-badge"
 import { Badge } from "./ui/badge"
 import { MILESTONE_TYPE_OPTIONS, StatusType } from "@/lib/types"
-import { CardContents, TypeBadge } from "./private-milestone-node"
+import { CardContents } from "./private-milestone-node"
+import { TypeBadge } from "./type-badge"
 
 export type PublicMilestoneNode = Node<
     {
