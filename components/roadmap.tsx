@@ -222,7 +222,7 @@ export function Roadmap({data}: {data: any}) {
                         <ResizablePanel
                             defaultSize={40}
                             minSize={25}
-                            className="h-full flex flex-col"
+                            className="bg-white h-full flex flex-col"
                         >
                             <MilestoneDetailsPanel
                                 remountKey={milestoneRemountKey}

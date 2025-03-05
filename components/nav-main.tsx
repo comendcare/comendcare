@@ -24,9 +24,10 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import Link from "next/link"
-import {FaBell, FaCircle, FaPlus} from "react-icons/fa6"
+import {FaBell, FaCaretLeft, FaCircle, FaPlus} from "react-icons/fa6"
 import {NotificationsState, useNotificationsStore} from "@/state/notifications/notificationsStore"
 import {useShallow} from "zustand/react/shallow"
+import { cn } from "@/lib/utils"
 
 type Item = {
     title: string
@@ -79,9 +80,10 @@ export function NavMain({items}: { items: Item[] }) {
                             ) : (
                                 <SidebarMenuButton
                                     asChild
-                                    className={isActive ? "bg-muted text-primary" : ""}
+                                    // className={isActive ? "bg-muted text-primary" : ""}
+                                    className={cn(isActive ? "text-blue-dark": "")}
                                 >
-                                    <a href={item.url}>
+                                    <a href={item.url} className="flex">
                                         <div className="relative">
                                             {item.icon && <item.icon className="mr-2 h-4 w-4"/>}
                                             {state === "collapsed" &&
@@ -92,6 +94,7 @@ export function NavMain({items}: { items: Item[] }) {
                                         {state === "expanded" &&
                                             <NavNotificationExpandedIcon item={item}/>
                                         }
+                                        {isActive && <FaCaretLeft className="text-blue-700 h-24 w-24 ml-auto"/>}
                                     </a>
                                 </SidebarMenuButton>
                             )}
