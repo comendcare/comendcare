@@ -404,7 +404,7 @@ export const PrivateFlowView = ({
                 >
                     Browse milestone library
                 </Button>
-                <Button className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>
+                <Button variant={"cta"} className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>
                     <FaPlus />
                     Create milestone
                 </Button>
