@@ -156,7 +156,7 @@ export function CROSearchResults() {
                                             </Tooltip>
                                         </h2>
                                         <Link href="/app/research-plan">
-                                            <Button className="text-md">Create research plan</Button>
+                                            <Button variant={"cta"} className="text-md">Create research plan</Button>
                                         </Link>
                                     </div>
                                 </div>
@@ -171,14 +171,14 @@ export function CROSearchResults() {
                                     <div>
                                         <Image
                                             alt="No recommendations"
-                                            src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                            src="https://illustrations.popsy.co/white/team-idea.svg"
                                             width={400}
                                             height={400}
                                             className="dark:hidden"
                                         />
                                         <Image
                                             alt="No recommendations"
-                                            src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                            src="https://illustrations.popsy.co/white/team-idea.svg"
                                             width={400}
                                             height={400}
                                             className="hidden dark:block"
@@ -190,7 +190,7 @@ export function CROSearchResults() {
                                             {`Please add more information to your research plan to generate some recommendations.`}
                                         </p>
                                         <Link href="/app/research-plan">
-                                            <Button className="text-md">Edit research plan</Button>
+                                            <Button variant={"cta"} className="text-md">Edit research plan</Button>
                                         </Link>
                                     </div>
                                 </CardContent>

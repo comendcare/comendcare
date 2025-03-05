@@ -63,7 +63,7 @@ export function MarketplaceNav({
                                 "flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
                                 pathname?.endsWith(link.href) ||
                                 (index === 0 && pathname === "/")
-                                    ? "bg-muted font-medium text-primary"
+                                    ? "bg-blue-light font-medium text-primary"
                                     : "text-muted-foreground",
                                 link.comingSoon ? "pointer-events-none opacity-60" : "" // Disable click and add opacity
                             )}

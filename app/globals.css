@@ -139,20 +139,15 @@ h6 {
 /* default shadcn theme */
 @layer base {
     :root {
-        --background: 0 0% 98%;
+        --background: 0 0% 100%;
+        --secondary-background: 0 0% 98%;
         --foreground: 0 0% 3.9%;
         --card: 0 0% 100%;
         --card-foreground: 0 0% 3.9%;
         --popover: 0 0% 100%;
         --popover-foreground: 0 0% 3.9%;
         --primary: 0 0% 9%;
-        /* --primary: 193 71% 20%; */
-        /* --primary: 180 100% 19%; */
-        /* --primary: 236 80% 37%; */
-        /* --primary: 199 47% 32%; */
         --primary-foreground: 0 0% 98%;
-        /* --primary: 200 95% 14%; */
-        /* --primary-foreground: 0 0% 98%; */
         --secondary: 0 0% 96.1%;
         --secondary-foreground: 0 0% 9%;
         --muted: 0 0% 96.1%;
@@ -161,6 +156,8 @@ h6 {
         --accent-foreground: 0 0% 9%;
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 0 0% 98%;
+        /* --destructive: 359 49% 37%;
+        --destructive-foreground: 0 100% 96%; */
         --border: 0 0% 89.8%;
         --input: 0 0% 89.8%;
         --ring: 0 0% 3.9%;
@@ -178,40 +175,29 @@ h6 {
         --seagull: 197 71% 73%;
         --magic-mint: 139 68% 73%;
         --sidebar-background: 0 0% 100%;
-        /* --sidebar-background: 200 95% 14%; */
         --sidebar-foreground: 240 5.3% 26.1%;
-        /* --sidebar-foreground: 0 0% 98%;  */
         --sidebar-primary: 240 5.9% 10%;
         --sidebar-primary-foreground: 0 0% 98%;
         --sidebar-accent: 240 4.8% 95.9%;
         --sidebar-accent-foreground: 240 5.9% 10%;
         --sidebar-border: 220 13% 91%;
         --sidebar-ring: 217.2 91.2% 59.8%;
-
-
-      /* green = asset, purple = project, light blue = RFP */
         --asset: 136 50% 96%;
         --asset-foreground: 144 68% 20%;
-        /* --project: 265 40% 94%;
-        --project-foreground: 266 45% 45%;
-        --rfp: 201 100% 93%;
-        ---rfp-foreground: 197 90% 32%; */
-
-        /* shrek green = asset, pink = project, orange = RFP */
-        /* --asset: 68 69% 98%;
-        --asset-foreground: 69 70% 28%; */
         --project: 323 60% 97%;
         --project-foreground: 325 33% 44%;
         --rfp: 33, 100%, 96%;
         --rfp-foreground: 17, 88%, 40%;
         
         --planned: 0 100% 96%;
-        --planned-foreground: 359 49% 40%;
-        --inprogress: 41 100% 93%;
-        --inprogress-foreground: 39 60% 44%;
-        --completed: 215 92% 95%;
-        --completed-foreground: 222, 44%, 37%;
+        --planned-foreground: 359 49% 37%;
+        --inprogress: 46 100% 95%;
+        --inprogress-foreground: 35 54% 28%;
+        --completed: 136 48% 91%;
+        --completed-foreground: 144 68% 20%;
 
+        /* --blue-dark: 226, 71%, 40%;
+        --blue-light: 214, 95%, 93%; */
         --blue-dark: 226, 71%, 40%;
         --blue-light: 214, 95%, 93%;
     }
