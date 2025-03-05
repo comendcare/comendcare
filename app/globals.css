@@ -196,10 +196,17 @@ h6 {
         --completed: 136 48% 91%;
         --completed-foreground: 144 68% 20%;
 
-        /* --blue-dark: 226, 71%, 40%;
-        --blue-light: 214, 95%, 93%; */
         --blue-dark: 226, 71%, 40%;
+        /* --blue-dark: 0 0% 9%; */
+        /* Light Blue */
         --blue-light: 214, 95%, 93%;
+
+        /* Comend Blue */
+        /* --blue-light: 198 65% 79%; */
+
+        /* Comend Green */
+        /* --blue-light: 137 68% 79%; */
+        
     }
     .dark {
         --background: 0 0% 3.9%;
