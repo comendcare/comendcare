@@ -603,12 +603,13 @@ model Company {
   headquarters       String?
   companyType        String?
 
-  sites          Site[]
-  services       Service[]
-  certifications Certification[]
-  rfis           RFI[]
-  reviews        Review[]
-  avgRating      Float?          @default(0.0) // Stores the average rating of the company
+  sites                    Site[]
+  services                 Service[]
+  certifications           Certification[]
+  simplifiedCertifications String[]
+  rfis                     RFI[]
+  reviews                  Review[]
+  avgRating                Float?          @default(0.0) // Stores the average rating of the company
 }
 
 model Site {

@@ -63,6 +63,8 @@ async function main() {
                         })) || [],
                     },
 
+                    simplifiedCertifications: company.simplifiedCertifications,
+
                     rfis: {
                         create: company.rfis?.map((rfi: any) => ({
                             name: rfi.name,
