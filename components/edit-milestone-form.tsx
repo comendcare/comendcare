@@ -59,7 +59,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
 import { Card, CardContent } from "./ui/card"
 import Image from "next/image"
-import { CRORecommendationCard } from "./marketplace-cro-card"
+import { CROMarketplaceCard, CRORecommendationCard } from "./marketplace-cro-card"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -457,9 +457,10 @@ export function EditMilestoneForm({
 
                             {recommendations && recommendations.length > 0 && (
                                 <>
-                                    <div className={cn("w-full grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3")}>
+                                    <div className={cn("w-full grid gap-4 grid-cols-1")}>
                                         {(recommendations || []).map((result, index) => (
-                                            <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
+                                            // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
+                                            <CROMarketplaceCard cro={result.content} key={index} />
                                         ))}
                                     </div>
                                 </>
