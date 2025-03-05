@@ -145,7 +145,7 @@ export default async function CompanyHomePage({
                         </div>
                         <Link
                             href={cro.website || ""}
-                            className={buttonVariants({variant: "default"})}
+                            className={buttonVariants({variant: "cta"})}
                             target="_blank"
                         >
                             <FaArrowUpRightFromSquare/>

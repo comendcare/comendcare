@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore";
+import { CROSearchState, sampleCROs, useCROSearchStore } from "@/state/search/croSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import InfiniteScroll from "./ui/infinite-scroll";
 import Image from "next/image";
@@ -17,44 +17,6 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import { FaQuestion } from "react-icons/fa6";
 import { FaInfoCircle } from "react-icons/fa";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { nanoid } from "nanoid";
-
-const sampleCROs: any[] = [
-    // {
-    //     content: {
-    //         id: nanoid(),
-    //         title: "Sample CRO 1",
-    //         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    //         url: "comend.io",
-    //         scientistDotComURL: null,
-    //         yearEstablished: 2023,
-    //         website: "https://comend.io/",
-    //         headquarters: "Austin, Texas",
-    //         companyType: "startup",
-    //     },
-    //     milestone: {
-    //         nodeType: "RFP",
-    //         title: "Sample Milestone 1"
-    //     }
-    // },
-    // {
-    //     content: {
-    //         id: nanoid(),
-    //         title: "Sample CRO 2",
-    //         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    //         url: "comend.io",
-    //         scientistDotComURL: null,
-    //         yearEstablished: 2023,
-    //         website: "https://comend.io/",
-    //         headquarters: "Toronto, Ontario",
-    //         companyType: "startup",
-    //     },
-    //     milestone: {
-    //         nodeType: "PROJECT",
-    //         title: "Sample Milestone 2"
-    //     }
-    // }
-]
 
 const selector = (state: CROSearchState) => ({
     recommendations: state.recommendations,
@@ -138,7 +100,6 @@ export function CROSearchResults() {
                             ))}
                         </div>
 
-                        {!roadmapId && (
                             <div className="absolute inset-0 bg-black/10 backdrop-blur flex items-center justify-center p-4 rounded-md">
                                 <div className="grid w-full max-w-xl p-4 gap-4 rounded-lg bg-white shadow-lg">
                                     <div className="flex flex-col gap-4 justify-center items-center">
@@ -161,7 +122,6 @@ export function CROSearchResults() {
                                     </div>
                                 </div>
                             </div>
-                        )}
                         </>
                     ): (
                         <>
