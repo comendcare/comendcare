@@ -208,7 +208,7 @@ export function TaskCard({task, isOverlay, mountKey}: TaskCardProps) {
                     <CardFooter className="flex justify-end mr-2">
                         {task?.stakeholders && task?.stakeholders.length > 0 && (
                             task.stakeholders.map((stakeholder, index) => (
-                                <ProfilePhoto 
+                                <ProfilePhoto
                                     className="ring-0 h-8 w-8 -mr-2" 
                                     key={index} 
                                     img={stakeholder.user?.image} 
