@@ -34,7 +34,9 @@ const editOrgFormSchema = z.object({
     incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
     description: z.string().max(500).optional(),
     website: z.string().url().optional(),
-    raised: z.number().optional()
+    raised: z.number().optional(),
+    deployed: z.number().optional(),
+    budget: z.number().optional()
 });
 
 export default function EditPAGProfileHeaderDialog({organization}: { organization: Organization }) {
@@ -235,6 +237,21 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                     description="The total amount of funding raised to date by your patient group."
                                     name="raised"
                                 />
+
+                                <MoneyInput
+                                    form={editOrgForm}
+                                    label="Total funds deployed to research"
+                                    description="The total amount of money deployed to research to date."
+                                    name="deployed"
+                                />
+
+                                <MoneyInput
+                                    form={editOrgForm}
+                                    label="Annual research budget"
+                                    description="The amount of money allocated to advancing research this year."
+                                    name="budget"
+                                />
+
                                 <Button type="submit">Save</Button>
                             </form>
                         </Form>
