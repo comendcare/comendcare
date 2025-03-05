@@ -99,7 +99,7 @@ export default async function PAGSettingsMembersTab() {
                                                          src={person.user?.image || createDicebearAvatar(person.user?.name || faker.string.uuid(), 50, 40, "identicon")}
                                                          alt={`${person.user?.name}'s profile picture`}
                                                     /> */}
-                                                    <ProfilePhoto 
+                                                    <ProfilePhoto
                                                         img={person?.user?.image}
                                                         name={person?.user?.name}
                                                         className="h-11 w-11 rounded-full"
