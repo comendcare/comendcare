@@ -141,6 +141,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             <div className="flex flex-col gap-2">
                                 <Button
                                     className="w-fit"
+                                    variant={"secondary"}
                                     onClick={async () => {
                                         if (session?.user?.organizationId) {
                                             const response = await getRoadmap(session.user.organizationId)
@@ -231,6 +232,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             <div className="flex flex-col gap-2">
                                 <Button
                                     className="w-fit"
+                                    variant={"secondary"}
                                     onClick={async () => {
                                         if (session?.user?.organizationId) {
                                             const response = await getRoadmap(session.user.organizationId)

@@ -199,11 +199,11 @@ export function MilestoneFilters() {
                 </FormItem> */}
 
                 <span className="flex justify-end gap-4 flex-wrap">
-                    <Button type="submit" variant="destructive" onClick={() => {
+                    <Button type="submit" variant="secondary" onClick={() => {
                         setFilters(defaultFilters)
                         form.reset(defaultFilters)
                     }}>Clear All Filters</Button>
-                    <Button type="submit">Apply Filters</Button>
+                    <Button variant="secondary" type="submit">Apply Filters</Button>
                 </span>
             </form>
             </ScrollArea>
