@@ -52,7 +52,7 @@ const router = useRouter()
 
     return (
         <ScrollArea className="w-full h-full p-10 pt-0">
-            <ol className="ml-4 relative border-s border-gray-200 dark:border-gray-700">
+            <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700">
                 {milestones?.sort((a, b) => {
                     return a.startDate - b.startDate
                 }).map((milestone: any, index: number) => (
@@ -64,7 +64,7 @@ const router = useRouter()
                             className={cn("w-full text-left hover:bg-secondary p-2 rounded-md", selectedNodeId === milestone.nodeId ? "bg-secondary" : "")}
                         >
                             <>
-                            <span className="absolute flex items-center justify-center bg-white rounded-full -start-4">
+                            <span className="absolute flex items-center justify-center bg-white rounded-full -start-[18px]">
                                 <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.node?.type || "PROJECT"}/>
                             </span>
                             <div className="flex flex-row items-center justify-start gap-4">

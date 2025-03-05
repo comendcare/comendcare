@@ -18,7 +18,7 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilest
     setUrlMilestone?: (id: string) => void | undefined
 }) => {
     return (
-        <ol className="relative border-s border-gray-200 dark:border-gray-700 space-y-8">
+        <ol className="relative border-s-4 border-blue-light dark:border-gray-700 space-y-8">
             {roadmap?.milestones?.sort((a: any, b: any) => {
                     return a.startDate - b.startDate
                 }).map((item: any, index: number) => (
@@ -74,7 +74,7 @@ const TimelineElementButton = ({key, item, setUrlMilestone}: {key: number, item:
 const TimelineElementContent = ({item, externalLinkIcon}: {item: any, externalLinkIcon: boolean}) => {
     return (
         <>
-            <span className="absolute flex items-center justify-center bg-white rounded-full -start-4">
+            <span className="absolute flex items-center justify-center bg-white rounded-full -start-[18px]">
                 <TypeBadge className="w-8 p-2" iconOnly={true} type={item?.node?.type || "PROJECT"}/>
             </span>
             <div className="flex flex-row items-center justify-start gap-4">
