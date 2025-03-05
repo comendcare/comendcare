@@ -80,8 +80,8 @@ export function NavMain({items}: { items: Item[] }) {
                             ) : (
                                 <SidebarMenuButton
                                     asChild
-                                    // className={isActive ? "bg-muted text-primary" : ""}
-                                    className={cn(isActive ? "text-blue-dark": "")}
+                                    className={isActive ? "bg-blue-light text-primary" : ""}
+                                    // className={cn(isActive ? "text-blue-dark": "")}
                                 >
                                     <a href={item.url} className="flex">
                                         <div className="relative">
@@ -94,7 +94,7 @@ export function NavMain({items}: { items: Item[] }) {
                                         {state === "expanded" &&
                                             <NavNotificationExpandedIcon item={item}/>
                                         }
-                                        {isActive && <FaCaretLeft className="text-blue-700 h-24 w-24 ml-auto"/>}
+                                        {/* {isActive && <FaCaretLeft className="text-blue-700 h-24 w-24 ml-auto"/>} */}
                                     </a>
                                 </SidebarMenuButton>
                             )}
