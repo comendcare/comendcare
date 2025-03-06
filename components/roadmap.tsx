@@ -21,8 +21,21 @@ import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { FaArrowUpRightFromSquare } from "react-icons/fa6"
+import { FaArrowUpRightFromSquare, FaPlus } from "react-icons/fa6"
 import { FaRedo, FaUndo } from "react-icons/fa"
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "./ui/dialog"
+import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
+import { MilestoneTemplateTabs } from "./roadmap-templates"
+import { nanoid } from "nanoid"
+import { useStoreApi, type Edge, type Node, type NodeChange } from "@xyflow/react"
 
 const selector = (state: RoadmapState) => ({
     selectedView: state.selectedView,
@@ -30,7 +43,8 @@ const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
-    saveState: state.saveState
+    saveState: state.saveState,
+    addNodes: state.addNodes
 })
 
 export function Roadmap({data}: {data: any}) {
@@ -42,7 +56,8 @@ export function Roadmap({data}: {data: any}) {
         selectedNodeId, 
         setSelectedNodeId, 
         milestones, 
-        saveState
+        saveState,
+        addNodes
     } = useRoadmapStore(useShallow(selector))
     const router = useRouter()
     const pathname = usePathname()
@@ -50,6 +65,9 @@ export function Roadmap({data}: {data: any}) {
     const { undo, redo } = useRoadmapStore.temporal.getState()
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1);
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
+    const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
+    const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+    const store = useStoreApi()
     
     useEffect(() => {
         milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
@@ -116,23 +134,84 @@ export function Roadmap({data}: {data: any}) {
         setSelectedNodeId(null) // deselect any selected milestones when switching tabs
     }
 
+    // Add a empty milestone node
+    // if a position is provided, place at the given coordinates
+    // if a position is not provided, place in the center
+    const addMilestones = async (newMilestones: any[]) => {
+        const newNodes: any[] = []
+
+        // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
+        const {
+            height,
+            width,
+            transform: [transformX, transformY, zoomLevel]
+        } = store.getState()
+
+        const zoomMultiplier = 1 / zoomLevel
+        let centerX =
+            -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+        let centerY =
+            -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+
+        newMilestones.forEach(defaultData => {
+            const id = nanoid()
+            const newNode: Node = {
+                id: id,
+                type: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
+                position: {
+                    x: centerX,
+                    y: centerY
+                },
+                origin: [0.0, 0.0],
+                data: {
+                    id: nanoid(),
+                    nodeId: id,
+                    types: defaultData?.types || [],
+                    title: defaultData?.title || `New Milestone`,
+                    ...(defaultData?.description ? { description: defaultData.description } : undefined),
+                    status: defaultData?.status || "PLANNED",
+                    private: true
+                }
+            }
+
+            centerX += 500
+            // centerY += 200
+
+            newNodes.push(newNode)
+        })
+
+        const nodes = await addNodes(newNodes)
+        return nodes
+    }
+
     return (
         <TooltipProvider delayDuration={0}>
             <ResizablePanelGroup
                 direction="horizontal"
-                // onLayout={(sizes: number[]) => {
-                //     setLayout(sizes) // Use Zustand's setLayout to save panel sizes
-                // }}
                 className="h-full items-stretch"
             >
                 <ResizablePanel>
-                    <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
+                    <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col">
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-start">
                             <TabsList>
                                 <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
-                                {/* <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger> */}
                             </TabsList>
+
+                            <Button variant={"cta"} className="research-plan-tour-step1 ml-auto" onClick={() => setNewMilestoneIsOpen(true)}>
+                                <FaPlus />
+                                Create milestone
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                type="button"
+                                onClick={() => {
+                                    router.push('/app/research-plan/templates')
+                                }}
+                            >
+                                Browse milestone library
+                            </Button>
+
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button onClick={() => {
@@ -174,17 +253,23 @@ export function Roadmap({data}: {data: any}) {
                                 </TooltipContent>
                             </Tooltip>
 
-                            <Link
-                                href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
-                                className={cn(
-                                    buttonVariants({ variant: "secondary" }),
-                                    "flex items-center ml-auto"
-                                )}
-                                target={"_blank"}
-                            >
-                                {`View public research plan`}
-                                <FaArrowUpRightFromSquare size={12}/>
-                            </Link>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Link
+                                        href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
+                                        className={cn(
+                                            buttonVariants({ variant: "ghost" }),
+                                            "flex items-center"
+                                        )}
+                                        target={"_blank"}
+                                    >
+                                        <FaArrowUpRightFromSquare size={12}/>
+                                    </Link>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80">
+                                    <p>{`View public research plan`}</p>
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
 
                         {/* Flow View */}
@@ -205,13 +290,6 @@ export function Roadmap({data}: {data: any}) {
                             <PrivateTimelineView />
                         </TabsContent>
 
-                        {/* Gantt Chart View */}
-                        {/* <TabsContent
-                            value="gantt"
-                            className="mt-0 h-[calc(100vh-3.5rem)]"
-                        >
-                            <GanttChartView />
-                        </TabsContent> */}
                     </Tabs>
                 </ResizablePanel>
 
@@ -235,6 +313,61 @@ export function Roadmap({data}: {data: any}) {
                         </ResizablePanel>
                     </>
                 )}
+
+                <Dialog open={newMilestoneIsOpen} onOpenChange={(open: boolean) => {
+                    if (!open) setSelectedMilestones([])
+                    setNewMilestoneIsOpen(open)
+                }}>
+                    <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start">
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl">
+                                Select from a milestone template
+                            </DialogTitle>
+                            <DialogDescription>
+                                {`Templates can help you find inspiration and get started faster. Click on a Milestone Template to add it to your Research Plan.`}
+                            </DialogDescription>
+                        </DialogHeader>
+        
+                        <MilestoneTemplateTabs 
+                            selectedMilestones={selectedMilestones}
+                            setSelectedMilestones={setSelectedMilestones}
+                            createEmpty={() => addMilestones([{name: 'New Milestone'}])}
+                            inDialog={true}
+                        />
+        
+                        <DialogFooter>
+                            <DialogClose>
+                                <Button variant="secondary" type="button">
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+        
+                            <Button
+                                variant="secondary"
+                                type="button"
+                                onClick={() => {
+                                    router.push('/app/research-plan/templates')
+                                }}
+                            >
+                                Browse milestone library
+                            </Button>
+                            
+                            <DialogClose>
+                                <Button
+                                    disabled={selectedMilestones.length === 0}
+                                    type="button"
+                                    onClick={() => {
+                                        console.log(`add milestones`, selectedMilestones)
+                                        addMilestones(selectedMilestones)
+                                    }}
+                                >
+                                    <FaPlus />
+                                    Create selected milestones
+                                </Button>
+                            </DialogClose>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </ResizablePanelGroup>
         </TooltipProvider>
     )

@@ -394,23 +394,9 @@ export const PrivateFlowView = ({
                 nodeColor='#757575'
                 maskColor='rgb(200, 200, 200, 0.8)' 
             />
-            <Controls className="flex flex-col gap-2">
-                <Button
-                    variant="secondary"
-                    type="button"
-                    onClick={() => {
-                        router.push('/app/research-plan/templates')
-                    }}
-                >
-                    Browse milestone library
-                </Button>
-                <Button variant={"cta"} className="research-plan-tour-step1" onClick={() => setNewMilestoneIsOpen(true)}>
-                    <FaPlus />
-                    Create milestone
-                </Button>
-            </Controls>
+            <Controls className="flex flex-col gap-2" />
         </ReactFlow>
-        <Dialog open={newMilestoneIsOpen} onOpenChange={(open: boolean) => {
+        {/* <Dialog open={newMilestoneIsOpen} onOpenChange={(open: boolean) => {
             if (!open) setSelectedMilestones([])
             setNewMilestoneIsOpen(open)
         }}>
@@ -423,19 +409,6 @@ export const PrivateFlowView = ({
                         {`Templates can help you find inspiration and get started faster. Click on a Milestone Template to add it to your Research Plan.`}
                     </DialogDescription>
                 </DialogHeader>
-
-                {/* <ScrollArea className="w-full max-h-[50vh] overflow-visible">
-                    <div className="w-full pr-4 grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-visible pt-2">
-                        {templateMilestones.map((milestoneData, index) => (
-                            <MilestoneTemplateCard 
-                                key={index}
-                                milestoneData={milestoneData}
-                                selectedMilestones={selectedMilestones}
-                                setSelectedMilestones={setSelectedMilestones}
-                            />
-                        ))}
-                    </div>
-                </ScrollArea> */}
 
                 <MilestoneTemplateTabs 
                     selectedMilestones={selectedMilestones}
@@ -460,18 +433,6 @@ export const PrivateFlowView = ({
                     >
                         Browse milestone library
                     </Button>
-
-                    {/* <DialogClose>
-                        <Button
-                            variant="secondary"
-                            type="button"
-                            // onClick={handleAddEmptyMilestone}
-                            onClick={() => addMilestones([{name: 'New Milestone'}])}
-                        >
-                            <FaPlus />
-                            Create empty milestone
-                        </Button>
-                    </DialogClose> */}
                     
                     <DialogClose>
                         <Button
@@ -488,7 +449,7 @@ export const PrivateFlowView = ({
                     </DialogClose>
                 </DialogFooter>
             </DialogContent>
-        </Dialog>
+        </Dialog> */}
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
         </Dialog>
