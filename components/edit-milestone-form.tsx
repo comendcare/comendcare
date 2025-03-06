@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaCalendar, FaGlobe, FaLock, FaX} from "react-icons/fa6"
+import {FaCalendar, FaEllipsis, FaGlobe, FaLock, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -61,6 +61,13 @@ import { Card, CardContent } from "./ui/card"
 import Image from "next/image"
 import { CROMarketplaceCard, CRORecommendationCard } from "./marketplace-cro-card"
 import Link from "next/link"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { TypeBadge } from "./type-badge"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -272,14 +279,63 @@ export function EditMilestoneForm({
                     <EditTitle form={form}/>
 
                     <Tabs defaultValue="edit" className="space-y-4 w-full">
-                        <TabsList>
-                            <TabsTrigger value="edit">
-                                Edit
-                            </TabsTrigger>
-                            <TabsTrigger value="recommendations">
-                                Recommendations
-                            </TabsTrigger>
-                        </TabsList>
+                        <div className="flex gap-4 items-center justify-between">
+                            <TabsList>
+                                <TabsTrigger value="edit">
+                                    Edit
+                                </TabsTrigger>
+                                <TabsTrigger value="recommendations">
+                                    Recommendations
+                                </TabsTrigger>
+                            </TabsList>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost">
+                                        <FaEllipsis/>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <FormField 
+                                        control={form.control}
+                                        name="nodeType"
+                                        render={({field}) => (
+                                            <>
+                                            {field.value !== "ASSET" && (
+                                                <DropdownMenuItem
+                                                    onSelect={(e) => {
+                                                        field.onChange("ASSET")
+                                                    }}
+                                                >
+                                                    <TypeBadge type="ASSET" iconOnly={true} className="w-8"/>
+                                                    Migrate to asset
+                                                </DropdownMenuItem>
+                                            )}
+                                            {field.value !== "PROJECT" && (
+                                                <DropdownMenuItem
+                                                    onSelect={(e) => {
+                                                        field.onChange("PROJECT")
+                                                    }}
+                                                >
+                                                    <TypeBadge type="PROJECT" iconOnly={true} className="w-8"/>
+                                                    Migrate to project
+                                                </DropdownMenuItem>
+                                            )}
+                                            {field.value !== "RFP" && (
+                                                <DropdownMenuItem
+                                                    onSelect={(e) => {
+                                                        field.onChange("RFP")
+                                                    }}
+                                                >
+                                                    <TypeBadge type="RFP" iconOnly={true} className="w-8"/>
+                                                    Migrate to RFP
+                                                </DropdownMenuItem>
+                                            )}
+                                            </>
+                                        )}
+                                    />
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                         <TabsContent value="edit" className="space-y-4 w-full">
                             <FormItem>
                             {/* <FormField
@@ -468,7 +524,7 @@ export function EditMilestoneForm({
                             )}
 
                             <Link href="/app/marketplace/cro">
-                                <Button variant={"link"}>Explore the marketplace</Button>
+                                <Button className="pl-0" variant={"link"}>Explore the marketplace</Button>
                             </Link>
                         </TabsContent>
                     </Tabs>
