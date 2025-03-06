@@ -43,6 +43,7 @@ const selector = (state: RoadmapState) => ({
     setSelectedView: state.setSelectedView,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
+    nodes: state.nodes,
     milestones: state.milestones,
     saveState: state.saveState,
     addNodes: state.addNodes
@@ -56,6 +57,7 @@ export function Roadmap({data}: {data: any}) {
         setSelectedView,
         selectedNodeId, 
         setSelectedNodeId, 
+        nodes: dbNodes,
         milestones, 
         saveState,
         addNodes
@@ -149,10 +151,20 @@ export function Roadmap({data}: {data: any}) {
         } = store.getState()
 
         const zoomMultiplier = 1 / zoomLevel
-        let centerX =
-            -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        let centerY =
-            -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        const milestonesAlongXAxis = dbNodes.sort((a, b) => {
+            return a.position.x - b.position.x
+        })
+        console.log(`milestones along XAxis`, milestonesAlongXAxis)
+        // let centerX =
+        //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+        let centerX = milestonesAlongXAxis.length > 0 ? (
+            milestonesAlongXAxis[milestonesAlongXAxis.length - 1].position.x + 500
+        ): (
+            0
+        )
+        // let centerY =
+        //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        let centerY = 0
 
         newMilestones.forEach(defaultData => {
             const id = nanoid()
@@ -192,7 +204,7 @@ export function Roadmap({data}: {data: any}) {
                 className="h-full items-stretch"
             >
                 <ResizablePanel>
-                    <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col">
+                    <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-start">
                             <TabsList>
                                 <TabsTrigger value="timeline">Timeline View</TabsTrigger>

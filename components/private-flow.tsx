@@ -396,60 +396,6 @@ export const PrivateFlowView = ({
             />
             <Controls className="flex flex-col gap-2" />
         </ReactFlow>
-        {/* <Dialog open={newMilestoneIsOpen} onOpenChange={(open: boolean) => {
-            if (!open) setSelectedMilestones([])
-            setNewMilestoneIsOpen(open)
-        }}>
-            <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start">
-                <DialogHeader>
-                    <DialogTitle className="text-2xl">
-                        Select from a milestone template
-                    </DialogTitle>
-                    <DialogDescription>
-                        {`Templates can help you find inspiration and get started faster. Click on a Milestone Template to add it to your Research Plan.`}
-                    </DialogDescription>
-                </DialogHeader>
-
-                <MilestoneTemplateTabs 
-                    selectedMilestones={selectedMilestones}
-                    setSelectedMilestones={setSelectedMilestones}
-                    createEmpty={() => addMilestones([{name: 'New Milestone'}])}
-                    inDialog={true}
-                />
-
-                <DialogFooter>
-                    <DialogClose>
-                        <Button variant="secondary" type="button">
-                            Cancel
-                        </Button>
-                    </DialogClose>
-
-                    <Button
-                        variant="secondary"
-                        type="button"
-                        onClick={() => {
-                            router.push('/app/research-plan/templates')
-                        }}
-                    >
-                        Browse milestone library
-                    </Button>
-                    
-                    <DialogClose>
-                        <Button
-                            disabled={selectedMilestones.length === 0}
-                            type="button"
-                            onClick={() => {
-                                console.log(`add milestones`, selectedMilestones)
-                                addMilestones(selectedMilestones)
-                            }}
-                        >
-                            <FaPlus />
-                            Create selected milestones
-                        </Button>
-                    </DialogClose>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog> */}
         <Dialog open={deleteIsOpen} onOpenChange={setDeleteIsOpen}>
             <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
         </Dialog>
