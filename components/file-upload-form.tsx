@@ -15,6 +15,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import Papa from "papaparse"
+import { DialogClose } from "./ui/dialog"
 
 const feedbackFormSchema = z.object({
     file: z.any()
@@ -61,13 +62,15 @@ export function FileUploadForm({accept, onSubmit}: {accept: string, onSubmit: (f
                     )}
                 />
 
-                <Button
-                    variant={"cta"}
-                    className="w-fit self-end"
-                    type="submit"
-                >
-                    Upload
-                </Button>
+                <DialogClose>
+                    <Button
+                        variant={"cta"}
+                        className="w-fit self-end"
+                        type="submit"
+                    >
+                        Upload
+                    </Button>
+                </DialogClose>
             </form>
         </Form>
     )
