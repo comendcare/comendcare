@@ -9,14 +9,16 @@ import {
     FaIndustry,
     FaRocket,
     FaUsers,
-    FaUserTie
+    FaUserTie,
+    FaBookmark
 } from "react-icons/fa6";
 import {truncate} from "@/lib/utils";
 import React from "react";
 import {Company, Milestone} from "@prisma/client";
-import {FaUniversity} from "react-icons/fa";
+import {FaSave, FaUniversity} from "react-icons/fa";
 import { Separator } from "./ui/separator";
 import { TypeBadge } from "./type-badge";
+import { Button } from "./ui/button";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -103,9 +105,13 @@ export function CROCardHeaderContents({cro}: {cro: Company}) {
 
     return (
         <>
+            <div className="flex justify-between">
             <CardTitle className="text-xl flex flex-row gap-2 items-center">
                 {title}
             </CardTitle>
+            {/* save button */}
+            <Button variant={"ghost"} onClick={(e) => e.preventDefault()}><FaBookmark /></Button>
+            </div>
             {companyType && (
                 <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
                     {companyTypeIcons[companyType] || <FaBuilding className="size-4 text-gray-500 dark:text-gray-400" />}
