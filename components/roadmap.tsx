@@ -40,6 +40,7 @@ import { Redo2, Undo2 } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import Papa from "papaparse"
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { toast } from "sonner"
 
 const selector = (state: RoadmapState) => ({
     selectedView: state.selectedView,
@@ -386,6 +387,12 @@ export function Roadmap({data}: {data: any}) {
                                                     console.error(`Invalid milestone type`, entry)
                                                 }
                                             })
+
+                                            if (newMilestones.length !== result.data.length) {
+                                                toast('Error!', {
+                                                    description: `Some milestones were not formatted properly. Some milestones have not been imported.`
+                                                })
+                                            }
                                             addMilestones(newMilestones)
                                         },
                                         header: true,
