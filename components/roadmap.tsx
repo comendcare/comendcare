@@ -38,6 +38,9 @@ import { nanoid } from "nanoid"
 import { useStoreApi, type Edge, type Node, type NodeChange } from "@xyflow/react"
 import { Redo2, Undo2 } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
+import Papa from "papaparse"
+import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { toast } from "sonner"
 
 const selector = (state: RoadmapState) => ({
     selectedView: state.selectedView,
@@ -353,11 +356,53 @@ export function Roadmap({data}: {data: any}) {
                                 Import milestones
                             </DialogTitle>
                             <DialogDescription>
-                                Import multiple milestones at a time. Fill our our milestone <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">input template</Link> and upload.
+                                Import multiple milestones at a time. Fill out our milestone <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">input template</Link> and upload.
                             </DialogDescription>
                         </DialogHeader>
 
-                        <FileUploadForm accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                        <FileUploadForm 
+                            accept=".csv" 
+                            onSubmit={(file) => {
+                                if (file && file.name.endsWith(".csv")) {
+                                    // parse CSV file
+                                    Papa.parse(file, {
+                                        complete: (result) => {
+                                            const newMilestones: any[] = []
+                                            result.data.forEach((entry: any) => {
+                                                // validate milestone format - don't include the milestone if it doesn't have all the
+                                                // proper fields or if the fields are not of the correct type
+                                                if (
+                                                    entry.title && typeof entry.title === "string" && 
+                                                    entry.description && typeof entry.description === "string" &&
+                                                    entry.type && typeof entry.type === "string" &&
+                                                    entry.category && typeof entry.type === "string"
+                                                ) {
+                                                    newMilestones.push({
+                                                        title: entry.title,
+                                                        description: entry.description,
+                                                        types: [MILESTONE_TYPE_OPTIONS.find(type => type.label === entry.type)?.value],
+                                                        nodeType: entry.category
+                                                    })
+                                                } else {
+                                                    console.error(`Invalid milestone type`, entry)
+                                                }
+                                            })
+
+                                            if (newMilestones.length !== result.data.length) {
+                                                toast('Error!', {
+                                                    description: `Some milestones were not formatted properly. Some milestones have not been imported.`
+                                                })
+                                            }
+                                            addMilestones(newMilestones)
+                                        },
+                                        header: true,
+                                        skipEmptyLines: true,
+                                    })
+                                } else {
+                                    console.error("Please upload a valid CSV file.");
+                                }
+                            }}
+                        />
                     </DialogContent>
                 </Dialog>
 
