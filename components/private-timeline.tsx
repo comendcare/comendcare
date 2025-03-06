@@ -65,7 +65,7 @@ const router = useRouter()
                         >
                             <>
                             <span className="absolute flex items-center justify-center bg-white rounded-full -start-[18px]">
-                                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || "PROJECT"}/>
+                                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
                             </span>
                             <div className="flex flex-row items-center justify-start gap-4">
                                 <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white ">
