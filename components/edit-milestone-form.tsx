@@ -45,7 +45,7 @@ import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
 import {ExternalContactField} from "./external-contact-field"
 import {ExternalAttachmentField} from "./external-attachment-field"
 import {Popover, PopoverContent, PopoverTrigger} from "./ui/popover"
-import {cn} from "@/lib/utils"
+import {cn, sleep} from "@/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "./ui/calendar"
 import {FaInfoCircle} from "react-icons/fa";
@@ -68,6 +68,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { TypeBadge } from "./type-badge"
+import Loading from "@/app/loading"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -131,6 +132,7 @@ export function EditMilestoneForm({
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
+    const [isMigrating, setIsMigrating] = useState(false)
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -252,6 +254,7 @@ export function EditMilestoneForm({
         //     position: "bottom-left",
         //     description: 'The changes to your milestone have been successfully saved.'
         // })
+        setIsMigrating(false)
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
@@ -302,8 +305,11 @@ export function EditMilestoneForm({
                                             <>
                                             {field.value !== "ASSET" && (
                                                 <DropdownMenuItem
-                                                    onSelect={(e) => {
+                                                    onSelect={async (e) => {
+                                                        setIsMigrating(true)
+                                                        await sleep(1000)
                                                         field.onChange("ASSET")
+                                                        setIsMigrating(false)
                                                     }}
                                                 >
                                                     <TypeBadge type="ASSET" iconOnly={true} className="w-8"/>
@@ -312,8 +318,11 @@ export function EditMilestoneForm({
                                             )}
                                             {field.value !== "PROJECT" && (
                                                 <DropdownMenuItem
-                                                    onSelect={(e) => {
+                                                    onSelect={async (e) => {
+                                                        setIsMigrating(true)
+                                                        await sleep(1000)
                                                         field.onChange("PROJECT")
+                                                        setIsMigrating(false)
                                                     }}
                                                 >
                                                     <TypeBadge type="PROJECT" iconOnly={true} className="w-8"/>
@@ -322,8 +331,11 @@ export function EditMilestoneForm({
                                             )}
                                             {field.value !== "RFP" && (
                                                 <DropdownMenuItem
-                                                    onSelect={(e) => {
+                                                    onSelect={async (e) => {
+                                                        setIsMigrating(true)
+                                                        await sleep(1000)
                                                         field.onChange("RFP")
+                                                        setIsMigrating(false)
                                                     }}
                                                 >
                                                     <TypeBadge type="RFP" iconOnly={true} className="w-8"/>
@@ -336,197 +348,205 @@ export function EditMilestoneForm({
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
-                        <TabsContent value="edit" className="space-y-4 w-full">
-                            <FormItem>
-                            {/* <FormField
-                                control={form.control}
-                                name="nodeType"
-                                render={({field}) => (
-                                    <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
-                                        <FormControl>
-                                            <ToggleGroup
-                                                type="single"
-                                                variant="outline"
-                                                value={field.value}
-                                                onValueChange={(value) => {
-                                                    if (value) {
-                                                        field.onChange(value)
-                                                    }
-                                                }}
-                                                className="w-full flex flex-wrap gap-2 justify-between"
-                                            >
-                                                {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
-                                                    <ToggleGroupItem
-                                                        key={value}
-                                                        value={value}
-                                                        className={"text-md grow flex gap-2"}
-                                                    >
-                                                        {label}
-                                                        <Tooltip>
-                                                            <TooltipTrigger>
-                                                                <FaInfoCircle/>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent className="max-w-80 text-wrap text-left">
-                                                                {description}
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    </ToggleGroupItem>
-                                                ))}
-                                            </ToggleGroup>
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            /> */}
+                        {isMigrating ? (
+                            <Loading />
+                        ): (
+                            <>
+                            <TabsContent value="edit" className="space-y-4 w-full">
+                                <FormItem>
+                                {/* <FormField
+                                    control={form.control}
+                                    name="nodeType"
+                                    render={({field}) => (
+                                        <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
+                                            <FormControl>
+                                                <ToggleGroup
+                                                    type="single"
+                                                    variant="outline"
+                                                    value={field.value}
+                                                    onValueChange={(value) => {
+                                                        if (value) {
+                                                            field.onChange(value)
+                                                        }
+                                                    }}
+                                                    className="w-full flex flex-wrap gap-2 justify-between"
+                                                >
+                                                    {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
+                                                        <ToggleGroupItem
+                                                            key={value}
+                                                            value={value}
+                                                            className={"text-md grow flex gap-2"}
+                                                        >
+                                                            {label}
+                                                            <Tooltip>
+                                                                <TooltipTrigger>
+                                                                    <FaInfoCircle/>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                                                    {description}
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </ToggleGroupItem>
+                                                    ))}
+                                                </ToggleGroup>
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                /> */}
 
-                            <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
-                                <FormLabel className="text-md mt-2">Visibility</FormLabel>
-                                <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                            </FormItem>
+                                {/* <TypeBadge type={formData.nodeType} className="grid-col-2"/> */}
 
-                            <FormField
-                                control={form.control}
-                                name="description"
-                                render={({field}) => (
-                                    <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
-                                        <FormLabel className="text-md mt-2">
-                                            {`Description`}
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Textarea
-                                                id="description"
-                                                placeholder={`Enter a description...`}
-                                                defaultValue={field.value}
-                                                {...field}
-                                                className="border-transparent hover:border-input"
-                                            />
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
+                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
+                                    <FormLabel className="text-md mt-2">Visibility</FormLabel>
+                                    <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
+                                </FormItem>
 
-                            <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-4 items-center">
-                                <div>
-                                <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
-                                {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
-                                </div>
-                                <MilestoneTypeFormField form={form}/>
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                            <FormLabel className="text-md mt-2">
+                                                {`Description`}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    id="description"
+                                                    placeholder={`Enter a description...`}
+                                                    defaultValue={field.value}
+                                                    {...field}
+                                                    className="border-transparent hover:border-input"
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
 
-                                {formData.nodeType === "ASSET" && (
-                                    <>
-                                        <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
-                                        <BudgetFormField form={form}/>
-                                    </>
-                                )}
+                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-4 items-center">
+                                    <div>
+                                    <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
+                                    {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
+                                    </div>
+                                    <MilestoneTypeFormField form={form}/>
+
+                                    {formData.nodeType === "ASSET" && (
+                                        <>
+                                            <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
+                                            <BudgetFormField form={form}/>
+                                        </>
+                                    )}
+
+                                    {formData.nodeType === "PROJECT" && (
+                                        <>
+                                            <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
+                                            <StatusFormField form={form}/>
+
+                                            <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                            <BudgetFormField form={form}/>
+                                        </>
+                                    )}
+
+                                    {formData.nodeType === "RFP" && (
+                                        <>
+                                            <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                            <BudgetFormField form={form}/>
+
+                                            <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
+                                            <OpenToFormField form={form}/>
+                                        </>
+                                    )}
+                                </FormItem>
 
                                 {formData.nodeType === "PROJECT" && (
-                                    <>
-                                        <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
-                                        <StatusFormField form={form}/>
-
-                                        <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                        <BudgetFormField form={form}/>
-                                    </>
+                                    <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
                                 )}
 
                                 {formData.nodeType === "RFP" && (
-                                    <>
-                                        <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                        <BudgetFormField form={form}/>
+                                    <TimelineFormField form={form} startLabel={"Request Opens"}
+                                                    endLabel={"Deadline for Proposals"}/>
+                                )}
+                                </FormItem>
 
-                                        <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
-                                        <OpenToFormField form={form}/>
+                                <ContactsFormField form={form}/>
+
+                                <AttachmentsFormField
+                                    form={form}
+                                    attachments={formData.attachments as AttachmentType[]}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="notes"
+                                    render={({field}) => (
+                                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                            <FormLabel
+                                                className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
+                                            >
+                                                {`Notes`}
+                                                <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
+                                            </FormLabel>
+                                            <FormControl>
+                                                <div className="w-full col-span-2" data-registry="plate">
+                                                    <SettingsProvider>
+                                                        <PlateEditor
+                                                            value={field.value}
+                                                            onChange={field.onChange}
+                                                        />
+                                                    </SettingsProvider>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            </TabsContent>
+                            <TabsContent value="recommendations" className="space-y-4 w-full">
+                                {(!recommendations || recommendations.length === 0) && (
+                                    <Card className="w-full flex flex-col mx-auto justify-center items-center align-center">
+                                        <CardContent className="flex flex-col gap-4 p-4">
+                                            <h2 className="text-xl">{`Sorry, we don't have any recommendations for this milestone`}</h2>
+                                            <div className="flex justify-center">
+                                                <Image
+                                                    alt="No recommendations"
+                                                    src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                                    width={300}
+                                                    height={300}
+                                                    className="dark:hidden"
+                                                />
+                                                <Image
+                                                    alt="No recommendations"
+                                                    src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                                    width={300}
+                                                    height={300}
+                                                    className="hidden dark:block"
+                                                />
+                                            </div>
+                                            <p className="text-md">
+                                                {`Please add more information to your milestone to generate some recommendations.`}
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                )}
+
+                                {recommendations && recommendations.length > 0 && (
+                                    <>
+                                        <div className={cn("w-full grid gap-4 grid-cols-1")}>
+                                            {(recommendations || []).map((result, index) => (
+                                                // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
+                                                <CROMarketplaceCard cro={result.content} key={index} />
+                                            ))}
+                                        </div>
                                     </>
                                 )}
-                            </FormItem>
 
-                            {formData.nodeType === "PROJECT" && (
-                                <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
-                            )}
-
-                            {formData.nodeType === "RFP" && (
-                                <TimelineFormField form={form} startLabel={"Request Opens"}
-                                                endLabel={"Deadline for Proposals"}/>
-                            )}
-                            </FormItem>
-
-                            <ContactsFormField form={form}/>
-
-                            <AttachmentsFormField
-                                form={form}
-                                attachments={formData.attachments as AttachmentType[]}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="notes"
-                                render={({field}) => (
-                                    <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
-                                        <FormLabel
-                                            className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
-                                        >
-                                            {`Notes`}
-                                            <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
-                                        </FormLabel>
-                                        <FormControl>
-                                            <div className="w-full col-span-2" data-registry="plate">
-                                                <SettingsProvider>
-                                                    <PlateEditor
-                                                        value={field.value}
-                                                        onChange={field.onChange}
-                                                    />
-                                                </SettingsProvider>
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-                        </TabsContent>
-                        <TabsContent value="recommendations" className="space-y-4 w-full">
-                            {(!recommendations || recommendations.length === 0) && (
-                                <Card className="w-full flex flex-col mx-auto justify-center items-center align-center">
-                                    <CardContent className="flex flex-col gap-4 p-4">
-                                        <h2 className="text-xl">{`Sorry, we don't have any recommendations for this milestone`}</h2>
-                                        <div className="flex justify-center">
-                                            <Image
-                                                alt="No recommendations"
-                                                src="https://illustrations.popsy.co/gray/team-idea.svg"
-                                                width={300}
-                                                height={300}
-                                                className="dark:hidden"
-                                            />
-                                            <Image
-                                                alt="No recommendations"
-                                                src="https://illustrations.popsy.co/gray/team-idea.svg"
-                                                width={300}
-                                                height={300}
-                                                className="hidden dark:block"
-                                            />
-                                        </div>
-                                        <p className="text-md">
-                                            {`Please add more information to your milestone to generate some recommendations.`}
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {recommendations && recommendations.length > 0 && (
-                                <>
-                                    <div className={cn("w-full grid gap-4 grid-cols-1")}>
-                                        {(recommendations || []).map((result, index) => (
-                                            // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
-                                            <CROMarketplaceCard cro={result.content} key={index} />
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-
-                            <Link href="/app/marketplace/cro">
-                                <Button className="pl-0" variant={"link"}>Explore the marketplace</Button>
-                            </Link>
-                        </TabsContent>
+                                <Link href="/app/marketplace/cro">
+                                    <Button className="pl-0" variant={"link"}>Explore the marketplace</Button>
+                                </Link>
+                            </TabsContent>
+                            </>
+                        )}
                     </Tabs>
 
                     <span className="h-8" />
