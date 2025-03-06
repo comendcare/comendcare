@@ -21,7 +21,7 @@ import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { FaArrowUpRightFromSquare, FaPlus } from "react-icons/fa6"
+import { FaArrowUpRightFromSquare, FaFileImport, FaPlus } from "react-icons/fa6"
 import { FaRedo, FaUndo } from "react-icons/fa"
 import {
     Dialog,
@@ -37,6 +37,7 @@ import { MilestoneTemplateTabs } from "./roadmap-templates"
 import { nanoid } from "nanoid"
 import { useStoreApi, type Edge, type Node, type NodeChange } from "@xyflow/react"
 import { Redo2, Undo2 } from "lucide-react"
+import { FileUploadForm } from "./file-upload-form"
 
 const selector = (state: RoadmapState) => ({
     selectedView: state.selectedView,
@@ -68,6 +69,7 @@ export function Roadmap({data}: {data: any}) {
     const { undo, redo } = useRoadmapStore.temporal.getState()
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1);
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
+    const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false);
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const store = useStoreApi()
@@ -228,6 +230,20 @@ export function Roadmap({data}: {data: any}) {
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button onClick={() => {
+                                        console.log("Bulk import triggered")
+                                        setBulkImportIsOpen(true)
+                                    }} size={"icon"} variant={"ghost"}>
+                                        <FaFileImport />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80">
+                                    <p>{`Import milestones from .csv`}</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button onClick={() => {
                                         console.log("Undo action triggered")
                                         undo() // undo updates zustand state
                                         saveState() // save state to update database
@@ -326,6 +342,24 @@ export function Roadmap({data}: {data: any}) {
                         </ResizablePanel>
                     </>
                 )}
+
+                <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
+                    setBulkImportIsOpen(open)
+                }}>
+                    {/* <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start"> */}
+                    <DialogContent className="flex flex-col justify-start">
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl">
+                                Import milestones
+                            </DialogTitle>
+                            <DialogDescription>
+                                {`Import multiple milestones at a time. Fill our our milestone import template and upload.`}
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <FileUploadForm accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                    </DialogContent>
+                </Dialog>
 
                 <Dialog open={newMilestoneIsOpen} onOpenChange={(open: boolean) => {
                     if (!open) setSelectedMilestones([])
