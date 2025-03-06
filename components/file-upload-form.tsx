@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
     Form,
@@ -14,19 +14,25 @@ import { Input } from "@/components/ui/input"
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
+import Papa from "papaparse"
 
 const feedbackFormSchema = z.object({
     file: z.any()
 })
 
-export function FileUploadForm({accept}: {accept: string}) {
+export function FileUploadForm({accept, onSubmit}: {accept: string, onSubmit: (file: File | undefined) => void}) {
     const form = useForm({
         mode: "onChange",
         resolver: zodResolver(feedbackFormSchema)
     })
+    const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined)
 
-    const handleSubmitClick = async (data: any) => {
-        console.log(`UPLOAD FILE`, data)
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectedFile(event.target.files?.[0] || undefined)
+    }
+
+    const handleSubmitClick = (data: any) => {
+        onSubmit(selectedFile)
     }
 
     return (
@@ -47,7 +53,7 @@ export function FileUploadForm({accept}: {accept: string}) {
                                 <Input
                                     type="file"
                                     accept={accept}
-                                    {...form.register("file")}
+                                    onChange={handleFileChange}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -59,7 +65,6 @@ export function FileUploadForm({accept}: {accept: string}) {
                     variant={"cta"}
                     className="w-fit self-end"
                     type="submit"
-                    disabled={!form.formState.isValid}
                 >
                     Upload
                 </Button>
