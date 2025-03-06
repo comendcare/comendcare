@@ -79,10 +79,24 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
         } = store.getState()
 
         const zoomMultiplier = 1 / zoomLevel
-        const centerX =
-            -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        const centerY =
-            -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        // const centerX =
+        //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+        // const centerY =
+        //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        const milestonesAlongXAxis = nodes.sort((a, b) => {
+            return a.position.x - b.position.x
+        })
+        console.log(`milestones along XAxis`, milestonesAlongXAxis)
+        // let centerX =
+        //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+        let centerX = milestonesAlongXAxis.length > 0 ? (
+            milestonesAlongXAxis[milestonesAlongXAxis.length - 1].position.x + 500
+        ): (
+            0
+        )
+        // let centerY =
+        //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        let centerY = 0
 
         const id = nanoid()
         const newNode = {

@@ -232,10 +232,19 @@ export const PrivateFlowView = ({
         } = store.getState()
 
         const zoomMultiplier = 1 / zoomLevel
-        let centerX =
-            -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        let centerY =
-            -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        // let centerX =
+        //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+        // let centerY =
+        //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        const milestonesAlongXAxis = localNodes.sort((a, b) => {
+            return a.position.x - b.position.x
+        })
+        let centerX = milestonesAlongXAxis.length > 0 ? (
+            milestonesAlongXAxis[milestonesAlongXAxis.length - 1].position.x + 500
+        ): (
+            0
+        )
+        let centerY = 0
 
         newMilestones.forEach(defaultData => {
             const id = nanoid()
