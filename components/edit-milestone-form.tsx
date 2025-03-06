@@ -60,6 +60,7 @@ import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore
 import { Card, CardContent } from "./ui/card"
 import Image from "next/image"
 import { CROMarketplaceCard, CRORecommendationCard } from "./marketplace-cro-card"
+import Link from "next/link"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -465,6 +466,10 @@ export function EditMilestoneForm({
                                     </div>
                                 </>
                             )}
+
+                            <Link href="/app/marketplace/cro">
+                                <Button variant={"link"}>Explore the marketplace</Button>
+                            </Link>
                         </TabsContent>
                     </Tabs>
 
