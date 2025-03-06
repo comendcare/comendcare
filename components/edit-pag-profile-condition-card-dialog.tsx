@@ -65,8 +65,10 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                         const fetchedValues = conditions.map((condition) => ({
                             disorder: condition.name || "",
                             summary: condition.summary || "",
+                            therapeutics: condition.therapeuticsInDevelopment.map((ther) => ({label: ther, value: ther})) || [],
                             categories: condition.diseaseCategories.map((cat) => ({label: cat, value: cat})) || [],
                             modalities: condition.interestedModalities.map((mod) => ({label: mod, value: mod})) || [],
+                            causal: condition.causalGenes.map((gene) => ({label: gene, value: gene})) || [],
                             genes: condition.associatedGenes.map((gene) => ({label: gene, value: gene})) || [],
                             systems: condition.associatedSystems.map((system) => ({
                                 label: system,

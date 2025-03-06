@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth";
 import { getConditionsFromOrganizationId, getOrganizationFromOrganizationId } from "@/lib/fetchers";
 import { FaGlobe, FaMoneyBill, FaFile, FaImage, FaMap } from "react-icons/fa6";
+import {PrivateBadge} from "@/components/private-badge";
 
 // Define the possible milestone keys explicitly
 type MilestoneKey =
@@ -51,27 +52,27 @@ interface Condition {
 const milestoneMessages: Record<MilestoneKey, { message: string; icon: JSX.Element }> = {
     "Add website and description": {
         message: "Add your organization's website and description to improve visibility.",
-        icon: <FaGlobe className="size-8" />,
+        icon: <FaGlobe className="size-4" />,
     },
     "Provide financial & incorporation details": {
         message: "Provide financial and incorporation details to enhance credibility.",
-        icon: <FaMoneyBill className="size-8" />,
+        icon: <FaMoneyBill className="size-4" />,
     },
     "Complete condition data": {
         message: "Complete condition details to help researchers understand your focus.",
-        icon: <FaFile className="size-8" />,
+        icon: <FaFile className="size-4" />,
     },
     "Upload profile image": {
         message: "Upload a profile image to personalize your organization's profile.",
-        icon: <FaImage className="size-8" />,
+        icon: <FaImage className="size-4" />,
     },
     "Upload header image": {
         message: "Upload a header image to make your profile more visually appealing.",
-        icon: <FaImage className="size-8" />,
+        icon: <FaImage className="size-4" />,
     },
     "Add roadmap": {
         message: "Add a research roadmap to showcase your planned initiatives.",
-        icon: <FaMap className="size-8" />,
+        icon: <FaMap className="size-4" />,
     },
 };
 
@@ -99,7 +100,7 @@ export async function ProfileCompletionCard() {
         ),
         "Complete condition data": conditions.length > 0 && conditions.every(condition =>
             Boolean(
-                condition.description &&
+                // condition.description &&
                 condition.associatedSystems.length > 0 &&
                 condition.associatedGenes.length > 0 &&
                 condition.causalGenes.length > 0 &&
@@ -133,10 +134,11 @@ export async function ProfileCompletionCard() {
 
     return (
         <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xl font-normal tracking-tight">
                     Profile strength: <span className="font-bold">{profileStrength}</span>
                 </CardTitle>
+                <PrivateBadge/>
             </CardHeader>
             <CardContent className="flex flex-col space-y-4">
                 <ol className="flex items-center w-full">
@@ -179,16 +181,18 @@ export async function ProfileCompletionCard() {
                         </li>
                     ))}
                 </ol>
-                <div className="space-y-6">
-                    <div className="flex flex-row items-start space-x-3 border p-4">
-                        <div>{messageData.icon}</div>
-                        <div>{messageData.message}</div>
+                {profileStrength !== "Complete" &&
+                    <div className="space-y-6">
+                        <div className="flex flex-row items-center space-x-3 border p-4">
+                            <div>{messageData.icon}</div>
+                            <div>{messageData.message}</div>
+                        </div>
                     </div>
-                </div>
+                }
             </CardContent>
-            <CardFooter className="place-self-end">
-                <Button variant="cta">Complete profile</Button>
-            </CardFooter>
+            {/*<CardFooter className="place-self-end">*/}
+            {/*    <Button variant="cta">Complete profile</Button>*/}
+            {/*</CardFooter>*/}
         </Card>
     );
 }
