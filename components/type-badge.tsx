@@ -2,7 +2,7 @@ import { FaBullhorn, FaFileLines, FaStar } from "react-icons/fa6"
 import { Badge } from "./ui/badge"
 import { cn } from "@/lib/utils"
 
-const style = "p-3 h-8 text-sm flex gap-2 border-none text-blue-dark bg-blue-light"
+const style = "h-8 text-sm flex justify-center gap-2 border-none text-blue-dark bg-blue-light"
 
 export const TypeBadge = ({type, iconOnly = false, className}: {
     type: string,
@@ -11,7 +11,7 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
 }) => {
 
     return (
-        <Badge variant="outline" className={cn(style, className)}>
+        <Badge variant="outline" className={cn(iconOnly ? "w-8" : "", style, className)}>
             {type === "ASSET" && (
                 <>
                     <FaStar/>
