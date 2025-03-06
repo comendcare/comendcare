@@ -59,6 +59,7 @@ export function ProfilePhoto({
     })
 
     async function onProfileFormSubmit(values: z.infer<typeof editOrgProfileImageSchema>) {
+        console.log("Hi")
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
             return;
@@ -118,7 +119,7 @@ export function ProfilePhoto({
                     </DialogHeader>
 
                     <Form {...editOrgForm}>
-                        <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8 mx-auto">
+                        <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
                             <FormImageCropper
                                 form={editOrgForm}
                                 name="image"
@@ -126,11 +127,13 @@ export function ProfilePhoto({
                                 aspect={1}
                                 selectedFile={selectedFileProfile}
                                 setSelectedFile={setSelectedFileProfile}
+                                className="mx-auto"
                             />
+                            <Button type="submit" className="w-fit">Save</Button>
+
                         </form>
                     </Form>
 
-                    <Button type="submit" className="w-fit">Save</Button>
                 </DialogContent>
             </Dialog>
         ) : (

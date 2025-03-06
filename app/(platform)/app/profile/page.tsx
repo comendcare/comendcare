@@ -213,10 +213,7 @@ export default async function ProfilePage() {
                                     {/*        </TabsTrigger>*/}
                                     {/*    </TabsList>*/}
                                     {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
-                                    <ProfileCompletionCard
-                                        milestones={["Test", "Test 2", "Test 3", "Test 4", "Test 5", "Test 2"]}
-                                        completedCount={4}
-                                    />
+                                    <ProfileCompletionCard />
                                     <PAGProfileAssetsAndRFPsHoverableCard
                                         isPrivate={true}
                                         assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "ASSET")}
