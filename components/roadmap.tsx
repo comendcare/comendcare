@@ -36,6 +36,7 @@ import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
 import { MilestoneTemplateTabs } from "./roadmap-templates"
 import { nanoid } from "nanoid"
 import { useStoreApi, type Edge, type Node, type NodeChange } from "@xyflow/react"
+import { Redo2, Undo2 } from "lucide-react"
 
 const selector = (state: RoadmapState) => ({
     selectedView: state.selectedView,
@@ -225,11 +226,11 @@ export function Roadmap({data}: {data: any}) {
                                             setMilestoneRemountKey(prevKey => prevKey + 1)
                                         }
                                     }} size={"icon"} variant={"ghost"}>
-                                        <FaUndo />
+                                        <Undo2 />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
-                                    <p>{`Undo`}</p>
+                                    <p>{`Undo (⌘+Z)`}</p>
                                 </TooltipContent>
                             </Tooltip>
                             <Tooltip>
@@ -245,11 +246,11 @@ export function Roadmap({data}: {data: any}) {
                                             setMilestoneRemountKey(prevKey => prevKey + 1)
                                         }
                                     }} size={"icon"} variant={"ghost"}>
-                                        <FaRedo />
+                                        <Redo2 />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
-                                    <p>{`Redo`}</p>
+                                    <p>{`Redo (⌘+Shift+Z)`}</p>
                                 </TooltipContent>
                             </Tooltip>
 
