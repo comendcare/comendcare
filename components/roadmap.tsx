@@ -353,7 +353,7 @@ export function Roadmap({data}: {data: any}) {
                                 Import milestones
                             </DialogTitle>
                             <DialogDescription>
-                                {`Import multiple milestones at a time. Fill our our milestone import template and upload.`}
+                                Import multiple milestones at a time. Fill our our milestone <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">input template</Link> and upload.
                             </DialogDescription>
                         </DialogHeader>
 
