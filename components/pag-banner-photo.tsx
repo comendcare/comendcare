@@ -113,7 +113,7 @@ export function PAGBannerPhoto({
                     </DialogHeader>
 
                     <Form {...editOrgForm}>
-                        <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8 mx-auto">
+                        <form onSubmit={editOrgForm.handleSubmit(onProfileFormSubmit)} className="space-y-8">
                             <FormImageCropper
                                 form={editOrgForm}
                                 name="headerImage"
@@ -122,12 +122,13 @@ export function PAGBannerPhoto({
                                 aspect={16 / 4}
                                 selectedFile={selectedFileHeader}
                                 setSelectedFile={setSelectedFileHeader}
-                                className="rounded h-[100px] w-[400px]"
+                                className="rounded h-[100px] w-[400px] mx-auto"
                             />
+
+                            <Button type="submit" className="w-fit">Save</Button>
                         </form>
                     </Form>
 
-                    <Button type="submit" className="w-fit">Save</Button>
                 </DialogContent>
             </Dialog>
         ) : (
