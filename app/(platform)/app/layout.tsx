@@ -150,9 +150,9 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     useEffect(() => {
         // Only run if the session data has changed
-        if (JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)) {
+        // if (JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)) {
             handleSessionUpdate()
-        }
+        // }
 
         // Update the ref to the latest session
         prevSessionRef.current = session
