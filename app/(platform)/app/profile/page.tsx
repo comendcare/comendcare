@@ -89,7 +89,7 @@ export default async function ProfilePage() {
 
         // Existing verified organization rendering logic
         return (
-            <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-2 mx-auto gap-4">
+            <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
                 <main className="col-span-4 flex flex-col items-center">
                     <div className="w-full flex flex-col mx-4 space-y-2">
                         <div className="w-full flex flex-col space-y-4">
