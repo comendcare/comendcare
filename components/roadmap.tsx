@@ -366,22 +366,26 @@ export function Roadmap({data}: {data: any}) {
                                     // parse CSV file
                                     Papa.parse(file, {
                                         complete: (result) => {
-                                            console.log("Parsed file:", result.data)
                                             const newMilestones: any[] = []
                                             result.data.forEach((entry: any) => {
-                                                // validate
-                                                if (entry.title && entry.description && entry.types) {
+                                                // validate milestone format - don't include the milestone if it doesn't have all the
+                                                // proper fields or if the fields are not of the correct type
+                                                if (
+                                                    entry.title && typeof entry.title === "string" && 
+                                                    entry.description && typeof entry.description === "string" &&
+                                                    entry.type && typeof entry.type === "string" &&
+                                                    entry.category && typeof entry.type === "string"
+                                                ) {
                                                     newMilestones.push({
                                                         title: entry.title,
                                                         description: entry.description,
-                                                        types: [MILESTONE_TYPE_OPTIONS.find(type => type.label === entry.types)?.value]
+                                                        types: [MILESTONE_TYPE_OPTIONS.find(type => type.label === entry.type)?.value],
+                                                        nodeType: entry.category
                                                     })
                                                 } else {
                                                     console.error(`Invalid milestone type`, entry)
                                                 }
                                             })
-
-                                            console.log(`new milestones`, newMilestones)
                                             addMilestones(newMilestones)
                                         },
                                         header: true,
