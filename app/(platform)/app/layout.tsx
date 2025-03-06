@@ -149,10 +149,14 @@ export default function AppLayout({children}: AppLayoutProps) {
     }
 
     useEffect(() => {
-        // Only run if the session data has changed
-        // if (JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)) {
+        // Only run if the session data has changed or the session has not yet been set up
+        if (
+            status !== "authenticated" || 
+            !session || 
+            JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
+        ) {
             handleSessionUpdate()
-        // }
+        }
 
         // Update the ref to the latest session
         prevSessionRef.current = session
@@ -201,4 +205,6 @@ export default function AppLayout({children}: AppLayoutProps) {
             </SidebarProvider>
         )
     }
+
+    return <Loading />
 }
