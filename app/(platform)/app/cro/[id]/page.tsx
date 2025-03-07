@@ -36,6 +36,7 @@ import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/
 import {CRODescription} from "@/components/cro-description";
 import {CertificationBadge} from "@/components/certification-badge";
 import CROMarketplaceProfileReviewsTab from "@/components/cro-marketplace-profile-reviews-tab";
+import {cn} from "@/lib/utils";
 
 const companyTypeIcons: Record<string, JSX.Element> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
@@ -95,10 +96,10 @@ export default async function CompanyHomePage({
                     Back to marketplace
                 </Link>
                 <main className="flex flex-col w-full max-w-7xl mx-auto space-y-8">
-                    <div className="flex flex-row">
-                        <div className="flex flex-col space-y-4">
-                            <div className="min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">
-                                <h1 className="whitespace-nowrap leading-normal">
+                    <div className="grid grid-cols-5 gap-8">
+                        <div className="col-span-4 flex flex-col space-y-4">
+                            <div className="min-w-0 flex-1 text-wrap text-3xl font-bold text-gray-900">
+                                <h1 className="leading-normal">
                                     {cro.title}
                                 </h1>
                             </div>
@@ -145,7 +146,7 @@ export default async function CompanyHomePage({
                         </div>
                         <Link
                             href={cro.website || ""}
-                            className={buttonVariants({variant: "cta"})}
+                            className={cn(buttonVariants({variant: "cta"}), "col-span-1 w-fit")}
                             target="_blank"
                         >
                             <FaArrowUpRightFromSquare/>
