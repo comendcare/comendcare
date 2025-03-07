@@ -492,7 +492,7 @@ export function EditMilestoneForm({
                                                 <div className="w-full col-span-2" data-registry="plate">
                                                     <SettingsProvider>
                                                         <PlateEditor
-                                                            value={field.value}
+                                                            value={field.value ?? []}
                                                             onChange={field.onChange}
                                                         />
                                                     </SettingsProvider>

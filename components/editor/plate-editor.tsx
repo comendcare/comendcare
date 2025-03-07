@@ -1,13 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { Plate } from '@udecode/plate-common/react';
+import { createPlateEditor, Plate } from '@udecode/plate-common/react';
 import { useCreateEditor } from '@/components/editor/use-create-editor';
 import { Editor, EditorContainer } from '@/components/plate-ui/editor';
 
-export function PlateEditor({ value, onChange }: { value: any[], onChange: (...event: any[]) => void }) {
+type PlateEditorProps = {
+  value: any[]
+  onChange: (value: any[]) => void
+}
+
+export function PlateEditor({ value, onChange }: PlateEditorProps) {
   const editor = useCreateEditor({ value })
 
   return (

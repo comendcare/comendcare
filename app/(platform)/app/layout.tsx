@@ -122,6 +122,9 @@ export default function AppLayout({children}: AppLayoutProps) {
                 if (pathname === '/app/task-board') {
                     setNotificationsViewed(notifications.data.filter(notification => notification.type === "NEW_TASK"))
                 }
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
             }
 
             // let kanban = await getKanbanFromOrganizationId()
@@ -198,8 +201,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                         </div>
                     </header>
                     <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full overflow-hidden overflow-y-auto">
-                        {isLoading ? <Loading /> : (children)}
-                        {/* {children} */}
+                        {status !== "authenticated" || !session  ? <Loading /> : (children)}
                     </div>
                 </SidebarInset>
             </SidebarProvider>
