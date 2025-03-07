@@ -291,6 +291,7 @@ export function EditMilestoneForm({
                                     Recommendations
                                 </TabsTrigger>
                             </TabsList>
+                            <TypeBadge type={formData.nodeType}/>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost">

@@ -90,7 +90,6 @@ export function CROSearchResults() {
         // default to grid view
         return (
             <div className="w-full flex flex-col gap-4">
-                <h1 className="text-xl">Recommendations</h1>
                 <div className="relative flex flex-col gap-2 items-start">
                     {!roadmapId ? (
                         <>
@@ -185,10 +184,6 @@ export function CROSearchResults() {
                         </>
                     )}
                 </div>
-
-                <Separator />
-
-                <h1 className="text-xl">Results</h1>
 
                 {(!searchResults || searchResults.length === 0) ? (
                     <NoResultsView />
