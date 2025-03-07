@@ -10,12 +10,14 @@ import React from "react";
 
 type NodeTypeCount = Record<string, number>;
 
-function countNodeTypes(data: { node: { type: string } }[]): NodeTypeCount {
-    return data.reduce((acc: NodeTypeCount, item) => {
-        const type = item.node.type;
-        acc[type] = (acc[type] || 0) + 1;
-        return acc;
-    }, {});
+function countPublicNodeTypes(data: { node: { type: string }; private: boolean }[]): NodeTypeCount {
+    return data
+        .filter(item => !item.private) // Filter out private milestones
+        .reduce((acc: NodeTypeCount, item) => {
+            const type = item.node.type;
+            acc[type] = (acc[type] || 0) + 1;
+            return acc;
+        }, {});
 }
 
 export function OrganizationMarketplaceCard({organization}: { organization: any }) {
@@ -23,7 +25,7 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
     const orgCondition = condition?.[0]?.condition || {};
     const {associatedGenes = [], numberOfPatientsEngaged} = orgCondition;
 
-    const nodeTypeCount = countNodeTypes(organization.Milestone);
+    const nodeTypeCount = countPublicNodeTypes(organization.Milestone);
 
     const nodeTypeLabels = [
         {key: "ASSET", icon: FaStar, label: "Asset"},
