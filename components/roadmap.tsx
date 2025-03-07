@@ -41,8 +41,10 @@ import { FileUploadForm } from "./file-upload-form"
 import Papa from "papaparse"
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
 import { toast } from "sonner"
+import Loading from "@/app/loading"
 
 const selector = (state: RoadmapState) => ({
+    initialized: state.initialized,
     selectedView: state.selectedView,
     setSelectedView: state.setSelectedView,
     selectedNodeId: state.selectedNodeId,
@@ -57,6 +59,7 @@ export function Roadmap({data}: {data: any}) {
     // Zustand state management
     const { defaultLayout } = useSidebarStore()
     const { 
+        initialized,
         selectedView,
         setSelectedView,
         selectedNodeId, 
@@ -200,6 +203,10 @@ export function Roadmap({data}: {data: any}) {
 
         const nodes = await addNodes(newNodes)
         return nodes
+    }
+
+    if (!initialized) {
+        return <Loading />
     }
 
     return (
