@@ -18,21 +18,21 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilest
     setUrlMilestone?: (id: string) => void | undefined
 }) => {
     return (
-        <ol className="relative border-s-4 border-blue-light dark:border-gray-700 space-y-8">
+        <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700">
             {roadmap?.milestones?.sort((a: any, b: any) => {
                     return a.startDate - b.startDate
                 }).map((item: any, index: number) => (
                     externalLinks 
-                        ? <TimelineElementLink key={index} subdomain={subdomain} item={item}/> 
-                        : <TimelineElementButton key={index} item={item} setUrlMilestone={setUrlMilestone}/>
+                        ? <TimelineElementLink key={index} subdomain={subdomain} item={item} urlMilestone={urlMilestone}/> 
+                        : <TimelineElementButton key={index} item={item} setUrlMilestone={setUrlMilestone} urlMilestone={urlMilestone}/>
             ))}
         </ol>
     )
 }
 
-const TimelineElementLink = ({key, subdomain, item}: {key: number, subdomain: string | undefined, item: any}) => {
+const TimelineElementLink = ({key, subdomain, item, urlMilestone}: {key: number, subdomain: string | undefined, item: any, urlMilestone?: string | undefined}) => {
     return (
-        <li className="ms-6">
+        <li className={cn("ms-6 w-full text-left hover:bg-secondary p-2 rounded-md", item.private ? "pointer-events-none": "")}>
             <a
                 href={
                     subdomain ?
@@ -51,11 +51,11 @@ const TimelineElementLink = ({key, subdomain, item}: {key: number, subdomain: st
     )
 }
 
-const TimelineElementButton = ({key, item, setUrlMilestone}: {key: number, item: any, setUrlMilestone?: (id: string) => void | undefined}) => {
+const TimelineElementButton = ({key, item, setUrlMilestone, urlMilestone}: {key: number, item: any, setUrlMilestone?: (id: string) => void | undefined, urlMilestone?: string | undefined}) => {
     return (
         <li className="ms-6">
-            <div 
-                className="hover:cursor-pointer"
+            <button 
+                className={cn("hover:cursor-pointer w-full text-left hover:bg-secondary p-2 rounded-md", urlMilestone === item.id ? "border-primary border-2" : "")}
                 onClick={() => {
                     if (setUrlMilestone !== undefined) {
                         setUrlMilestone(item.id)
@@ -66,7 +66,7 @@ const TimelineElementButton = ({key, item, setUrlMilestone}: {key: number, item:
                     item={item}
                     externalLinkIcon={false}
                 />
-            </div>
+            </button>
         </li>
     )
 }
