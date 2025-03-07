@@ -42,6 +42,7 @@ import Papa from "papaparse"
 import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
 import { toast } from "sonner"
 import Loading from "@/app/loading"
+import Image from "next/image"
 
 const selector = (state: RoadmapState) => ({
     initialized: state.initialized,
@@ -316,9 +317,13 @@ export function Roadmap({data}: {data: any}) {
                             value="flow"
                             className="m-0 h-[calc(100vh-6rem)]"
                         >
-                            <PrivateFlowView
-                                width={defaultLayout[0]}
-                            />
+                            {milestones.length > 0 ? (
+                                <PrivateFlowView
+                                    width={defaultLayout[0]}
+                                />
+                            ): (
+                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} />
+                            )}
                         </TabsContent>
                         
                         {/* Timeline view */}
@@ -326,7 +331,11 @@ export function Roadmap({data}: {data: any}) {
                             value="timeline"
                             className="mt-0 h-[calc(100vh-6rem)]"
                         >
-                            <PrivateTimelineView />
+                            {milestones.length > 0 ? (
+                                <PrivateTimelineView />
+                            ): (
+                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} />
+                            )}
                         </TabsContent>
 
                     </Tabs>
@@ -504,5 +513,26 @@ const MilestoneDetailsPanel = ({
             milestoneData={milestone}
             onClose={handleClose}
         />
+    )
+}
+
+const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val: boolean) => void}) => {
+    return (
+        <div className="h-full w-full flex flex-col justify-center items-center gap-4">
+            <h1 className="font-cal text-4xl">You do not have any milestones</h1>
+            <Image
+                alt="missing milestones"
+                src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                width={400}
+                height={400}
+            />
+            <p className="text-lg text-stone-500">
+                You do not have any milestones yet. Create one to get started.
+            </p>
+            <Button variant={"cta"} onClick={() => setNewMilestoneIsOpen(true)}>
+                <FaPlus />
+                Create milestone
+            </Button>
+        </div>
     )
 }
