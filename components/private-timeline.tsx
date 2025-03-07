@@ -61,7 +61,7 @@ const router = useRouter()
                             onClick={() => {
                                 handleEditClick(milestone.nodeId)
                             }}
-                            className={cn("w-full text-left hover:bg-secondary p-2 rounded-md", selectedNodeId === milestone.nodeId ? "bg-secondary" : "")}
+                            className={cn("w-full text-left hover:bg-secondary p-2 rounded-md", selectedNodeId === milestone.nodeId ? "border-primary border-2" : "")}
                         >
                             <>
                             <span className="absolute flex items-center justify-center bg-white rounded-full -start-[18px]">
