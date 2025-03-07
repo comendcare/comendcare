@@ -27,7 +27,7 @@ import {toast} from "sonner";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {PAGBannerPhoto} from "@/components/pag-banner-photo";
-import {RoadmapCard} from "@/components/public-roadmap-card";
+import {NoResearchPlanCard, RoadmapCard} from "@/components/public-roadmap-card";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import NoOrganization from "@/components/no-organization";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
@@ -35,6 +35,8 @@ import {PublishOrganizationSwitch} from "@/components/publish-organization-switc
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {ProfileCompletionCard} from "@/components/profile-completion-card";
 import EditPagProfileSubdomainDialog from "@/components/edit-pag-profile-subdomain-dialog";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import { FaInfoCircle } from "react-icons/fa";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -214,19 +216,26 @@ export default async function ProfilePage() {
                                     {/*    </TabsList>*/}
                                     {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
                                     <ProfileCompletionCard />
-                                    <PAGProfileAssetsAndRFPsHoverableCard
-                                        isPrivate={true}
-                                        assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "ASSET")}
-                                        rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "RFP")}
-                                        // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
-                                        // rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
-                                    />
-                                    <RoadmapCard
-                                        roadmap={roadmaps[0]}
-                                        subdomain={organization?.subdomain || undefined}
-                                        isPublic={false}
-                                        externalLinks={true}
-                                    />
+                                    <div className="flex flex-col gap-4 relative">
+                                        <PAGProfileAssetsAndRFPsHoverableCard
+                                            isPrivate={true}
+                                            assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "ASSET")}
+                                            rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "RFP")}
+                                            // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
+                                            // rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
+                                        />
+                                        <RoadmapCard
+                                            roadmap={roadmaps[0]}
+                                            subdomain={organization?.subdomain || undefined}
+                                            isPublic={false}
+                                            externalLinks={true}
+                                        />
+                                        {roadmaps.length <= 0 && (
+                                            <div className="absolute inset-0 bg-black/10 backdrop-blur flex items-center justify-center p-4 rounded-md">
+                                                <NoResearchPlanCard isPublic={false}/>
+                                            </div>
+                                        )}
+                                    </div>
                                     {/*    </TabsContent>*/}
                                     {/*    <TabsContent value="activity" className="mt-0">*/}
                                     {/*        <PAGProfileActivityCard/>*/}
