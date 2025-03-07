@@ -1723,7 +1723,8 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 }
             },
             nodes: true,
-            edges: true
+            edges: true,
+            organization: true
         }
     })
 
