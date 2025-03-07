@@ -9,6 +9,7 @@ import { Card, CardContent } from "./ui/card"
 import { Button } from "./ui/button"
 import { usePathname } from "next/navigation"
 import { TypeBadge } from "./type-badge"
+import { TimelineCardContents } from "./private-timeline"
 
 export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilestone, setUrlMilestone}: {
     roadmap: any,
@@ -18,7 +19,7 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilest
     setUrlMilestone?: (id: string) => void | undefined
 }) => {
     return (
-        <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700">
+        <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
             {roadmap?.milestones?.sort((a: any, b: any) => {
                     return a.startDate - b.startDate
                 }).map((item: any, index: number) => (
@@ -75,7 +76,7 @@ const TimelineElementContent = ({item, externalLinkIcon}: {item: any, externalLi
     return (
         <>
             <span className="absolute flex items-center justify-center bg-white rounded-full -start-[18px]">
-                <TypeBadge className="w-8 p-2" iconOnly={true} type={item?.node?.type || "PROJECT"}/>
+                <TypeBadge className="w-8 p-2" iconOnly={true} type={item?.node?.type || item?.nodeType || "PROJECT"}/>
             </span>
             <div className="flex flex-row items-center justify-start gap-4">
                 <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white ">
@@ -88,9 +89,10 @@ const TimelineElementContent = ({item, externalLinkIcon}: {item: any, externalLi
                     {getDates(item)}
                 </time>
             </div>
-            <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2">
+            <p className="mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2">
                 {item.description}
             </p>
+            <TimelineCardContents milestoneData={item} nodeType={item?.node?.type || item?.nodeType || "PROJECT"}/>
         </>
     )
 }
