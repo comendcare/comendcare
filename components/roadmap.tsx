@@ -77,7 +77,7 @@ export function Roadmap({data}: {data: any}) {
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1);
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false);
-    const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
+    const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(milestones.length <= 0)
     const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const store = useStoreApi()
     
