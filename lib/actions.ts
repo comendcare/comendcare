@@ -2607,11 +2607,13 @@ export const createReview = async (companyId: string, formData: FormData): Promi
 
         const title = formData.get("title") as string;
         const body = formData.get("body") as string;
+        const rating = formData.get("rating") as string;
 
         const review = await prisma.review.create({
             data: {
                 title: title,
                 body: body,
+                rating: parseInt(rating),
                 author: {
                     connect: {
                         id: session.user.id
