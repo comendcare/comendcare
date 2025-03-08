@@ -53,7 +53,9 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             incorporationStatus: organization.incorporationStatus || undefined,
             description: organization.description || "",
             website: organization.website || "",
-            raised: organization.moneyRaised || 0
+            raised: organization.moneyRaised || 0,
+            deployed: organization.moneyDeployed || 0,
+            budget: organization.researchBudget || 0
         }
     });
 
@@ -64,7 +66,9 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             incorporationStatus: organization.incorporationStatus || undefined,
             description: organization.description || "",
             website: organization.website || "",
-            raised: organization.moneyRaised || 0
+            raised: organization.moneyRaised || 0,
+            deployed: organization.moneyDeployed || 0,
+            budget: organization.researchBudget || 0
         });
     }, [organization, editOrgForm]);
 
