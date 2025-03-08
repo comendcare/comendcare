@@ -1,7 +1,7 @@
 import {Company, Organization, Review, User} from "@prisma/client";
 import {CROReviewCard} from "@/components/cro-review-card";
 import CROReviewDialog from "@/components/cro-review-dialog";
-import {CRORatingSection} from "@/components/cro-rating-section";
+import CRORatingSection from "@/components/cro-rating-section";
 import { Card, CardContent } from "./ui/card";
 import Image from "next/image";
 
@@ -19,7 +19,7 @@ export default function CROMarketplaceProfileReviewsTab({cro}: { cro: CompanyWit
         <div className="pt-4 pb-8">
             <div className="grid grid-cols-3 gap-8">
                 <div className="col-span-1">
-                    <CRORatingSection/>
+                    <CRORatingSection reviews={cro.reviews}/>
                 </div>
                 <div className="col-span-2 flex flex-col space-y-8">
                     <div className="place-self-end">

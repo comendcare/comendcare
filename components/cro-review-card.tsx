@@ -37,7 +37,14 @@ export const CROReviewCard = ({review}: { review: ReviewWithAuthor }) => {
                         <StarRatingIndicator rating={4.3}/>
                         <div className="flex items-start">
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Reviewed: <time dateTime="2022-01-20 19:00">January 20, 2022</time>
+                                Reviewed:{" "}
+                                <time dateTime={new Date(review.createdAt).toISOString()}>
+                                    {new Date(review.createdAt).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    })}
+                                </time>
                             </p>
                         </div>
                     </div>
