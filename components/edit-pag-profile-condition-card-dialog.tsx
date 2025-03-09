@@ -16,7 +16,7 @@ import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import { getConditionsFromOrganizationId } from "@/lib/fetchers";
-import {FaPen, FaUpload} from "react-icons/fa6";
+import {FaPencil} from "react-icons/fa6";
 import {
     Dialog,
     DialogContent,
@@ -225,7 +225,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                         variant="ghost"
                         className="gap-x-2 organization-profile-tour-step3"
                     >
-                        <FaPen/>
+                        <FaPencil/>
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="max-h-[80vh] overflow-y-auto">
