@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Organization } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { FaPen } from "react-icons/fa6";
+import { FaPencil } from "react-icons/fa6";
 
 // Schema for validating the contact email
 const editContactEmailSchema = z.object({
@@ -71,7 +71,7 @@ export default function EditPAGContactEmailDialog({ organization }: { organizati
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="ghost">
-                    <FaPen />
+                    <FaPencil />
                 </Button>
             </DialogTrigger>
             <DialogContent>

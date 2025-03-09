@@ -21,7 +21,7 @@ import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Member, Organization, User} from "@prisma/client";
 import {useEffect, useState} from "react";
-import {FaPen} from "react-icons/fa6";
+import {FaPencil} from "react-icons/fa6";
 
 const editOrgFormSchema = z.object({
     description: z.string().max(500, {
@@ -83,7 +83,7 @@ export default function EditPagProfileAboutCardDialog({organization}: { organiza
                 <Button
                     variant="ghost"
                 >
-                    <FaPen/>
+                    <FaPencil/>
                 </Button>
             </DialogTrigger>
             <DialogContent>
