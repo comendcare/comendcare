@@ -44,17 +44,7 @@ export const sampleCROs: any[] = [
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    mechanisms: {
-        label: string,
-        value: string,
-        disable?: boolean,
-    }[],
     systems: {
-        label: string,
-        value: string,
-        disable?: boolean,
-    }[],
-    modalities: {
         label: string,
         value: string,
         disable?: boolean,
@@ -84,20 +74,6 @@ function generateFiltersString(filters: FiltersType) {
         filters.systems.forEach(system => {
             filtersList.push(`condition.condition.associatedSystems:=[${system.value}]`)
             typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.associatedSystems:=[${system.value}]`)
-        })
-    }
-
-    if (filters.mechanisms.length > 0) {
-        filters.mechanisms.forEach(mechanism => {
-            filtersList.push(`condition.condition.relevantDiseaseMechanisms:=[${mechanism.value}]`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.relevantDiseaseMechanisms:=[${mechanism.value}]`)
-        })
-    }
-
-    if (filters.modalities.length > 0) {
-        filters.modalities.forEach(modality => {
-            filtersList.push(`condition.condition.interestedModalities:=[${modality.value}]`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.interestedModalities:=[${modality.value}]`)
         })
     }
 

@@ -32,6 +32,7 @@ import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hov
 import NoOrganization from "@/components/no-organization";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
 import {PublishOrganizationSwitch} from "@/components/publish-organization-switch";
+import {BiopharmaConsentSwitch} from "@/components/biopharma-consent-switch";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {ProfileCompletionCard} from "@/components/profile-completion-card";
 import EditPagProfileSubdomainDialog from "@/components/edit-pag-profile-subdomain-dialog";
@@ -251,6 +252,8 @@ export default async function ProfilePage() {
                 <Card className="col-span-1 flex flex-col space-y-4 h-fit">
                     <CardHeader className="flex flex-col gap-4 pb-0">
                         <PublishOrganizationSwitch organization={organization}/>
+                        <BiopharmaConsentSwitch organization={organization} />
+                        
                         <div className="flex flex-col gap-2 pb-0">
                             <div
                                 className="flex flex-row items-center justify-between"
