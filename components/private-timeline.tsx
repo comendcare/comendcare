@@ -168,12 +168,6 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                         )
                     }
                 })}
-
-                {(milestoneData?.startDate || milestoneData?.endDate) && (
-                    <li>
-                        <DateView startDate={milestoneData?.startDate || undefined} endDate={milestoneData?.endDate || undefined}/>
-                    </li>
-                )}
             </ul>
         )
     }
@@ -188,12 +182,6 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                         </Badge>
                     </li>
                 ))}
-                {(milestoneData?.startDate || milestoneData?.endDate) && (
-                    <li>
-                        <DateView startDate={milestoneData?.startDate || undefined} endDate={milestoneData?.endDate || undefined}
-                                    startLabel={"Request Opens:"} endLabel={"Deadline for Proposals:"}/>
-                    </li>
-                )}
                 {milestoneData?.budget && (
                     <li className="flex gap-2 items-center">
                         <FaDollarSign/>
