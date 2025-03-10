@@ -2,6 +2,7 @@
 import {PrismaClient} from '@prisma/client'
 import {addTypeSenseDocument, createTypeSenseCollection, sendTypeSenseRequest} from "@/lib/utils";
 import { DEFAULT_KANBAN_COLUMNS } from '@/lib/types';
+import { MILESTONE_TYPE_OPTIONS } from './milestone-types';
 
 const prisma = new PrismaClient()
 
@@ -22,6 +23,12 @@ async function main() {
     } catch (err) {
         console.log(`Collection organizations does not exist. Skipping delete.`);
     }
+
+    // seed milestone types
+    await prisma.milestoneType.deleteMany()
+    const milestoneTypes = await prisma.milestoneType.createMany({
+        data: MILESTONE_TYPE_OPTIONS
+    })
 
     const flawnson = await prisma.user.upsert({
         where: {email: 'flawnsontong1@gmail.com'},
@@ -927,14 +934,10 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
                 const newMilestone = await prisma.milestone.findUnique({
                     where: {nodeId: node.id},
                     include: {
-                        attachments: true, 
-                        // asset: {
-                        //     include: { contacts: true, attachments: true }
-                        // },
-                        // RFP: {
-                        //     include: { contacts: true, attachments: true }
-                        // },
-                        node: true
+                        node: true,
+                        contacts: true,
+                        attachments: true,
+                        types: true
                     }
                 })
 

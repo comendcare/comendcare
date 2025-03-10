@@ -16,7 +16,7 @@ import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useRef, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { GanttChartView } from "./gantt-chart"
-import { getRoadmapId } from "@/lib/fetchers"
+import { getMilestoneTypes, getRoadmapId } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
 import { cn } from "@/lib/utils"
@@ -33,16 +33,21 @@ import {
     DialogTitle,
 } from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
-import { MilestoneTemplateTabs } from "./roadmap-templates"
+import { MilestoneTemplates, MilestoneTemplateTabs } from "./roadmap-templates"
 import { nanoid } from "nanoid"
 import { useStoreApi, type Edge, type Node, type NodeChange } from "@xyflow/react"
 import { Redo2, Undo2 } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import Papa from "papaparse"
-import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
 import { toast } from "sonner"
 import Loading from "@/app/loading"
 import Image from "next/image"
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { Separator } from "@radix-ui/react-separator"
+import { NewMilestoneDialogForm } from "./new-milestone-dialog"
+import { MilestoneType } from "@prisma/client"
+// import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/milestone-types"
+import { Option } from "@/lib/types"
 
 const selector = (state: RoadmapState) => ({
     initialized: state.initialized,
@@ -78,8 +83,26 @@ export function Roadmap({data}: {data: any}) {
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false);
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(milestones.length <= 0)
-    const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+    // const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+    const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
     const store = useStoreApi()
+    const [milestoneTypes, setMilestoneTypes] = useState<Option[]>([])
+
+    useEffect(() => {
+        const init = async () => {
+            // get milestone types from database
+            const response = await getMilestoneTypes()
+            if (response.success && response.data) {
+                setMilestoneTypes(response.data.map(type => ({
+                    value: type.id,
+                    label: type.label,
+                    description: type.description || undefined
+                })))
+            }
+        }
+
+        init()
+    }, []);
     
     useEffect(() => {
         milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
@@ -136,7 +159,6 @@ export function Roadmap({data}: {data: any}) {
         window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
     }, [selectedNodeId, selectedView])
     
-
     const handleMilestonePanelChange = (open: boolean) => {
         if (!open) { setSelectedNodeId(null) }
     }
@@ -167,7 +189,7 @@ export function Roadmap({data}: {data: any}) {
         // let centerX =
         //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
         let centerX = milestonesAlongXAxis.length > 0 ? (
-            milestonesAlongXAxis[milestonesAlongXAxis.length - 1].position.x + 500
+            (milestonesAlongXAxis[milestonesAlongXAxis.length - 1]?.position?.x || 0) + 500
         ): (
             0
         )
@@ -224,26 +246,29 @@ export function Roadmap({data}: {data: any}) {
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
                             </TabsList>
 
-                            <Button variant={"cta"} className="research-plan-tour-step1 ml-auto" onClick={() => setNewMilestoneIsOpen(true)}>
-                                <FaPlus />
-                                Create milestone
-                            </Button>
-                            <Button
-                                variant="secondary"
-                                type="button"
-                                onClick={() => {
-                                    router.push('/app/research-plan/templates')
-                                }}
-                            >
-                                Browse milestone library
-                            </Button>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button size={"icon"} variant={"cta"} className="research-plan-tour-step1 ml-auto" onClick={() => setNewMilestoneIsOpen(true)}>
+                                        <FaPlus />
+                                        {/* Create milestone */}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80">
+                                    <p>{`Create a milestone`}</p>
+                                </TooltipContent>
+                            </Tooltip>
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button onClick={() => {
-                                        console.log("Bulk import triggered")
-                                        setBulkImportIsOpen(true)
-                                    }} size={"icon"} variant={"ghost"}>
+                                    <Button 
+                                        disabled={milestoneTypes.length === 0}
+                                        onClick={() => {
+                                            console.log("Bulk import triggered")
+                                            setBulkImportIsOpen(true)
+                                        }} 
+                                        size={"icon"} 
+                                        variant={"ghost"}
+                                    >
                                         <FaFileImport />
                                     </Button>
                                 </TooltipTrigger>
@@ -396,7 +421,7 @@ export function Roadmap({data}: {data: any}) {
                                                     newMilestones.push({
                                                         title: entry.title,
                                                         description: entry.description,
-                                                        types: [MILESTONE_TYPE_OPTIONS.find(type => type.label === entry.type)?.value],
+                                                        types: [milestoneTypes.find(type => type.label === entry.type)],
                                                         nodeType: entry.category
                                                     })
                                                 } else {
@@ -422,60 +447,10 @@ export function Roadmap({data}: {data: any}) {
                     </DialogContent>
                 </Dialog>
 
-                <Dialog open={newMilestoneIsOpen} onOpenChange={(open: boolean) => {
-                    if (!open) setSelectedMilestones([])
-                    setNewMilestoneIsOpen(open)
-                }}>
-                    <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start">
-                        <DialogHeader>
-                            <DialogTitle className="text-2xl">
-                                Select from a milestone template
-                            </DialogTitle>
-                            <DialogDescription>
-                                {`Templates can help you find inspiration and get started faster. Click on a Milestone Template to add it to your Research Plan.`}
-                            </DialogDescription>
-                        </DialogHeader>
-        
-                        <MilestoneTemplateTabs 
-                            selectedMilestones={selectedMilestones}
-                            setSelectedMilestones={setSelectedMilestones}
-                            createEmpty={() => addMilestones([{name: 'New Milestone'}])}
-                            inDialog={true}
-                        />
-        
-                        <DialogFooter>
-                            <DialogClose>
-                                <Button variant="secondary" type="button">
-                                    Cancel
-                                </Button>
-                            </DialogClose>
-        
-                            <Button
-                                variant="secondary"
-                                type="button"
-                                onClick={() => {
-                                    router.push('/app/research-plan/templates')
-                                }}
-                            >
-                                Browse milestone library
-                            </Button>
-                            
-                            <DialogClose>
-                                <Button
-                                    disabled={selectedMilestones.length === 0}
-                                    type="button"
-                                    onClick={() => {
-                                        console.log(`add milestones`, selectedMilestones)
-                                        addMilestones(selectedMilestones)
-                                    }}
-                                >
-                                    <FaPlus />
-                                    Create selected milestones
-                                </Button>
-                            </DialogClose>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                <NewMilestoneDialogForm 
+                    open={newMilestoneIsOpen}
+                    setOpen={setNewMilestoneIsOpen}
+                />
             </ResizablePanelGroup>
         </TooltipProvider>
     )

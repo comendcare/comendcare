@@ -46,8 +46,10 @@ export type Edge = Prisma.EdgeGetPayload<{}>
 
 export type Milestone = Prisma.MilestoneGetPayload<{
     include: {
+        node: true,
+        contacts: true,
         attachments: true,
-        contacts: true
+        types: true
     }
 }>
 
@@ -1717,9 +1719,10 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
         include: {
             milestones: {
                 include: {
-                    attachments: true,
+                    node: true,
                     contacts: true,
-                    node: true
+                    attachments: true,
+                    types: true
                 }
             },
             nodes: true,
@@ -1885,9 +1888,10 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         })
         const updatedMilestones = await prisma.milestone.findMany({
             include: {
-                attachments: true,
+                node: true,
                 contacts: true,
-                node: true
+                attachments: true,
+                types: true
             },
             where: {roadmapId}
         })
@@ -1975,9 +1979,10 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         const nodeIds = updatedNodes.map(node => node.id)
         let updatedMilestones = await prisma.milestone.findMany({
             include: {
-                attachments: true,
+                node: true,
                 contacts: true,
-                node: true
+                attachments: true,
+                types: true
             },
             where: {roadmapId}
         })
@@ -2099,9 +2104,10 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     where: {nodeId: milestone.nodeId},
                     // where: {id: milestone.id},
                     include: {
-                        attachments: true,
+                        node: true,
                         contacts: true,
-                        node: true
+                        attachments: true,
+                        types: true
                     }
                 })
 
@@ -2114,13 +2120,16 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     where: {nodeId: milestone.nodeId},
                     // where: {id: milestone.id},
                     include: {
-                        attachments: true,
+                        node: true,
                         contacts: true,
-                        node: true
+                        attachments: true,
+                        types: true
                     },
                     data: {
                         title: milestone.title,
-                        types: milestone.types || [],
+                        types: {
+                            set: milestone.types.map((type: any) => ({ id: type.value }))
+                        },
                         otherTypeDetails: milestone.otherTypeDetails,
                         description: milestone.description,
                         startDate: milestone.startDate,

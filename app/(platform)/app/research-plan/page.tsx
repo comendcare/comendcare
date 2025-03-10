@@ -5,7 +5,6 @@ import {Roadmap} from "@/components/roadmap"
 import RoadmapTemplates from "@/components/roadmap-templates"
 import NoOrganization from "@/components/no-organization";
 import { createRoadmap } from "@/lib/actions"
-import { initializeRoadmapState } from "@/lib/initialize-client-state"
 import RoadmapInitWrapper from "@/components/roadmap-init-wrapper"
 
 export default async function RoadmapPage() {

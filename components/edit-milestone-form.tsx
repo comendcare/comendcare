@@ -36,8 +36,8 @@ import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
-import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {Prisma} from "@prisma/client"
+import {NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
+import {MilestoneType, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
@@ -69,6 +69,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { TypeBadge } from "./type-badge"
 import Loading from "@/app/loading"
+import { Option } from "@/lib/types"
+import { getMilestoneTypes } from "@/lib/fetchers"
+
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -76,6 +79,7 @@ type ContactType = Prisma.ExternalContactGetPayload<{}>
 export const optionSchema = z.object({
     label: z.string(),
     value: z.string(),
+    description: z.string().optional()
     // disable: z.boolean().optional(),
 });
 
@@ -133,6 +137,7 @@ export function EditMilestoneForm({
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
+    const [milestoneTypes, setMilestoneTypes] = useState<Option[]>([])
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -141,10 +146,7 @@ export function EditMilestoneForm({
             nodeType: milestoneData?.nodeType || milestoneData?.node?.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            types: (milestoneData?.types || []).map((type: any) => MILESTONE_TYPE_OPTIONS.find(option => option?.value === type) || {
-                label: 'Unknown',
-                value: "UNKNOWN"
-            }),
+            types: (milestoneData?.types || []),
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
             startDate: milestoneData?.startDate,
             endDate: milestoneData?.endDate,
@@ -190,6 +192,16 @@ export function EditMilestoneForm({
                 }
             }
 
+            // get milestone types from database
+            const response = await getMilestoneTypes()
+            if (response.success && response.data) {
+                setMilestoneTypes(response.data.map(type => ({
+                    value: type.id,
+                    label: type.label,
+                    description: type.description || undefined
+                })))
+            }
+
             initializing.current = false
         }
 
@@ -221,6 +233,8 @@ export function EditMilestoneForm({
             notes
         } = values;
 
+        console.log(`types`, types)
+
         setMilestone(milestoneData?.nodeId, {
             nodeType,
             title,
@@ -229,7 +243,7 @@ export function EditMilestoneForm({
             ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
             ...(attachments ? {attachments} : undefined),
-            ...(types ? {types: types.map(t => t?.value)} : undefined),
+            ...(types ? {types} : undefined),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
@@ -430,7 +444,7 @@ export function EditMilestoneForm({
                                     <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
                                     {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
                                     </div>
-                                    <MilestoneTypeFormField form={form}/>
+                                    <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
 
                                     {formData.nodeType === "ASSET" && (
                                         <>
@@ -578,7 +592,7 @@ export function EditMilestoneForm({
     )
 }
 
-const MilestoneTypeFormField = ({form}: { form: any }) => {
+const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTypes: Option[] }) => {
     const types = form.watch("types")
 
     return (
@@ -592,8 +606,8 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                             <MultipleSelector
                                 {...field}
                                 maxSelected={3}
-                                defaultOptions={MILESTONE_TYPE_OPTIONS}
-                                options={MILESTONE_TYPE_OPTIONS}
+                                defaultOptions={milestoneTypes}
+                                options={milestoneTypes}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Milestone type"
