@@ -17,7 +17,7 @@ export const PAGProfileConditionsCard = ({conditions, organization, showEditDial
             <TooltipProvider>
                 <Card className="organization-profile-tour-step2">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
+                        <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
                             Condition
                         </CardTitle>
                         {showEditDialog &&
@@ -157,7 +157,7 @@ export const PAGProfileConditionsCard = ({conditions, organization, showEditDial
         return (
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
+                    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
                         Conditions
                     </CardTitle>
                 </CardHeader>

@@ -7,6 +7,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ReviewReplyReportReason {
+  HARASSMENT
+  FALSE
+  SPAM
+  SALES
+  HATE
+  OTHER
+}
+
 model User {
   id                    String                 @id @default(cuid())
   name                  String?
@@ -43,6 +52,10 @@ model User {
   sessions              Session[]
   stakeholders          TaskStakeholder[]
   platformNotifications PlatformNotification[]
+  reviews               Review[]
+  repliess              Reply[]
+  reportOnReviews       ReportOnReview[]
+  reportOnReplys        ReportOnReply[]
 }
 
 model PlatformNotification {
@@ -357,9 +370,10 @@ model Organization {
   id                   String                    @id @default(cuid())
   public               Boolean                   @default(true)
   verified             Boolean                   @default(false)
-  published            Boolean                   @default(false)
+  published            Boolean                   @default(true)
   name                 String?
   description          String?                   @db.Text
+  contactEmail         String?
   logo                 String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
   font                 String                    @default("font-cal")
   image                String?                   @db.Text
@@ -397,6 +411,7 @@ model Organization {
   Kanban               Kanban?
   Milestone            Milestone[]
   PlatformNotification PlatformNotification[]
+  reviews              Review[]
 
   @@index([userId])
 }
@@ -589,17 +604,20 @@ model Company {
   headquarters       String?
   companyType        String?
 
-  sites          Site[]
-  services       Service[]
-  certifications Certification[]
-  rfis           RFI[]
+  sites                    Site[]
+  services                 Service[]
+  certifications           Certification[]
+  simplifiedCertifications String[]
+  rfis                     RFI[]
+  reviews                  Review[]
+  avgRating                Float?          @default(0.0) // Stores the average rating of the company
 }
 
 model Site {
   id        String  @id @default(uuid())
   name      String
   address   String
-  company   Company @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
 }
 
@@ -607,14 +625,14 @@ model Service {
   id          String  @id @default(uuid())
   name        String
   description String?
-  company     Company @relation(fields: [companyId], references: [id])
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId   String
 }
 
 model Certification {
   id        String  @id @default(uuid())
   name      String
-  company   Company @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
   files     File[]
 }
@@ -623,7 +641,7 @@ model File {
   id              String        @id @default(uuid())
   fileName        String
   fileUrl         String
-  certification   Certification @relation(fields: [certificationId], references: [id])
+  certification   Certification @relation(fields: [certificationId], references: [id], onDelete: Cascade)
   certificationId String
 }
 
@@ -631,6 +649,59 @@ model RFI {
   id          String    @id @default(uuid())
   name        String
   submittedOn DateTime?
-  company     Company   @relation(fields: [companyId], references: [id])
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId   String
+}
+
+model Review {
+  id             String           @id @default(uuid())
+  title          String
+  body           String
+  rating         Float            @default(0.0) // Stores the rating given by the user (can be 1-5, 1-10, etc.)
+  authorId       String
+  author         User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  companyId      String
+  company        Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization?    @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  replies        Reply[]          @relation("ReviewToReply")
+  reports        ReportOnReview[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([authorId, companyId, organizationId]) // Ensures one review per user per company per organization
+}
+
+model Reply {
+  id        String          @id @default(uuid())
+  body      String
+  authorId  String
+  author    User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reviewId  String
+  review    Review          @relation("ReviewToReply", fields: [reviewId], references: [id], onDelete: Cascade)
+  reports   ReportOnReply[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model ReportOnReview {
+  id          String                  @id @default(uuid())
+  userId      String
+  reviewId    String
+  reason      ReviewReplyReportReason
+  description String?
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  review      Review                  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt   DateTime                @default(now())
+}
+
+model ReportOnReply {
+  id          String                  @id @default(uuid())
+  userId      String
+  replyId     String
+  reason      ReviewReplyReportReason
+  description String?
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reply       Reply                   @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime                @default(now())
 }

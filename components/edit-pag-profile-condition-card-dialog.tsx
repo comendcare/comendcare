@@ -16,7 +16,7 @@ import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import { getConditionsFromOrganizationId } from "@/lib/fetchers";
-import {FaPen, FaUpload} from "react-icons/fa6";
+import {FaPencil} from "react-icons/fa6";
 import {
     Dialog,
     DialogContent,
@@ -65,8 +65,10 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                         const fetchedValues = conditions.map((condition) => ({
                             disorder: condition.name || "",
                             summary: condition.summary || "",
+                            therapeutics: condition.therapeuticsInDevelopment.map((ther) => ({label: ther, value: ther})) || [],
                             categories: condition.diseaseCategories.map((cat) => ({label: cat, value: cat})) || [],
                             modalities: condition.interestedModalities.map((mod) => ({label: mod, value: mod})) || [],
+                            causal: condition.causalGenes.map((gene) => ({label: gene, value: gene})) || [],
                             genes: condition.associatedGenes.map((gene) => ({label: gene, value: gene})) || [],
                             systems: condition.associatedSystems.map((system) => ({
                                 label: system,
@@ -223,16 +225,16 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                         variant="ghost"
                         className="gap-x-2 organization-profile-tour-step3"
                     >
-                        <FaPen/>
+                        <FaPencil/>
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
-                            Edit organization profile
+                            Edit condition
                         </DialogTitle>
                         <DialogDescription>
-                            {`Make changes to your profile here. Click save when you're done.`}
+                            {`Make changes to your condition here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
                     <Form {...editResearchForm}>

@@ -48,7 +48,6 @@ export type Milestone = Prisma.MilestoneGetPayload<{
     include: {
         attachments: true,
         contacts: true
-        tasks: true
     }
 }>
 
@@ -1670,7 +1669,6 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 //     include: {
                 //         attachments: true,
                 //         contacts: true,
-                //         tasks: true,
                 //         node: true
                 //     }
                 // })
@@ -1721,7 +1719,6 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 include: {
                     attachments: true,
                     contacts: true,
-                    tasks: true,
                     node: true
                 }
             },
@@ -1889,7 +1886,6 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
             include: {
                 attachments: true,
                 contacts: true,
-                tasks: true,
                 node: true
             },
             where: {roadmapId}
@@ -1980,7 +1976,6 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
             include: {
                 attachments: true,
                 contacts: true,
-                tasks: true,
                 node: true
             },
             where: {roadmapId}
@@ -2105,7 +2100,6 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     include: {
                         attachments: true,
                         contacts: true,
-                        tasks: true,
                         node: true
                     }
                 })
@@ -2121,7 +2115,6 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     include: {
                         attachments: true,
                         contacts: true,
-                        tasks: true,
                         node: true
                     },
                     data: {
@@ -2221,6 +2214,56 @@ export async function createKanban(orgId: string) {
 }
 
 /* HANDLE KANBAN COLUMNS - create, update, delete ------------------------------------------------------------------------ */
+export async function kanbanSync({kanbanId, columns, tasks}: {kanbanId: string | undefined, columns: Column[], tasks: Task[]}) {
+    try {
+        if (!kanbanId) return
+
+        console.log(`kanban id`, kanbanId)
+        // return
+
+        await prisma.column.deleteMany({
+            where: { kanbanId }
+        })
+
+        // Save or update nodes
+        await Promise.all(
+            columns.map(async (column: Column) => {
+                const c = await prisma.column.create({
+                    // here we have to re-connect all the previously created connections
+                    data: {
+                        ...column,
+                        kanbanId,
+                        tasks: {
+                            create: tasks.filter(t => t.columnId === column.id).map(task => ({
+                                ...task,
+                                columnId: undefined,
+                                column: undefined,
+                                checklist: {
+                                    create: (task.checklist || []).map((item: any) => ({
+                                        ...item,
+                                        taskId: undefined
+                                    }))
+                                },
+                                milestoneId: task.milestoneId,
+                                milestone: undefined,
+                                stakeholders: {
+                                    create: (task.stakeholders || []).map((stakeholder: any) => ({
+                                        userId: stakeholder?.user?.id || stakeholder?.userId,
+                                    }))
+                                }
+                            }))
+                        }
+                    }
+                })
+            })
+        )
+
+    } catch (error: any) {
+        logError("Error syncing kanban", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 export async function createColumn(column: Partial<Column>) {
     try {
         const {data: kanban} = await getKanbanFromOrganizationId()
@@ -2540,3 +2583,66 @@ export async function deleteTask(taskId: string) {
         return {success: false, error: "Internal server error"};
     }
 }
+
+export const createReview = async (companyId: string, formData: FormData): Promise<ApiResponse<any>> => {
+    const session = await getSession()
+    if (!session?.user.id) {
+        throw new Error("You must be signed in to perform this action")
+    }
+
+    try { // Check if a member request already exists
+        const existingReview = await prisma.review.findUnique({
+            where: {
+                authorId_companyId_organizationId: {
+                    authorId: session.user.id,
+                    companyId: companyId, // Use the correct variable name for company ID
+                    organizationId: session.user.organizationId
+                },
+            },
+        });
+
+        if (existingReview) {
+            return {success: false, error: "You have already created a review for this company."};
+        }
+
+        const title = formData.get("title") as string;
+        const body = formData.get("body") as string;
+        const rating = formData.get("rating") as string;
+
+        const review = await prisma.review.create({
+            data: {
+                title: title,
+                body: body,
+                rating: parseInt(rating),
+                author: {
+                    connect: {
+                        id: session.user.id
+                    }
+                },
+                company: {
+                    connect: {
+                        id: companyId
+                    }
+                },
+                organization: {
+                    connect: {
+                        id: session.user.organizationId
+                    }
+                }
+            }
+        })
+
+        if (!review) {
+            console.error("Error creating review.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        revalidatePath("app/cro/")
+
+        return {success: true, data: review}
+    } catch (error: any) {
+        console.error("Error creating member request:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+

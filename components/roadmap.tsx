@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
 import { PrivateFlowView } from "@/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { GanttChartView } from "./gantt-chart"
 import { getRoadmapId } from "@/lib/fetchers"
@@ -21,41 +21,74 @@ import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { FaArrowUpRightFromSquare } from "react-icons/fa6"
-import { FaUndo } from "react-icons/fa"
+import { FaArrowUpRightFromSquare, FaFileImport, FaPlus } from "react-icons/fa6"
+import { FaRedo, FaUndo } from "react-icons/fa"
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "./ui/dialog"
+import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
+import { MilestoneTemplateTabs } from "./roadmap-templates"
+import { nanoid } from "nanoid"
+import { useStoreApi, type Edge, type Node, type NodeChange } from "@xyflow/react"
+import { Redo2, Undo2 } from "lucide-react"
+import { FileUploadForm } from "./file-upload-form"
+import Papa from "papaparse"
+import { MILESTONE_TYPE_OPTIONS } from "@/lib/types"
+import { toast } from "sonner"
+import Loading from "@/app/loading"
+import Image from "next/image"
 
 const selector = (state: RoadmapState) => ({
+    initialized: state.initialized,
     selectedView: state.selectedView,
     setSelectedView: state.setSelectedView,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
+    nodes: state.nodes,
     milestones: state.milestones,
-    saveState: state.saveState
+    saveState: state.saveState,
+    addNodes: state.addNodes
 })
 
 export function Roadmap({data}: {data: any}) {
     // Zustand state management
     const { defaultLayout } = useSidebarStore()
     const { 
+        initialized,
         selectedView,
         setSelectedView,
         selectedNodeId, 
         setSelectedNodeId, 
+        nodes: dbNodes,
         milestones, 
-        saveState
+        saveState,
+        addNodes
     } = useRoadmapStore(useShallow(selector))
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
-    const { undo } = useRoadmapStore.temporal.getState()
-    const [milestoneRemountKey, setMilestoneRemountKey] = useState(1)
-
+    const { undo, redo } = useRoadmapStore.temporal.getState()
+    const [milestoneRemountKey, setMilestoneRemountKey] = useState(1);
+    const milestoneRemountKeyRef = useRef(milestoneRemountKey);
+    const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false);
+    const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
+    const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+    const store = useStoreApi()
+    
     useEffect(() => {
-        const handleUndo = (event: KeyboardEvent) => {
-            if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-                event.preventDefault(); // Prevent default undo behavior (optional)
-                console.log("Undo action triggered")
-                undo() // undo updates zustand state
+        milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
+    
+        const handleUndoRedo = (event: KeyboardEvent) => {
+            console.log(event)
+            if (event.shiftKey && (event.metaKey || event.ctrlKey) && event.key === "z") {
+                console.log("Redo action triggered")
+                redo() // undo updates zustand state
                 saveState() // save state to update database
 
                 if (selectedNodeId) {
@@ -66,11 +99,22 @@ export function Roadmap({data}: {data: any}) {
 
                 return
             }
+            if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+                console.log("Undo action triggered");
+                undo(); // undo updates zustand state
+                saveState(); // save state to update database
+    
+                if (selectedNodeId) {
+                    // Remount the milestone form and update the milestoneRemountKey
+                    // using the ref to get the most recent value
+                    setMilestoneRemountKey(milestoneRemountKeyRef.current + 1);
+                }
+            }
         };
     
-        document.addEventListener("keydown", handleUndo);
-        return () => document.removeEventListener("keydown", handleUndo);
-    }, []);
+        document.addEventListener("keydown", handleUndoRedo);
+        return () => document.removeEventListener("keydown", handleUndoRedo);
+    }, [selectedNodeId, milestoneRemountKey]);
 
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString())
@@ -102,23 +146,112 @@ export function Roadmap({data}: {data: any}) {
         setSelectedNodeId(null) // deselect any selected milestones when switching tabs
     }
 
+    // Add a empty milestone node
+    // if a position is provided, place at the given coordinates
+    // if a position is not provided, place in the center
+    const addMilestones = async (newMilestones: any[]) => {
+        const newNodes: any[] = []
+
+        // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
+        const {
+            height,
+            width,
+            transform: [transformX, transformY, zoomLevel]
+        } = store.getState()
+
+        const zoomMultiplier = 1 / zoomLevel
+        const milestonesAlongXAxis = dbNodes.sort((a, b) => {
+            return a.position.x - b.position.x
+        })
+        console.log(`milestones along XAxis`, milestonesAlongXAxis)
+        // let centerX =
+        //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+        let centerX = milestonesAlongXAxis.length > 0 ? (
+            milestonesAlongXAxis[milestonesAlongXAxis.length - 1].position.x + 500
+        ): (
+            0
+        )
+        // let centerY =
+        //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        let centerY = 0
+
+        newMilestones.forEach(defaultData => {
+            const id = nanoid()
+            const newNode: Node = {
+                id: id,
+                type: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
+                position: {
+                    x: centerX,
+                    y: centerY
+                },
+                origin: [0.0, 0.0],
+                data: {
+                    id: nanoid(),
+                    nodeId: id,
+                    types: defaultData?.types || [],
+                    title: defaultData?.title || `New Milestone`,
+                    ...(defaultData?.description ? { description: defaultData.description } : undefined),
+                    status: defaultData?.status || "PLANNED",
+                    private: true
+                }
+            }
+
+            centerX += 500
+            // centerY += 200
+
+            newNodes.push(newNode)
+        })
+
+        const nodes = await addNodes(newNodes)
+        return nodes
+    }
+
+    if (!initialized) {
+        return <Loading />
+    }
+
     return (
         <TooltipProvider delayDuration={0}>
             <ResizablePanelGroup
                 direction="horizontal"
-                // onLayout={(sizes: number[]) => {
-                //     setLayout(sizes) // Use Zustand's setLayout to save panel sizes
-                // }}
                 className="h-full items-stretch"
             >
                 <ResizablePanel>
-                    <Tabs defaultValue={selectedView ? selectedView : "flow"} onValueChange={handleTabChange} className="flex flex-col gap-4">
+                    <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-start">
                             <TabsList>
-                                <TabsTrigger value="flow">Flow View</TabsTrigger>
                                 <TabsTrigger value="timeline">Timeline View</TabsTrigger>
-                                {/* <TabsTrigger value="gantt">Gantt Chart View</TabsTrigger> */}
+                                <TabsTrigger value="flow">Flow View</TabsTrigger>
                             </TabsList>
+
+                            <Button variant={"cta"} className="research-plan-tour-step1 ml-auto" onClick={() => setNewMilestoneIsOpen(true)}>
+                                <FaPlus />
+                                Create milestone
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                type="button"
+                                onClick={() => {
+                                    router.push('/app/research-plan/templates')
+                                }}
+                            >
+                                Browse milestone library
+                            </Button>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button onClick={() => {
+                                        console.log("Bulk import triggered")
+                                        setBulkImportIsOpen(true)
+                                    }} size={"icon"} variant={"ghost"}>
+                                        <FaFileImport />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80">
+                                    <p>{`Import milestones from .csv`}</p>
+                                </TooltipContent>
+                            </Tooltip>
+
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button onClick={() => {
@@ -132,25 +265,51 @@ export function Roadmap({data}: {data: any}) {
                                             setMilestoneRemountKey(prevKey => prevKey + 1)
                                         }
                                     }} size={"icon"} variant={"ghost"}>
-                                        <FaUndo />
+                                        <Undo2 />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
-                                    <p>{`Undo`}</p>
+                                    <p>{`Undo (⌘+Z)`}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button onClick={() => {
+                                        console.log("Redo action triggered")
+                                        redo() // undo updates zustand state
+                                        saveState() // save state to update database
+                        
+                                        if (selectedNodeId) {
+                                            // if there is a node selected, remount the milestone form
+                                            // to update the form data after the undo was triggered
+                                            setMilestoneRemountKey(prevKey => prevKey + 1)
+                                        }
+                                    }} size={"icon"} variant={"ghost"}>
+                                        <Redo2 />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80">
+                                    <p>{`Redo (⌘+Shift+Z)`}</p>
                                 </TooltipContent>
                             </Tooltip>
 
-                            <Link
-                                href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
-                                className={cn(
-                                    buttonVariants({ variant: "secondary" }),
-                                    "flex items-center ml-auto"
-                                )}
-                                target={"_blank"}
-                            >
-                                {`View public research plan`}
-                                <FaArrowUpRightFromSquare size={12}/>
-                            </Link>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Link
+                                        href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
+                                        className={cn(
+                                            buttonVariants({ variant: "ghost" }),
+                                            "flex items-center"
+                                        )}
+                                        target={"_blank"}
+                                    >
+                                        <FaArrowUpRightFromSquare size={12}/>
+                                    </Link>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80">
+                                    <p>{`View public research plan`}</p>
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
 
                         {/* Flow View */}
@@ -158,9 +317,13 @@ export function Roadmap({data}: {data: any}) {
                             value="flow"
                             className="m-0 h-[calc(100vh-6rem)]"
                         >
-                            <PrivateFlowView
-                                width={defaultLayout[0]}
-                            />
+                            {milestones.length > 0 ? (
+                                <PrivateFlowView
+                                    width={defaultLayout[0]}
+                                />
+                            ): (
+                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} />
+                            )}
                         </TabsContent>
                         
                         {/* Timeline view */}
@@ -168,16 +331,13 @@ export function Roadmap({data}: {data: any}) {
                             value="timeline"
                             className="mt-0 h-[calc(100vh-6rem)]"
                         >
-                            <PrivateTimelineView />
+                            {milestones.length > 0 ? (
+                                <PrivateTimelineView />
+                            ): (
+                                <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} />
+                            )}
                         </TabsContent>
 
-                        {/* Gantt Chart View */}
-                        {/* <TabsContent
-                            value="gantt"
-                            className="mt-0 h-[calc(100vh-3.5rem)]"
-                        >
-                            <GanttChartView />
-                        </TabsContent> */}
                     </Tabs>
                 </ResizablePanel>
 
@@ -188,7 +348,7 @@ export function Roadmap({data}: {data: any}) {
                         <ResizablePanel
                             defaultSize={40}
                             minSize={25}
-                            className="h-full flex flex-col"
+                            className="bg-white h-full flex flex-col"
                         >
                             <MilestoneDetailsPanel
                                 remountKey={milestoneRemountKey}
@@ -201,6 +361,121 @@ export function Roadmap({data}: {data: any}) {
                         </ResizablePanel>
                     </>
                 )}
+
+                <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
+                    setBulkImportIsOpen(open)
+                }}>
+                    {/* <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start"> */}
+                    <DialogContent className="flex flex-col justify-start">
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl">
+                                Import milestones
+                            </DialogTitle>
+                            <DialogDescription>
+                                Import multiple milestones at a time. Fill out our milestone <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">input template</Link> and upload.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <FileUploadForm 
+                            accept=".csv" 
+                            onSubmit={(file) => {
+                                if (file && file.name.endsWith(".csv")) {
+                                    // parse CSV file
+                                    Papa.parse(file, {
+                                        complete: (result) => {
+                                            const newMilestones: any[] = []
+                                            result.data.forEach((entry: any) => {
+                                                // validate milestone format - don't include the milestone if it doesn't have all the
+                                                // proper fields or if the fields are not of the correct type
+                                                if (
+                                                    entry.title && typeof entry.title === "string" && 
+                                                    entry.description && typeof entry.description === "string" &&
+                                                    entry.type && typeof entry.type === "string" &&
+                                                    entry.category && typeof entry.type === "string"
+                                                ) {
+                                                    newMilestones.push({
+                                                        title: entry.title,
+                                                        description: entry.description,
+                                                        types: [MILESTONE_TYPE_OPTIONS.find(type => type.label === entry.type)?.value],
+                                                        nodeType: entry.category
+                                                    })
+                                                } else {
+                                                    console.error(`Invalid milestone type`, entry)
+                                                }
+                                            })
+
+                                            if (newMilestones.length !== result.data.length) {
+                                                toast('Error!', {
+                                                    description: `Some milestones were not formatted properly. Some milestones have not been imported.`
+                                                })
+                                            }
+                                            addMilestones(newMilestones)
+                                        },
+                                        header: true,
+                                        skipEmptyLines: true,
+                                    })
+                                } else {
+                                    console.error("Please upload a valid CSV file.");
+                                }
+                            }}
+                        />
+                    </DialogContent>
+                </Dialog>
+
+                <Dialog open={newMilestoneIsOpen} onOpenChange={(open: boolean) => {
+                    if (!open) setSelectedMilestones([])
+                    setNewMilestoneIsOpen(open)
+                }}>
+                    <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start">
+                        <DialogHeader>
+                            <DialogTitle className="text-2xl">
+                                Select from a milestone template
+                            </DialogTitle>
+                            <DialogDescription>
+                                {`Templates can help you find inspiration and get started faster. Click on a Milestone Template to add it to your Research Plan.`}
+                            </DialogDescription>
+                        </DialogHeader>
+        
+                        <MilestoneTemplateTabs 
+                            selectedMilestones={selectedMilestones}
+                            setSelectedMilestones={setSelectedMilestones}
+                            createEmpty={() => addMilestones([{name: 'New Milestone'}])}
+                            inDialog={true}
+                        />
+        
+                        <DialogFooter>
+                            <DialogClose>
+                                <Button variant="secondary" type="button">
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+        
+                            <Button
+                                variant="secondary"
+                                type="button"
+                                onClick={() => {
+                                    router.push('/app/research-plan/templates')
+                                }}
+                            >
+                                Browse milestone library
+                            </Button>
+                            
+                            <DialogClose>
+                                <Button
+                                    disabled={selectedMilestones.length === 0}
+                                    type="button"
+                                    onClick={() => {
+                                        console.log(`add milestones`, selectedMilestones)
+                                        addMilestones(selectedMilestones)
+                                    }}
+                                >
+                                    <FaPlus />
+                                    Create selected milestones
+                                </Button>
+                            </DialogClose>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </ResizablePanelGroup>
         </TooltipProvider>
     )
@@ -238,5 +513,26 @@ const MilestoneDetailsPanel = ({
             milestoneData={milestone}
             onClose={handleClose}
         />
+    )
+}
+
+const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val: boolean) => void}) => {
+    return (
+        <div className="h-full w-full flex flex-col justify-center items-center gap-4">
+            <h1 className="font-cal text-4xl">You do not have any milestones</h1>
+            <Image
+                alt="missing milestones"
+                src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                width={400}
+                height={400}
+            />
+            <p className="text-lg text-stone-500">
+                You do not have any milestones yet. Create one to get started.
+            </p>
+            <Button variant={"cta"} onClick={() => setNewMilestoneIsOpen(true)}>
+                <FaPlus />
+                Create milestone
+            </Button>
+        </div>
     )
 }

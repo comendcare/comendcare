@@ -10,10 +10,11 @@ import {cn, formatMoney, truncate} from "@/lib/utils";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {Separator} from "@/components/ui/separator";
 import {BookCheck, Paperclip, TestTube, UserCheck} from "lucide-react";
-import {CardContents, TypeBadge} from "@/components/private-milestone-node";
+import {CardContents} from "@/components/private-milestone-node";
 import { PrivateBadge } from "./private-badge";
 import { PublicMilestoneNode } from "./public-milestone-node";
 import { NodeProps } from "@xyflow/react";
+import { TypeBadge } from "./type-badge";
 
 const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
     PLANNED: {
@@ -38,16 +39,16 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
     const getLink = () => {
         if (organization?.subdomain) {
             // if (organization.roadmaps?.filter((roadmap: any) => roadmap.id === milestone?.roadmapId).length > 0) {
-            //     return `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${milestone?.id}&view=flow`
+            //     return `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${milestone?.id}`
             // }
             //
             // return `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`
 
             if (organization.roadmaps?.filter((roadmap: any) => roadmap.id === milestone?.roadmapId).length > 0) {
-                return `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${organization.subdomain}/research-plan?milestone=${milestone?.id}&view=flow`
+                return `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${organization.subdomain}/research-plan?milestone=${milestone?.id}`
             }
 
-            return `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${organization.subdomain}/research-plan?milestone=${milestone?.id}&view=flow`
+            return `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${organization.subdomain}/research-plan?milestone=${milestone?.id}`
         }
 
         return '#'

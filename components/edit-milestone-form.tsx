@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaCalendar, FaEllipsis, FaGlobe, FaLinkSlash, FaLock, FaPlus, FaTrash, FaX} from "react-icons/fa6"
+import {FaCalendar, FaEllipsis, FaGlobe, FaLock, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -33,63 +33,45 @@ import {
     DialogTrigger
 } from "./ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
-import {toast} from "sonner"
-import {
-    DndContext,
-    useSensor,
-    useSensors,
-    KeyboardSensor,
-    Announcements,
-    TouchSensor,
-    MouseSensor,
-    closestCorners,
-    SensorDescriptor,
-    SensorOptions
-} from "@dnd-kit/core"
-import {CSS} from "@dnd-kit/utilities"
-import {
-    arrayMove,
-    SortableContext,
-    sortableKeyboardCoordinates,
-    useSortable,
-    verticalListSortingStrategy
-} from "@dnd-kit/sortable"
-import {CalendarIcon, GripVertical} from "lucide-react"
-import {cva} from "class-variance-authority"
-import {Switch} from "./ui/switch"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
 import {Prisma} from "@prisma/client"
-import {Separator} from "./ui/separator"
-import {FaEdit} from "react-icons/fa"
-import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore"
-import {getKanbanFromOrganizationId, getOrganizationFromOrganizationId} from "@/lib/fetchers"
-import mixpanel, { disable } from "mixpanel-browser"
+import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
+import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
-import {AttachmentsEditForm} from "./attachments-edit-form"
 import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
 import {ExternalContactField} from "./external-contact-field"
 import {ExternalAttachmentField} from "./external-attachment-field"
 import {Popover, PopoverContent, PopoverTrigger} from "./ui/popover"
-import {cn} from "@/lib/utils"
+import {cn, sleep} from "@/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "./ui/calendar"
 import {FaInfoCircle} from "react-icons/fa";
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
-import {PublicBadge} from "./public-badge"
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "./ui/dropdown-menu"
 import MoneyInput from "@/components/money-input";
 import MultipleSelector from "./ui/multiple-selector"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
-import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 import { SettingsProvider } from "./editor/settings"
 import { PlateEditor } from "./editor/plate-editor"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
+import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
+import { Card, CardContent } from "./ui/card"
+import Image from "next/image"
+import { CROMarketplaceCard, CRORecommendationCard } from "./marketplace-cro-card"
+import Link from "next/link"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { TypeBadge } from "./type-badge"
+import Loading from "@/app/loading"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
-type TaskType = Prisma.TaskGetPayload<{}>
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -97,24 +79,12 @@ export const optionSchema = z.object({
     // disable: z.boolean().optional(),
 });
 
-const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
-
 const selector = (state: RoadmapState) => ({
     setMilestone: state.setMilestone
 })
 
-const kanbanSelector = (state: KanbanState) => ({
-    columns: state.columns,
-    tasks: state.tasks,
-    updateTask: state.updateTask,
-    setTasks: state.setTasks,
-    addTask: state.addTask,
-    deleteTask: state.deleteTask,
-    addColumn: state.addColumn
-})
-
-const notificationsSelector = (state: NotificationsState) => ({
-    addNotification: state.addNotification
+const recommendationsSelector = (state: CROSearchState) => ({
+    recommendations: state.recommendations
 })
 
 const editMilestoneForm = z.object({
@@ -143,7 +113,6 @@ const editMilestoneForm = z.object({
     // }),
     budget: z.number().max(2147483647).min(0).optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
-    tasks: z.array(z.custom<TaskType>()).optional(),
     status: z.string(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
@@ -152,27 +121,18 @@ const editMilestoneForm = z.object({
 })
 
 export function EditMilestoneForm({
-                                      milestoneData,
-                                      onClose
-                                  }: {
+    milestoneData,
+    onClose
+}: {
     milestoneData: any
     onClose: () => void
 }) {
-    const {setMilestone} = useRoadmapStore(
-        useShallow(selector)
-    )
-    const {
-        columns: kanbanColumns,
-        tasks: kanbanTasks,
-        updateTask,
-        setTasks,
-        addTask,
-        deleteTask,
-        addColumn
-    } = useKanbanStore(useShallow(kanbanSelector))
+    const {setMilestone} = useRoadmapStore(useShallow(selector))
+    const { recommendations } = useCROSearchStore(useShallow(recommendationsSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
+    const [isMigrating, setIsMigrating] = useState(false)
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -190,7 +150,6 @@ export function EditMilestoneForm({
             endDate: milestoneData?.endDate,
             budget: milestoneData?.budget || undefined,
             attachments: milestoneData?.attachments || undefined,
-            tasks: kanbanTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [],
             status: milestoneData?.status || "PLANNED",
             isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
@@ -209,7 +168,6 @@ export function EditMilestoneForm({
         endDate: form.watch("endDate"),
         budget: form.watch("budget"),
         attachments: form.watch("attachments"),
-        tasks: form.watch("tasks"),
         status: form.watch("status"),
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
@@ -255,7 +213,7 @@ export function EditMilestoneForm({
             endDate,
             budget,
             attachments,
-            tasks,
+            // tasks,
             status,
             isPrivate,
             contacts,
@@ -296,65 +254,7 @@ export function EditMilestoneForm({
         //     position: "bottom-left",
         //     description: 'The changes to your milestone have been successfully saved.'
         // })
-    }
-
-    const sensors = useSensors(
-        useSensor(MouseSensor),
-        useSensor(TouchSensor),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates
-        })
-    )
-
-    function getDraggedData(id: string) {
-        const name = formData.tasks?.find(task => task.id === id)?.name
-        const position = (formData.tasks?.findIndex(task => task.id === id) || 0) + 1
-        const length = formData.tasks?.length || 0
-
-        return {name, position, length}
-    }
-
-    const announcements: Announcements = {
-        onDragStart({active}) {
-            const data = getDraggedData(active?.id.toString())
-            const message = `Picked up task ${data.name} at position ${data.position} of ${data.length}`
-            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-            return message
-        },
-        onDragOver({active, over}) {
-            const activeData = getDraggedData(active?.id.toString())
-
-            if (over) {
-                const overData = getDraggedData(over?.id.toString())
-                const message = `Task ${activeData.name} was moved over position ${overData.position} of ${activeData.length}.`
-                if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-                return message
-            }
-
-            const message = `Task ${activeData.name} is no longer over a droppable position.`
-            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-            return message
-        },
-        onDragEnd({active, over}) {
-            const activeData = getDraggedData(active?.id.toString())
-
-            if (over) {
-                const overData = getDraggedData(over?.id.toString())
-                const message = `Task ${activeData.name} was dropped into position ${overData.position} of ${activeData.length}`
-                if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-                return message
-            }
-
-            const message = `Task ${activeData} was dropped.`
-            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-            return message
-        },
-        onDragCancel({active}) {
-            const activeData = getDraggedData(active?.id.toString())
-            const message = `Dragging was cancelled. Task ${activeData.name} was dropped.`
-            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
-            return message
-        },
+        setIsMigrating(false)
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
@@ -370,7 +270,7 @@ export function EditMilestoneForm({
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
-                    className="flex flex-col gap-8 mt-2 px-1"
+                    className="flex flex-col gap-4 mt-2 px-1"
                 >
                     <Button className="absolute top-0 right-0 mx-4 my-2" variant="secondary" onClick={(e) => {
                         e.preventDefault()
@@ -381,169 +281,276 @@ export function EditMilestoneForm({
 
                     <EditTitle form={form}/>
 
-                    <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
-                        <FormLabel
-                            className="text-2xl font-semibold leading-none tracking-tight mt-2 mr-auto">Visibility</FormLabel>
-                        <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                    </FormItem>
-
-                    <FormItem>
-                        <FormLabel
-                            className="text-2xl font-semibold leading-none tracking-tight">{`Details`}
-                        </FormLabel>
-
-                        <FormField
-                            control={form.control}
-                            name="nodeType"
-                            render={({field}) => (
-                                <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
-                                    <FormControl>
-                                        <ToggleGroup
-                                            type="single"
-                                            variant="outline"
-                                            value={field.value}
-                                            onValueChange={(value) => {
-                                                if (value) {
-                                                    field.onChange(value)
-                                                }
-                                            }}
-                                            className="w-full flex flex-wrap gap-2 justify-between"
-                                        >
-                                            {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
-                                                <ToggleGroupItem
-                                                    key={value}
-                                                    value={value}
-                                                    className={"text-md grow flex gap-2"}
+                    <Tabs defaultValue="edit" className="space-y-4 w-full">
+                        <div className="flex gap-4 items-center justify-between">
+                            <TabsList>
+                                <TabsTrigger value="edit">
+                                    Edit
+                                </TabsTrigger>
+                                <TabsTrigger value="recommendations">
+                                    Recommendations
+                                </TabsTrigger>
+                            </TabsList>
+                            <TypeBadge type={formData.nodeType}/>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost">
+                                        <FaEllipsis/>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <FormField 
+                                        control={form.control}
+                                        name="nodeType"
+                                        render={({field}) => (
+                                            <>
+                                            {field.value !== "ASSET" && (
+                                                <DropdownMenuItem
+                                                    onSelect={async (e) => {
+                                                        setIsMigrating(true)
+                                                        await sleep(1000)
+                                                        field.onChange("ASSET")
+                                                        setIsMigrating(false)
+                                                    }}
                                                 >
-                                                    {label}
-                                                    <Tooltip>
-                                                        <TooltipTrigger>
-                                                            <FaInfoCircle/>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent className="max-w-80 text-wrap text-left">
-                                                            {description}
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </ToggleGroupItem>
-                                            ))}
-                                        </ToggleGroup>
-                                    </FormControl>
-                                    <FormMessage/>
+                                                    <TypeBadge type="ASSET" iconOnly={true} className="w-8"/>
+                                                    Migrate to asset
+                                                </DropdownMenuItem>
+                                            )}
+                                            {field.value !== "PROJECT" && (
+                                                <DropdownMenuItem
+                                                    onSelect={async (e) => {
+                                                        setIsMigrating(true)
+                                                        await sleep(1000)
+                                                        field.onChange("PROJECT")
+                                                        setIsMigrating(false)
+                                                    }}
+                                                >
+                                                    <TypeBadge type="PROJECT" iconOnly={true} className="w-8"/>
+                                                    Migrate to project
+                                                </DropdownMenuItem>
+                                            )}
+                                            {field.value !== "RFP" && (
+                                                <DropdownMenuItem
+                                                    onSelect={async (e) => {
+                                                        setIsMigrating(true)
+                                                        await sleep(1000)
+                                                        field.onChange("RFP")
+                                                        setIsMigrating(false)
+                                                    }}
+                                                >
+                                                    <TypeBadge type="RFP" iconOnly={true} className="w-8"/>
+                                                    Migrate to RFP
+                                                </DropdownMenuItem>
+                                            )}
+                                            </>
+                                        )}
+                                    />
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                        {isMigrating ? (
+                            <Loading />
+                        ): (
+                            <>
+                            <TabsContent value="edit" className="space-y-4 w-full">
+                                <FormItem>
+                                {/* <FormField
+                                    control={form.control}
+                                    name="nodeType"
+                                    render={({field}) => (
+                                        <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
+                                            <FormControl>
+                                                <ToggleGroup
+                                                    type="single"
+                                                    variant="outline"
+                                                    value={field.value}
+                                                    onValueChange={(value) => {
+                                                        if (value) {
+                                                            field.onChange(value)
+                                                        }
+                                                    }}
+                                                    className="w-full flex flex-wrap gap-2 justify-between"
+                                                >
+                                                    {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
+                                                        <ToggleGroupItem
+                                                            key={value}
+                                                            value={value}
+                                                            className={"text-md grow flex gap-2"}
+                                                        >
+                                                            {label}
+                                                            <Tooltip>
+                                                                <TooltipTrigger>
+                                                                    <FaInfoCircle/>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                                                    {description}
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </ToggleGroupItem>
+                                                    ))}
+                                                </ToggleGroup>
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                /> */}
+
+                                {/* <TypeBadge type={formData.nodeType} className="grid-col-2"/> */}
+
+                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
+                                    <FormLabel className="text-md mt-2">Visibility</FormLabel>
+                                    <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
                                 </FormItem>
-                            )}
-                        />
 
-                        <FormField
-                            control={form.control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
-                                    <FormLabel className="text-md mt-2">
-                                        {`Description`}
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Textarea
-                                            id="description"
-                                            placeholder={`Enter a description...`}
-                                            defaultValue={field.value}
-                                            {...field}
-                                            className="border-transparent hover:border-input"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
-                        />
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                            <FormLabel className="text-md mt-2">
+                                                {`Description`}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    id="description"
+                                                    placeholder={`Enter a description...`}
+                                                    defaultValue={field.value}
+                                                    {...field}
+                                                    className="border-transparent hover:border-input"
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
 
-                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-4 items-center">
-                            <div>
-                            <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
-                            {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
-                            </div>
-                            <MilestoneTypeFormField form={form}/>
-
-                            {formData.nodeType === "ASSET" && (
-                                <>
-                                    <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
-                                    <BudgetFormField form={form}/>
-                                </>
-                            )}
-
-                            {formData.nodeType === "PROJECT" && (
-                                <>
-                                    <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
-                                    <StatusFormField form={form}/>
-
-                                    <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                    <BudgetFormField form={form}/>
-                                </>
-                            )}
-
-                            {formData.nodeType === "RFP" && (
-                                <>
-                                    <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                    <BudgetFormField form={form}/>
-
-                                    <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
-                                    <OpenToFormField form={form}/>
-                                </>
-                            )}
-                        </FormItem>
-
-                        {formData.nodeType === "PROJECT" && (
-                            <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
-                        )}
-
-                        {formData.nodeType === "RFP" && (
-                            <TimelineFormField form={form} startLabel={"Request Opens"}
-                                               endLabel={"Deadline for Proposals"}/>
-                        )}
-                    </FormItem>
-
-                    <ContactsFormField form={form}/>
-
-                    <AttachmentsFormField
-                        form={form}
-                        attachments={formData.attachments as AttachmentType[]}
-                    />
-
-                    <TasksFormField
-                        form={form}
-                        formData={formData}
-                        announcements={announcements}
-                        sensors={sensors}
-                        milestoneData={milestoneData}
-                    />
-
-                    <FormField
-                        control={form.control}
-                        name="notes"
-                        render={({field}) => (
-                            <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
-                                <FormLabel
-                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
-                                >
-                                    {`Notes`}
-                                    <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
-                                </FormLabel>
-                                <FormControl>
-                                    <div className="w-full col-span-2" data-registry="plate">
-                                        <SettingsProvider>
-                                            <PlateEditor
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                            />
-                                        </SettingsProvider>
+                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-4 items-center">
+                                    <div>
+                                    <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
+                                    {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
                                     </div>
-                                </FormControl>
-                                <FormMessage/>
-                            </FormItem>
+                                    <MilestoneTypeFormField form={form}/>
+
+                                    {formData.nodeType === "ASSET" && (
+                                        <>
+                                            <FormLabel className="text-md mt-2">{`Total Cost`}</FormLabel>
+                                            <BudgetFormField form={form}/>
+                                        </>
+                                    )}
+
+                                    {formData.nodeType === "PROJECT" && (
+                                        <>
+                                            <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
+                                            <StatusFormField form={form}/>
+
+                                            <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                            <BudgetFormField form={form}/>
+                                        </>
+                                    )}
+
+                                    {formData.nodeType === "RFP" && (
+                                        <>
+                                            <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                            <BudgetFormField form={form}/>
+
+                                            <FormLabel className="text-md mt-2">{`Open To`}</FormLabel>
+                                            <OpenToFormField form={form}/>
+                                        </>
+                                    )}
+                                </FormItem>
+
+                                {formData.nodeType === "PROJECT" && (
+                                    <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
+                                )}
+
+                                {formData.nodeType === "RFP" && (
+                                    <TimelineFormField form={form} startLabel={"Request Opens"}
+                                                    endLabel={"Deadline for Proposals"}/>
+                                )}
+                                </FormItem>
+
+                                <ContactsFormField form={form}/>
+
+                                <AttachmentsFormField
+                                    form={form}
+                                    attachments={formData.attachments as AttachmentType[]}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="notes"
+                                    render={({field}) => (
+                                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                            <FormLabel
+                                                className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
+                                            >
+                                                {`Notes`}
+                                                <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
+                                            </FormLabel>
+                                            <FormControl>
+                                                <div className="w-full col-span-2" data-registry="plate">
+                                                    <SettingsProvider>
+                                                        <PlateEditor
+                                                            value={field.value ?? []}
+                                                            onChange={field.onChange}
+                                                        />
+                                                    </SettingsProvider>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+                            </TabsContent>
+                            <TabsContent value="recommendations" className="space-y-4 w-full">
+                                {(!recommendations || recommendations.length === 0) && (
+                                    <Card className="w-full flex flex-col mx-auto justify-center items-center align-center">
+                                        <CardContent className="flex flex-col gap-4 p-4">
+                                            <h2 className="text-xl">{`Sorry, we don't have any recommendations for this milestone`}</h2>
+                                            <div className="flex justify-center">
+                                                <Image
+                                                    alt="No recommendations"
+                                                    src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                                    width={300}
+                                                    height={300}
+                                                    className="dark:hidden"
+                                                />
+                                                <Image
+                                                    alt="No recommendations"
+                                                    src="https://illustrations.popsy.co/gray/team-idea.svg"
+                                                    width={300}
+                                                    height={300}
+                                                    className="hidden dark:block"
+                                                />
+                                            </div>
+                                            <p className="text-md">
+                                                {`Please add more information to your milestone to generate some recommendations.`}
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                )}
+
+                                {recommendations && recommendations.length > 0 && (
+                                    <>
+                                        <div className={cn("w-full grid gap-4 grid-cols-1")}>
+                                            {(recommendations || []).map((result, index) => (
+                                                // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
+                                                <CROMarketplaceCard cro={result.content} key={index} />
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+
+                                <Link href="/app/marketplace/cro">
+                                    <Button className="pl-0" variant={"link"}>Explore the marketplace</Button>
+                                </Link>
+                            </TabsContent>
+                            </>
                         )}
-                    />
+                    </Tabs>
 
-                    <span className="h-4">
-
-                    </span>
+                    <span className="h-8" />
 
                     <span className="flex justify-end gap-4 flex-wrap absolute bottom-0 right-0 mx-4 my-2">
                         <Dialog>
@@ -937,273 +944,6 @@ const OpenToFormField = ({form}: { form: any }) => {
                         </ToggleGroupItem>
                     ))}
                 </ToggleGroup>
-
-                // <Select
-                //     defaultValue={field.value}
-                //     onValueChange={field.onChange}
-                // >
-                //     <SelectTrigger>
-                //         <SelectValue placeholder="Open to work from..." />
-                //     </SelectTrigger>
-                //     <SelectContent>
-                //         {RFP_OPEN_TO_TYPE_OPTIONS.map((type, index) => (
-                //             <SelectItem key={index} value={type.value}>{type.label}</SelectItem>
-                //         ))}
-                //     </SelectContent>
-                // </Select>
-            )}
-        />
-    )
-}
-
-const TasksFormField = ({
-                            form,
-                            formData,
-                            announcements,
-                            sensors,
-                            milestoneData
-                        }: {
-    form: any,
-    // formData: z.infer<typeof editMilestoneForm>,
-    formData: any,
-    announcements: Announcements,
-    sensors: SensorDescriptor<SensorOptions>[],
-    milestoneData: any
-}) => {
-    const {
-        columns: kanbanColumns,
-        tasks: kanbanTasks,
-        setTasks,
-        addTask,
-        deleteTask,
-        addColumn
-    } = useKanbanStore(useShallow(kanbanSelector))
-    const { addNotification } = useNotificationsStore(useShallow(notificationsSelector))
-    const {data: session} = useSession()
-
-    const debounceSetTasks = useCallback(
-        debounce(async (updatedValues) => {
-            await setTasks(updatedValues)
-            // toast('Success!', {
-            //     position: "bottom-left",
-            //     description: 'The changes to your tasks have been successfully saved.'
-            // })
-        }, 500), []
-    )
-
-    return (
-        <FormField
-            control={form.control}
-            name="tasks"
-            render={({field}) => (
-                <FormItem className="flex flex-col grow">
-                    <FormControl>
-                        <>
-                            <div className="flex flex-row justify-between items-center gap-4">
-                                <FormLabel
-                                    className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
-                                >
-                                    {`Tasks`}
-                                    <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
-                                </FormLabel>
-
-                                <div className="h-full flex flex-row flex-wrap justify-end items-end gap-2">
-                                    <LinkTask
-                                        milestoneId={milestoneData?.id}
-                                        kanbanTasks={kanbanTasks}
-                                        onLink={async (taskId) => {
-                                            const newTask = kanbanTasks?.find((task) => task.id === taskId)
-                                            addNotification({
-                                                type: "NEW_TASK",
-                                                title: "New task assigned",
-                                                message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
-                                            })
-                                            form.setValue(
-                                                'tasks',
-                                                [...field?.value || [], {
-                                                    ...newTask,
-                                                    milestoneId: milestoneData?.id,
-                                                    milestone: {id: milestoneData?.id}
-                                                }]
-                                            )
-                                            debounceSetTasks(kanbanTasks.map(t => {
-                                                if (t.id === newTask.id) {
-                                                    return ({
-                                                        ...t,
-                                                        milestoneId: milestoneData?.id,
-                                                        milestone: {id: milestoneData?.id}
-                                                    })
-                                                }
-                                                return t
-                                            }))
-                                        }}
-                                    />
-
-                                    <Button
-                                        variant={'secondary'}
-                                        onClick={async (e) => {
-                                            e.preventDefault()
-                                            // if kanban doesn't exist or kanban has no columns
-                                            if (kanbanColumns.length === 0) {
-                                                const response = await getKanbanFromOrganizationId()
-
-                                                if (response.success && response.data) {
-                                                    // kanban found, add column
-                                                    const column = await addColumn({
-                                                        name: 'Unsorted Tasks'
-                                                    })
-
-                                                    if (!column) return
-
-                                                    const newTask = await addTask(column.id)
-                                                    addNotification({
-                                                        type: "NEW_TASK",
-                                                        title: "New task assigned",
-                                                        message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
-                                                    })
-                                                    if (newTask) {
-                                                        const updatedTasks = [...form.getValues().tasks || [], {
-                                                            ...newTask,
-                                                            milestoneId: milestoneData?.id,
-                                                            milestone: {id: milestoneData?.id},
-                                                            stakeholders: [{userId: session?.user.id}]
-                                                        }]
-                                                        form.setValue('tasks', updatedTasks)
-                                                    }
-
-                                                    return
-                                                }
-                                            }
-
-                                            const columnId = kanbanColumns[0].id
-
-                                            const newTask = await addTask(columnId)
-                                            // if (newTask) {
-                                            //     const updatedTasks = [...form.getValues().tasks || [], {
-                                            //         ...newTask,
-                                            //         milestoneId: milestoneData?.id,
-                                            //         milestone: {id: milestoneData?.id}
-                                            //     }]
-                                            //     form.setValue('tasks', updatedTasks)
-                                            // }
-                                            addNotification({
-                                                type: "NEW_TASK",
-                                                title: "New task assigned",
-                                                message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
-                                            })
-                                            const newTasks = await setTasks([
-                                                ...kanbanTasks,
-                                                {
-                                                    ...newTask,
-                                                    milestoneId: milestoneData?.id,
-                                                    milestone: {id: milestoneData?.id},
-                                                    stakeholders: [{userId: session?.user.id}]
-                                                }
-                                            ].map(t => {
-                                                if (t.id === newTask?.id) {
-                                                    return ({
-                                                        ...t,
-                                                        milestoneId: milestoneData?.id,
-                                                        stakeholders: [{userId: session?.user.id}]
-                                                    })
-                                                }
-                                                return t
-                                            }))
-                                            form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
-
-                                        }}
-                                    >
-                                        {`Add a new task`}
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <DndContext
-                                accessibility={{
-                                    announcements
-                                }}
-                                collisionDetection={closestCorners}
-                                sensors={sensors}
-                                onDragEnd={(event) => {
-                                    const {active, over} = event
-
-                                    if (active.id === over?.id) return
-
-                                    const originalPosition = field?.value?.findIndex((item: any) => item.id === active.id) || 0
-                                    const newPosition = field?.value?.findIndex((item: any) => item.id === over?.id) || 0
-
-                                    form.setValue('tasks', arrayMove(field?.value || [], originalPosition, newPosition))
-                                }}
-                            >
-                                <ol className="flex flex-col gap-2">
-                                    <SortableContext
-                                        items={field?.value?.map((item: any) => item.id) || []}
-                                        strategy={verticalListSortingStrategy}>
-                                        {field?.value?.map((task: any, index: number) => (
-                                            <TaskField
-                                                key={task.id}
-                                                index={index}
-                                                task={task}
-                                                onUnlink={async () => {
-                                                    form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
-                                                    debounceSetTasks(kanbanTasks.map(t => {
-                                                        if (t.id === task.id) {
-                                                            return ({
-                                                                ...t,
-                                                                milestone: undefined,
-                                                                milestoneId: undefined
-                                                            })
-                                                        }
-
-                                                        return t
-                                                    }))
-                                                }}
-                                                onDelete={async () => {
-                                                    await deleteTask(task.id)
-                                                    form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
-                                                }}
-                                                onNameChange={async (newName) => {
-                                                    form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
-                                                        ...t,
-                                                        name: newName
-                                                    } : t))
-                                                    debounceSetTasks(kanbanTasks.map(t => {
-                                                        if (t.id === task.id) {
-                                                            return ({
-                                                                ...t,
-                                                                name: newName
-                                                            })
-                                                        }
-
-                                                        return t
-                                                    }))
-                                                }}
-                                                onColumnChange={async (newColumnId) => {
-                                                    form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
-                                                        ...t,
-                                                        columnId: newColumnId
-                                                    } : t))
-                                                    debounceSetTasks(kanbanTasks.map(t => {
-                                                        if (t.id === task.id) {
-                                                            return ({
-                                                                ...t,
-                                                                columnId: newColumnId
-                                                            })
-                                                        }
-
-                                                        return t
-                                                    }))
-                                                }}
-                                                kanbanColumns={kanbanColumns}
-                                            />
-                                        ))}
-                                    </SortableContext>
-                                </ol>
-                            </DndContext>
-                        </>
-                    </FormControl>
-                    <FormMessage/>
-                </FormItem>
             )}
         />
     )
@@ -1385,182 +1125,3 @@ const EditTitle = ({form}: { form: any }) => {
         />
     );
 };
-
-const LinkTask = ({milestoneId, kanbanTasks, onLink}: {
-    milestoneId: string,
-    kanbanTasks: any[],
-    onLink: (id: string) => void
-}) => {
-    const [isLinking, setIsLinking] = useState(false)
-
-    if (isLinking) {
-        return (
-            <Select
-                onValueChange={(value: string) => {
-                    onLink(value)
-                    setIsLinking(false)
-                }}
-            >
-                <SelectTrigger className="w-full">
-                    <SelectValue placeholder={'Select a task'}/>
-                </SelectTrigger>
-                <SelectContent>
-                    {kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).map(task => (
-                        <SelectItem key={task.id} value={task.id}>{task.name}</SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-        )
-    }
-
-    return (
-        <Button
-            disabled={kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).length === 0}
-            variant={'secondary'}
-            onClick={() => {
-                setIsLinking(true)
-            }}
-        >
-            {kanbanTasks?.filter((task: any) => task.milestoneId === milestoneId).length === 0 ? (
-                `Link task`
-            ) : (
-                `Link another task`
-            )}
-        </Button>
-    )
-}
-
-const TaskField = ({
-                       index,
-                       task,
-                       onUnlink,
-                       onDelete,
-                       onNameChange,
-                       onColumnChange,
-                       kanbanColumns,
-                   }: {
-    index: number
-    task: TaskType
-    onUnlink: () => void
-    onDelete: () => void
-    onNameChange: (newName: string) => void
-    onColumnChange: (newColumnId: string) => void
-    kanbanColumns: any[]
-}) => {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging
-    } = useSortable({id: task.id || ""})
-    const style = {
-        transition,
-        transform: CSS.Translate.toString(transform)
-    }
-
-    const unlinkTask = (e: React.MouseEvent<HTMLElement>) => {
-        e.preventDefault()
-        onUnlink()
-    }
-
-    const deleteTask = (e: React.MouseEvent<HTMLElement>) => {
-        e.preventDefault()
-        onDelete()
-    }
-
-    const nameChanged = (e: React.FormEvent<HTMLInputElement>) => {
-        onNameChange(e.currentTarget.value)
-    }
-
-    const columnChanged = (newColumnId: string) => {
-        onColumnChange(newColumnId)
-    }
-
-    const variants = cva("flex flex-row gap-2 items-center", {
-        variants: {
-            dragging: {
-                overlay: "ring-2 ring-primary"
-            }
-        }
-    })
-
-    return (
-        <li
-            key={index}
-            ref={setNodeRef}
-            style={style}
-            className={cn(
-                "grid grid-cols-4",
-                variants({
-                    dragging: isDragging ? "overlay" : undefined
-                })
-            )}
-        >
-            {/* move task */}
-            <Button
-                type="button"
-                variant={"ghost"}
-                {...attributes}
-                {...listeners}
-                className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
-            >
-                <span className="sr-only">Move task</span>
-                <GripVertical/>
-            </Button>
-
-            {/* select kanban column */}
-            <Select onValueChange={(value: string) => columnChanged(value)} value={task.columnId}>
-                <SelectTrigger className="w-[120px]">
-                    <SelectValue/>
-                </SelectTrigger>
-                <SelectContent>
-                    {kanbanColumns.map(column => (
-                        <SelectItem
-                            key={column.id}
-                            value={column.id}
-                            // defaultValue={column.id}
-                        >
-                            {column.name}
-                        </SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
-
-            {/* task name */}
-            <div className="grow">
-                <Input
-                    placeholder={task.name}
-                    defaultValue={task.name}
-                    // value={task.name}
-                    onChange={nameChanged}
-                    className="h-full"
-                />
-            </div>
-
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button size="icon" variant="secondary">
-                        <FaEllipsis/>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="left">
-                    <DropdownMenuItem onClick={deleteTask}>
-                        <FaTrash/>
-                        Delete task
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={unlinkTask}>
-                        <FaLinkSlash/>
-                        Unlink from milestone
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* unlink task */}
-            {/* <Button variant="secondary" size="icon" onClick={unlinkTask}>
-                <FaLinkSlash/>
-            </Button> */}
-        </li>
-    )
-}

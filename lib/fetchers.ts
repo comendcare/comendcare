@@ -90,6 +90,12 @@ export async function getCROData(id: string) {
                 }
             },
             rfis: true,
+            reviews: {
+                include: {
+                    author: true,
+                    organization: true
+                },
+            }
         }
     })
 }
@@ -692,7 +698,6 @@ export async function getMilestoneDetails(id: string) {
         const milestone = await prisma.milestone.findUnique({
             where: {id},
             include: {
-                tasks: true,
                 attachments: true,
                 contacts: true,
                 node: true

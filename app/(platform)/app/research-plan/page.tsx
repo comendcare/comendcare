@@ -15,20 +15,13 @@ export default async function RoadmapPage() {
         )
     }
 
+
     // check if this organization has an existing roadmap
     const response = await getRoadmap(orgId)
     if (response.success && response.data) {
-        if (response.data.milestones && response.data.milestones.length > 0) {
-            return (
-                <main className="flex flex-col items-center h-full w-full mx-auto">
-                    <Roadmap data={response.data}/>
-                </main>
-            )
-        }
-
         return (
-            <main className="flex flex-col items-center h-full mx-auto">
-                <RoadmapTemplates/>
+            <main className="flex flex-col items-center h-full w-full mx-auto">
+                <Roadmap data={response.data}/>
             </main>
         )
     }

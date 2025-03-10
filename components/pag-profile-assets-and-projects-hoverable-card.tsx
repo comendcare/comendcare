@@ -79,10 +79,24 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
         } = store.getState()
 
         const zoomMultiplier = 1 / zoomLevel
-        const centerX =
-            -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        const centerY =
-            -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        // const centerX =
+        //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+        // const centerY =
+        //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        const milestonesAlongXAxis = nodes.sort((a, b) => {
+            return a.position.x - b.position.x
+        })
+        console.log(`milestones along XAxis`, milestonesAlongXAxis)
+        // let centerX =
+        //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+        let centerX = milestonesAlongXAxis.length > 0 ? (
+            milestonesAlongXAxis[milestonesAlongXAxis.length - 1].position.x + 500
+        ): (
+            0
+        )
+        // let centerY =
+        //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+        let centerY = 0
 
         const id = nanoid()
         const newNode = {
@@ -107,13 +121,13 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
     if (assets && rfps) {
         return (
             <Card className="organization-profile-tour-step5">
-                <CardHeader className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                    <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
-                        Milestones
-                    </CardTitle>
-                </CardHeader>
+                {/*<CardHeader className="flex flex-col md:flex-row items-center justify-between space-y-0">*/}
+                {/*    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">*/}
+                {/*        Milestones*/}
+                {/*    </CardTitle>*/}
+                {/*</CardHeader>*/}
 
-                <CardContent className="grid md:grid-cols-2 gap-4">
+                <CardContent className="grid md:grid-cols-2 gap-4 mt-8">
                     <div className="flex flex-col space-y-4">
                         <span className="flex gap-2">
                             <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
@@ -141,6 +155,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             <div className="flex flex-col gap-2">
                                 <Button
                                     className="w-fit"
+                                    variant={"secondary"}
                                     onClick={async () => {
                                         if (session?.user?.organizationId) {
                                             const response = await getRoadmap(session.user.organizationId)
@@ -231,6 +246,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             <div className="flex flex-col gap-2">
                                 <Button
                                     className="w-fit"
+                                    variant={"secondary"}
                                     onClick={async () => {
                                         if (session?.user?.organizationId) {
                                             const response = await getRoadmap(session.user.organizationId)

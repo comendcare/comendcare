@@ -32,6 +32,7 @@ import { FaCalendar } from "react-icons/fa6"
 import { truncate } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
 import { PriorityType, StatusType } from "@/lib/types"
+import { useKanbanStore } from "@/state/kanban/kanbanStore"
 
 export interface Task {
     columnId: string;
@@ -50,7 +51,8 @@ export interface Task {
 
 interface TaskCardProps {
     task: Task
-    isOverlay?: boolean
+    isOverlay?: boolean,
+    mountKey: number
 }
 
 export type TaskType = "Task"
@@ -60,7 +62,7 @@ export interface TaskDragData {
     task: Task
 }
 
-export function TaskCard({task, isOverlay}: TaskCardProps) {
+export function TaskCard({task, isOverlay, mountKey}: TaskCardProps) {
     const {
         setNodeRef,
         attributes,
@@ -206,7 +208,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                     <CardFooter className="flex justify-end mr-2">
                         {task?.stakeholders && task?.stakeholders.length > 0 && (
                             task.stakeholders.map((stakeholder, index) => (
-                                <ProfilePhoto 
+                                <ProfilePhoto
                                     className="ring-0 h-8 w-8 -mr-2" 
                                     key={index} 
                                     img={stakeholder.user?.image} 
@@ -222,6 +224,7 @@ export function TaskCard({task, isOverlay}: TaskCardProps) {
                         <DialogTitle>Edit Task Details</DialogTitle>
                     </DialogHeader>
                     <EditTaskForm
+                        key={mountKey}
                         taskData={task} 
                         onClose={() => {}}
                         setSelectIsOpen={setSelectIsOpen}

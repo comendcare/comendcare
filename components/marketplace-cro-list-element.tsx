@@ -17,7 +17,7 @@ export function CROMarketplaceListElement({ cro }: { cro: any }) {
         <Card className="h-full w-full text-left">
             <CardHeader className="w-full">
                 <CardTitle className="flex flex-row gap-2 items-center">
-                    <ProfilePhoto 
+                    <ProfilePhoto
                         img={cro?.image}
                         name={cro?.name}
                         className="h-10 w-10"

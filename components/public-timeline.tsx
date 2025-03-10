@@ -4,11 +4,12 @@ import React, { ReactNode } from "react"
 import {getDates} from "./pag-profile-research-plan-card"
 import {PrivateBadge} from "./private-badge"
 import {FaArrowUpRightFromSquare} from "react-icons/fa6"
-import { TypeBadge } from "./private-milestone-node"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "./ui/card"
 import { Button } from "./ui/button"
 import { usePathname } from "next/navigation"
+import { TypeBadge } from "./type-badge"
+import { TimelineCardContents } from "./private-timeline"
 
 export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilestone, setUrlMilestone}: {
     roadmap: any,
@@ -18,21 +19,21 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilest
     setUrlMilestone?: (id: string) => void | undefined
 }) => {
     return (
-        <ol className="relative border-s border-gray-200 dark:border-gray-700 space-y-8">
+        <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
             {roadmap?.milestones?.sort((a: any, b: any) => {
                     return a.startDate - b.startDate
                 }).map((item: any, index: number) => (
                     externalLinks 
-                        ? <TimelineElementLink key={index} subdomain={subdomain} item={item}/> 
-                        : <TimelineElementButton key={index} item={item} setUrlMilestone={setUrlMilestone}/>
+                        ? <TimelineElementLink key={index} subdomain={subdomain} item={item} urlMilestone={urlMilestone}/> 
+                        : <TimelineElementButton key={index} item={item} setUrlMilestone={setUrlMilestone} urlMilestone={urlMilestone}/>
             ))}
         </ol>
     )
 }
 
-const TimelineElementLink = ({key, subdomain, item}: {key: number, subdomain: string | undefined, item: any}) => {
+const TimelineElementLink = ({key, subdomain, item, urlMilestone}: {key: number, subdomain: string | undefined, item: any, urlMilestone?: string | undefined}) => {
     return (
-        <li className="ms-6">
+        <li className={cn("ms-6 w-full text-left hover:bg-secondary p-2 rounded-md", item.private ? "pointer-events-none": "")}>
             <a
                 href={
                     subdomain ?
@@ -51,11 +52,11 @@ const TimelineElementLink = ({key, subdomain, item}: {key: number, subdomain: st
     )
 }
 
-const TimelineElementButton = ({key, item, setUrlMilestone}: {key: number, item: any, setUrlMilestone?: (id: string) => void | undefined}) => {
+const TimelineElementButton = ({key, item, setUrlMilestone, urlMilestone}: {key: number, item: any, setUrlMilestone?: (id: string) => void | undefined, urlMilestone?: string | undefined}) => {
     return (
         <li className="ms-6">
-            <div 
-                className="hover:cursor-pointer"
+            <button 
+                className={cn("hover:cursor-pointer w-full text-left hover:bg-secondary p-2 rounded-md", urlMilestone === item.id ? "border-primary border-2" : "")}
                 onClick={() => {
                     if (setUrlMilestone !== undefined) {
                         setUrlMilestone(item.id)
@@ -66,7 +67,7 @@ const TimelineElementButton = ({key, item, setUrlMilestone}: {key: number, item:
                     item={item}
                     externalLinkIcon={false}
                 />
-            </div>
+            </button>
         </li>
     )
 }
@@ -74,8 +75,8 @@ const TimelineElementButton = ({key, item, setUrlMilestone}: {key: number, item:
 const TimelineElementContent = ({item, externalLinkIcon}: {item: any, externalLinkIcon: boolean}) => {
     return (
         <>
-            <span className="absolute flex items-center justify-center bg-white rounded-full -start-4">
-                <TypeBadge className="w-8 p-2" iconOnly={true} type={item?.node?.type || "PROJECT"}/>
+            <span className="absolute flex items-center justify-center bg-white rounded-full -start-[18px]">
+                <TypeBadge className="w-8 p-2" iconOnly={true} type={item?.node?.type || item?.nodeType || "PROJECT"}/>
             </span>
             <div className="flex flex-row items-center justify-start gap-4">
                 <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white ">
@@ -88,9 +89,10 @@ const TimelineElementContent = ({item, externalLinkIcon}: {item: any, externalLi
                     {getDates(item)}
                 </time>
             </div>
-            <p className="mb-4 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2">
+            <p className="mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2">
                 {item.description}
             </p>
+            <TimelineCardContents milestoneData={item} nodeType={item?.node?.type || item?.nodeType || "PROJECT"}/>
         </>
     )
 }

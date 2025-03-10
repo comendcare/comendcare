@@ -5,7 +5,6 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {FaArrowUpRightFromSquare, FaDollarSign, FaPaperclip} from "react-icons/fa6"
 import {Label} from "./ui/label"
-import {TaskType, TypeBadge} from "./private-milestone-node"
 import {
     Card,
     CardContent,
@@ -24,6 +23,7 @@ import {Separator} from "./ui/separator"
 import Link from "next/link"
 import {RFPDetails} from "./rfp-details.tsx"
 import {Button} from "./ui/button"
+import { TypeBadge } from "./type-badge"
 
 export function MilestoneDetails({milestone}: { milestone: any }) {
     return (
