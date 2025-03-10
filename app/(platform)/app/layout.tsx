@@ -106,6 +106,8 @@ export default function AppLayout({children}: AppLayoutProps) {
                         selectedView: urlView,
                         selectedNodeId: urlNode 
                     })
+
+                    console.log(`init nodes`, nodesResponse.data.nodes)
                 }
             } else {
                 console.error(response.error)

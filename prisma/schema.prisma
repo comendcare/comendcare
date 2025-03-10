@@ -223,7 +223,7 @@ model Milestone {
   endDate          DateTime?
   startDate        DateTime?
   private          Boolean              @default(true)
-  types            String[]             @default([])
+  types            MilestoneType[]
   otherTypeDetails String?
   openTo           String[]
   tasks            Task[]
@@ -236,6 +236,18 @@ model Milestone {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   nodeId         String?      @unique
   node           Node?        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+}
+
+model MilestoneType {
+  id          String   @id // value
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  label       String
+  services    String[]
+  category    String
+  description String?
+
+  milestones Milestone[]
 }
 
 model Kanban {

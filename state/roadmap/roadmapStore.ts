@@ -16,7 +16,7 @@ export type RoadmapState = {
     onboardingActive: boolean,
     setOnboardingActive: (active: boolean) => void,
     roadmapId: string | null
-    setRoadmapId: (id: string) => void
+    setRoadmapId: (id: string | null) => void
     selectedView: string | null,
     setSelectedView: (view: string | null) => void,
     selectedNodeId: string | null
@@ -40,7 +40,7 @@ export const useRoadmapStore = create<RoadmapState>()(
         initialized: false,
         isUpdating: false,
         initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
-            console.log(`init roadmap state`)
+            console.log(`init roadmap state`, nodes)
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
                 style: { stroke: 'black' }
@@ -53,7 +53,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ onboardingActive: active })
         },
         roadmapId: null,
-        setRoadmapId: (id: string) => {
+        setRoadmapId: (id: string | null) => {
             console.log(`set roadmap id`)
             set({ roadmapId: id })
         },

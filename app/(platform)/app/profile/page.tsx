@@ -73,7 +73,8 @@ export default async function ProfilePage() {
                             include: {
                                 node: true,
                                 contacts: true,
-                                attachments: true
+                                attachments: true,
+                                types: true
                             }
                         }
                     }
@@ -83,7 +84,8 @@ export default async function ProfilePage() {
                     include: {
                         node: true,
                         contacts: true,
-                        attachments: true
+                        attachments: true,
+                        types: true
                     }
                 }
             }

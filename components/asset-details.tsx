@@ -34,7 +34,9 @@ type AttachmentType = AssetType['attachments'][0]
 type MilestoneType = Prisma.MilestoneGetPayload<{
     include: {
         node: true,
-        contacts: true
+        contacts: true,
+        attachments: true,
+        types: true
     }
 }>
 

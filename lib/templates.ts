@@ -5,21 +5,24 @@ export const templateMilestones = [
         types: ['NATURALHISTORYSTUDY'],
         attachments: [],
         // nodeType: "ASSET"
-        nodeType: "PROJECT"
+        nodeType: "PROJECT",
+        phase: "EARLY-STAGE"
     },
     {
         title: 'Literature Review',
         description: 'Examine existing research to better understand the disease, identify gaps in knowledge, and assess the latest findings on potential treatments.',
         types: ['LITERATUREREVIEW'],
         attachments: [],
-        nodeType: "PROJECT"
+        nodeType: "PROJECT",
+        phase: "EARLY-STAGE"
     },
     {
         title: 'Identify Existing Disease Models',
         description: 'Research and evaluate lab models.',
         // types: ['LITERATUREREVIEW'],
         attachments: [],
-        nodeType: "PROJECT"
+        nodeType: "PROJECT",
+        phase: "EARLY-STAGE"
     },
     {
         title: 'Construct Mouse Models',
@@ -27,7 +30,8 @@ export const templateMilestones = [
         types: ['MOUSEMODEL'],
         attachments: [],
         // nodeType: "RFP"
-        nodeType: "PROJECT"
+        nodeType: "PROJECT",
+        phase: "PRE-CLINICAL"
     },
     {
         title: 'Construct Patient-Derived Cells',
@@ -35,7 +39,8 @@ export const templateMilestones = [
         types: ['PATIENTDERIVEDCELLLINE'],
         attachments: [],
         // nodeType: "RFP"
-        nodeType: "PROJECT"
+        nodeType: "PROJECT",
+        phase: "PRE-CLINICAL"
     },
     {
         title: 'Design ASO Construct',
@@ -43,7 +48,8 @@ export const templateMilestones = [
         types: ['CONSTRUCTDESIGN'],
         attachments: [],
         // nodeType: "RFP"
-        nodeType: "PROJECT"
+        nodeType: "PROJECT",
+        phase: "PRE-CLINICAL"
     },
     {
         title: 'Produce Plasmid',
@@ -51,7 +57,8 @@ export const templateMilestones = [
         types: ['PLASMIDPRODUCTION'],
         attachments: [],
         // nodeType: "RFP"
-        nodeType: "PROJECT"
+        nodeType: "PROJECT",
+        phase: "PRE-CLINICAL"
     },
     {
         title: 'Proof-Of-Concept Study',
@@ -59,7 +66,8 @@ export const templateMilestones = [
         types: ['PROOFOFCONCEPT'],
         attachments: [],
         // nodeType: "RFP"
-        nodeType: "PROJECT"
+        nodeType: "PROJECT",
+        phase: "PRE-CLINICAL"
     },
     {
         title: 'Animal Toxicology Study',
@@ -67,7 +75,8 @@ export const templateMilestones = [
         types: ['TOXICOLOGY'],
         attachments: [],
         // nodeType: "RFP"
-        nodeType: "PROJECT"
+        nodeType: "PROJECT",
+        phase: "PRE-CLINICAL"
     }
 ]
 

@@ -14,7 +14,7 @@ import { TypeBadge } from "./type-badge"
 import { Milestone } from "@/lib/actions"
 import { Badge } from "./ui/badge"
 import { AttachmentsTag } from "./private-milestone-node"
-import { MILESTONE_TYPE_OPTIONS, StatusType } from "@/lib/types"
+import { StatusType } from "@/lib/types"
 import { DateView } from "./miletone-date-view"
 import StatusButton from "./milestone-status-button"
 
@@ -100,10 +100,10 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
     if (nodeType === "ASSET") {
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                     <li>
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                            {milestoneType.label || "No type"}
                         </Badge>
                     </li>
                 ))}
@@ -151,10 +151,10 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                         }}
                     />
                 </li>
-                {(milestoneData?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                     <li>
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                            {milestoneType.label || "No type"}
                         </Badge>
                     </li>
                 ))}
@@ -175,10 +175,10 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
     if (nodeType === "RFP") {
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                     <li>
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                            {milestoneType.label || "No type"}
                         </Badge>
                     </li>
                 ))}

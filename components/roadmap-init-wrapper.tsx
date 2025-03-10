@@ -8,6 +8,13 @@ export default function RoadmapInitWrapper({ roadmap }: {roadmap: any }) {
     useEffect(() => {
         if (roadmap) {
             initializeRoadmapState({
+                // nodes: roadmap.nodes.map((node: any) => ({
+                //     ...node,
+                //     position: {
+                //         x: node.positionX,
+                //         y: node.positionY
+                //     }
+                // })),
                 nodes: roadmap.nodes,
                 milestones: roadmap.milestones,
                 edges: roadmap.edges,
