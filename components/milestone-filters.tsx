@@ -72,7 +72,7 @@ export function MilestoneFilters() {
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={MILESTONE_TYPE_OPTIONS}
+                                    // defaultOptions={MILESTONE_TYPE_OPTIONS}
                                     placeholder="Select milestone types..."
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">

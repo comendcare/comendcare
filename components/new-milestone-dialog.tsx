@@ -3,10 +3,98 @@ import { MilestoneTemplates } from "./roadmap-templates"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog"
 import { Button } from "./ui/button"
 import { FaPlus } from "react-icons/fa6"
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
+import { useShallow } from "zustand/react/shallow"
+import { useStoreApi } from "@xyflow/react"
+import { nanoid } from "nanoid"
+
+const selector = (state: RoadmapState) => ({
+    initialized: state.initialized,
+    selectedView: state.selectedView,
+    setSelectedView: state.setSelectedView,
+    selectedNodeId: state.selectedNodeId,
+    setSelectedNodeId: state.setSelectedNodeId,
+    nodes: state.nodes,
+    milestones: state.milestones,
+    saveState: state.saveState,
+    addNodes: state.addNodes
+})
 
 export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen: (open: boolean) => void}) => {
     // const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
+        const { 
+            initialized,
+            selectedView,
+            setSelectedView,
+            selectedNodeId, 
+            setSelectedNodeId, 
+            nodes: dbNodes,
+            milestones, 
+            saveState,
+            addNodes
+        } = useRoadmapStore(useShallow(selector))
+        const store = useStoreApi()
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
+
+        // Add a empty milestone node
+        // if a position is provided, place at the given coordinates
+        // if a position is not provided, place in the center
+        const addMilestones = async (newMilestones: any[]) => {
+            const newNodes: any[] = []
+    
+            // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
+            const {
+                height,
+                width,
+                transform: [transformX, transformY, zoomLevel]
+            } = store.getState()
+    
+            const zoomMultiplier = 1 / zoomLevel
+            const milestonesAlongXAxis = dbNodes.sort((a, b) => {
+                return a.position.x - b.position.x
+            })
+            console.log(`milestones along XAxis`, milestonesAlongXAxis)
+            // let centerX =
+            //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+            let centerX = milestonesAlongXAxis.length > 0 ? (
+                (milestonesAlongXAxis[milestonesAlongXAxis.length - 1]?.position?.x || 0) + 500
+            ): (
+                0
+            )
+            // let centerY =
+            //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+            let centerY = 0
+    
+            newMilestones.forEach(defaultData => {
+                const id = nanoid()
+                const newNode: any = {
+                    id: id,
+                    type: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
+                    position: {
+                        x: centerX,
+                        y: centerY
+                    },
+                    origin: [0.0, 0.0],
+                    data: {
+                        id: nanoid(),
+                        nodeId: id,
+                        // types: defaultData?.types || [],
+                        title: defaultData?.title || `New Milestone`,
+                        ...(defaultData?.description ? { description: defaultData.description } : undefined),
+                        status: defaultData?.status || "PLANNED",
+                        private: true
+                    }
+                }
+    
+                centerX += 500
+                // centerY += 200
+    
+                newNodes.push(newNode)
+            })
+    
+            const nodes = await addNodes(newNodes)
+            return nodes
+        }
 
     useEffect(() => {
         console.log(`selected milestone template changed`, selectedMilestoneTemplate)
@@ -121,7 +209,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                             type="button"
                             onClick={() => {
                                 console.log(`add milestone`, selectedMilestoneTemplate)
-                                // addMilestones([selectedMilestoneTemplate])
+                                addMilestones([selectedMilestoneTemplate])
                             }}
                         >
                             <FaPlus />
