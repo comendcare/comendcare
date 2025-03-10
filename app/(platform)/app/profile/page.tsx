@@ -32,11 +32,13 @@ import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hov
 import NoOrganization from "@/components/no-organization";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
 import {PublishOrganizationSwitch} from "@/components/publish-organization-switch";
+import {BiopharmaConsentSwitch} from "@/components/biopharma-consent-switch";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {ProfileCompletionCard} from "@/components/profile-completion-card";
 import EditPagProfileSubdomainDialog from "@/components/edit-pag-profile-subdomain-dialog";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import { FaInfoCircle } from "react-icons/fa";
+import {FaInfoCircle} from "react-icons/fa";
+import EditPAGContactEmailDialog from "@/components/edit-pag-contact-email-dialog";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -217,7 +219,7 @@ export default async function ProfilePage() {
                                     {/*        </TabsTrigger>*/}
                                     {/*    </TabsList>*/}
                                     {/*    <TabsContent value="roadmap" className="flex flex-col space-y-4">*/}
-                                    <ProfileCompletionCard />
+                                    <ProfileCompletionCard/>
                                     <div className="flex flex-col gap-4 relative">
                                         <PAGProfileAssetsAndRFPsHoverableCard
                                             isPrivate={true}
@@ -233,7 +235,8 @@ export default async function ProfilePage() {
                                             externalLinks={true}
                                         />
                                         {roadmaps.length <= 0 && (
-                                            <div className="absolute inset-0 bg-black/10 backdrop-blur flex items-center justify-center p-4 rounded-md">
+                                            <div
+                                                className="absolute inset-0 bg-black/10 backdrop-blur flex items-center justify-center p-4 rounded-md">
                                                 <NoResearchPlanCard isPublic={false}/>
                                             </div>
                                         )}
@@ -249,25 +252,40 @@ export default async function ProfilePage() {
                     </div>
                 </main>
                 <Card className="col-span-1 flex flex-col space-y-4 h-fit">
-                    <CardHeader className="flex flex-col gap-2 pb-0">
+                    <CardHeader className="flex flex-col gap-4 pb-0">
                         <PublishOrganizationSwitch organization={organization}/>
-                        <CardTitle
-                            className="text-xl flex flex-row items-center justify-between"
-                        >
-                            Public URL
-                            <EditPagProfileSubdomainDialog organization={organization}/>
-                        </CardTitle>
+                        <BiopharmaConsentSwitch organization={organization} />
+
+                        <div className="flex flex-col gap-2 pb-0">
+                            <div
+                                className="flex flex-row items-center justify-between"
+                            >
+                                Public URL
+                                <EditPagProfileSubdomainDialog organization={organization}/>
+                            </div>
+                            <Link
+                                href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="w-full inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
+                            >
+                                <span className="truncate">{organization.subdomain}.comend.io</span>
+                                <FaArrowUpRightFromSquare className="flex-shrink-0"/>
+                            </Link>
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <Link
-                            href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
-                        >
-                            {organization.subdomain}.comend.io
-                            <FaArrowUpRightFromSquare/>
-                        </Link>
+                        <div className="flex flex-col gap-2 pb-0">
+                            <div className="flex flex-row items-center justify-between">
+                                Contact Email
+                                <EditPAGContactEmailDialog organization={organization}/>
+                            </div>
+                            {organization.contactEmail && organization.contactEmail.trim() !== "" ?
+                                <p>{organization.contactEmail}</p>
+                                :
+                                <p className="text-muted-foreground">No contact email set</p>
+                            }
+                        </div>
                     </CardContent>
                 </Card>
             </div>

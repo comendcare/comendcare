@@ -25,7 +25,7 @@ import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import React, {useEffect, useState} from "react";
 import MoneyInput from "@/components/money-input";
-import {FaPen} from "react-icons/fa6";
+import {FaPencil} from "react-icons/fa6";
 import {years} from "@/lib/utils";
 
 const editOrgFormSchema = z.object({
@@ -53,7 +53,9 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             incorporationStatus: organization.incorporationStatus || undefined,
             description: organization.description || "",
             website: organization.website || "",
-            raised: organization.moneyRaised || 0
+            raised: organization.moneyRaised || 0,
+            deployed: organization.moneyDeployed || 0,
+            budget: organization.researchBudget || 0
         }
     });
 
@@ -64,7 +66,9 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             incorporationStatus: organization.incorporationStatus || undefined,
             description: organization.description || "",
             website: organization.website || "",
-            raised: organization.moneyRaised || 0
+            raised: organization.moneyRaised || 0,
+            deployed: organization.moneyDeployed || 0,
+            budget: organization.researchBudget || 0
         });
     }, [organization, editOrgForm]);
 
@@ -118,7 +122,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                 <Button
                     variant="ghost"
                 >
-                    <FaPen/>
+                    <FaPencil/>
                 </Button>
             </DialogTrigger>
             <DialogContent>

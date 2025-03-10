@@ -21,7 +21,7 @@ import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Member, Organization, User} from "@prisma/client";
 import {useEffect, useState} from "react";
-import {FaPen} from "react-icons/fa6";
+import {FaPencil} from "react-icons/fa6";
 import {useDebounce} from "use-debounce";
 import {checkSubdomainAvailability, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {getPublicFile} from "@/lib/utils";
@@ -136,7 +136,7 @@ export default function EditPagProfileSubdomainDialog({organization}: { organiza
                 <Button
                     variant="ghost"
                 >
-                    <FaPen/>
+                    <FaPencil/>
                 </Button>
             </DialogTrigger>
             <DialogContent>
