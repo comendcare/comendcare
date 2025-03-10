@@ -1651,7 +1651,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                             create: {
                                 roadmapId: roadmap.id,
                                 organizationId,
-                                types: milestone.types || [],
+                                // types: milestone.types || [],
                                 status: milestone.status || "PLANNED",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
@@ -1840,7 +1840,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                                     connect: {id: organizationId}
                                 },
                                 title: node.data?.title || "New Milestone",
-                                types: node.data?.types || [],
+                                // types: node.data?.types || [],
                                 description: node.data?.description,
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
@@ -1952,7 +1952,10 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                     connect: {id: organizationId}
                                 },
                                 title: node.data?.title || "New Milestone",
-                                types: node.data?.types || [],
+                                // types: node.data?.types || [],
+                                // types: {
+                                //     set: node.data?.types.map((type: any) => ({ id: type.value })) || []
+                                // },
                                 description: node.data?.description,
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
