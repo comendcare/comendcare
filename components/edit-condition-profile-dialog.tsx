@@ -18,13 +18,14 @@ import Link from "next/link"
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
+import MultipleSelector from "@/components/ui/multiple-selector";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {FaQuestionCircle} from "react-icons/fa";
 import React from "react";
 import LoadingDots from "@/components/icons/loading-dots";
 import {researchFormSchema} from "@/components/research-onboarding-form";
+import { Option } from "@/lib/types";
 
 export const optionSchema = z.object({
     label: z.string(),
