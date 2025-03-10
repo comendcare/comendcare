@@ -253,7 +253,7 @@ export default async function ProfilePage() {
                     <CardHeader className="flex flex-col gap-4 pb-0">
                         <PublishOrganizationSwitch organization={organization}/>
                         <BiopharmaConsentSwitch organization={organization} />
-                        
+
                         <div className="flex flex-col gap-2 pb-0">
                             <div
                                 className="flex flex-row items-center justify-between"
@@ -265,10 +265,10 @@ export default async function ProfilePage() {
                                 href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
+                                className="w-full inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
                             >
-                                {organization.subdomain}.comend.io
-                                <FaArrowUpRightFromSquare/>
+                                <span className="truncate">{organization.subdomain}.comend.io</span>
+                                <FaArrowUpRightFromSquare className="flex-shrink-0"/>
                             </Link>
                         </div>
                     </CardHeader>
