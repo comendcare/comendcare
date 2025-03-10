@@ -9,9 +9,9 @@ import {
 } from "@xyflow/react"
 import { createNodes, deleteNode, Milestone, updateDBFlow, updateEdges, updateMilestones} from "@/lib/actions"
 import { toast } from "sonner"
-import { getRoadmap, getRoadmapId } from "@/lib/fetchers"
 
 export type RoadmapState = {
+    initialized: boolean,
     isUpdating: boolean,
     onboardingActive: boolean,
     setOnboardingActive: (active: boolean) => void,
@@ -37,6 +37,7 @@ export type RoadmapState = {
 
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
+        initialized: false,
         isUpdating: false,
         initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
             console.log(`init roadmap state`)
@@ -44,7 +45,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 ...edge,
                 style: { stroke: 'black' }
             }))
-            set({ nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeId, roadmapId })
+            set({ initialized: true, nodes, edges: edgesWithMarker, milestones, selectedView, selectedNodeId, roadmapId })
         },
         onboardingActive: true,
         setOnboardingActive: (active: boolean) => {

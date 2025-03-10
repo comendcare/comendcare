@@ -19,7 +19,7 @@ import {
     getRoadmapId
 } from "@/lib/fetchers";
 import {toast} from "sonner";
-import {initializeKanbanState, initializeNotificationsState, initializeRoadmapState} from "@/lib/initialize-client-state";
+import {initializeNotificationsState, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import { createKanban } from "@/lib/actions";
@@ -62,15 +62,9 @@ export default function AppLayout({children}: AppLayoutProps) {
     const { startOnborda } = useOnborda()
     const pathname = usePathname()
     const { 
-        selectedNodeId, 
         setSelectedNodeId
     } = useRoadmapStore(useShallow(selector))
     const { setNotificationsViewed } = useNotificationsStore(useShallow(notificationsSelector))
-    const [sidebarOpen, setSidebarOpen] = useState(selectedNodeId === null)
-
-    useEffect(() => {
-        if (selectedNodeId !== null) setSidebarOpen(false)
-    }, [selectedNodeId])
 
     useEffect(() => {
         // Handle loading state for the session
@@ -128,25 +122,29 @@ export default function AppLayout({children}: AppLayoutProps) {
                 if (pathname === '/app/task-board') {
                     setNotificationsViewed(notifications.data.filter(notification => notification.type === "NEW_TASK"))
                 }
-            }
-
-            let kanban = await getKanbanFromOrganizationId()
-            if (!kanban.data && session.user.organizationId) {
-                // kanban was not found, create it
-                kanban = await createKanban(session.user.organizationId)
-            }
-
-            if (kanban.success) {
-                const kanbanResponse = await getColumns(session.user.organizationId)
-                if (kanbanResponse.success) {
-                    initializeKanbanState({
-                        columns: kanbanResponse.data.columns
-                    })
-                }
             } else {
-                console.error(kanban.error)
-                toast.error(kanban.error)
+                console.error(response.error)
+                toast.error(response.error)
             }
+
+            // let kanban = await getKanbanFromOrganizationId()
+            // if (!kanban.data && session.user.organizationId) {
+            //     // kanban was not found, create it
+            //     kanban = await createKanban(session.user.organizationId)
+            // }
+
+            // if (kanban.success) {
+            //     const kanbanResponse = await getColumns(session.user.organizationId)
+            //     if (kanbanResponse.success) {
+            //         initializeKanbanState({
+            //             columns: kanbanResponse.data.columns,
+            //             kanbanId: kanban?.data?.id
+            //         })
+            //     }
+            // } else {
+            //     console.error(kanban.error)
+            //     toast.error(kanban.error)
+            // }
 
             console.log(`Research plan, kanban, and notifications zustand states initialized successfully!`)
             setIsLoading(false)
@@ -154,8 +152,12 @@ export default function AppLayout({children}: AppLayoutProps) {
     }
 
     useEffect(() => {
-        // Only run if the session data has changed
-        if (JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)) {
+        // Only run if the session data has changed or the session has not yet been set up
+        if (
+            status !== "authenticated" || 
+            !session || 
+            JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
+        ) {
             handleSessionUpdate()
         }
 
@@ -165,10 +167,10 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     if (status === "authenticated" && session) {
         return (
-            <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
+            <SidebarProvider>
                 <AppSidebar />
                 <SidebarInset className="w-full max-w-full overflow-hidden">
-                    <header className="sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden">
+                    <header className="bg-white sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden">
                         <div className="w-full flex items-center justify-between gap-4 px-4">
                             <SidebarTrigger className="-ml-1" />
                             <div className="flex items-center">
@@ -199,11 +201,12 @@ export default function AppLayout({children}: AppLayoutProps) {
                         </div>
                     </header>
                     <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full overflow-hidden overflow-y-auto">
-                        {isLoading ? <Loading /> : (children)}
-                        {/* {children} */}
+                        {status !== "authenticated" || !session  ? <Loading /> : (children)}
                     </div>
                 </SidebarInset>
             </SidebarProvider>
         )
     }
+
+    return <Loading />
 }

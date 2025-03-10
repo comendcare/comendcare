@@ -17,7 +17,7 @@ export function OrganizationMarketplaceListElement({ organization }: { organizat
         <Card className="h-full w-full text-left">
             <CardHeader className="w-full">
                 <CardTitle className="flex flex-row gap-2 items-center">
-                    <ProfilePhoto 
+                    <ProfilePhoto
                         img={organization?.image}
                         name={organization?.name}
                         className="h-10 w-10"

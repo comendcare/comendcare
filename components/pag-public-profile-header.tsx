@@ -1,7 +1,6 @@
 import {formatMoney, standardizeYear} from "@/lib/utils";
 import {FaCity, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup} from "react-icons/fa6";
 import {Organization} from "@prisma/client";
-import PublicProfileDropdown from "@/components/public-profile-dropdown";
 import {ProfilePhoto} from "./profile-photo";
 import {BackButton} from "./back-button";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
@@ -48,10 +47,10 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                             className="mt-6 sm:flex flex-row sm:flex-row sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
                         >
                             <div className="mt-6 min-w-0 flex-1 sm:hidden md:block">
-                                <div className="mt-6 min-w-0 flex-1 truncate text-4xl font-bold text-gray-900">
+                                <div className="mt-6 min-w-0 flex-1 truncate text-3xl font-bold text-gray-900">
                                     <HoverCard>
                                         <HoverCardTrigger asChild>
-                                            <h1 className="text-wrap md:truncate cursor-pointer">
+                                            <h1 className="text-wrap cursor-pointer w-full">
                                                 {organization?.name}
                                             </h1>
                                         </HoverCardTrigger>
@@ -98,7 +97,7 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                             className="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
                             <div className="flex flex-row space-x-2">
                                 {/*<PAGFollowButton organizationId={organization.id} />*/}
-                                <PublicProfileDropdown website={organization?.website}/>
+                                {/*<PublicProfileDropdown website={organization?.website}/>*/}
                             </div>
                         </div>
 

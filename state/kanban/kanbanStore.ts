@@ -1,16 +1,18 @@
 import {create} from "zustand"
 import {temporal} from 'zundo'
-import { Column, createColumn, createTask, deleteColumn, deleteTask, Task, updateColumns, updateTasks } from "@/lib/actions";
+import { Column, createColumn, createTask, deleteColumn, deleteTask, kanbanSync, Task, updateColumns, updateTasks } from "@/lib/actions";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
+import { string } from "zod";
 // import { PlatformNotification } from "@prisma/client";
 import { NotificationsState, useNotificationsStore } from "../notifications/notificationsStore";
 import { useShallow } from "zustand/react/shallow";
 
 export type KanbanState = {
+    kanbanId: string | undefined,
     columns: any[],
     tasks: any[],
-    initState: (columns: Column[], tasks: any[]) => void,
+    initState: (columns: Column[], tasks: any[], kanbanId: string | undefined) => void,
     addColumn: (column: any) => Promise<Column | void>,
     deleteColumn: (columnId: string) => Promise<Column | void>
     updateColumn: (columnId: string, newProperties: any) => Promise<Column[] | void>,
@@ -19,15 +21,17 @@ export type KanbanState = {
     updateTask: (taskId: string, newProperties: any) => Promise<Task[] | void>,
     setTasks: (tasks: any[]) => Promise<Task[] | void>,
     deleteTask: (taskId: string) => Promise<Task | void>,
+    saveState: () => void
 }
 
 export const useKanbanStore = create<KanbanState>()(
     temporal((set, get) => ({
+            kanbanId: undefined,
             columns: [],
             tasks: [],
-            initState: (columns: Column[], tasks: any[]) => {
+            initState: (columns: Column[], tasks: any[], kanbanId: string | undefined) => {
                 console.log(`init kanban state`)
-                set({ columns, tasks })
+                set({ columns, tasks, kanbanId })
             },
             addColumn: async (column: Partial<Column>) => {
                 console.log(`add column`)
@@ -165,6 +169,11 @@ export const useKanbanStore = create<KanbanState>()(
                     toast.error('There was an error deleting your task')
                 }
             },
+            saveState: () => {
+                console.log(`save state`)
+                const state = get()
+                kanbanSync({ kanbanId: state.kanbanId, columns: state.columns, tasks: state.tasks })
+            }
         }),
         {
             limit: 100, // limit the stored history states to 100
@@ -174,5 +183,9 @@ export const useKanbanStore = create<KanbanState>()(
                 fetchNotifications()
                 return
             },
+            // partialize: (state) => {
+            //     const { columns, tasks, ...rest } = state;
+            //     return { columns, tasks };
+            // },
         })
 )

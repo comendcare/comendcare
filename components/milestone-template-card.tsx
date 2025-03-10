@@ -23,7 +23,6 @@ import { Popover } from "./plate-ui/popover"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { CheckBubble } from "./check-bubble"
-import { TypeBadge } from "./private-milestone-node"
 
 export function MilestoneTemplateCard({ milestoneData, selectedMilestones, setSelectedMilestones }: {milestoneData: any, selectedMilestones: any[], setSelectedMilestones: (value: SetStateAction<any[]>) => void}) {
     const [isChecked, setIsChecked] = useState(false);

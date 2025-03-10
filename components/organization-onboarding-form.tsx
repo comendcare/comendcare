@@ -63,6 +63,9 @@ export const newOrgFormSchema = z.object({
     }).max(60, {
         message: "Your organization's nickname must be a maximum of 50 characters."
     }),
+    contactEmail: z.string().email({
+        message: "Please enter a valid email address.",
+    }).optional(),
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
     looking: z.string().min(0).optional(),
     founded: z.string().optional(),
@@ -376,6 +379,7 @@ export default function OrganizationOnboardingForm(
                         title: currentUserTitle,  // Title of the user at the org
                         subdomain: organizationData.subdomain || "",
                         website: organizationData.website || "",
+                        contactEmail: organizationData.contactEmail || "",
                         address1: organizationData.address1 || "",
                         address2: organizationData.address2 || "",
                         formattedAddress: organizationData.formattedAddress || "",
@@ -553,6 +557,28 @@ export default function OrganizationOnboardingForm(
                                             />
                                         </FormControl>
                                         <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={newOrgForm.control}
+                                name="contactEmail"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Contact Email</FormLabel>
+                                        <FormDescription>
+                                            The main email contact for your organization.
+                                        </FormDescription>
+                                        <FormControl>
+                                            <Input
+                                                type="email"
+                                                id="contactEmail"
+                                                placeholder="name@example.com"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -760,7 +786,7 @@ export default function OrganizationOnboardingForm(
                                     </Button>
                                 </div>
                                 {showSkip &&
-                                    <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                    <Button variant="ghost" onClick={() => router.push("/app/marketplace/cro")}>
                                         Skip for now
                                     </Button>
                                 }
@@ -814,7 +840,7 @@ export default function OrganizationOnboardingForm(
                                         Join Organization
                                     </Button>
                                     {showSkip &&
-                                        <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                        <Button variant="ghost" onClick={() => router.push("/app/marketplace/cro")}>
                                             Skip for now
                                         </Button>
                                     }

@@ -7,23 +7,23 @@ async function main() {
     console.log('Starting seed script...');
 
     // Load the JSON data
-    const companies = JSON.parse(await fs.readFile('data/fixedCombinedFinalData.json', 'utf-8'));
+    const companies = JSON.parse(await fs.readFile('data/fixedCombinedFinalData-finalFiltered.json', 'utf-8'));
 
     console.log(`Total records to process: ${companies.length}`);
 
     let processedCount = 0;
 
     for (const company of companies) {
-        const hasValidDescription = company.description && company.description.trim() !== "";
-        const hasNonEmptyServices = Array.isArray(company.services) && company.services.length > 0;
-        const hasNonEmptySites = Array.isArray(company.sites) && company.sites.length > 0;
-        const hasNonEmptyCertifications = Array.isArray(company.certifications) && company.certifications.length > 0;
-        const hasValidWebsite = company.website && company.website.trim() !== "";
-
-        if (!(hasValidDescription && hasNonEmptyServices && hasNonEmptySites && hasNonEmptyCertifications && hasValidWebsite)) {
-            console.warn(`Skipping company that does not meet all validation criteria: ${company.title || 'Unknown Title'}`);
-            continue;
-        }
+        // const hasValidDescription = company.description && company.description.trim() !== "";
+        // const hasNonEmptyServices = Array.isArray(company.services) && company.services.length > 0;
+        // const hasNonEmptySites = Array.isArray(company.sites) && company.sites.length > 0;
+        // const hasNonEmptyCertifications = Array.isArray(company.certifications) && company.certifications.length > 0;
+        // const hasValidWebsite = company.website && company.website.trim() !== "";
+        //
+        // if (!(hasValidDescription && hasNonEmptyServices && hasNonEmptySites && hasNonEmptyCertifications && hasValidWebsite)) {
+        //     console.warn(`Skipping company that does not meet all validation criteria: ${company.title || 'Unknown Title'}`);
+        //     continue;
+        // }
 
         try {
             await prisma.company.create({
@@ -62,6 +62,8 @@ async function main() {
                             },
                         })) || [],
                     },
+
+                    simplifiedCertifications: company.simplifiedCertifications,
 
                     rfis: {
                         create: company.rfis?.map((rfi: any) => ({
