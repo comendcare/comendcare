@@ -78,7 +78,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                     data: {
                         id: nanoid(),
                         nodeId: id,
-                        types: defaultData?.types || [],
+                        // types: defaultData?.types || [],
                         title: defaultData?.title || `New Milestone`,
                         ...(defaultData?.description ? { description: defaultData.description } : undefined),
                         status: defaultData?.status || "PLANNED",
