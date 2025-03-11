@@ -49,7 +49,7 @@ export type Milestone = Prisma.MilestoneGetPayload<{
         node: true,
         contacts: true,
         attachments: true,
-        types: true
+        types: { include: { milestoneType: true } }
     }
 }>
 
@@ -1785,7 +1785,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: true
+                    types: { include: { milestoneType: true } }
                 }
             },
             nodes: true,
@@ -1954,7 +1954,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: true
+                types: { include: { milestoneType: true } }
             },
             where: {roadmapId}
         })
@@ -2015,13 +2015,13 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                     connect: {id: organizationId}
                                 },
                                 title: node.data?.title || "New Milestone",
-                                // types: node.data?.types || [],
                                 types: {
-                                    connect: (node.data?.types || []).map((type: any) => ({ id: type.id })) || []
+                                    create: (node.data?.types || []).map((type: any) => ({
+                                        milestoneType: {
+                                            connect: { id: type.milestoneTypeId }
+                                        }
+                                    }))
                                 },
-                                // types: {
-                                //     set: node.data?.types.map((type: any) => ({ id: type.value })) || []
-                                // },
                                 description: node.data?.description,
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
@@ -2051,7 +2051,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: true
+                types: { include: { milestoneType: true } }
             },
             where: {roadmapId}
         })
@@ -2178,7 +2178,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: true
+                        types: { include: { milestoneType: true } }
                     }
                 })
 
@@ -2194,12 +2194,17 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: true
+                        types: { include: { milestoneType: true } }
                     },
                     data: {
                         title: milestone.title,
                         types: {
-                            set: milestone.types.map((type: any) => ({ id: type.id }))
+                            deleteMany: {},
+                            create: (milestone.types || []).map((type: any) => ({
+                                milestoneType: {
+                                    connect: { id: type.milestoneTypeId || type.milestoneType.id }
+                                }
+                            }))
                         },
                         otherTypeDetails: milestone.otherTypeDetails,
                         description: milestone.description,

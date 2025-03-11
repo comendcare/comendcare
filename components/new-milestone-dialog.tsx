@@ -38,7 +38,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
     } = useRoadmapStore(useShallow(selector))
     const store = useStoreApi()
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
-    const [selectedMiletoneType, setSelectedMilestoneType] = useState<"PROJECT" | "ASSET" | "RFP" | undefined>()
+    const [selectedMilestoneType, setSelectedMilestoneType] = useState<string>("ASSET")
     const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
 
     // Allow update once form is initialized
@@ -62,7 +62,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
     // Add a empty milestone node
     // if a position is provided, place at the given coordinates
     // if a position is not provided, place in the center
-    const addMilestones = async (newMilestones: any[]) => {
+    const addMilestones = async (newMilestones: any[], type: string) => {
         const newNodes: any[] = []
 
         // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
@@ -76,7 +76,6 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
         const milestonesAlongXAxis = dbNodes.sort((a, b) => {
             return a.position.x - b.position.x
         })
-        console.log(`milestones along XAxis`, milestonesAlongXAxis)
         // let centerX =
         //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
         let centerX = milestonesAlongXAxis.length > 0 ? (
@@ -90,22 +89,33 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
 
         newMilestones.forEach(defaultData => {
             const id = nanoid()
+            const milestoneId = nanoid()
             const newNode: any = {
                 id: id,
-                type: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
+                type: type,
                 position: {
                     x: centerX,
                     y: centerY
                 },
                 origin: [0.0, 0.0],
                 data: {
-                    id: nanoid(),
+                    id: milestoneId,
                     nodeId: id,
-                    types: defaultData?.types?.map((type: any) => milestoneTypes.find(t => t.id === type)).filter((val: any) => val !== undefined) || [],
+                    types: defaultData?.types?.map((type: any) => {
+                        const dbType = milestoneTypes.find(t => t.id === type)
+                        if (dbType) {
+                            return ({
+                                milestoneId: milestoneId,
+                                milestoneTypeId: type,
+                                milestoneType: dbType
+                            })
+                        }
+                    }).filter((type: any) => type !== undefined),
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     status: defaultData?.status || "PLANNED",
-                    private: true
+                    private: true,
+                    nodeType: type
                 }
             }
 
@@ -205,8 +215,10 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                     )}
                 />  */}
 
-                {/* <RadioGroup
+                <RadioGroup
                     className="flex gap-4 justify-between px-20"
+                    defaultValue="ASSET"
+                    onValueChange={(value) => {setSelectedMilestoneType(value)}}
                 >
                     <div className="flex items-center space-x-2">
                         <RadioGroupItem value="ASSET" id="ASSET"/>
@@ -220,7 +232,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                         <RadioGroupItem value="RFP" id="RFP"/>
                         <Label htmlFor="RFP">RFP</Label>
                     </div>
-                </RadioGroup> */}
+                </RadioGroup>
 
                 <DialogFooter>
                     <DialogClose>
@@ -245,11 +257,11 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
 
                     <DialogClose>
                         <Button
-                            disabled={!selectedMilestoneTemplate || milestoneTypes.length === 0}
+                            disabled={!selectedMilestoneTemplate || !selectedMilestoneType || milestoneTypes.length === 0}
                             type="button"
                             onClick={() => {
                                 console.log(`add milestone`, selectedMilestoneTemplate)
-                                addMilestones([selectedMilestoneTemplate])
+                                addMilestones([selectedMilestoneTemplate], selectedMilestoneType)
                             }}
                         >
                             <FaPlus />
