@@ -10,6 +10,10 @@ import { nanoid } from "nanoid"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { Label } from "./ui/label"
+import { NODE_TYPE_OPTIONS } from "@/lib/types"
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
+import { FaInfoCircle } from "react-icons/fa"
 
 const selector = (state: RoadmapState) => ({
     initialized: state.initialized,
@@ -129,14 +133,12 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
         return nodes
     }
 
-    useEffect(() => {
-        console.log(`selected milestone template changed`, selectedMilestoneTemplate)
-    }, [selectedMilestoneTemplate])
-
     return (
         <Dialog open={open} onOpenChange={(open: boolean) => {
-            // if (!open) setSelectedMilestones([])
-            if (!open) setSelectedMilestoneTemplate(undefined)
+            if (!open) {
+                setSelectedMilestoneTemplate(undefined)
+                setSelectedMilestoneType("ASSET")
+            }
             setOpen(open)
         }}>
             <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start gap-4">
@@ -144,23 +146,11 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                     <DialogTitle className="text-2xl">
                         Create a milestone
                     </DialogTitle>
-                    {/* <DialogDescription>
-                        {`Templates can help you find inspiration and get started faster. Click on a Milestone Template to add it to your Research Plan.`}
-                    </DialogDescription> */}
                 </DialogHeader>
 
                 <h2 className="text-2xl">1. Select a milestone template</h2>
-                
-                {/* <MilestoneTemplateTabs 
-                    selectedMilestones={selectedMilestones}
-                    setSelectedMilestones={setSelectedMilestones}
-                    createEmpty={() => addMilestones([{name: 'New Milestone'}])}
-                    inDialog={true}
-                /> */}
 
                 <MilestoneTemplates
-                    // selectedMilestones={selectedMilestones}
-                    // setSelectedMilestones={setSelectedMilestones}
                     selectedMilestoneTemplate={selectedMilestoneTemplate}
                     setSelectedMilestoneTemplate={setSelectedMilestoneTemplate}
                     createEmpty={() => {
@@ -171,68 +161,35 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
 
                 <h2 className="text-2xl">2. What are you creating</h2>
 
-                {/* <FormField
-                    control={editOrgForm.control}
-                    name="incorporationStatus"
-                    render={({field}) => (
-                        <FormItem className="space-y-3">
-                            <FormLabel>{`What is your 501c3 status`}</FormLabel>
-                            <FormControl>
-                                <RadioGroup
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                    value={field.value}
-                                    className="flex flex-col space-y-1"
-                                >
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="YES"/>
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            {`Yes, I have a 501c3`}
-                                        </FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="INPROGRESS"/>
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            {`No, but I'm working on it`}
-                                        </FormLabel>
-                                    </FormItem>
-                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                            <RadioGroupItem value="NO"/>
-                                        </FormControl>
-                                        <FormLabel className="font-normal">
-                                            {`No, I don't have a 501c3`}
-                                        </FormLabel>
-                                    </FormItem>
-                                </RadioGroup>
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />  */}
-
-                <RadioGroup
-                    className="flex gap-4 justify-between px-20"
-                    defaultValue="ASSET"
-                    onValueChange={(value) => {setSelectedMilestoneType(value)}}
+                <ToggleGroup
+                        type="single"
+                        variant="outline"
+                        value={selectedMilestoneType}
+                        onValueChange={(value: string) => {
+                            if (value) {
+                                setSelectedMilestoneType(value)
+                            }
+                        }}
+                        className="w-full flex flex-wrap gap-2 justify-between"
                 >
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="ASSET" id="ASSET"/>
-                        <Label htmlFor="ASSET">Asset</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="PROJECT" id="PROJECT"/>
-                        <Label htmlFor="PROJECT">Project</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="RFP" id="RFP"/>
-                        <Label htmlFor="RFP">RFP</Label>
-                    </div>
-                </RadioGroup>
+                    {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
+                        <ToggleGroupItem
+                            key={value}
+                            value={value}
+                            className={"text-md grow flex gap-2"}
+                        >
+                            {label}
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <FaInfoCircle/>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-80 text-wrap text-left">
+                                    {description}
+                                </TooltipContent>
+                            </Tooltip>
+                        </ToggleGroupItem>
+                    ))}
+                </ToggleGroup>
 
                 <DialogFooter>
                     <DialogClose>
@@ -240,20 +197,6 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                             Cancel
                         </Button>
                     </DialogClose>
-                    
-                    {/* <DialogClose>
-                        <Button
-                            disabled={selectedMilestones.length === 0}
-                            type="button"
-                            onClick={() => {
-                                console.log(`add milestones`, selectedMilestones)
-                                addMilestones(selectedMilestones)
-                            }}
-                        >
-                            <FaPlus />
-                            Create selected milestones
-                        </Button>
-                    </DialogClose> */}
 
                     <DialogClose>
                         <Button
