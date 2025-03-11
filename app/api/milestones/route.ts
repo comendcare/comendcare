@@ -11,6 +11,7 @@ export async function POST(req: Request) {
                 id: { in: ids }, // Ensure we fetch all organizations
             },
             include: {
+                organization: true,
                 node: true,
                 contacts: true,
                 attachments: true,
