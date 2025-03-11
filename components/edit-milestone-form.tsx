@@ -145,7 +145,7 @@ export function EditMilestoneForm({
             nodeType: milestoneData?.nodeType || milestoneData?.node?.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            types: (milestoneData?.types || []),
+            types: ((milestoneData?.types || []).map((type: any) => type.milestoneType) || []),
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
             startDate: milestoneData?.startDate,
             endDate: milestoneData?.endDate,
@@ -233,6 +233,8 @@ export function EditMilestoneForm({
             notes
         } = values;
 
+        console.log(`types to save`, types)
+
         setMilestone(milestoneData?.nodeId, {
             nodeType,
             title,
@@ -241,7 +243,13 @@ export function EditMilestoneForm({
             ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
             ...(attachments ? {attachments} : undefined),
-            ...(types ? {types} : undefined),
+            ...(types ? {
+                types: types.map((type: any) => ({
+                    milestoneId: milestoneData.id,
+                    milestoneTypeId: type.id,
+                    milestoneType: type
+                }))
+            } : undefined),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,

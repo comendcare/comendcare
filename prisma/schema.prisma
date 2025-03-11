@@ -212,18 +212,18 @@ model Node {
 }
 
 model Milestone {
-  id               String               @id @unique @default(uuid())
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @default(now()) @updatedAt
+  id               String                     @id @unique @default(uuid())
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @default(now()) @updatedAt
   title            String
   description      String?
   notes            String?
-  status           String?              @default("PLANNED")
+  status           String?                    @default("PLANNED")
   budget           Int?
   endDate          DateTime?
   startDate        DateTime?
-  private          Boolean              @default(true)
-  types            MilestoneType[]
+  private          Boolean                    @default(true)
+  types            MilestoneTypeOnMilestone[]
   otherTypeDetails String?
   openTo           String[]
   tasks            Task[]
@@ -240,16 +240,16 @@ model Milestone {
   reviews Review[]
 }
 
-// model MilestoneTypeOnMilestone {
-//   id          String                  @id @default(uuid())
-//   milestoneTypeId      String
-//   milestoneId    String
-//   reason      ReviewReplyReportReason
-//   description String?
-//   user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   review      Review                  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-//   createdAt   DateTime                @default(now())
-// }
+model MilestoneTypeOnMilestone {
+  id              String        @id @default(uuid())
+  milestoneTypeId String
+  milestoneId     String
+  milestoneType   MilestoneType @relation(fields: [milestoneTypeId], references: [id], onDelete: Cascade)
+  milestone       Milestone     @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+
+  @@unique([milestoneTypeId, milestoneId])
+}
 
 model MilestoneType {
   id          String   @id // value
@@ -260,7 +260,7 @@ model MilestoneType {
   categories  String[]
   description String?
 
-  milestones Milestone[]
+  milestones MilestoneTypeOnMilestone[]
 }
 
 model Kanban {

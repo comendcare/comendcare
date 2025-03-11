@@ -26,7 +26,7 @@ export function MilestoneMarketplaceListElement({ milestone }: { milestone: any 
             <CardContent className="w-full flex flex-row gap-4 flex-wrap">
                 {(milestone?.types || []).map((type: any, index: number) => (
                     <Badge className="flex text-sm" key={index}>
-                        {type?.label || "No type"}
+                        {type?.milestoneType?.label || "No type"}
                     </Badge>
                 ))}
                 

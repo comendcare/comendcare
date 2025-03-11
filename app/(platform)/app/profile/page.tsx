@@ -76,7 +76,7 @@ export default async function ProfilePage() {
                                 node: true,
                                 contacts: true,
                                 attachments: true,
-                                // types: true
+                                types: { include: { milestoneType: true } }
                             }
                         }
                     }
@@ -87,7 +87,7 @@ export default async function ProfilePage() {
                         node: true,
                         contacts: true,
                         attachments: true,
-                        // types: true
+                        types: { include: { milestoneType: true } }
                     }
                 }
             }

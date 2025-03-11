@@ -90,6 +90,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
 
         newMilestones.forEach(defaultData => {
             const id = nanoid()
+            const milestoneId = nanoid()
             const newNode: any = {
                 id: id,
                 type: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
@@ -99,9 +100,19 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                 },
                 origin: [0.0, 0.0],
                 data: {
-                    id: nanoid(),
+                    id: milestoneId,
                     nodeId: id,
-                    types: defaultData?.types?.map((type: any) => milestoneTypes.find(t => t.id === type)).filter((val: any) => val !== undefined) || [],
+                    types: defaultData?.types?.map((type: any) => {
+                        const dbType = milestoneTypes.find(t => t.id === type)
+                        if (dbType) {
+                            return ({
+                                milestoneId: milestoneId,
+                                milestoneTypeId: type,
+                                milestoneType: dbType
+                            })
+                        }
+                    }).filter((type: any) => type !== undefined),
+                    // types: defaultData?.types?.map((type: any) => milestoneTypes.find(t => t.id === type)).filter((val: any) => val !== undefined) || [],
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     status: defaultData?.status || "PLANNED",

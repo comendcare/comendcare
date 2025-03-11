@@ -131,7 +131,7 @@ export async function getRoadmapsForOrganization(domain: string) {
                             node: true,
                             contacts: true,
                             attachments: true,
-                            types: true
+                            types: { include: { milestoneType: true } }
                         }
                     }
                 },
@@ -148,7 +148,7 @@ export async function getRoadmapsForOrganization(domain: string) {
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: true
+                    types: { include: { milestoneType: true } }
                 }
             },
         },
@@ -498,7 +498,7 @@ export async function getRoadmap(orgId: string | null | undefined) {
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: true
+                        types: { include: { milestoneType: true } }
                     }
                 },
                 edges: true,
@@ -721,7 +721,7 @@ export async function getMilestoneDetails(id: string) {
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: true
+                types: { include: { milestoneType: true } }
             }
         })
 
@@ -798,7 +798,7 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: true
+                    types: { include: { milestoneType: true } }
                 }
             })
 

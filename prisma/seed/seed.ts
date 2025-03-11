@@ -937,7 +937,7 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
     //                     node: true,
     //                     contacts: true,
     //                     attachments: true,
-    //                     types: true
+    //                     types: { include: { milestoneType: true } }
     //                 }
     //             })
     //
