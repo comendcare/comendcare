@@ -26,9 +26,9 @@ async function main() {
 
     // seed milestone types
     await prisma.milestoneType.deleteMany()
-    const milestoneTypes = await prisma.milestoneType.createMany({
-        data: MILESTONE_TYPE_OPTIONS
-    })
+    // const milestoneTypes = await prisma.milestoneType.createMany({
+    //     data: MILESTONE_TYPE_OPTIONS
+    // })
 
     const flawnson = await prisma.user.upsert({
         where: {email: 'flawnsontong1@gmail.com'},
@@ -900,86 +900,86 @@ async function createRoadmap(organizationId: string, kanbanId: string, roadmapTe
     });
 
     // if a roadmap template was provided, create the relevant nodes, milestones, and edges
-    if (roadmapTemplate?.milestones) {
-        const milestones = roadmapTemplate.milestones
-
-        const nodes = await Promise.all(
-            milestones.map(async (milestone: any, index: number) => {
-                // create Node & associated Milestone
-                const node = await prisma.node.create({
-                    data: {
-                        roadmapId: roadmap.id,
-                        type: milestone.nodeType,
-                        positionX: index * 500,
-                        positionY: 0,
-                        data: {
-                            create: {
-                                roadmapId: roadmap.id,
-                                organizationId,
-                                status: milestone.status || "PLANNED",
-                                title: milestone.title,
-                                ...(milestone.description ? {description: milestone.description} : undefined),
-                                ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
-                                ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
-                                ...(milestone.budget ? {budget: milestone.budget} : undefined),
-                                types: milestone.types || [],
-                                private: milestone.private || false
-                            }
-                        }
-                    }
-                })
-
-                // grab milestone so we can add tasks
-                // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
-                const newMilestone = await prisma.milestone.findUnique({
-                    where: {nodeId: node.id},
-                    include: {
-                        node: true,
-                        contacts: true,
-                        attachments: true,
-                        types: true
-                    }
-                })
-
-                // create tasks for relevant milestone
-                if (newMilestone) {
-                    await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
-                        await prisma.task.create({
-                            data: {
-                                milestoneId: newMilestone?.id,
-                                status: task.status || "PLANNED",
-                                name: task.name,
-                                columnId: createdColumns[0]?.id,
-                                orderPosition: index,
-                                kanbanPosition: index,
-                                checklist: {
-                                    createMany: {
-                                        data: (task.checklist || []).map((item: any, index: number) => ({
-                                            name: item.name,
-                                            complete: item.complete || false,
-                                            orderPosition: index
-                                        }))
-                                    }
-                                }
-                            }
-                        })
-                    )))
-                }
-
-                return node
-            })
-        )
-
-        for (let i = 0; i < nodes.length - 1; i++) {
-            const edge = await prisma.edge.create({
-                data: {
-                    roadmap: {connect: {id: roadmap.id}},
-                    source: nodes[i]?.id,
-                    target: nodes[i + 1]?.id
-                }
-            })
-        }
-    }
+    // if (roadmapTemplate?.milestones) {
+    //     const milestones = roadmapTemplate.milestones
+    //
+    //     const nodes = await Promise.all(
+    //         milestones.map(async (milestone: any, index: number) => {
+    //             // create Node & associated Milestone
+    //             const node = await prisma.node.create({
+    //                 data: {
+    //                     roadmapId: roadmap.id,
+    //                     type: milestone.nodeType,
+    //                     positionX: index * 500,
+    //                     positionY: 0,
+    //                     data: {
+    //                         create: {
+    //                             roadmapId: roadmap.id,
+    //                             organizationId,
+    //                             status: milestone.status || "PLANNED",
+    //                             title: milestone.title,
+    //                             ...(milestone.description ? {description: milestone.description} : undefined),
+    //                             ...(milestone.startDate ? {startDate: milestone.startDate} : undefined),
+    //                             ...(milestone.endDate ? {endDate: milestone.endDate} : undefined),
+    //                             ...(milestone.budget ? {budget: milestone.budget} : undefined),
+    //                             types: milestone.types || [],
+    //                             private: milestone.private || false
+    //                         }
+    //                     }
+    //                 }
+    //             })
+    //
+    //             // grab milestone so we can add tasks
+    //             // createMany doesn't support nested creates - we must add tasks after creating the Milestone object
+    //             const newMilestone = await prisma.milestone.findUnique({
+    //                 where: {nodeId: node.id},
+    //                 include: {
+    //                     node: true,
+    //                     contacts: true,
+    //                     attachments: true,
+    //                     types: true
+    //                 }
+    //             })
+    //
+    //             // create tasks for relevant milestone
+    //             if (newMilestone) {
+    //                 await Promise.all((milestone.tasks || []).map(async (task: any, index: number) => (
+    //                     await prisma.task.create({
+    //                         data: {
+    //                             milestoneId: newMilestone?.id,
+    //                             status: task.status || "PLANNED",
+    //                             name: task.name,
+    //                             columnId: createdColumns[0]?.id,
+    //                             orderPosition: index,
+    //                             kanbanPosition: index,
+    //                             checklist: {
+    //                                 createMany: {
+    //                                     data: (task.checklist || []).map((item: any, index: number) => ({
+    //                                         name: item.name,
+    //                                         complete: item.complete || false,
+    //                                         orderPosition: index
+    //                                     }))
+    //                                 }
+    //                             }
+    //                         }
+    //                     })
+    //                 )))
+    //             }
+    //
+    //             return node
+    //         })
+    //     )
+    //
+    //     for (let i = 0; i < nodes.length - 1; i++) {
+    //         const edge = await prisma.edge.create({
+    //             data: {
+    //                 roadmap: {connect: {id: roadmap.id}},
+    //                 source: nodes[i]?.id,
+    //                 target: nodes[i + 1]?.id
+    //             }
+    //         })
+    //     }
+    // }
 
     return roadmap
 }
