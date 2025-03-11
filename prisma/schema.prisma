@@ -246,7 +246,7 @@ model MilestoneType {
   updatedAt   DateTime @updatedAt
   label       String
   services    String[]
-  category    String[]
+  categories  String[]
   description String?
 
   milestones Milestone[]
