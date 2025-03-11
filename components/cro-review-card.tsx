@@ -3,6 +3,17 @@ import React from "react";
 import {Review, User, Organization} from "@prisma/client";
 import {StarRatingIndicator} from "@/components/star-rating-indicator";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {useSession} from "next-auth/react";
+import {FaEllipsisVertical, FaFlag, FaPencil, FaTrash} from "react-icons/fa6";
+
 
 interface ReviewWithAuthor extends Review {
     author: User;
@@ -10,6 +21,8 @@ interface ReviewWithAuthor extends Review {
 }
 
 export const CROReviewCard = ({review}: { review: ReviewWithAuthor }) => {
+    const {data: session} = useSession()
+
     return (
         <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-4">
@@ -33,8 +46,9 @@ export const CROReviewCard = ({review}: { review: ReviewWithAuthor }) => {
                             </div>
                         </div>
                     </div>
+
                     <div className="font-medium dark:text-white">
-                        <StarRatingIndicator rating={4.3}/>
+                        <StarRatingIndicator rating={review.rating}/>
                         <div className="flex items-start">
                             <p className="text-sm text-gray-500 dark:text-gray-400">
                                 Reviewed:{" "}
@@ -48,6 +62,31 @@ export const CROReviewCard = ({review}: { review: ReviewWithAuthor }) => {
                             </p>
                         </div>
                     </div>
+
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <FaEllipsisVertical/>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            {session?.user.id === review.author.id &&
+                                <DropdownMenuItem>
+                                    <FaPencil/>
+                                    Edit review
+                                </DropdownMenuItem>
+                            }
+                            {session?.user.id !== review.author.id &&
+                                <DropdownMenuItem>
+                                    <FaFlag/>
+                                    Report review
+                                </DropdownMenuItem>
+                            }
+                            <DropdownMenuSeparator/>
+                            <DropdownMenuItem>
+                                <FaTrash/>
+                                Delete review
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
 
                 <ul className="flex flex-row space-x-4 text-sm text-gray-500 dark:text-gray-400">

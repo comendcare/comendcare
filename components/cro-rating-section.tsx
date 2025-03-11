@@ -24,34 +24,32 @@ const RatingBar = ({ label, percentage }: { label: number; percentage: number })
 );
 
 const CRORatingSection = ({ reviews }: { reviews: Review[] }) => {
-    // Default state for when there are no reviews
+    const validReviews = reviews.filter((review) => review.rating >= 1 && review.rating <= 5);
+    const totalReviews = validReviews.length;
+
     let avgRating = 0;
-    let totalReviews = reviews.length;
-    let ratingPercentages = [
-        { label: 5, percentage: 0 },
-        { label: 4, percentage: 0 },
-        { label: 3, percentage: 0 },
-        { label: 2, percentage: 0 },
-        { label: 1, percentage: 0 },
-    ];
+    let ratingPercentages: { label: number; percentage: number }[] = [];
 
     if (totalReviews > 0) {
         // Calculate average rating
-        const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+        const totalRating = validReviews.reduce((acc, review) => acc + review.rating, 0);
         avgRating = totalRating / totalReviews;
 
         // Count occurrences of each rating (1-5)
         const ratingCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-        reviews.forEach((review) => {
+        validReviews.forEach((review) => {
             const roundedRating = Math.round(review.rating);
             ratingCounts[roundedRating] += 1;
         });
 
-        // Convert counts to percentages
-        ratingPercentages = Object.entries(ratingCounts).map(([rating, count]) => ({
-            label: Number(rating),
-            percentage: (count / totalReviews) * 100,
-        })).reverse(); // Reverse to show 5-star at the top
+        // Convert counts to percentages, only include non-zero counts
+        ratingPercentages = Object.entries(ratingCounts)
+            .filter(([_, count]) => count > 0) // Exclude ratings that have 0 count
+            .map(([rating, count]) => ({
+                label: Number(rating),
+                percentage: (count / totalReviews) * 100,
+            }))
+            .reverse(); // Reverse to show 5-star at the top
     }
 
     return (

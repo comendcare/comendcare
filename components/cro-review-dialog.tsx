@@ -4,7 +4,15 @@ import React, {useCallback, useEffect, useRef, useState} from "react";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter} from "@/components/ui/dialog";
+import {
+    Dialog,
+    DialogTrigger,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogDescription
+} from "@/components/ui/dialog";
 import {Button} from "@/components/ui/button";
 import {
     Select,
@@ -32,7 +40,6 @@ import {StarRatingSelector} from "@/components/star-rating-selector";
 import {FaPenAlt} from "react-icons/fa";
 import {getMembers, getMilestones} from "@/lib/fetchers";
 import {useSession} from "next-auth/react";
-import {debounce} from "lodash";
 import {FaLinkSlash} from "react-icons/fa6";
 
 const reviewForm = z.object({
@@ -44,12 +51,16 @@ const reviewForm = z.object({
         .string({required_error: "Please provide a description"})
         .min(1, "Description is required")
         .max(500, "Description must be less than 500 characters"),
-    rating: z.number({required_error: "Please provide a rating"}),
-    milestone: z.string().optional(),
+    rating: z
+        .number({required_error: "Please provide a rating"})
+        .min(1, "Rating is required"),
+    milestone: z
+        .string()
+        .optional(),
 });
 
 export default function CROReviewDialog({cro}: { cro: Company }) {
-    const { data: session } = useSession()
+    const {data: session} = useSession()
     const router = useRouter();
     const initializing = useRef(true)
     const [loading, setLoading] = useState(false);
@@ -81,11 +92,6 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
         fetchData()
     }, [])
 
-    useEffect(() => {
-        const subscription = form.watch((values) => debounceUpdates(values))
-        return () => subscription.unsubscribe();
-    }, [form.watch])
-
     const handleFormSubmit = async (values: z.infer<typeof reviewForm>) => {
         setLoading(true);
         try {
@@ -112,10 +118,6 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
         }
     };
 
-    const debounceUpdates = useCallback(
-        debounce((updatedValues) => handleFormSubmit(updatedValues), 500), []
-    )
-
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -129,6 +131,9 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Submit a Review</DialogTitle>
+                    <DialogDescription>
+                        All fields are required to submit a review.
+                    </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
@@ -167,21 +172,23 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                                 <FormItem>
                                     <FormLabel>Rating</FormLabel>
                                     <FormControl>
-                                        <StarRatingSelector control={form.control} name="rating" totalStars={5}
-                                                            size={24}/>
+                                        <StarRatingSelector
+                                            control={form.control}
+                                            name="rating"
+                                            totalStars={5}
+                                            size={24}/>
                                     </FormControl>
                                     <FormMessage/>
                                 </FormItem>
                             )}
                         />
 
-
                         <FormField
                             control={form.control}
                             name="milestone"
                             render={({field}) => (
-                                <FormItem className="grid grid-cols-[180px_auto] gap-8 items-center w-full">
-                                    <FormLabel className="text-md mt-2">{`Associated Milestone`}</FormLabel>
+                                <FormItem>
+                                    <FormLabel>{`Associated Milestone`}</FormLabel>
                                     <div className="flex flex-row gap-4">
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
