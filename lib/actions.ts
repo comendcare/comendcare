@@ -11,6 +11,7 @@ import {
     Condition,
     TaskStakeholder, Invitation,
     PlatformNotification,
+    Review,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
@@ -2728,6 +2729,24 @@ export const createReview = async (companyId: string, formData: FormData): Promi
         return {success: true, data: review}
     } catch (error: any) {
         console.error("Error creating member request:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function deleteReview(review: Review) {
+    try {
+        const response = prisma.review.delete({
+            where: {id: review.id},
+        });
+
+        if (!response) {
+            console.error("Error deleting review.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        console.error("Error deleting review:", error)
         return {success: false, error: "Database error. please try again later."}
     }
 }

@@ -17,10 +17,17 @@ import {Button} from "@/components/ui/button";
 import {
     Select,
     SelectContent,
+    SelectLabel,
+    SelectGroup,
     SelectTrigger,
     SelectValue,
     SelectItem
 } from "@/components/ui/select"
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/components/ui/hover-card"
 import {
     Form,
     FormControl,
@@ -55,8 +62,7 @@ const reviewForm = z.object({
         .number({required_error: "Please provide a rating"})
         .min(1, "Rating is required"),
     milestone: z
-        .string()
-        .optional(),
+        .string({required_error: "Please provide a milestone"})
 });
 
 export default function CROReviewDialog({cro}: { cro: Company }) {
@@ -65,6 +71,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
     const initializing = useRef(true)
     const [loading, setLoading] = useState(false);
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
+    console.log(fetchedMilestones)
 
     const form = useForm<z.infer<typeof reviewForm>>({
         mode: "onChange",
@@ -81,7 +88,11 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
         const fetchData = async () => {
             const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
             if (milestonesResponse.success) {
-                setFetchedMilestones(milestonesResponse?.data as Milestone[])
+                console.log(milestonesResponse?.data)
+                const filteredMilestones = milestonesResponse?.data?.filter(
+                    item => (item.status === "INPROGRESS" || item.status === "COMPLETED") && !item.private
+                )
+                setFetchedMilestones(filteredMilestones as Milestone[])
             } else {
                 console.error(milestonesResponse.error)
             }
@@ -121,12 +132,28 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button
-                    className="w-fit"
-                >
-                    <FaPenAlt/>
-                    Write a Review
-                </Button>
+                {fetchedMilestones.length === 0 ?
+                    <HoverCard openDelay={0}>
+                        <HoverCardTrigger>
+                            <Button
+                                className="w-fit"
+                                disabled
+                            >
+                                <FaPenAlt/>
+                                Write a Review
+                            </Button>
+                        </HoverCardTrigger>
+                        <HoverCardContent>
+                            To leave a review you must have a roadmap with in progress or completed milestones.
+                        </HoverCardContent>
+                    </HoverCard>
+                    : <Button
+                        className="w-fit"
+                    >
+                        <FaPenAlt/>
+                        Write a Review
+                    </Button>
+                }
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
@@ -197,19 +224,26 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                {fetchedMilestones.map((m: Milestone, index: number) => (
-                                                    <SelectItem value={m.id} key={index}>
-                                                        {m.title}
-                                                    </SelectItem>
-                                                ))}
+                                                <SelectGroup>
+                                                    {fetchedMilestones.length === 0 ?
+                                                        <SelectLabel>
+                                                            {`You don't have any in progress or completed milestones.`}
+                                                        </SelectLabel>
+                                                        : fetchedMilestones.map((m: Milestone, index: number) => (
+                                                            <SelectItem value={m.id} key={index}>
+                                                                {m.title}
+                                                            </SelectItem>
+                                                        ))}
+                                                </SelectGroup>
                                             </SelectContent>
                                         </Select>
+                                        <FormMessage/>
                                         <Button
                                             variant="secondary"
                                             size="icon"
                                             onClick={(e) => {
                                                 e.preventDefault()
-                                                form.setValue('milestone', undefined)
+                                                form.setValue('milestone', "")
                                             }}
                                             disabled={!field.value}
                                         >
