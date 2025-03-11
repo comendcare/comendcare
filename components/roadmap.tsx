@@ -46,7 +46,6 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { Separator } from "@radix-ui/react-separator"
 import { NewMilestoneDialogForm } from "./new-milestone-dialog"
 import { MilestoneType } from "@prisma/client"
-// import { MILESTONE_TYPE_OPTIONS } from "@/prisma/seed/milestone-types"
 import { Option } from "@/lib/types"
 
 const selector = (state: RoadmapState) => ({
