@@ -103,7 +103,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                 {(milestoneData?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                     <li>
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType.label || "No type"}
+                            {milestoneType?.label || "No type"}
                         </Badge>
                     </li>
                 ))}
@@ -154,7 +154,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                 {(milestoneData?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                     <li>
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType.label || "No type"}
+                            {milestoneType?.label || "No type"}
                         </Badge>
                     </li>
                 ))}
@@ -178,7 +178,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                 {(milestoneData?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                     <li>
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType.label || "No type"}
+                            {milestoneType?.label || "No type"}
                         </Badge>
                     </li>
                 ))}
