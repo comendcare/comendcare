@@ -69,7 +69,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { TypeBadge } from "./type-badge"
 import Loading from "@/app/loading"
-import { Option } from "@/lib/types"
 import { getMilestoneTypes } from "@/lib/fetchers"
 
 
@@ -137,7 +136,7 @@ export function EditMilestoneForm({
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
-    const [milestoneTypes, setMilestoneTypes] = useState<Option[]>([])
+    const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -195,11 +194,12 @@ export function EditMilestoneForm({
             // get milestone types from database
             const response = await getMilestoneTypes()
             if (response.success && response.data) {
-                setMilestoneTypes(response.data.map(type => ({
-                    value: type.id,
-                    label: type.label,
-                    description: type.description || undefined
-                })))
+                // setMilestoneTypes(response.data.map(type => ({
+                //     value: type.id,
+                //     label: type.label,
+                //     description: type.description || undefined
+                // })))
+                setMilestoneTypes(response.data || [])
             }
 
             initializing.current = false
@@ -232,8 +232,6 @@ export function EditMilestoneForm({
             openTo,
             notes
         } = values;
-
-        console.log(`types`, types)
 
         setMilestone(milestoneData?.nodeId, {
             nodeType,
@@ -592,7 +590,7 @@ export function EditMilestoneForm({
     )
 }
 
-const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTypes: Option[] }) => {
+const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTypes: any[] }) => {
     const types = form.watch("types")
 
     return (
@@ -606,8 +604,8 @@ const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTy
                             <MultipleSelector
                                 {...field}
                                 maxSelected={3}
-                                defaultOptions={milestoneTypes}
-                                options={milestoneTypes}
+                                defaultOptions={milestoneTypes.map(type => ({...type, value: type.id}))}
+                                options={milestoneTypes.map(type => ({...type, value: type.id}))}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Milestone type"
@@ -825,7 +823,6 @@ const TimelineFormField = ({
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
                                 onChange={(event) => {
-                                    console.log(`start date year`, event.target.value)
                                     const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
                                     const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
                                     form.setValue('startDate', newStartDate)
@@ -886,7 +883,6 @@ const TimelineFormField = ({
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
                                 onChange={(event) => {
-                                    console.log(`start date year`, event.target.value)
                                     const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
                                     const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
                                     form.setValue('endDate', newEndDate)

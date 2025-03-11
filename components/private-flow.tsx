@@ -259,7 +259,7 @@ export const PrivateFlowView = ({
                 data: {
                     id: nanoid(),
                     nodeId: id,
-                    types: defaultData?.types || [],
+                    types: [],
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     status: defaultData?.status || "PLANNED",
