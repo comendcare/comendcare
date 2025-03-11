@@ -37,8 +37,6 @@ export function PublishOrganizationSwitch({organization}: { organization: Organi
         // Call the published function with the organization
         try {
             const result = await toggleOrganizationPublished(organization.id)
-            console.log("test")
-            console.log(result)
 
             if (result && 'published' in result) {
                 // Update the form value to reflect the latest state
@@ -67,6 +65,7 @@ export function PublishOrganizationSwitch({organization}: { organization: Organi
                                         <Switch
                                             checked={field.value}
                                             onCheckedChange={() => handleToggle()}
+                                            className="data-[state=checked]:bg-blue-dark data-[state=unchecked]:bg-blue-light"
                                         />
                                     </FormControl>
                                     <FormLabel htmlFor="published" className="inline-flex items-center gap-1">

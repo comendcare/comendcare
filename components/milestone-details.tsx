@@ -13,7 +13,7 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS} from "@/lib/types"
+import {NODE_TYPE_OPTIONS} from "@/lib/types"
 import {Badge} from "./ui/badge"
 import {DateView} from "./miletone-date-view"
 import {BudgetView} from "./milestone-budget-view"
@@ -85,16 +85,10 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                     }
                     {(milestone.types || []).sort((a: any, b: any) => a.length - b.length).map((milestoneType: any, index: number) => (
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                            {milestoneType?.label || "No type"}
                         </Badge>
                     ))}
                 </span>
-
-                {/*{(milestone.types || []).map((type: string, index: number) => (*/}
-                {/*    <Badge className="flex text-sm h-[30px] w-fit" key={index}>*/}
-                {/*        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === type))?.label || "No type"}*/}
-                {/*    </Badge>*/}
-                {/*))}*/}
 
                 {milestone.attachments && milestone.attachments.length > 0 && (
                     <div className="flex flex-col gap-4">

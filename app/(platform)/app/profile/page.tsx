@@ -32,6 +32,7 @@ import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hov
 import NoOrganization from "@/components/no-organization";
 import ComendVerifiedBadge from "@/components/comend-verified-badge";
 import {PublishOrganizationSwitch} from "@/components/publish-organization-switch";
+import {BiopharmaConsentSwitch} from "@/components/biopharma-consent-switch";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {ProfileCompletionCard} from "@/components/profile-completion-card";
 import EditPagProfileSubdomainDialog from "@/components/edit-pag-profile-subdomain-dialog";
@@ -74,7 +75,8 @@ export default async function ProfilePage() {
                             include: {
                                 node: true,
                                 contacts: true,
-                                attachments: true
+                                attachments: true,
+                                types: true
                             }
                         }
                     }
@@ -84,7 +86,8 @@ export default async function ProfilePage() {
                     include: {
                         node: true,
                         contacts: true,
-                        attachments: true
+                        attachments: true,
+                        types: true
                     }
                 }
             }
@@ -251,6 +254,8 @@ export default async function ProfilePage() {
                 <Card className="col-span-1 flex flex-col space-y-4 h-fit">
                     <CardHeader className="flex flex-col gap-4 pb-0">
                         <PublishOrganizationSwitch organization={organization}/>
+                        <BiopharmaConsentSwitch organization={organization} />
+
                         <div className="flex flex-col gap-2 pb-0">
                             <div
                                 className="flex flex-row items-center justify-between"
@@ -262,10 +267,10 @@ export default async function ProfilePage() {
                                 href={`http://${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
+                                className="w-full inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
                             >
-                                {organization.subdomain}.comend.io
-                                <FaArrowUpRightFromSquare/>
+                                <span className="truncate">{organization.subdomain}.comend.io</span>
+                                <FaArrowUpRightFromSquare className="flex-shrink-0"/>
                             </Link>
                         </div>
                     </CardHeader>

@@ -342,6 +342,14 @@ export const syncToTypesense = async (env: {
                     index: true,
                     store: true,
                     optional: true
+                },
+                {
+                    name: "categories",
+                    type: "string[]",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
                 }
             ],
         };
@@ -377,7 +385,8 @@ export const syncToTypesense = async (env: {
                 yearEstablished: true,
                 website: true,
                 headquarters: true,
-                companyType: true
+                companyType: true,
+                categories: true
             }
         });
 

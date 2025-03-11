@@ -153,7 +153,7 @@ const FloatingDockDesktop = ({
                 mouseY.set(Infinity);
             }}
             className={cn(
-                "hidden md:flex gap-4 items-end rounded-2xl bg-gray-50 dark:bg-neutral-900 p-4",
+                "hidden md:flex gap-4 items-end rounded-2xl bg-blue-light dark:bg-neutral-900 p-4",
                 orientation === "vertical"
                     ? "flex-col h-auto fixed top-1/2 right-4 transform -translate-y-1/2"
                     : "flex-row h-16 mx-auto",
@@ -244,11 +244,11 @@ function IconContainer({
                         style={{width, height}}
                         onMouseEnter={() => setHovered(true)}
                         onMouseLeave={() => setHovered(false)}
-                        className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative cursor-pointer"
+                        className="aspect-square rounded-full bg-blue-dark flex items-center justify-center relative cursor-pointer"
                     >
                         <motion.div
                             style={{width: widthIcon, height: heightIcon}}
-                            className="flex items-center justify-center"
+                            className="flex items-center justify-center text-blue-light"
                         >
                             {icon}
                         </motion.div>
@@ -280,7 +280,7 @@ function IconContainer({
                         style={{width, height}}
                         onMouseEnter={() => setHovered(true)}
                         onMouseLeave={() => setHovered(false)}
-                        className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative cursor-pointer"
+                        className="aspect-square rounded-full bg-blue-dark flex items-center justify-center relative cursor-pointer"
                     >
                         <motion.div style={{width: widthIconSpring, height: heightIconSpring}}
                                     className="flex items-center justify-center">
@@ -312,7 +312,7 @@ function IconContainer({
                 style={{width, height}}
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
-                className="aspect-square rounded-full bg-gray-200 dark:bg-neutral-800 flex items-center justify-center relative"
+                className="aspect-square rounded-full bg-blue-dark flex items-center justify-center relative"
             >
                 <AnimatePresence>
                     {hovered && (

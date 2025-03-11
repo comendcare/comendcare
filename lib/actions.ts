@@ -46,8 +46,10 @@ export type Edge = Prisma.EdgeGetPayload<{}>
 
 export type Milestone = Prisma.MilestoneGetPayload<{
     include: {
+        node: true,
+        contacts: true,
         attachments: true,
-        contacts: true
+        types: true
     }
 }>
 
@@ -393,6 +395,69 @@ export const createOrganization = async (formData: FormData) => {
             return {
                 error: error.message
             }
+        }
+    }
+}
+
+export const toggleBiopharmaConsentSettings = async (organizationId: string) => {
+    try {
+        const organization = await prisma.organization.findUnique({
+            where: {
+                id: organizationId,
+            }
+        })
+        const newConsent = !organization?.biopharmaConsentSettings
+
+        if (organization) {
+            const updatedOrganization = await prisma.organization.update({
+                where: {
+                    id: organization.id
+                },
+                data: {
+                    biopharmaConsentSettings: newConsent
+                }
+            })
+
+            if (newConsent) {
+                await addTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    {
+                        id: organization.id,
+                        name: organization.name,
+                        description: organization.description,
+                        biopharmaConsentSettings: newConsent,
+                        subdomain: organization.subdomain,
+                    },
+                    'organizations'
+                );
+            } else {
+                await deleteTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    organization.id,
+                    'organizations'
+                );
+            }
+
+            console.log("Toggled biopharma consent settings for organization", organization.id)
+            await revalidateTag(
+                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
+            )
+
+            return updatedOrganization
+        }
+    } catch (error: any) {
+        return {
+            error: error.message
         }
     }
 }
@@ -1649,7 +1714,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                             create: {
                                 roadmapId: roadmap.id,
                                 organizationId,
-                                types: milestone.types || [],
+                                // types: milestone.types || [],
                                 status: milestone.status || "PLANNED",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
@@ -1717,13 +1782,15 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
         include: {
             milestones: {
                 include: {
-                    attachments: true,
+                    node: true,
                     contacts: true,
-                    node: true
+                    attachments: true,
+                    types: true
                 }
             },
             nodes: true,
-            edges: true
+            edges: true,
+            organization: true
         }
     })
 
@@ -1836,7 +1903,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                                     connect: {id: organizationId}
                                 },
                                 title: node.data?.title || "New Milestone",
-                                types: node.data?.types || [],
+                                // types: node.data?.types || [],
                                 description: node.data?.description,
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
@@ -1884,9 +1951,10 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
         })
         const updatedMilestones = await prisma.milestone.findMany({
             include: {
-                attachments: true,
+                node: true,
                 contacts: true,
-                node: true
+                attachments: true,
+                types: true
             },
             where: {roadmapId}
         })
@@ -1947,7 +2015,13 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                     connect: {id: organizationId}
                                 },
                                 title: node.data?.title || "New Milestone",
-                                types: node.data?.types || [],
+                                // types: node.data?.types || [],
+                                types: {
+                                    connect: (node.data?.types || []).map((type: any) => ({ id: type.id })) || []
+                                },
+                                // types: {
+                                //     set: node.data?.types.map((type: any) => ({ id: type.value })) || []
+                                // },
                                 description: node.data?.description,
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
@@ -1974,9 +2048,10 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         const nodeIds = updatedNodes.map(node => node.id)
         let updatedMilestones = await prisma.milestone.findMany({
             include: {
-                attachments: true,
+                node: true,
                 contacts: true,
-                node: true
+                attachments: true,
+                types: true
             },
             where: {roadmapId}
         })
@@ -2092,15 +2167,18 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
     try {
         let updatedMilestones: Milestone[] = []
 
+        console.log(`milestone types`, milestones.flatMap(milestone => milestone.types))
+
         await Promise.all(
             milestones.map(async (milestone: any) => {
                 const previousMilestone = await prisma.milestone.findUnique({
                     where: {nodeId: milestone.nodeId},
                     // where: {id: milestone.id},
                     include: {
-                        attachments: true,
+                        node: true,
                         contacts: true,
-                        node: true
+                        attachments: true,
+                        types: true
                     }
                 })
 
@@ -2113,13 +2191,16 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     where: {nodeId: milestone.nodeId},
                     // where: {id: milestone.id},
                     include: {
-                        attachments: true,
+                        node: true,
                         contacts: true,
-                        node: true
+                        attachments: true,
+                        types: true
                     },
                     data: {
                         title: milestone.title,
-                        types: milestone.types || [],
+                        types: {
+                            set: milestone.types.map((type: any) => ({ id: type.id }))
+                        },
                         otherTypeDetails: milestone.otherTypeDetails,
                         description: milestone.description,
                         startDate: milestone.startDate,
