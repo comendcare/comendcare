@@ -24,7 +24,7 @@ export type PublicMilestoneNode = Node<
         nodeId: string
         title: string
         description?: string
-        types?: MilestoneType[],
+        types?: {milestoneId: string, milestoneTypeId: string, milestoneType: MilestoneType}[],
         startDate?: Date,
         endDate?: Date,
         budget?: number

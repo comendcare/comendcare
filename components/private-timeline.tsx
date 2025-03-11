@@ -100,10 +100,10 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
     if (nodeType === "ASSET") {
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).sort((a, b) => a.milestoneType?.label.length - b.milestoneType?.label.length).map((milestoneType, index) => (
                     <li>
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType?.label || "No type"}
+                            {milestoneType?.milestoneType?.label || "No type"}
                         </Badge>
                     </li>
                 ))}
@@ -151,10 +151,10 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                         }}
                     />
                 </li>
-                {(milestoneData?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
                     <li>
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType?.label || "No type"}
+                            {milestoneType?.milestoneType?.label || "No type"}
                         </Badge>
                     </li>
                 ))}
@@ -175,10 +175,10 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
     if (nodeType === "RFP") {
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
                     <li>
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType?.label || "No type"}
+                            {milestoneType?.milestoneType?.label || "No type"}
                         </Badge>
                     </li>
                 ))}
