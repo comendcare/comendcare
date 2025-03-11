@@ -15,7 +15,7 @@ import { DoubleSliderBarChart } from "./ui/slider-double"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
 import MultipleSelector from "./ui/multiple-selector"
-import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types"
+import {ASSOCIATED_CATEGORIES} from "@/lib/types"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 
@@ -32,7 +32,7 @@ const optionSchema = z.object({
 });
 
 const filtersFormSchema = z.object({
-    systems: z.array(optionSchema),
+    categories: z.array(optionSchema),
 })
 
 export function CROFilters() {
@@ -47,15 +47,6 @@ export function CROFilters() {
         setFilters(values)
     }
 
-    const moneyDeployedRange = [0, 10000000]
-    const moneyDeployedStep = moneyDeployedRange[1]/50
-    const moneyDeployedChartData = (new Array((moneyDeployedRange[1] - moneyDeployedRange[0])/moneyDeployedStep).fill(0)).map((value, index) => ({
-        xAxis: index,
-        data: allResults.filter(
-            result => result.document.moneyDeployed >= index*moneyDeployedStep && result.document.moneyDeployed < (index+1)*moneyDeployedStep
-        ).length
-    }))
-
     return (
         <Form {...form}>
             <ScrollArea className="w-full h-full">
@@ -69,17 +60,17 @@ export function CROFilters() {
 
                 <FormField
                     control={form.control}
-                    name="systems"
+                    name="categories"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">Associated systems</FormLabel>
-                            <FormDescription>{`The systems affected by a condition.`}</FormDescription>
+                            <FormLabel className="font-semibold text-base">Service categories</FormLabel>
+                            <FormDescription>{`The service categories provided by the CRO.`}</FormDescription>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={ASSOCIATED_SYSTEMS}
+                                    defaultOptions={ASSOCIATED_CATEGORIES}
                                     hidePlaceholderWhenSelected={true}
-                                    placeholder="Select associated systems..."
+                                    placeholder="Select associated categories..."
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                             no results found.
