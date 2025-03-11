@@ -95,13 +95,13 @@ export default function OnboardingSteps() {
                                     {stepIdx !== updatedSteps.length - 1 && (
                                         <div
                                             aria-hidden="true"
-                                            className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-indigo-600"
+                                            className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-blue-dark"
                                         />
                                     )}
                                     <a href={step.href} className="group relative flex items-start">
                                         <span className="flex h-9 items-center">
                                             <span
-                                                className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 group-hover:bg-indigo-800">
+                                                className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-blue-dark group-hover:bg-blue-900">
                                                 <FaCheck aria-hidden="true" className="h-5 w-5 text-white"/>
                                             </span>
                                         </span>
@@ -122,12 +122,12 @@ export default function OnboardingSteps() {
                                     <a href={step.href} aria-current="step" className="group relative flex items-start">
                                         <span aria-hidden="true" className="flex h-9 items-center">
                                             <span
-                                                className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-indigo-600 bg-white">
-                                                <span className="h-2.5 w-2.5 rounded-full bg-indigo-600"/>
+                                                className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-blue-dark bg-white">
+                                                <span className="h-2.5 w-2.5 rounded-full bg-blue-dark"/>
                                             </span>
                                         </span>
                                         <span className="ml-4 flex min-w-0 flex-col">
-                                            <span className="text-xl font-semibold text-indigo-600">{step.name}</span>
+                                            <span className="text-xl font-semibold text-blue-dark">{step.name}</span>
                                             <span className="text-sm text-gray-500">{step.description}</span>
                                         </span>
                                     </a>
