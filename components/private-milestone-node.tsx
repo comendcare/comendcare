@@ -308,7 +308,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                     )}
                     {(props?.data?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType.label || "No type"}
+                            {milestoneType?.label || "No type"}
                         </Badge>
                     ))}
                 </span>
@@ -349,7 +349,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                     />
                     {(props?.data?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType.label || "No type"}
+                            {milestoneType?.label || "No type"}
                         </Badge>
                     ))}
             </span>
@@ -379,7 +379,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                 <span className="w-full flex gap-2 flex-wrap text-wrap">
                     {(props?.data?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType.label || "No type"}
+                            {milestoneType?.label || "No type"}
                         </Badge>
                     ))}
             </span>
