@@ -85,7 +85,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                     }
                     {(milestone.types || []).sort((a: any, b: any) => a.length - b.length).map((milestoneType: any, index: number) => (
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType.label || "No type"}
+                            {milestoneType?.label || "No type"}
                         </Badge>
                     ))}
                 </span>
