@@ -101,7 +101,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
                 {(milestoneData?.types || []).sort((a, b) => a.milestoneType?.label.length - b.milestoneType?.label.length).map((milestoneType, index) => (
-                    <li>
+                    <li key={index}>
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
                             {milestoneType?.milestoneType?.label || "No type"}
                         </Badge>
@@ -152,7 +152,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                     />
                 </li>
                 {(milestoneData?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-                    <li>
+                    <li key={index}>
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
                             {milestoneType?.milestoneType?.label || "No type"}
                         </Badge>

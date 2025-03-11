@@ -2,7 +2,7 @@
 import {PrismaClient} from '@prisma/client'
 import {addTypeSenseDocument, createTypeSenseCollection, sendTypeSenseRequest} from "@/lib/utils";
 import { DEFAULT_KANBAN_COLUMNS } from '@/lib/types';
-import { MILESTONE_TYPE_OPTIONS } from './milestone-types';
+import { MILESTONE_TYPE_OPTIONS } from './seed-options';
 
 const prisma = new PrismaClient()
 
@@ -27,7 +27,8 @@ async function main() {
     // seed milestone types
     await prisma.milestoneType.deleteMany()
     const milestoneTypes = await prisma.milestoneType.createMany({
-        data: MILESTONE_TYPE_OPTIONS
+        data: MILESTONE_TYPE_OPTIONS,
+        skipDuplicates: true
     })
 
     const flawnson = await prisma.user.upsert({

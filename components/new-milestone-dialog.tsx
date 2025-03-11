@@ -28,7 +28,6 @@ const selector = (state: RoadmapState) => ({
 })
 
 export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen: (open: boolean) => void}) => {
-    // const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const { 
         initialized,
         selectedView,
