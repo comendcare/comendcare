@@ -16,7 +16,7 @@ export default function RoadmapInitWrapper({ roadmap }: {roadmap: any }) {
     const { roadmapId } = useRoadmapStore(useShallow(selector))
 
     useEffect(() => {
-        if (roadmap.id !== roadmapId) {
+        if (roadmap?.id !== roadmapId) {
             // if the roadmapId doesn't match what's in the zustand store
             // refresh the page to re-initialize the zustand state
             // this will happen when we've created a brand new research plan

@@ -26,9 +26,9 @@ async function main() {
 
     // seed milestone types
     await prisma.milestoneType.deleteMany()
-    // const milestoneTypes = await prisma.milestoneType.createMany({
-    //     data: MILESTONE_TYPE_OPTIONS
-    // })
+    const milestoneTypes = await prisma.milestoneType.createMany({
+        data: MILESTONE_TYPE_OPTIONS
+    })
 
     const flawnson = await prisma.user.upsert({
         where: {email: 'flawnsontong1@gmail.com'},

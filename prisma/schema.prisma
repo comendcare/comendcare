@@ -240,6 +240,17 @@ model Milestone {
   reviews Review[]
 }
 
+// model MilestoneTypeOnMilestone {
+//   id          String                  @id @default(uuid())
+//   milestoneTypeId      String
+//   milestoneId    String
+//   reason      ReviewReplyReportReason
+//   description String?
+//   user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   review      Review                  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+//   createdAt   DateTime                @default(now())
+// }
+
 model MilestoneType {
   id          String   @id // value
   createdAt   DateTime @default(now())
