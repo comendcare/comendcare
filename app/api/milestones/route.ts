@@ -15,6 +15,7 @@ export async function POST(req: Request) {
                 node: true,
                 contacts: true,
                 attachments: true,
+                types: true
             }
         });
 

@@ -6,10 +6,10 @@ import {useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useEffect, useState} from "react";
 import {updateCondition} from "@/lib/actions";
-import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
+import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@/lib/types";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
-import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
+import MultipleSelector from "@/components/ui/multiple-selector";
 import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
@@ -124,8 +124,8 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
                 numberOfPatientsEngaged: values.engaged ? parseInt(values.engaged, 10) : null,
-                nationalEstimatedPopulation: values.engaged ? parseInt(values.national ?? "0", 10) : null,
-                globalEstimatedPopulation: values.engaged ? parseInt(values.global ?? "0", 10) : null,
+                nationalEstimatedPopulation: values.national ? parseInt(values.national, 10) || null : null,
+                globalEstimatedPopulation: values.global ? parseInt(values.global, 10) || null : null,
                 relevantDiseaseMechanisms: values.mechanisms || [],
                 causalGenes: values.causal?.map((item) => item.label) || [],
                 associatedGenes: values.genes?.map((item) => item.label) || [],

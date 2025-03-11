@@ -110,7 +110,8 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                 id: nanoid(),
                 nodeId: id,
                 title,
-                private: true
+                private: true,
+                types: []
             }
         }
 

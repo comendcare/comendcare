@@ -11,6 +11,7 @@ import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import Image from "next/image"
+import {CROFilters} from "@/components/cro-filters";
 
 // export const metadata: Metadata = {
 //     title: "Comend",
@@ -99,6 +100,8 @@ const FiltersPanel = () => {
 
     if (pathname.endsWith('/milestones')) {
         return <MilestoneFilters/>
+    } else if (pathname.endsWith('/cro')){
+        return <CROFilters/>
     } else {
         return <PAGFilters/>
     }

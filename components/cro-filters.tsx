@@ -1,0 +1,97 @@
+import { useShallow } from "zustand/react/shallow"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage
+} from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { DoubleSliderBarChart } from "./ui/slider-double"
+import { ScrollArea } from "./ui/scroll-area"
+import { Button } from "./ui/button"
+import MultipleSelector from "./ui/multiple-selector"
+import {ASSOCIATED_CATEGORIES} from "@/lib/types"
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
+import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
+
+const selector = (state: CROSearchState) => ({
+    filters: state.filters,
+    allResults: state.allResults,
+    setFilters: state.setFilters
+})
+
+const optionSchema = z.object({
+    label: z.string(),
+    value: z.string(),
+    disable: z.boolean().optional(),
+});
+
+const filtersFormSchema = z.object({
+    categories: z.array(optionSchema),
+})
+
+export function CROFilters() {
+    const { filters, allResults, setFilters } = useCROSearchStore(useShallow(selector))
+    const form = useForm<z.infer<typeof filtersFormSchema>>({
+        mode: "onChange",
+        resolver: zodResolver(filtersFormSchema),
+        defaultValues: filters
+    })
+
+    const handleSubmit = async (values: z.infer<typeof filtersFormSchema>) => {
+        setFilters(values)
+    }
+
+    return (
+        <Form {...form}>
+            <ScrollArea className="w-full h-full">
+            <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="flex flex-col gap-8 px-1"
+            >
+                <h1 className={"scroll-m-20 text-2xl font-semibold tracking-tight"}>
+                    Filters
+                </h1>
+
+                <FormField
+                    control={form.control}
+                    name="categories"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel className="font-semibold text-base">Service categories</FormLabel>
+                            <FormDescription>{`The service categories provided by the CRO.`}</FormDescription>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={ASSOCIATED_CATEGORIES}
+                                    hidePlaceholderWhenSelected={true}
+                                    placeholder="Select associated categories..."
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <span className="flex justify-end gap-4 flex-wrap">
+                    <Button type="submit" variant="secondary" onClick={() => {
+                        setFilters(defaultFilters)
+                        form.reset(defaultFilters)
+                    }}>Clear All Filters</Button>
+                    <Button variant="secondary" type="submit">Apply Filters</Button>
+                </span>
+            </form>
+            </ScrollArea>
+        </Form>
+    )
+}

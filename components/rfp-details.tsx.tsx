@@ -23,7 +23,9 @@ type RFPType = Prisma.RFPGetPayload<{}>
 type MilestoneType = Prisma.MilestoneGetPayload<{
     include: {
         node: true,
-        contacts: true
+        contacts: true,
+        attachments: true,
+        types: true
     }
 }>
 

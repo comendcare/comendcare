@@ -146,7 +146,7 @@ export default async function CompanyHomePage({
                         </div>
                         <Link
                             href={cro.website || ""}
-                            className={cn(buttonVariants({variant: "cta"}), "col-span-1 w-fit")}
+                            className={cn(buttonVariants({variant: "cta"}), "col-span-1 w-fit justify-self-end")}
                             target="_blank"
                         >
                             <FaArrowUpRightFromSquare/>

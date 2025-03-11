@@ -14,17 +14,7 @@ import {cn} from '@/lib/utils';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {useMutationObserver} from "@/lib/hooks/use-mutation-observer";
 import { ScrollArea } from './scroll-area';
-
-export interface Option {
-    value: string;
-    label: string;
-    disable?: boolean;
-    /** fixed option that can't be removed. */
-    fixed?: boolean;
-
-    /** Group the options by providing key. */
-    [key: string]: string | boolean | undefined;
-}
+import { Option } from '@/lib/types';
 
 interface GroupOption {
     [key: string]: Option[];

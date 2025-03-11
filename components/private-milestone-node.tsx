@@ -38,7 +38,7 @@ import {DateView} from "./miletone-date-view"
 import {PrivateBadge} from "./private-badge"
 import {monthsList} from "@/lib/data";
 import {Badge, badgeVariants} from "./ui/badge"
-import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, StatusType} from "@/lib/types"
+import {StatusType} from "@/lib/types"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -52,6 +52,7 @@ import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {PublicMilestoneNode} from "./public-milestone-node"
 import { TypeBadge } from "./type-badge"
+import { MilestoneType } from "@prisma/client"
 // import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export type PrivateMilestoneNode = Node<
@@ -61,7 +62,7 @@ export type PrivateMilestoneNode = Node<
         node: any
         title: string
         description?: string
-        types?: string[],
+        types?: MilestoneType[],
         startDate?: Date,
         endDate?: Date,
         budget?: number
@@ -305,9 +306,9 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                     {props?.data?.attachments && props.data?.attachments?.length > 0 && (
                         <AttachmentsTag attachments={props.data.attachments}/>
                     )}
-                    {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                    {(props?.data?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                            {milestoneType?.label || "No type"}
                         </Badge>
                     ))}
                 </span>
@@ -346,9 +347,9 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                         onStatusChange={() => {
                         }}
                     />
-                    {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                    {(props?.data?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                            {milestoneType?.label || "No type"}
                         </Badge>
                     ))}
             </span>
@@ -376,9 +377,9 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                 </ul>
 
                 <span className="w-full flex gap-2 flex-wrap text-wrap">
-                    {(props?.data?.types || []).sort((a, b) => a.length - b.length).map((milestoneType, index) => (
+                    {(props?.data?.types || []).sort((a, b) => a.label.length - b.label.length).map((milestoneType, index) => (
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
+                            {milestoneType?.label || "No type"}
                         </Badge>
                     ))}
             </span>

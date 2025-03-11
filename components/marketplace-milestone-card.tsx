@@ -1,6 +1,6 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
-import {MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS} from "@/lib/types";
+import {MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS} from "@/lib/types";
 import {Badge} from "./ui/badge";
 import {DateView} from "./miletone-date-view";
 import {getOrganizationFromOrganizationId, getOrganizationFromRoadmapId} from "@/lib/fetchers";
@@ -54,8 +54,6 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
         return '#'
     }
 
-    // const milestoneType = MILESTONE_TYPE_OPTIONS.find((option) => option.value === milestone.type)?.label;
-    const milestoneTypes = milestone?.types.map((type: any) => MILESTONE_TYPE_OPTIONS.find(option => option.value === type)?.label)
     const status = MILESTONE_STATUS_OPTIONS.find((option) => option.value === milestone.status)?.label;
 
     const statusKey = milestone.status as keyof typeof StatusData;
