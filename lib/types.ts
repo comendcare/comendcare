@@ -253,6 +253,45 @@ export const ASSOCIATED_SYSTEMS: Option[] = [
     },
 ]
 
+export const ASSOCIATED_CATEGORIES: { id: string; label: string; value: string; description: string }[] = [
+    {
+        id: '1',
+        label: 'Discovery',
+        value: 'discovery',
+        description: 'Focuses on early-stage research, hypothesis generation, and initial identification of potential treatments.',
+    },
+    {
+        id: '2',
+        label: 'Preclinical',
+        value: 'preclinical',
+        description: 'Covers laboratory and animal studies to assess the safety and efficacy of new treatments before clinical trials.',
+    },
+    {
+        id: '3',
+        label: 'Clinical Study',
+        value: 'clinical study',
+        description: 'Involves human trials to evaluate the safety, efficacy, and outcomes of new medical interventions.',
+    },
+    {
+        id: '4',
+        label: 'Disease Models',
+        value: 'disease models',
+        description: 'Utilizes experimental models to study disease mechanisms and test potential treatments.',
+    },
+    {
+        id: '5',
+        label: 'Design & Manufacturing',
+        value: 'design & manufacturing',
+        description: 'Focuses on the engineering, production, and optimization of medical products and therapeutics.',
+    },
+    {
+        id: '6',
+        label: 'Regulatory',
+        value: 'regulatory',
+        description: 'Covers compliance, approval processes, and regulatory frameworks governing medical treatments and interventions.',
+    },
+];
+
 export const MOLECULAR_MECHANISMS: Option[] = [
     {
         id: '1',

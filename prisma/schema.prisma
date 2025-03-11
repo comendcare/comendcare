@@ -246,7 +246,7 @@ model MilestoneType {
   updatedAt   DateTime @updatedAt
   label       String
   services    String[]
-  category    String
+  category    String[]
   description String?
 
   milestones Milestone[]
@@ -626,6 +626,7 @@ model Company {
   rfis                     RFI[]
   reviews                  Review[]
   avgRating                Float?          @default(0.0) // Stores the average rating of the company
+  categories               String[]
 }
 
 model Site {
