@@ -44,7 +44,7 @@ export const sampleCROs: any[] = [
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    systems: {
+    categories: {
         label: string,
         value: string,
         disable?: boolean,
@@ -58,9 +58,7 @@ export type FiltersType = {
 }
 
 export const defaultFilters = {
-    mechanisms: [],
-    systems: [],
-    modalities: [],
+    categories: [],
     // moneyDeployed: [0, 10000000],
     // genes: []
 }
@@ -70,11 +68,10 @@ function generateFiltersString(filters: FiltersType) {
     let typesenseFilters = ""
 
     // addative filters
-    if (filters.systems.length > 0) {
-        filters.systems.forEach(system => {
-            filtersList.push(`condition.condition.associatedSystems:=[${system.value}]`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.associatedSystems:=[${system.value}]`)
-        })
+    if (filters.categories.length > 0) {
+        const categoryFilters = filters.categories.map(category => `categories:=[${category.value}]`).join(" || ");
+        filtersList.push(`(${categoryFilters})`);
+        typesenseFilters += `(${categoryFilters})`;
     }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
@@ -112,7 +109,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             query_by: "title",
             per_page: 10,
             page: state.lastFetchedPage,
-            // ...(generateFiltersString(state.filters) ? { filter_by: generateFiltersString(state.filters) } : undefined),
+            ...(generateFiltersString(state.filters) ? { filter_by: generateFiltersString(state.filters) } : undefined),
             // ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
         };
 

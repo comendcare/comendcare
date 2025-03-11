@@ -223,7 +223,7 @@ model Milestone {
   endDate          DateTime?
   startDate        DateTime?
   private          Boolean              @default(true)
-  types            String[]             @default([])
+  types            MilestoneType[]
   otherTypeDetails String?
   openTo           String[]
   tasks            Task[]
@@ -238,6 +238,18 @@ model Milestone {
   node           Node?        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 
   reviews Review[]
+}
+
+model MilestoneType {
+  id          String   @id // value
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  label       String
+  services    String[]
+  category    String[]
+  description String?
+
+  milestones Milestone[]
 }
 
 model Kanban {
@@ -614,6 +626,7 @@ model Company {
   rfis                     RFI[]
   reviews                  Review[]
   avgRating                Float?          @default(0.0) // Stores the average rating of the company
+  categories               String[]
 }
 
 model Site {

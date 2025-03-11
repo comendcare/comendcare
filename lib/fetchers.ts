@@ -128,9 +128,10 @@ export async function getRoadmapsForOrganization(domain: string) {
                 include: {
                     data: {
                         include: {
+                            node: true,
                             contacts: true,
                             attachments: true,
-                            node: true
+                            types: true
                         }
                     }
                 },
@@ -144,9 +145,10 @@ export async function getRoadmapsForOrganization(domain: string) {
                     private: false
                 },
                 include: {
+                    node: true,
                     contacts: true,
                     attachments: true,
-                    node: true
+                    types: true
                 }
             },
         },
@@ -491,7 +493,14 @@ export async function getRoadmap(orgId: string | null | undefined) {
             where: {organizationId: organization.id},
             include: {
                 nodes: true,
-                milestones: true,
+                milestones: {
+                    include: {
+                        node: true,
+                        contacts: true,
+                        attachments: true,
+                        types: true
+                    }
+                },
                 edges: true,
                 organization: true
             }
@@ -693,14 +702,26 @@ export async function checkSubdomainAvailability(nickname: string) {
     }
 }
 
+export async function getMilestoneTypes() {
+    try {
+        const types = await prisma.milestoneType.findMany({})
+
+        return {success: true, data: types}
+    } catch (error: any) {
+        console.error("Database error finding milestone types:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
 export async function getMilestoneDetails(id: string) {
     try {
         const milestone = await prisma.milestone.findUnique({
             where: {id},
             include: {
-                attachments: true,
+                node: true,
                 contacts: true,
-                node: true
+                attachments: true,
+                types: true
             }
         })
 
@@ -774,15 +795,10 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
             const dbMilestones = await prisma.milestone.findMany({
                 where: {roadmapId: roadmapId},
                 include: {
-                    attachments: true,
+                    node: true,
                     contacts: true,
-                    tasks: {
-                        orderBy: {orderPosition: 'asc'},
-                        include: {
-                            checklist: {orderBy: {orderPosition: 'asc'}}
-                        }
-                    },
-                    node: true
+                    attachments: true,
+                    types: true
                 }
             })
 

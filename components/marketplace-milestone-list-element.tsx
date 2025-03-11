@@ -1,7 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
-import { MILESTONE_TYPE_OPTIONS } from "@/lib/types";
 import { DateView } from "./miletone-date-view";
 
 export function MilestoneMarketplaceListElement({ milestone }: { milestone: any }) {
@@ -27,7 +26,7 @@ export function MilestoneMarketplaceListElement({ milestone }: { milestone: any 
             <CardContent className="w-full flex flex-row gap-4 flex-wrap">
                 {(milestone?.types || []).map((type: any, index: number) => (
                     <Badge className="flex text-sm" key={index}>
-                        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === type))?.label || "No type"}
+                        {type.label || "No type"}
                     </Badge>
                 ))}
                 

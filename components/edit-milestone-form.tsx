@@ -36,8 +36,8 @@ import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
-import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {Prisma} from "@prisma/client"
+import {NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
+import {MilestoneType, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
@@ -69,6 +69,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { TypeBadge } from "./type-badge"
 import Loading from "@/app/loading"
+import { getMilestoneTypes } from "@/lib/fetchers"
+
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -76,6 +78,7 @@ type ContactType = Prisma.ExternalContactGetPayload<{}>
 export const optionSchema = z.object({
     label: z.string(),
     value: z.string(),
+    description: z.string().optional()
     // disable: z.boolean().optional(),
 });
 
@@ -133,6 +136,7 @@ export function EditMilestoneForm({
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
+    const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -141,10 +145,7 @@ export function EditMilestoneForm({
             nodeType: milestoneData?.nodeType || milestoneData?.node?.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            types: (milestoneData?.types || []).map((type: any) => MILESTONE_TYPE_OPTIONS.find(option => option?.value === type) || {
-                label: 'Unknown',
-                value: "UNKNOWN"
-            }),
+            types: (milestoneData?.types || []),
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
             startDate: milestoneData?.startDate,
             endDate: milestoneData?.endDate,
@@ -190,6 +191,17 @@ export function EditMilestoneForm({
                 }
             }
 
+            // get milestone types from database
+            const response = await getMilestoneTypes()
+            if (response.success && response.data) {
+                // setMilestoneTypes(response.data.map(type => ({
+                //     value: type.id,
+                //     label: type.label,
+                //     description: type.description || undefined
+                // })))
+                setMilestoneTypes(response.data || [])
+            }
+
             initializing.current = false
         }
 
@@ -229,7 +241,7 @@ export function EditMilestoneForm({
             ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
             ...(attachments ? {attachments} : undefined),
-            ...(types ? {types: types.map(t => t?.value)} : undefined),
+            ...(types ? {types} : undefined),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
@@ -430,7 +442,7 @@ export function EditMilestoneForm({
                                     <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
                                     {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
                                     </div>
-                                    <MilestoneTypeFormField form={form}/>
+                                    <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
 
                                     {formData.nodeType === "ASSET" && (
                                         <>
@@ -578,7 +590,7 @@ export function EditMilestoneForm({
     )
 }
 
-const MilestoneTypeFormField = ({form}: { form: any }) => {
+const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTypes: any[] }) => {
     const types = form.watch("types")
 
     return (
@@ -592,8 +604,8 @@ const MilestoneTypeFormField = ({form}: { form: any }) => {
                             <MultipleSelector
                                 {...field}
                                 maxSelected={3}
-                                defaultOptions={MILESTONE_TYPE_OPTIONS}
-                                options={MILESTONE_TYPE_OPTIONS}
+                                defaultOptions={milestoneTypes.map(type => ({...type, value: type.id}))}
+                                options={milestoneTypes.map(type => ({...type, value: type.id}))}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Milestone type"
@@ -811,7 +823,6 @@ const TimelineFormField = ({
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
                                 onChange={(event) => {
-                                    console.log(`start date year`, event.target.value)
                                     const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
                                     const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
                                     form.setValue('startDate', newStartDate)
@@ -872,7 +883,6 @@ const TimelineFormField = ({
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
                                 onChange={(event) => {
-                                    console.log(`start date year`, event.target.value)
                                     const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
                                     const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
                                     form.setValue('endDate', newEndDate)
