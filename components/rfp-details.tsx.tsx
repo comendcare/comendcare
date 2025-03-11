@@ -25,7 +25,7 @@ type MilestoneType = Prisma.MilestoneGetPayload<{
         node: true,
         contacts: true,
         attachments: true,
-        types: true
+        types: { include: { milestoneType: true } }
     }
 }>
 

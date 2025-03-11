@@ -145,7 +145,7 @@ export function EditMilestoneForm({
             nodeType: milestoneData?.nodeType || milestoneData?.node?.type || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
-            types: (milestoneData?.types || []),
+            types: ((milestoneData?.types || []).map((type: any) => type.milestoneType) || []),
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
             startDate: milestoneData?.startDate,
             endDate: milestoneData?.endDate,
@@ -241,7 +241,13 @@ export function EditMilestoneForm({
             ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
             ...(attachments ? {attachments} : undefined),
-            ...(types ? {types} : undefined),
+            ...(types ? {
+                types: types.map((type: any) => ({
+                    milestoneId: milestoneData.id,
+                    milestoneTypeId: type.id,
+                    milestoneType: type
+                }))
+            } : undefined),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
@@ -367,48 +373,6 @@ export function EditMilestoneForm({
                             <>
                             <TabsContent value="edit" className="space-y-4 w-full">
                                 <FormItem>
-                                {/* <FormField
-                                    control={form.control}
-                                    name="nodeType"
-                                    render={({field}) => (
-                                        <FormItem className="flex flex-row items-center justify-between gap-4 flex-wrap grow">
-                                            <FormControl>
-                                                <ToggleGroup
-                                                    type="single"
-                                                    variant="outline"
-                                                    value={field.value}
-                                                    onValueChange={(value) => {
-                                                        if (value) {
-                                                            field.onChange(value)
-                                                        }
-                                                    }}
-                                                    className="w-full flex flex-wrap gap-2 justify-between"
-                                                >
-                                                    {NODE_TYPE_OPTIONS.map(({label, value, description}) => (
-                                                        <ToggleGroupItem
-                                                            key={value}
-                                                            value={value}
-                                                            className={"text-md grow flex gap-2"}
-                                                        >
-                                                            {label}
-                                                            <Tooltip>
-                                                                <TooltipTrigger>
-                                                                    <FaInfoCircle/>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent className="max-w-80 text-wrap text-left">
-                                                                    {description}
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </ToggleGroupItem>
-                                                    ))}
-                                                </ToggleGroup>
-                                            </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                /> */}
-
-                                {/* <TypeBadge type={formData.nodeType} className="grid-col-2"/> */}
 
                                 <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
                                     <FormLabel className="text-md mt-2">Visibility</FormLabel>
