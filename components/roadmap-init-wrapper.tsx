@@ -3,26 +3,26 @@
 import { useEffect } from "react";
 import { initializeRoadmapState } from "@/lib/initialize-client-state";
 import { Roadmap } from "./roadmap";
+import { useRouter } from "next/navigation";
+import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
+import { useShallow } from "zustand/react/shallow";
+
+const selector = (state: RoadmapState) => ({
+    roadmapId: state.roadmapId
+})
 
 export default function RoadmapInitWrapper({ roadmap }: {roadmap: any }) {
-    // useEffect(() => {
-    //     if (roadmap) {
-    //         initializeRoadmapState({
-    //             // nodes: roadmap.nodes.map((node: any) => ({
-    //             //     ...node,
-    //             //     position: {
-    //             //         x: node.positionX,
-    //             //         y: node.positionY
-    //             //     }
-    //             // })),
-    //             nodes: roadmap.nodes,
-    //             milestones: roadmap.milestones,
-    //             edges: roadmap.edges,
-    //             selectedNodeId: null,
-    //             roadmapId: roadmap.id
-    //         });
-    //     }
-    // }, [roadmap]);
+    const router = useRouter()
+    const { roadmapId } = useRoadmapStore(useShallow(selector))
+
+    useEffect(() => {
+        if (roadmap.id !== roadmapId) {
+            // if the roadmapId doesn't match what's in the zustand store
+            // refresh the page to re-initialize the zustand state
+            // this will happen when we've created a brand new research plan
+            router.refresh()
+        }
+    }, [roadmap])
 
     return <Roadmap data={roadmap}/>
 }
