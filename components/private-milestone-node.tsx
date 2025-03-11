@@ -62,7 +62,7 @@ export type PrivateMilestoneNode = Node<
         node: any
         title: string
         description?: string
-        types?: any[],
+        types?: {milestoneId: string, milestoneTypeId: string, milestoneType: MilestoneType}[],
         startDate?: Date,
         endDate?: Date,
         budget?: number
@@ -347,7 +347,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                         onStatusChange={() => {
                         }}
                     />
-                    {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneTypes?.label.length).map((milestoneType, index) => (
+                    {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
                         <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
                             {milestoneType?.milestoneType?.label || "No type"}
                         </Badge>

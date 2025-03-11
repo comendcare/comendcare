@@ -233,8 +233,6 @@ export function EditMilestoneForm({
             notes
         } = values;
 
-        console.log(`types to save`, types)
-
         setMilestone(milestoneData?.nodeId, {
             nodeType,
             title,
