@@ -67,8 +67,8 @@ export const columns: ColumnDef<StrainData>[] = [
             </div>
         ),
     },
-    {
-        id: "actions",
-        cell: ({ row }) => <DataTableRowActions row={row} />,
-    },
+    // {
+    //     id: "actions",
+    //     cell: ({ row }) => <DataTableRowActions row={row} />,
+    // },
 ]

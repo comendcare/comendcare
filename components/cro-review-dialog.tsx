@@ -136,6 +136,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                     <HoverCard openDelay={0}>
                         <HoverCardTrigger>
                             <Button
+                                variant="cta"
                                 className="w-fit"
                                 disabled
                             >
@@ -148,6 +149,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                         </HoverCardContent>
                     </HoverCard>
                     : <Button
+                        variant="cta"
                         className="w-fit"
                     >
                         <FaPenAlt/>
