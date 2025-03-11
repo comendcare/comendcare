@@ -8,6 +8,8 @@ import { useShallow } from "zustand/react/shallow"
 import { useStoreApi } from "@xyflow/react"
 import { nanoid } from "nanoid"
 import { getMilestoneTypes } from "@/lib/fetchers"
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { Label } from "./ui/label"
 
 const selector = (state: RoadmapState) => ({
     initialized: state.initialized,
@@ -36,6 +38,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
     } = useRoadmapStore(useShallow(selector))
     const store = useStoreApi()
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
+    const [selectedMiletoneType, setSelectedMilestoneType] = useState<"PROJECT" | "ASSET" | "RFP" | undefined>()
     const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
 
     // Allow update once form is initialized
@@ -201,6 +204,23 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                         </FormItem>
                     )}
                 />  */}
+
+                {/* <RadioGroup
+                    className="flex gap-4 justify-between px-20"
+                >
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="ASSET" id="ASSET"/>
+                        <Label htmlFor="ASSET">Asset</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="PROJECT" id="PROJECT"/>
+                        <Label htmlFor="PROJECT">Project</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="RFP" id="RFP"/>
+                        <Label htmlFor="RFP">RFP</Label>
+                    </div>
+                </RadioGroup> */}
 
                 <DialogFooter>
                     <DialogClose>
