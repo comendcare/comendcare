@@ -13,9 +13,10 @@ import StatusButton from "./milestone-status-button"
 import { truncate, cn } from "@/lib/utils"
 import { PrivateBadge } from "./private-badge"
 import { Badge } from "./ui/badge"
-import { MILESTONE_TYPE_OPTIONS, StatusType } from "@/lib/types"
+import { StatusType } from "@/lib/types"
 import { CardContents } from "./private-milestone-node"
 import { TypeBadge } from "./type-badge"
+import { MilestoneType } from "@prisma/client"
 
 export type PublicMilestoneNode = Node<
     {
@@ -23,7 +24,7 @@ export type PublicMilestoneNode = Node<
         nodeId: string
         title: string
         description?: string
-        types?: string[],
+        types?: MilestoneType[],
         startDate?: Date,
         endDate?: Date,
         budget?: number

@@ -10,7 +10,7 @@ import { useShallow } from "zustand/react/shallow";
 import { nanoid } from "nanoid";
 import type { Node } from "@xyflow/react"
 import ComendLoadingSpinner from "./comend-loading-spinner";
-import { MilestoneTemplateCard } from "./milestone-template-card";
+import { MilestoneTemplateCardMultiSelect, MilestoneTemplateCardSingleSelect } from "./milestone-template-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { FaInfoCircle, FaPlus } from "react-icons/fa";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -49,7 +49,7 @@ export default function RoadmapTemplates() {
                 data: {
                     id: nanoid(),
                     nodeId: id,
-                    types: defaultData?.types || [],
+                    types: [],
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     status: defaultData?.status || "PLANNED",
@@ -156,7 +156,7 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
                                 <EmptyMilestoneCard handleClick={(e) => createEmpty()} inDialog={inDialog}/>
                                 {templateMilestones.filter((template) => template.nodeType === "ASSET").map((milestoneData, index) => (
-                                    <MilestoneTemplateCard 
+                                    <MilestoneTemplateCardMultiSelect
                                         key={index} 
                                         milestoneData={milestoneData}
                                         selectedMilestones={selectedMilestones}
@@ -174,7 +174,7 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
                                 <EmptyMilestoneCard handleClick={(e) => createEmpty()} inDialog={inDialog}/>
                                 {templateMilestones.filter((template) => template.nodeType === "PROJECT").map((milestoneData, index) => (
-                                    <MilestoneTemplateCard 
+                                    <MilestoneTemplateCardMultiSelect
                                         key={index} 
                                         milestoneData={milestoneData}
                                         selectedMilestones={selectedMilestones}
@@ -192,7 +192,7 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
                                 <EmptyMilestoneCard handleClick={(e) => createEmpty()} inDialog={inDialog}/>
                                 {templateMilestones.filter((template) => template.nodeType === "RFP").map((milestoneData, index) => (
-                                    <MilestoneTemplateCard 
+                                    <MilestoneTemplateCardMultiSelect
                                         key={index} 
                                         milestoneData={milestoneData}
                                         selectedMilestones={selectedMilestones}
@@ -205,6 +205,34 @@ export const MilestoneTemplateTabs = ({ selectedMilestones, setSelectedMilestone
                 )}
             </Tabs>
         </div>
+    )
+}
+
+export const MilestoneTemplates = ({ selectedMilestoneTemplate, setSelectedMilestoneTemplate, createEmpty, inDialog = false }: {selectedMilestoneTemplate: any, setSelectedMilestoneTemplate: (value: SetStateAction<any>) => void, createEmpty: () => void, inDialog?: boolean}) => {
+    return(
+        <ScrollArea className="h-0 flex-1 w-full" type="always">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pr-5 pt-2">
+                {/* <EmptyMilestoneCard handleClick={(e) => createEmpty()} inDialog={inDialog}/> */}
+                <h3 className="col-span-full text-lg">Early Stage Milestones</h3>
+                {templateMilestones.filter(milestone => milestone.phase == "EARLY-STAGE").map((milestoneData, index) => (
+                    <MilestoneTemplateCardSingleSelect
+                        key={index} 
+                        milestoneData={milestoneData}
+                        selectedMilestoneTemplate={selectedMilestoneTemplate}
+                        setSelectedMilestoneTemplate={setSelectedMilestoneTemplate}
+                    />
+                ))}
+                <h3 className="col-span-full text-lg">Pre-Clinical Milestones</h3>
+                {templateMilestones.filter(milestone => milestone.phase == "PRE-CLINICAL").map((milestoneData, index) => (
+                    <MilestoneTemplateCardSingleSelect
+                        key={index} 
+                        milestoneData={milestoneData}
+                        selectedMilestoneTemplate={selectedMilestoneTemplate}
+                        setSelectedMilestoneTemplate={setSelectedMilestoneTemplate}
+                    />
+                ))}
+            </div>
+        </ScrollArea>
     )
 }
 

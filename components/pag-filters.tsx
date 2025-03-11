@@ -16,9 +16,8 @@ import { DoubleSliderBarChart } from "./ui/slider-double"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
 import MultipleSelector from "./ui/multiple-selector"
-import { ASSOCIATED_SYSTEMS, MILESTONE_TYPE_OPTIONS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types"
+import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
-import type { Option } from "./ui/multiple-selector"
 
 const selector = (state: OrganizationSearchState) => ({
     filters: state.filters,

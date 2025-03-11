@@ -15,8 +15,7 @@ import { useForm } from "react-hook-form"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
 import { defaultFilters, MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore"
-import { MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS } from "@/lib/types"
-import type { Option } from "./ui/multiple-selector"
+import { MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS } from "@/lib/types"
 import MultipleSelector from "./ui/multiple-selector"
 import { Checkbox } from "./ui/checkbox"
 
@@ -73,7 +72,7 @@ export function MilestoneFilters() {
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={MILESTONE_TYPE_OPTIONS}
+                                    // defaultOptions={MILESTONE_TYPE_OPTIONS}
                                     placeholder="Select milestone types..."
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
