@@ -2016,6 +2016,9 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                 },
                                 title: node.data?.title || "New Milestone",
                                 // types: node.data?.types || [],
+                                types: {
+                                    connect: (node.data?.types || []).map((type: any) => ({ id: type.id })) || []
+                                },
                                 // types: {
                                 //     set: node.data?.types.map((type: any) => ({ id: type.value })) || []
                                 // },
@@ -2164,6 +2167,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
     try {
         let updatedMilestones: Milestone[] = []
 
+        console.log(`milestone types`, milestones.flatMap(milestone => milestone.types))
+
         await Promise.all(
             milestones.map(async (milestone: any) => {
                 const previousMilestone = await prisma.milestone.findUnique({
@@ -2194,7 +2199,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     data: {
                         title: milestone.title,
                         types: {
-                            set: milestone.types.map((type: any) => ({ id: type.value }))
+                            set: milestone.types.map((type: any) => ({ id: type.id }))
                         },
                         otherTypeDetails: milestone.otherTypeDetails,
                         description: milestone.description,
