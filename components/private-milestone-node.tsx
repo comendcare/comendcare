@@ -152,22 +152,22 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                                     <Button
                                         onClick={(e) => {
                                             e.stopPropagation()
-                                            handleDeleteClick()
-                                        }}
-                                        variant="ghost"
-                                        className="w-full h-full justify-start text-xl"
-                                    >
-                                        Delete
-                                    </Button>
-                                    <Button
-                                        onClick={(e) => {
-                                            e.stopPropagation()
                                             handleDuplicate()
                                         }}
                                         variant="ghost"
                                         className="w-full h-full justify-start text-xl"
                                     >
                                         Duplicate
+                                    </Button>
+                                    <Button
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleDeleteClick()
+                                        }}
+                                        variant="ghost"
+                                        className="w-full h-full justify-start text-xl"
+                                    >
+                                        Delete
                                     </Button>
                                 </CardContent>
                             </Card>
