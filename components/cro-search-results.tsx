@@ -87,9 +87,10 @@ export function CROSearchResults() {
 
     useEffect(() => {
         if (milestones && roadmapInitialized) {
+            console.log(`UPDATE RECOMMENDATIONS`)
             const urlMilestone = searchParams.get("milestone")
             const options = urlMilestone ? { priority: urlMilestone } : undefined
-            if (options) setRecommendations(milestones, options)
+            setRecommendations(milestones, options)
         }
     }, [milestones])
 
