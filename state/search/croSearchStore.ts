@@ -49,6 +49,16 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
+    types: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    certifications: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     // moneyDeployed: number[],
     // genes: {
     //     label: string,
@@ -59,6 +69,8 @@ export type FiltersType = {
 
 export const defaultFilters = {
     categories: [],
+    types: [],
+    certifications: [],
     // moneyDeployed: [0, 10000000],
     // genes: []
 }
@@ -72,6 +84,16 @@ function generateFiltersString(filters: FiltersType) {
         const categoryFilters = filters.categories.map(category => `categories:=[${category.value}]`).join(" || ");
         filtersList.push(`(${categoryFilters})`);
         typesenseFilters += `(${categoryFilters})`;
+    }
+    if (filters.categories.length > 0) {
+        const typeFilters = filters.types.map(type => `companyType:=[${type.value}]`).join(" || ");
+        filtersList.push(`(${typeFilters})`);
+        typesenseFilters += `(${typeFilters})`;
+    }
+    if (filters.categories.length > 0) {
+        const certificationFilters = filters.certifications.map(certification => `simplifiedCertifications:=[${certification.value}]`).join(" || ");
+        filtersList.push(`(${certificationFilters})`);
+        typesenseFilters += `(${certificationFilters})`;
     }
 
     if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")

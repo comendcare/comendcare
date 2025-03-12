@@ -33,6 +33,8 @@ const optionSchema = z.object({
 
 const filtersFormSchema = z.object({
     categories: z.array(optionSchema),
+    types: z.array(optionSchema),
+    certifications: z.array(optionSchema),
 })
 
 export function CROFilters() {
@@ -64,6 +66,56 @@ export function CROFilters() {
                     render={({field}) => (
                         <FormItem>
                             <FormLabel className="font-semibold text-base">Service categories</FormLabel>
+                            <FormDescription>{`The service categories provided by the CRO.`}</FormDescription>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={ASSOCIATED_CATEGORIES}
+                                    hidePlaceholderWhenSelected={true}
+                                    placeholder="Select associated categories..."
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="types"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel className="font-semibold text-base">Business types</FormLabel>
+                            <FormDescription>{`The service categories provided by the CRO.`}</FormDescription>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={ASSOCIATED_CATEGORIES}
+                                    hidePlaceholderWhenSelected={true}
+                                    placeholder="Select associated categories..."
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="certifications"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel className="font-semibold text-base">Certifications</FormLabel>
                             <FormDescription>{`The service categories provided by the CRO.`}</FormDescription>
                             <FormControl>
                                 <MultipleSelector
