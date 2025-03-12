@@ -110,7 +110,7 @@ function generateFiltersString(filters: FiltersType): string {
 }
 
 const sortByFilters: { [key: string]: string } = {
-    "alphabetical": "name:asc",
+    "alphabetical": "title:asc",
     "highest-rated": "avgRating:desc",
     // "most-reviewed": "moneyDeployed:desc",
 }
