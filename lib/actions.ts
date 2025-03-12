@@ -1326,7 +1326,7 @@ export async function deleteInvitation(
             return {success: false, error: "Failed to delete invitation. Request not found."};
         }
 
-        revalidatePath("/app/analytics")
+        revalidatePath("/app/settings")
 
         return {success: true, data: deletedInvitation};
 

@@ -83,7 +83,7 @@ export default function OrganizationSettingsPage({organization}: { organization:
                     </p>
                 </div>
 
-                <div className={`${session?.user.membership.role !== "owner" ? "mt-8 opacity-50 cursor-not-allowed space-y-4" : ""}`}>
+                <div className={`${session?.user.membership.role !== "owner" ? "mt-8 opacity-50 cursor-not-allowed space-y-4" : "space-y-4"}`}>
                     <div className={`border rounded-md p-8 border-red-200 flex items-center justify-between `}>
                         <span className="flex flex-grow flex-col">
                             <span className="text-sm font-medium leading-6 text-gray-900">
