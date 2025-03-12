@@ -102,7 +102,7 @@ export function NavMain({items}: { items: Item[] }) {
                                     <SidebarMenuSubItem  key={subItem.title}>
                                     <SidebarMenuSubButton
                                         asChild
-                                        className={isActive ? "bg-blue-light text-primary" : ""}
+                                        className={pathname === subItem.url ? "bg-blue-light text-primary" : ""}
                                     >
                                         <a href={subItem.url} className="flex">
                                             <div className="relative">
