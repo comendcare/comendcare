@@ -36,7 +36,7 @@ import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
-import {NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
+import {Milestone, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
 import {MilestoneType, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
@@ -56,7 +56,7 @@ import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { SettingsProvider } from "./editor/settings"
 import { PlateEditor } from "./editor/plate-editor"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
-import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
+import { CROSearchState, Recommendation, useCROSearchStore } from "@/state/search/croSearchStore"
 import { Card, CardContent } from "./ui/card"
 import Image from "next/image"
 import { CROMarketplaceCard, CRORecommendationCard } from "./marketplace-cro-card"
@@ -87,7 +87,8 @@ const selector = (state: RoadmapState) => ({
 })
 
 const recommendationsSelector = (state: CROSearchState) => ({
-    recommendations: state.recommendations
+    recommendations: state.recommendations,
+    setRecommendations: state.setRecommendations
 })
 
 const editMilestoneForm = z.object({
@@ -131,7 +132,7 @@ export function EditMilestoneForm({
     onClose: () => void
 }) {
     const {setMilestone} = useRoadmapStore(useShallow(selector))
-    const { recommendations } = useCROSearchStore(useShallow(recommendationsSelector))
+    const { recommendations, setRecommendations } = useCROSearchStore(useShallow(recommendationsSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
@@ -202,6 +203,10 @@ export function EditMilestoneForm({
                 setMilestoneTypes(response.data || [])
             }
 
+            if (milestoneData) {
+                await setRecommendations([milestoneData as Milestone], 3)
+            }
+
             initializing.current = false
         }
 
@@ -233,7 +238,7 @@ export function EditMilestoneForm({
             notes
         } = values;
 
-        setMilestone(milestoneData?.nodeId, {
+        const updateData = {
             nodeType,
             title,
             ...(description !== undefined && description !== null ? {description} : undefined),
@@ -254,7 +259,17 @@ export function EditMilestoneForm({
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined),
             ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)}: undefined)
-        })
+        }
+
+        setMilestone(milestoneData?.nodeId, updateData)
+
+        // update recommendations
+        if (milestoneData) {
+            await setRecommendations([{
+                ...milestoneData,
+                ...updateData
+            } as Milestone], 3)
+        }
 
         // Mixpanel tracking for "Other" field
         // only send to mixpanel if the details explaining the 'other' type have been updated
@@ -480,7 +495,11 @@ export function EditMilestoneForm({
                                 />
                             </TabsContent>
                             <TabsContent value="recommendations" className="space-y-4 w-full">
-                                {(!recommendations || recommendations.length === 0) && (
+                                {!recommendations && (
+                                    <Loading />
+                                )}
+                                
+                                {(recommendations && recommendations.length === 0) && (
                                     <Card className="w-full flex flex-col mx-auto justify-center items-center align-center">
                                         <CardContent className="flex flex-col gap-4 p-4">
                                             <h2 className="text-xl">{`Sorry, we don't have any recommendations for this milestone`}</h2>
@@ -510,7 +529,7 @@ export function EditMilestoneForm({
                                 {recommendations && recommendations.length > 0 && (
                                     <>
                                         <div className={cn("w-full grid gap-4 grid-cols-1")}>
-                                            {(recommendations || []).map((result, index) => (
+                                            {(recommendations || []).map((result: Recommendation, index) => (
                                                 // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
                                                 <CROMarketplaceCard cro={result.content} key={index} />
                                             ))}
