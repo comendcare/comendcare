@@ -1,10 +1,13 @@
 'use client';
 
-import {usePathname} from 'next/navigation';
+import {usePathname, useRouter} from 'next/navigation';
 import {FaCheck} from 'react-icons/fa';
 import {useOnboardingStore} from '@/state/onboarding/onboardingStore';
 import {useSession} from 'next-auth/react';
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {useEffect, useState} from "react";
+import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
+import {toast} from "sonner";
 
 type StepStatus = 'complete' | 'current' | 'upcoming' | 'disabled';
 
@@ -48,22 +51,26 @@ const allSteps: Step[] = [
 ];
 
 export default function OnboardingSteps() {
+    const router = useRouter();
     const pathname = usePathname();
     const session = useSession();
+    const [invitations, setInvitations] = useState<any[]>([]);
     const isNewOrganization = useOnboardingStore((state) => state.isNewOrganization);
 
     // Check if user has an organization
     const hasOrganization = Boolean(session.data?.user.organizationId);
+    const hasInvitations = invitations.length > 0;
 
-    // Determine which steps to show based on `isNewOrganization` and `hasOrganization`
-    const steps = isNewOrganization
-        ? allSteps.map((step) =>
-            // If user is creating a new organization but no organizationId exists, disable "Finances" and "Research"
-            !hasOrganization && ['Finances', 'Research'].includes(step.name)
-                ? {...step, status: 'disabled'}
-                : step
-        )
-        : allSteps.filter((step) => !['Finances', 'Research'].includes(step.name)); // Filter out if not a new organization
+    // If user has invitations, only show the first two steps
+    const steps = hasInvitations
+        ? allSteps.slice(0, 2)
+        : isNewOrganization
+            ? allSteps.map((step) =>
+                !hasOrganization && ['Finances', 'Research'].includes(step.name)
+                    ? {...step, status: 'disabled'}
+                    : step
+            )
+            : allSteps.filter((step) => !['Finances', 'Research'].includes(step.name));
 
     // Determine the status of each step dynamically
     const updatedSteps = steps.map((step, index) => {
@@ -77,6 +84,32 @@ export default function OnboardingSteps() {
             status: isCurrent ? 'current' : isComplete ? 'complete' : 'upcoming',
         };
     });
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await getInvitations();
+
+                if (response.success && response.data) {
+                    const invitationsWithDetails = await Promise.all(
+                        response.data.map(async (invitation) => {
+                            const orgResponse = await getOrganizationFromOrganizationId(invitation.organizationId);
+                            return {
+                                ...invitation,
+                                organization: orgResponse.success ? orgResponse.data : null,
+                            };
+                        })
+                    );
+
+                    setInvitations(invitationsWithDetails);
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            }
+        };
+
+        fetchUserData()
+    }, [session, router]);
 
     return (
         <TooltipProvider>

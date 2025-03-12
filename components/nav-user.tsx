@@ -221,7 +221,7 @@ export function NavUser() {
         }
     };
 
-    const handleDeny = async (invitation: Invitation) => {
+    const handleDecline = async (invitation: Invitation) => {
         try {
             // Call API to deny invitation
             if (session?.user.organizationId) {
@@ -265,8 +265,8 @@ export function NavUser() {
                             </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                            <AlertDialogCancel onClick={() => handleDeny(invitations[0])}>
-                                Deny and delete
+                            <AlertDialogCancel onClick={() => handleDecline(invitations[0])}>
+                                Decline and delete
                             </AlertDialogCancel>
                             <AlertDialogAction onClick={() => handleAccept(invitations[0])}>
                                 Accept and join

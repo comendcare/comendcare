@@ -18,6 +18,8 @@ import { FaArrowUpRightFromSquare, FaTrash } from "react-icons/fa6"
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import { cn } from "@/lib/utils"
 import { PrivateBadge } from "./private-badge"
+import { TypeBadge } from "./type-badge"
+import { PublicBadge } from "./public-badge"
 
 type AssetType = Prisma.AssetGetPayload<{ 
     include: { 
@@ -54,11 +56,12 @@ export function AssetDetails({ asset, isPublic }: { asset: MilestoneType, isPubl
                         className="w-full flex items-center justify-between space-x-4 py-2"
                     >
                         <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
-                            <div className="flex items-start gap-x-3 w-full">
+                            <div className="flex items-center gap-x-3 w-full">
+                                <TypeBadge type={asset?.node?.type || "ASSET"} iconOnly={true}/>
                                 <h2 className="text-sm font-semibold truncate text-wrap break-words">
                                     {asset?.title}
                                 </h2>
-                                {asset.private && <PrivateBadge />}
+                                {asset?.private ? <PrivateBadge iconOnly={true}/> : (!isPublic ? <PublicBadge iconOnly={true}/> : undefined)}
                             </div>
                             {asset?.contacts && asset.contacts.length > 0 ? (
                                 <div className={"w-full mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap"}>

@@ -25,7 +25,7 @@ export default function OnboardingWelcomePage() {
                         {`To create your profile and help us understand how we can best support you, we have some questions.`}
                     </p>
                     <p>
-                        {`This should take ~10 minutes.`}
+                        {`This should take ~5 minutes if you're creating an organization for the first time.`}
                     </p>
                     <p>
                         {`All questions in this form are optional unless marked as (required), and you can edit your information at any time after signing up.`}
