@@ -71,7 +71,6 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
     const initializing = useRef(true)
     const [loading, setLoading] = useState(false);
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
-    console.log(fetchedMilestones)
 
     const form = useForm<z.infer<typeof reviewForm>>({
         mode: "onChange",
