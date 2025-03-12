@@ -7,7 +7,9 @@ import {
     Newspaper,
     Pin,
     Store, User, Workflow,
+    Bookmark
 } from "lucide-react"
+import { FaRegBookmark } from "react-icons/fa6"
 
 import {NavMain} from "@/components/nav-main"
 import {NavUser} from "@/components/nav-user"
@@ -36,45 +38,33 @@ const data = {
             icon: Store,
             variant: "ghost",
             url: "/app/marketplace/cro",
+            subPages: [{
+                title: "Saves",
+                icon: Bookmark,
+                variant: "ghost",
+                url: "/app/saves"
+            }]
         },
         {
             title: "Research Planner",
             icon: Workflow,
             variant: "ghost",
-            url: `/app/research-plan`
+            url: `/app/research-plan`,
+            subPages: []
         },
         {
             title: "Organization Profile",
             icon: User,
             variant: "ghost",
-            url: "/app/profile"
+            url: "/app/profile",
+            subPages: []
         },
-        // {
-        //     title: "Task Board",
-        //     icon: Pin,
-        //     variant: "ghost",
-        //     url: "/app/task-board",
-        //     notificationKeys: KANBAN_NOTIFICATIONS
-        // },
-        // {
-        //     title: "Analytics",
-        //     icon: LayoutDashboard,
-        //     variant: "ghost",
-        //     url: "/app/analytics",
-        //     comingSoon: true
-        // },
-        // {
-        //     title: "Feed",
-        //     icon: Newspaper,
-        //     variant: "ghost",
-        //     url: "/app/feed",
-        //     comingSoon: true
-        // },
         {
             title: "Organization Settings",
             icon: Cog,
             variant: "ghost",
-            url: "/app/settings"
+            url: "/app/settings",
+            subPages: []
         },
     ]
 }

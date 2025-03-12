@@ -8,25 +8,26 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
+import {Button} from "@/components/ui/button";
+import {z} from "zod";
+import {useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
 import mixpanel from "mixpanel-browser";
-import { toast } from "sonner";
-import { Organization } from "@prisma/client";
+import {toast} from "sonner";
+import {Organization} from "@prisma/client";
+import {sendPAGContactEmail} from "@/lib/emails";
 
 // Validation schema
 const contactSchema = z.object({
-    name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-    email: z.string().email({ message: "Please enter a valid email address." }),
-    message: z.string().min(10, { message: "Message must be at least 10 characters." }),
+    name: z.string().min(2, {message: "Name must be at least 2 characters."}),
+    email: z.string().email({message: "Please enter a valid email address."}),
+    message: z.string().min(10, {message: "Message must be at least 10 characters."}),
 });
 
-export default function ContactPAGDialog({ organization }: { organization: Organization }) {
+export default function ContactPAGDialog({organization}: { organization: Organization }) {
     const form = useForm<z.infer<typeof contactSchema>>({
         mode: "onChange",
         resolver: zodResolver(contactSchema),
@@ -44,10 +45,20 @@ export default function ContactPAGDialog({ organization }: { organization: Organ
         });
     };
 
-    const onSubmit = (values: z.infer<typeof contactSchema>) => {
+    const onSubmit = async (values: z.infer<typeof contactSchema>) => {
         trackMixpanelEvent();
         toast.success(`Your message to ${organization.name} has been sent!`);
         form.reset();
+        try {
+            await sendPAGContactEmail({
+                name: values.name,
+                email: values.email,
+                message: values.message,
+                organizationEmail: organization.contactEmail
+            })
+        } catch (error) {
+            toast.error(`Failed to send message to ${organization.name}. Please try again.`);
+        }
     };
 
     return (
@@ -60,13 +71,13 @@ export default function ContactPAGDialog({ organization }: { organization: Organ
                     <FormField
                         control={form.control}
                         name="name"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <FormItem>
                                 <FormLabel>Your Name</FormLabel>
                                 <FormControl>
                                     <Input type="text" placeholder="John Doe" {...field} />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
@@ -74,13 +85,13 @@ export default function ContactPAGDialog({ organization }: { organization: Organ
                     <FormField
                         control={form.control}
                         name="email"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <FormItem>
                                 <FormLabel>Your Email</FormLabel>
                                 <FormControl>
                                     <Input type="email" placeholder="name@example.com" {...field} />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
@@ -88,13 +99,13 @@ export default function ContactPAGDialog({ organization }: { organization: Organ
                     <FormField
                         control={form.control}
                         name="message"
-                        render={({ field }) => (
+                        render={({field}) => (
                             <FormItem>
                                 <FormLabel>Your Message</FormLabel>
                                 <FormControl>
-                                    <Textarea placeholder="Write your message..." rows={4} {...field} />
+                                    <Textarea placeholder="Write your message..." rows={6} {...field} />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />

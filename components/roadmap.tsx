@@ -85,18 +85,14 @@ export function Roadmap({data}: {data: any}) {
     // const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
     const store = useStoreApi()
-    const [milestoneTypes, setMilestoneTypes] = useState<Option[]>([])
+    const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
 
     useEffect(() => {
         const init = async () => {
             // get milestone types from database
             const response = await getMilestoneTypes()
             if (response.success && response.data) {
-                setMilestoneTypes(response.data.map(type => ({
-                    value: type.id,
-                    label: type.label,
-                    description: type.description || undefined
-                })))
+                setMilestoneTypes(response.data || [])
             }
         }
 
@@ -107,7 +103,6 @@ export function Roadmap({data}: {data: any}) {
         milestoneRemountKeyRef.current = milestoneRemountKey;  // Always sync ref with the latest state
     
         const handleUndoRedo = (event: KeyboardEvent) => {
-            console.log(event)
             if (event.shiftKey && (event.metaKey || event.ctrlKey) && event.key === "z") {
                 console.log("Redo action triggered")
                 redo() // undo updates zustand state
@@ -184,7 +179,6 @@ export function Roadmap({data}: {data: any}) {
         const milestonesAlongXAxis = dbNodes.sort((a, b) => {
             return a.position.x - b.position.x
         })
-        console.log(`milestones along XAxis`, milestonesAlongXAxis)
         // let centerX =
         //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
         let centerX = milestonesAlongXAxis.length > 0 ? (
@@ -198,6 +192,7 @@ export function Roadmap({data}: {data: any}) {
 
         newMilestones.forEach(defaultData => {
             const id = nanoid()
+            const milestoneId = nanoid()
             const newNode: Node = {
                 id: id,
                 type: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
@@ -207,13 +202,18 @@ export function Roadmap({data}: {data: any}) {
                 },
                 origin: [0.0, 0.0],
                 data: {
-                    id: nanoid(),
+                    id: milestoneId,
                     nodeId: id,
-                    types: [],
+                    types: defaultData?.types.filter((type: any)=> type !== undefined).map((type: any) => ({
+                        milestoneId: milestoneId,
+                        milestoneTypeId: type?.id,
+                        milestoneType: type
+                    })),
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     status: defaultData?.status || "PLANNED",
-                    private: true
+                    private: true,
+                    nodeType: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
                 }
             }
 
@@ -396,7 +396,7 @@ export function Roadmap({data}: {data: any}) {
                                 Import milestones
                             </DialogTitle>
                             <DialogDescription>
-                                Import multiple milestones at a time. Fill out our milestone <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">input template</Link> and upload.
+                                Import multiple milestones at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">Milestone input template</Link>, filling it out, downloading it as a CSV, and uploading it.
                             </DialogDescription>
                         </DialogHeader>
 
@@ -408,18 +408,18 @@ export function Roadmap({data}: {data: any}) {
                                     Papa.parse(file, {
                                         complete: (result) => {
                                             const newMilestones: any[] = []
+
                                             result.data.forEach((entry: any) => {
                                                 // validate milestone format - don't include the milestone if it doesn't have all the
                                                 // proper fields or if the fields are not of the correct type
                                                 if (
                                                     entry.title && typeof entry.title === "string" && 
-                                                    entry.description && typeof entry.description === "string" &&
                                                     entry.type && typeof entry.type === "string" &&
                                                     entry.category && typeof entry.type === "string"
                                                 ) {
                                                     newMilestones.push({
-                                                        title: entry.title,
-                                                        description: entry.description,
+                                                        title: entry.title || 'New Milestone',
+                                                        description: entry.description || '', // description is optional
                                                         types: [milestoneTypes.find(type => type.label === entry.type)],
                                                         nodeType: entry.category
                                                     })
@@ -433,6 +433,7 @@ export function Roadmap({data}: {data: any}) {
                                                     description: `Some milestones were not formatted properly. Some milestones have not been imported.`
                                                 })
                                             }
+
                                             addMilestones(newMilestones)
                                         },
                                         header: true,

@@ -11,6 +11,7 @@ import {
     Condition,
     TaskStakeholder, Invitation,
     PlatformNotification,
+    Review,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
@@ -2671,63 +2672,98 @@ export async function deleteTask(taskId: string) {
 }
 
 export const createReview = async (companyId: string, formData: FormData): Promise<ApiResponse<any>> => {
-    const session = await getSession()
+    const session = await getSession();
     if (!session?.user.id) {
-        throw new Error("You must be signed in to perform this action")
+        throw new Error("You must be signed in to perform this action");
     }
 
-    try { // Check if a member request already exists
+    try {
+        // Check if a review already exists
         const existingReview = await prisma.review.findUnique({
             where: {
                 authorId_companyId_organizationId: {
                     authorId: session.user.id,
-                    companyId: companyId, // Use the correct variable name for company ID
-                    organizationId: session.user.organizationId
+                    companyId: companyId,
+                    organizationId: session.user.organizationId,
                 },
             },
         });
 
         if (existingReview) {
-            return {success: false, error: "You have already created a review for this company."};
+            return { success: false, error: "You have already created a review for this company." };
         }
 
         const title = formData.get("title") as string;
         const body = formData.get("body") as string;
-        const rating = formData.get("rating") as string;
+        const rating = parseInt(formData.get("rating") as string);
 
-        const review = await prisma.review.create({
-            data: {
-                title: title,
-                body: body,
-                rating: parseInt(rating),
-                author: {
-                    connect: {
-                        id: session.user.id
-                    }
+        // Use a transaction to create the review and update avgRating atomically
+        const result = await prisma.$transaction(async (tx) => {
+            // Create the review
+            const review = await tx.review.create({
+                data: {
+                    title,
+                    body,
+                    rating,
+                    author: { connect: { id: session.user.id } },
+                    company: { connect: { id: companyId } },
+                    organization: { connect: { id: session.user.organizationId } },
                 },
-                company: {
-                    connect: {
-                        id: companyId
-                    }
-                },
-                organization: {
-                    connect: {
-                        id: session.user.organizationId
-                    }
-                }
+            });
+
+            // Calculate new avgRating
+            const aggregated = await tx.review.aggregate({
+                where: { companyId },
+                _avg: { rating: true },
+            });
+
+            const newAvgRating = aggregated._avg.rating ?? 0;
+
+            // Update the company's avgRating
+            const updatedCompany = await tx.company.update({
+                where: { id: companyId },
+                data: { avgRating: newAvgRating },
+            });
+
+            if (review && updatedCompany) {
+                await updateTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    updatedCompany,
+                    'companies'
+                );
             }
-        })
 
-        if (!review) {
-            console.error("Error creating review.")
+            return review;
+        });
+
+        revalidatePath("app/cro/");
+
+        return { success: true, data: result };
+    } catch (error: any) {
+        console.error("Error creating review:", error);
+        return { success: false, error: "Database error. Please try again later." };
+    }
+};
+
+export async function deleteReview(review: Review) {
+    try {
+        const response = prisma.review.delete({
+            where: {id: review.id},
+        });
+
+        if (!response) {
+            console.error("Error deleting review.")
             return {success: false, error: "Database error. please try again later."}
         }
 
-        revalidatePath("app/cro/")
-
-        return {success: true, data: review}
+        return {success: true, data: response}
     } catch (error: any) {
-        console.error("Error creating member request:", error)
+        console.error("Error deleting review:", error)
         return {success: false, error: "Database error. please try again later."}
     }
 }

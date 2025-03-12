@@ -28,29 +28,24 @@ const CRORatingSection = ({ reviews }: { reviews: Review[] }) => {
     const totalReviews = validReviews.length;
 
     let avgRating = 0;
-    let ratingPercentages: { label: number; percentage: number }[] = [];
+    const ratingCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 
     if (totalReviews > 0) {
-        // Calculate average rating
         const totalRating = validReviews.reduce((acc, review) => acc + review.rating, 0);
         avgRating = totalRating / totalReviews;
 
-        // Count occurrences of each rating (1-5)
-        const ratingCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
         validReviews.forEach((review) => {
             const roundedRating = Math.round(review.rating);
             ratingCounts[roundedRating] += 1;
         });
-
-        // Convert counts to percentages, only include non-zero counts
-        ratingPercentages = Object.entries(ratingCounts)
-            .filter(([_, count]) => count > 0) // Exclude ratings that have 0 count
-            .map(([rating, count]) => ({
-                label: Number(rating),
-                percentage: (count / totalReviews) * 100,
-            }))
-            .reverse(); // Reverse to show 5-star at the top
     }
+
+    const ratingPercentages = Object.entries(ratingCounts)
+        .map(([rating, count]) => ({
+            label: Number(rating),
+            percentage: totalReviews > 0 ? (count / totalReviews) * 100 : 0,
+        }))
+        .reverse();
 
     return (
         <div>

@@ -15,7 +15,7 @@ import { DoubleSliderBarChart } from "./ui/slider-double"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
 import MultipleSelector from "./ui/multiple-selector"
-import {ASSOCIATED_CATEGORIES} from "@/lib/types"
+import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS} from "@/lib/types"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 
@@ -33,6 +33,8 @@ const optionSchema = z.object({
 
 const filtersFormSchema = z.object({
     categories: z.array(optionSchema),
+    types: z.array(optionSchema),
+    certifications: z.array(optionSchema),
 })
 
 export function CROFilters() {
@@ -69,6 +71,56 @@ export function CROFilters() {
                                 <MultipleSelector
                                     {...field}
                                     defaultOptions={ASSOCIATED_CATEGORIES}
+                                    hidePlaceholderWhenSelected={true}
+                                    placeholder="Select associated categories..."
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="types"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel className="font-semibold text-base">Business types</FormLabel>
+                            <FormDescription>{`The service categories provided by the CRO.`}</FormDescription>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={BUSINESS_TYPES}
+                                    hidePlaceholderWhenSelected={true}
+                                    placeholder="Select associated categories..."
+                                    emptyIndicator={
+                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                            no results found.
+                                        </p>
+                                    }
+                                />
+                            </FormControl>
+                            <FormMessage/>
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="certifications"
+                    render={({field}) => (
+                        <FormItem>
+                            <FormLabel className="font-semibold text-base">Certifications</FormLabel>
+                            <FormDescription>{`The service categories provided by the CRO.`}</FormDescription>
+                            <FormControl>
+                                <MultipleSelector
+                                    {...field}
+                                    defaultOptions={CRO_CERTIFICATIONS}
                                     hidePlaceholderWhenSelected={true}
                                     placeholder="Select associated categories..."
                                     emptyIndicator={
