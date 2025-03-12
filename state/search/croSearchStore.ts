@@ -194,6 +194,11 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
     }
 };
 
+type SetRecommendationsOptions = {
+    limit?: number,
+    priority?: string // milestone id
+}
+
 export interface CROSearchState {
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
@@ -210,7 +215,7 @@ export interface CROSearchState {
     filters: FiltersType,
     setFilters: (updatedFilters: FiltersType) => void,
     recommendations: Recommendation[] | undefined
-    setRecommendations: (milestones: Milestone[], limit?: number) => Promise<void>
+    setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<void>
 }
 
 export const useCROSearchStore = create<CROSearchState>()(
@@ -270,15 +275,20 @@ export const useCROSearchStore = create<CROSearchState>()(
                 })
             },
             recommendations: undefined,
-            setRecommendations: async (milestones: Milestone[], limit?: number) => {
-                console.log(`get recommendations`)
+            setRecommendations: async (milestones: Milestone[], options?: SetRecommendationsOptions) => {
+                console.log(`get recommendations`, options)
                 set({recommendations: undefined})
-                const recommendationResults = await generateRecommendations(milestones)
+                const recommendationResults = await generateRecommendations(
+                    options?.priority 
+                        // ? milestones.sort(function(x,y){ return x == first ? -1 : y == first ? 1 : 0; })
+                        ? milestones.sort((x, y) => x.id === options.priority ? -1 : y.id === options.priority ? 1 : 0)
+                        : milestones
+                )
 
                 // remove duplicates before returning
                 set({
-                    recommendations: limit 
-                        ? Array.from(new Set(recommendationResults)).slice(0, limit) 
+                    recommendations: options?.limit
+                        ? Array.from(new Set(recommendationResults)).slice(0, options.limit) 
                         : Array.from(new Set(recommendationResults))
                 })
             }
