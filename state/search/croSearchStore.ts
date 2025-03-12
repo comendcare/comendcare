@@ -1,8 +1,8 @@
 import { typesense } from '@/lib/typesense';
-import { Milestone } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
+import { ASSOCIATED_CATEGORIES, Milestone } from '@/lib/types'
 
 export const sampleCROs: any[] = [
     {
@@ -75,11 +75,16 @@ export const defaultFilters = {
     // genes: []
 }
 
+export type Recommendation = {
+    content: any
+    milestone: Milestone
+}
+
 function generateFiltersString(filters: FiltersType): string {
     let filtersList: string[] = [];
 
     // Categories (Array Field)
-    if (filters.categories.length > 0) {
+    if (filters?.categories  && filters.categories.length > 0) {
         const categoryFilter = filters.categories
             .map(category => `categories:=["${category.value}"]`)
             .join(" && ");
@@ -87,7 +92,7 @@ function generateFiltersString(filters: FiltersType): string {
     }
 
     // Company Types (Single String Field)
-    if (filters.types.length > 0) {
+    if (filters?.types && filters.types.length > 0) {
         const typeFilter = filters.types
             .map(type => `companyType:="${type.value}"`) // Ensure quotes around value
             .join(" && ");
@@ -95,7 +100,7 @@ function generateFiltersString(filters: FiltersType): string {
     }
 
     // Certifications (Array Field)
-    if (filters.certifications.length > 0) {
+    if (filters?.certifications && filters.certifications.length > 0) {
         const certificationFilter = filters.certifications
             .map(cert => `simplifiedCertifications:=["${cert.value}"]`)
             .join(" && ");
@@ -113,6 +118,36 @@ const sortByFilters: { [key: string]: string } = {
     "alphabetical": "name:asc",
     "highest-rated": "avgRating:desc",
     // "most-reviewed": "moneyDeployed:desc",
+}
+
+const generateRecommendations = async (milestones: Milestone[]) => {
+    let recommendationResults: Recommendation[] = []
+    await Promise.all(
+        milestones.map(async (milestone) => {
+            const newFilters = {
+                categories: Array.from(
+                    new Set((milestone?.types || []).flatMap(type => type.milestoneType.categories))
+                )
+                    .map(categoryValue => (ASSOCIATED_CATEGORIES.find(c => c.value === categoryValue)))
+                    .filter(c => c !== undefined)
+                    .map(c => ({label: c?.label, value: c?.value})),
+                types: [],
+                certifications: []
+            }
+            const newSearchResults = await getUpdatedSearchResults({
+                searchTerm: '',
+                sortBy: undefined,
+                filters: newFilters,
+                lastFetchedPage: 1,
+            }, true)
+            recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => ({
+                content: result,
+                milestone
+            } as Recommendation)))
+        })
+    )
+
+    return recommendationResults
 }
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
@@ -159,11 +194,6 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
     }
 };
 
-export type Recommendation = {
-    content: any
-    milestone: Milestone
-}
-
 export interface CROSearchState {
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
@@ -177,10 +207,10 @@ export interface CROSearchState {
     setAllResults: (results: any[]) => void,
     searchResults: any[] | undefined
     setSearchResults: (results: any[]) => void
-    recommendations: Recommendation[] | undefined
-    setRecommendations: (results: any[]) => void
     filters: FiltersType,
-    setFilters: (updatedFilters: FiltersType) => void
+    setFilters: (updatedFilters: FiltersType) => void,
+    recommendations: Recommendation[] | undefined
+    setRecommendations: (milestones: Milestone[], limit?: number) => Promise<void>
 }
 
 export const useCROSearchStore = create<CROSearchState>()(
@@ -198,13 +228,13 @@ export const useCROSearchStore = create<CROSearchState>()(
                     searchResults: newSearchResults, 
                     lastFetchedPage: 1,
                     // TEMPORARY SOLUTION HERE: to add something to the recommendations section, remove setting recommendations here when fully implementing recommendations
-                    recommendations: newSearchResults.slice(0, 6).map((result: any) => ({
-                        content: result,
-                        milestone: {
-                            title: "Sample milestone",
-                            nodeType: "PROJECT"
-                        }
-                    })) 
+                    // recommendations: newSearchResults.slice(0, 6).map((result: any) => ({
+                    //     content: result,
+                    //     milestone: {
+                    //         title: "Sample milestone",
+                    //         nodeType: "PROJECT"
+                    //     }
+                    // })) 
                 })
             },
             sortBy: undefined,
@@ -230,10 +260,6 @@ export const useCROSearchStore = create<CROSearchState>()(
             setAllResults: (results: any[]) => set({ allResults: results }),
             searchResults: undefined,
             setSearchResults: (results: any[]) => set({ searchResults: results }),
-            // recommendations: undefined,
-            // TEMPORARY SOLUTION HERE: just setting this so we can get something in the milestone recommendations
-            recommendations: sampleCROs,
-            setRecommendations: (results: any[]) => set({ recommendations: results }),
             filters: defaultFilters,
             setFilters: async (updatedFilters: FiltersType) => {
                 const newFilters = {
@@ -249,6 +275,19 @@ export const useCROSearchStore = create<CROSearchState>()(
                     filters: newFilters, 
                     lastFetchedPage: 1,
                     searchResults: newSearchResults
+                })
+            },
+            recommendations: undefined,
+            setRecommendations: async (milestones: Milestone[], limit?: number) => {
+                console.log(`get recommendations`)
+                set({recommendations: undefined})
+                const recommendationResults = await generateRecommendations(milestones)
+
+                // remove duplicates before returning
+                set({
+                    recommendations: limit 
+                        ? Array.from(new Set(recommendationResults)).slice(0, limit) 
+                        : Array.from(new Set(recommendationResults))
                 })
             }
         }),
