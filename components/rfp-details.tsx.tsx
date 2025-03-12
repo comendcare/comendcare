@@ -17,6 +17,8 @@ import { Separator } from "./ui/separator"
 import { FaArrowUpRightFromSquare, FaTrash } from "react-icons/fa6"
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import { PrivateBadge } from "./private-badge"
+import { TypeBadge } from "./type-badge"
+import { PublicBadge } from "./public-badge"
 
 type RFPType = Prisma.RFPGetPayload<{}>
 
@@ -63,11 +65,12 @@ export function RFPDetails({ rfp, isPublic }: { rfp: MilestoneType, isPublic: bo
                         className="w-full flex items-center justify-between space-x-4 py-2 text-wrap"
                     >
                         <div className="flex flex-col justify-between min-w-0 w-full">
-                            <div className="flex items-start gap-x-3 w-full">
+                            <div className="flex items-center gap-x-3 w-full">
+                                <TypeBadge type={rfp?.node?.type || "RFP"} iconOnly={true}/>
                                 <h2 className="text-sm font-semibold truncate text-wrap break-words">
                                     {rfp?.title}
                                 </h2>
-                                {rfp.private && <PrivateBadge />}
+                                {rfp?.private ? <PrivateBadge iconOnly={true}/> : (!isPublic ? <PublicBadge iconOnly={true}/> : undefined)}
                             </div>
                             <div className="mt-2 flex items-center gap-x-2.5 text-sm text-gray-400 text-wrap">
                                 <Details rfp={rfp} />
