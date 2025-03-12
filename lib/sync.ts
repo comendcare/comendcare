@@ -345,6 +345,14 @@ export const syncToTypesense = async (env: {
                     optional: true
                 },
                 {
+                    name: "avgRating",
+                    type: "float",
+                    index: true,
+                    sort: true,
+                    store: true,
+                    optional: true
+                },
+                {
                     name: "simplifiedCertifications",
                     type: "string[]",
                     index: true,

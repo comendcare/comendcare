@@ -65,6 +65,10 @@ async function main() {
 
                     simplifiedCertifications: company.simplifiedCertifications,
 
+                    categories: company.categories,
+
+                    avgRating: 0,
+
                     rfis: {
                         create: company.rfis?.map((rfi: any) => ({
                             name: rfi.name,
