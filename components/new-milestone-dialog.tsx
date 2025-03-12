@@ -158,7 +158,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                     inDialog={true}
                 />
 
-                <h2 className="text-2xl">2. What are you creating</h2>
+                <h2 className="text-2xl">2. Select a category for your milestone</h2>
 
                 <ToggleGroup
                         type="single"

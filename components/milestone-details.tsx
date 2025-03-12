@@ -24,6 +24,7 @@ import Link from "next/link"
 import {RFPDetails} from "./rfp-details.tsx"
 import {Button} from "./ui/button"
 import { TypeBadge } from "./type-badge"
+import { MilestoneTypeBadge } from "./milestone-type-badge"
 
 export function MilestoneDetails({milestone}: { milestone: any }) {
     return (
@@ -79,14 +80,11 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                             className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
                             disabled={true}
                             status={milestone.status}
-                            onStatusChange={() => {
-                            }}
+                            onStatusChange={() => {}}
                         />
                     }
                     {(milestone.types || []).sort((a: any, b: any) => a?.milestoneType?.length - b?.milestoneType?.length).map((milestoneType: any, index: number) => (
-                        <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType?.milestoneType?.label || "No type"}
-                        </Badge>
+                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
                     ))}
                 </span>
 

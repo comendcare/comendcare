@@ -1,5 +1,14 @@
 import {User, Post, Comment, Prisma} from "@prisma/client";
 
+export type Milestone = Prisma.MilestoneGetPayload<{
+    include: {
+        node: true,
+        contacts: true,
+        attachments: true,
+        types: { include: { milestoneType: true } }
+    }
+}>;
+
 export interface Option {
     value: string;
     label: string;
