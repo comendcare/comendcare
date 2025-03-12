@@ -226,15 +226,7 @@ export const useCROSearchStore = create<CROSearchState>()(
                 set({ 
                     searchTerm: newSearch, 
                     searchResults: newSearchResults, 
-                    lastFetchedPage: 1,
-                    // TEMPORARY SOLUTION HERE: to add something to the recommendations section, remove setting recommendations here when fully implementing recommendations
-                    // recommendations: newSearchResults.slice(0, 6).map((result: any) => ({
-                    //     content: result,
-                    //     milestone: {
-                    //         title: "Sample milestone",
-                    //         nodeType: "PROJECT"
-                    //     }
-                    // })) 
+                    lastFetchedPage: 1
                 })
             },
             sortBy: undefined,

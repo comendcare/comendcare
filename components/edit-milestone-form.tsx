@@ -213,10 +213,6 @@ export function EditMilestoneForm({
         init()
     }, []);
 
-    useEffect(() => {
-        console.log(`recommendations changed`, recommendations)
-    }, [recommendations])
-
     // Watch form changes, don't watch while initializing
     useEffect(() => {
         const subscription = form.watch((values) => debounceUpdates(values))
