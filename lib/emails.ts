@@ -2,6 +2,7 @@
 import {render} from "@react-email/render"
 import sgMail from "@sendgrid/mail"
 import ContactEmail from "@/packages/transactional/emails/contact/contact-email"
+import PAGContactEmail from "@/packages/transactional/emails/pag/contact-email";
 import rateLimit from "@/lib/rate-limit";
 import axios from "axios";
 import WaitlistEmail from "@/packages/transactional/emails/contact/waitlist-email";
@@ -85,6 +86,27 @@ export async function sendBetaSignupEmail(params: {
             html: emailTemplate,
             text: "Add this user to the waitlist",
             subject: "[WAITLIST] Beta tester waitlist request"
+        }
+        await sendEmail(msg)
+    }
+}
+
+export async function sendPAGContactEmail(params: {
+    name: string | null | undefined; email: string | null | undefined; message: string | null | undefined; organizationEmail: string | null | undefined;
+}) {
+    const emailTemplate = await render(
+        PAGContactEmail({name: params.name, sendingEmail: params.email, message: params.message, receivingEmail: params.organizationEmail})
+    )
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
+    if (params.email && params.organizationEmail) {
+        const msg = {
+            // to: 'flawnsontong1@gmail.com', // NOTE: for testing purposes, you can change the recipient of the emails
+            to: params.organizationEmail,
+            from: "contact@comendcare.com",
+            html: emailTemplate,
+            text: "Someone is reaching out on Comend",
+            subject: "Someone is reaching out on Comend"
         }
         await sendEmail(msg)
     }
