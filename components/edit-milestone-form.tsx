@@ -299,7 +299,7 @@ export function EditMilestoneForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className="research-plan-tour-step3 px-8 pb-4">
+            <ScrollArea className="research-plan-tour-step3 px-8 pb-4 h-full">
                 <form
                     onKeyDown={handleKeyDown}
                     onSubmit={form.handleSubmit(handleMilestoneFormSubmit)}
@@ -314,14 +314,14 @@ export function EditMilestoneForm({
 
                     <EditTitle form={form}/>
 
-                    <Tabs defaultValue="edit" className="space-y-4 w-full">
+                    <Tabs defaultValue="edit" className="space-y-4 w-full h-full">
                         <div className="flex gap-4 items-center justify-between">
                             <TabsList>
                                 <TabsTrigger value="edit">
                                     Edit
                                 </TabsTrigger>
                                 <TabsTrigger value="recommendations">
-                                    Recommendations
+                                    Relevant Results
                                 </TabsTrigger>
                             </TabsList>
                             <TypeBadge type={formData.nodeType}/>
@@ -386,7 +386,7 @@ export function EditMilestoneForm({
                             <Loading />
                         ): (
                             <>
-                            <TabsContent value="edit" className="space-y-4 w-full">
+                            <TabsContent value="edit" className="space-y-4 w-full h-full">
                                 <FormItem>
 
                                 <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
@@ -493,6 +493,29 @@ export function EditMilestoneForm({
                                         </FormItem>
                                     )}
                                 />
+
+                                <span className="h-8" />
+
+                                <span className="flex justify-end gap-4 flex-wrap absolute bottom-2 right-0 m-4">
+                                    <Dialog>
+                                        <DialogTrigger>
+                                            <Button type="button" variant="destructive">
+                                                Delete Milestone
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
+                                    </Dialog>
+                                    <Button
+                                        id="edit-milestone-scroll-area"
+                                        className="research-plan-tour-step4"
+                                        onClick={() => {
+                                            handleMilestoneFormSubmit(form.getValues())
+                                            onClose()
+                                        }}
+                                    >
+                                        Save Changes
+                                    </Button>
+                                </span>
                             </TabsContent>
                             <TabsContent value="recommendations" className="space-y-4 w-full">
                                 {!recommendations && (
@@ -544,29 +567,6 @@ export function EditMilestoneForm({
                             </>
                         )}
                     </Tabs>
-
-                    <span className="h-8" />
-
-                    <span className="flex justify-end gap-4 flex-wrap absolute bottom-0 right-0 mx-4 my-2">
-                        <Dialog>
-                            <DialogTrigger>
-                                <Button type="button" variant="destructive">
-                                    Delete Milestone
-                                </Button>
-                            </DialogTrigger>
-                            <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
-                        </Dialog>
-                        <Button
-                            id="edit-milestone-scroll-area"
-                            className="research-plan-tour-step4"
-                            onClick={() => {
-                                handleMilestoneFormSubmit(form.getValues())
-                                onClose()
-                            }}
-                        >
-                            Save Changes
-                        </Button>
-                    </span>
                 </form>
             </ScrollArea>
         </Form>
