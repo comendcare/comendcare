@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { CROSearchState, sampleCROs, useCROSearchStore } from "@/state/search/croSearchStore";
 import { useShallow } from "zustand/react/shallow";
 import InfiniteScroll from "./ui/infinite-scroll";
@@ -17,9 +17,13 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/compon
 import { FaQuestion } from "react-icons/fa6";
 import { FaInfoCircle } from "react-icons/fa";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import Loading from "@/app/loading";
+import Spinner from "@/components/ui/spinner"
+import logo from "@/public/Full logo.png"
 
 const selector = (state: CROSearchState) => ({
     recommendations: state.recommendations,
+    setRecommendations: state.setRecommendations,
     lastFetchedPage: state.lastFetchedPage,
     setLastFetchedPage: state.setLastFetchedPage,
     view: state.view,
@@ -27,7 +31,9 @@ const selector = (state: CROSearchState) => ({
 })
 
 const researchPlanSelector = (state: RoadmapState) => ({
-    roadmapId: state.roadmapId
+    initialized: state.initialized,
+    roadmapId: state.roadmapId,
+    milestones: state.milestones
 })
 
 export const NoResultsView = () => {
@@ -64,15 +70,24 @@ export const NoResultsView = () => {
 export function CROSearchResults() {
     const { 
         recommendations,
+        setRecommendations,
         lastFetchedPage, 
         setLastFetchedPage, 
         view, 
         searchResults 
     } = useCROSearchStore(useShallow(selector))
     const {
-        roadmapId
+        initialized: roadmapInitialized,
+        roadmapId,
+        milestones
     } = useRoadmapStore(useShallow(researchPlanSelector))
     const [recommendationsIsExpanded, setRecommendationsIsExpanded] = useState(false)
+
+    useEffect(() => {
+        if (milestones && roadmapInitialized) {
+            setRecommendations(milestones)
+        }
+    }, [milestones])
 
     if (!searchResults) return <ComendLoadingSpinner />
     console.log(searchResults)
@@ -92,7 +107,7 @@ export function CROSearchResults() {
         return (
             <div className="w-full flex flex-col gap-4">
                 <div className="relative flex flex-col gap-2 items-start">
-                    {!roadmapId ? (
+                    {(!roadmapId && roadmapInitialized) ? (
                         <>
                         <div className={cn("w-full min-h-[200px] grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3")}>
                             {sampleCROs.map((result, index) => (
@@ -125,7 +140,17 @@ export function CROSearchResults() {
                         </>
                     ): (
                         <>
-                        {(!recommendations || recommendations.length === 0) && (
+                        {!recommendations && (
+                            <Card className="w-full flex flex-col mx-auto justify-center items-center align-center">
+                                <CardContent className="flex flex-col space-y-8 py-20 items-center justify-center">
+                                    <Spinner className="scale-150" />
+                                    <div className="w-1/6 min-w-40">
+                                        <Image priority src={logo} alt="Comend logo" />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+                        {(recommendations && recommendations.length === 0) && (
                             <Card className="w-full flex flex-col mx-auto justify-center items-center align-center">
                                 <CardContent className="flex gap-4 p-4">
                                     <div>
