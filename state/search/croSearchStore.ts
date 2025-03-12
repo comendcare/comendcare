@@ -49,6 +49,16 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
+    types: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
+    certifications: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     // moneyDeployed: number[],
     // genes: {
     //     label: string,
@@ -59,47 +69,50 @@ export type FiltersType = {
 
 export const defaultFilters = {
     categories: [],
+    types: [],
+    certifications: [],
     // moneyDeployed: [0, 10000000],
     // genes: []
 }
 
-function generateFiltersString(filters: FiltersType) {
-    let filtersList: string[] = []
-    let typesenseFilters = ""
+function generateFiltersString(filters: FiltersType): string {
+    let filtersList: string[] = [];
 
-    // addative filters
+    // Categories (Array Field)
     if (filters.categories.length > 0) {
-        const categoryFilters = filters.categories.map(category => `categories:=[${category.value}]`).join(" || ");
-        filtersList.push(`(${categoryFilters})`);
-        typesenseFilters += `(${categoryFilters})`;
+        const categoryFilter = filters.categories
+            .map(category => `categories:=["${category.value}"]`)
+            .join(" && ");
+        filtersList.push(`(${categoryFilter})`);
     }
 
-    if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
+    // Company Types (Single String Field)
+    if (filters.types.length > 0) {
+        const typeFilter = filters.types
+            .map(type => `companyType:="${type.value}"`) // Ensure quotes around value
+            .join(" && ");
+        filtersList.push(`(${typeFilter})`);
+    }
 
-    // subtractive filters
-    // if (filters.moneyDeployed) {
-    //     filtersList.push(`moneyDeployed:>=${filters.moneyDeployed[0]}`)
-    //     filtersList.push(`moneyDeployed:<${filters.moneyDeployed[1]}`)
-    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:>=${filters.moneyDeployed[0]}`)
-    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:<${filters.moneyDeployed[1]}`)
-    // }
+    // Certifications (Array Field)
+    if (filters.certifications.length > 0) {
+        const certificationFilter = filters.certifications
+            .map(cert => `simplifiedCertifications:=["${cert.value}"]`)
+            .join(" && ");
+        filtersList.push(`(${certificationFilter})`);
+    }
 
-    console.log(`typesense filters: `, typesenseFilters)
-    return typesenseFilters
+    // Combine all filters with `&&`
+    const typesenseFilters = filtersList.length > 0 ? filtersList.join(" && ") : "";
+
+    console.log(`Typesense filters: ${typesenseFilters}`);
+    return typesenseFilters;
 }
 
 const sortByFilters: { [key: string]: string } = {
-    "alphabetical": "name:asc",
-    // "patients-low-high": "condition.numberOfIdentifiedPatients:asc",
-    // "patients-high-low": "condition.numberOfIdentifiedPatients:desc",
-    // "prevalence-low-high": "prevalenceRatio:asc",
-    // "prevalence-high-low": "prevalenceRatio:desc",
-    // "money-raised-low-high": "moneyRaised:asc",
-    // "money-raised-high-low": "moneyRaised:desc",
-    "money-deployed-low-high": "moneyDeployed:asc",
-    "money-deployed-high-low": "moneyDeployed:desc",
-    "patients-engaged-low-high": "firstConditionPatientsEngaged:asc",
-    "patients-engaged-high-low": "firstConditionPatientsEngaged:desc"
+    "alphabetical": "title:asc",
+    "highest-rated": "avgRating:desc",
+    // "most-reviewed": "moneyDeployed:desc",
 }
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
@@ -110,7 +123,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             per_page: 10,
             page: state.lastFetchedPage,
             ...(generateFiltersString(state.filters) ? { filter_by: generateFiltersString(state.filters) } : undefined),
-            // ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
+            ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
         };
 
         const results = await typesense

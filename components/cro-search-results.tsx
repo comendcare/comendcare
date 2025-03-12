@@ -75,6 +75,7 @@ export function CROSearchResults() {
     const [recommendationsIsExpanded, setRecommendationsIsExpanded] = useState(false)
 
     if (!searchResults) return <ComendLoadingSpinner />
+    console.log(searchResults)
 
     const ResultsView = () => {
         if (view === "list") {
