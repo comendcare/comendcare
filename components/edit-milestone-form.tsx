@@ -204,7 +204,7 @@ export function EditMilestoneForm({
             }
 
             if (milestoneData) {
-                await setRecommendations([milestoneData as Milestone], 3)
+                await setRecommendations([milestoneData as Milestone], {limit: 3})
             }
 
             initializing.current = false
@@ -268,7 +268,7 @@ export function EditMilestoneForm({
             await setRecommendations([{
                 ...milestoneData,
                 ...updateData
-            } as Milestone], 3)
+            } as Milestone], {limit: 3})
         }
 
         // Mixpanel tracking for "Other" field
@@ -560,7 +560,7 @@ export function EditMilestoneForm({
                                     </>
                                 )}
 
-                                <Link href="/app/marketplace/cro">
+                                <Link href={`/app/marketplace/cro?milestone=${milestoneData.id}&expanded=true`}>
                                     <Button className="pl-0" variant={"link"}>Explore the marketplace</Button>
                                 </Link>
                             </TabsContent>

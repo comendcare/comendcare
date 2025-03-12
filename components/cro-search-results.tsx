@@ -20,6 +20,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import Loading from "@/app/loading";
 import Spinner from "@/components/ui/spinner"
 import logo from "@/public/Full logo.png"
+import { useSearchParams } from "next/navigation";
 
 const selector = (state: CROSearchState) => ({
     recommendations: state.recommendations,
@@ -81,11 +82,14 @@ export function CROSearchResults() {
         roadmapId,
         milestones
     } = useRoadmapStore(useShallow(researchPlanSelector))
-    const [recommendationsIsExpanded, setRecommendationsIsExpanded] = useState(false)
+    const searchParams = useSearchParams()
+    const [recommendationsIsExpanded, setRecommendationsIsExpanded] = useState(searchParams.get("expanded") === "true")
 
     useEffect(() => {
         if (milestones && roadmapInitialized) {
-            setRecommendations(milestones)
+            const urlMilestone = searchParams.get("milestone")
+            const options = urlMilestone ? { priority: urlMilestone } : undefined
+            if (options) setRecommendations(milestones, options)
         }
     }, [milestones])
 
