@@ -11,7 +11,8 @@ export function PublicBadge({ className = "", iconOnly = false }: { className?: 
                 </TooltipTrigger>
                 <TooltipContent className="max-w-80 text-wrap text-left">
                     <p className={cn(className, "text-normal")}>
-                        {`Visible on your profile and discoverable in the marketplace.`}
+                        {/* {`Visible on your profile and discoverable in the marketplace.`} */}
+                        {`Public milestones are visible on your profile and discoverable in the marketplace.`}
                     </p>
                 </TooltipContent>
             </Tooltip>

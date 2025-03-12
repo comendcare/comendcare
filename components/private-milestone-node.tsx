@@ -53,6 +53,7 @@ import {useShallow} from "zustand/react/shallow"
 import {PublicMilestoneNode} from "./public-milestone-node"
 import { TypeBadge } from "./type-badge"
 import { MilestoneType } from "@prisma/client"
+import { MilestoneTypeBadge } from "./milestone-type-badge"
 // import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export type PrivateMilestoneNode = Node<
@@ -151,22 +152,22 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                                     <Button
                                         onClick={(e) => {
                                             e.stopPropagation()
-                                            handleDeleteClick()
-                                        }}
-                                        variant="ghost"
-                                        className="w-full h-full justify-start text-xl"
-                                    >
-                                        Delete
-                                    </Button>
-                                    <Button
-                                        onClick={(e) => {
-                                            e.stopPropagation()
                                             handleDuplicate()
                                         }}
                                         variant="ghost"
                                         className="w-full h-full justify-start text-xl"
                                     >
                                         Duplicate
+                                    </Button>
+                                    <Button
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleDeleteClick()
+                                        }}
+                                        variant="ghost"
+                                        className="w-full h-full justify-start text-xl"
+                                    >
+                                        Delete
                                     </Button>
                                 </CardContent>
                             </Card>
@@ -307,9 +308,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                         <AttachmentsTag attachments={props.data.attachments}/>
                     )}
                     {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-                        <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType?.milestoneType?.label || "No type"}
-                        </Badge>
+                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
                     ))}
                 </span>
             </>
@@ -348,9 +347,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                         }}
                     />
                     {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-                        <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType?.milestoneType?.label || "No type"}
-                        </Badge>
+                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
                     ))}
             </span>
             </>
@@ -378,9 +375,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
 
                 <span className="w-full flex gap-2 flex-wrap text-wrap">
                     {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-                        <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {milestoneType?.milestoneType?.label || "No type"}
-                        </Badge>
+                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
                     ))}
             </span>
             </>
