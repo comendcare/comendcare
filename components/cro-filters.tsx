@@ -15,7 +15,7 @@ import { DoubleSliderBarChart } from "./ui/slider-double"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
 import MultipleSelector from "./ui/multiple-selector"
-import {ASSOCIATED_CATEGORIES} from "@/lib/types"
+import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS} from "@/lib/types"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 
@@ -95,7 +95,7 @@ export function CROFilters() {
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={ASSOCIATED_CATEGORIES}
+                                    defaultOptions={BUSINESS_TYPES}
                                     hidePlaceholderWhenSelected={true}
                                     placeholder="Select associated categories..."
                                     emptyIndicator={
@@ -120,7 +120,7 @@ export function CROFilters() {
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
-                                    defaultOptions={ASSOCIATED_CATEGORIES}
+                                    defaultOptions={CRO_CERTIFICATIONS}
                                     hidePlaceholderWhenSelected={true}
                                     placeholder="Select associated categories..."
                                     emptyIndicator={
