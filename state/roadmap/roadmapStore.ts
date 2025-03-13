@@ -12,7 +12,7 @@ import { toast } from "sonner"
 
 export type RoadmapState = {
     initialized: boolean,
-    isUpdating: boolean,
+    initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void,
     onboardingActive: boolean,
     setOnboardingActive: (active: boolean) => void,
     roadmapId: string | null
@@ -31,16 +31,14 @@ export type RoadmapState = {
     setEdges: (edges: Edge[]) => Promise<Edge[] | void>
     addNodes: (node: Node[]) => Promise<Node[] | void>
     deleteNode: (nodeId: string) => Promise<any | void>
-    initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void
     saveState: () => void
 }
 
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
         initialized: false,
-        isUpdating: false,
         initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
-            console.log(`init roadmap state`, nodes)
+            console.log(`init roadmap state`)
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
                 style: { stroke: 'black' }

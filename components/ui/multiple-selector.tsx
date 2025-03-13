@@ -446,10 +446,10 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 }}
             >
                 <div className="relative flex flex-wrap gap-1">
-                {selected.map((option) => {
+                {selected.map((option, index) => {
                     return (
                         <Badge
-                            key={option.value}
+                            key={index}
                             className={cn(
                                 'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
                                 'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
@@ -553,9 +553,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                         className="h-full"
                                     >
                                         {Object.entries(selectables).flatMap(value => value[1]).length > 0 && (
-                                            Object.entries(selectables).flatMap(value => value[1]).map(framework => {
+                                            Object.entries(selectables).flatMap(value => value[1]).map((framework, index) => {
                                                 return (
-                                                    <HoverCard openDelay={0} closeDelay={0}>
+                                                    <HoverCard openDelay={0} closeDelay={0} key={index}>
                                                         <HoverCardTrigger>
                                                         <CommandItem
                                                             key={framework.value}

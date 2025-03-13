@@ -118,7 +118,7 @@ export const NoResearchPlanCard = ({isPublic}: {isPublic: Boolean}) => {
                         You do not have a research plan yet. Create one to get started.
                     </p>
                     {!isPublic && (
-                        <Link 
+                        <a 
                             href={"/app/research-plan"}
                             className={cn(
                                 buttonVariants({ variant: "default" }),
@@ -127,7 +127,7 @@ export const NoResearchPlanCard = ({isPublic}: {isPublic: Boolean}) => {
                         >
                                 <FaPlus />
                                 Create a research plan
-                        </Link>
+                        </a>
                     )}
                 </div>
             </CardContent>

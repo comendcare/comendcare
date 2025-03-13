@@ -63,14 +63,10 @@ const router = useRouter()
                 {milestones?.sort((a, b) => {
                     return a.startDate - b.startDate
                 }).map((milestone: any, index: number) => (
-                    <li key={index} className="ms-6">
-                        <button 
-                            onClick={() => {
-                                handleEditClick(milestone.nodeId)
-                            }}
-                            className={cn("w-full text-left hover:bg-secondary p-2 rounded-md", selectedNodeId === milestone.nodeId ? "border-primary border-2" : "")}
-                        >
-                            <>
+                    <li 
+                        key={index} 
+                        className={cn("ms-6 text-left hover:bg-secondary p-2 rounded-md hover:cursor-pointer", selectedNodeId === milestone.nodeId ? "border-primary border-2" : "")}
+                        onClick={() => {handleEditClick(milestone.nodeId)}}>
                             <span className="absolute flex items-center justify-center bg-white rounded-full -start-[18px]">
                                 <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
                             </span>
@@ -88,8 +84,6 @@ const router = useRouter()
                                 {milestone.description}
                             </p>
                             <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
-                            </>
-                        </button>
                     </li>
                 ))}
             </ol>
