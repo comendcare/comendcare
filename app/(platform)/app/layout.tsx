@@ -22,7 +22,7 @@ import {toast} from "sonner";
 import {initializeCROSearch, initializeMilestoneSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
-import { createKanban } from "@/lib/actions";
+import { createKanban, createRoadmap } from "@/lib/actions";
 import { FeedbackSheet } from "@/components/feedback";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import { useOnborda } from "@/components/onborda/OnbordaContext";
@@ -143,8 +143,16 @@ export default function AppLayout({children}: AppLayoutProps) {
             console.log(`Organization search initialized...`)
 
             // Init Research Plan Store
-            const response = await getRoadmapId(session.user.organizationId)
+            let response = await getRoadmapId(session.user.organizationId)
             if (response.success) {
+                // if we're on the research plan page and the resarch plan doesn't exist, create it, then initialize
+                if (pathname === "/app/research-plan" && !response.data) {
+                    console.log(`research plan doesn't exist, create it`)
+                    const roadmap =  await createRoadmap(session.user.organizationId, {})
+                    console.log(`roadmap`, roadmap)
+                    response = await getRoadmapId(session.user.organizationId)
+                }
+
                 const nodesResponse = await getNodesEdgesAndMilestones(response.data)
                 const urlNode = searchParams.get("milestone")
                 const urlView = searchParams.get("view")

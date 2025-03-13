@@ -50,6 +50,7 @@ import { Option } from "@/lib/types"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
 
 const selector = (state: RoadmapState) => ({
+    roadmapId: state.roadmapId,
     initialized: state.initialized,
     selectedView: state.selectedView,
     setSelectedView: state.setSelectedView,
@@ -69,6 +70,7 @@ export function Roadmap({data}: {data: any}) {
     // Zustand state management
     const { defaultLayout } = useSidebarStore()
     const { 
+        roadmapId,
         initialized,
         selectedView,
         setSelectedView,
@@ -236,8 +238,12 @@ export function Roadmap({data}: {data: any}) {
         return nodes
     }
 
-    if (!initialized) {
-        return <Loading />
+    if (!roadmapId || !initialized) {
+        return (
+            <div className="w-full h-full flex justify-center items-center">
+                <p>Research plan is not intialized... please refresh the page</p>
+            </div>
+        )
     }
 
     return (

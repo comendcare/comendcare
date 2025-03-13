@@ -147,9 +147,11 @@ export function CROSearchResults() {
                                                 </TooltipContent>
                                             </Tooltip>
                                         </h2>
-                                        <Link href="/app/research-plan">
+                                        <a
+                                            href={`/app/research-plan`}
+                                        >
                                             <Button variant={"cta"} className="text-md">Create research plan</Button>
-                                        </Link>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
