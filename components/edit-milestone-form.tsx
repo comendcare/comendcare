@@ -406,7 +406,7 @@ export function EditMilestoneForm({
                                                 <Textarea
                                                     id="description"
                                                     placeholder={`Enter a description...`}
-                                                    defaultValue={field.value}
+                                                    // defaultValue={field.value}
                                                     {...field}
                                                     className="border-transparent hover:border-input"
                                                 />
@@ -498,7 +498,7 @@ export function EditMilestoneForm({
 
                                 <span className="flex justify-end gap-4 flex-wrap absolute bottom-2 right-0 m-4">
                                     <Dialog>
-                                        <DialogTrigger>
+                                        <DialogTrigger asChild>
                                             <Button type="button" variant="destructive">
                                                 Delete Milestone
                                             </Button>
@@ -620,7 +620,7 @@ const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTy
                                     <Textarea
                                         id="otherTypeDetails"
                                         placeholder={`Please enter a short description of your milestone type.`}
-                                        defaultValue={field.value}
+                                        // defaultValue={field.value}
                                         {...field}
                                     />
                                 </FormControl>
@@ -643,7 +643,7 @@ const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any,
                 <span className="h-full items-center flex flex-row justify-end gap-4">
                     <FormControl>
                      <Tooltip disableHoverableContent={disabled}>
-                        <TooltipTrigger disabled={disabled}>
+                        <TooltipTrigger disabled={disabled} asChild>
                             <RadioGroup
                                 onValueChange={(value)=> {
                                     form.setValue("isPrivate", value === "PRIVATE")
@@ -654,35 +654,34 @@ const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any,
                             >
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
-                                        <Tooltip disableHoverableContent={disabled}>
-                                            <TooltipTrigger disabled={disabled}>
-                                                <span className="flex gap-2">
-                                                    <RadioGroupItem value="PRIVATE" />
+                                        <span className="flex gap-2">
+                                            <RadioGroupItem value="PRIVATE" />
+                                            <Tooltip disableHoverableContent={disabled}>
+                                                <TooltipTrigger disabled={disabled} asChild>
                                                     <FormLabel className="font-normal flex gap-1 items-center">
                                                         <FaLock />
                                                         {`Private`}
                                                     </FormLabel>
-                                                </span>
-                                            </TooltipTrigger>
-                                            {!disabled && (
-                                                <TooltipContent className="max-w-80 text-wrap text-left">
-                                                    {`Private milestones are only visible to your team.`}
-                                                </TooltipContent>
-                                            )}
-                                        </Tooltip>
+                                                </TooltipTrigger>
+                                                {!disabled && (
+                                                    <TooltipContent className="max-w-80 text-wrap text-left">
+                                                        {`Private milestones are only visible to your team.`}
+                                                    </TooltipContent>
+                                                )}
+                                            </Tooltip>
+                                        </span>
                                     </FormControl>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
-                                        <Tooltip disableHoverableContent={disabled}>
-                                            <TooltipTrigger disabled={disabled}>
-                                                <span className="flex gap-2">
-                                                    <RadioGroupItem value="PUBLIC" />
-                                                    <FormLabel className="font-normal flex gap-1 items-center">
-                                                        <FaGlobe />
-                                                        {`Public`}
-                                                    </FormLabel>
-                                                </span>
+                                        <span className="flex gap-2">
+                                            <RadioGroupItem value="PUBLIC" />
+                                            <Tooltip disableHoverableContent={disabled}>
+                                            <TooltipTrigger disabled={disabled} asChild>
+                                                <FormLabel className="font-normal flex gap-1 items-center">
+                                                    <FaGlobe />
+                                                    {`Public`}
+                                                </FormLabel>
                                             </TooltipTrigger>
                                             {!disabled && (
                                                 <TooltipContent className="max-w-80 text-wrap text-left">
@@ -690,6 +689,7 @@ const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any,
                                                 </TooltipContent>
                                             )}
                                         </Tooltip>
+                                        </span>
                                     </FormControl>
                                 </FormItem>
                             </RadioGroup>

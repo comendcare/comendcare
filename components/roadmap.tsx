@@ -19,7 +19,7 @@ import { GanttChartView } from "./gantt-chart"
 import { getMilestoneTypes, getRoadmapId } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
-import { cn } from "@/lib/utils"
+import { cn, sleep } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare, FaFileImport, FaPlus } from "react-icons/fa6"
 import { FaRedo, FaUndo } from "react-icons/fa"
@@ -47,8 +47,10 @@ import { Separator } from "@radix-ui/react-separator"
 import { NewMilestoneDialogForm } from "./new-milestone-dialog"
 import { MilestoneType } from "@prisma/client"
 import { Option } from "@/lib/types"
+import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
 
 const selector = (state: RoadmapState) => ({
+    roadmapId: state.roadmapId,
     initialized: state.initialized,
     selectedView: state.selectedView,
     setSelectedView: state.setSelectedView,
@@ -60,10 +62,15 @@ const selector = (state: RoadmapState) => ({
     addNodes: state.addNodes
 })
 
+const recommendationsSelector = (state: CROSearchState) => ({
+    recommendations: state.recommendations
+})
+
 export function Roadmap({data}: {data: any}) {
     // Zustand state management
     const { defaultLayout } = useSidebarStore()
     const { 
+        roadmapId,
         initialized,
         selectedView,
         setSelectedView,
@@ -74,6 +81,7 @@ export function Roadmap({data}: {data: any}) {
         saveState,
         addNodes
     } = useRoadmapStore(useShallow(selector))
+    const { recommendations } = useCROSearchStore(useShallow(recommendationsSelector))
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -81,7 +89,7 @@ export function Roadmap({data}: {data: any}) {
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1);
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false);
-    const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(milestones.length <= 0)
+    const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     // const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
     const store = useStoreApi()
@@ -94,6 +102,9 @@ export function Roadmap({data}: {data: any}) {
             if (response.success && response.data) {
                 setMilestoneTypes(response.data || [])
             }
+
+            await sleep(300)
+            if (milestones.length <= 0 && initialized) setNewMilestoneIsOpen(true)
         }
 
         init()
@@ -227,8 +238,12 @@ export function Roadmap({data}: {data: any}) {
         return nodes
     }
 
-    if (!initialized) {
-        return <Loading />
+    if (!roadmapId || !initialized) {
+        return (
+            <div className="w-full h-full flex justify-center items-center">
+                <p>Research plan is not intialized... please refresh the page</p>
+            </div>
+        )
     }
 
     return (
@@ -247,9 +262,13 @@ export function Roadmap({data}: {data: any}) {
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button size={"icon"} variant={"cta"} className="research-plan-tour-step1 ml-auto" onClick={() => setNewMilestoneIsOpen(true)}>
+                                    <Button 
+                                        size={"icon"} 
+                                        variant={"cta"} 
+                                        className="research-plan-tour-step1 ml-auto" 
+                                        onClick={() => setNewMilestoneIsOpen(true)}
+                                    >
                                         <FaPlus />
-                                        {/* Create milestone */}
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
@@ -296,6 +315,7 @@ export function Roadmap({data}: {data: any}) {
                                     <p>{`Undo (⌘+Z)`}</p>
                                 </TooltipContent>
                             </Tooltip>
+
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button onClick={() => {

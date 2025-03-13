@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { MilestoneTemplates } from "./roadmap-templates"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog"
 import { Button } from "./ui/button"
@@ -43,6 +43,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
     const [selectedMilestoneType, setSelectedMilestoneType] = useState<string>("ASSET")
     const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
+    const dialogRef = useRef<HTMLDivElement>(null);
 
     // Allow update once form is initialized
     useEffect(() => {
@@ -140,7 +141,15 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
             }
             setOpen(open)
         }}>
-            <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start gap-4">
+            <DialogContent 
+                ref={dialogRef}
+                className="outline-none min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start gap-4" 
+                onOpenAutoFocus={(e) => {
+                    e.preventDefault(); // Prevent default autofocus
+                    setTimeout(() => dialogRef.current?.focus(), 0); // Focus the dialog
+                }}
+                tabIndex={-1} // Make it focusable
+            >
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
                         Create a milestone
