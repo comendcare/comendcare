@@ -72,7 +72,7 @@ export default function AppLayout({children}: AppLayoutProps) {
         if (status === "loading") {
             setIsLoading(true);
         } else {
-            setIsLoading(false);
+            // setIsLoading(false);
 
             // Redirect if unauthenticated
             if (status === "unauthenticated") {
@@ -194,8 +194,6 @@ export default function AppLayout({children}: AppLayoutProps) {
         prevSessionRef.current = session
     }, [session]);
 
-    if (isLoading) return <Loading />
-
     if (status === "authenticated" && session) {
         return (
             <SidebarProvider>
@@ -232,7 +230,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                         </div>
                     </header>
                     <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full overflow-hidden overflow-y-auto">
-                        {status !== "authenticated" || !session  ? <Loading /> : (children)}
+                        {status !== "authenticated" || !session || isLoading  ? <Loading /> : (children)}
                     </div>
                 </SidebarInset>
             </SidebarProvider>
