@@ -912,3 +912,27 @@ export async function isUserFollowing(id: string) {
         return {success: false, error: "Database error. please try again later."}
     }
 }
+
+export async function getSavedCompaniesFromOrganizationId(organizationId: string | undefined) {
+    if (!organizationId) {
+        return {success: false, error: "No organization id provided."};
+    }
+
+    try {
+        const savedCompanies = await prisma?.savedCompany.findMany({
+            where: {organizationId}
+        })
+
+        if (!savedCompanies) {
+            return {success: false, error: "Saved companies not found"};
+        }
+
+        return {
+            success: true,
+            data: savedCompanies
+        };
+    } catch (error: any) {
+        logError("Error fetching saved companies", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
