@@ -21,6 +21,9 @@ import { toast } from "sonner";
 import { getMilestones, getSavedCompaniesFromOrganizationId } from "@/lib/fetchers";
 import { useSession } from "next-auth/react";
 import { Form, FormField, FormItem, FormLabel, FormMessage, FormControl } from "@/components/ui/form";
+import va from "@vercel/analytics"
+import {saveCRO} from "@/lib/actions";
+import {useRouter} from "next/navigation";
 
 const formSchema = z.object({
     engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
@@ -39,6 +42,7 @@ const engagementOptions = [
 ];
 
 export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card" | "page" }) {
+    const router = useRouter()
     const { data: session } = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([]);
@@ -74,20 +78,20 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
     const onSubmit = async (data: SaveCROFormData) => {
         setIsSubmitting(true);
         try {
-            const response = await fetch("/api/saved-company", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    companyId: cro.id,
-                    milestoneId: data.milestoneId,
-                    engagement: data.engagement,
-                }),
-            });
-            if (!response.ok) throw new Error("Failed to save company");
-            toast.success("Company saved successfully!");
-            setIsSaved(true);
+            const response = await saveCRO(cro.id, data.milestoneId, data.engagement);
+
+            if (response.success) {
+                va.track("Deleted review");
+                router.refresh();
+                toast.success("Successfully saved cro!");
+            } else {
+                toast.error(response.error);
+            }
         } catch (error) {
-            toast.error("Error saving company");
+            toast.error(
+                "An unexpected error occurred. Please try again later."
+            );
+            console.error("Error saving cro:", error);
         } finally {
             setIsSubmitting(false);
         }
