@@ -6,6 +6,9 @@ import RoadmapTemplates from "@/components/roadmap-templates"
 import NoOrganization from "@/components/no-organization";
 import { createRoadmap } from "@/lib/actions"
 import RoadmapInitWrapper from "@/components/roadmap-init-wrapper"
+import { initializeRoadmapState } from "@/lib/initialize-client-state"
+import { Router } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default async function RoadmapPage() {
     const session = await getSession();
@@ -31,22 +34,10 @@ export default async function RoadmapPage() {
     }
 
     let response = await getRoadmap(orgId)
-    if (response.success) {
-        if (!response.data) {
-            const roadmap = await createNewRoadmap()
-
-            if (roadmap) {
-                response = {
-                    success: true,
-                    data: roadmap
-                }
-            }
-        }
-    }
 
     return (
         <main className="flex flex-col items-center h-full w-full mx-auto">
-            <RoadmapInitWrapper roadmap={response.data} />
+            <Roadmap data={response.data} />
         </main>
     )
 }

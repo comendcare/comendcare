@@ -308,7 +308,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                         <AttachmentsTag attachments={props.data.attachments}/>
                     )}
                     {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
+                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} key={index} />
                     ))}
                 </span>
             </>
