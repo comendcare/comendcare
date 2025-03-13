@@ -262,7 +262,12 @@ export function Roadmap({data}: {data: any}) {
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button size={"icon"} variant={"cta"} className="research-plan-tour-step1 ml-auto" onClick={() => setNewMilestoneIsOpen(true)}>
+                                    <Button 
+                                        size={"icon"} 
+                                        variant={"cta"} 
+                                        className="research-plan-tour-step1 ml-auto" 
+                                        onClick={() => setNewMilestoneIsOpen(true)}
+                                    >
                                         <FaPlus />
                                     </Button>
                                 </TooltipTrigger>
