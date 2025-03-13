@@ -37,6 +37,7 @@ import {CRODescription} from "@/components/cro-description";
 import {CertificationBadge} from "@/components/certification-badge";
 import CROMarketplaceProfileReviewsTab from "@/components/cro-marketplace-profile-reviews-tab";
 import {cn} from "@/lib/utils";
+import SaveCRODialog from "@/components/save-cro-dialog";
 
 const companyTypeIcons: Record<string, JSX.Element> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
@@ -144,15 +145,19 @@ export default async function CompanyHomePage({
                                 </div>
                             )}
                         </div>
-                        <Link
-                            href={cro.website || ""}
-                            className={cn(buttonVariants({variant: "secondary"}), "col-span-1 w-fit justify-self-end")}
-                            target="_blank"
-                        >
-                            <FaArrowUpRightFromSquare/>
-                            Visit website
-                        </Link>
+                        <div className="flex flex-col justify-start items-end space-y-2 col-span-1 w-full justify-self-end">
+                            <Link
+                                href={cro.website || ""}
+                                className={cn(buttonVariants({variant: "secondary"}), "w-fit")}
+                                target="_blank"
+                            >
+                                <FaArrowUpRightFromSquare/>
+                                Visit website
+                            </Link>
+                            <SaveCRODialog cro={cro} />
+                        </div>
                     </div>
+
                     <Tabs defaultValue="services" className="space-y-4 w-full">
                         <TabsList variant="outline">
                             <TabsTrigger value="services" variant="outline" className="px-8">
