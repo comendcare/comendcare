@@ -154,7 +154,7 @@ export default async function CompanyHomePage({
                                 <FaArrowUpRightFromSquare/>
                                 Visit website
                             </Link>
-                            <SaveCRODialog cro={cro} />
+                            <SaveCRODialog cro={cro} type={"page"}/>
                         </div>
                     </div>
 

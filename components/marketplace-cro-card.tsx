@@ -17,10 +17,11 @@ import {truncate} from "@/lib/utils";
 import React from "react";
 import {Company, Milestone} from "@prisma/client";
 import {FaSave, FaUniversity} from "react-icons/fa";
-import { Separator } from "./ui/separator";
-import { TypeBadge } from "./type-badge";
-import { Button } from "./ui/button";
-import { FiShare2 } from "react-icons/fi"
+import {Separator} from "./ui/separator";
+import {TypeBadge} from "./type-badge";
+import {Button} from "./ui/button";
+import {FiShare2} from "react-icons/fi"
+import SaveCRODialog from "@/components/save-cro-dialog";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -44,16 +45,16 @@ export const companyTypeMap: Record<string, string> = {
 };
 
 const companyTypeIcons: Record<string, JSX.Element> = {
-    "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="size-4 text-gray-500 dark:text-gray-400" />,
-    "Small Business (1-10M TTM Revenue)": <FaBuilding className="size-4 text-gray-500 dark:text-gray-400" />,
-    "Academic Core Facility": <FaUniversity className="size-4 text-gray-500 dark:text-gray-400" />,
-    "New Startup (0-1M TTM Revenue)": <FaRocket className="size-4 text-gray-500 dark:text-gray-400" />,
-    "Consultant (5 or more employees)": <FaUserTie className="size-4 text-gray-500 dark:text-gray-400" />,
-    "Large Business (>100M TTM Revenue)": <FaCity className="size-4 text-gray-500 dark:text-gray-400" />,
-    "Consultant (<5 employees)": <FaUserTie className="size-4 text-gray-500 dark:text-gray-400" />,
+    "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "Small Business (1-10M TTM Revenue)": <FaBuilding className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "Academic Core Facility": <FaUniversity className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "New Startup (0-1M TTM Revenue)": <FaRocket className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "Consultant (5 or more employees)": <FaUserTie className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "Large Business (>100M TTM Revenue)": <FaCity className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "Consultant (<5 employees)": <FaUserTie className="size-4 text-gray-500 dark:text-gray-400"/>,
 };
 
-export function CRORecommendationCard({cro, milestone}: {cro: Company, milestone: any}) {
+export function CRORecommendationCard({cro, milestone}: { cro: Company, milestone: any }) {
     const {id} = cro;
 
     return (
@@ -69,13 +70,14 @@ export function CRORecommendationCard({cro, milestone}: {cro: Company, milestone
                     <CardDescription
                         className="text-base flex flex-row gap-2 items-center"
                     >
-                        {milestone?.node?.type && <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.node?.type}/>}
+                        {milestone?.node?.type &&
+                            <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.node?.type}/>}
                         {milestone.title}
                     </CardDescription>
                     <Separator className="my-2"/>
-                    <CROCardHeaderContents cro={cro} />
+                    <CROCardHeaderContents cro={cro}/>
                 </CardHeader>
-                <CROCardContents cro={cro} />
+                <CROCardContents cro={cro}/>
             </Card>
         </Link>
     );
@@ -85,54 +87,60 @@ export function CROMarketplaceCard({cro}: { cro: Company }) {
     const {id} = cro;
 
     return (
-        <Link
-            href={
-                process.env.NEXT_PUBLIC_VERCEL_ENV
-                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
-                    : `http://localhost:3000/app/cro/${id}`
-            }
-        >
-            <Card className="h-full w-full text-left flex flex-col justify-between">
-                <CardHeader className="gap-2">
-                    <CROCardHeaderContents cro={cro} />
-                </CardHeader>
-                <CROCardContents cro={cro} />
-            </Card>
-        </Link>
-    );
+        <Card className="h-full w-full text-left flex flex-col justify-between">
+            <CardHeader className="gap-2">
+                <CROCardHeaderContents cro={cro}/>
+            </CardHeader>
+            <CROCardContents cro={cro}/>
+        </Card>
+    )
+        ;
 }
 
-export function CROCardHeaderContents({cro}: {cro: Company}) {
+export function CROCardHeaderContents({cro}: { cro: Company }) {
     const {id, title, description, companyType} = cro;
 
     return (
         <>
             <div className="flex justify-between">
-            <CardTitle className="text-xl flex flex-row gap-2 items-center">
-                {title}
-            </CardTitle>
-            {/* save button */}
-            <Button variant={"ghost"} onClick={(e) => e.preventDefault()}>
-                {/* {isSaved ? <FaBookmark /> : <FaRegBookmark />} */}
-                <FaRegBookmark />
-            </Button>
+                <Link
+                    href={
+                        process.env.NEXT_PUBLIC_VERCEL_ENV
+                            ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
+                            : `http://localhost:3000/app/cro/${id}`
+                    }
+                >
+                    <CardTitle className="text-xl flex flex-row gap-2 items-center">
+                        {title}
+                    </CardTitle>
+                </Link>
+                <SaveCRODialog cro={cro} type={"card"}/>
             </div>
-            {companyType && (
-                <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
-                    {companyTypeIcons[companyType] || <FaBuilding className="size-4 text-gray-500 dark:text-gray-400" />}
-                    {companyTypeMap[companyType] || companyType}
-                </div>
-            )}
-            {description && description.trim() && (
-                <CardDescription className="text-wrap break-words line-clamp-2">
-                    {truncate(description, 200)}
-                </CardDescription>
-            )}
+            <Link
+                href={
+                    process.env.NEXT_PUBLIC_VERCEL_ENV
+                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
+                        : `http://localhost:3000/app/cro/${id}`
+                }
+            >
+                {companyType && (
+                    <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
+                        {companyTypeIcons[companyType] ||
+                            <FaBuilding className="size-4 text-gray-500 dark:text-gray-400"/>}
+                        {companyTypeMap[companyType] || companyType}
+                    </div>
+                )}
+                {description && description.trim() && (
+                    <CardDescription className="text-wrap break-words line-clamp-2">
+                        {truncate(description, 200)}
+                    </CardDescription>
+                )}
+            </Link>
         </>
     )
 }
 
-export function CROCardContents({cro}: {cro: Company}) {
+export function CROCardContents({cro}: { cro: Company }) {
     const categoryCounts = countCategories(cro);
 
     const categoryLabels = [
@@ -143,27 +151,34 @@ export function CROCardContents({cro}: {cro: Company}) {
     ];
 
     return (
-        <>
-        {Object.values(categoryCounts).some(count => count > 0) && (
-            <CardContent className="flex flex-col items-start justify-center">
-                <div className="grid w-full gap-2 grid-cols-1 sm:grid-cols-2">
-                    {categoryLabels
-                        .filter(({key}) => categoryCounts[key] > 0)
-                        .map(({key, icon: Icon, label}, index) => {
-                            const count = categoryCounts[key];
-                            return (
-                                <div
-                                    key={key}
-                                    className={`text-xs flex flex-row justify-start items-center gap-x-1 border-l-2 border-gray-300 pl-2`}
-                                >
-                                    <Icon className="size-4"/>
-                                    {label}:<div className="text-sm">{count}</div>
-                                </div>
-                            );
-                        })}
-                </div>
-            </CardContent>
-        )}
-        </>
+        <Link
+            href={
+                process.env.NEXT_PUBLIC_VERCEL_ENV
+                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${cro.id}`
+                    : `http://localhost:3000/app/cro/${cro.id}`
+            }
+        >
+            {Object.values(categoryCounts).some(count => count > 0) && (
+                <CardContent className="flex flex-col items-start justify-center">
+                    <div className="grid w-full gap-2 grid-cols-1 sm:grid-cols-2">
+                        {categoryLabels
+                            .filter(({key}) => categoryCounts[key] > 0)
+                            .map(({key, icon: Icon, label}, index) => {
+                                const count = categoryCounts[key];
+                                return (
+                                    <div
+                                        key={key}
+                                        className={`text-xs flex flex-row justify-start items-center gap-x-1 border-l-2 border-gray-300 pl-2`}
+                                    >
+                                        <Icon className="size-4"/>
+                                        {label}:
+                                        <div className="text-sm">{count}</div>
+                                    </div>
+                                );
+                            })}
+                    </div>
+                </CardContent>
+            )}
+        </Link>
     )
 }
