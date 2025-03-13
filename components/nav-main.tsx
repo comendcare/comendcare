@@ -98,8 +98,8 @@ export function NavMain({items}: { items: Item[] }) {
                                 </SidebarMenuButton>
                             )}
                             {(item?.subPages || []).map((subItem) => (
-                                <SidebarMenuSub>
-                                    <SidebarMenuSubItem  key={subItem.title}>
+                                <SidebarMenuSub key={subItem.title}>
+                                    <SidebarMenuSubItem>
                                     <SidebarMenuSubButton
                                         asChild
                                         className={pathname === subItem.url ? "bg-blue-light text-primary" : ""}

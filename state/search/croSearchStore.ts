@@ -152,12 +152,14 @@ const generateRecommendations = async (milestones: Milestone[]) => {
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
     try {
+        const filtersString = generateFiltersString(state.filters)
+
         const searchParameters = {
             q: state.searchTerm,
             query_by: "title",
             per_page: 10,
             page: state.lastFetchedPage,
-            ...(generateFiltersString(state.filters) ? { filter_by: generateFiltersString(state.filters) } : undefined),
+            ...(filtersString ? { filter_by: filtersString } : undefined),
             ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
         };
 
@@ -200,6 +202,8 @@ type SetRecommendationsOptions = {
 }
 
 export interface CROSearchState {
+    initialized: boolean,
+    initState: () => void,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | undefined,
@@ -220,6 +224,10 @@ export interface CROSearchState {
 
 export const useCROSearchStore = create<CROSearchState>()(
     temporal((set, get) => ({
+            initialized: false,
+            initState: () => {
+                set({ initialized: true, recommendations: [] })
+            },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
                 console.log(`set search term`)

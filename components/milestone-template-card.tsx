@@ -51,7 +51,9 @@ export function MilestoneTemplateCardSingleSelect({ milestoneData, selectedMiles
     
     return (
         <button onClick={handleCheck}>
-            <Card className="relative h-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer">
+            <Card 
+                className="relative h-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible hover:bg-secondary cursor-pointer"
+            >
                 <CardHeader>
                     <CheckBubble isChecked={milestoneData.title === selectedMilestoneTemplate?.title} onCheckedChanged={handleCheck}/>
                 </CardHeader>

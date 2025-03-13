@@ -19,10 +19,10 @@ import {
     getRoadmapId
 } from "@/lib/fetchers";
 import {toast} from "sonner";
-import {initializeNotificationsState, initializeRoadmapState} from "@/lib/initialize-client-state";
+import {initializeCROSearch, initializeMilestoneSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
-import { createKanban } from "@/lib/actions";
+import { createKanban, createRoadmap } from "@/lib/actions";
 import { FeedbackSheet } from "@/components/feedback";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import { useOnborda } from "@/components/onborda/OnbordaContext";
@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
+import { sleep } from "@/lib/utils";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -71,7 +72,7 @@ export default function AppLayout({children}: AppLayoutProps) {
         if (status === "loading") {
             setIsLoading(true);
         } else {
-            setIsLoading(false);
+            // setIsLoading(false);
 
             // Redirect if unauthenticated
             if (status === "unauthenticated") {
@@ -92,41 +93,24 @@ export default function AppLayout({children}: AppLayoutProps) {
                 return
             }
 
-            const response = await getRoadmapId(session.user.organizationId)
-            if (response.success) {
-                const nodesResponse = await getNodesEdgesAndMilestones(response.data)
-                const urlNode = searchParams.get("milestone")
-                const urlView = searchParams.get("view")
-                if (nodesResponse.success) {
-                    initializeRoadmapState({
-                        roadmapId: response.data,
-                        nodes: nodesResponse.data.nodes,
-                        edges: nodesResponse.data.edges,
-                        milestones: nodesResponse.data.milestones,
-                        selectedView: urlView,
-                        selectedNodeId: urlNode 
-                    })
-                }
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
+            console.log(`Start initialization...`)
 
-            let notifications = await getAllNotifications()
-            if (notifications.success && notifications.data) {
-                initializeNotificationsState({
-                    notifications: notifications.data
-                })
+            // Init Notifications Store
+            // let notifications = await getAllNotifications()
+            // if (notifications.success && notifications.data) {
+            //     initializeNotificationsState({
+            //         notifications: notifications.data
+            //     })
 
-                // if we're going to the kanban set notifications to viewed
-                if (pathname === '/app/task-board') {
-                    setNotificationsViewed(notifications.data.filter(notification => notification.type === "NEW_TASK"))
-                }
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
-
+            //     // if we're going to the kanban set notifications to viewed
+            //     if (pathname === '/app/task-board') {
+            //         setNotificationsViewed(notifications.data.filter(notification => notification.type === "NEW_TASK"))
+            //     }
+            // } else {
+            //     console.error(notifications.error)
+            //     toast.error(notifications.error)
+            // }
+            
             // let kanban = await getKanbanFromOrganizationId()
             // if (!kanban.data && session.user.organizationId) {
             //     // kanban was not found, create it
@@ -146,7 +130,59 @@ export default function AppLayout({children}: AppLayoutProps) {
             //     toast.error(kanban.error)
             // }
 
-            console.log(`Research plan, kanban, and notifications zustand states initialized successfully!`)
+            // Init CRO Search Store
+            initializeCROSearch()
+            console.log(`CRO search initialized...`)
+
+            // Init Milestone Search Store
+            initializeMilestoneSearch()
+            console.log(`Milestone search initialized...`)
+
+            // Init Organization/PAG Search Store
+            initializeOrganizationSearch()
+            console.log(`Organization search initialized...`)
+
+            // Init Research Plan Store
+            let response = await getRoadmapId(session.user.organizationId)
+            if (response.success) {
+                // if we're on the research plan page and the resarch plan doesn't exist, create it, then initialize
+                if (pathname === "/app/research-plan" && !response.data) {
+                    console.log(`research plan doesn't exist, create it`)
+                    const roadmap =  await createRoadmap(session.user.organizationId, {})
+                    console.log(`roadmap`, roadmap)
+                    response = await getRoadmapId(session.user.organizationId)
+                }
+
+                const nodesResponse = await getNodesEdgesAndMilestones(response.data)
+                const urlNode = searchParams.get("milestone")
+                const urlView = searchParams.get("view")
+                if (nodesResponse.success) {
+                    initializeRoadmapState({
+                        roadmapId: response.data,
+                        nodes: nodesResponse.data.nodes,
+                        edges: nodesResponse.data.edges,
+                        milestones: nodesResponse.data.milestones,
+                        selectedView: urlView,
+                        selectedNodeId: urlNode 
+                    })
+                } else {
+                    // init state, but research plan has not been created yet
+                    initializeRoadmapState({
+                        roadmapId: null,
+                        nodes: [],
+                        edges: [],
+                        milestones: [],
+                        selectedView: null,
+                        selectedNodeId: null 
+                    })
+                }
+                console.log(`Research Plan initialized...`)
+            } else {
+                console.error(response.error)
+                toast.error(response.error)
+            }
+
+            console.log(`Initialization completed successfully!`)
             setIsLoading(false)
         }
     }
@@ -154,6 +190,7 @@ export default function AppLayout({children}: AppLayoutProps) {
     useEffect(() => {
         // Only run if the session data has changed or the session has not yet been set up
         if (
+            // !isLoading &&
             status !== "authenticated" || 
             !session || 
             JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
@@ -201,7 +238,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                         </div>
                     </header>
                     <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full overflow-hidden overflow-y-auto">
-                        {status !== "authenticated" || !session  ? <Loading /> : (children)}
+                        {status !== "authenticated" || !session || isLoading  ? <Loading /> : (children)}
                     </div>
                 </SidebarInset>
             </SidebarProvider>
