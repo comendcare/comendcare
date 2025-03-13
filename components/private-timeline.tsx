@@ -223,7 +223,10 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
 
     const style = {
         transition,
-        transform: CSS.Translate.toString(transform)
+        // transform: CSS.Translate.toString(transform),
+        transform: transform ? `translateY(${transform.y}px)` : undefined, // Restrict X-axis
+        touchAction: "none",
+        userSelect: "none",
     }
 
     // const variants = cva("rounded-lg w-full flex items-center gap-2", {
