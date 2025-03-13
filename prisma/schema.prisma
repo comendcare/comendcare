@@ -237,7 +237,16 @@ model Milestone {
   nodeId         String?      @unique
   node           Node?        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 
-  reviews Review[]
+  reviews MilestoneToReview[]
+}
+
+model MilestoneToReview {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  milestoneId String
+  milestone   Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  reviewId    String
+  review      Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 }
 
 model MilestoneTypeOnMilestone {
@@ -681,21 +690,21 @@ model RFI {
 }
 
 model Review {
-  id             String           @id @default(uuid())
+  id             String              @id @default(uuid())
   title          String
   body           String
-  rating         Float            @default(0.0) // Stores the rating given by the user (can be 1-5, 1-10, etc.)
+  rating         Float               @default(0.0) // Stores the rating given by the user (can be 1-5, 1-10, etc.)
   authorId       String
-  author         User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author         User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
   companyId      String
-  company        Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company        Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
   organizationId String?
-  organization   Organization?    @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-  replies        Reply[]          @relation("ReviewToReply")
+  organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  replies        Reply[]             @relation("ReviewToReply")
   reports        ReportOnReview[]
-  milestones     Milestone[]
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  milestones     MilestoneToReview[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
 
   @@unique([authorId, companyId, organizationId]) // Ensures one review per user per company per organization
 }
