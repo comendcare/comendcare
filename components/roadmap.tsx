@@ -19,7 +19,7 @@ import { GanttChartView } from "./gantt-chart"
 import { getMilestoneTypes, getRoadmapId } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
-import { cn } from "@/lib/utils"
+import { cn, sleep } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare, FaFileImport, FaPlus } from "react-icons/fa6"
 import { FaRedo, FaUndo } from "react-icons/fa"
@@ -47,6 +47,7 @@ import { Separator } from "@radix-ui/react-separator"
 import { NewMilestoneDialogForm } from "./new-milestone-dialog"
 import { MilestoneType } from "@prisma/client"
 import { Option } from "@/lib/types"
+import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
 
 const selector = (state: RoadmapState) => ({
     initialized: state.initialized,
@@ -58,6 +59,10 @@ const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
     saveState: state.saveState,
     addNodes: state.addNodes
+})
+
+const recommendationsSelector = (state: CROSearchState) => ({
+    recommendations: state.recommendations
 })
 
 export function Roadmap({data}: {data: any}) {
@@ -74,6 +79,7 @@ export function Roadmap({data}: {data: any}) {
         saveState,
         addNodes
     } = useRoadmapStore(useShallow(selector))
+    const { recommendations } = useCROSearchStore(useShallow(recommendationsSelector))
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
@@ -81,7 +87,7 @@ export function Roadmap({data}: {data: any}) {
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1);
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false);
-    const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(milestones.length <= 0)
+    const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     // const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
     const store = useStoreApi()
@@ -94,6 +100,9 @@ export function Roadmap({data}: {data: any}) {
             if (response.success && response.data) {
                 setMilestoneTypes(response.data || [])
             }
+
+            await sleep(300)
+            if (milestones.length <= 0 && initialized) setNewMilestoneIsOpen(true)
         }
 
         init()
@@ -249,7 +258,6 @@ export function Roadmap({data}: {data: any}) {
                                 <TooltipTrigger asChild>
                                     <Button size={"icon"} variant={"cta"} className="research-plan-tour-step1 ml-auto" onClick={() => setNewMilestoneIsOpen(true)}>
                                         <FaPlus />
-                                        {/* Create milestone */}
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
@@ -296,6 +304,7 @@ export function Roadmap({data}: {data: any}) {
                                     <p>{`Undo (⌘+Z)`}</p>
                                 </TooltipContent>
                             </Tooltip>
+
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button onClick={() => {

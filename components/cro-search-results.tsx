@@ -78,7 +78,7 @@ export function CROSearchResults() {
         searchResults 
     } = useCROSearchStore(useShallow(selector))
     const {
-        initialized: roadmapInitialized,
+        initialized,
         roadmapId,
         milestones
     } = useRoadmapStore(useShallow(researchPlanSelector))
@@ -86,8 +86,7 @@ export function CROSearchResults() {
     const [recommendationsIsExpanded, setRecommendationsIsExpanded] = useState(searchParams.get("expanded") === "true")
 
     useEffect(() => {
-        if (milestones && roadmapInitialized) {
-            console.log(`UPDATE RECOMMENDATIONS`)
+        if (milestones && initialized) {
             const urlMilestone = searchParams.get("milestone")
             const options = urlMilestone ? { priority: urlMilestone } : undefined
             setRecommendations(milestones, options)
@@ -112,7 +111,7 @@ export function CROSearchResults() {
         return (
             <div className="w-full flex flex-col gap-4">
                 <div className="relative flex flex-col gap-2 items-start">
-                    {(!roadmapId && roadmapInitialized) ? (
+                    {(!roadmapId && initialized) ? (
                         <>
                         <div className={cn("w-full min-h-[200px] grid gap-4 grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3")}>
                             {sampleCROs.map((result, index) => (

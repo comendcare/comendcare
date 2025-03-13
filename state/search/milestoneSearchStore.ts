@@ -138,6 +138,8 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true, 
 }
 
 export interface MilestoneSearchState {
+    initialized: boolean,
+    initState: () => void,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | undefined,
@@ -157,6 +159,10 @@ export interface MilestoneSearchState {
 
 export const useMilestoneSearchStore = create<MilestoneSearchState>()(
     temporal((set, get) => ({
+            initialized: false,
+            initState: () => {
+                set({ initialized: true })
+            },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
                 const newSearchResultsAdd = await getUpdatedSearchResults({
