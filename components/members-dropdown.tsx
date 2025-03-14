@@ -75,7 +75,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     {
-                        (session.data?.user.id === member.user.id || session.data?.user.membership.role === "owner") && (
+                        (session.data?.user?.id === member?.user?.id || session.data?.user?.membership?.role === "owner") && (
                             <DialogTrigger asChild>
                                 <DropdownMenuItem>
                                     <FaUserPen/>
@@ -123,7 +123,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                             />
 
                             {
-                                session.data?.user.membership.role === "owner" &&
+                                session.data?.user?.membership?.role === "owner" &&
                                 <FormField
                                     control={form.control}
                                     name="role"
