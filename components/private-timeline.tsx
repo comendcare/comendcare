@@ -162,7 +162,7 @@ const router = useRouter()
                     // form.setValue('checklist', arrayMove(field?.value || [], originalPosition, newPosition))
                 }}
             >
-                <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
+                <ol className="ml-12 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
                     <SortableContext 
                         items={milestones?.map(milestone => milestone.id) || []}
                         strategy={verticalListSortingStrategy}
@@ -243,26 +243,32 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
             ref={setNodeRef}
             style={style}
             className={cn( 
-                selectedNodeId === milestone.nodeId ? "border-primary border-2" : "",
+                // selectedNodeId === milestone.nodeId ? "border-primary border-2" : "",
                 // variants({ dragging: isDragging ? "overlay" : undefined }),
-                "ms-6 text-left p-2 hover:cursor-pointer flex -ml-[26px]",
+                "text-left hover:cursor-pointer flex items-start -ml-[54px] gap-2",
+                isDragging ? "z-20" : ""
             )}
             onClick={() => {handleEditClick(milestone.nodeId)}}
         >
-            <span className="flex items-center justify-center rounded-full justify-self-start">
-                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
-            </span>
             <Button
                 type="button"
                 variant={"ghost"}
                 {...attributes}
                 {...listeners}
-                className="p-1 text-secondary-foreground/50 -ml-2 cursor-grab ml-4"
+                className="p-1 text-secondary-foreground/50 cursor-grab ml-1 mt-2"
             >
                 <span className="sr-only">Move timeline</span>
                 <GripVertical/>
             </Button>
-            <div className="hover:bg-secondary w-full p-4 rounded-md">
+            <span className="flex items-center justify-center rounded-full mt-3">
+                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
+            </span>
+            <div 
+                className={cn(
+                    "bg-card hover:bg-secondary w-full p-4 rounded-md", 
+                    selectedNodeId === milestone.nodeId ? "border-primary border-2" : ""
+                )}
+            >
                 <div className="flex flex-row items-center justify-start gap-4">
                     <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white ">
                         {milestone.title}
