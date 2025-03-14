@@ -2,7 +2,7 @@
 
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {MemberWithUser} from "@/lib/types";
-import {deleteMember, updateMember} from "@/lib/actions";
+import {deleteMember, leaveOrganization, updateMember} from "@/lib/actions";
 import {toast} from "sonner";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
 import {FaEllipsis, FaUserPen, FaUserXmark} from "react-icons/fa6";
@@ -22,14 +22,23 @@ import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {revalidatePath} from "next/cache";
+import {useEffect, useState} from "react";
+import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
+import {Member, Organization} from "@prisma/client";
+
+type MembershipWithOrganization = Member & {
+    organization?: Organization | null; // Optional because the organization might be null if not fetched
+};
 
 const formSchema = z.object({
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
-    role: z.enum(["admin", "owner"], { message: "Role must be either Admin or Owner." }),
+    role: z.enum(["admin", "owner"], {message: "Role must be either Admin or Owner."}),
 })
 
 export default async function MembersDropdown({member}: { member: MemberWithUser }) {
-    const session = useSession()
+    const {data: session, update} = useSession()
+    const [memberships, setMemberships] = useState<MembershipWithOrganization[]>();
     console.log(session)
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -41,8 +50,32 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
         }
     })
 
+    useEffect(() => {
+        async function fetchOrgData() {
+            if (session) {
+                try {
+                    const response = await getAllMembershipsFromUserId(session.user.id);
+
+                    // Map the response to the correct structure if needed
+                    if (response.success && response.data) {
+                        setMemberships(response.data);
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+
+                } catch (error) {
+                    console.error("Error fetching organizations:", error);
+                    toast.error("Couldn't get organizations");
+                }
+            }
+        }
+
+        fetchOrgData()
+    }, [session]);
+
     async function onEditMembershipSubmit(values: z.infer<typeof formSchema>) {
-        if (session?.data?.user.organizationId) {
+        if (session?.user.organizationId) {
             const response = await updateMember(member.id, values)
 
             if (response.success && response.data) {
@@ -55,7 +88,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
     }
 
     async function revokeMembership(member: MemberWithUser) {
-        if (session?.data?.user.organizationId) {
+        if (session?.user.organizationId) {
             const response = await deleteMember(member.id)
 
             if (response.success && response.data) {
@@ -67,6 +100,50 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
         }
     }
 
+    const handleLeaveOrganization = async () => {
+        try {
+            const response = await leaveOrganization(session, session?.user.organizationId || "");
+
+            if (session && response.success) {
+                // Fetch the latest memberships after leaving
+                const updatedMembershipsResponse = await getAllMembershipsFromUserId(session.user.id);
+
+                if (updatedMembershipsResponse.success && updatedMembershipsResponse.data) {
+                    if (updatedMembershipsResponse.data.length > 0) {
+                        // Assign to another membership (pick the first one)
+                        const newMembership = updatedMembershipsResponse.data[0];
+
+                        await update({
+                            user: {
+                                ...session?.user,
+                                organizationId: newMembership.organizationId,
+                                membership: newMembership,
+                            },
+                        });
+
+                        toast.success(`Switched to ${newMembership.organization?.name || "another organization"} successfully.`);
+                    }
+                } else {
+                    // No other memberships left, reset to null
+                    await update({
+                        user: {
+                            ...session?.user,
+                            organizationId: null,
+                            membership: null,
+                        },
+                    });
+
+                    toast.success("Removed from Organization successfully.");
+                }
+            } else {
+                toast.error("Failed to leave organization. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error leaving organization:", error);
+            toast.error("An error occurred. Please try again later.");
+        }
+    };
+
     return (
         <Dialog>
             <DropdownMenu modal={false}>
@@ -75,7 +152,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     {
-                        (session.data?.user?.id === member?.user?.id || session.data?.user?.membership?.role === "owner") && (
+                        (session?.user?.id === member?.user?.id || session?.user?.membership?.role === "owner") && (
                             <DialogTrigger asChild>
                                 <DropdownMenuItem>
                                     <FaUserPen/>
@@ -85,13 +162,27 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                         )
                     }
 
-                    <DropdownMenuItem
-                        onClick={() => revokeMembership(member)}
-                        className="text-red-600 hover:text-red-800"
-                    >
-                        <FaUserXmark/>
-                        Revoke membership
-                    </DropdownMenuItem>
+                    {
+                        session?.user?.id === member?.user?.id ? (
+                            // Case 1: The current user is viewing their own membership
+                            <DropdownMenuItem
+                                onClick={handleLeaveOrganization}
+                                className="text-red-600 hover:text-red-800"
+                            >
+                                <FaUserXmark/>
+                                Leave organization
+                            </DropdownMenuItem>
+                        ) : session?.user?.membership?.role === "owner" ? (
+                            // Case 2: The current user is an owner and viewing someone else's membership
+                            <DropdownMenuItem
+                                onClick={() => revokeMembership(member)}
+                                className="text-red-600 hover:text-red-800"
+                            >
+                                <FaUserXmark/>
+                                Revoke membership
+                            </DropdownMenuItem>
+                        ) : null // Case 3: The user is neither the owner nor the same user, show nothing
+                    }
                 </DropdownMenuContent>
             </DropdownMenu>
             <DialogContent>
@@ -123,11 +214,11 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                             />
 
                             {
-                                session.data?.user?.membership?.role === "owner" &&
+                                session?.user?.membership?.role === "owner" &&
                                 <FormField
                                     control={form.control}
                                     name="role"
-                                    render={({ field }) => (
+                                    render={({field}) => (
                                         <FormItem>
                                             <FormLabel>Role</FormLabel>
                                             <FormDescription>
@@ -136,7 +227,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select a role" />
+                                                        <SelectValue placeholder="Select a role"/>
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
@@ -144,7 +235,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                                                     <SelectItem value="owner">Owner</SelectItem>
                                                 </SelectContent>
                                             </Select>
-                                            <FormMessage />
+                                            <FormMessage/>
                                         </FormItem>
                                     )}
                                 />
