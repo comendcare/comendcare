@@ -43,6 +43,7 @@ import {
 import {GripVertical} from "lucide-react"
 import { cva } from "class-variance-authority"
 import {CSS} from "@dnd-kit/utilities"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
@@ -187,13 +188,13 @@ const router = useRouter()
                         }
                         strategy={verticalListSortingStrategy}
                     >
-                        {/* {(milestones || []).sort((a, b) => (a.timelineOrder - b.timelineOrder)).map((milestone, index) => ( */}
                         {(milestones || []).map((milestone, index) => (
                             <DraggableTimelineItem 
                                 milestone={milestone} 
                                 index={index} 
                                 selectedNodeId={selectedNodeId} 
                                 handleEditClick={handleEditClick} 
+                                disabled={sortBy !== "custom"}
                             />
                         ))}
                     </SortableContext>
@@ -203,7 +204,7 @@ const router = useRouter()
     )
 }
 
-const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClick}: {milestone: any, index: number, selectedNodeId: string | null, handleEditClick: (nodeId: string) => void}) => {
+const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClick, disabled}: {milestone: any, index: number, selectedNodeId: string | null, handleEditClick: (nodeId: string) => void, disabled: boolean}) => {
     const {
         attributes,
         listeners,
@@ -232,16 +233,39 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
             )}
             onClick={() => {handleEditClick(milestone.nodeId)}}
         >
-            <Button
-                type="button"
-                variant={"ghost"}
-                {...attributes}
-                {...listeners}
-                className="p-1 text-secondary-foreground/50 cursor-grab ml-1 mt-2"
-            >
-                <span className="sr-only">Move timeline</span>
-                <GripVertical/>
-            </Button>
+            {disabled ? (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button
+                            disabled={true}
+                            type="button"
+                            variant={"ghost"}
+                            {...attributes}
+                            {...listeners}
+                            className="p-1 text-secondary-foreground/50 cursor-grab ml-1 mt-2"
+                        >
+                            <span className="sr-only">Move timeline</span>
+                            <GripVertical/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-80">
+                        <p>
+                            {`Dragging is only available in custom mode.`}
+                        </p>
+                    </TooltipContent>
+                </Tooltip>
+            ): (
+                <Button
+                    type="button"
+                    variant={"ghost"}
+                    {...attributes}
+                    {...listeners}
+                    className="p-1 text-secondary-foreground/50 cursor-grab ml-1 mt-2"
+                >
+                    <span className="sr-only">Move timeline</span>
+                    <GripVertical/>
+                </Button>
+            )}
             <span className="flex items-center justify-center rounded-full mt-3">
                 <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
             </span>
