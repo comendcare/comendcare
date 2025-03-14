@@ -226,8 +226,14 @@ export const createCondition = async (formData: FormData) => {
 
         return {success: true, data: condition};
     } catch (error: any) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2002") {
+                return { success: false, error: "A condition with this name already exists." };
+            }
+        }
+
         console.error("Error creating condition:", error);
-        return {success: false, error: "Database error. Please try again later."};
+        return { success: false, error: "Database error. Please try again later." };
     }
 }
 
