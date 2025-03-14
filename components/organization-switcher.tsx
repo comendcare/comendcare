@@ -3,7 +3,7 @@
 import * as React from "react";
 import {ChevronsUpDown, Plus, Check} from "lucide-react";
 import {useSession} from "next-auth/react";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 
 import {
     DropdownMenu,
@@ -31,6 +31,7 @@ export function OrganizationSwitcher({
     const {isMobile} = useSidebar();
     const router = useRouter();
     const {data: session, update} = useSession();
+    const pathname = usePathname()
     const [activeOrganization, setActiveOrganization] = React.useState<MemberWithOrganization | null>(null);
 
     React.useEffect(() => {
@@ -63,7 +64,9 @@ export function OrganizationSwitcher({
             organizationId: membership.organizationId,
             membership: membership,
         });
-        router.refresh()
+        if (pathname === "/app/profile" || pathname === "/app/settings") {
+            router.refresh()
+        }
     };
 
     return (
