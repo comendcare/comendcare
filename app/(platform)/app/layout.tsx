@@ -189,6 +189,7 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     useEffect(() => {
         // Only run if the session data has changed or the session has not yet been set up
+        console.log(`session changed:`, session, `\nauthenticated: ${status === "authenticated"}\nsession has changed: ${JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)}`)
         if (
             // !isLoading &&
             status !== "authenticated" || 
