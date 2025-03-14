@@ -92,7 +92,8 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
                 nodeId: id,
                 title: `New Milestone`,
                 status: "PLANNED",
-                private: true
+                private: true,
+                timelineOrder: nodes.length // add in last position in timeline
             }
         }
 

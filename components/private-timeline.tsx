@@ -164,18 +164,19 @@ const router = useRouter()
                     const updatedMilestones = arrayMove(milestones || [], originalPosition, newPosition)
                     setMilestones(updatedMilestones.map((milestone, index) => ({
                         ...milestone,
-                        timelinePosition: index
+                        timelineOrder: index
                     })))
                 }}
             >
                 <ol className="ml-12 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
                     <SortableContext 
                         items={
-                            milestones ? milestones.sort((a, b) => (a.timelinePosition - b.timelinePosition)).map(milestone => milestone.id) : []
+                            milestones ? milestones.sort((a, b) => (a.timelineOrder - b.timelineOrder)).map(milestone => milestone.id) : []
                         }
                         strategy={verticalListSortingStrategy}
                     >
-                        {milestones?.map((milestone, index) => (
+                        {/* {(milestones || []).sort((a, b) => (a.timelineOrder - b.timelineOrder)).map((milestone, index) => ( */}
+                        {(milestones || []).map((milestone, index) => (
                             <DraggableTimelineItem 
                                 milestone={milestone} 
                                 index={index} 
