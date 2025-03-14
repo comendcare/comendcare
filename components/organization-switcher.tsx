@@ -43,20 +43,27 @@ export function OrganizationSwitcher({
     }, [memberships, session?.user?.organizationId]);
 
     const handleOrganizationChange = async (membership: MemberWithOrganization) => {
-        setActiveOrganization(membership);
+        // setActiveOrganization(membership);
         // await update({
         //     ...session,
         //     organizationId: membership.organizationId,
         //     membership: membership,
         // });
+        console.log(`UPDATE ORGANIZATION: ${membership.organization.name} (${membership.organization.id})`)
+        // await update({
+        //     user: {
+        //         ...session?.user,
+        //         organizationId: membership.organization.id, // Ensure the correct org ID is set
+        //         membership: membership, // Explicitly set membership
+        //     }
+        // });
+
         await update({
-            user: {
-                ...session?.user,
-                organizationId: membership.organization.id, // Ensure the correct org ID is set
-                membership: membership, // Explicitly set membership
-            }
+            ...session,
+            organizationId: membership.organizationId,
+            membership: membership,
         });
-        router.refresh();
+        // router.refresh();
     };
 
     return (

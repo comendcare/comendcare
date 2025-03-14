@@ -93,7 +93,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                 return
             }
 
-            console.log(`Start initialization...`)
+            console.log(`Start initialization... for org ${session.user.organizationId}`)
 
             // Init Notifications Store
             // let notifications = await getAllNotifications()
