@@ -1988,7 +1988,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         const organizationId: string = organization.id
 
         await Promise.all(
-            nodes.map(async (node: any) => {
+            nodes.map(async (node: any, index: number) => {
                 const n = await prisma.node.create({
                     include: {data: true},
                     // where: {id: node.id},
@@ -2023,6 +2023,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                         }
                                     }))
                                 },
+                                timelineOrder: node.data?.timelineOrder,
                                 description: node.data?.description,
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
@@ -2207,6 +2208,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                                 }
                             }))
                         },
+                        timelineOrder: milestone.timelineOrder,
                         otherTypeDetails: milestone.otherTypeDetails,
                         description: milestone.description,
                         startDate: milestone.startDate,

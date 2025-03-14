@@ -211,7 +211,10 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
         addNodes: async (nodes: Node[]) => {
             console.log(`add nodes`)
-            set({ nodes: [...get().nodes, ...nodes], milestones: [...get().milestones, ...nodes.map(node => node.data)] })
+            set({ 
+                nodes: [...get().nodes, ...nodes], 
+                milestones: [...get().milestones, ...nodes.map(node => node.data)] 
+            })
             
             // update DB Nodes
             const response = await createNodes({ roadmapId: get().roadmapId, nodes })

@@ -246,7 +246,7 @@ export const PrivateFlowView = ({
         )
         let centerY = 0
 
-        newMilestones.forEach(defaultData => {
+        newMilestones.forEach((defaultData, index) => {
             const id = nanoid()
             const newNode: Node = {
                 id: id,
@@ -264,7 +264,8 @@ export const PrivateFlowView = ({
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     status: defaultData?.status || "PLANNED",
-                    private: true
+                    private: true,
+                    timelineOrder: milestones.length + index // add in last position in timeline
                 }
             }
 

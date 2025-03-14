@@ -203,7 +203,7 @@ export function Roadmap({data}: {data: any}) {
         //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
         let centerY = 0
 
-        newMilestones.forEach(defaultData => {
+        newMilestones.forEach((defaultData, index) => {
             const id = nanoid()
             const milestoneId = nanoid()
             const newNode: Node = {
@@ -227,6 +227,7 @@ export function Roadmap({data}: {data: any}) {
                     status: defaultData?.status || "PLANNED",
                     private: true,
                     nodeType: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
+                    timelineOrder: milestones.length + index // add in last position in timeline
                 }
             }
 
