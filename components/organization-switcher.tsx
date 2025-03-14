@@ -63,7 +63,7 @@ export function OrganizationSwitcher({
             organizationId: membership.organizationId,
             membership: membership,
         });
-        // router.refresh();
+        router.refresh()
     };
 
     return (
