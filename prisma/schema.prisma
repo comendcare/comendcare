@@ -16,6 +16,13 @@ enum ReviewReplyReportReason {
   OTHER
 }
 
+enum OrganizationToCompanyEngagement {
+  EXPLORING
+  QUOTE
+  COLLABORATING
+  COLLABORATED
+}
+
 model User {
   id                    String                 @id @default(cuid())
   name                  String?
@@ -238,6 +245,7 @@ model Milestone {
   node           Node?        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 
   reviews MilestoneToReview[]
+  savedCompanies SavedCompany[]
 }
 
 model MilestoneToReview {
@@ -447,6 +455,7 @@ model Organization {
   Milestone                Milestone[]
   PlatformNotification     PlatformNotification[]
   reviews                  Review[]
+  savedCompanies           SavedCompany[]
 
   @@index([userId])
 }
@@ -647,6 +656,24 @@ model Company {
   reviews                  Review[]
   avgRating                Float?          @default(0.0) // Stores the average rating of the company
   categories               String[]
+  savedByOrganizations     SavedCompany[]
+}
+
+model SavedCompany {
+  id             String                          @id @default(uuid())
+  organizationId String
+  companyId      String
+  milestoneId    String
+  engagement     OrganizationToCompanyEngagement
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  milestone    Milestone    @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([organizationId, companyId]) // Ensures an organization can't save the same company more than once
 }
 
 model Site {

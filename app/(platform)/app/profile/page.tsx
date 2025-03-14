@@ -56,6 +56,7 @@ export default async function ProfilePage() {
 
     let conditions = null
     if (session?.user.organizationId) {
+        console.log(`GET CONDITION FROM ORG ID`, session?.user.organizationId)
         const response = await getConditionsDataFromOrgId(session?.user.organizationId)
         if (response.success) {
             conditions = response.data

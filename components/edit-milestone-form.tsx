@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaCalendar, FaEllipsis, FaGlobe, FaLock, FaX} from "react-icons/fa6"
+import {FaAngleDown, FaBullhorn, FaCalendar, FaEllipsis, FaFileLines, FaGlobe, FaLock, FaStar, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -70,6 +70,7 @@ import {
 import { TypeBadge } from "./type-badge"
 import Loading from "@/app/loading"
 import { getMilestoneTypes } from "@/lib/fetchers"
+import { Badge } from "./ui/badge"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -324,11 +325,30 @@ export function EditMilestoneForm({
                                     Relevant Results
                                 </TabsTrigger>
                             </TabsList>
-                            <TypeBadge type={formData.nodeType}/>
+                            {/* <TypeBadge type={formData.nodeType}/> */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost">
-                                        <FaEllipsis/>
+                                    {/* Modified version of type-badge.tsx */}
+                                    <Button className="font-semibold h-8 text-sm flex justify-center gap-2 border-none text-blue-dark bg-blue-light hover:bg-blue-light rounded-full">
+                                        {formData.nodeType === "ASSET" && (
+                                            <>
+                                                <FaStar/>
+                                                {"Asset"}
+                                            </>
+                                        )}
+                                        {formData.nodeType === "PROJECT" && (
+                                            <>
+                                                <FaFileLines/>
+                                                {"Project"}
+                                            </>
+                                        )}
+                                        {formData.nodeType === "RFP" && (
+                                            <>
+                                                <FaBullhorn/>
+                                                {"RFP"}
+                                            </>
+                                        )}
+                                        <FaAngleDown />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
@@ -348,6 +368,14 @@ export function EditMilestoneForm({
                                                 >
                                                     <TypeBadge type="ASSET" iconOnly={true} className="w-8"/>
                                                     Migrate to asset
+                                                    <Tooltip>
+                                                        <TooltipTrigger className="ml-auto">
+                                                            <FaInfoCircle/>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                                            {NODE_TYPE_OPTIONS.find(option => option.value === "ASSET")?.description}
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                 </DropdownMenuItem>
                                             )}
                                             {field.value !== "PROJECT" && (
@@ -361,6 +389,14 @@ export function EditMilestoneForm({
                                                 >
                                                     <TypeBadge type="PROJECT" iconOnly={true} className="w-8"/>
                                                     Migrate to project
+                                                    <Tooltip>
+                                                        <TooltipTrigger className="ml-auto">
+                                                            <FaInfoCircle/>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                                            {NODE_TYPE_OPTIONS.find(option => option.value === "PROJECT")?.description}
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                 </DropdownMenuItem>
                                             )}
                                             {field.value !== "RFP" && (
@@ -374,6 +410,14 @@ export function EditMilestoneForm({
                                                 >
                                                     <TypeBadge type="RFP" iconOnly={true} className="w-8"/>
                                                     Migrate to RFP
+                                                    <Tooltip>
+                                                        <TooltipTrigger className="ml-auto">
+                                                            <FaInfoCircle/>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                                            {NODE_TYPE_OPTIONS.find(option => option.value === "RFP")?.description}
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                 </DropdownMenuItem>
                                             )}
                                             </>

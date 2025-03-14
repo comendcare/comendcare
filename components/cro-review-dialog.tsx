@@ -87,7 +87,6 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
         const fetchData = async () => {
             const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
             if (milestonesResponse.success) {
-                console.log(milestonesResponse?.data)
                 const filteredMilestones = milestonesResponse?.data?.filter(
                     item => (item.status === "INPROGRESS" || item.status === "COMPLETED") && !item.private
                 )
