@@ -48,6 +48,7 @@ import { NewMilestoneDialogForm } from "./new-milestone-dialog"
 import { MilestoneType } from "@prisma/client"
 import { Option } from "@/lib/types"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -94,6 +95,7 @@ export function Roadmap({data}: {data: any}) {
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
     const store = useStoreApi()
     const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
+    const [sortBy, setSortBy] = useState('custom')
 
     useEffect(() => {
         const init = async () => {
@@ -255,17 +257,33 @@ export function Roadmap({data}: {data: any}) {
                 <ResizablePanel>
                     <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-start">
-                            <TabsList>
+                            <TabsList className="mr-auto">
                                 <TabsTrigger value="timeline">Timeline View</TabsTrigger>
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
                             </TabsList>
+
+                            {selectedView === "timeline" && (
+                                <div className="flex flex-row gap-4 items-center">
+                                    <p>Sort by:</p>
+                                    <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
+                                        <SelectTrigger className="w-[180px]">
+                                            <SelectValue defaultValue={'default'} placeholder={"Sort by"}/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="custom">{`Custom`}</SelectItem>
+                                            <SelectItem value="start">{`Start Date`}</SelectItem>
+                                            <SelectItem value="end">{`End Date`}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button 
                                         size={"icon"} 
                                         variant={"cta"} 
-                                        className="research-plan-tour-step1 ml-auto" 
+                                        className="research-plan-tour-step1" 
                                         onClick={() => setNewMilestoneIsOpen(true)}
                                     >
                                         <FaPlus />

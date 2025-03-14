@@ -178,35 +178,6 @@ const router = useRouter()
                     </SortableContext>
                 </ol>
             </DndContext>
-
-            {/* <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
-                {milestones?.sort((a, b) => {
-                    return a.startDate - b.startDate
-                }).map((milestone: any, index: number) => (
-                    <li 
-                        key={index} 
-                        className={cn("ms-6 text-left hover:bg-secondary p-2 rounded-md hover:cursor-pointer", selectedNodeId === milestone.nodeId ? "border-primary border-2" : "")}
-                        onClick={() => {handleEditClick(milestone.nodeId)}}>
-                            <span className="absolute flex items-center justify-center bg-white rounded-full -start-[18px]">
-                                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
-                            </span>
-                            <div className="flex flex-row items-center justify-start gap-4">
-                                <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white ">
-                                    {milestone.title}
-                                </h3>
-                                {milestone.private && <PrivateBadge iconOnly/>}
-                                <time
-                                    className="ml-auto block font-semibold leading-none dark:text-gray-500">
-                                    {getDates(milestone)}
-                                </time>
-                            </div>
-                            <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2"}>
-                                {milestone.description}
-                            </p>
-                            <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
-                    </li>
-                ))}
-            </ol> */}
         </ScrollArea>
     )
 }
@@ -229,22 +200,12 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
         userSelect: "none" as any,
     }
 
-    // const variants = cva("rounded-lg w-full flex items-center gap-2", {
-    //     variants: {
-    //         dragging: {
-    //             overlay: "ring-2 ring-primary"
-    //         }
-    //     }
-    // })
-
     return (
         <li 
             key={index} 
             ref={setNodeRef}
             style={style}
             className={cn( 
-                // selectedNodeId === milestone.nodeId ? "border-primary border-2" : "",
-                // variants({ dragging: isDragging ? "overlay" : undefined }),
                 "text-left hover:cursor-pointer flex items-start -ml-[54px] gap-2",
                 isDragging ? "z-20" : ""
             )}
