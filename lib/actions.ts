@@ -11,7 +11,7 @@ import {
     Condition,
     TaskStakeholder, Invitation,
     PlatformNotification,
-    Review,
+    Review, OrganizationToCompanyEngagement,
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
@@ -2768,3 +2768,57 @@ export async function deleteReview(review: Review) {
     }
 }
 
+export async function saveCRO(croId: string, milestoneId: string, engagement: string) {
+    const session = await getSession()
+
+    try {
+        const response = prisma.savedCompany.create({
+            data: {
+                company: {
+                    connect: {
+                        id: croId
+                    }
+                },
+                organization: {
+                    connect: {
+                        id: session?.user.organizationId
+                    }
+                },
+                milestone: {
+                    connect: {
+                        id: milestoneId
+                    }
+                },
+                engagement: engagement as OrganizationToCompanyEngagement
+            }
+        });
+
+        if (!response) {
+            console.error("Error saving company.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        console.error("Error saving company:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function unsaveCRO(savedCompanyId: string) {
+    try {
+        const response = prisma.savedCompany.delete({
+            where: {id: savedCompanyId},
+        });
+
+        if (!response) {
+            console.error("Error unsaving company.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        console.error("Error unsaving company:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}

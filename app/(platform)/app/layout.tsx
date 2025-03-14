@@ -93,7 +93,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                 return
             }
 
-            console.log(`Start initialization...`)
+            console.log(`Start initialization... for org ${session.user.organizationId}`)
 
             // Init Notifications Store
             // let notifications = await getAllNotifications()
@@ -189,6 +189,7 @@ export default function AppLayout({children}: AppLayoutProps) {
 
     useEffect(() => {
         // Only run if the session data has changed or the session has not yet been set up
+        console.log(`session changed:`, session, `\nauthenticated: ${status === "authenticated"}\nsession has changed: ${JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)}`)
         if (
             // !isLoading &&
             status !== "authenticated" || 
