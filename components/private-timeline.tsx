@@ -50,6 +50,7 @@ const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
+    setMilestones: state.setMilestones,
     nodes: state.nodes,
     setNodes: state.setNodes,
     edges: state.edges,
@@ -63,6 +64,7 @@ export const PrivateTimelineView = () => {
         selectedNodeId,
         setSelectedNodeId,
         milestones,
+        setMilestones,
         nodes,
         setNodes: setDbNodes,
         edges,
@@ -159,12 +161,18 @@ const router = useRouter()
                     const originalPosition = milestones?.findIndex(item => item.id === active.id) || 0
                     const newPosition = milestones?.findIndex(item => item.id === over?.id) || 0
 
-                    // form.setValue('checklist', arrayMove(field?.value || [], originalPosition, newPosition))
+                    const updatedMilestones = arrayMove(milestones || [], originalPosition, newPosition)
+                    setMilestones(updatedMilestones.map((milestone, index) => ({
+                        ...milestone,
+                        timelinePosition: index
+                    })))
                 }}
             >
                 <ol className="ml-12 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
                     <SortableContext 
-                        items={milestones?.map(milestone => milestone.id) || []}
+                        items={
+                            milestones ? milestones.sort((a, b) => (a.timelinePosition - b.timelinePosition)).map(milestone => milestone.id) : []
+                        }
                         strategy={verticalListSortingStrategy}
                     >
                         {milestones?.map((milestone, index) => (
