@@ -59,7 +59,7 @@ const selector = (state: RoadmapState) => ({
     addNodes: state.addNodes,
 })
 
-export const PrivateTimelineView = () => {
+export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
     const {
         selectedNodeId,
         setSelectedNodeId,
@@ -170,8 +170,20 @@ const router = useRouter()
             >
                 <ol className="ml-12 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
                     <SortableContext 
+                        disabled={sortBy !== "custom"}
                         items={
-                            milestones ? milestones.sort((a, b) => (a.timelineOrder - b.timelineOrder)).map(milestone => milestone.id) : []
+                            milestones ? milestones.sort((a, b) => {
+                                switch (sortBy) {
+                                    case "custom": 
+                                        return (a.timelineOrder - b.timelineOrder)
+                                    case "start":
+                                        return (a.startDate - b.startDate)
+                                    case "end":
+                                        return (a.endDate - b.endDate)
+                                    default:
+                                        return 0
+                                }
+                            }).map(milestone => milestone.id) : []
                         }
                         strategy={verticalListSortingStrategy}
                     >

@@ -182,13 +182,13 @@ export function Roadmap({data}: {data: any}) {
         const newNodes: any[] = []
 
         // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
-        const {
-            height,
-            width,
-            transform: [transformX, transformY, zoomLevel]
-        } = store.getState()
+        // const {
+        //     height,
+        //     width,
+        //     transform: [transformX, transformY, zoomLevel]
+        // } = store.getState()
 
-        const zoomMultiplier = 1 / zoomLevel
+        // const zoomMultiplier = 1 / zoomLevel
         const milestonesAlongXAxis = dbNodes.sort((a, b) => {
             return a.position.x - b.position.x
         })
@@ -263,7 +263,7 @@ export function Roadmap({data}: {data: any}) {
                                 <TabsTrigger value="flow">Flow View</TabsTrigger>
                             </TabsList>
 
-                            {selectedView === "timeline" && (
+                            {selectedView === "timeline" || selectedView === null && (
                                 <div className="flex flex-row gap-4 items-center">
                                     <p>Sort by:</p>
                                     <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
@@ -395,7 +395,7 @@ export function Roadmap({data}: {data: any}) {
                             className="mt-0 h-[calc(100vh-6rem)]"
                         >
                             {milestones.length > 0 ? (
-                                <PrivateTimelineView />
+                                <PrivateTimelineView sortBy={sortBy}/>
                             ): (
                                 <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} />
                             )}
