@@ -53,7 +53,7 @@ export default function CROMarketplaceProfileReviewsTab({cro}: { cro: CompanyWit
                             </CardContent>
                         </Card>
                         : cro.reviews.map((review, index) => (
-                        <CROReviewCard key={index} review={review}/>
+                        <CROReviewCard key={index} review={review} cro={cro}/>
                     ))}
                 </div>
             </div>
