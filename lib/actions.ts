@@ -2756,6 +2756,85 @@ export const createReview = async (companyId: string, formData: FormData): Promi
     }
 };
 
+export const editReview = async (companyId: string, formData: FormData): Promise<ApiResponse<any>> => {
+    const session = await getSession();
+    if (!session?.user.id) {
+        throw new Error("You must be signed in to perform this action");
+    }
+
+    try {
+        // Check if a review already exists
+        const existingReview = await prisma.review.findUnique({
+            where: {
+                authorId_companyId_organizationId: {
+                    authorId: session.user.id,
+                    companyId: companyId,
+                    organizationId: session.user.organizationId,
+                },
+            },
+        });
+
+        if (!existingReview) {
+            return { success: false, error: "No existing review found to update." };
+        }
+
+        const title = formData.get("title") as string;
+        const body = formData.get("body") as string;
+        const rating = parseInt(formData.get("rating") as string);
+        const milestoneId = formData.get("milestone") as string || null;
+
+        // Use a transaction to update the review and recalculate avgRating atomically
+        const result = await prisma.$transaction(async (tx) => {
+            // Update the review
+            const updatedReview = await tx.review.update({
+                where: { id: existingReview.id },
+                data: {
+                    title,
+                    body,
+                    rating,
+                    milestones: milestoneId ? { connect: { id: milestoneId } } : undefined,
+                },
+            });
+
+            // Calculate new avgRating
+            const aggregated = await tx.review.aggregate({
+                where: { companyId },
+                _avg: { rating: true },
+            });
+
+            const newAvgRating = aggregated._avg.rating ?? 0;
+
+            // Update the company's avgRating
+            const updatedCompany = await tx.company.update({
+                where: { id: companyId },
+                data: { avgRating: newAvgRating },
+            });
+
+            if (updatedReview && updatedCompany) {
+                await updateTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    updatedCompany,
+                    'companies'
+                );
+            }
+
+            return updatedReview;
+        });
+
+        revalidatePath("app/cro/");
+
+        return { success: true, data: result };
+    } catch (error: any) {
+        console.error("Error updating review:", error);
+        return { success: false, error: "Database error. Please try again later." };
+    }
+};
+
 export async function deleteReview(review: Review) {
     try {
         const response = prisma.review.delete({
