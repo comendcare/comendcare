@@ -224,7 +224,7 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
 
     return (
         <li 
-            key={index} 
+            key={milestone.id}
             ref={setNodeRef}
             style={style}
             className={cn( 
