@@ -920,7 +920,10 @@ export async function getSavedCompaniesFromOrganizationId(organizationId: string
 
     try {
         const savedCompanies = await prisma?.savedCompany.findMany({
-            where: {organizationId}
+            where: {organizationId},
+            include: {
+                company: true
+            }
         })
 
         if (!savedCompanies) {

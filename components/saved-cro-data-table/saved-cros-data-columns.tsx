@@ -5,82 +5,79 @@ import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import {OrganizationToCompanyEngagement} from "@prisma/client";
+import {Company, SavedCompany} from "@prisma/client";
+import {toTitleCase} from "@/lib/utils";
 
-// Assuming your data shape looks like this:
-export type StrainData = {
-    id: string
-    organizationId: string
-    companyId: string
-    milestoneId: string
-    engagement: OrganizationToCompanyEngagement
-    updatedAt: Date
-    createdAt: Date
-}
+export type SavedCompanyData = SavedCompany & {
+    company: Company;
+};
 
-export const columns: ColumnDef<StrainData>[] = [
-    // {
-    //     id: "select",
-    //     header: ({ table }) => (
-    //         <Checkbox
-    //             checked={
-    //                 table.getIsAllPageRowsSelected() ||
-    //                 (table.getIsSomePageRowsSelected() && "indeterminate")
-    //             }
-    //             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-    //             aria-label="Select all"
-    //             className="translate-y-[2px]"
-    //         />
-    //     ),
-    //     cell: ({ row }) => (
-    //         <Checkbox
-    //             checked={row.getIsSelected()}
-    //             onCheckedChange={(value) => row.toggleSelected(!!value)}
-    //             aria-label="Select row"
-    //             className="translate-y-[2px]"
-    //         />
-    //     ),
-    //     enableSorting: false,
-    //     enableHiding: false,
-    // },
-    // {
-    //     accessorKey: "Strain ID",
-    //     header: ({ column }) => (
-    //         <DataTableColumnHeader column={column} title="Strain ID" />
-    //     ),
-    //     cell: ({ row }) => <div className="w-[100px]">{row.getValue("Strain ID")}</div>,
-    //     enableSorting: true,
-    // },
+export const columns: ColumnDef<SavedCompanyData>[] = [
     {
-        accessorKey: "name",
+        id: "select",
+        header: ({ table }) => (
+            <Checkbox
+                checked={
+                    table.getIsAllPageRowsSelected() ||
+                    (table.getIsSomePageRowsSelected() && "indeterminate")
+                }
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+                className="translate-y-[2px]"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+                className="translate-y-[2px]"
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: "company.title",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Name" />
         ),
         cell: ({ row }) => (
             <div>
-                {row.getValue("name")}
+                {row.original.company.title}
             </div>
         ),
     },
     {
-        accessorKey: "description",
+        accessorKey: "company.website",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Description" />
         ),
         cell: ({ row }) => (
+            <div className="line-clamp-3 w-96">
+                {row.original.company.description}
+            </div>
+        ),
+    },
+    {
+        accessorKey: "company.website",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Website" />
+        ),
+        cell: ({ row }) => (
             <div>
-                {row.getValue("description")}
+                {row.original.company.website}
             </div>
         ),
     },
     {
         accessorKey: "engagement",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Description" />
+            <DataTableColumnHeader column={column} title="Engagement" />
         ),
         cell: ({ row }) => (
             <div>
-                {row.getValue("description")}
+                {toTitleCase(row.getValue("engagement"))}
             </div>
         ),
     },
