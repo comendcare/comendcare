@@ -236,6 +236,7 @@ model Milestone {
   tasks            Task[]
   attachments      ExternalAttachment[]
   contacts         ExternalContact[]
+  timelineOrder    Int                        @default(0)
 
   roadmapId      String
   roadmap        Roadmap      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
@@ -244,7 +245,7 @@ model Milestone {
   nodeId         String?      @unique
   node           Node?        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 
-  reviews MilestoneToReview[]
+  reviews        MilestoneToReview[]
   savedCompanies SavedCompany[]
 }
 

@@ -16,6 +16,7 @@ import { Card, CardContent, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
 
 const selector = (state: RoadmapState) => ({
+    milestones: state.milestones,
     addNodes: state.addNodes,
 })
 
@@ -25,6 +26,7 @@ export default function RoadmapTemplates() {
     const [isLoading, setIsLoading] = useState(false)
 
     const {
+        milestones,
         addNodes,
     } = useRoadmapStore(useShallow(selector))
 
@@ -33,7 +35,7 @@ export default function RoadmapTemplates() {
         let centerX = 0
         let centerY = 0
 
-        newMilestones.forEach(defaultData => {
+        newMilestones.forEach((defaultData, index) => {
             const id = nanoid()
             const newNode: Node = {
                 id: id,
@@ -49,7 +51,8 @@ export default function RoadmapTemplates() {
                     title: defaultData?.title || `New Milestone`,
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     status: defaultData?.status || "PLANNED",
-                    private: true
+                    private: true,
+                    timelineOrder: milestones.length + index // add in last position in timeline
                 }
             }
 

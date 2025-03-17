@@ -23,6 +23,7 @@ export type RoadmapState = {
     setSelectedNodeId: (id: string | null) => void
     milestones: any[]
     setMilestone: (id: string, newProperties: any) => Promise<Milestone[] | void>
+    setMilestones: (milestones: Milestone[]) => Promise<Milestone[] | void>
     nodes: Node[]
     edges: Edge[]
     onEdgesChange: (changes: EdgeChange[]) => Promise<Edge[] | void>
@@ -104,6 +105,46 @@ export const useRoadmapStore = create<RoadmapState>()(
                 console.error(`Error updating milestones`, response?.error)
             }
         },
+        setMilestones: async (milestones: Milestone[]) => {
+            console.log(`set milestones`)
+            // const milestones = get().milestones.map(milestone =>
+            //     milestone.nodeId === nodeId
+            //         ? { ...milestone, ...newProperties }
+            //         : milestone
+            // )
+            // if (newProperties.nodeType) {
+            //     // if the type has been updated, we also update the node type
+            //     const nodes = get().nodes.map(node => (
+            //         node.id === nodeId 
+            //             ? { ...node, type: newProperties.nodeType }
+            //             : node
+            //     ))
+            //     set({ milestones, nodes })
+            // } else {
+            //     set({ milestones })
+            // }
+            const updatedMilestones = get().milestones.map(oldMilestone => {
+                const newMilestone = milestones.find(m => m.id === oldMilestone.id)
+                if (newMilestone) {
+                    return ({
+                        ...oldMilestone,
+                        ...newMilestone
+                    })
+                } else {
+                    return oldMilestone
+                }
+            })
+            set({ milestones: updatedMilestones })
+
+            // update DB milestones
+            const response = await updateMilestones({ milestones: updatedMilestones })
+            if (response?.success && response?.data) {
+                return response.data as Milestone[]
+            } else {
+                toast.error("Could not update milestones", {position: "bottom-left"})
+                console.error(`Error updating milestones`, response?.error)
+            }
+        },
         nodes: [],
         edges: [],
         onEdgesChange: async (changes: EdgeChange[]) => {
@@ -170,7 +211,10 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
         addNodes: async (nodes: Node[]) => {
             console.log(`add nodes`)
-            set({ nodes: [...get().nodes, ...nodes], milestones: [...get().milestones, ...nodes.map(node => node.data)] })
+            set({ 
+                nodes: [...get().nodes, ...nodes], 
+                milestones: [...get().milestones, ...nodes.map(node => node.data)] 
+            })
             
             // update DB Nodes
             const response = await createNodes({ roadmapId: get().roadmapId, nodes })

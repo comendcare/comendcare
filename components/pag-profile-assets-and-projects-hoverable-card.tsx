@@ -111,7 +111,8 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                 nodeId: id,
                 title,
                 private: true,
-                types: []
+                types: [],
+                timelineOrder: milestones.length // add in last position in timeline
             }
         }
 
