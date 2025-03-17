@@ -30,7 +30,7 @@ import { Button } from "@/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
-import { sleep } from "@/lib/utils";
+import { cn, sleep } from "@/lib/utils";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -213,6 +213,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                             <SidebarTrigger className="-ml-1" />
                             <div className="flex items-center">
                                 <Button 
+                                    className={cn(!pathname.includes('app/profile') && !pathname.includes('app/research-plan') ? "hidden" : "")}
                                     disabled={!pathname.includes('app/profile') && !pathname.includes('app/research-plan')}
                                     variant="ghost"
                                     onClick={() => {
