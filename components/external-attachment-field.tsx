@@ -41,7 +41,7 @@ export const ExternalAttachmentField = ({
             <div className="h-full w-full grow">
             <Input
                 className="h-full"
-                placeholder={`Link`}
+                placeholder={`Url`}
                 value={value.link}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
                     onValueChange({
@@ -51,7 +51,7 @@ export const ExternalAttachmentField = ({
                 }}
             />
             </div>
-            <Button variant="secondary" onClick={deleteElement}>
+            <Button className="w-[40px]" variant="secondary" onClick={deleteElement}>
                 <FaTrash />
             </Button>
         </li>

@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaAngleDown, FaBullhorn, FaCalendar, FaEllipsis, FaFileLines, FaGlobe, FaLock, FaStar, FaX} from "react-icons/fa6"
+import {FaAngleDown, FaBullhorn, FaCalendar, FaEllipsis, FaFileLines, FaGlobe, FaLock, FaPlus, FaStar, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -452,7 +452,6 @@ export function EditMilestoneForm({
                                                     placeholder={`Enter a description...`}
                                                     // defaultValue={field.value}
                                                     {...field}
-                                                    className="border-transparent hover:border-input"
                                                 />
                                             </FormControl>
                                             <FormMessage/>
@@ -460,7 +459,7 @@ export function EditMilestoneForm({
                                     )}
                                 />
 
-                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-4 items-center">
+                                <div className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
                                     <div>
                                     <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
                                     {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
@@ -480,7 +479,7 @@ export function EditMilestoneForm({
                                             <StatusFormField form={form}/>
 
                                             <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                            <BudgetFormField form={form}/>
+                                            <span className="mt-2"><BudgetFormField form={form}/></span>
                                         </>
                                     )}
 
@@ -493,7 +492,7 @@ export function EditMilestoneForm({
                                             <OpenToFormField form={form}/>
                                         </>
                                     )}
-                                </FormItem>
+                                </div>
 
                                 {formData.nodeType === "PROJECT" && (
                                     <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
@@ -636,7 +635,6 @@ const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTy
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Milestone type"
-                                className="border-transparent hover:border-input"
                                 emptyIndicator={
                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                         no results found.
@@ -778,7 +776,7 @@ const StatusFormField = ({form}: { form: any }) => {
 const BudgetFormField = ({form}: { form: any }) => {
     return (
         <MoneyInput
-            className="h-[40px] -mt-2 border-transparent hover:border-input"
+            className="h-[40px] -mt-2"
             form={form}
             name="budget"
         />
@@ -804,7 +802,7 @@ const TimelineFormField = ({
                     control={form.control}
                     name="startDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                        <FormItem className="h-[40px]">
                             <Select
                                 defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                                 onValueChange={(value) => {
@@ -815,7 +813,7 @@ const TimelineFormField = ({
                                 }}
                             >
                                 <FormControl>
-                                    <SelectTrigger className="h-[40px] border-transparent hover:border-input">
+                                    <SelectTrigger className="h-[40px]">
                                         <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
@@ -843,9 +841,9 @@ const TimelineFormField = ({
                     control={form.control}
                     name="startDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                        <FormItem className="h-[40px]">
                             <Input
-                                className="h-[40px] border-transparent hover:border-input w-fit"
+                                className="h-[40px]"
                                 placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
@@ -864,7 +862,7 @@ const TimelineFormField = ({
                     control={form.control}
                     name="endDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                        <FormItem className="h-[40px]">
                             <Select
                                 defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                                 onValueChange={(value) => {
@@ -875,7 +873,7 @@ const TimelineFormField = ({
                                 }}
                             >
                                 <FormControl>
-                                    <SelectTrigger className="h-[40px] border-transparent hover:border-input">
+                                    <SelectTrigger className="h-[40px]">
                                         <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
@@ -903,9 +901,9 @@ const TimelineFormField = ({
                     control={form.control}
                     name="endDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                        <FormItem className="h-[40px]">
                             <Input
-                                className="h-[40px] border-transparent hover:border-input w-fit"
+                                className="h-[40px]"
                                 placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
@@ -970,7 +968,7 @@ const OpenToFormField = ({form}: { form: any }) => {
                     onValueChange={
                         field.onChange
                     }
-                    className="w-fit flex flex-wrap gap-2 justify-start"
+                    className="w-fit flex flex-wrap gap-2 justify-start mt-2"
                 >
                     {RFP_OPEN_TO_TYPE_OPTIONS.map(type => (
                         <ToggleGroupItem
@@ -999,21 +997,26 @@ export function AttachmentsFormField({form, attachments}: { form: UseFormReturn<
                                 <FormLabel className="text-2xl font-semibold leading-none tracking-tight">
                                     {`Links`}
                                 </FormLabel>
-
-                                <Button
-                                    className="w-fit"
-                                    variant="secondary"
-                                    onClick={(e: any) => {
-                                        e.preventDefault()
-                                        form.setValue("attachments", [
-                                            ...(field?.value || []),
-                                            {name: '', link: ''}
-                                        ])
-                                    }}
-                                >
-                                    {`Add a link`}
-                                </Button>
-
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button
+                                            className="w-[40px]"
+                                            variant="secondary"
+                                            onClick={(e: any) => {
+                                                e.preventDefault()
+                                                form.setValue("attachments", [
+                                                    ...(field?.value || []),
+                                                    {name: '', link: ''}
+                                                ])
+                                            }}
+                                        >
+                                            <FaPlus />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`Add a link`}
+                                    </TooltipContent>
+                                </Tooltip>
                             </div>
 
                             {field.value && field.value.length > 0 && (
@@ -1059,20 +1062,26 @@ const ContactsFormField = ({form}: { form: any }) => {
                         <FormLabel className="text-2xl font-semibold leading-none tracking-tight">
                             {`Contacts`}
                         </FormLabel>
-                        <Button
-                            variant="secondary"
-                            className="w-fit"
-                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                e.preventDefault()
-                                form.setValue("contacts", [
-                                    ...(field.value || []),
-                                    {name: "", email: "", role: null}
-                                ])
-                            }}
-                        >
-                            {/* <FaPlus /> */}
-                            {`Add a contact`}
-                        </Button>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button
+                                    variant="secondary"
+                                    className="w-[40px]"
+                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                        e.preventDefault()
+                                        form.setValue("contacts", [
+                                            ...(field.value || []),
+                                            {name: "", email: "", role: null}
+                                        ])
+                                    }}
+                                >
+                                    <FaPlus />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                {`Add a contact`}
+                            </TooltipContent>
+                        </Tooltip>
                     </div>
 
                     {field?.value && field.value.length > 0 && (
@@ -1136,7 +1145,7 @@ const EditTitle = ({form}: { form: any }) => {
                 <FormItem className="flex flex-col grow mr-10">
                     <FormControl>
                         <AutosizeTextarea
-                            className="overflow-hidden font-semibold text-3xl border-transparent hover:border-input"
+                            className="overflow-hidden font-semibold text-3xl"
                             id="title"
                             placeholder={`Enter a title`}
                             defaultValue={field.value}
