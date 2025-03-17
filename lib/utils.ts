@@ -11,6 +11,13 @@ export const acceptedFiletypes = {
     "image/*": [".jpg", ".jpeg", ".png"],
 };
 
+export function toTitleCase(str: string) {
+    return str.replace(
+        /\w\S*/g,
+        text => text.charAt(0).toUpperCase() + text.substring(1).toLowerCase()
+    );
+}
+
 export function standardizeYear(dateString: string): string {
     const match = dateString.match(/^(\d{4})/);
     return match ? match[1] : "";
