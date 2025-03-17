@@ -22,7 +22,7 @@ import { Button, buttonVariants } from "./ui/button"
 import { cn, sleep } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare, FaFileImport, FaPlus } from "react-icons/fa6"
-import { FaRedo, FaUndo } from "react-icons/fa"
+import { FaInfoCircle, FaRedo, FaUndo } from "react-icons/fa"
 import {
     Dialog,
     DialogClose,
@@ -260,7 +260,17 @@ export function Roadmap({data}: {data: any}) {
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-start">
                             <TabsList className="mr-auto">
                                 <TabsTrigger value="timeline">Timeline View</TabsTrigger>
-                                <TabsTrigger value="flow">Flow View</TabsTrigger>
+                                <TabsTrigger value="flow" className="flex gap-2">
+                                    Flow View
+                                    <Tooltip>
+                                        <TooltipTrigger className="ml-auto">
+                                            <FaInfoCircle/>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                            {"Position of milestones in flow view is controlled manually via drag & drop."}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TabsTrigger>
                             </TabsList>
 
                             {selectedView === "timeline" || selectedView === null && (
