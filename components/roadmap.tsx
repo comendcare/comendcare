@@ -22,7 +22,7 @@ import { Button, buttonVariants } from "./ui/button"
 import { cn, sleep } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare, FaFileImport, FaPlus } from "react-icons/fa6"
-import { FaRedo, FaUndo } from "react-icons/fa"
+import { FaInfoCircle, FaRedo, FaUndo } from "react-icons/fa"
 import {
     Dialog,
     DialogClose,
@@ -48,6 +48,7 @@ import { NewMilestoneDialogForm } from "./new-milestone-dialog"
 import { MilestoneType } from "@prisma/client"
 import { Option } from "@/lib/types"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -94,6 +95,7 @@ export function Roadmap({data}: {data: any}) {
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
     const store = useStoreApi()
     const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
+    const [sortBy, setSortBy] = useState('custom')
 
     useEffect(() => {
         const init = async () => {
@@ -180,13 +182,13 @@ export function Roadmap({data}: {data: any}) {
         const newNodes: any[] = []
 
         // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
-        const {
-            height,
-            width,
-            transform: [transformX, transformY, zoomLevel]
-        } = store.getState()
+        // const {
+        //     height,
+        //     width,
+        //     transform: [transformX, transformY, zoomLevel]
+        // } = store.getState()
 
-        const zoomMultiplier = 1 / zoomLevel
+        // const zoomMultiplier = 1 / zoomLevel
         const milestonesAlongXAxis = dbNodes.sort((a, b) => {
             return a.position.x - b.position.x
         })
@@ -201,7 +203,7 @@ export function Roadmap({data}: {data: any}) {
         //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
         let centerY = 0
 
-        newMilestones.forEach(defaultData => {
+        newMilestones.forEach((defaultData, index) => {
             const id = nanoid()
             const milestoneId = nanoid()
             const newNode: Node = {
@@ -225,6 +227,7 @@ export function Roadmap({data}: {data: any}) {
                     status: defaultData?.status || "PLANNED",
                     private: true,
                     nodeType: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
+                    timelineOrder: milestones.length + index // add in last position in timeline
                 }
             }
 
@@ -255,17 +258,43 @@ export function Roadmap({data}: {data: any}) {
                 <ResizablePanel>
                     <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-start">
-                            <TabsList>
+                            <TabsList className="mr-auto">
                                 <TabsTrigger value="timeline">Timeline View</TabsTrigger>
-                                <TabsTrigger value="flow">Flow View</TabsTrigger>
+                                <TabsTrigger value="flow" className="flex gap-2">
+                                    Flow View
+                                    <Tooltip>
+                                        <TooltipTrigger className="ml-auto">
+                                            <FaInfoCircle/>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                            {"Position of milestones in flow view is controlled manually via drag & drop."}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TabsTrigger>
                             </TabsList>
+
+                            {selectedView === "timeline" || selectedView === null && (
+                                <div className="flex flex-row gap-4 items-center">
+                                    <p>Sort by:</p>
+                                    <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
+                                        <SelectTrigger className="w-[180px]">
+                                            <SelectValue defaultValue={'default'} placeholder={"Sort by"}/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="custom">{`Custom`}</SelectItem>
+                                            <SelectItem value="start">{`Start Date`}</SelectItem>
+                                            <SelectItem value="end">{`End Date`}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button 
                                         size={"icon"} 
                                         variant={"cta"} 
-                                        className="research-plan-tour-step1 ml-auto" 
+                                        className="research-plan-tour-step1" 
                                         onClick={() => setNewMilestoneIsOpen(true)}
                                     >
                                         <FaPlus />
@@ -376,7 +405,7 @@ export function Roadmap({data}: {data: any}) {
                             className="mt-0 h-[calc(100vh-6rem)]"
                         >
                             {milestones.length > 0 ? (
-                                <PrivateTimelineView />
+                                <PrivateTimelineView sortBy={sortBy}/>
                             ): (
                                 <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} />
                             )}

@@ -91,7 +91,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
         //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
         let centerY = 0
 
-        newMilestones.forEach(defaultData => {
+        newMilestones.forEach((defaultData, index) => {
             const id = nanoid()
             const milestoneId = nanoid()
             const newNode: any = {
@@ -119,7 +119,8 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                     ...(defaultData?.description ? { description: defaultData.description } : undefined),
                     status: defaultData?.status || "PLANNED",
                     private: true,
-                    nodeType: type
+                    nodeType: type,
+                    timelineOrder: milestones.length + index // add in last position in timeline
                 }
             }
 
