@@ -106,7 +106,7 @@ const router = useRouter()
     const announcements: Announcements = {
         onDragStart({active}) {
             const data = getDraggedData(active?.id.toString())
-            const message = `Picked up checklist item ${data.name} at position ${data.position} of ${data.length}`
+            const message = `Picked up milestone ${data.name} at position ${data.position} of ${data.length}`
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
             return message
         },
@@ -115,12 +115,12 @@ const router = useRouter()
 
             if (over) {
                 const overData = getDraggedData(over?.id.toString())
-                const message = `Checklist item ${activeData.name} was moved over position ${overData.position} of ${activeData.length}.`
+                const message = `Milestone ${activeData.name} was moved over position ${overData.position} of ${activeData.length}.`
                 if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
                 return message
             }
 
-            const message = `Checklist item ${activeData.name} is no longer over a droppable position.`
+            const message = `Milestone ${activeData.name} is no longer over a droppable position.`
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
             return message
         },
@@ -129,18 +129,18 @@ const router = useRouter()
 
             if (over) {
                 const overData = getDraggedData(over?.id.toString())
-                const message = `Checklist item ${activeData.name} was dropped into position ${overData.position} of ${activeData.length}`
+                const message = `Milestone ${activeData.name} was dropped into position ${overData.position} of ${activeData.length}`
                 if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
                 return message
             }
 
-            const message = `Checklist item ${activeData} was dropped.`
+            const message = `Milestone ${activeData} was dropped.`
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
             return message
         },
         onDragCancel({active}) {
             const activeData = getDraggedData(active?.id.toString())
-            const message = `Dragging was cancelled. Checklist item ${activeData.name} was dropped.`
+            const message = `Dragging was cancelled. Milestone ${activeData.name} was dropped.`
             if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
             return message
         },
