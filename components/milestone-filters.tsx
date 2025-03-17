@@ -20,6 +20,7 @@ import MultipleSelector from "./ui/multiple-selector"
 import { Checkbox } from "./ui/checkbox"
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import { FaInfoCircle } from "react-icons/fa"
+import { useEffect } from "react"
 
 const selector = (state: MilestoneSearchState) => ({
     filters: state.filters,
@@ -51,6 +52,11 @@ export function MilestoneFilters() {
     const handleSubmit = async (values: z.infer<typeof filtersFormSchema>) => {
         setFilters(values)
     }
+
+    useEffect(() => {
+        const subscription = form.watch(() => form.handleSubmit(handleSubmit)())
+        return () => subscription.unsubscribe()
+    }, [handleSubmit, form.watch])
 
     return (
         <Form {...form}>
@@ -232,7 +238,6 @@ export function MilestoneFilters() {
                         setFilters(defaultFilters)
                         form.reset(defaultFilters)
                     }}>Clear All Filters</Button>
-                    <Button variant="secondary" type="submit">Apply Filters</Button>
                 </span>
             </form>
             </ScrollArea>

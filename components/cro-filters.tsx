@@ -20,6 +20,7 @@ import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import { FaInfoCircle } from "react-icons/fa"
+import { useEffect } from "react"
 
 const selector = (state: CROSearchState) => ({
     filters: state.filters,
@@ -50,6 +51,11 @@ export function CROFilters() {
     const handleSubmit = async (values: z.infer<typeof filtersFormSchema>) => {
         setFilters(values)
     }
+
+    useEffect(() => {
+        const subscription = form.watch(() => form.handleSubmit(handleSubmit)())
+        return () => subscription.unsubscribe()
+    }, [handleSubmit, form.watch])
 
     return (
         <Form {...form}>
@@ -169,7 +175,6 @@ export function CROFilters() {
                         setFilters(defaultFilters)
                         form.reset(defaultFilters)
                     }}>Clear All Filters</Button>
-                    <Button variant="secondary" type="submit">Apply Filters</Button>
                 </span>
             </form>
             </ScrollArea>
