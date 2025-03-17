@@ -20,6 +20,7 @@ import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/type
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import { FaInfoCircle } from "react-icons/fa"
+import { useEffect } from "react"
 
 const selector = (state: OrganizationSearchState) => ({
     filters: state.filters,
@@ -52,6 +53,11 @@ export function PAGFilters() {
     const handleSubmit = async (values: z.infer<typeof filtersFormSchema>) => {
         setFilters(values)
     }
+
+    useEffect(() => {
+        const subscription = form.watch(() => form.handleSubmit(handleSubmit)())
+        return () => subscription.unsubscribe()
+    }, [handleSubmit, form.watch])
 
     const moneyDeployedRange = [0, 10000000]
     const moneyDeployedStep = moneyDeployedRange[1]/50
@@ -180,7 +186,6 @@ export function PAGFilters() {
                         setFilters(defaultFilters)
                         form.reset(defaultFilters)
                     }}>Clear All Filters</Button>
-                    <Button variant="secondary" type="submit">Apply Filters</Button>
                 </span>
             </form>
             </ScrollArea>
