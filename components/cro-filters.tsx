@@ -18,6 +18,8 @@ import MultipleSelector from "./ui/multiple-selector"
 import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS} from "@/lib/types"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
+import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
+import { FaInfoCircle } from "react-icons/fa"
 
 const selector = (state: CROSearchState) => ({
     filters: state.filters,
@@ -65,8 +67,17 @@ export function CROFilters() {
                     name="categories"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">Service categories</FormLabel>
-                            <FormDescription>{`The service categories provided by the CRO.`}</FormDescription>
+                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                Service categories
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle/>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`The service categories provided by the CRO.`}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -90,8 +101,17 @@ export function CROFilters() {
                     name="types"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">Business types</FormLabel>
-                            <FormDescription>{`The service categories provided by the CRO.`}</FormDescription>
+                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                Business types
+                                {/* <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle/>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`The service categories provided by the CRO.`}
+                                    </TooltipContent>
+                                </Tooltip> */}
+                            </FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -115,8 +135,17 @@ export function CROFilters() {
                     name="certifications"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">Certifications</FormLabel>
-                            <FormDescription>{`The service categories provided by the CRO.`}</FormDescription>
+                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                Certifications
+                                {/* <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle/>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`The service categories provided by the CRO.`}
+                                    </TooltipContent>
+                                </Tooltip> */}
+                            </FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}

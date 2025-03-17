@@ -18,6 +18,8 @@ import { Button } from "./ui/button"
 import MultipleSelector from "./ui/multiple-selector"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
+import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
+import { FaInfoCircle } from "react-icons/fa"
 
 const selector = (state: OrganizationSearchState) => ({
     filters: state.filters,
@@ -76,8 +78,17 @@ export function PAGFilters() {
                     name="systems"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">Associated systems</FormLabel>
-                            <FormDescription>{`The systems affected by a condition.`}</FormDescription>
+                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                Associated systems
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle/>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`The systems affected by a condition.`}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -101,12 +112,17 @@ export function PAGFilters() {
                     name="mechanisms"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">
+                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
                                 Mechanisms of action
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle/>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`The type of condition a patient advocacy group focuses on.`}
+                                    </TooltipContent>
+                                </Tooltip>
                             </FormLabel>
-                            <FormDescription className="flex items-center">
-                                {`The type of condition a patient advocacy group focuses on.`}
-                            </FormDescription>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -130,12 +146,17 @@ export function PAGFilters() {
                     name="modalities"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">
+                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
                                 Modalities of interest
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle/>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`The treatment modalities of interest to an organization.`}
+                                    </TooltipContent>
+                                </Tooltip>
                             </FormLabel>
-                            <FormDescription className="flex items-center">
-                                {`The treatment modalities of interest to an organization.`}
-                            </FormDescription>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
