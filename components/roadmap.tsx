@@ -458,26 +458,81 @@ export function Roadmap({data}: {data: any}) {
                                         complete: (result) => {
                                             const newMilestones: any[] = []
 
+                                            const isValidFormat = (entry: any) => {
+                                                const errors = []
+
+                                                if (!(entry.title && typeof entry.title === "string")) {
+                                                    errors.push({
+                                                        type: "title",
+                                                        message: "Field 'title' is not formatted properly"
+                                                    })
+                                                }
+
+                                                // description is optional, so we don't check it
+
+                                                if (!(entry.type && typeof entry.type === "string" || entry.type === null)) {
+                                                    errors.push({
+                                                        type: "type",
+                                                        message: "Field 'type' is not formatted properly"
+                                                    })
+                                                }
+
+                                                if (!(milestoneTypes.find(type => type.label === entry.type))) {
+                                                    errors.push({
+                                                        type: "type",
+                                                        message: `Type ${entry.type} not found in database`
+                                                    })
+                                                }
+
+                                                if (!(entry.category && typeof entry.category === "string")) {
+                                                    errors.push({
+                                                        type: "category",
+                                                        message: "Field 'category' is not formated properly"
+                                                    })
+                                                }
+
+                                                if (!(entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET")) {
+                                                    errors.push({
+                                                        type: "category",
+                                                        message: `Category ${entry.category} is not a valid category`
+                                                    })
+                                                }
+
+                                                if (errors.length > 0) return { isValid: false, errors: errors }
+                                                return { isValid: true }
+                                            }
+
+                                            let errors: {type: string, message: string}[] = []
                                             result.data.forEach((entry: any) => {
                                                 // validate milestone format - don't include the milestone if it doesn't have all the
                                                 // proper fields or if the fields are not of the correct type
-                                                if (
-                                                    entry.title && typeof entry.title === "string" && 
-                                                    entry.type && typeof entry.type === "string" &&
-                                                    entry.category && typeof entry.type === "string"
-                                                ) {
+                                                const validate = isValidFormat(entry)
+                                                if (validate.isValid && !validate.errors) {
+                                                    const foundType = milestoneTypes.find(type => type.label === entry.type)
                                                     newMilestones.push({
                                                         title: entry.title || 'New Milestone',
                                                         description: entry.description || '', // description is optional
-                                                        types: [milestoneTypes.find(type => type.label === entry.type)],
+                                                        types: foundType ? [foundType] : [],
                                                         nodeType: entry.category
                                                     })
                                                 } else {
-                                                    console.error(`Invalid milestone type`, entry)
+                                                    console.error(`Invalid milestone format`, entry)
+                                                    console.error(`Format validation errors: `, validate.errors)
+
+                                                    errors.concat(validate.errors || [])
+
+                                                    const foundType = milestoneTypes.find(type => type.label === entry.type)
+                                                    // attempt to create anyways
+                                                    newMilestones.push({
+                                                        title: entry.title && typeof entry.title === 'string' ? entry.title : 'New milestone',
+                                                        description: '',
+                                                        types: foundType ? [foundType] : [],
+                                                        nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT"
+                                                    })
                                                 }
                                             })
 
-                                            if (newMilestones.length !== result.data.length) {
+                                            if (errors.length > 0) {
                                                 toast('Error!', {
                                                     description: `Some milestones were not formatted properly. Some milestones have not been imported.`
                                                 })
