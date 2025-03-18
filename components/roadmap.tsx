@@ -516,10 +516,12 @@ export function Roadmap({data}: {data: any}) {
                                                         nodeType: entry.category
                                                     })
                                                 } else {
-                                                    console.error(`Invalid milestone format`, entry)
-                                                    console.error(`Format validation errors: `, validate.errors)
+                                                    console.error(`Invalid milestone format`, entry);
+                                                    (validate.errors || []).forEach((error: any) => {
+                                                        console.error(`Format validation error: `, error.message)
+                                                    })
 
-                                                    errors.concat(validate.errors || [])
+                                                    errors = errors.concat(validate.errors || [])
 
                                                     const foundType = milestoneTypes.find(type => type.label === entry.type)
                                                     // attempt to create anyways
@@ -534,6 +536,7 @@ export function Roadmap({data}: {data: any}) {
 
                                             if (errors.length > 0) {
                                                 toast('Error!', {
+                                                    duration: 4000,
                                                     description: `Some milestones were not formatted properly. Some milestones have not been imported.`
                                                 })
                                             }
