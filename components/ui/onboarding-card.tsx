@@ -16,9 +16,8 @@ import { types } from "node:util"
 const selector = (state: RoadmapState) => ({
     setOnboardingActive: state.setOnboardingActive,
     nodes: state.nodes,
-    addNodes: state.addNodes,
-    selectedNodeId: state.selectedNodeId,
-    setSelectedNodeId: state.setSelectedNodeId
+    setSelectedNodeId: state.setSelectedNodeId,
+    addMilestones: state.addMilestones
 })
 
 
@@ -26,18 +25,13 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
     // Onborda hooks
     const { closeOnborda } = useOnborda()
     const cardRef = useRef<HTMLDivElement>(null)
-    const store = useStoreApi()
     const { fitView } = useReactFlow()
-    const router = useRouter()
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
 
     const {
         setOnboardingActive,
         nodes,
-        addNodes,
-        selectedNodeId,
-        setSelectedNodeId
+        setSelectedNodeId,
+        addMilestones
     } = useRoadmapStore(useShallow(selector))
 
     function handleConfetti() {
@@ -64,58 +58,25 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         }
     }, [closeOnborda])
 
-    const addMilestone = (position?: { x: number; y: number }) => {
-        // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
-        const {
-            height,
-            width,
-            transform: [transformX, transformY, zoomLevel]
-        } = store.getState()
-
-        const zoomMultiplier = 1 / zoomLevel
-        const centerX =
-            -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        const centerY =
-            -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
-
-        const id = nanoid()
-        const newNode = {
-            id: id,
-            type: "PROJECT",
-            position: {
-                x: position ? position?.x : centerX,
-                y: position ? position?.y : centerY
-            },
-            data: {
-                id: nanoid(),
-                types: [],
-                nodeId: id,
-                title: `New Milestone`,
-                status: "PLANNED",
-                private: true,
-                timelineOrder: nodes.length // add in last position in timeline
-            }
-        }
-
-        addNodes([newNode])
-        return newNode
-    }
-
     const handleNextStep = async (e: any) => {
         e.preventDefault()
-        let onboardingNodeId = nodes.sort((a: any, b: any) => b.createdAt - a.createdAt)[0]?.id
+        let onboardingNodeId: string | undefined = nodes.sort((a: any, b: any) => b.createdAt - a.createdAt)[0]?.id
 
         // execute any actions that need to occur before we move to the next step
         if (step.selector === '.research-plan-tour-step1') {
             // if there are no nodes, we create one to use for the onboarding flow
             if (nodes.length <= 0) {
-                const newNode = addMilestone()
-                onboardingNodeId = newNode.id
+                const newNode = await addMilestones([{
+                    types: [],
+                    title: `New Milestone`,
+                    status: "PLANNED",
+                }])
+                onboardingNodeId = newNode?.[0]?.id
             }
 
-            fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
+            if (onboardingNodeId) fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
         }
-        if (step.selector === '.research-plan-tour-step2') {
+        if (step.selector === '.research-plan-tour-step2' && onboardingNodeId) {
             setSelectedNodeId(onboardingNodeId)
             fitView({ nodes: [{ id: onboardingNodeId }], padding: 2, duration: 500 })
         } else if (step.selector === '.research-plan-tour-step3') {
