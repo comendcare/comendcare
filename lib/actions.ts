@@ -2545,7 +2545,7 @@ export async function createNotification({notificationData}: { notificationData:
             data: {
                 ...notificationData,
                 user: {connect: {id: session?.user.id}},
-                organization: {connect: {id: session.user.organizationId}}
+                organization: {connect: {id: session.user.organizationId}},
             }
         })
 

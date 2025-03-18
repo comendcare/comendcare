@@ -3,6 +3,10 @@ import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { ASSOCIATED_CATEGORIES, Milestone } from '@/lib/types'
+import { getAllNotifications } from '@/lib/fetchers';
+import { NotificationType } from '@/lib/types';
+import { PlatformNotification } from '@prisma/client';
+import { createNotification } from '@/lib/actions';
 
 export const sampleCROs: any[] = [
     {
@@ -122,6 +126,12 @@ const sortByFilters: { [key: string]: string } = {
 
 const generateRecommendations = async (milestones: Milestone[]) => {
     let recommendationResults: Recommendation[] = []
+    let previousNotifications: PlatformNotification[] = []
+    const response = await getAllNotifications()
+    if (response.success) {
+        previousNotifications = response.data || []
+    }
+
     await Promise.all(
         milestones.map(async (milestone) => {
             const newFilters = {
@@ -140,10 +150,31 @@ const generateRecommendations = async (milestones: Milestone[]) => {
                 filters: newFilters,
                 lastFetchedPage: 1,
             }, true)
-            recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => ({
-                content: result,
-                milestone
-            } as Recommendation)))
+
+            recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => {
+                // if a notification for this recommendation doesn't exist yet, create one
+                if (
+                    previousNotifications
+                        .filter((notification: any) => (
+                            notification.type === "NEW_RECOMMENDATION" &&   // grab all recommendation notifications
+                            notification.targetId === result.id             // grab only notifications related to this company (recommendation)
+                        )).length <= 0                                      // length == 0, nothing found, create notification
+                ) {
+                    createNotification({
+                        notificationData: {
+                            type: "NEW_RECOMMENDATION",
+                            title: `New recommendation: ${result.title}`,
+                            targetId: result.id,
+                            targetType: "Company"
+                        }
+                    })
+                }
+
+                return ({
+                    content: result,
+                    milestone
+                } as Recommendation)
+            }))
         })
     )
 
