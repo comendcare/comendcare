@@ -71,6 +71,8 @@ import { TypeBadge } from "./type-badge"
 import Loading from "@/app/loading"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { Badge } from "./ui/badge"
+import { NotificationBubble } from "./notification-bubble"
+import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -90,6 +92,10 @@ const selector = (state: RoadmapState) => ({
 const recommendationsSelector = (state: CROSearchState) => ({
     recommendations: state.recommendations,
     setRecommendations: state.setRecommendations
+})
+
+const notificationsSelector = (state: NotificationsState) => ({
+    notifications: state.notifications
 })
 
 const editMilestoneForm = z.object({
@@ -132,8 +138,9 @@ export function EditMilestoneForm({
     milestoneData: any
     onClose: () => void
 }) {
-    const {setMilestone} = useRoadmapStore(useShallow(selector))
+    const { setMilestone } = useRoadmapStore(useShallow(selector))
     const { recommendations, setRecommendations } = useCROSearchStore(useShallow(recommendationsSelector))
+    const { notifications } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
@@ -321,8 +328,9 @@ export function EditMilestoneForm({
                                 <TabsTrigger value="edit">
                                     Edit
                                 </TabsTrigger>
-                                <TabsTrigger value="recommendations">
+                                <TabsTrigger className="relative" value="recommendations">
                                     Relevant Results
+                                    {notifications && notifications.length > 0 && <NotificationBubble />}
                                 </TabsTrigger>
                             </TabsList>
                             {/* <TypeBadge type={formData.nodeType}/> */}

@@ -39,7 +39,7 @@ export type PostWithAuthorAndComments = Post & {
 
 export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 
-export type NotificationType = 'NEW_TASK'
+export type NotificationType = 'NEW_TASK' | 'NEW_RECOMMENDATION'
 
 export const KANBAN_NOTIFICATIONS: NotificationType[] = ["NEW_TASK"]
 
