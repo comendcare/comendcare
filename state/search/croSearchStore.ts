@@ -164,7 +164,7 @@ const generateRecommendations = async (milestones: Milestone[]) => {
                         notificationData: {
                             type: "NEW_RECOMMENDATION",
                             title: `New recommendation: ${result.title}`,
-                            targetId: result.id,
+                            targetId: result.id,    // company id for this recommendation
                             targetType: "Company"
                         }
                     })

@@ -2626,15 +2626,24 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                             // don't create a notification for the user creating the task
                             if (stakeholder.userId === session?.user.id) return
 
-                            let n = await prisma.platformNotification.create({
-                                data: {
-                                    type: "NEW_TASK",
-                                    title: "New task assigned",
-                                    message: `${newTask.name} was assigned to you.`,
-                                    user: {connect: {id: stakeholder.userId}},
-                                    organization: {connect: {id: organizations[0].id}}
-                                }
-                            })
+                            // let n = await prisma.platformNotification.create({
+                            //     data: {
+                            //         type: "NEW_TASK",
+                            //         title: "New task assigned",
+                            //         message: `${newTask.name} was assigned to you.`,
+                            //         targetId: stakeholder.taskId,
+                            //         targetType: "Task",
+                            //         user: {connect: {id: stakeholder.userId}},
+                            //         organization: {connect: {id: organizations[0].id}}
+                            //     }
+                            // })
+                            let n = await createNotification({notificationData: {
+                                type: "NEW_TASK",
+                                title: "New task assigned",
+                                message: `${newTask.name} was assigned to you.`,
+                                targetId: stakeholder.taskId,
+                                targetType: "Task",
+                            }})
                         })
                     )
                 }
