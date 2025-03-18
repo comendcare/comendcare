@@ -2556,6 +2556,34 @@ export async function createNotification({notificationData}: { notificationData:
     }
 }
 
+export async function createNotifications({notificationsList}: {notificationsList: any[]}) {
+    try {
+        const session = await getSession()
+        if (!session) throw new Error("No session data")
+
+        await prisma.platformNotification.createMany({
+            data: notificationsList.map(notification => ({
+                ...notification,
+                userId: session?.user.id,
+                organizationId: session.user.organizationId
+            }))
+        })
+
+        // Fetch the inserted notifications
+        const notifications = await prisma.platformNotification.findMany({
+            where: {
+                userId: session?.user.id,
+                organizationId: session.user.organizationId
+            },
+        })
+
+        return {success: true, data: notifications}
+    } catch (error) {
+        logError("Could not create notifications", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 export async function updateTasks({tasks}: { tasks: Task[] }) {
     try {
         let updatedTasks: Task[] = []
@@ -2626,23 +2654,11 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                             // don't create a notification for the user creating the task
                             if (stakeholder.userId === session?.user.id) return
 
-                            // let n = await prisma.platformNotification.create({
-                            //     data: {
-                            //         type: "NEW_TASK",
-                            //         title: "New task assigned",
-                            //         message: `${newTask.name} was assigned to you.`,
-                            //         targetId: stakeholder.taskId,
-                            //         targetType: "Task",
-                            //         user: {connect: {id: stakeholder.userId}},
-                            //         organization: {connect: {id: organizations[0].id}}
-                            //     }
-                            // })
                             let n = await createNotification({notificationData: {
                                 type: "NEW_TASK",
                                 title: "New task assigned",
                                 message: `${newTask.name} was assigned to you.`,
-                                targetId: stakeholder.taskId,
-                                targetType: "Task",
+                                metadata: { taskId: stakeholder.taskId, stakeholderId: stakeholder.id }
                             }})
                         })
                     )
