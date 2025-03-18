@@ -60,7 +60,7 @@ const selector = (state: RoadmapState) => ({
     nodes: state.nodes,
     milestones: state.milestones,
     saveState: state.saveState,
-    addNodes: state.addNodes
+    addMilestones: state.addMilestones
 })
 
 const recommendationsSelector = (state: CROSearchState) => ({
@@ -80,7 +80,7 @@ export function Roadmap({data}: {data: any}) {
         nodes: dbNodes,
         milestones, 
         saveState,
-        addNodes
+        addMilestones
     } = useRoadmapStore(useShallow(selector))
     const { recommendations } = useCROSearchStore(useShallow(recommendationsSelector))
     const router = useRouter()
@@ -173,72 +173,6 @@ export function Roadmap({data}: {data: any}) {
     const handleTabChange = (value: string) => {
         setSelectedView(value)
         setSelectedNodeId(null) // deselect any selected milestones when switching tabs
-    }
-
-    // Add a empty milestone node
-    // if a position is provided, place at the given coordinates
-    // if a position is not provided, place in the center
-    const addMilestones = async (newMilestones: any[]) => {
-        const newNodes: any[] = []
-
-        // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
-        // const {
-        //     height,
-        //     width,
-        //     transform: [transformX, transformY, zoomLevel]
-        // } = store.getState()
-
-        // const zoomMultiplier = 1 / zoomLevel
-        const milestonesAlongXAxis = dbNodes.sort((a, b) => {
-            return a.position.x - b.position.x
-        })
-        // let centerX =
-        //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        let centerX = milestonesAlongXAxis.length > 0 ? (
-            (milestonesAlongXAxis[milestonesAlongXAxis.length - 1]?.position?.x || 0) + 500
-        ): (
-            0
-        )
-        // let centerY =
-        //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
-        let centerY = 0
-
-        newMilestones.forEach((defaultData, index) => {
-            const id = nanoid()
-            const milestoneId = nanoid()
-            const newNode: Node = {
-                id: id,
-                type: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
-                position: {
-                    x: centerX,
-                    y: centerY
-                },
-                origin: [0.0, 0.0],
-                data: {
-                    id: milestoneId,
-                    nodeId: id,
-                    types: defaultData?.types.filter((type: any)=> type !== undefined).map((type: any) => ({
-                        milestoneId: milestoneId,
-                        milestoneTypeId: type?.id,
-                        milestoneType: type
-                    })),
-                    title: defaultData?.title || `New Milestone`,
-                    ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                    status: defaultData?.status || "PLANNED",
-                    private: true,
-                    nodeType: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
-                    timelineOrder: milestones.length + index // add in last position in timeline
-                }
-            }
-
-            centerX += 500
-            // centerY += 200
-
-            newNodes.push(newNode)
-        })
-
-        const nodes = await addNodes(newNodes)
-        return nodes
     }
 
     if (!roadmapId || !initialized) {
@@ -512,7 +446,7 @@ export function Roadmap({data}: {data: any}) {
                                                     newMilestones.push({
                                                         title: entry.title || 'New Milestone',
                                                         description: entry.description || '', // description is optional
-                                                        types: foundType ? [foundType] : [],
+                                                        types: foundType ? [foundType.milestoneTypeId || foundType.milestoneType?.id] : [],
                                                         nodeType: entry.category
                                                     })
                                                 } else {
@@ -528,7 +462,7 @@ export function Roadmap({data}: {data: any}) {
                                                     newMilestones.push({
                                                         title: entry.title && typeof entry.title === 'string' ? entry.title : 'New milestone',
                                                         description: '',
-                                                        types: foundType ? [foundType] : [],
+                                                        types: foundType ? [foundType.milestoneTypeId || foundType.milestoneType?.id] : [],
                                                         nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT"
                                                     })
                                                 }
