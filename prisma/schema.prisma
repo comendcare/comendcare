@@ -68,8 +68,7 @@ model User {
 model PlatformNotification {
   id             String       @id @default(uuid())
   type           String // Stores the notification type (e.g. "NEW_TASK", "NEW_RECOMMENDATION")
-  targetId       String // Stores the ID of the related model
-  targetType     String // Stores the type of model (e.g., "Milestone", "Company", "Organization")
+  metadata       Json? // Stores additional information associated with this notification, e.g. for recommendations - company & milestone id
   title          String
   message        String?
   link           String?

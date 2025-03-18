@@ -7,6 +7,13 @@ import { getAllNotifications } from '@/lib/fetchers';
 import { NotificationType } from '@/lib/types';
 import { PlatformNotification } from '@prisma/client';
 import { createNotification } from '@/lib/actions';
+import { NotificationsState, useNotificationsStore } from '../notifications/notificationsStore';
+import { useShallow } from 'zustand/react/shallow';
+
+// const notificationsSelector = (state: NotificationsState) => ({
+//     notifications: state.notifications,
+//     addNotification: state.addNotification
+// })
 
 export const sampleCROs: any[] = [
     {
@@ -126,14 +133,16 @@ const sortByFilters: { [key: string]: string } = {
 
 const generateRecommendations = async (milestones: Milestone[]) => {
     let recommendationResults: Recommendation[] = []
-    let previousNotifications: PlatformNotification[] = []
-    const response = await getAllNotifications()
-    if (response.success) {
-        previousNotifications = response.data || []
-    }
+    // let previousNotifications: Partial<PlatformNotification>[] = []
+    // const response = await getAllNotifications()
+    // if (response.success) {
+    //     previousNotifications = response.data || []
+    // }
+    // console.log(`fetched previous notifications`, previousNotifications)
 
     await Promise.all(
         milestones.map(async (milestone) => {
+            // const { notifications, addNotification } = useNotificationsStore(useShallow(notificationsSelector))
             const newFilters = {
                 categories: Array.from(
                     new Set((milestone?.types || []).flatMap(type => type.milestoneType.categories))
@@ -153,22 +162,41 @@ const generateRecommendations = async (milestones: Milestone[]) => {
 
             recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => {
                 // if a notification for this recommendation doesn't exist yet, create one
-                if (
-                    previousNotifications
-                        .filter((notification: any) => (
-                            notification.type === "NEW_RECOMMENDATION" &&   // grab all recommendation notifications
-                            notification.targetId === result.id             // grab only notifications related to this company (recommendation)
-                        )).length <= 0                                      // length == 0, nothing found, create notification
-                ) {
-                    createNotification({
-                        notificationData: {
-                            type: "NEW_RECOMMENDATION",
-                            title: `New recommendation: ${result.title}`,
-                            targetId: result.id,    // company id for this recommendation
-                            targetType: "Company"
-                        }
-                    })
-                }
+            //     if (
+            //         notifications
+            //             .filter((notification: any) => (
+            //                 notification.type === "NEW_RECOMMENDATION" &&           // grab all recommendation notifications
+            //                 notification.metadata?.companyId === result.id &&       // grab only notifications related to this company (recommendation)
+            //                 notification.metadata?.milestoneId === milestone.id     // grab only notifications related to this milestone
+            //             )).length <= 0                                              // length == 0, nothing found, create notification
+            //     ) {
+            //         // createNotification({
+            //         //     notificationData: {
+            //         //         type: "NEW_RECOMMENDATION",
+            //         //         title: `New recommendation: ${result.title} for milestone ${milestone.title}`,
+            //         //         metadata: {
+            //         //             milestoneId: milestone.id,
+            //         //             companyId: result.id
+            //         //         }
+            //         //     }
+            //         // })
+            //         addNotification({
+            //             type: "NEW_RECOMMENDATION",
+            //             title: `New recommendation: ${result.title} for milestone ${milestone.title}`,
+            //             metadata: {
+            //                 milestoneId: milestone.id,
+            //                 companyId: result.id
+            //             }
+            //         })
+
+            //         // previousNotifications.push({
+            //         //     type: "NEW_RECOMMENDATION",
+            //         //     metadata: {
+            //         //         companyId: result.id,
+            //         //         milestoneId: milestone.id
+            //         //     }
+            //         // })
+            //     }
 
                 return ({
                     content: result,
@@ -250,7 +278,7 @@ export interface CROSearchState {
     filters: FiltersType,
     setFilters: (updatedFilters: FiltersType) => void,
     recommendations: Recommendation[] | undefined
-    setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<void>
+    setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<Recommendation[]>
 }
 
 export const useCROSearchStore = create<CROSearchState>()(
@@ -325,11 +353,14 @@ export const useCROSearchStore = create<CROSearchState>()(
                 )
 
                 // remove duplicates before returning
+                const prunedRecommendations = options?.limit
+                    ? Array.from(new Set(recommendationResults)).slice(0, options.limit) 
+                    : Array.from(new Set(recommendationResults))
+
                 set({
-                    recommendations: options?.limit
-                        ? Array.from(new Set(recommendationResults)).slice(0, options.limit) 
-                        : Array.from(new Set(recommendationResults))
+                    recommendations: prunedRecommendations
                 })
+                return prunedRecommendations
             }
         }),
         {
