@@ -3,17 +3,6 @@ import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
 import { ASSOCIATED_CATEGORIES, Milestone } from '@/lib/types'
-import { getAllNotifications } from '@/lib/fetchers';
-import { NotificationType } from '@/lib/types';
-import { PlatformNotification } from '@prisma/client';
-import { createNotification } from '@/lib/actions';
-import { NotificationsState, useNotificationsStore } from '../notifications/notificationsStore';
-import { useShallow } from 'zustand/react/shallow';
-
-// const notificationsSelector = (state: NotificationsState) => ({
-//     notifications: state.notifications,
-//     addNotification: state.addNotification
-// })
 
 export const sampleCROs: any[] = [
     {
@@ -133,16 +122,9 @@ const sortByFilters: { [key: string]: string } = {
 
 const generateRecommendations = async (milestones: Milestone[]) => {
     let recommendationResults: Recommendation[] = []
-    // let previousNotifications: Partial<PlatformNotification>[] = []
-    // const response = await getAllNotifications()
-    // if (response.success) {
-    //     previousNotifications = response.data || []
-    // }
-    // console.log(`fetched previous notifications`, previousNotifications)
 
     await Promise.all(
         milestones.map(async (milestone) => {
-            // const { notifications, addNotification } = useNotificationsStore(useShallow(notificationsSelector))
             const newFilters = {
                 categories: Array.from(
                     new Set((milestone?.types || []).flatMap(type => type.milestoneType.categories))
@@ -161,43 +143,6 @@ const generateRecommendations = async (milestones: Milestone[]) => {
             }, true)
 
             recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => {
-                // if a notification for this recommendation doesn't exist yet, create one
-            //     if (
-            //         notifications
-            //             .filter((notification: any) => (
-            //                 notification.type === "NEW_RECOMMENDATION" &&           // grab all recommendation notifications
-            //                 notification.metadata?.companyId === result.id &&       // grab only notifications related to this company (recommendation)
-            //                 notification.metadata?.milestoneId === milestone.id     // grab only notifications related to this milestone
-            //             )).length <= 0                                              // length == 0, nothing found, create notification
-            //     ) {
-            //         // createNotification({
-            //         //     notificationData: {
-            //         //         type: "NEW_RECOMMENDATION",
-            //         //         title: `New recommendation: ${result.title} for milestone ${milestone.title}`,
-            //         //         metadata: {
-            //         //             milestoneId: milestone.id,
-            //         //             companyId: result.id
-            //         //         }
-            //         //     }
-            //         // })
-            //         addNotification({
-            //             type: "NEW_RECOMMENDATION",
-            //             title: `New recommendation: ${result.title} for milestone ${milestone.title}`,
-            //             metadata: {
-            //                 milestoneId: milestone.id,
-            //                 companyId: result.id
-            //             }
-            //         })
-
-            //         // previousNotifications.push({
-            //         //     type: "NEW_RECOMMENDATION",
-            //         //     metadata: {
-            //         //         companyId: result.id,
-            //         //         milestoneId: milestone.id
-            //         //     }
-            //         // })
-            //     }
-
                 return ({
                     content: result,
                     milestone
