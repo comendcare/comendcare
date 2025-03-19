@@ -1,4 +1,3 @@
-import prisma from "@/lib/prisma"
 import {notFound} from "next/navigation"
 import {getCROData} from "@/lib/fetchers"
 import Link from "next/link";
@@ -6,7 +5,7 @@ import {
     FaArrowLeftLong,
     FaBuilding,
     FaCalendar,
-    FaCircleDollarToSlot, FaCity,
+    FaCity,
     FaIndustry,
     FaRocket,
     FaUserTie,
