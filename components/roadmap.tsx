@@ -14,40 +14,27 @@ import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
 import { PrivateFlowView } from "@/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useRef, useState } from "react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { GanttChartView } from "./gantt-chart"
-import { getMilestoneTypes, getRoadmapId } from "@/lib/fetchers"
+import { usePathname, useSearchParams } from "next/navigation"
+import { getMilestoneTypes } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
 import { cn, sleep } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare, FaFileImport, FaPlus } from "react-icons/fa6"
-import { FaInfoCircle, FaRedo, FaUndo } from "react-icons/fa"
+import { FaInfoCircle } from "react-icons/fa"
 import {
     Dialog,
-    DialogClose,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from "./ui/dialog"
-import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
-import { MilestoneTemplates, MilestoneTemplateTabs } from "./roadmap-templates"
-import { nanoid } from "nanoid"
-import { useStoreApi, type Edge, type Node, type NodeChange } from "@xyflow/react"
 import { Redo2, Undo2 } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import Papa from "papaparse"
 import { toast } from "sonner"
-import Loading from "@/app/loading"
 import Image from "next/image"
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
-import { Separator } from "@radix-ui/react-separator"
 import { NewMilestoneDialogForm } from "./new-milestone-dialog"
-import { MilestoneType } from "@prisma/client"
-import { Option } from "@/lib/types"
-import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 
 const selector = (state: RoadmapState) => ({
@@ -57,14 +44,9 @@ const selector = (state: RoadmapState) => ({
     setSelectedView: state.setSelectedView,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
-    nodes: state.nodes,
     milestones: state.milestones,
     saveState: state.saveState,
     addMilestones: state.addMilestones
-})
-
-const recommendationsSelector = (state: CROSearchState) => ({
-    recommendations: state.recommendations
 })
 
 export function Roadmap({data}: {data: any}) {
@@ -77,25 +59,19 @@ export function Roadmap({data}: {data: any}) {
         setSelectedView,
         selectedNodeId, 
         setSelectedNodeId, 
-        nodes: dbNodes,
         milestones, 
         saveState,
         addMilestones
     } = useRoadmapStore(useShallow(selector))
-    const { recommendations } = useCROSearchStore(useShallow(recommendationsSelector))
-    const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const { undo, redo } = useRoadmapStore.temporal.getState()
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1);
-    const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false);
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
-    // const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
-    const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
-    const store = useStoreApi()
     const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
     const [sortBy, setSortBy] = useState('custom')
+    const milestoneRemountKeyRef = useRef(milestoneRemountKey);
 
     useEffect(() => {
         const init = async () => {
@@ -374,7 +350,6 @@ export function Roadmap({data}: {data: any}) {
                 <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
                     setBulkImportIsOpen(open)
                 }}>
-                    {/* <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start"> */}
                     <DialogContent className="flex flex-col justify-start">
                         <DialogHeader>
                             <DialogTitle className="text-2xl">

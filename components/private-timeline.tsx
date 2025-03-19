@@ -3,7 +3,7 @@
 import React from "react"
 import {getDates} from "./pag-profile-research-plan-card"
 import {PrivateBadge} from "./private-badge"
-import {FaArrowUpRightFromSquare, FaDollarSign, FaUser} from "react-icons/fa6"
+import { FaDollarSign, FaUser} from "react-icons/fa6"
 import { cn, formatMoney } from "@/lib/utils"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
@@ -12,23 +12,16 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { ScrollArea } from "./ui/scroll-area"
 import { TypeBadge } from "./type-badge"
 import { Milestone } from "@/lib/actions"
-import { Badge } from "./ui/badge"
 import { AttachmentsTag } from "./private-milestone-node"
 import { StatusType } from "@/lib/types"
-import { DateView } from "./miletone-date-view"
 import StatusButton from "./milestone-status-button"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
 import {
     DndContext,
-    type DragEndEvent,
-    type DragOverEvent,
-    DragOverlay,
-    type DragStartEvent,
     useSensor,
     useSensors,
     KeyboardSensor,
     Announcements,
-    UniqueIdentifier,
     TouchSensor,
     MouseSensor,
     closestCorners
@@ -41,8 +34,6 @@ import {
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
 import {GripVertical} from "lucide-react"
-import { cva } from "class-variance-authority"
-import {CSS} from "@dnd-kit/utilities"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -52,12 +43,6 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
     setMilestones: state.setMilestones,
-    nodes: state.nodes,
-    setNodes: state.setNodes,
-    edges: state.edges,
-    onEdgesChange: state.onEdgesChange,
-    onConnect: state.onConnect,
-    addNodes: state.addNodes,
 })
 
 export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
@@ -65,26 +50,11 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
         selectedNodeId,
         setSelectedNodeId,
         milestones,
-        setMilestones,
-        nodes,
-        setNodes: setDbNodes,
-        edges,
-        onEdgesChange,
-        addNodes,
-        onConnect,
+        setMilestones
     } = useRoadmapStore(useShallow(selector))
-const router = useRouter()
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
 
     const handleEditClick = (nodeId: string) => {
         setSelectedNodeId(nodeId)
-
-        // const params = new URLSearchParams(searchParams.toString())
-        // params.delete("milestone")
-        // params.set("milestone", nodeId)
-
-        // router.replace(`${pathname}?${params.toString()}`, { scroll: false })
     }
 
     const sensors = useSensors(
@@ -217,7 +187,6 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
 
     const style = {
         transition,
-        // transform: CSS.Translate.toString(transform),
         transform: transform ? `translateY(${transform.y}px)` : undefined, // Restrict X-axis
         touchAction: "none",
         userSelect: "none" as any,
