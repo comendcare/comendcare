@@ -12,7 +12,7 @@ import logoWABS from "@/public/logos/affiliations/WABS.png"
 import Image from "next/image"
 import React from "react"
 
-export function LogoCloud() {
+export function PartneredWithLogoCloud() {
     const logos = [
         {
             name: "Character",

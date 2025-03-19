@@ -261,7 +261,7 @@ export const CloudHeroSection = () => {
                     >
                         Where patient groups
                         <Highlight className="text-black dark:text-white">
-                            drive research
+                            advance treatments
                         </Highlight>
                     </motion.h1>
                 </HeroHighlight>
@@ -273,7 +273,7 @@ export const CloudHeroSection = () => {
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                     className="max-w-screen-sm text-2xl"
                 >
-                    {`Build your research plan, discover partners, and launch new projects.`}
+                    {`Build your research plan, discover partners, and share your progress.`}
                 </motion.p>
             </div>
 
