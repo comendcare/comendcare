@@ -41,6 +41,8 @@ export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 
 export type NotificationType = 'NEW_TASK' | 'NEW_RECOMMENDATION'
 
+export type NodeType = 'ASSET' | 'PROJECT' | 'RFP'
+
 export const KANBAN_NOTIFICATIONS: NotificationType[] = ["NEW_TASK"]
 
 export const DEFAULT_KANBAN_COLUMNS = [
