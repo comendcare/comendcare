@@ -49,7 +49,7 @@ const selector = (state: RoadmapState) => ({
     onEdgesChange: state.onEdgesChange,
     onConnect: state.onConnect,
     addNodes: state.addNodes,
-    saveState: state.saveState,
+    addMilestones: state.addMilestones
 })
 
 export const PrivateFlowView = ({
@@ -67,7 +67,7 @@ export const PrivateFlowView = ({
         onEdgesChange,
         addNodes,
         onConnect,
-        saveState,
+        addMilestones
     } = useRoadmapStore(useShallow(selector))
     const store = useStoreApi()
     const router = useRouter()
@@ -218,67 +218,6 @@ export const PrivateFlowView = ({
         [previewNode, startConnectNode, screenToFlowPosition],
     );
 
-    // Add a empty milestone node
-    // if a position is provided, place at the given coordinates
-    // if a position is not provided, place in the center
-    const addMilestones = async (newMilestones: any[]) => {
-        const newNodes: any[] = []
-
-        // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
-        const {
-            height,
-            width,
-            transform: [transformX, transformY, zoomLevel]
-        } = store.getState()
-
-        const zoomMultiplier = 1 / zoomLevel
-        // let centerX =
-        //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        // let centerY =
-        //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
-        const milestonesAlongXAxis = localNodes.sort((a, b) => {
-            return a.position.x - b.position.x
-        })
-        let centerX = milestonesAlongXAxis.length > 0 ? (
-            milestonesAlongXAxis[milestonesAlongXAxis.length - 1].position.x + 500
-        ): (
-            0
-        )
-        let centerY = 0
-
-        newMilestones.forEach((defaultData, index) => {
-            const id = nanoid()
-            const newNode: Node = {
-                id: id,
-                type: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
-                position: {
-                    x: centerX,
-                    y: centerY
-                },
-                origin: [0.0, 0.0],
-                data: {
-                    id: nanoid(),
-                    nodeId: id,
-                    types: [],
-                    // types: defaultData?.types || [],
-                    title: defaultData?.title || `New Milestone`,
-                    ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                    status: defaultData?.status || "PLANNED",
-                    private: true,
-                    timelineOrder: milestones.length + index // add in last position in timeline
-                }
-            }
-
-            centerX += 500
-            // centerY += 200
-
-            newNodes.push(newNode)
-        })
-
-        const nodes = await addNodes(newNodes)
-        return nodes
-    }
-
     const handleDelete = async ({nodes, edges}: {nodes: Node[], edges: Edge[]}) => {
         // override default delete behaviour with our custom dialog
         if (nodes.length > 0) {
@@ -313,7 +252,11 @@ export const PrivateFlowView = ({
 
                 if (milestone) {
                     addMilestones([{
-                        ...milestone,
+                        nodeType: milestone.nodeType || milestone.node?.type,
+                        title: milestone.title,
+                        description: milestone.description,
+                        types: milestone.types.map((type: any) => type.milestoneTypeId || type.milestoneType.id),
+                        status: milestone.status
                     }])
                 }
             },
