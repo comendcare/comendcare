@@ -197,8 +197,10 @@ export function Roadmap({data}: {data: any}) {
                                 <TabsTrigger value="flow" className="flex gap-2">
                                     Flow View
                                     <Tooltip>
-                                        <TooltipTrigger className="ml-auto">
-                                            <FaInfoCircle/>
+                                        <TooltipTrigger asChild>
+                                            <div className="ml-auto">
+                                            <FaInfoCircle />
+                                            </div>
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-80 text-wrap text-left">
                                             {"Position of milestones in flow view is controlled manually via drag & drop."}
