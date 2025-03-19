@@ -54,14 +54,8 @@ import {cn} from "@/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import UserEditForm from "@/components/user-edit-form";
 import UserSettings from "@/components/user-settings";
+import {MembershipWithOrganization} from "@/lib/types";
 
-type InvitationWithOrganization = Invitation & {
-    organization?: Organization | null; // Optional because the organization might be null if not fetched
-};
-
-type MembershipWithOrganization = Member & {
-    organization?: Organization | null; // Optional because the organization might be null if not fetched
-};
 
 export function NavUser() {
     const {data: session, update, status} = useSession();

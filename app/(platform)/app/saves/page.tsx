@@ -10,17 +10,18 @@ import {getSavedCompaniesFromOrganizationId} from "@/lib/fetchers";
 import {CROServicesDataTable} from "@/components/cro-services-data-table/cro-services-data-table";
 import {columns} from "@/components/saved-cro-data-table/saved-cros-data-columns";
 import {SavedCROsDataTable} from "@/components/saved-cro-data-table/saved-cros-data-table";
+import {SavedCompanyData} from "@/lib/types";
 
 export default async function SavesPage() {
     const router = useRouter()
     const { data: session } = useSession();
-    const [savedCompanies, setSavedCompanies] = useState<SavedCompany[]>([]);
+    const [savedCompanies, setSavedCompanies] = useState<SavedCompanyData[]>([]);
 
     useEffect(() => {
         async function fetchData() {
             const savedCompaniesResponse = await getSavedCompaniesFromOrganizationId(session?.user?.organizationId || undefined);
             if (savedCompaniesResponse.success) {
-                const savedCompaniesData = savedCompaniesResponse.data as SavedCompany[];
+                const savedCompaniesData = savedCompaniesResponse.data as SavedCompanyData[];
                 setSavedCompanies(savedCompaniesData);
             } else {
                 console.error(savedCompaniesResponse.error);
@@ -63,7 +64,7 @@ export default async function SavesPage() {
                     </div>
                 </div>
                 :
-                <SavedCROsDataTable data={savedCompanies} columns={columns as any}/>
+                <SavedCROsDataTable data={savedCompanies} columns={columns}/>
             }
         </main>
     )

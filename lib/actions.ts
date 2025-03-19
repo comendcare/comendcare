@@ -532,7 +532,6 @@ export const toggleOrganizationPublished = async (organizationId: string) => {
             }
 
             // Log or revalidate if necessary
-            console.log("Toggled published status for organization", organization.id)
             await revalidateTag(
                 `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
@@ -566,7 +565,6 @@ export const toggleOrganizationVerified = async (organizationId: string) => {
             })
 
             // Log or revalidate if necessary
-            console.log("Toggled verified status for organization", organization.id)
             await revalidateTag(
                 `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
@@ -745,11 +743,11 @@ export const updateOrganizationAttribute = withOrganizationAttributeAuth(
                 })
             }
 
-            console.log(
-                "Updated organization data! Revalidating tags: ",
-                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
-                `${organization.customDomain}-metadata`
-            )
+            // console.log(
+            //     "Updated organization data! Revalidating tags: ",
+            //     `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
+            //     `${organization.customDomain}-metadata`
+            // )
             await revalidateTag(
                 `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
@@ -1072,7 +1070,6 @@ export async function inviteUser(
                 organizationId: organization.organizationId
             }
         }).then((res) => {
-            console.log(`Invitation created for ${email}`)
 
             return res
         })
@@ -1665,7 +1662,6 @@ export async function updateCondition(formData: FormData, organizationId: string
                 data[key] = value;
             }
         });
-        console.log(data)
 
         // Find the first condition associated with the organization
         const conditions = await prisma.conditionToOrganization.findMany({

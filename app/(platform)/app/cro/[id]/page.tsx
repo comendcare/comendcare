@@ -38,6 +38,7 @@ import {CertificationBadge} from "@/components/certification-badge";
 import CROMarketplaceProfileReviewsTab from "@/components/cro-marketplace-profile-reviews-tab";
 import {cn} from "@/lib/utils";
 import SaveCRODialog from "@/components/save-cro-dialog";
+import {CompanyWithReviews} from "@/lib/types";
 
 const companyTypeIcons: Record<string, JSX.Element> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
@@ -229,7 +230,7 @@ export default async function CompanyHomePage({
                         {/*    <CROMarketplaceProfileCertificationsTab croCertifications={cro.certifications}/>*/}
                         {/*</TabsContent>*/}
                         <TabsContent value="reviews" className="space-y-4 w-full">
-                            <CROMarketplaceProfileReviewsTab cro={cro as any}/>
+                            <CROMarketplaceProfileReviewsTab cro={cro as CompanyWithReviews}/>
                         </TabsContent>
                     </Tabs>
                 </main>
