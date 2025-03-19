@@ -24,7 +24,7 @@ export type RoadmapState = {
     setSelectedView: (view: string | null) => void,
     selectedNodeId: string | null
     setSelectedNodeId: (id: string | null) => void
-    milestones: any[]
+    milestones: Milestone[]
     setMilestone: (id: string, newProperties: any) => Promise<Milestone[] | void>
     setMilestones: (milestones: Milestone[]) => Promise<Milestone[] | void>
     nodes: Node[]
@@ -290,7 +290,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             console.log(`add nodes`)
             set({ 
                 nodes: [...get().nodes, ...nodes], 
-                milestones: [...get().milestones, ...nodes.map(node => node.data)] 
+                milestones: [...get().milestones, ...nodes.map(node => node.data as Milestone)] 
             })
             
             // update DB Nodes

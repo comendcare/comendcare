@@ -7,7 +7,7 @@ export type Milestone = Prisma.MilestoneGetPayload<{
         attachments: true,
         types: { include: { milestoneType: true } }
     }
-}>;
+}>
 
 export interface Option {
     value: string;
