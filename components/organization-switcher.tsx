@@ -24,8 +24,8 @@ import {MemberWithOrganization} from "@/app/(platform)/app/layout";
 import {ProfilePhoto} from "@/components/profile-photo";
 
 export function OrganizationSwitcher({
-                                 memberships,
-                             }: {
+                                         memberships,
+                                     }: {
     memberships: MemberWithOrganization[];
 }) {
     const {isMobile} = useSidebar();
@@ -111,13 +111,11 @@ export function OrganizationSwitcher({
                                 className="gap-2 p-2"
                             >
                                 <div className="flex size-6 items-center justify-center">
-                                    {activeOrganization &&
-                                        <ProfilePhoto
-                                            img={activeOrganization?.organization?.image}
-                                            name={activeOrganization?.organization?.name}
-                                            className="size-4 shrink-0"
-                                        />
-                                    }
+                                    <ProfilePhoto
+                                        img={membership?.organization?.image}
+                                        name={membership?.organization?.name}
+                                        className="size-4 shrink-0"
+                                    />
                                 </div>
                                 {membership.organization.name}
                                 {activeOrganization?.id === membership.id && (
