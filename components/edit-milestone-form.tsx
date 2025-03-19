@@ -262,24 +262,17 @@ export function EditMilestoneForm({
                             `ADD NOTIFICATION`,
                             `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`
                         );
-            
-                        const newNotification = await addNotification({
+
+                        const notificationData = {
                             type: "NEW_RECOMMENDATION",
                             title: `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`,
                             metadata: {
                                 milestoneId: recommendation.milestone.id,
                                 companyId: recommendation.content.id,
                             },
-                        });
-    
-                        localNotifications = localNotifications.concat([{
-                            type: "NEW_RECOMMENDATION",
-                            title: `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`,
-                            metadata: {
-                                milestoneId: recommendation.milestone.id,
-                                companyId: recommendation.content.id,
-                            }
-                        }])
+                        }
+                        await addNotification(notificationData)
+                        localNotifications = localNotifications.concat([notificationData])
                     }
                 }
             }
@@ -397,21 +390,17 @@ export function EditMilestoneForm({
                                 </TabsTrigger>
                                 <TabsTrigger className="relative" value="recommendations">
                                     Relevant Results
-                                    {notifications && 
+                                    {
+                                        notifications && 
                                         notifications
                                             .filter((notification: any) => (
                                                 notification.type === "NEW_RECOMMENDATION" && 
                                                 notification.metadata?.milestoneId === milestoneData.id && 
+                                                (recommendations || []).map(rec => rec.content.id).includes(notification.metadata?.companyId) &&
                                                 !notification.lastViewedAt
                                             )).length > 0 && 
-                                        // (recommendations || []).map((recommendation) => (
-                                        //     notifications.filter((notification: any) => (
-                                        //         notification.type === "NEW_RECOMMENDATION" &&
-                                        //         notification.metadata?.companyId === recommendation.content.id &&
-                                        //         notification.metadata?.milestoneId === recommendation.milestone.id &&
-                                        //         notification.lastViewedAt
-                                        //     )))).length > 0 &&
-                                            <NotificationBubble />}
+                                        <NotificationBubble />
+                                    }
                                 </TabsTrigger>
                             </TabsList>
                             {/* <TypeBadge type={formData.nodeType}/> */}
