@@ -83,7 +83,7 @@ export function BetaSignup({
     return (
         <div className="flex flex-col justify-center items-center space-y-2">
             {!inline && !isSubscribed && <Label className="text-xl">
-                🎉&nbsp;&nbsp;Book a demo
+                🎉&nbsp;&nbsp;Schedule a demo
             </Label>}
             {!inline && isSubscribed && <Label className="text-base">
                 Thank you for joining!
