@@ -20,7 +20,7 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaAngleDown, FaBullhorn, FaCalendar, FaEllipsis, FaFileLines, FaGlobe, FaLock, FaStar, FaX} from "react-icons/fa6"
+import {FaAngleDown, FaBullhorn, FaCalendar, FaEllipsis, FaFileLines, FaGlobe, FaLock, FaPlus, FaStar, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -37,7 +37,7 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {Milestone, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {MilestoneType, Prisma} from "@prisma/client"
+import {MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
@@ -71,6 +71,8 @@ import { TypeBadge } from "./type-badge"
 import Loading from "@/app/loading"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { Badge } from "./ui/badge"
+import { NotificationBubble } from "./notification-bubble"
+import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -90,6 +92,13 @@ const selector = (state: RoadmapState) => ({
 const recommendationsSelector = (state: CROSearchState) => ({
     recommendations: state.recommendations,
     setRecommendations: state.setRecommendations
+})
+
+const notificationsSelector = (state: NotificationsState) => ({
+    initialized: state.initialized,
+    notifications: state.notifications,
+    addNotification: state.addNotification,
+    setNotificationsViewed: state.setNotificationsViewed
 })
 
 const editMilestoneForm = z.object({
@@ -132,13 +141,15 @@ export function EditMilestoneForm({
     milestoneData: any
     onClose: () => void
 }) {
-    const {setMilestone} = useRoadmapStore(useShallow(selector))
+    const { setMilestone } = useRoadmapStore(useShallow(selector))
     const { recommendations, setRecommendations } = useCROSearchStore(useShallow(recommendationsSelector))
+    const { initialized: notificationsInitialized, notifications, addNotification, setNotificationsViewed } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
+    const [tab, setTab] = useState<"edit" | "recommendations">("edit")
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -183,6 +194,20 @@ export function EditMilestoneForm({
         debounce((updatedValues) => handleMilestoneFormSubmit(updatedValues), 500), []
     )
 
+    // when switching to recommendations tab, set notifications as viewed
+    useEffect(() => {
+        if (tab === "recommendations") {
+            const relevantNotifications = recommendations?.map(({content, milestone}) => (
+                notifications.find((notification: any) => (
+                    notification.type === "NEW_RECOMMENDATION" &&
+                    notification.metadata?.companyId === content.id &&
+                    notification.metadata?.milestoneId === milestone.id
+                ))
+            )).filter(n => n !== undefined) || []
+            setNotificationsViewed(relevantNotifications)
+        }
+    }, [tab])
+
     // Allow update once form is initialized
     useEffect(() => {
         const init = async () => {
@@ -205,7 +230,7 @@ export function EditMilestoneForm({
             }
 
             if (milestoneData) {
-                await setRecommendations([milestoneData as Milestone], {limit: 3})
+                await setRecommendations([milestoneData as Milestone], { limit: 3 })
             }
 
             initializing.current = false
@@ -213,6 +238,48 @@ export function EditMilestoneForm({
 
         init()
     }, []);
+
+    useEffect(() => {
+        const setupNotifications = async () => {
+            if (!initializing.current && notificationsInitialized) {
+                // if is initialized, set up the notifications for new recommendations
+                // Copy the notifications to avoid mutating the original array
+                let localNotifications: Partial<PlatformNotification>[] = [...notifications]
+                for (const recommendation of (recommendations || [])) {
+                    
+                    const exists = localNotifications
+                                    .filter((notification: any) => (
+                                        notification.type === "NEW_RECOMMENDATION" && 
+                                        notification.metadata?.milestoneId === recommendation.milestone.id && 
+                                        notification.metadata?.companyId === recommendation.content.id
+                                    )).length > 0
+
+                    console.log(`notifications exist`, exists)
+            
+                    if (!exists) {
+                        console.log(`notifications`, localNotifications);
+                        console.log(
+                            `ADD NOTIFICATION`,
+                            `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`
+                        );
+
+                        const notificationData = {
+                            type: "NEW_RECOMMENDATION",
+                            title: `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`,
+                            metadata: {
+                                milestoneId: recommendation.milestone.id,
+                                companyId: recommendation.content.id,
+                            },
+                        }
+                        await addNotification(notificationData)
+                        localNotifications = localNotifications.concat([notificationData])
+                    }
+                }
+            }
+        }
+
+        setupNotifications()
+    }, [recommendations, notificationsInitialized])
 
     // Watch form changes, don't watch while initializing
     useEffect(() => {
@@ -315,14 +382,25 @@ export function EditMilestoneForm({
 
                     <EditTitle form={form}/>
 
-                    <Tabs defaultValue="edit" className="space-y-4 w-full h-full">
+                    <Tabs value={tab} onValueChange={(value) => setTab(value as "edit" | "recommendations")} className="space-y-4 w-full h-full">
                         <div className="flex gap-4 items-center justify-between">
                             <TabsList>
                                 <TabsTrigger value="edit">
                                     Edit
                                 </TabsTrigger>
-                                <TabsTrigger value="recommendations">
+                                <TabsTrigger className="relative" value="recommendations">
                                     Relevant Results
+                                    {
+                                        notifications && 
+                                        notifications
+                                            .filter((notification: any) => (
+                                                notification.type === "NEW_RECOMMENDATION" && 
+                                                notification.metadata?.milestoneId === milestoneData.id && 
+                                                (recommendations || []).map(rec => rec.content.id).includes(notification.metadata?.companyId) &&
+                                                !notification.lastViewedAt
+                                            )).length > 0 && 
+                                        <NotificationBubble />
+                                    }
                                 </TabsTrigger>
                             </TabsList>
                             {/* <TypeBadge type={formData.nodeType}/> */}
@@ -452,7 +530,6 @@ export function EditMilestoneForm({
                                                     placeholder={`Enter a description...`}
                                                     // defaultValue={field.value}
                                                     {...field}
-                                                    className="border-transparent hover:border-input"
                                                 />
                                             </FormControl>
                                             <FormMessage/>
@@ -460,7 +537,7 @@ export function EditMilestoneForm({
                                     )}
                                 />
 
-                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-4 items-center">
+                                <div className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
                                     <div>
                                     <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
                                     {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
@@ -480,7 +557,7 @@ export function EditMilestoneForm({
                                             <StatusFormField form={form}/>
 
                                             <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                            <BudgetFormField form={form}/>
+                                            <span className="mt-2"><BudgetFormField form={form}/></span>
                                         </>
                                     )}
 
@@ -493,7 +570,7 @@ export function EditMilestoneForm({
                                             <OpenToFormField form={form}/>
                                         </>
                                     )}
-                                </FormItem>
+                                </div>
 
                                 {formData.nodeType === "PROJECT" && (
                                     <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
@@ -636,7 +713,6 @@ const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTy
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
                                 placeholder="Milestone type"
-                                className="border-transparent hover:border-input"
                                 emptyIndicator={
                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                         no results found.
@@ -778,7 +854,7 @@ const StatusFormField = ({form}: { form: any }) => {
 const BudgetFormField = ({form}: { form: any }) => {
     return (
         <MoneyInput
-            className="h-[40px] -mt-2 border-transparent hover:border-input"
+            className="h-[40px] -mt-2"
             form={form}
             name="budget"
         />
@@ -804,7 +880,7 @@ const TimelineFormField = ({
                     control={form.control}
                     name="startDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                        <FormItem className="h-[40px]">
                             <Select
                                 defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                                 onValueChange={(value) => {
@@ -815,7 +891,7 @@ const TimelineFormField = ({
                                 }}
                             >
                                 <FormControl>
-                                    <SelectTrigger className="h-[40px] border-transparent hover:border-input">
+                                    <SelectTrigger className="h-[40px]">
                                         <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
@@ -843,9 +919,9 @@ const TimelineFormField = ({
                     control={form.control}
                     name="startDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                        <FormItem className="h-[40px]">
                             <Input
-                                className="h-[40px] border-transparent hover:border-input w-fit"
+                                className="h-[40px]"
                                 placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
@@ -864,7 +940,7 @@ const TimelineFormField = ({
                     control={form.control}
                     name="endDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                        <FormItem className="h-[40px]">
                             <Select
                                 defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                                 onValueChange={(value) => {
@@ -875,7 +951,7 @@ const TimelineFormField = ({
                                 }}
                             >
                                 <FormControl>
-                                    <SelectTrigger className="h-[40px] border-transparent hover:border-input">
+                                    <SelectTrigger className="h-[40px]">
                                         <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
@@ -903,9 +979,9 @@ const TimelineFormField = ({
                     control={form.control}
                     name="endDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px] border-transparent hover:border-input">
+                        <FormItem className="h-[40px]">
                             <Input
-                                className="h-[40px] border-transparent hover:border-input w-fit"
+                                className="h-[40px]"
                                 placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
@@ -970,7 +1046,7 @@ const OpenToFormField = ({form}: { form: any }) => {
                     onValueChange={
                         field.onChange
                     }
-                    className="w-fit flex flex-wrap gap-2 justify-start"
+                    className="w-fit flex flex-wrap gap-2 justify-start mt-2"
                 >
                     {RFP_OPEN_TO_TYPE_OPTIONS.map(type => (
                         <ToggleGroupItem
@@ -999,21 +1075,26 @@ export function AttachmentsFormField({form, attachments}: { form: UseFormReturn<
                                 <FormLabel className="text-2xl font-semibold leading-none tracking-tight">
                                     {`Links`}
                                 </FormLabel>
-
-                                <Button
-                                    className="w-fit"
-                                    variant="secondary"
-                                    onClick={(e: any) => {
-                                        e.preventDefault()
-                                        form.setValue("attachments", [
-                                            ...(field?.value || []),
-                                            {name: '', link: ''}
-                                        ])
-                                    }}
-                                >
-                                    {`Add a link`}
-                                </Button>
-
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button
+                                            className="w-[40px]"
+                                            variant="secondary"
+                                            onClick={(e: any) => {
+                                                e.preventDefault()
+                                                form.setValue("attachments", [
+                                                    ...(field?.value || []),
+                                                    {name: '', link: ''}
+                                                ])
+                                            }}
+                                        >
+                                            <FaPlus />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`Add a link`}
+                                    </TooltipContent>
+                                </Tooltip>
                             </div>
 
                             {field.value && field.value.length > 0 && (
@@ -1059,20 +1140,26 @@ const ContactsFormField = ({form}: { form: any }) => {
                         <FormLabel className="text-2xl font-semibold leading-none tracking-tight">
                             {`Contacts`}
                         </FormLabel>
-                        <Button
-                            variant="secondary"
-                            className="w-fit"
-                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                e.preventDefault()
-                                form.setValue("contacts", [
-                                    ...(field.value || []),
-                                    {name: "", email: "", role: null}
-                                ])
-                            }}
-                        >
-                            {/* <FaPlus /> */}
-                            {`Add a contact`}
-                        </Button>
+                        <Tooltip>
+                            <TooltipTrigger>
+                                <Button
+                                    variant="secondary"
+                                    className="w-[40px]"
+                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                        e.preventDefault()
+                                        form.setValue("contacts", [
+                                            ...(field.value || []),
+                                            {name: "", email: "", role: null}
+                                        ])
+                                    }}
+                                >
+                                    <FaPlus />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                {`Add a contact`}
+                            </TooltipContent>
+                        </Tooltip>
                     </div>
 
                     {field?.value && field.value.length > 0 && (
@@ -1136,7 +1223,7 @@ const EditTitle = ({form}: { form: any }) => {
                 <FormItem className="flex flex-col grow mr-10">
                     <FormControl>
                         <AutosizeTextarea
-                            className="overflow-hidden font-semibold text-3xl border-transparent hover:border-input"
+                            className="overflow-hidden font-semibold text-3xl"
                             id="title"
                             placeholder={`Enter a title`}
                             defaultValue={field.value}

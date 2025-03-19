@@ -6,6 +6,7 @@ import LinkedInProvider from "next-auth/providers/linkedin"
 import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter"
 import prisma from "@/lib/prisma"
+import {Member} from "@prisma/client";
 import {User} from "next-auth";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL
@@ -159,7 +160,7 @@ export const authOptions: NextAuthOptions = {
             // Storing both the current organizationId AND the membership object is redundant
             // The membership object has the organizationId
             let activeOrganizationId = token.organizationId as string | null;
-            let membership = token.membership as any
+            let membership = token.membership as Member | null
 
             if (organizationIds) {
                 // If activeOrganizationId is null but the user has memberships, use the first membership
@@ -179,7 +180,7 @@ export const authOptions: NextAuthOptions = {
                     membership = dbUser.memberships[0];
                 } else if (
                     membership &&
-                    !dbUser.memberships.some((m) => m.id === membership.id)
+                    !dbUser.memberships.some((m) => m.id === membership?.id)
                 ) {
                     // If membership exists but isn't in the user's memberships, reset it
                     membership = null;

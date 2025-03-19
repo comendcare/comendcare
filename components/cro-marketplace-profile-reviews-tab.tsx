@@ -4,15 +4,7 @@ import CROReviewDialog from "@/components/cro-review-dialog";
 import CRORatingSection from "@/components/cro-rating-section";
 import { Card, CardContent } from "./ui/card";
 import Image from "next/image";
-
-interface ReviewWithAuthor extends Review {
-    author: User;
-    organization: Organization;
-}
-
-interface CompanyWithReviews extends Company {
-    reviews: ReviewWithAuthor[];
-}
+import {CompanyWithReviews} from "@/lib/types";
 
 export default function CROMarketplaceProfileReviewsTab({cro}: { cro: CompanyWithReviews }) {
     return (
@@ -53,7 +45,7 @@ export default function CROMarketplaceProfileReviewsTab({cro}: { cro: CompanyWit
                             </CardContent>
                         </Card>
                         : cro.reviews.map((review, index) => (
-                        <CROReviewCard key={index} review={review}/>
+                        <CROReviewCard key={index} review={review} cro={cro}/>
                     ))}
                 </div>
             </div>

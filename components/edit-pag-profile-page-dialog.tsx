@@ -607,7 +607,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                 <DialogTrigger asChild>
                     <Button
                         variant="secondary"
-                        className="gap-x-2 organization-profile-tour-step3"
+                        className="gap-x-2"
                     >
                         <FaPen/>
                         Edit profile

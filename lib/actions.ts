@@ -226,8 +226,14 @@ export const createCondition = async (formData: FormData) => {
 
         return {success: true, data: condition};
     } catch (error: any) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2002") {
+                return { success: false, error: "A condition with this name already exists." };
+            }
+        }
+
         console.error("Error creating condition:", error);
-        return {success: false, error: "Database error. Please try again later."};
+        return { success: false, error: "Database error. Please try again later." };
     }
 }
 
@@ -526,7 +532,6 @@ export const toggleOrganizationPublished = async (organizationId: string) => {
             }
 
             // Log or revalidate if necessary
-            console.log("Toggled published status for organization", organization.id)
             await revalidateTag(
                 `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
@@ -560,7 +565,6 @@ export const toggleOrganizationVerified = async (organizationId: string) => {
             })
 
             // Log or revalidate if necessary
-            console.log("Toggled verified status for organization", organization.id)
             await revalidateTag(
                 `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
@@ -739,11 +743,11 @@ export const updateOrganizationAttribute = withOrganizationAttributeAuth(
                 })
             }
 
-            console.log(
-                "Updated organization data! Revalidating tags: ",
-                `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
-                `${organization.customDomain}-metadata`
-            )
+            // console.log(
+            //     "Updated organization data! Revalidating tags: ",
+            //     `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`,
+            //     `${organization.customDomain}-metadata`
+            // )
             await revalidateTag(
                 `${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}-metadata`
             )
@@ -1066,7 +1070,6 @@ export async function inviteUser(
                 organizationId: organization.organizationId
             }
         }).then((res) => {
-            console.log(`Invitation created for ${email}`)
 
             return res
         })
@@ -1659,7 +1662,6 @@ export async function updateCondition(formData: FormData, organizationId: string
                 data[key] = value;
             }
         });
-        console.log(data)
 
         // Find the first condition associated with the organization
         const conditions = await prisma.conditionToOrganization.findMany({
@@ -1988,7 +1990,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
         const organizationId: string = organization.id
 
         await Promise.all(
-            nodes.map(async (node: any) => {
+            nodes.map(async (node: any, index: number) => {
                 const n = await prisma.node.create({
                     include: {data: true},
                     // where: {id: node.id},
@@ -2023,6 +2025,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                         }
                                     }))
                                 },
+                                timelineOrder: node.data?.timelineOrder,
                                 description: node.data?.description,
                                 startDate: node.data?.startDate,
                                 endDate: node.data?.endDate,
@@ -2207,6 +2210,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                                 }
                             }))
                         },
+                        timelineOrder: milestone.timelineOrder,
                         otherTypeDetails: milestone.otherTypeDetails,
                         description: milestone.description,
                         startDate: milestone.startDate,
@@ -2537,13 +2541,41 @@ export async function createNotification({notificationData}: { notificationData:
             data: {
                 ...notificationData,
                 user: {connect: {id: session?.user.id}},
-                organization: {connect: {id: session.user.organizationId}}
+                organization: {connect: {id: session.user.organizationId}},
             }
         })
 
         return {success: true, data: notification}
     } catch (error) {
         logError("Could not create notification", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
+export async function createNotifications({notificationsList}: {notificationsList: any[]}) {
+    try {
+        const session = await getSession()
+        if (!session) throw new Error("No session data")
+
+        await prisma.platformNotification.createMany({
+            data: notificationsList.map(notification => ({
+                ...notification,
+                userId: session?.user.id,
+                organizationId: session.user.organizationId
+            }))
+        })
+
+        // Fetch the inserted notifications
+        const notifications = await prisma.platformNotification.findMany({
+            where: {
+                userId: session?.user.id,
+                organizationId: session.user.organizationId
+            },
+        })
+
+        return {success: true, data: notifications}
+    } catch (error) {
+        logError("Could not create notifications", error)
         return {success: false, error: "Internal server error"}
     }
 }
@@ -2618,15 +2650,12 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                             // don't create a notification for the user creating the task
                             if (stakeholder.userId === session?.user.id) return
 
-                            let n = await prisma.platformNotification.create({
-                                data: {
-                                    type: "NEW_TASK",
-                                    title: "New task assigned",
-                                    message: `${newTask.name} was assigned to you.`,
-                                    user: {connect: {id: stakeholder.userId}},
-                                    organization: {connect: {id: organizations[0].id}}
-                                }
-                            })
+                            let n = await createNotification({notificationData: {
+                                type: "NEW_TASK",
+                                title: "New task assigned",
+                                message: `${newTask.name} was assigned to you.`,
+                                metadata: { taskId: stakeholder.taskId, stakeholderId: stakeholder.id }
+                            }})
                         })
                     )
                 }
@@ -2746,6 +2775,85 @@ export const createReview = async (companyId: string, formData: FormData): Promi
         return { success: true, data: result };
     } catch (error: any) {
         console.error("Error creating review:", error);
+        return { success: false, error: "Database error. Please try again later." };
+    }
+};
+
+export const editReview = async (companyId: string, formData: FormData): Promise<ApiResponse<any>> => {
+    const session = await getSession();
+    if (!session?.user.id) {
+        throw new Error("You must be signed in to perform this action");
+    }
+
+    try {
+        // Check if a review already exists
+        const existingReview = await prisma.review.findUnique({
+            where: {
+                authorId_companyId_organizationId: {
+                    authorId: session.user.id,
+                    companyId: companyId,
+                    organizationId: session.user.organizationId,
+                },
+            },
+        });
+
+        if (!existingReview) {
+            return { success: false, error: "No existing review found to update." };
+        }
+
+        const title = formData.get("title") as string;
+        const body = formData.get("body") as string;
+        const rating = parseInt(formData.get("rating") as string);
+        const milestoneId = formData.get("milestone") as string || null;
+
+        // Use a transaction to update the review and recalculate avgRating atomically
+        const result = await prisma.$transaction(async (tx) => {
+            // Update the review
+            const updatedReview = await tx.review.update({
+                where: { id: existingReview.id },
+                data: {
+                    title,
+                    body,
+                    rating,
+                    milestones: milestoneId ? { connect: { id: milestoneId } } : undefined,
+                },
+            });
+
+            // Calculate new avgRating
+            const aggregated = await tx.review.aggregate({
+                where: { companyId },
+                _avg: { rating: true },
+            });
+
+            const newAvgRating = aggregated._avg.rating ?? 0;
+
+            // Update the company's avgRating
+            const updatedCompany = await tx.company.update({
+                where: { id: companyId },
+                data: { avgRating: newAvgRating },
+            });
+
+            if (updatedReview && updatedCompany) {
+                await updateTypeSenseDocument(
+                    `https://${process.env.NEXT_PUBLIC_TYPESENSE_NODE!}`,
+                    (
+                        process.env.NEXT_PUBLIC_NODE_ENV === "development" || process.env.NEXT_PUBLIC_NODE_ENV === "preview"
+                            ? process.env.NEXT_PUBLIC_TYPESENSE_ADMIN_API_KEY
+                            : process.env.TYPESENSE_ADMIN_API_KEY
+                    )!,
+                    updatedCompany,
+                    'companies'
+                );
+            }
+
+            return updatedReview;
+        });
+
+        revalidatePath("app/cro/");
+
+        return { success: true, data: result };
+    } catch (error: any) {
+        console.error("Error updating review:", error);
         return { success: false, error: "Database error. Please try again later." };
     }
 };

@@ -1,8 +1,17 @@
 "use client"
-import React from "react";
-import {Review, User, Organization} from "@prisma/client";
+
+import React, {useEffect, useRef, useState} from "react";
+import {Review, User, Organization, Milestone, Company} from "@prisma/client";
 import {StarRatingIndicator} from "@/components/star-rating-indicator";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormLabel,
+    FormItem,
+    FormMessage,
+} from "@/components/ui/form";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -11,22 +20,59 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+    Select,
+    SelectContent,
+    SelectLabel,
+    SelectGroup,
+    SelectTrigger,
+    SelectValue,
+    SelectItem
+} from "@/components/ui/select"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription, DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
+import {StarRatingSelector} from "@/components/star-rating-selector";
 import {useSession} from "next-auth/react";
-import {FaEllipsisVertical, FaFlag, FaPencil, FaTrash} from "react-icons/fa6";
-import {deleteReview} from "@/lib/actions";
+import {FaEllipsisVertical, FaFlag, FaLinkSlash, FaPencil, FaTrash} from "react-icons/fa6";
+import {editReview, deleteReview} from "@/lib/actions";
 import {useRouter} from "next/navigation";
 import {toast} from "sonner";
 import va from "@vercel/analytics"
+import {useForm} from "react-hook-form";
+import {z} from "zod";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {getMilestones} from "@/lib/fetchers";
+import { reviewForm } from "./cro-review-dialog";
+import {Button} from "@/components/ui/button";
+import {ReviewWithAuthor} from "@/lib/types";
 
 
-interface ReviewWithAuthor extends Review {
-    author: User;
-    organization: Organization;
-}
-
-export const CROReviewCard = ({review}: { review: ReviewWithAuthor }) => {
+export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Company }) => {
     const router = useRouter()
     const {data: session} = useSession()
+    const initializing = useRef(true)
+    const [loading, setLoading] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
+
+    const form = useForm<z.infer<typeof reviewForm>>({
+        mode: "onChange",
+        resolver: zodResolver(reviewForm),
+        defaultValues: {
+            title: review.title,
+            body: review.body,
+            rating: review.rating,
+            milestone: "",
+        },
+    });
 
     async function handleDeleteReview(review: ReviewWithAuthor) {
         try {
@@ -46,6 +92,50 @@ export const CROReviewCard = ({review}: { review: ReviewWithAuthor }) => {
             console.error("Error deleting review:", error);
         }
     }
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
+            if (milestonesResponse.success) {
+                const filteredMilestones = milestonesResponse?.data?.filter(
+                    item => (item.status === "INPROGRESS" || item.status === "COMPLETED") && !item.private
+                )
+                setFetchedMilestones(filteredMilestones as Milestone[])
+            } else {
+                console.error(milestonesResponse.error)
+            }
+            // Allow update once form is initialized
+            initializing.current = false;
+        }
+
+        fetchData()
+    }, [])
+
+    const handleFormSubmit = async (values: z.infer<typeof reviewForm>) => {
+        setLoading(true);
+        try {
+            const formData = new FormData();
+            Object.entries(values).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    formData.append(key, value.toString());
+                }
+            });
+
+            editReview(cro.id, formData).then((res: any) => {
+                if (res.error) {
+                    toast.error(res.error);
+                } else {
+                    va.track("Edited review");
+                    router.refresh();
+                    toast.success("Successfully edited review!");
+                }
+            });
+        } catch (error) {
+            toast.error("An error occurred while editing your review.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="flex flex-col gap-4">
@@ -139,32 +229,143 @@ export const CROReviewCard = ({review}: { review: ReviewWithAuthor }) => {
                         Not helpful
                     </a>
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger>
-                            <FaEllipsisVertical/>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            {session?.user.id === review.author.id &&
-                                <DropdownMenuItem>
-                                    <FaPencil/>
-                                    Edit review
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+
+                        <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger>
+                                <FaEllipsisVertical/>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                {session?.user.id === review.author.id &&
+                                    <DialogTrigger asChild>
+                                        <DropdownMenuItem>
+                                            <FaPencil/>
+                                            Edit review
+                                        </DropdownMenuItem>
+                                    </DialogTrigger>
+                                }
+                                {session?.user.id !== review.author.id &&
+                                    <DropdownMenuItem>
+                                        <FaFlag/>
+                                        Report review
+                                    </DropdownMenuItem>
+                                }
+                                <DropdownMenuSeparator/>
+                                <DropdownMenuItem
+                                    onClick={() => handleDeleteReview(review)}
+                                >
+                                    <FaTrash/>
+                                    Delete review
                                 </DropdownMenuItem>
-                            }
-                            {session?.user.id !== review.author.id &&
-                                <DropdownMenuItem>
-                                    <FaFlag/>
-                                    Report review
-                                </DropdownMenuItem>
-                            }
-                            <DropdownMenuSeparator/>
-                            <DropdownMenuItem
-                                onClick={() => handleDeleteReview(review)}
-                            >
-                                <FaTrash/>
-                                Delete review
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Edit Review</DialogTitle>
+                                <DialogDescription>Modify your review below.</DialogDescription>
+                            </DialogHeader>
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(handleFormSubmit)} className="flex flex-col gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="title"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Title</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Enter a title" {...field} />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="body"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Description</FormLabel>
+                                                <FormControl>
+                                                    <Textarea placeholder="Enter a description" {...field} />
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="rating"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Rating</FormLabel>
+                                                <FormControl>
+                                                    <StarRatingSelector
+                                                        control={form.control}
+                                                        name="rating"
+                                                        totalStars={5}
+                                                        size={24}/>
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="milestone"
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>{`Associated Milestone`}</FormLabel>
+                                                <div className="flex flex-row gap-4">
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Link to a milestone"/>
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            <SelectGroup>
+                                                                {fetchedMilestones.length === 0 ?
+                                                                    <SelectLabel>
+                                                                        {`You don't have any in progress or completed milestones.`}
+                                                                    </SelectLabel>
+                                                                    : fetchedMilestones.map((m: Milestone, index: number) => (
+                                                                        <SelectItem value={m.id} key={index}>
+                                                                            {m.title}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                            </SelectGroup>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage/>
+                                                    <Button
+                                                        variant="secondary"
+                                                        size="icon"
+                                                        onClick={(e) => {
+                                                            e.preventDefault()
+                                                            form.setValue('milestone', "")
+                                                        }}
+                                                        disabled={!field.value}
+                                                    >
+                                                        <FaLinkSlash/>
+                                                    </Button>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <DialogFooter>
+                                        <Button type="submit" disabled={loading}>
+                                            {loading ? "Submitting..." : "Submit Review"}
+                                        </Button>
+                                    </DialogFooter>
+                                </form>
+                            </Form>
+                        </DialogContent>
+                    </Dialog>
                 </aside>
             </div>
         </div>

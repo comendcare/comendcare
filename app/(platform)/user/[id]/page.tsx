@@ -23,12 +23,9 @@ import {Button} from "@/components/ui/button"
 import {acceptInvitation} from "@/lib/actions";
 import Image from "next/image"
 import {useRouter} from "next/navigation";
+import {MembershipWithOrganization} from "@/lib/types";
 
 type InvitationWithOrganization = Invitation & {
-    organization?: Organization | null; // Optional because the organization might be null if not fetched
-};
-
-type MembershipWithOrganization = Member & {
     organization?: Organization | null; // Optional because the organization might be null if not fetched
 };
 

@@ -9,6 +9,9 @@ import {
 } from "@xyflow/react"
 import { createNodes, deleteNode, Milestone, updateDBFlow, updateEdges, updateMilestones} from "@/lib/actions"
 import { toast } from "sonner"
+import { nanoid } from "nanoid"
+import { NodeType, StatusType } from "@/lib/types"
+import { getMilestoneTypes } from "@/lib/fetchers"
 
 export type RoadmapState = {
     initialized: boolean,
@@ -23,12 +26,14 @@ export type RoadmapState = {
     setSelectedNodeId: (id: string | null) => void
     milestones: any[]
     setMilestone: (id: string, newProperties: any) => Promise<Milestone[] | void>
+    setMilestones: (milestones: Milestone[]) => Promise<Milestone[] | void>
     nodes: Node[]
     edges: Edge[]
     onEdgesChange: (changes: EdgeChange[]) => Promise<Edge[] | void>
     onConnect: (connection: any) => Promise<Edge[] | void>
     setNodes: (nodes: Node[]) => Promise<Node[] | void>
     setEdges: (edges: Edge[]) => Promise<Edge[] | void>
+    addMilestones: (milestones: Partial<{nodeType: NodeType, title: string | undefined, description: string | undefined, types: string[], status: StatusType | undefined}>[]) => Promise<Node[] | void>
     addNodes: (node: Node[]) => Promise<Node[] | void>
     deleteNode: (nodeId: string) => Promise<any | void>
     saveState: () => void
@@ -104,6 +109,46 @@ export const useRoadmapStore = create<RoadmapState>()(
                 console.error(`Error updating milestones`, response?.error)
             }
         },
+        setMilestones: async (milestones: Milestone[]) => {
+            console.log(`set milestones`)
+            // const milestones = get().milestones.map(milestone =>
+            //     milestone.nodeId === nodeId
+            //         ? { ...milestone, ...newProperties }
+            //         : milestone
+            // )
+            // if (newProperties.nodeType) {
+            //     // if the type has been updated, we also update the node type
+            //     const nodes = get().nodes.map(node => (
+            //         node.id === nodeId 
+            //             ? { ...node, type: newProperties.nodeType }
+            //             : node
+            //     ))
+            //     set({ milestones, nodes })
+            // } else {
+            //     set({ milestones })
+            // }
+            const updatedMilestones = get().milestones.map(oldMilestone => {
+                const newMilestone = milestones.find(m => m.id === oldMilestone.id)
+                if (newMilestone) {
+                    return ({
+                        ...oldMilestone,
+                        ...newMilestone
+                    })
+                } else {
+                    return oldMilestone
+                }
+            })
+            set({ milestones: updatedMilestones })
+
+            // update DB milestones
+            const response = await updateMilestones({ milestones: updatedMilestones })
+            if (response?.success && response?.data) {
+                return response.data as Milestone[]
+            } else {
+                toast.error("Could not update milestones", {position: "bottom-left"})
+                console.error(`Error updating milestones`, response?.error)
+            }
+        },
         nodes: [],
         edges: [],
         onEdgesChange: async (changes: EdgeChange[]) => {
@@ -168,9 +213,85 @@ export const useRoadmapStore = create<RoadmapState>()(
                 console.error(`Error updating Flow Edges`, response?.error)
             }
         },
+        addMilestones: async (milestones: Partial<{
+            nodeType: NodeType, 
+            title: string | undefined,
+            description: string | undefined,
+            types: string[],
+            status: StatusType | undefined
+        }>[]) => {
+            console.log(`add milestones`)
+            const newNodes: any[] = []
+    
+            // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
+            // const {
+            //     height,
+            //     width,
+            //     transform: [transformX, transformY, zoomLevel]
+            // } = store.getState()
+    
+            // const zoomMultiplier = 1 / zoomLevel
+            // let centerX =
+            //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
+            // let centerY =
+            //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
+
+            const milestoneTypes = await getMilestoneTypes()
+    
+            const milestonesAlongXAxis = get().nodes.sort((a, b) => {
+                return a.position.x - b.position.x
+            })
+            let centerX = milestonesAlongXAxis.length > 0 ? ((milestonesAlongXAxis[milestonesAlongXAxis.length - 1]?.position?.x || 0) + 500): (0)
+            let centerY = 0
+    
+            milestones.forEach((defaultData, index) => {
+                const id = nanoid()
+                const milestoneId = nanoid()
+                const newNode: Node = {
+                    id: id,
+                    type: defaultData?.nodeType || "PROJECT",
+                    position: {
+                        x: centerX,
+                        y: centerY
+                    },
+                    origin: [0.0, 0.0],
+                    data: {
+                        id: milestoneId,
+                        nodeId: id,
+                        private: true,
+                        timelineOrder: get().milestones.length + index, // add in last position in timeline
+                        nodeType: defaultData?.nodeType || "PROJECT",
+                        title: defaultData?.title || 'New Milestone',
+                        description: defaultData?.description || '',
+                        types: defaultData?.types?.map((type: any) => {
+                            const dbType = (milestoneTypes.data || []).find(t => t.id === type)
+                            if (dbType) {
+                                return ({
+                                    milestoneId: milestoneId,
+                                    milestoneTypeId: type,
+                                    milestoneType: dbType
+                                })
+                            }
+                        }).filter((type: any) => type !== undefined),
+                        status: defaultData?.status || "PLANNED",
+                    }
+                }
+    
+                centerX += 500
+                // centerY += 200
+    
+                newNodes.push(newNode)
+            })
+    
+            const nodes = await get().addNodes(newNodes)
+            return nodes
+        },
         addNodes: async (nodes: Node[]) => {
             console.log(`add nodes`)
-            set({ nodes: [...get().nodes, ...nodes], milestones: [...get().milestones, ...nodes.map(node => node.data)] })
+            set({ 
+                nodes: [...get().nodes, ...nodes], 
+                milestones: [...get().milestones, ...nodes.map(node => node.data)] 
+            })
             
             // update DB Nodes
             const response = await createNodes({ roadmapId: get().roadmapId, nodes })

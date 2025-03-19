@@ -1,4 +1,4 @@
-import {User, Post, Comment, Prisma} from "@prisma/client";
+import {User, Post, Comment, Prisma, Review, Organization, Member, Company, SavedCompany} from "@prisma/client";
 
 export type Milestone = Prisma.MilestoneGetPayload<{
     include: {
@@ -20,6 +20,23 @@ export interface Option {
     [key: string]: string | boolean | undefined;
 }
 
+export type SavedCompanyData = SavedCompany & {
+    company: Company;
+};
+
+export interface CompanyWithReviews extends Company {
+    reviews: ReviewWithAuthor[];
+}
+
+export type MembershipWithOrganization = Member & {
+    organization?: Organization | null; // Optional because the organization might be null if not fetched
+};
+
+export interface ReviewWithAuthor extends Review {
+    author: User;
+    organization: Organization;
+}
+
 export type MemberWithUser = Prisma.MemberGetPayload<{
     include: { user: true };
 }>;
@@ -39,7 +56,9 @@ export type PostWithAuthorAndComments = Post & {
 
 export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 
-export type NotificationType = 'NEW_TASK'
+export type NotificationType = 'NEW_TASK' | 'NEW_RECOMMENDATION'
+
+export type NodeType = 'ASSET' | 'PROJECT' | 'RFP'
 
 export const KANBAN_NOTIFICATIONS: NotificationType[] = ["NEW_TASK"]
 

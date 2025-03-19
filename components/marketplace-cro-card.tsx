@@ -30,7 +30,8 @@ function countCategories(cro: any): NodeTypeCount {
         services: cro.services?.length || 0,
         certifications: cro.certifications?.length || 0,
         rfis: cro.rfis?.length || 0,
-        sites: cro.sites?.length || 0
+        sites: cro.sites?.length || 0,
+        reviews: cro.reviews?.length || 0
     };
 }
 
@@ -145,6 +146,7 @@ export function CROCardContents({cro}: { cro: Company }) {
 
     const categoryLabels = [
         {key: "services", icon: FaFileLines, label: "Services"},
+        {key: "reviews", icon: FaFileLines, label: "Reviews"},
         // {key: "certifications", icon: FaUsers, label: "Certifications"},
         // {key: "rfis", icon: FaBullhorn, label: "RFIs"},
         // {key: "sites", icon: FaLocationDot, label: "Sites"}

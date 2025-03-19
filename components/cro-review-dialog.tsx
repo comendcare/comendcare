@@ -49,7 +49,7 @@ import {getMembers, getMilestones} from "@/lib/fetchers";
 import {useSession} from "next-auth/react";
 import {FaLinkSlash} from "react-icons/fa6";
 
-const reviewForm = z.object({
+export const reviewForm = z.object({
     title: z
         .string({required_error: "Please provide a title"})
         .min(1, "Title is required")
