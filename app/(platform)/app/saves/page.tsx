@@ -10,17 +10,18 @@ import {getSavedCompaniesFromOrganizationId} from "@/lib/fetchers";
 import {CROServicesDataTable} from "@/components/cro-services-data-table/cro-services-data-table";
 import {columns} from "@/components/saved-cro-data-table/saved-cros-data-columns";
 import {SavedCROsDataTable} from "@/components/saved-cro-data-table/saved-cros-data-table";
+import {SavedCompanyData} from "@/lib/types";
 
 export default async function SavesPage() {
     const router = useRouter()
     const { data: session } = useSession();
-    const [savedCompanies, setSavedCompanies] = useState<SavedCompany[]>([]);
+    const [savedCompanies, setSavedCompanies] = useState<SavedCompanyData[]>([]);
 
     useEffect(() => {
         async function fetchData() {
             const savedCompaniesResponse = await getSavedCompaniesFromOrganizationId(session?.user?.organizationId || undefined);
             if (savedCompaniesResponse.success) {
-                const savedCompaniesData = savedCompaniesResponse.data as SavedCompany[];
+                const savedCompaniesData = savedCompaniesResponse.data as SavedCompanyData[];
                 setSavedCompanies(savedCompaniesData);
             } else {
                 console.error(savedCompaniesResponse.error);
@@ -29,9 +30,10 @@ export default async function SavesPage() {
 
         fetchData();
     }, [session?.user?.organizationId]);
+    console.log(savedCompanies);
 
     return (
-        <main className="flex gap-8 flex-col w-full h-full justify-center items-center mx-auto">
+        <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto">
             {savedCompanies.length === 0 ?
                 <div className="h-full flex flex-col items-center justify-center py-20">
                     <Image

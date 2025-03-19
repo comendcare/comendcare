@@ -16,6 +16,7 @@ import { Card, CardContent, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
 
 const selector = (state: RoadmapState) => ({
+    milestones: state.milestones,
     addNodes: state.addNodes,
 })
 
@@ -25,43 +26,9 @@ export default function RoadmapTemplates() {
     const [isLoading, setIsLoading] = useState(false)
 
     const {
+        milestones,
         addNodes,
     } = useRoadmapStore(useShallow(selector))
-
-    const addMilestones = async (newMilestones: any[]) => {
-        const newNodes: any[] = []
-        let centerX = 0
-        let centerY = 0
-
-        newMilestones.forEach(defaultData => {
-            const id = nanoid()
-            const newNode: Node = {
-                id: id,
-                type: defaultData?.nodeType || "PROJECT",
-                position: {
-                    x: centerX,
-                    y: centerY
-                },
-                data: {
-                    id: nanoid(),
-                    nodeId: id,
-                    types: [],
-                    title: defaultData?.title || `New Milestone`,
-                    ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                    status: defaultData?.status || "PLANNED",
-                    private: true
-                }
-            }
-
-            centerX += 500
-            // centerY += 200
-
-            newNodes.push(newNode)
-        })
-
-        const nodes = await addNodes(newNodes)
-        return nodes
-    }
 
     if (isLoading) {
         return (
@@ -85,7 +52,7 @@ export default function RoadmapTemplates() {
                 setSelectedMilestones={setSelectedMilestones}
                 createEmpty={async () => {
                     setIsLoading(true)
-                    await addMilestones([{name: 'New Milestone'}])
+                    // await addMilestones([{name: 'New Milestone'}])
                     router.push('/app/research-plan')
                     router.refresh()
                 }}
@@ -97,7 +64,7 @@ export default function RoadmapTemplates() {
                         disabled={selectedMilestones.length === 0}
                         onClick={async () => {
                             setIsLoading(true)
-                            await addMilestones(selectedMilestones)
+                            // await addMilestones(selectedMilestones)
                             router.push('/app/research-plan')
                             router.refresh()
                         }}

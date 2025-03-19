@@ -158,7 +158,6 @@ export async function getRoadmapsForOrganization(domain: string) {
             }
         ]
     })
-    console.log(`roadmaps`, roadmaps)
     return roadmaps
 
     // return await unstable_cache(
@@ -693,7 +692,6 @@ export async function checkSubdomainAvailability(nickname: string) {
         const existingOrg = await prisma.organization.findUnique({
             where: {subdomain: nickname},
         });
-        console.log(`serverside: ${existingOrg}`)
 
         return !existingOrg
     } catch (error: any) {
@@ -920,7 +918,10 @@ export async function getSavedCompaniesFromOrganizationId(organizationId: string
 
     try {
         const savedCompanies = await prisma?.savedCompany.findMany({
-            where: {organizationId}
+            where: {organizationId},
+            include: {
+                company: true
+            }
         })
 
         if (!savedCompanies) {

@@ -172,7 +172,7 @@ const steps: Tour[] = [
             {
                 icon: <>👋</>,
                 title: "Updating your organization",
-                content: <>{`If you'd like to update your organization's information, click the "Edit profile" button.`}</>,
+                content: <>{`If you'd like to update your organization's information, click the pencil icon near the content you want to edit.`}</>,
                 selector: ".organization-profile-tour-step3",
                 side: "left" as any,
                 showControls: true,

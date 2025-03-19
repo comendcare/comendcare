@@ -6,38 +6,19 @@ import { FaPlus } from "react-icons/fa6"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { useStoreApi } from "@xyflow/react"
-import { nanoid } from "nanoid"
 import { getMilestoneTypes } from "@/lib/fetchers"
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
-import { Label } from "./ui/label"
-import { NODE_TYPE_OPTIONS } from "@/lib/types"
+import { NODE_TYPE_OPTIONS, NodeType } from "@/lib/types"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { FaInfoCircle } from "react-icons/fa"
 
 const selector = (state: RoadmapState) => ({
-    initialized: state.initialized,
-    selectedView: state.selectedView,
-    setSelectedView: state.setSelectedView,
-    selectedNodeId: state.selectedNodeId,
-    setSelectedNodeId: state.setSelectedNodeId,
-    nodes: state.nodes,
-    milestones: state.milestones,
-    saveState: state.saveState,
-    addNodes: state.addNodes
+    addMilestones: state.addMilestones
 })
 
 export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen: (open: boolean) => void}) => {
     const { 
-        initialized,
-        selectedView,
-        setSelectedView,
-        selectedNodeId, 
-        setSelectedNodeId, 
-        nodes: dbNodes,
-        milestones, 
-        saveState,
-        addNodes
+        addMilestones,
     } = useRoadmapStore(useShallow(selector))
     const store = useStoreApi()
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
@@ -51,87 +32,12 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
             // get milestone types from database
             const response = await getMilestoneTypes()
             if (response.success && response.data) {
-                // setMilestoneTypes(response.data.map(type => ({
-                //     value: type.id,
-                //     label: type.label,
-                //     description: type.description || undefined
-                // })))
                 setMilestoneTypes(response.data || [])
             }
         }
 
         init()
     }, []);
-
-    // Add a empty milestone node
-    // if a position is provided, place at the given coordinates
-    // if a position is not provided, place in the center
-    const addMilestones = async (newMilestones: any[], type: string) => {
-        const newNodes: any[] = []
-
-        // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
-        const {
-            height,
-            width,
-            transform: [transformX, transformY, zoomLevel]
-        } = store.getState()
-
-        const zoomMultiplier = 1 / zoomLevel
-        const milestonesAlongXAxis = dbNodes.sort((a, b) => {
-            return a.position.x - b.position.x
-        })
-        // let centerX =
-        //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        let centerX = milestonesAlongXAxis.length > 0 ? (
-            (milestonesAlongXAxis[milestonesAlongXAxis.length - 1]?.position?.x || 0) + 500
-        ): (
-            0
-        )
-        // let centerY =
-        //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
-        let centerY = 0
-
-        newMilestones.forEach(defaultData => {
-            const id = nanoid()
-            const milestoneId = nanoid()
-            const newNode: any = {
-                id: id,
-                type: type,
-                position: {
-                    x: centerX,
-                    y: centerY
-                },
-                origin: [0.0, 0.0],
-                data: {
-                    id: milestoneId,
-                    nodeId: id,
-                    types: defaultData?.types?.map((type: any) => {
-                        const dbType = milestoneTypes.find(t => t.id === type)
-                        if (dbType) {
-                            return ({
-                                milestoneId: milestoneId,
-                                milestoneTypeId: type,
-                                milestoneType: dbType
-                            })
-                        }
-                    }).filter((type: any) => type !== undefined),
-                    title: defaultData?.title || `New Milestone`,
-                    ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                    status: defaultData?.status || "PLANNED",
-                    private: true,
-                    nodeType: type
-                }
-            }
-
-            centerX += 500
-            // centerY += 200
-
-            newNodes.push(newNode)
-        })
-
-        const nodes = await addNodes(newNodes)
-        return nodes
-    }
 
     return (
         <Dialog open={open} onOpenChange={(open: boolean) => {
@@ -212,7 +118,15 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                             type="button"
                             onClick={() => {
                                 console.log(`add milestone`, selectedMilestoneTemplate)
-                                addMilestones([selectedMilestoneTemplate], selectedMilestoneType)
+                                addMilestones([selectedMilestoneTemplate].map((template: any) => {
+                                    return ({
+                                        nodeType: selectedMilestoneType as NodeType,
+                                        title: template?.title,
+                                        description: template?.description,
+                                        types: template?.types,
+                                        status: template?.status,
+                                    })
+                                }))
                             }}
                         >
                             <FaPlus />

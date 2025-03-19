@@ -30,7 +30,7 @@ import { Button } from "@/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
-import { sleep } from "@/lib/utils";
+import { cn, sleep } from "@/lib/utils";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -96,20 +96,16 @@ export default function AppLayout({children}: AppLayoutProps) {
             console.log(`Start initialization... for org ${session.user.organizationId}`)
 
             // Init Notifications Store
-            // let notifications = await getAllNotifications()
-            // if (notifications.success && notifications.data) {
-            //     initializeNotificationsState({
-            //         notifications: notifications.data
-            //     })
-
-            //     // if we're going to the kanban set notifications to viewed
-            //     if (pathname === '/app/task-board') {
-            //         setNotificationsViewed(notifications.data.filter(notification => notification.type === "NEW_TASK"))
-            //     }
-            // } else {
-            //     console.error(notifications.error)
-            //     toast.error(notifications.error)
-            // }
+            let notifications = await getAllNotifications()
+            if (notifications.success && notifications.data) {
+                initializeNotificationsState({
+                    notifications: notifications.data
+                })
+            } else {
+                console.error(notifications.error)
+                toast.error(notifications.error)
+            }
+            console.log(`Notificaions initialized...`)
             
             // let kanban = await getKanbanFromOrganizationId()
             // if (!kanban.data && session.user.organizationId) {
@@ -213,6 +209,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                             <SidebarTrigger className="-ml-1" />
                             <div className="flex items-center">
                                 <Button 
+                                    className={cn(!pathname.includes('app/profile') && !pathname.includes('app/research-plan') ? "hidden" : "")}
                                     disabled={!pathname.includes('app/profile') && !pathname.includes('app/research-plan')}
                                     variant="ghost"
                                     onClick={() => {

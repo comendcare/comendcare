@@ -140,7 +140,7 @@ export default function TabsFeaturesSection() {
             <div className="hidden md:block">
                 <Tabs
                     value={activeTab}
-                    onValueChange={handleTabChange as any}
+                    onValueChange={handleTabChange}
                     className="flex flex-row space-x-8"
                     aria-live="polite"
                 >

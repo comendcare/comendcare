@@ -18,7 +18,9 @@ import { defaultFilters, MilestoneSearchState, useMilestoneSearchStore } from "@
 import { MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS } from "@/lib/types"
 import MultipleSelector from "./ui/multiple-selector"
 import { Checkbox } from "./ui/checkbox"
-
+import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
+import { FaInfoCircle } from "react-icons/fa"
+import { useEffect } from "react"
 
 const selector = (state: MilestoneSearchState) => ({
     filters: state.filters,
@@ -51,6 +53,11 @@ export function MilestoneFilters() {
         setFilters(values)
     }
 
+    useEffect(() => {
+        const subscription = form.watch(() => form.handleSubmit(handleSubmit)())
+        return () => subscription.unsubscribe()
+    }, [handleSubmit, form.watch])
+
     return (
         <Form {...form}>
             <ScrollArea className="w-full h-full">
@@ -67,8 +74,17 @@ export function MilestoneFilters() {
                     name="milestoneTypes"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">Milestone types</FormLabel>
-                            <FormDescription>{`Types of milestones an organization may have in their research plan`}</FormDescription>
+                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                Milestone types
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle/>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`Types of milestones an organization may have in their research plan`}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </FormLabel>
                             <FormControl>
                                 <MultipleSelector
                                     {...field}
@@ -92,7 +108,17 @@ export function MilestoneFilters() {
                     name="milestoneStatus"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">Milestone status</FormLabel>
+                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                Milestone status
+                                {/* <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle/>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`Types of milestones an organization may have in their research plan`}
+                                    </TooltipContent>
+                                </Tooltip> */}
+                            </FormLabel>
                             <FormControl>
                                 <ToggleGroup
                                     type="multiple"
@@ -123,7 +149,17 @@ export function MilestoneFilters() {
                     name="nodeType"
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel className="font-semibold text-base">Milestone class</FormLabel>
+                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                Milestone class
+                                {/* <Tooltip>
+                                    <TooltipTrigger>
+                                        <FaInfoCircle/>
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`Types of milestones an organization may have in their research plan`}
+                                    </TooltipContent>
+                                </Tooltip> */}
+                            </FormLabel>
                             <FormControl>
                                 <ToggleGroup
                                     type="multiple"
@@ -202,7 +238,6 @@ export function MilestoneFilters() {
                         setFilters(defaultFilters)
                         form.reset(defaultFilters)
                     }}>Clear All Filters</Button>
-                    <Button variant="secondary" type="submit">Apply Filters</Button>
                 </span>
             </form>
             </ScrollArea>

@@ -18,11 +18,40 @@ import { StatusType } from "@/lib/types"
 import { DateView } from "./miletone-date-view"
 import StatusButton from "./milestone-status-button"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
+import {
+    DndContext,
+    type DragEndEvent,
+    type DragOverEvent,
+    DragOverlay,
+    type DragStartEvent,
+    useSensor,
+    useSensors,
+    KeyboardSensor,
+    Announcements,
+    UniqueIdentifier,
+    TouchSensor,
+    MouseSensor,
+    closestCorners
+} from "@dnd-kit/core"
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy
+} from "@dnd-kit/sortable"
+import {GripVertical} from "lucide-react"
+import { cva } from "class-variance-authority"
+import {CSS} from "@dnd-kit/utilities"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
+
+const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
 const selector = (state: RoadmapState) => ({
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
+    setMilestones: state.setMilestones,
     nodes: state.nodes,
     setNodes: state.setNodes,
     edges: state.edges,
@@ -31,11 +60,12 @@ const selector = (state: RoadmapState) => ({
     addNodes: state.addNodes,
 })
 
-export const PrivateTimelineView = () => {
+export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
     const {
         selectedNodeId,
         setSelectedNodeId,
         milestones,
+        setMilestones,
         nodes,
         setNodes: setDbNodes,
         edges,
@@ -57,37 +87,210 @@ const router = useRouter()
         // router.replace(`${pathname}?${params.toString()}`, { scroll: false })
     }
 
+    const sensors = useSensors(
+        useSensor(MouseSensor),
+        useSensor(TouchSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates
+        })
+    )
+
+    function getDraggedData(id: string) {
+        const name = milestones?.find(item => item.id === id)?.name
+        const position = (milestones?.findIndex(item => item.id === id) || 0) + 1
+        const length = milestones?.length || 0
+
+        return {name, position, length}
+    }
+
+    const announcements: Announcements = {
+        onDragStart({active}) {
+            const data = getDraggedData(active?.id.toString())
+            const message = `Picked up milestone ${data.name} at position ${data.position} of ${data.length}`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+        onDragOver({active, over}) {
+            const activeData = getDraggedData(active?.id.toString())
+
+            if (over) {
+                const overData = getDraggedData(over?.id.toString())
+                const message = `Milestone ${activeData.name} was moved over position ${overData.position} of ${activeData.length}.`
+                if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+                return message
+            }
+
+            const message = `Milestone ${activeData.name} is no longer over a droppable position.`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+        onDragEnd({active, over}) {
+            const activeData = getDraggedData(active?.id.toString())
+
+            if (over) {
+                const overData = getDraggedData(over?.id.toString())
+                const message = `Milestone ${activeData.name} was dropped into position ${overData.position} of ${activeData.length}`
+                if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+                return message
+            }
+
+            const message = `Milestone ${activeData} was dropped.`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+        onDragCancel({active}) {
+            const activeData = getDraggedData(active?.id.toString())
+            const message = `Dragging was cancelled. Milestone ${activeData.name} was dropped.`
+            if (SHOW_ACCESSIBILITY_MESSAGES) console.log(message)
+            return message
+        },
+    }
+
     return (
         <ScrollArea className="w-full h-full p-10 pt-0">
-            <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
-                {milestones?.sort((a, b) => {
-                    return a.startDate - b.startDate
-                }).map((milestone: any, index: number) => (
-                    <li 
-                        key={index} 
-                        className={cn("ms-6 text-left hover:bg-secondary p-2 rounded-md hover:cursor-pointer", selectedNodeId === milestone.nodeId ? "border-primary border-2" : "")}
-                        onClick={() => {handleEditClick(milestone.nodeId)}}>
-                            <span className="absolute flex items-center justify-center bg-white rounded-full -start-[18px]">
-                                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
-                            </span>
-                            <div className="flex flex-row items-center justify-start gap-4">
-                                <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white ">
-                                    {milestone.title}
-                                </h3>
-                                {milestone.private && <PrivateBadge iconOnly/>}
-                                <time
-                                    className="ml-auto block font-semibold leading-none dark:text-gray-500">
-                                    {getDates(milestone)}
-                                </time>
-                            </div>
-                            <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2"}>
-                                {milestone.description}
-                            </p>
-                            <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
-                    </li>
-                ))}
-            </ol>
+            <DndContext
+                accessibility={{
+                    announcements
+                }}
+                collisionDetection={closestCorners}
+                sensors={sensors}
+                onDragEnd={(event) => {
+                    const {active, over} = event
+
+                    if (active.id === over?.id) return
+
+                    const originalPosition = milestones?.findIndex(item => item.id === active.id) || 0
+                    const newPosition = milestones?.findIndex(item => item.id === over?.id) || 0
+
+                    const updatedMilestones = arrayMove(milestones || [], originalPosition, newPosition)
+                    setMilestones(updatedMilestones.map((milestone, index) => ({
+                        ...milestone,
+                        timelineOrder: index
+                    })))
+                }}
+            >
+                <ol className="ml-12 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
+                    <SortableContext 
+                        disabled={sortBy !== "custom"}
+                        items={
+                            milestones ? milestones.sort((a, b) => {
+                                switch (sortBy) {
+                                    case "custom": 
+                                        return (a.timelineOrder - b.timelineOrder)
+                                    case "start":
+                                        return (a.startDate - b.startDate)
+                                    case "end":
+                                        return (a.endDate - b.endDate)
+                                    default:
+                                        return 0
+                                }
+                            }).map(milestone => milestone.id) : []
+                        }
+                        strategy={verticalListSortingStrategy}
+                    >
+                        {(milestones || []).map((milestone, index) => (
+                            <DraggableTimelineItem 
+                                milestone={milestone} 
+                                index={index} 
+                                selectedNodeId={selectedNodeId} 
+                                handleEditClick={handleEditClick} 
+                                disabled={sortBy !== "custom"}
+                            />
+                        ))}
+                    </SortableContext>
+                </ol>
+            </DndContext>
         </ScrollArea>
+    )
+}
+
+const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClick, disabled}: {milestone: any, index: number, selectedNodeId: string | null, handleEditClick: (nodeId: string) => void, disabled: boolean}) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({id: milestone.id})
+
+    const style = {
+        transition,
+        // transform: CSS.Translate.toString(transform),
+        transform: transform ? `translateY(${transform.y}px)` : undefined, // Restrict X-axis
+        touchAction: "none",
+        userSelect: "none" as any,
+    }
+
+    return (
+        <li 
+            key={milestone.id}
+            ref={setNodeRef}
+            style={style}
+            className={cn( 
+                "text-left hover:cursor-pointer flex items-start -ml-[54px] gap-2",
+                isDragging ? "z-20" : ""
+            )}
+            onClick={() => {handleEditClick(milestone.nodeId)}}
+        >
+            {disabled ? (
+                <Tooltip>
+                    <TooltipTrigger>
+                        <Button
+                            disabled={true}
+                            type="button"
+                            variant={"ghost"}
+                            {...attributes}
+                            {...listeners}
+                            className="p-1 text-secondary-foreground/50 cursor-grab ml-1 mt-2"
+                        >
+                            <span className="sr-only">Move timeline</span>
+                            <GripVertical/>
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-80">
+                        <p>
+                            {`Dragging is only available in custom mode.`}
+                        </p>
+                    </TooltipContent>
+                </Tooltip>
+            ): (
+                <Button
+                    type="button"
+                    variant={"ghost"}
+                    {...attributes}
+                    {...listeners}
+                    className="p-1 text-secondary-foreground/50 cursor-grab ml-1 mt-2"
+                >
+                    <span className="sr-only">Move timeline</span>
+                    <GripVertical/>
+                </Button>
+            )}
+            <span className="flex items-center justify-center rounded-full mt-3">
+                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
+            </span>
+            <div 
+                className={cn(
+                    "bg-card hover:bg-secondary w-full p-4 rounded-md", 
+                    selectedNodeId === milestone.nodeId ? "border-primary border-2" : ""
+                )}
+            >
+                <div className="flex flex-row items-center justify-start gap-4">
+                    <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white ">
+                        {milestone.title}
+                    </h3>
+                    {milestone.private && <PrivateBadge iconOnly/>}
+                    <time
+                        className="ml-auto block font-semibold leading-none dark:text-gray-500">
+                        {getDates(milestone)}
+                    </time>
+                </div>
+                <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2"}>
+                    {milestone.description}
+                </p>
+                <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
+            </div>
+        </li>
     )
 }
 

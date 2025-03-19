@@ -22,7 +22,7 @@ import { Button, buttonVariants } from "./ui/button"
 import { cn, sleep } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare, FaFileImport, FaPlus } from "react-icons/fa6"
-import { FaRedo, FaUndo } from "react-icons/fa"
+import { FaInfoCircle, FaRedo, FaUndo } from "react-icons/fa"
 import {
     Dialog,
     DialogClose,
@@ -48,6 +48,7 @@ import { NewMilestoneDialogForm } from "./new-milestone-dialog"
 import { MilestoneType } from "@prisma/client"
 import { Option } from "@/lib/types"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -59,7 +60,7 @@ const selector = (state: RoadmapState) => ({
     nodes: state.nodes,
     milestones: state.milestones,
     saveState: state.saveState,
-    addNodes: state.addNodes
+    addMilestones: state.addMilestones
 })
 
 const recommendationsSelector = (state: CROSearchState) => ({
@@ -79,7 +80,7 @@ export function Roadmap({data}: {data: any}) {
         nodes: dbNodes,
         milestones, 
         saveState,
-        addNodes
+        addMilestones
     } = useRoadmapStore(useShallow(selector))
     const { recommendations } = useCROSearchStore(useShallow(recommendationsSelector))
     const router = useRouter()
@@ -94,6 +95,7 @@ export function Roadmap({data}: {data: any}) {
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
     const store = useStoreApi()
     const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
+    const [sortBy, setSortBy] = useState('custom')
 
     useEffect(() => {
         const init = async () => {
@@ -173,71 +175,6 @@ export function Roadmap({data}: {data: any}) {
         setSelectedNodeId(null) // deselect any selected milestones when switching tabs
     }
 
-    // Add a empty milestone node
-    // if a position is provided, place at the given coordinates
-    // if a position is not provided, place in the center
-    const addMilestones = async (newMilestones: any[]) => {
-        const newNodes: any[] = []
-
-        // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
-        const {
-            height,
-            width,
-            transform: [transformX, transformY, zoomLevel]
-        } = store.getState()
-
-        const zoomMultiplier = 1 / zoomLevel
-        const milestonesAlongXAxis = dbNodes.sort((a, b) => {
-            return a.position.x - b.position.x
-        })
-        // let centerX =
-        //     -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        let centerX = milestonesAlongXAxis.length > 0 ? (
-            (milestonesAlongXAxis[milestonesAlongXAxis.length - 1]?.position?.x || 0) + 500
-        ): (
-            0
-        )
-        // let centerY =
-        //     -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
-        let centerY = 0
-
-        newMilestones.forEach(defaultData => {
-            const id = nanoid()
-            const milestoneId = nanoid()
-            const newNode: Node = {
-                id: id,
-                type: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
-                position: {
-                    x: centerX,
-                    y: centerY
-                },
-                origin: [0.0, 0.0],
-                data: {
-                    id: milestoneId,
-                    nodeId: id,
-                    types: defaultData?.types.filter((type: any)=> type !== undefined).map((type: any) => ({
-                        milestoneId: milestoneId,
-                        milestoneTypeId: type?.id,
-                        milestoneType: type
-                    })),
-                    title: defaultData?.title || `New Milestone`,
-                    ...(defaultData?.description ? { description: defaultData.description } : undefined),
-                    status: defaultData?.status || "PLANNED",
-                    private: true,
-                    nodeType: defaultData?.nodeType || defaultData?.node?.type || "PROJECT",
-                }
-            }
-
-            centerX += 500
-            // centerY += 200
-
-            newNodes.push(newNode)
-        })
-
-        const nodes = await addNodes(newNodes)
-        return nodes
-    }
-
     if (!roadmapId || !initialized) {
         return (
             <div className="w-full h-full flex justify-center items-center">
@@ -255,17 +192,43 @@ export function Roadmap({data}: {data: any}) {
                 <ResizablePanel>
                     <Tabs defaultValue={selectedView ? selectedView : "timeline"} onValueChange={handleTabChange} className="flex flex-col gap-4">
                         <div className="flex flex-row items-center m-1 p-1 gap-x-1 justify-start">
-                            <TabsList>
+                            <TabsList className="mr-auto">
                                 <TabsTrigger value="timeline">Timeline View</TabsTrigger>
-                                <TabsTrigger value="flow">Flow View</TabsTrigger>
+                                <TabsTrigger value="flow" className="flex gap-2">
+                                    Flow View
+                                    <Tooltip>
+                                        <TooltipTrigger className="ml-auto">
+                                            <FaInfoCircle/>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-80 text-wrap text-left">
+                                            {"Position of milestones in flow view is controlled manually via drag & drop."}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TabsTrigger>
                             </TabsList>
+
+                            {selectedView === "timeline" || selectedView === null && (
+                                <div className="flex flex-row gap-4 items-center">
+                                    <p>Sort by:</p>
+                                    <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
+                                        <SelectTrigger className="w-[180px]">
+                                            <SelectValue defaultValue={'default'} placeholder={"Sort by"}/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="custom">{`Custom`}</SelectItem>
+                                            <SelectItem value="start">{`Start Date`}</SelectItem>
+                                            <SelectItem value="end">{`End Date`}</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button 
                                         size={"icon"} 
                                         variant={"cta"} 
-                                        className="research-plan-tour-step1 ml-auto" 
+                                        className="research-plan-tour-step1" 
                                         onClick={() => setNewMilestoneIsOpen(true)}
                                     >
                                         <FaPlus />
@@ -376,7 +339,7 @@ export function Roadmap({data}: {data: any}) {
                             className="mt-0 h-[calc(100vh-6rem)]"
                         >
                             {milestones.length > 0 ? (
-                                <PrivateTimelineView />
+                                <PrivateTimelineView sortBy={sortBy}/>
                             ): (
                                 <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} />
                             )}
@@ -429,27 +392,85 @@ export function Roadmap({data}: {data: any}) {
                                         complete: (result) => {
                                             const newMilestones: any[] = []
 
+                                            const isValidFormat = (entry: any) => {
+                                                const errors = []
+
+                                                if (!(entry.title && typeof entry.title === "string")) {
+                                                    errors.push({
+                                                        type: "title",
+                                                        message: "Field 'title' is not formatted properly"
+                                                    })
+                                                }
+
+                                                // description is optional, so we don't check it
+
+                                                if (!(entry.type && typeof entry.type === "string" || entry.type === null)) {
+                                                    errors.push({
+                                                        type: "type",
+                                                        message: "Field 'type' is not formatted properly"
+                                                    })
+                                                }
+
+                                                if (!(milestoneTypes.find(type => type.label === entry.type))) {
+                                                    errors.push({
+                                                        type: "type",
+                                                        message: `Type ${entry.type} not found in database`
+                                                    })
+                                                }
+
+                                                if (!(entry.category && typeof entry.category === "string")) {
+                                                    errors.push({
+                                                        type: "category",
+                                                        message: "Field 'category' is not formated properly"
+                                                    })
+                                                }
+
+                                                if (!(entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET")) {
+                                                    errors.push({
+                                                        type: "category",
+                                                        message: `Category ${entry.category} is not a valid category`
+                                                    })
+                                                }
+
+                                                if (errors.length > 0) return { isValid: false, errors: errors }
+                                                return { isValid: true }
+                                            }
+
+                                            let errors: {type: string, message: string}[] = []
                                             result.data.forEach((entry: any) => {
                                                 // validate milestone format - don't include the milestone if it doesn't have all the
                                                 // proper fields or if the fields are not of the correct type
-                                                if (
-                                                    entry.title && typeof entry.title === "string" && 
-                                                    entry.type && typeof entry.type === "string" &&
-                                                    entry.category && typeof entry.type === "string"
-                                                ) {
+                                                const validate = isValidFormat(entry)
+                                                if (validate.isValid && !validate.errors) {
+                                                    const foundType = milestoneTypes.find(type => type.label === entry.type)
                                                     newMilestones.push({
                                                         title: entry.title || 'New Milestone',
                                                         description: entry.description || '', // description is optional
-                                                        types: [milestoneTypes.find(type => type.label === entry.type)],
+                                                        types: foundType ? [foundType.milestoneTypeId || foundType.milestoneType?.id] : [],
                                                         nodeType: entry.category
                                                     })
                                                 } else {
-                                                    console.error(`Invalid milestone type`, entry)
+                                                    console.error(`Invalid milestone format`, entry);
+                                                    (validate.errors || []).forEach((error: any) => {
+                                                        console.error(`Format validation error: `, error.message)
+                                                    })
+
+                                                    errors = errors.concat(validate.errors || [])
+
+                                                    const foundType = milestoneTypes.find(type => type.label === entry.type)
+                                                    // attempt to create anyways
+                                                    newMilestones.push({
+                                                        title: entry.title && typeof entry.title === 'string' ? entry.title : 'New milestone',
+                                                        description: '',
+                                                        types: foundType ? [foundType.milestoneTypeId || foundType.milestoneType?.id] : [],
+                                                        nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT"
+                                                    })
                                                 }
                                             })
 
-                                            if (newMilestones.length !== result.data.length) {
+                                            if (errors.length > 0) {
                                                 toast('Error!', {
+                                                    duration: 4000,
                                                     description: `Some milestones were not formatted properly. Some milestones have not been imported.`
                                                 })
                                             }

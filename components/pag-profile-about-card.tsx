@@ -56,9 +56,9 @@ export const PagProfileAboutCard = ({organization, editable}: {
     }
 
     return (
-        <Card className="organization-profile-tour-step1">
+        <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
+                <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight organization-profile-tour-step1">
                     About
                 </CardTitle>
                 {(organization && editable) &&
