@@ -223,7 +223,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 <DialogTrigger asChild>
                     <Button
                         variant="ghost"
-                        className="gap-x-2 organization-profile-tour-step3"
+                        className="gap-x-2"
                     >
                         <FaPencil/>
                     </Button>

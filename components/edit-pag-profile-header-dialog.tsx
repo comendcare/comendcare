@@ -121,6 +121,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             <DialogTrigger asChild>
                 <Button
                     variant="ghost"
+                    className="organization-profile-tour-step3"
                 >
                     <FaPencil/>
                 </Button>
