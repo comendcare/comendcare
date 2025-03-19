@@ -37,7 +37,7 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {Milestone, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {MilestoneType, Prisma} from "@prisma/client"
+import {MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
@@ -71,6 +71,8 @@ import { TypeBadge } from "./type-badge"
 import Loading from "@/app/loading"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { Badge } from "./ui/badge"
+import { NotificationBubble } from "./notification-bubble"
+import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -90,6 +92,13 @@ const selector = (state: RoadmapState) => ({
 const recommendationsSelector = (state: CROSearchState) => ({
     recommendations: state.recommendations,
     setRecommendations: state.setRecommendations
+})
+
+const notificationsSelector = (state: NotificationsState) => ({
+    initialized: state.initialized,
+    notifications: state.notifications,
+    addNotification: state.addNotification,
+    setNotificationsViewed: state.setNotificationsViewed
 })
 
 const editMilestoneForm = z.object({
@@ -132,13 +141,15 @@ export function EditMilestoneForm({
     milestoneData: any
     onClose: () => void
 }) {
-    const {setMilestone} = useRoadmapStore(useShallow(selector))
+    const { setMilestone } = useRoadmapStore(useShallow(selector))
     const { recommendations, setRecommendations } = useCROSearchStore(useShallow(recommendationsSelector))
+    const { initialized: notificationsInitialized, notifications, addNotification, setNotificationsViewed } = useNotificationsStore(useShallow(notificationsSelector))
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
+    const [tab, setTab] = useState<"edit" | "recommendations">("edit")
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
@@ -183,6 +194,20 @@ export function EditMilestoneForm({
         debounce((updatedValues) => handleMilestoneFormSubmit(updatedValues), 500), []
     )
 
+    // when switching to recommendations tab, set notifications as viewed
+    useEffect(() => {
+        if (tab === "recommendations") {
+            const relevantNotifications = recommendations?.map(({content, milestone}) => (
+                notifications.find((notification: any) => (
+                    notification.type === "NEW_RECOMMENDATION" &&
+                    notification.metadata?.companyId === content.id &&
+                    notification.metadata?.milestoneId === milestone.id
+                ))
+            )).filter(n => n !== undefined) || []
+            setNotificationsViewed(relevantNotifications)
+        }
+    }, [tab])
+
     // Allow update once form is initialized
     useEffect(() => {
         const init = async () => {
@@ -205,7 +230,7 @@ export function EditMilestoneForm({
             }
 
             if (milestoneData) {
-                await setRecommendations([milestoneData as Milestone], {limit: 3})
+                await setRecommendations([milestoneData as Milestone], { limit: 3 })
             }
 
             initializing.current = false
@@ -213,6 +238,48 @@ export function EditMilestoneForm({
 
         init()
     }, []);
+
+    useEffect(() => {
+        const setupNotifications = async () => {
+            if (!initializing.current && notificationsInitialized) {
+                // if is initialized, set up the notifications for new recommendations
+                // Copy the notifications to avoid mutating the original array
+                let localNotifications: Partial<PlatformNotification>[] = [...notifications]
+                for (const recommendation of (recommendations || [])) {
+                    
+                    const exists = localNotifications
+                                    .filter((notification: any) => (
+                                        notification.type === "NEW_RECOMMENDATION" && 
+                                        notification.metadata?.milestoneId === recommendation.milestone.id && 
+                                        notification.metadata?.companyId === recommendation.content.id
+                                    )).length > 0
+
+                    console.log(`notifications exist`, exists)
+            
+                    if (!exists) {
+                        console.log(`notifications`, localNotifications);
+                        console.log(
+                            `ADD NOTIFICATION`,
+                            `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`
+                        );
+
+                        const notificationData = {
+                            type: "NEW_RECOMMENDATION",
+                            title: `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`,
+                            metadata: {
+                                milestoneId: recommendation.milestone.id,
+                                companyId: recommendation.content.id,
+                            },
+                        }
+                        await addNotification(notificationData)
+                        localNotifications = localNotifications.concat([notificationData])
+                    }
+                }
+            }
+        }
+
+        setupNotifications()
+    }, [recommendations, notificationsInitialized])
 
     // Watch form changes, don't watch while initializing
     useEffect(() => {
@@ -315,14 +382,25 @@ export function EditMilestoneForm({
 
                     <EditTitle form={form}/>
 
-                    <Tabs defaultValue="edit" className="space-y-4 w-full h-full">
+                    <Tabs value={tab} onValueChange={(value) => setTab(value as "edit" | "recommendations")} className="space-y-4 w-full h-full">
                         <div className="flex gap-4 items-center justify-between">
                             <TabsList>
                                 <TabsTrigger value="edit">
                                     Edit
                                 </TabsTrigger>
-                                <TabsTrigger value="recommendations">
+                                <TabsTrigger className="relative" value="recommendations">
                                     Relevant Results
+                                    {
+                                        notifications && 
+                                        notifications
+                                            .filter((notification: any) => (
+                                                notification.type === "NEW_RECOMMENDATION" && 
+                                                notification.metadata?.milestoneId === milestoneData.id && 
+                                                (recommendations || []).map(rec => rec.content.id).includes(notification.metadata?.companyId) &&
+                                                !notification.lastViewedAt
+                                            )).length > 0 && 
+                                        <NotificationBubble />
+                                    }
                                 </TabsTrigger>
                             </TabsList>
                             {/* <TypeBadge type={formData.nodeType}/> */}
