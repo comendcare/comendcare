@@ -1,7 +1,7 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod"
-import React, {useCallback, useEffect, useRef, useState} from "react"
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import {useForm, UseFormReturn} from "react-hook-form"
 import {z} from "zod"
 import {
@@ -189,104 +189,6 @@ export function EditMilestoneForm({
         notes: form.watch("notes")
     }
 
-    // callback ensures we're not creating a new debounce every time this is called
-    const debounceUpdates = useCallback(
-        debounce((updatedValues) => handleMilestoneFormSubmit(updatedValues), 500), []
-    )
-
-    // when switching to recommendations tab, set notifications as viewed
-    useEffect(() => {
-        if (tab === "recommendations") {
-            const relevantNotifications = recommendations?.map(({content, milestone}) => (
-                notifications.find((notification: any) => (
-                    notification.type === "NEW_RECOMMENDATION" &&
-                    notification.metadata?.companyId === content.id &&
-                    notification.metadata?.milestoneId === milestone.id
-                ))
-            )).filter(n => n !== undefined) || []
-            setNotificationsViewed(relevantNotifications)
-        }
-    }, [tab])
-
-    // Allow update once form is initialized
-    useEffect(() => {
-        const init = async () => {
-            if (session?.user.organizationId) {
-                const response = await getOrganizationFromOrganizationId(session.user.organizationId)
-                if (response.success && response.data) {
-                    setOrgIsPublished(response.data.published)
-                }
-            }
-
-            // get milestone types from database
-            const response = await getMilestoneTypes()
-            if (response.success && response.data) {
-                // setMilestoneTypes(response.data.map(type => ({
-                //     value: type.id,
-                //     label: type.label,
-                //     description: type.description || undefined
-                // })))
-                setMilestoneTypes(response.data || [])
-            }
-
-            if (milestoneData) {
-                await setRecommendations([milestoneData as Milestone], { limit: 3 })
-            }
-
-            initializing.current = false
-        }
-
-        init()
-    }, []);
-
-    useEffect(() => {
-        const setupNotifications = async () => {
-            if (!initializing.current && notificationsInitialized) {
-                // if is initialized, set up the notifications for new recommendations
-                // Copy the notifications to avoid mutating the original array
-                let localNotifications: Partial<PlatformNotification>[] = [...notifications]
-                for (const recommendation of (recommendations || [])) {
-                    
-                    const exists = localNotifications
-                                    .filter((notification: any) => (
-                                        notification.type === "NEW_RECOMMENDATION" && 
-                                        notification.metadata?.milestoneId === recommendation.milestone.id && 
-                                        notification.metadata?.companyId === recommendation.content.id
-                                    )).length > 0
-
-                    console.log(`notifications exist`, exists)
-            
-                    if (!exists) {
-                        console.log(`notifications`, localNotifications);
-                        console.log(
-                            `ADD NOTIFICATION`,
-                            `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`
-                        );
-
-                        const notificationData = {
-                            type: "NEW_RECOMMENDATION",
-                            title: `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`,
-                            metadata: {
-                                milestoneId: recommendation.milestone.id,
-                                companyId: recommendation.content.id,
-                            },
-                        }
-                        await addNotification(notificationData)
-                        localNotifications = localNotifications.concat([notificationData])
-                    }
-                }
-            }
-        }
-
-        setupNotifications()
-    }, [recommendations, notificationsInitialized])
-
-    // Watch form changes, don't watch while initializing
-    useEffect(() => {
-        const subscription = form.watch((values) => debounceUpdates(values))
-        return () => subscription.unsubscribe();
-    }, [form.watch])
-
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
         const {
             nodeType,
@@ -361,9 +263,119 @@ export function EditMilestoneForm({
     const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
         // Prevent form submission if Enter is pressed inside an input
         if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
-            e.preventDefault();
+            e.preventDefault()
         }
-    };
+    }
+
+    const handleMilestoneFormSubmitCallback = useCallback(
+        handleMilestoneFormSubmit, 
+        [milestoneData, session?.user.organizationId, setMilestone, setRecommendations]
+    )
+
+    // memo ensures we're not creating a new debounce every time this is called
+    const debounceUpdates = useMemo(() => 
+        debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500), 
+        [handleMilestoneFormSubmitCallback]
+    )
+
+    // Initialization - Allow update once form is initialized
+    useEffect(() => {
+        const init = async () => {
+            if (session?.user.organizationId) {
+                const response = await getOrganizationFromOrganizationId(session.user.organizationId)
+                if (response.success && response.data) {
+                    setOrgIsPublished(response.data.published)
+                }
+            }
+
+            // get milestone types from database
+            const response = await getMilestoneTypes()
+            if (response.success && response.data) {
+                // setMilestoneTypes(response.data.map(type => ({
+                //     value: type.id,
+                //     label: type.label,
+                //     description: type.description || undefined
+                // })))
+                setMilestoneTypes(response.data || [])
+            }
+
+            if (milestoneData) {
+                await setRecommendations([milestoneData as Milestone], { limit: 3 })
+            }
+
+            initializing.current = false
+        }
+
+        init()
+
+    // missing dependencies disabled - we only want to run this once on initialization
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    // when switching to recommendations tab, set notifications as viewed
+    useEffect(() => {
+        if (tab === "recommendations") {
+            const relevantNotifications = recommendations?.map(({content, milestone}) => (
+                notifications.find((notification: any) => (
+                    notification.type === "NEW_RECOMMENDATION" &&
+                    notification.metadata?.companyId === content.id &&
+                    notification.metadata?.milestoneId === milestone.id && 
+                    notification.lastViewed
+                ))
+            )).filter(n => n !== undefined) || []
+            if (relevantNotifications.length > 0) setNotificationsViewed(relevantNotifications)
+        }
+    }, [tab, notifications, recommendations, setNotificationsViewed])
+
+    useEffect(() => {
+        const setupNotifications = async () => {
+            if (!initializing.current && notificationsInitialized) {
+                // if is initialized, set up the notifications for new recommendations
+                // Copy the notifications to avoid mutating the original array
+                let localNotifications: Partial<PlatformNotification>[] = [...notifications]
+                for (const recommendation of (recommendations || [])) {
+                    
+                    const exists = localNotifications
+                                    .filter((notification: any) => (
+                                        notification.type === "NEW_RECOMMENDATION" && 
+                                        notification.metadata?.milestoneId === recommendation.milestone.id && 
+                                        notification.metadata?.companyId === recommendation.content.id
+                                    )).length > 0
+
+                    console.log(`notifications exist`, exists)
+            
+                    if (!exists) {
+                        console.log(`notifications`, localNotifications);
+                        console.log(
+                            `ADD NOTIFICATION`,
+                            `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`
+                        );
+
+                        const notificationData = {
+                            type: "NEW_RECOMMENDATION",
+                            title: `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`,
+                            metadata: {
+                                milestoneId: recommendation.milestone.id,
+                                companyId: recommendation.content.id,
+                            },
+                        }
+                        await addNotification(notificationData)
+                        localNotifications = localNotifications.concat([notificationData])
+                    }
+                }
+            }
+        }
+
+        setupNotifications()
+    // missing dependencies disabled - we only want to run this once on shortly after the notifications are initialized
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [recommendations, notificationsInitialized, addNotification])
+
+    // Watch form changes, don't watch while initializing
+    useEffect(() => {
+        const subscription = form.watch((values) => debounceUpdates(values))
+        return () => subscription.unsubscribe();
+    }, [form.watch, debounceUpdates, form])
 
     return (
         <Form {...form}>
