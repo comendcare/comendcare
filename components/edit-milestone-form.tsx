@@ -230,11 +230,22 @@ export function EditMilestoneForm({
             }
 
             if (milestoneData) {
-                const recommendations = await setRecommendations([milestoneData as Milestone], { limit: 3 })
+                await setRecommendations([milestoneData as Milestone], { limit: 3 })
+            }
 
+            initializing.current = false
+        }
+
+        init()
+    }, []);
+
+    useEffect(() => {
+        const setupNotifications = async () => {
+            if (!initializing.current && notificationsInitialized) {
+                // if is initialized, set up the notifications for new recommendations
                 // Copy the notifications to avoid mutating the original array
                 let localNotifications: Partial<PlatformNotification>[] = [...notifications]
-                for (const recommendation of recommendations) {
+                for (const recommendation of (recommendations || [])) {
                     
                     const exists = localNotifications
                                     .filter((notification: any) => (
@@ -243,6 +254,7 @@ export function EditMilestoneForm({
                                         notification.metadata?.companyId === recommendation.content.id
                                     )).length > 0
 
+                    console.log(`notifications exist`, exists)
             
                     if (!exists) {
                         console.log(`notifications`, localNotifications);
@@ -259,7 +271,7 @@ export function EditMilestoneForm({
                                 companyId: recommendation.content.id,
                             },
                         });
-
+    
                         localNotifications = localNotifications.concat([{
                             type: "NEW_RECOMMENDATION",
                             title: `New recommendation: ${recommendation.content.title} for milestone ${recommendation.milestone.title}`,
@@ -271,12 +283,10 @@ export function EditMilestoneForm({
                     }
                 }
             }
-
-            initializing.current = false
         }
 
-        init()
-    }, []);
+        setupNotifications()
+    }, [recommendations, notificationsInitialized])
 
     // Watch form changes, don't watch while initializing
     useEffect(() => {

@@ -96,20 +96,16 @@ export default function AppLayout({children}: AppLayoutProps) {
             console.log(`Start initialization... for org ${session.user.organizationId}`)
 
             // Init Notifications Store
-            // let notifications = await getAllNotifications()
-            // if (notifications.success && notifications.data) {
-            //     initializeNotificationsState({
-            //         notifications: notifications.data
-            //     })
-
-            //     // if we're going to the kanban set notifications to viewed
-            //     if (pathname === '/app/task-board') {
-            //         setNotificationsViewed(notifications.data.filter(notification => notification.type === "NEW_TASK"))
-            //     }
-            // } else {
-            //     console.error(notifications.error)
-            //     toast.error(notifications.error)
-            // }
+            let notifications = await getAllNotifications()
+            if (notifications.success && notifications.data) {
+                initializeNotificationsState({
+                    notifications: notifications.data
+                })
+            } else {
+                console.error(notifications.error)
+                toast.error(notifications.error)
+            }
+            console.log(`Notificaions initialized...`)
             
             // let kanban = await getKanbanFromOrganizationId()
             // if (!kanban.data && session.user.organizationId) {
