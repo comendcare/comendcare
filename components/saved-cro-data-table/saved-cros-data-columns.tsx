@@ -5,12 +5,8 @@ import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import {Company, SavedCompany} from "@prisma/client";
 import {toTitleCase} from "@/lib/utils";
-
-export type SavedCompanyData = SavedCompany & {
-    company: Company;
-};
+import {SavedCompanyData} from "@/lib/types";
 
 export const columns: ColumnDef<SavedCompanyData>[] = [
     {

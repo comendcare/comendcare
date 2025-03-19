@@ -25,11 +25,8 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {revalidatePath} from "next/cache";
 import {useEffect, useState} from "react";
 import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
-import {Member, Organization} from "@prisma/client";
+import {MembershipWithOrganization} from "@/lib/types";
 
-type MembershipWithOrganization = Member & {
-    organization?: Organization | null; // Optional because the organization might be null if not fetched
-};
 
 const formSchema = z.object({
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
@@ -46,7 +43,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
         resolver: zodResolver(formSchema),
         defaultValues: {
             title: member.title || "",
-            role: member.role || "" as any,
+            role: member.role as z.infer<typeof formSchema>["role"],
         }
     })
 

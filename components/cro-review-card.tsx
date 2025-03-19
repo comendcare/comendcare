@@ -52,12 +52,8 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {getMilestones} from "@/lib/fetchers";
 import { reviewForm } from "./cro-review-dialog";
 import {Button} from "@/components/ui/button";
+import {ReviewWithAuthor} from "@/lib/types";
 
-
-interface ReviewWithAuthor extends Review {
-    author: User;
-    organization: Organization;
-}
 
 export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Company }) => {
     const router = useRouter()
