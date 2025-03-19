@@ -192,6 +192,7 @@ const router = useRouter()
                             <DraggableTimelineItem 
                                 milestone={milestone} 
                                 index={index} 
+                                key={milestone.id}
                                 selectedNodeId={selectedNodeId} 
                                 handleEditClick={handleEditClick} 
                                 disabled={sortBy !== "custom"}
@@ -370,7 +371,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
                 {(milestoneData?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-                    <li>
+                    <li key={index}>
                         <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
                     </li>
                 ))}
