@@ -48,10 +48,10 @@ export const RoadmapCard = ({
             className="w-full"
             onValueChange={setUrlView ? setUrlView: () => {}}
         >
-            <Card className="organization-profile-tour-step4">
+            <Card>
                 <CardHeader className="w-full pt-6 pb-2 space-y-4">
                     <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                        <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
+                        <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight organization-profile-tour-step4">
                             Research Plan
                         </CardTitle>
                         {pathname === "/app/profile" &&
@@ -104,10 +104,10 @@ export const RoadmapCard = ({
 
 export const NoResearchPlanCard = ({isPublic}: {isPublic: Boolean}) => {
     return (
-        <Card className="organization-profile-tour-step4">
+        <Card>
             <CardContent>
                 <div className="flex flex-col items-center justify-center space-x-4 my-8">
-                    <h1 className="font-cal text-4xl">No research plan yet</h1>
+                    <h1 className="font-cal text-4xl organization-profile-tour-step4">No research plan yet</h1>
                     <Image
                         alt="missing roadmap"
                         src="https://illustrations.popsy.co/gray/graphic-design.svg"
@@ -139,10 +139,10 @@ export const UnderDevelopmentCard = ({isPublic}: {isPublic: Boolean}) => {
     const router = useRouter()
     
     return (
-        <Card className="organization-profile-tour-step4">
+        <Card>
             <CardHeader className="w-full pt-6 pb-2 space-y-4">
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                    <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                    <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight organization-profile-tour-step4">
                         Research Plan
                     </CardTitle>
                     {!isPublic &&
