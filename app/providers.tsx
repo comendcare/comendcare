@@ -6,6 +6,7 @@ import {ModalProvider} from "@/components/modal/provider"
 import {OnbordaProvider} from "@/components/onborda/OnbordaContext"
 import {ReactFlowProvider} from "@xyflow/react"
 import {MixpanelProvider} from "./mixpanel"
+import { SettingsProvider } from "@/components/editor/settings"
 
 export function Providers({children}: { children: React.ReactNode }) {
     return (
@@ -24,7 +25,9 @@ export function Providers({children}: { children: React.ReactNode }) {
                 <ReactFlowProvider>
                     <MixpanelProvider>
                         <OnbordaProvider>
+                            <SettingsProvider>
                             {children}
+                            </SettingsProvider>
                         </OnbordaProvider>
                     </MixpanelProvider>
                 </ReactFlowProvider>
