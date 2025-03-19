@@ -122,6 +122,7 @@ const sortByFilters: { [key: string]: string } = {
 
 const generateRecommendations = async (milestones: Milestone[]) => {
     let recommendationResults: Recommendation[] = []
+
     await Promise.all(
         milestones.map(async (milestone) => {
             const newFilters = {
@@ -140,10 +141,13 @@ const generateRecommendations = async (milestones: Milestone[]) => {
                 filters: newFilters,
                 lastFetchedPage: 1,
             }, true)
-            recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => ({
-                content: result,
-                milestone
-            } as Recommendation)))
+
+            recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => {
+                return ({
+                    content: result,
+                    milestone
+                } as Recommendation)
+            }))
         })
     )
 
@@ -219,7 +223,7 @@ export interface CROSearchState {
     filters: FiltersType,
     setFilters: (updatedFilters: FiltersType) => void,
     recommendations: Recommendation[] | undefined
-    setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<void>
+    setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<Recommendation[]>
 }
 
 export const useCROSearchStore = create<CROSearchState>()(
@@ -294,11 +298,14 @@ export const useCROSearchStore = create<CROSearchState>()(
                 )
 
                 // remove duplicates before returning
+                const prunedRecommendations = options?.limit
+                    ? Array.from(new Set(recommendationResults)).slice(0, options.limit) 
+                    : Array.from(new Set(recommendationResults))
+
                 set({
-                    recommendations: options?.limit
-                        ? Array.from(new Set(recommendationResults)).slice(0, options.limit) 
-                        : Array.from(new Set(recommendationResults))
+                    recommendations: prunedRecommendations
                 })
+                return prunedRecommendations
             }
         }),
         {
