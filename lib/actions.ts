@@ -2913,6 +2913,36 @@ export async function saveCRO(croId: string, milestoneId: string, engagement: st
     }
 }
 
+export async function editSavedCRO(savedCROId: string, milestoneId: string, engagement: string) {
+    const session = await getSession()
+
+    try {
+        const response = await prisma.savedCompany.update({
+            where: {
+                id: savedCROId // Make sure to specify the ID of the saved company you want to update
+            },
+            data: {
+                milestone: {
+                    connect: {
+                        id: milestoneId
+                    }
+                },
+                engagement: engagement as OrganizationToCompanyEngagement
+            }
+        });
+
+        if (!response) {
+            console.error("Error saving edits to saved company.")
+            return { success: false, error: "Database error. Please try again later." }
+        }
+
+        return { success: true, data: response }
+    } catch (error: any) {
+        console.error("Error editing saved company:", error)
+        return { success: false, error: "Database error. Please try again later." }
+    }
+}
+
 export async function unsaveCRO(savedCompanyId: string) {
     try {
         const response = prisma.savedCompany.delete({
