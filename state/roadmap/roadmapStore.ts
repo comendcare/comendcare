@@ -5,17 +5,19 @@ import {
     applyEdgeChanges,
     Edge,
     Node,
-    EdgeChange
+    EdgeChange,
+    Connection
 } from "@xyflow/react"
-import { createNodes, deleteNode, Milestone, updateDBFlow, updateEdges, updateMilestones} from "@/lib/actions"
+import { createNodes, deleteNode, updateDBFlow, updateEdges, updateMilestones} from "@/lib/actions"
 import { toast } from "sonner"
 import { nanoid } from "nanoid"
-import { NodeType, StatusType } from "@/lib/types"
+import { Milestone, NodeType, StatusType } from "@/lib/types"
 import { getMilestoneTypes } from "@/lib/fetchers"
+import { MilestoneTypeOnMilestone } from "@prisma/client"
 
 export type RoadmapState = {
     initialized: boolean,
-    initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void,
+    initState: (nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => void,
     onboardingActive: boolean,
     setOnboardingActive: (active: boolean) => void,
     roadmapId: string | null
@@ -25,24 +27,24 @@ export type RoadmapState = {
     selectedNodeId: string | null
     setSelectedNodeId: (id: string | null) => void
     milestones: Milestone[]
-    setMilestone: (id: string, newProperties: any) => Promise<Milestone[] | void>
+    setMilestone: (id: string, newProperties: Partial<Milestone>) => Promise<Milestone[] | void>
     setMilestones: (milestones: Milestone[]) => Promise<Milestone[] | void>
     nodes: Node[]
     edges: Edge[]
     onEdgesChange: (changes: EdgeChange[]) => Promise<Edge[] | void>
-    onConnect: (connection: any) => Promise<Edge[] | void>
+    onConnect: (connection: Connection) => Promise<Edge[] | void>
     setNodes: (nodes: Node[]) => Promise<Node[] | void>
     setEdges: (edges: Edge[]) => Promise<Edge[] | void>
-    addMilestones: (milestones: Partial<{nodeType: NodeType, title: string | undefined, description: string | undefined, types: string[], status: StatusType | undefined}>[]) => Promise<Node[] | void>
+    addMilestones: (milestones: Partial<Milestone>[]) => Promise<Node[] | void>
     addNodes: (node: Node[]) => Promise<Node[] | void>
-    deleteNode: (nodeId: string) => Promise<any | void>
+    deleteNode: (nodeId: string) => Promise<void>
     saveState: () => void
 }
 
 export const useRoadmapStore = create<RoadmapState>()(
     temporal((set, get) => ({
         initialized: false,
-        initState: (nodes: Node[], edges: Edge[], milestones: any[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
+        initState: (nodes: Node[], edges: Edge[], milestones: Milestone[], selectedView: string | null, selectedNodeId: string | null, selectedTaskId: string | null, roadmapId: string) => {
             console.log(`init roadmap state`)
             const edgesWithMarker = edges.map(edge => ({
                 ...edge,
@@ -81,7 +83,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             set({ selectedNodeId: id })
         },
         milestones: [],
-        setMilestone: async (nodeId: string, newProperties: any) => {
+        setMilestone: async (nodeId: string | null, newProperties: Partial<Milestone>) => {
             console.log(`set milestone`)
             const milestones = get().milestones.map(milestone =>
                 milestone.nodeId === nodeId
@@ -165,7 +167,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 console.error(`Error updating Flow Edges`, response?.error)
             }
         },
-        onConnect: async (connection: any) => {
+        onConnect: async (connection: Connection) => {
             console.log(`on connect`)
             const edges = addEdge(
                 {...connection, style: { stroke: 'black' }},
@@ -213,15 +215,9 @@ export const useRoadmapStore = create<RoadmapState>()(
                 console.error(`Error updating Flow Edges`, response?.error)
             }
         },
-        addMilestones: async (milestones: Partial<{
-            nodeType: NodeType, 
-            title: string | undefined,
-            description: string | undefined,
-            types: string[],
-            status: StatusType | undefined
-        }>[]) => {
-            console.log(`add milestones`)
-            const newNodes: any[] = []
+        addMilestones: async (milestones: Partial<Milestone>[]) => {
+            console.log(`add milestones`, milestones)
+            const newNodes: Node[] = []
     
             // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
             // const {
@@ -263,16 +259,17 @@ export const useRoadmapStore = create<RoadmapState>()(
                         nodeType: defaultData?.nodeType || "PROJECT",
                         title: defaultData?.title || 'New Milestone',
                         description: defaultData?.description || '',
-                        types: defaultData?.types?.map((type: any) => {
-                            const dbType = (milestoneTypes.data || []).find(t => t.id === type)
-                            if (dbType) {
-                                return ({
-                                    milestoneId: milestoneId,
-                                    milestoneTypeId: type,
-                                    milestoneType: dbType
-                                })
-                            }
-                        }).filter((type: any) => type !== undefined),
+                        // types: defaultData?.types?.map((type: any) => {
+                        //     const dbType = (milestoneTypes.data || []).find(t => t.id === type.milestoneTypeId)
+                        //     if (dbType) {
+                        //         return ({
+                        //             milestoneId: milestoneId,
+                        //             milestoneTypeId: type,
+                        //             milestoneType: dbType
+                        //         })
+                        //     }
+                        // }).filter((type: any) => type !== undefined),
+                        types: defaultData?.types,
                         status: defaultData?.status || "PLANNED",
                     }
                 }
@@ -313,7 +310,7 @@ export const useRoadmapStore = create<RoadmapState>()(
             // update DB nodes
             const response = await deleteNode(nodeId)
             if (response?.success && response?.data) {
-                return response.data
+                // don't return anything
             } else {
                 console.error(`Error deleting nodes`, response?.error)
                 toast.error(`Error deleting milestone: ${response?.error}`)

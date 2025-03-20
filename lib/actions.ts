@@ -2029,6 +2029,7 @@ export async function createMilestones({roadmapId, milestones}: {roadmapId: stri
                         },
                         status: milestone?.status || "PLANNED",
                         private: milestone?.private || true,
+                        nodeType: milestone?.nodeType || "PROJECT"
 
                         // create associated node
                         // node: {
@@ -2124,6 +2125,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                 },
                                 status: node.data?.status || "PLANNED",
                                 private: node.data?.private || true,
+                                nodeType: node.data?.nodeType || "PROJECT"
                             }
                         }
                     }
@@ -2328,7 +2330,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                                 type: milestone.nodeType
                             }
                         },
-                        notes: milestone.notes
+                        notes: milestone.notes,
+                        nodeType: milestone.nodeType || "PROJECT"
                     }
                 })
 

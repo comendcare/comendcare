@@ -36,6 +36,7 @@ import { toast } from "sonner"
 import Image from "next/image"
 import { NewMilestoneDialogForm } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { Milestone } from "@/lib/types"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -86,6 +87,9 @@ export function Roadmap({data}: {data: any}) {
         }
 
         init()
+
+    // missing dependencies disabled - we only want to run this once on initialization
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     
     useEffect(() => {
@@ -120,7 +124,7 @@ export function Roadmap({data}: {data: any}) {
     
         document.addEventListener("keydown", handleUndoRedo);
         return () => document.removeEventListener("keydown", handleUndoRedo);
-    }, [selectedNodeId, milestoneRemountKey]);
+    }, [selectedNodeId, milestoneRemountKey, redo, undo, saveState]);
 
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString())
@@ -140,7 +144,7 @@ export function Roadmap({data}: {data: any}) {
         // ensure shallow url update
         const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
         window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
-    }, [selectedNodeId, selectedView])
+    }, [selectedNodeId, selectedView, pathname, searchParams])
     
     const handleMilestonePanelChange = (open: boolean) => {
         if (!open) { setSelectedNodeId(null) }
@@ -367,7 +371,7 @@ export function Roadmap({data}: {data: any}) {
                                     // parse CSV file
                                     Papa.parse(file, {
                                         complete: (result) => {
-                                            const newMilestones: any[] = []
+                                            const newMilestones: Partial<Milestone>[] = []
 
                                             const isValidFormat = (entry: any) => {
                                                 const errors = []

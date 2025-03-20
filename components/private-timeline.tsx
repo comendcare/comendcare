@@ -66,7 +66,7 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
     )
 
     function getDraggedData(id: string) {
-        const name = milestones?.find(item => item.id === id)?.name
+        const name = milestones?.find(item => item.id === id)?.title
         const position = (milestones?.findIndex(item => item.id === id) || 0) + 1
         const length = milestones?.length || 0
 
@@ -148,9 +148,11 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
                                     case "custom": 
                                         return (a.timelineOrder - b.timelineOrder)
                                     case "start":
-                                        return (a.startDate - b.startDate)
+                                        if (a.startDate && b.startDate) return (a.startDate.getTime() - b.startDate.getTime())
+                                        return 0
                                     case "end":
-                                        return (a.endDate - b.endDate)
+                                        if (a.endDate && b.endDate) return (a.endDate.getTime() - b.endDate.getTime())
+                                        return 0
                                     default:
                                         return 0
                                 }

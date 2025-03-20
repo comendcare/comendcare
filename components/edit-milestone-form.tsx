@@ -138,7 +138,7 @@ export function EditMilestoneForm({
     milestoneData,
     onClose
 }: {
-    milestoneData: any
+    milestoneData: Milestone
     onClose: () => void
 }) {
     const { setMilestone } = useRoadmapStore(useShallow(selector))
@@ -160,8 +160,8 @@ export function EditMilestoneForm({
             description: milestoneData?.description || "",
             types: ((milestoneData?.types || []).map((type: any) => type.milestoneType) || []),
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
-            startDate: milestoneData?.startDate,
-            endDate: milestoneData?.endDate,
+            startDate: milestoneData?.startDate || undefined,
+            endDate: milestoneData?.endDate || undefined,
             budget: milestoneData?.budget || undefined,
             attachments: milestoneData?.attachments || undefined,
             status: milestoneData?.status || "PLANNED",
@@ -208,7 +208,8 @@ export function EditMilestoneForm({
             notes
         } = values;
 
-        const updateData = {
+        const updateData: Milestone = {
+            ...milestoneData,
             nodeType,
             title,
             ...(description !== undefined && description !== null ? {description} : undefined),
@@ -216,13 +217,13 @@ export function EditMilestoneForm({
             ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
             ...(attachments ? {attachments} : undefined),
-            ...(types ? {
-                types: types.map((type: any) => ({
-                    milestoneId: milestoneData.id,
-                    milestoneTypeId: type.id,
-                    milestoneType: type
-                }))
-            } : undefined),
+            // ...(types ? {
+            //     types: types.map((type: any) => ({
+            //         milestoneId: milestoneData.id,
+            //         milestoneTypeId: type.id,
+            //         milestoneType: type
+            //     }))
+            // } : undefined),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
@@ -231,7 +232,7 @@ export function EditMilestoneForm({
             ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)}: undefined)
         }
 
-        setMilestone(milestoneData?.nodeId, updateData)
+        if (milestoneData?.nodeId) setMilestone(milestoneData.nodeId, updateData)
 
         // update recommendations
         if (milestoneData) {

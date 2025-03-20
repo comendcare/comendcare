@@ -204,11 +204,21 @@ export const PrivateFlowView = ({
                     ? connectionState.fromNode?.id
                     : id
 
+                // const sourceHandle = connectionState.fromHandle?.position === "left" 
+                //     ? connectionState.toHandle
+                //     : connectionState.fromNode?.id
+                    
+                // const targetHandle = connectionState.fromHandle?.position === "left" 
+                //     ? connectionState.fromNode?.id
+                //     : id
+
                 // Add the edge
                 onConnect({
-                    id: `edge-${source}-${target}`,
+                    // id: `edge-${source}-${target}`,
                     source,
                     target,
+                    sourceHandle: "",
+                    targetHandle: ""
                 })
             }
 

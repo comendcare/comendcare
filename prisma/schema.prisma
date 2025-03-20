@@ -238,6 +238,7 @@ model Milestone {
   attachments      ExternalAttachment[]
   contacts         ExternalContact[]
   timelineOrder    Int                        @default(0)
+  nodeType         String                     @default("PROJECT")
 
   roadmapId      String
   roadmap        Roadmap      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)

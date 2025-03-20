@@ -1,4 +1,4 @@
-import {User, Post, Comment, Prisma, Review, Organization, Member, Company, SavedCompany} from "@prisma/client";
+import {User, Post, Comment, Prisma, Review, Organization, Member, Company, SavedCompany, MilestoneType, ExternalContact, ExternalAttachment} from "@prisma/client";
 
 export type Milestone = Prisma.MilestoneGetPayload<{
     include: {

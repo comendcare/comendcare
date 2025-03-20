@@ -123,7 +123,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                                         nodeType: selectedMilestoneType as NodeType,
                                         title: template?.title,
                                         description: template?.description,
-                                        types: template?.types,
+                                        types: template?.types.map((type: string) => ({ milestoneTypeId: type })),
                                         status: template?.status,
                                     })
                                 }))
