@@ -11,9 +11,8 @@ import { Button } from "./ui/button"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { ScrollArea } from "./ui/scroll-area"
 import { TypeBadge } from "./type-badge"
-import { Milestone } from "@/lib/actions"
 import { AttachmentsTag } from "./private-milestone-node"
-import { StatusType } from "@/lib/types"
+import { Milestone, StatusType } from "@/lib/types"
 import StatusButton from "./milestone-status-button"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
 import {
@@ -270,7 +269,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
     if (nodeType === "ASSET") {
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).sort((a, b) => a.milestoneType?.label.length - b.milestoneType?.label.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).map((milestoneType, index) => (
                     <li key={index}>
                         <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
                     </li>
@@ -319,7 +318,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                         }}
                     />
                 </li>
-                {(milestoneData?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).map((milestoneType, index) => (
                     <li key={index}>
                         <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
                     </li>
@@ -341,7 +340,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
     if (nodeType === "RFP") {
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).map((milestoneType, index) => (
                     <li key={index}>
                         <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
                     </li>

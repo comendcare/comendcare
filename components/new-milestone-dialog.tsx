@@ -11,6 +11,7 @@ import { NODE_TYPE_OPTIONS, NodeType } from "@/lib/types"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { FaInfoCircle } from "react-icons/fa"
+import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
@@ -23,7 +24,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
     const store = useStoreApi()
     const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
     const [selectedMilestoneType, setSelectedMilestoneType] = useState<string>("ASSET")
-    const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
+    const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const dialogRef = useRef<HTMLDivElement>(null);
 
     // Allow update once form is initialized
@@ -123,7 +124,14 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                                         nodeType: selectedMilestoneType as NodeType,
                                         title: template?.title,
                                         description: template?.description,
-                                        types: template?.types.map((type: string) => ({ milestoneTypeId: type })),
+                                        types: template?.types.map((type: string) => {
+                                            const milestoneType = milestoneTypes.find(t => t.id === type)
+                                            if (!milestoneType) return // milestone type not found, don't add it to created milestone
+                                            return ({ 
+                                                milestoneTypeId: type,
+                                                milestoneType
+                                             })
+                                        }).filter((type: Partial<MilestoneTypeOnMilestone> | undefined) => type !== undefined),
                                         status: template?.status,
                                     })
                                 }))

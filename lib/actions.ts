@@ -38,21 +38,12 @@ import {
     sendMemberDeletedEmail,
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser} from "@/lib/types";
+import {ApiResponse, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone} from "@/lib/types";
 import {includes} from "lodash"
 
 export type Node = Prisma.NodeGetPayload<{}>
 
 export type Edge = Prisma.EdgeGetPayload<{}>
-
-export type Milestone = Prisma.MilestoneGetPayload<{
-    include: {
-        node: true,
-        contacts: true,
-        attachments: true,
-        types: { include: { milestoneType: true } }
-    }
-}>
 
 export type Column = Prisma.ColumnGetPayload<{
     // include: { tasks: true }

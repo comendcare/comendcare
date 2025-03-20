@@ -37,7 +37,7 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {Milestone, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
+import {MilestoneType, MilestoneTypeOnMilestone, PlatformNotification, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
@@ -148,7 +148,7 @@ export function EditMilestoneForm({
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
-    const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
+    const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [tab, setTab] = useState<"edit" | "recommendations">("edit")
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -224,6 +224,16 @@ export function EditMilestoneForm({
             //         milestoneType: type
             //     }))
             // } : undefined),
+            types: (types || []).map((type) => {
+                const milestoneType = milestoneTypes.find(t => t.id === type.value)
+                if (!milestoneType) return // milestone type not found, don't add it to created milestone
+
+                return ({ 
+                    milestoneTypeId: type.value,
+                    milestoneType,
+                    milestoneId: milestoneData.id
+                })  
+            }).filter((type) => type !== undefined),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
             status,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
@@ -736,7 +746,7 @@ const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTy
                 )}
             />
 
-            {types.map((type: any) => type.value).includes("OTHER") && (
+            {types.map((type: any) => type?.value).includes("OTHER") && (
                 <>
                     <div>
                         <FormLabel className="text-md">{`Type Description`}</FormLabel>
