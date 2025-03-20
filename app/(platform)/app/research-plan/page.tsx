@@ -15,7 +15,7 @@ export default async function RoadmapPage() {
 
     return (
         <main className="flex flex-col items-center h-full w-full mx-auto">
-            <Roadmap data={response.data} />
+            <Roadmap orgSubdomain={response.data?.organization?.subdomain} />
         </main>
     )
 }

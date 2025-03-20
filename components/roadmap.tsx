@@ -37,6 +37,8 @@ import Image from "next/image"
 import { NewMilestoneDialogForm } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { Milestone } from "@/lib/types"
+import Loading from "@/app/loading"
+import { MilestoneType } from "@prisma/client"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -50,7 +52,7 @@ const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
 })
 
-export function Roadmap({data}: {data: any}) {
+export function Roadmap({orgSubdomain}: {orgSubdomain: string | null | undefined}) {
     // Zustand state management
     const { defaultLayout } = useSidebarStore()
     const { 
@@ -70,7 +72,7 @@ export function Roadmap({data}: {data: any}) {
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1);
     const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false);
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
-    const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
+    const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [sortBy, setSortBy] = useState('custom')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
 
@@ -285,7 +287,7 @@ export function Roadmap({data}: {data: any}) {
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Link
-                                        href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
+                                        href={orgSubdomain ? `http://${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
                                         className={cn(
                                             buttonVariants({ variant: "ghost" }),
                                             "flex items-center"
@@ -427,12 +429,12 @@ export function Roadmap({data}: {data: any}) {
                                                     newMilestones.push({
                                                         title: entry.title || 'New Milestone',
                                                         description: entry.description || '', // description is optional
-                                                        types: foundType ? [foundType.milestoneTypeId || foundType.milestoneType?.id] : [],
+                                                        types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
                                                         nodeType: entry.category
                                                     })
                                                 } else {
                                                     console.error(`Invalid milestone format`, entry);
-                                                    (validate.errors || []).forEach((error: any) => {
+                                                    (validate.errors || []).forEach((error: {type: string, message: string}) => {
                                                         console.error(`Format validation error: `, error.message)
                                                     })
 
@@ -443,7 +445,7 @@ export function Roadmap({data}: {data: any}) {
                                                     newMilestones.push({
                                                         title: entry.title && typeof entry.title === 'string' ? entry.title : 'New milestone',
                                                         description: '',
-                                                        types: foundType ? [foundType.milestoneTypeId || foundType.milestoneType?.id] : [],
+                                                        types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
                                                         nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT"
                                                     })
                                                 }
@@ -484,7 +486,7 @@ const MilestoneDetailsPanel = ({
     handlePanelChange
 }: {
     remountKey: number,
-    milestone: any
+    milestone: Milestone | undefined
     handlePanelChange: (open: boolean) => void
 }) => {
     const { 
@@ -504,13 +506,17 @@ const MilestoneDetailsPanel = ({
         handlePanelChange(false)
     }
 
-    return (
-        <EditMilestoneForm
-            key={milestoneRemountKey}
-            milestoneData={milestone}
-            onClose={handleClose}
-        />
-    )
+    if (milestone) {
+        return (
+            <EditMilestoneForm
+                key={milestoneRemountKey}
+                milestoneData={milestone}
+                onClose={handleClose}
+            />
+        )
+    }
+
+    return <Loading />
 }
 
 const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val: boolean) => void}) => {
