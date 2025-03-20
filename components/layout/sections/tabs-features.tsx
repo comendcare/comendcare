@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import roadmap from "@/public/illustrations/roadmap.png"
-import timeline from "@/public/illustrations/timeline.png"
-import kanban from "@/public/illustrations/kanban.png"
+import marketplace from "@/public/screenshots/marketplace.png"
+import publicProfile from "@/public/screenshots/public-profile.png"
+import researchPlanner from "@/public/screenshots/research-planner.png"
 
 export const imgWidth = 400
 export const imgHeight = 250
@@ -15,17 +15,7 @@ const tabContent = {
     profiles: {
         title: "Build your research plan",
         image: <Image
-            src={`https://api.microlink.io/?${encode({
-                url: "https://comend-refresh-sprint-3.vercel.app/pag/profile/ACME%20Syndrome%20Foundation",
-                screenshot: true,
-                meta: false,
-                embed: "screenshot.url",
-                colorScheme: "dark",
-                "viewport.isMobile": true,
-                "viewport.deviceScaleFactor": 1,
-                "viewport.width": imgWidth * 3,
-                "viewport.height": imgHeight * 3,
-            })}`}
+            src={researchPlanner}
             quality={100}
             layout="responsive"
             priority={true}
@@ -40,17 +30,7 @@ const tabContent = {
         title: "Discover partners",
         image: (
             <Image
-                src={`https://api.microlink.io/?${encode({
-                    url: "https://comend-refresh-sprint.vercel.app/researcher",
-                    screenshot: true,
-                    meta: false,
-                    embed: "screenshot.url",
-                    colorScheme: "dark",
-                    "viewport.isMobile": true,
-                    "viewport.deviceScaleFactor": 1,
-                    "viewport.width": imgWidth * 3,
-                    "viewport.height": imgHeight * 3
-                })}`}
+                src={marketplace}
                 quality={100}
                 layout="responsive"
                 priority={true}
@@ -66,17 +46,7 @@ const tabContent = {
     forums: {
         title: "Share your progress",
         image: <Image
-            src={`https://api.microlink.io/?${encode({
-                url: "https://comend-refresh-sprint-3.vercel.app/pag/project/Potassium%20Ion%20Channels/discussion",
-                screenshot: true,
-                meta: false,
-                embed: "screenshot.url",
-                colorScheme: "dark",
-                "viewport.isMobile": true,
-                "viewport.deviceScaleFactor": 1,
-                "viewport.width": imgWidth * 3,
-                "viewport.height": imgHeight * 3,
-            })}`}
+            src={publicProfile}
             quality={100}
             layout="responsive"
             priority={true}
