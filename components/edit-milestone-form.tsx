@@ -280,7 +280,7 @@ export function EditMilestoneForm({
 
     const handleMilestoneFormSubmitCallback = useCallback(
         handleMilestoneFormSubmit, 
-        [milestoneData, session?.user.organizationId, setMilestone, setRecommendations]
+        [milestoneData, session?.user.organizationId, setMilestone, setRecommendations, milestoneTypes]
     )
 
     // memo ensures we're not creating a new debounce every time this is called

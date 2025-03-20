@@ -56,7 +56,7 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
         return () => {
             document.removeEventListener("mousedown", handleClickOutside)
         }
-    }, [closeOnborda])
+    }, [closeOnborda, setOnboardingActive])
 
     const handleNextStep = async (e: any) => {
         e.preventDefault()
