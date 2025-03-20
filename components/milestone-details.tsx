@@ -84,7 +84,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                         />
                     }
                     {(milestone.types || []).sort((a: any, b: any) => a?.milestoneType?.length - b?.milestoneType?.length).map((milestoneType: any, index: number) => (
-                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
+                        <MilestoneTypeBadge key={index} label={milestoneType?.milestoneType?.label} />
                     ))}
                 </span>
 

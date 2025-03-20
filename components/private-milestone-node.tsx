@@ -347,7 +347,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                         }}
                     />
                     {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
+                        <MilestoneTypeBadge key={index} label={milestoneType?.milestoneType?.label} />
                     ))}
             </span>
             </>
@@ -375,7 +375,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
 
                 <span className="w-full flex gap-2 flex-wrap text-wrap">
                     {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
+                        <MilestoneTypeBadge key={index} label={milestoneType?.milestoneType?.label} />
                     ))}
             </span>
             </>
