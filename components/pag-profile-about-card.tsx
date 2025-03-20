@@ -32,6 +32,7 @@ export const PagProfileAboutCard = ({organization, editable}: {
                     <div className="flex flex-col space-y-2 ml-4">
                         <Button
                             onClick={startOnbordaAndRemoveToast}
+                            variant="secondary"
                         >
                             {`Yes please!`}
                         </Button>
@@ -40,6 +41,7 @@ export const PagProfileAboutCard = ({organization, editable}: {
                                 toast.dismiss()
                                 setOnboarded('organization-profile-tour')
                             }}
+                            variant="ghost"
                         >
                             {`No thanks!`}
                         </Button>
