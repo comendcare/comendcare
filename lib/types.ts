@@ -22,6 +22,7 @@ export interface Option {
 
 export type SavedCompanyData = SavedCompany & {
     company: Company;
+    milestone: Milestone;
 };
 
 export interface CompanyWithReviews extends Company {

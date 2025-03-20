@@ -5,7 +5,6 @@ import { PulsatingButton } from "@/components/ui/pulsating-button"
 import Image from "next/image"
 import {useRouter} from "next/navigation";
 import { useSession } from "next-auth/react";
-import {SavedCompany} from "@prisma/client";
 import {getSavedCompaniesFromOrganizationId} from "@/lib/fetchers";
 import {CROServicesDataTable} from "@/components/cro-services-data-table/cro-services-data-table";
 import {columns} from "@/components/saved-cro-data-table/saved-cros-data-columns";

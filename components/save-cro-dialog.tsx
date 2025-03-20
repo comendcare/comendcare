@@ -81,7 +81,7 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
             const response = await saveCRO(cro.id, data.milestoneId, data.engagement);
 
             if (response.success) {
-                va.track("Deleted review");
+                va.track("Saved CRO");
                 router.refresh();
                 toast.success("Successfully saved cro!");
             } else {
