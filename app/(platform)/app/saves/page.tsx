@@ -11,7 +11,7 @@ import {columns} from "@/components/saved-cro-data-table/saved-cros-data-columns
 import {SavedCROsDataTable} from "@/components/saved-cro-data-table/saved-cros-data-table";
 import {SavedCompanyData} from "@/lib/types";
 
-export default async function SavesPage() {
+export default function SavesPage() {
     const router = useRouter()
     const { data: session } = useSession();
     const [savedCompanies, setSavedCompanies] = useState<SavedCompanyData[]>([]);

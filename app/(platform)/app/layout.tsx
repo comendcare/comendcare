@@ -197,7 +197,7 @@ export default function AppLayout({children}: AppLayoutProps) {
 
         // Update the ref to the latest session
         prevSessionRef.current = session
-    }, [session]);
+    }, [session]); // For some reason, adding status and handleSessionUpdate as dependencies causes switching orgs to fail.
 
     if (status === "authenticated" && session) {
         return (
