@@ -259,16 +259,6 @@ export const useRoadmapStore = create<RoadmapState>()(
                         nodeType: defaultData?.nodeType || "PROJECT",
                         title: defaultData?.title || 'New Milestone',
                         description: defaultData?.description || '',
-                        // types: defaultData?.types?.map((type: any) => {
-                        //     const dbType = (milestoneTypes.data || []).find(t => t.id === type.milestoneTypeId)
-                        //     if (dbType) {
-                        //         return ({
-                        //             milestoneId: milestoneId,
-                        //             milestoneTypeId: type,
-                        //             milestoneType: dbType
-                        //         })
-                        //     }
-                        // }).filter((type: any) => type !== undefined),
                         types: defaultData?.types,
                         status: defaultData?.status || "PLANNED",
                     }

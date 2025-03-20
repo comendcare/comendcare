@@ -127,7 +127,7 @@ const generateRecommendations = async (milestones: Milestone[]) => {
         milestones.map(async (milestone) => {
             const newFilters = {
                 categories: Array.from(
-                    new Set((milestone?.types || []).flatMap(type => type.milestoneType.categories))
+                    new Set((milestone?.types || []).flatMap(type => type?.milestoneType?.categories || []))
                 )
                     .map(categoryValue => (ASSOCIATED_CATEGORIES.find(c => c.value === categoryValue)))
                     .filter(c => c !== undefined)
