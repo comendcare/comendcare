@@ -51,6 +51,7 @@ export const PublicFlowView = ({
         nodes={roadmap?.nodes.map((node: any) => ({
             ...node, 
             position: {x: node.positionX, y: node.positionY}, 
+            type: node.data.nodeType,
             data: {
                 ...node.data,
                 subdomain: subdomain,
