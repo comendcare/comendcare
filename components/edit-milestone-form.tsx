@@ -113,7 +113,8 @@ const editMilestoneForm = z.object({
         .string()
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
-    types: z.array(optionSchema).optional(),
+    // types: z.array(optionSchema).optional(),
+    types: z.array(z.custom<MilestoneType>()).optional(),
     otherTypeDetails: z.string().optional(),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
@@ -208,6 +209,8 @@ export function EditMilestoneForm({
             notes
         } = values;
 
+        console.log(`types`, types)
+
         const updateData: Milestone = {
             ...milestoneData,
             nodeType,
@@ -217,21 +220,11 @@ export function EditMilestoneForm({
             ...(endDate ? {endDate} : undefined),
             ...(budget ? {budget} : undefined),
             ...(attachments ? {attachments} : undefined),
-            // ...(types ? {
-            //     types: types.map((type: any) => ({
-            //         milestoneId: milestoneData.id,
-            //         milestoneTypeId: type.id,
-            //         milestoneType: type
-            //     }))
-            // } : undefined),
             types: (types || []).map((type) => {
-                const milestoneType = milestoneTypes.find(t => t.id === type.value)
-                if (!milestoneType) return // milestone type not found, don't add it to created milestone
-
                 return ({ 
-                    milestoneTypeId: type.value,
-                    milestoneType,
-                    milestoneId: milestoneData.id
+                    milestoneId: milestoneData.id,
+                    milestoneTypeId: type.id,
+                    milestoneType: type
                 })  
             }).filter((type) => type !== undefined),
             ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),

@@ -73,22 +73,22 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const {data: session} = useSession()
     const [memberships, setMemberships] = useState<MemberWithOrganization[]>([]);
 
-    const fetchOrganizations = async () => {
-        if (session) {
-            const response = await getAllMembershipsFromUserId(session.user.id);
-            if (response.success) {
-                const orgs = response.data ?? []
-                setMemberships(orgs)
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
-        }
-    };
-
     useEffect(() => {
+        const fetchOrganizations = async () => {
+            if (session) {
+                const response = await getAllMembershipsFromUserId(session.user.id);
+                if (response.success) {
+                    const orgs = response.data ?? []
+                    setMemberships(orgs)
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+            }
+        };
+        
         fetchOrganizations()
-    }, [fetchOrganizations, session])
+    }, [session])
 
     return (
         <Sidebar collapsible="icon" {...props}>
