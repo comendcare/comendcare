@@ -39,7 +39,7 @@ export default function SignOutPage() {
             clearInterval(timer)
             clearTimeout(redirect)
         }
-    }, [router])
+    }, [router, searchParams])
 
     const handleManualRedirect = () => {
         router.push('/')

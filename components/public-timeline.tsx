@@ -76,7 +76,7 @@ const TimelineElementContent = ({item, externalLinkIcon}: {item: any, externalLi
     return (
         <>
             <span className="absolute flex items-center justify-center bg-white rounded-full -start-[18px]">
-                <TypeBadge className="w-8 p-2" iconOnly={true} type={item?.node?.type || item?.nodeType || "PROJECT"}/>
+                <TypeBadge className="w-8 p-2" iconOnly={true} type={item?.nodeType || item?.nodeType || "PROJECT"}/>
             </span>
             <div className="flex flex-row items-center justify-start gap-4">
                 <h3 className="flex flex-row justify-center items-baseline gap-2 group-hover:underline text-lg font-semibold text-gray-900 dark:text-white ">
@@ -92,7 +92,7 @@ const TimelineElementContent = ({item, externalLinkIcon}: {item: any, externalLi
             <p className="mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2">
                 {item.description}
             </p>
-            <TimelineCardContents milestoneData={item} nodeType={item?.node?.type || item?.nodeType || "PROJECT"}/>
+            <TimelineCardContents milestoneData={item} nodeType={item?.nodeType || item?.nodeType || "PROJECT"}/>
         </>
     )
 }

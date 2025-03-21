@@ -71,8 +71,8 @@ export function CRORecommendationCard({cro, milestone}: { cro: Company, mileston
                     <CardDescription
                         className="text-base flex flex-row gap-2 items-center"
                     >
-                        {milestone?.node?.type &&
-                            <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.node?.type}/>}
+                        {milestone?.nodeType &&
+                            <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType}/>}
                         {milestone.title}
                     </CardDescription>
                     <Separator className="my-2"/>

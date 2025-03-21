@@ -38,21 +38,12 @@ import {
     sendMemberDeletedEmail,
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser} from "@/lib/types";
+import {ApiResponse, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone} from "@/lib/types";
 import {includes} from "lodash"
 
 export type Node = Prisma.NodeGetPayload<{}>
 
 export type Edge = Prisma.EdgeGetPayload<{}>
-
-export type Milestone = Prisma.MilestoneGetPayload<{
-    include: {
-        node: true,
-        contacts: true,
-        attachments: true,
-        types: { include: { milestoneType: true } }
-    }
-}>
 
 export type Column = Prisma.ColumnGetPayload<{
     // include: { tasks: true }
@@ -1710,14 +1701,12 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 const node = await prisma.node.create({
                     data: {
                         roadmapId: roadmap.id,
-                        type: milestone.nodeType || 'PROJECT',
                         positionX: index * 500,
                         positionY: 0,
                         data: {
                             create: {
                                 roadmapId: roadmap.id,
                                 organizationId,
-                                // types: milestone.types || [],
                                 status: milestone.status || "PLANNED",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
@@ -1892,7 +1881,6 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                         roadmap: {
                             connect: {id: roadmapId}
                         },
-                        type: node.type,
                         positionX: node.position?.x,
                         positionY: node.position?.y,
                         origin: node.origin,
@@ -1973,6 +1961,91 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
     }
 }
 
+export async function createMilestones({roadmapId, milestones}: {roadmapId: string | null, milestones: Milestone[]}) {
+    try {
+        const updatedMilestones: Milestone[] = []
+
+        if (!roadmapId) throw new Error('No roadmapId provided.')
+
+        const organizations = await prisma.organization.findMany({
+            include: {
+                roadmaps: true
+            }
+        })
+        const organization = organizations.find(org => org.roadmaps.map(r => r.id).includes(roadmapId))
+
+        if (!organization) throw new Error(`Could not find organization with roadmap id: ${roadmapId}`)
+        const organizationId: string = organization.id
+
+        await Promise.all(
+            milestones.map(async (milestone: Milestone, index: number) => {
+                const m = await prisma.milestone.create({
+                    include: {
+                        node: true,
+                        contacts: true,
+                        attachments: true,
+                        types: { include: { milestoneType: true } }
+                    },
+                    data: {
+                        id: milestone?.id,
+                        roadmap: {
+                            connect: {id: roadmapId}
+                        },
+                        organization: {
+                            connect: {id: organizationId}
+                        },
+                        title: milestone?.title || "New Milestone",
+                        types: {
+                            create: (milestone?.types || []).map((type: any) => ({
+                                milestoneType: {
+                                    connect: { id: type.milestoneTypeId }
+                                }
+                            }))
+                        },
+                        timelineOrder: milestone?.timelineOrder,
+                        description: milestone?.description,
+                        startDate: milestone?.startDate,
+                        endDate: milestone?.endDate,
+                        budget: milestone?.budget,
+                        attachments: {
+                            createMany: {
+                                data: (milestone?.attachments || []).map((attachment: any) => ({
+                                    link: attachment.link,
+                                    ...(attachment.name ? {name: attachment.name} : undefined)
+                                }))
+                            }
+                        },
+                        status: milestone?.status || "PLANNED",
+                        private: milestone?.private || true,
+                        nodeType: milestone?.nodeType || "PROJECT"
+
+                        // create associated node
+                        // node: {
+                        //     create: {
+                        //         id: node.id,
+                        //         roadmap: {
+                        //             connect: {id: roadmapId}
+                        //         },
+                        //         type: node.type,
+                        //         positionX: node.position?.x,
+                        //         positionY: node.position?.y,
+                        //         origin: node.origin,
+                        //     }
+                        // }
+                    }
+                })
+
+                updatedMilestones.push(m)
+            })
+        )
+
+        return {success: true, data: {milestones: updatedMilestones}}
+    } catch (error) {
+        logError("Could not create milestones", error)
+        return {success: false, error: "Internal server error"}
+    }
+}
+
 export async function createNodes({roadmapId, nodes}: { roadmapId: string | null, nodes: any[] }) {
     try {
         const updatedNodes: any[] = []
@@ -2004,7 +2077,6 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                         roadmap: {
                             connect: {id: roadmapId}
                         },
-                        type: node.type,
                         positionX: node.position?.x,
                         positionY: node.position?.y,
                         origin: node.origin,
@@ -2040,6 +2112,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                 },
                                 status: node.data?.status || "PLANNED",
                                 private: node.data?.private || true,
+                                nodeType: node.data?.nodeType || "PROJECT"
                             }
                         }
                     }
@@ -2239,12 +2312,8 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         openTo: milestone.openTo || [],
                         status: milestone.status || "PLANNED",
                         private: milestone.private || false,
-                        node: {
-                            update: {
-                                type: milestone.nodeType
-                            }
-                        },
-                        notes: milestone.notes
+                        notes: milestone.notes,
+                        nodeType: milestone.nodeType || "PROJECT"
                     }
                 })
 

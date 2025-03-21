@@ -440,7 +440,7 @@ const syncToTypesense = async (env: {
 
                 return {
                     ...milestone,
-                    nodeType: milestone.node?.type,
+                    nodeType: milestone.nodeType,
                     updatedAt: new Date(milestone.updatedAt).getTime(), // Convert to int64
                 }
             }))

@@ -1,13 +1,19 @@
-import {User, Post, Comment, Prisma, Review, Organization, Member, Company, SavedCompany} from "@prisma/client";
+import {User, Post, Comment, Prisma, Review, Organization, Member, Company, SavedCompany, MilestoneType, ExternalContact, ExternalAttachment} from "@prisma/client";
 
-export type Milestone = Prisma.MilestoneGetPayload<{
+export type Milestone = Omit<Prisma.MilestoneGetPayload<{
     include: {
         node: true,
         contacts: true,
         attachments: true,
-        types: { include: { milestoneType: true } }
+        types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } }
     }
-}>;
+}>, "types"> & {
+    types: Array<{
+        milestoneType?: MilestoneType; // Optional
+        milestoneId?: string; // Optional
+        milestoneTypeId: string; // Required
+    }>;
+};
 
 export interface Option {
     value: string;

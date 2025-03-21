@@ -63,8 +63,8 @@ export function GanttChartView() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const handleEditClick = (nodeId: string) => {
-    setSelectedNodeId(nodeId)
+  const handleEditClick = (nodeId: string | null) => {
+    if (nodeId) setSelectedNodeId(nodeId)
   }
 
   return (

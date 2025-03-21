@@ -41,31 +41,17 @@ interface AppLayoutProps {
 }
 
 const selector = (state: RoadmapState) => ({
-    roadmapId: state.roadmapId,
-    nodes: state.nodes,
-    edges: state.edges,
-    selectedView: state.selectedView,
-    setSelectedView: state.setSelectedView,
-    selectedNodeId: state.selectedNodeId,
-    setSelectedNodeId: state.setSelectedNodeId,
-    milestones: state.milestones,
-})
-
-const notificationsSelector = (state: NotificationsState) => ({
-    setNotificationsViewed: state.setNotificationsViewed
+    setSelectedNodeId: state.setSelectedNodeId
 })
 
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
     const [isLoading, setIsLoading] = useState(true)
     const searchParams = useSearchParams()
-    const prevSessionRef: any = useRef()
+    const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
     const { startOnborda } = useOnborda()
     const pathname = usePathname()
-    const { 
-        setSelectedNodeId
-    } = useRoadmapStore(useShallow(selector))
-    const { setNotificationsViewed } = useNotificationsStore(useShallow(notificationsSelector))
+    const { setSelectedNodeId } = useRoadmapStore(useShallow(selector))
 
     useEffect(() => {
         // Handle loading state for the session

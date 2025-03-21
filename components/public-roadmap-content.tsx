@@ -25,7 +25,7 @@ export function PublicRoadmapContent({roadmap, subdomain}: {roadmap: any, subdom
         // ensure shallow url update
         const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
         window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
-    }, [milestone, view])
+    }, [milestone, view, pathname, searchParams])
     
     return (
         <div className="flex flex-col-reverse md:grid md:grid-cols-2 m-auto w-full gap-4">

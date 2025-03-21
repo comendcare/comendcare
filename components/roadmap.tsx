@@ -14,41 +14,32 @@ import { Tabs, TabsTrigger, TabsList, TabsContent } from "@/components/ui/tabs"
 import { PrivateFlowView } from "@/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useRef, useState } from "react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { GanttChartView } from "./gantt-chart"
-import { getMilestoneTypes, getRoadmapId } from "@/lib/fetchers"
+import { usePathname, useSearchParams } from "next/navigation"
+import { getMilestoneTypes, getOrganizationFromOrganizationId } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
 import { cn, sleep } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare, FaFileImport, FaPlus } from "react-icons/fa6"
-import { FaInfoCircle, FaRedo, FaUndo } from "react-icons/fa"
+import { FaInfoCircle } from "react-icons/fa"
 import {
     Dialog,
-    DialogClose,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from "./ui/dialog"
-import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
-import { MilestoneTemplates, MilestoneTemplateTabs } from "./roadmap-templates"
-import { nanoid } from "nanoid"
-import { useStoreApi, type Edge, type Node, type NodeChange } from "@xyflow/react"
 import { Redo2, Undo2 } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import Papa from "papaparse"
 import { toast } from "sonner"
-import Loading from "@/app/loading"
 import Image from "next/image"
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
-import { Separator } from "@radix-ui/react-separator"
 import { NewMilestoneDialogForm } from "./new-milestone-dialog"
-import { MilestoneType } from "@prisma/client"
-import { Option } from "@/lib/types"
-import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { Milestone } from "@/lib/types"
+import Loading from "@/app/loading"
+import { MilestoneType } from "@prisma/client"
+import { useSession } from "next-auth/react"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -57,17 +48,12 @@ const selector = (state: RoadmapState) => ({
     setSelectedView: state.setSelectedView,
     selectedNodeId: state.selectedNodeId,
     setSelectedNodeId: state.setSelectedNodeId,
-    nodes: state.nodes,
     milestones: state.milestones,
     saveState: state.saveState,
     addMilestones: state.addMilestones
 })
 
-const recommendationsSelector = (state: CROSearchState) => ({
-    recommendations: state.recommendations
-})
-
-export function Roadmap({data}: {data: any}) {
+export function Roadmap() {
     // Zustand state management
     const { defaultLayout } = useSidebarStore()
     const { 
@@ -77,25 +63,21 @@ export function Roadmap({data}: {data: any}) {
         setSelectedView,
         selectedNodeId, 
         setSelectedNodeId, 
-        nodes: dbNodes,
         milestones, 
         saveState,
         addMilestones
     } = useRoadmapStore(useShallow(selector))
-    const { recommendations } = useCROSearchStore(useShallow(recommendationsSelector))
-    const router = useRouter()
+    const {data: session} = useSession()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const { undo, redo } = useRoadmapStore.temporal.getState()
     const [milestoneRemountKey, setMilestoneRemountKey] = useState(1);
-    const milestoneRemountKeyRef = useRef(milestoneRemountKey);
     const [bulkImportIsOpen, setBulkImportIsOpen] = useState(false);
     const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
-    // const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
-    const [selectedMilestoneTemplate, setSelectedMilestoneTemplate] = useState<string | undefined>()
-    const store = useStoreApi()
-    const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
+    const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [sortBy, setSortBy] = useState('custom')
+    const milestoneRemountKeyRef = useRef(milestoneRemountKey);
+    const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
 
     useEffect(() => {
         const init = async () => {
@@ -107,9 +89,19 @@ export function Roadmap({data}: {data: any}) {
 
             await sleep(300)
             if (milestones.length <= 0 && initialized) setNewMilestoneIsOpen(true)
+
+            if (session?.user.organizationId) {
+                let orgData = await getOrganizationFromOrganizationId(session.user.organizationId)
+                if (orgData.success && orgData.data) {
+                    setOrgSubdomain(orgData.data.subdomain || undefined)
+                }
+            }
         }
 
         init()
+
+    // missing dependencies disabled - we only want to run this once on initialization
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     
     useEffect(() => {
@@ -144,7 +136,7 @@ export function Roadmap({data}: {data: any}) {
     
         document.addEventListener("keydown", handleUndoRedo);
         return () => document.removeEventListener("keydown", handleUndoRedo);
-    }, [selectedNodeId, milestoneRemountKey]);
+    }, [selectedNodeId, milestoneRemountKey, redo, undo, saveState]);
 
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString())
@@ -164,7 +156,7 @@ export function Roadmap({data}: {data: any}) {
         // ensure shallow url update
         const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
         window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
-    }, [selectedNodeId, selectedView])
+    }, [selectedNodeId, selectedView, pathname, searchParams])
     
     const handleMilestonePanelChange = (open: boolean) => {
         if (!open) { setSelectedNodeId(null) }
@@ -303,9 +295,9 @@ export function Roadmap({data}: {data: any}) {
                             </Tooltip>
 
                             <Tooltip>
-                                <TooltipTrigger asChild>
+                                <TooltipTrigger asChild disabled={!orgSubdomain}>
                                     <Link
-                                        href={data?.organization?.subdomain ? `http://${data?.organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
+                                        href={orgSubdomain ? `http://${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
                                         className={cn(
                                             buttonVariants({ variant: "ghost" }),
                                             "flex items-center"
@@ -374,7 +366,6 @@ export function Roadmap({data}: {data: any}) {
                 <Dialog open={bulkImportIsOpen} onOpenChange={(open: boolean) => {
                     setBulkImportIsOpen(open)
                 }}>
-                    {/* <DialogContent className="min-w-[80vw] h-[80vh] w-[80vw] flex flex-col justify-start"> */}
                     <DialogContent className="flex flex-col justify-start">
                         <DialogHeader>
                             <DialogTitle className="text-2xl">
@@ -392,7 +383,7 @@ export function Roadmap({data}: {data: any}) {
                                     // parse CSV file
                                     Papa.parse(file, {
                                         complete: (result) => {
-                                            const newMilestones: any[] = []
+                                            const newMilestones: Partial<Milestone>[] = []
 
                                             const isValidFormat = (entry: any) => {
                                                 const errors = []
@@ -448,12 +439,12 @@ export function Roadmap({data}: {data: any}) {
                                                     newMilestones.push({
                                                         title: entry.title || 'New Milestone',
                                                         description: entry.description || '', // description is optional
-                                                        types: foundType ? [foundType.milestoneTypeId || foundType.milestoneType?.id] : [],
+                                                        types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
                                                         nodeType: entry.category
                                                     })
                                                 } else {
                                                     console.error(`Invalid milestone format`, entry);
-                                                    (validate.errors || []).forEach((error: any) => {
+                                                    (validate.errors || []).forEach((error: {type: string, message: string}) => {
                                                         console.error(`Format validation error: `, error.message)
                                                     })
 
@@ -464,7 +455,7 @@ export function Roadmap({data}: {data: any}) {
                                                     newMilestones.push({
                                                         title: entry.title && typeof entry.title === 'string' ? entry.title : 'New milestone',
                                                         description: '',
-                                                        types: foundType ? [foundType.milestoneTypeId || foundType.milestoneType?.id] : [],
+                                                        types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
                                                         nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT"
                                                     })
                                                 }
@@ -505,7 +496,7 @@ const MilestoneDetailsPanel = ({
     handlePanelChange
 }: {
     remountKey: number,
-    milestone: any
+    milestone: Milestone | undefined
     handlePanelChange: (open: boolean) => void
 }) => {
     const { 
@@ -525,13 +516,17 @@ const MilestoneDetailsPanel = ({
         handlePanelChange(false)
     }
 
-    return (
-        <EditMilestoneForm
-            key={milestoneRemountKey}
-            milestoneData={milestone}
-            onClose={handleClose}
-        />
-    )
+    if (milestone) {
+        return (
+            <EditMilestoneForm
+                key={milestoneRemountKey}
+                milestoneData={milestone}
+                onClose={handleClose}
+            />
+        )
+    }
+
+    return <Loading />
 }
 
 const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val: boolean) => void}) => {
