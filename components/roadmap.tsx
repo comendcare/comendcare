@@ -15,7 +15,7 @@ import { PrivateFlowView } from "@/components/private-flow"
 import { EditMilestoneForm } from "./edit-milestone-form"
 import { useEffect, useRef, useState } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
-import { getMilestoneTypes } from "@/lib/fetchers"
+import { getMilestoneTypes, getOrganizationFromOrganizationId } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
 import { cn, sleep } from "@/lib/utils"
@@ -39,6 +39,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Milestone } from "@/lib/types"
 import Loading from "@/app/loading"
 import { MilestoneType } from "@prisma/client"
+import { useSession } from "next-auth/react"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -52,7 +53,7 @@ const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
 })
 
-export function Roadmap({orgSubdomain}: {orgSubdomain: string | null | undefined}) {
+export function Roadmap() {
     // Zustand state management
     const { defaultLayout } = useSidebarStore()
     const { 
@@ -66,6 +67,7 @@ export function Roadmap({orgSubdomain}: {orgSubdomain: string | null | undefined
         saveState,
         addMilestones
     } = useRoadmapStore(useShallow(selector))
+    const {data: session} = useSession()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const { undo, redo } = useRoadmapStore.temporal.getState()
@@ -75,6 +77,7 @@ export function Roadmap({orgSubdomain}: {orgSubdomain: string | null | undefined
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [sortBy, setSortBy] = useState('custom')
     const milestoneRemountKeyRef = useRef(milestoneRemountKey);
+    const [orgSubdomain, setOrgSubdomain] = useState<string | undefined>()
 
     useEffect(() => {
         const init = async () => {
@@ -86,6 +89,13 @@ export function Roadmap({orgSubdomain}: {orgSubdomain: string | null | undefined
 
             await sleep(300)
             if (milestones.length <= 0 && initialized) setNewMilestoneIsOpen(true)
+
+            if (session?.user.organizationId) {
+                let orgData = await getOrganizationFromOrganizationId(session.user.organizationId)
+                if (orgData.success && orgData.data) {
+                    setOrgSubdomain(orgData.data.subdomain || undefined)
+                }
+            }
         }
 
         init()
@@ -285,7 +295,7 @@ export function Roadmap({orgSubdomain}: {orgSubdomain: string | null | undefined
                             </Tooltip>
 
                             <Tooltip>
-                                <TooltipTrigger asChild>
+                                <TooltipTrigger asChild disabled={!orgSubdomain}>
                                     <Link
                                         href={orgSubdomain ? `http://${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
                                         className={cn(
