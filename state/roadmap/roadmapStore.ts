@@ -90,17 +90,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                     ? { ...milestone, ...newProperties }
                     : milestone
             )
-            if (newProperties.nodeType) {
-                // if the type has been updated, we also update the node type
-                const nodes = get().nodes.map(node => (
-                    node.id === nodeId 
-                        ? { ...node, type: newProperties.nodeType }
-                        : node
-                ))
-                set({ milestones, nodes })
-            } else {
-                set({ milestones })
-            }
+            set({ milestones })
 
             // update DB milestones
             const response = await updateMilestones({ milestones })

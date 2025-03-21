@@ -65,9 +65,18 @@ export const PrivateFlowView = ({
     const pathname = usePathname()
 
     useEffect(() => {
-        setLocalNodes(nodes.sort((a: any, b: any) => b.createdAt - a.createdAt).map(node => ({...node, type: milestones.find(m => m.nodeId === node.id)?.nodeType || "PROJECT"} as Node)))
+        setLocalNodes(nodes
+            .sort((a: any, b: any) => b.createdAt - a.createdAt)
+            .map(node => {
+                const milestone = milestones.find(m => m.nodeId == node.id)
+                return {
+                    ...node, 
+                    type: milestone?.nodeType || "PROJECT",
+                    data: milestone || node.data
+                } as Node
+            }))
         setLocalEdges(edges)
-    }, [nodes, edges])
+    }, [nodes, edges, milestones])
 
     const [localNodes, setLocalNodes] = useState(nodes)
     const [localEdges, setLocalEdges] = useState(edges)
