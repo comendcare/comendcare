@@ -1,41 +1,28 @@
 "use client"
 
+import "@xyflow/react/dist/base.css"
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
     ReactFlow,
     MiniMap,
     Controls,
     useReactFlow,
-    useStoreApi,
     applyNodeChanges,
 } from "@xyflow/react"
 import type { Edge, Node, NodeChange } from "@xyflow/react"
 import { useShallow } from "zustand/react/shallow"
-
-import "@xyflow/react/dist/base.css"
-
 import PrivateMilestoneNode from "@/components/private-milestone-node"
 import { Button } from "./ui/button"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { nanoid } from "nanoid"
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from "./ui/dialog"
+import { Dialog } from "./ui/dialog"
 import { DeleteMilestoneDialogContent } from "./delete-milestone-dialog-content"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useOnborda } from "./onborda/OnbordaContext"
 import { toast } from "sonner"
 import { isOnboarded, setOnboarded} from "@/lib/utils"
 import { debounce } from "lodash"
 import { CustomEdge } from "./custom-edge"
-import { MilestoneTemplateTabs } from "./roadmap-templates"
-import { FaPlus } from "react-icons/fa6"
 
 const proOptions = { hideAttribution: true }
 
@@ -69,22 +56,27 @@ export const PrivateFlowView = ({
         onConnect,
         addMilestones
     } = useRoadmapStore(useShallow(selector))
-    const store = useStoreApi()
-    const router = useRouter()
     const nodeTypes = { PROJECT: PrivateMilestoneNode, ASSET: PrivateMilestoneNode, RFP: PrivateMilestoneNode }
     const edgeTypes = { DEFAULT: CustomEdge }
     const [milestoneData, setMilestoneData] = useState({})
     const [deleteIsOpen, setDeleteIsOpen] = useState(false)
-    const [newMilestoneIsOpen, setNewMilestoneIsOpen] = useState(false)
     const { startOnborda } = useOnborda()
     const { screenToFlowPosition, getIntersectingNodes, fitView } = useReactFlow()
-    const [selectedMilestones, setSelectedMilestones] = useState<any[]>([])
     const pathname = usePathname()
 
     useEffect(() => {
-        setLocalNodes(nodes.sort((a: any, b: any) => b.createdAt - a.createdAt))
+        setLocalNodes(nodes
+            .sort((a: any, b: any) => b.createdAt - a.createdAt)
+            .map(node => {
+                const milestone = milestones.find(m => m.nodeId == node.id)
+                return {
+                    ...node, 
+                    type: milestone?.nodeType || "PROJECT",
+                    data: milestone || node.data
+                } as Node
+            }))
         setLocalEdges(edges)
-    }, [nodes, edges])
+    }, [nodes, edges, milestones])
 
     const [localNodes, setLocalNodes] = useState(nodes)
     const [localEdges, setLocalEdges] = useState(edges)
@@ -112,7 +104,7 @@ export const PrivateFlowView = ({
              }, 
             type: "PROJECT",
         });
-      }, [previewNode, startConnectNode]);
+      }, []);
     
       const handleMouseMove = useCallback((event: any) => {
         if (startConnectNode) {
@@ -147,7 +139,7 @@ export const PrivateFlowView = ({
             setStartConnectNode(null)
             setPreviewNode(null)
         }
-      }, [previewNode, startConnectNode, screenToFlowPosition]);
+      }, [startConnectNode, screenToFlowPosition, getIntersectingNodes]);
 
     const handleEditClick = (event: React.MouseEvent, node: Node) => {
         setSelectedNodeId(node.id)
@@ -206,16 +198,17 @@ export const PrivateFlowView = ({
 
                 // Add the edge
                 onConnect({
-                    id: `edge-${source}-${target}`,
                     source,
                     target,
+                    sourceHandle: "",
+                    targetHandle: ""
                 })
             }
 
             setPreviewNode(null)
             setStartConnectNode(null)
         },
-        [previewNode, startConnectNode, screenToFlowPosition],
+        [screenToFlowPosition, addNodes, onConnect],
     );
 
     const handleDelete = async ({nodes, edges}: {nodes: Node[], edges: Edge[]}) => {
@@ -252,10 +245,10 @@ export const PrivateFlowView = ({
 
                 if (milestone) {
                     addMilestones([{
-                        nodeType: milestone.nodeType || milestone.node?.type,
+                        nodeType: milestone.nodeType || milestone.nodeType,
                         title: milestone.title,
                         description: milestone.description,
-                        types: milestone.types.map((type: any) => type.milestoneTypeId || type.milestoneType.id),
+                        types: milestone.types || [],
                         status: milestone.status
                     }])
                 }
@@ -276,17 +269,20 @@ export const PrivateFlowView = ({
             if (selectedNodeId) {
                 fitView({ nodes: [{ id: selectedNodeId }], padding: 2, duration: 500 })
             } else {
-                fitView({ nodes: localNodes.map(node => ({ id: node.id })), padding: 0.4, duration: 500 })
+                fitView({ padding: 0.4, duration: 500 })
             }
         }, 1) // Delay by a short time to allow layout adjustment
 
         return () => clearTimeout(timer)
-    }, [width, selectedNodeId])
+    }, [width, selectedNodeId, fitView])
 
     useEffect(() => {
-        // if (!isOnboarded('research-plan-tour')) {
-        //     startOnbordaAndRemoveToast()
-        // }
+        const startOnbordaAndRemoveToast = () => {
+            setSelectedNodeId(null)
+            startOnborda('research-plan-tour')
+            setOnboarded('research-plan-tour')
+            toast.dismiss()
+        }
 
         // Only start tour if user is new and is on the /app/research-plan page
         if (pathname === '/app/research-plan' && !isOnboarded('research-plan-tour')) {
@@ -316,14 +312,7 @@ export const PrivateFlowView = ({
                 )
             })
         }
-    }, [localNodes])
-
-    const startOnbordaAndRemoveToast = () => {
-        setSelectedNodeId(null)
-        startOnborda('research-plan-tour')
-        setOnboarded('research-plan-tour')
-        toast.dismiss()
-    }
+    }, [localNodes, pathname, setSelectedNodeId, startOnborda])
 
     return (
         <div className="h-full w-full pb-6" onMouseMove={handleMouseMove}>

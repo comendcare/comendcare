@@ -25,7 +25,7 @@ export const DonutChartCard = () => {
     // Group milestones by status and count them
     const milestoneStatusData = milestones.reduce<Record<string, number>>(
         (acc, milestone) => {
-            acc[milestone.status] = (acc[milestone.status] || 0) + 1;
+            if (milestone.status) acc[milestone.status] = (acc[milestone.status] || 0) + 1;
             return acc;
         },
         {}

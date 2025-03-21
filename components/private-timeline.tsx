@@ -3,7 +3,7 @@
 import React from "react"
 import {getDates} from "./pag-profile-research-plan-card"
 import {PrivateBadge} from "./private-badge"
-import {FaArrowUpRightFromSquare, FaDollarSign, FaUser} from "react-icons/fa6"
+import { FaDollarSign, FaUser} from "react-icons/fa6"
 import { cn, formatMoney } from "@/lib/utils"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
@@ -11,24 +11,16 @@ import { Button } from "./ui/button"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { ScrollArea } from "./ui/scroll-area"
 import { TypeBadge } from "./type-badge"
-import { Milestone } from "@/lib/actions"
-import { Badge } from "./ui/badge"
 import { AttachmentsTag } from "./private-milestone-node"
-import { StatusType } from "@/lib/types"
-import { DateView } from "./miletone-date-view"
+import { Milestone, StatusType } from "@/lib/types"
 import StatusButton from "./milestone-status-button"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
 import {
     DndContext,
-    type DragEndEvent,
-    type DragOverEvent,
-    DragOverlay,
-    type DragStartEvent,
     useSensor,
     useSensors,
     KeyboardSensor,
     Announcements,
-    UniqueIdentifier,
     TouchSensor,
     MouseSensor,
     closestCorners
@@ -41,8 +33,6 @@ import {
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
 import {GripVertical} from "lucide-react"
-import { cva } from "class-variance-authority"
-import {CSS} from "@dnd-kit/utilities"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -52,12 +42,6 @@ const selector = (state: RoadmapState) => ({
     setSelectedNodeId: state.setSelectedNodeId,
     milestones: state.milestones,
     setMilestones: state.setMilestones,
-    nodes: state.nodes,
-    setNodes: state.setNodes,
-    edges: state.edges,
-    onEdgesChange: state.onEdgesChange,
-    onConnect: state.onConnect,
-    addNodes: state.addNodes,
 })
 
 export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
@@ -65,26 +49,11 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
         selectedNodeId,
         setSelectedNodeId,
         milestones,
-        setMilestones,
-        nodes,
-        setNodes: setDbNodes,
-        edges,
-        onEdgesChange,
-        addNodes,
-        onConnect,
+        setMilestones
     } = useRoadmapStore(useShallow(selector))
-const router = useRouter()
-    const pathname = usePathname()
-    const searchParams = useSearchParams()
 
     const handleEditClick = (nodeId: string) => {
         setSelectedNodeId(nodeId)
-
-        // const params = new URLSearchParams(searchParams.toString())
-        // params.delete("milestone")
-        // params.set("milestone", nodeId)
-
-        // router.replace(`${pathname}?${params.toString()}`, { scroll: false })
     }
 
     const sensors = useSensors(
@@ -96,7 +65,7 @@ const router = useRouter()
     )
 
     function getDraggedData(id: string) {
-        const name = milestones?.find(item => item.id === id)?.name
+        const name = milestones?.find(item => item.id === id)?.title
         const position = (milestones?.findIndex(item => item.id === id) || 0) + 1
         const length = milestones?.length || 0
 
@@ -178,9 +147,11 @@ const router = useRouter()
                                     case "custom": 
                                         return (a.timelineOrder - b.timelineOrder)
                                     case "start":
-                                        return (a.startDate - b.startDate)
+                                        if (a.startDate && b.startDate) return (a.startDate.getTime() - b.startDate.getTime())
+                                        return 0
                                     case "end":
-                                        return (a.endDate - b.endDate)
+                                        if (a.endDate && b.endDate) return (a.endDate.getTime() - b.endDate.getTime())
+                                        return 0
                                     default:
                                         return 0
                                 }
@@ -217,7 +188,6 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
 
     const style = {
         transition,
-        // transform: CSS.Translate.toString(transform),
         transform: transform ? `translateY(${transform.y}px)` : undefined, // Restrict X-axis
         touchAction: "none",
         userSelect: "none" as any,
@@ -268,7 +238,7 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
                 </Button>
             )}
             <span className="flex items-center justify-center rounded-full mt-3">
-                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
+                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/>
             </span>
             <div 
                 className={cn(
@@ -289,7 +259,7 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
                 <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2"}>
                     {milestone.description}
                 </p>
-                <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
+                <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/>
             </div>
         </li>
     )
@@ -299,7 +269,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
     if (nodeType === "ASSET") {
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).sort((a, b) => a.milestoneType?.label.length - b.milestoneType?.label.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).map((milestoneType, index) => (
                     <li key={index}>
                         <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
                     </li>
@@ -348,7 +318,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                         }}
                     />
                 </li>
-                {(milestoneData?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).map((milestoneType, index) => (
                     <li key={index}>
                         <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
                     </li>
@@ -370,7 +340,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
     if (nodeType === "RFP") {
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
+                {(milestoneData?.types || []).map((milestoneType, index) => (
                     <li key={index}>
                         <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
                     </li>
