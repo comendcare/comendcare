@@ -37,9 +37,9 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                             {milestone.title}
                         </CardTitle>
 
-                        {milestone.node.type && (
+                        {milestone.nodeType && (
                             <TypeBadge className="w-fit"
-                                       type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone.node.type))?.value || "PROJECT"}/>
+                                       type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone.nodeType))?.value || "PROJECT"}/>
                         )}
                     </div>
 
@@ -84,7 +84,10 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                         />
                     }
                     {(milestone.types || []).sort((a: any, b: any) => a?.milestoneType?.length - b?.milestoneType?.length).map((milestoneType: any, index: number) => (
-                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
+                        <MilestoneTypeBadge
+                            key={index}
+                            label={milestoneType?.milestoneType?.label}
+                        />
                     ))}
                 </span>
 

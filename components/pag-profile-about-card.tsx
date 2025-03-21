@@ -21,6 +21,12 @@ export const PagProfileAboutCard = ({organization, editable}: {
     const {startOnborda} = useOnborda()
     const pathname = usePathname();
 
+    const startOnbordaAndRemoveToast = () => {
+        startOnborda('organization-profile-tour')
+        setOnboarded('organization-profile-tour')
+        toast.dismiss()
+    }
+
     useEffect(() => {
         // Only start tour if user is new and is on the /app/profile page
         if (pathname === "/app/profile" && !isOnboarded('organization-profile-tour')) {
@@ -49,13 +55,7 @@ export const PagProfileAboutCard = ({organization, editable}: {
                 )
             })
         }
-    }, [])
-
-    const startOnbordaAndRemoveToast = () => {
-        startOnborda('organization-profile-tour')
-        setOnboarded('organization-profile-tour')
-        toast.dismiss()
-    }
+    }, [pathname, startOnbordaAndRemoveToast])
 
     return (
         <Card>

@@ -73,7 +73,7 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
                     </CardDescription>
                     <Separator className="my-2"/>
                     <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
-                        <TypeBadge type={milestone.node.type}/>
+                        <TypeBadge type={milestone.nodeType}/>
                         {!milestone.private && <FaArrowUpRightFromSquare className="h-[12px] w-[12px]"/>}
                     </div>
                 </CardHeader>
@@ -89,7 +89,7 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
     
                     <div className="flex flex-col gap-4 justify-end grow">
                         <CardContents props={{
-                            type: milestone.node.type,
+                            type: milestone.nodeType,
                             data: milestone
                         } as NodeProps<PublicMilestoneNode>}/>
                     </div>

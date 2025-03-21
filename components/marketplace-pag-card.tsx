@@ -10,11 +10,11 @@ import React from "react";
 
 type NodeTypeCount = Record<string, number>;
 
-function countPublicNodeTypes(data: { node: { type: string }; private: boolean }[]): NodeTypeCount {
+function countPublicNodeTypes(data: { nodeType: string; private: boolean }[]): NodeTypeCount {
     return data
         .filter(item => !item.private) // Filter out private milestones
         .reduce((acc: NodeTypeCount, item) => {
-            const type = item.node.type;
+            const type = item.nodeType;
             acc[type] = (acc[type] || 0) + 1;
             return acc;
         }, {});
