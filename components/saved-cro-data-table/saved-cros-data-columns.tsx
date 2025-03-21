@@ -78,6 +78,17 @@ export const columns: ColumnDef<SavedCompanyData>[] = [
         ),
     },
     {
+        accessorKey: "milestone.title",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Milestone" />
+        ),
+        cell: ({ row }) => (
+            <div>
+                {row.original.milestone.title}
+            </div>
+        ),
+    },
+    {
         id: "actions",
         cell: ({ row }) => <DataTableRowActions row={row} />,
     },

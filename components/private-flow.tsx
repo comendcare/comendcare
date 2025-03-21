@@ -286,6 +286,7 @@ export const PrivateFlowView = ({
                     <div className="flex flex-col space-y-2 ml-4">
                         <Button
                             onClick={() => startOnbordaAndRemoveToast()}
+                            variant="secondary"
                         >
                             {`Yes please!`}
                         </Button>
@@ -294,6 +295,7 @@ export const PrivateFlowView = ({
                                 toast.dismiss()
                                 setOnboarded('research-plan-tour')
                             }}
+                            variant="ghost"
                         >
                             {`No thanks!`}
                         </Button>

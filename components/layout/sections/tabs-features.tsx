@@ -4,28 +4,18 @@ import React, { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import roadmap from "@/public/illustrations/roadmap.png"
-import timeline from "@/public/illustrations/timeline.png"
-import kanban from "@/public/illustrations/kanban.png"
+import marketplace from "@/public/screenshots/marketplace.png"
+import publicProfile from "@/public/screenshots/public-profile.png"
+import researchPlanner from "@/public/screenshots/research-planner.png"
 
 export const imgWidth = 400
 export const imgHeight = 250
 
 const tabContent = {
     profiles: {
-        title: "Research Planner",
+        title: "Build your research plan",
         image: <Image
-            src={`https://api.microlink.io/?${encode({
-                url: "https://comend-refresh-sprint-3.vercel.app/pag/profile/ACME%20Syndrome%20Foundation",
-                screenshot: true,
-                meta: false,
-                embed: "screenshot.url",
-                colorScheme: "dark",
-                "viewport.isMobile": true,
-                "viewport.deviceScaleFactor": 1,
-                "viewport.width": imgWidth * 3,
-                "viewport.height": imgHeight * 3,
-            })}`}
+            src={researchPlanner}
             quality={100}
             layout="responsive"
             priority={true}
@@ -34,23 +24,13 @@ const tabContent = {
             width={imgWidth}
             height={imgHeight}
         />,
-        description: "Develop your research strategy with the help of playbooks and other groups. Then organize your tasks and share your roadmap with others.",
+        description: "Map out your efforts intuitively, with your team. Showcase your assets and funding opportunities to prospective researchers.",
     },
     marketplace: {
-        title: "Marketplace",
+        title: "Discover partners",
         image: (
             <Image
-                src={`https://api.microlink.io/?${encode({
-                    url: "https://comend-refresh-sprint.vercel.app/researcher",
-                    screenshot: true,
-                    meta: false,
-                    embed: "screenshot.url",
-                    colorScheme: "dark",
-                    "viewport.isMobile": true,
-                    "viewport.deviceScaleFactor": 1,
-                    "viewport.width": imgWidth * 3,
-                    "viewport.height": imgHeight * 3
-                })}`}
+                src={marketplace}
                 quality={100}
                 layout="responsive"
                 priority={true}
@@ -61,22 +41,12 @@ const tabContent = {
             />
         ),
         description:
-            "Find and learn about those who can help you advance your research objectives based on shared biologies, projects, or goals."
+            "Discover synergies with other patient groups. Find relevant CROs, leave or read reviews, and indicate interest."
     },
     forums: {
-        title: "Forum",
+        title: "Share your progress",
         image: <Image
-            src={`https://api.microlink.io/?${encode({
-                url: "https://comend-refresh-sprint-3.vercel.app/pag/project/Potassium%20Ion%20Channels/discussion",
-                screenshot: true,
-                meta: false,
-                embed: "screenshot.url",
-                colorScheme: "dark",
-                "viewport.isMobile": true,
-                "viewport.deviceScaleFactor": 1,
-                "viewport.width": imgWidth * 3,
-                "viewport.height": imgHeight * 3,
-            })}`}
+            src={publicProfile}
             quality={100}
             layout="responsive"
             priority={true}
@@ -85,7 +55,7 @@ const tabContent = {
             width={imgWidth}
             height={imgHeight}
         />,
-        description: "Learn or share about challenges, wins, and the latest news in rare disease science and drug development.",
+        description: "Easily keep your profile up-to-date and share it with your community, donors, biopharma, and more.",
     },
 };
 
@@ -121,17 +91,17 @@ export default function TabsFeaturesSection() {
         >
             <div className="flex flex-col justify-center items-center md:w-1/2 mx-auto text-center">
                 <div>
-                    <h2
-                        id="features-heading"
-                        className="text-lg text-primary mb-2 tracking-wider"
-                    >
-                        Platform
-                    </h2>
+                    {/*<h2*/}
+                    {/*    id="features-heading"*/}
+                    {/*    className="text-lg text-primary mb-2 tracking-wider"*/}
+                    {/*>*/}
+                    {/*    Platform*/}
+                    {/*</h2>*/}
                     <h3 className="text-3xl md:text-4xl font-bold mb-4">
-                        The accelerator for patient-led research
+                        Assembling and accelerating patient-led research
                     </h3>
                     <p className="text-xl text-muted-foreground mb-8">
-                        Comend supports patient groups from formation to IND approval.
+                        The network and tools to empower you from formation to clinical trials.
                     </p>
                 </div>
             </div>

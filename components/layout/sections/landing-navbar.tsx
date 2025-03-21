@@ -91,11 +91,11 @@ export const LandingNavbar: React.FC = () => {
             link: process.env.NEXT_PUBLIC_VERCEL_ENV
                 ? `https://${rootDomain}/faq` : `http://${rootDomain}/faq`
         },
-        {
-            name: "Contact",
-            link: process.env.NEXT_PUBLIC_VERCEL_ENV
-                ? `https://${rootDomain}/contact` : `http://${rootDomain}/contact`
-        },
+        // {
+        //     name: "Contact",
+        //     link: process.env.NEXT_PUBLIC_VERCEL_ENV
+        //         ? `https://${rootDomain}/contact` : `http://${rootDomain}/contact`
+        // },
     ]
 
     const ref = useRef<HTMLDivElement>(null)
