@@ -48,18 +48,16 @@ import {Popover, PopoverContent, PopoverTrigger} from "./ui/popover"
 import {cn, sleep} from "@/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "./ui/calendar"
-import {FaInfoCircle} from "react-icons/fa";
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import MoneyInput from "@/components/money-input";
 import MultipleSelector from "./ui/multiple-selector"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
-import { SettingsProvider } from "./editor/settings"
 import { PlateEditor } from "./editor/plate-editor"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
 import { CROSearchState, Recommendation, useCROSearchStore } from "@/state/search/croSearchStore"
 import { Card, CardContent } from "./ui/card"
 import Image from "next/image"
-import { CROMarketplaceCard, CRORecommendationCard } from "./marketplace-cro-card"
+import { CROMarketplaceCard  } from "./marketplace-cro-card"
 import Link from "next/link"
 import {
     DropdownMenu,
@@ -70,10 +68,10 @@ import {
 import { TypeBadge } from "./type-badge"
 import Loading from "@/app/loading"
 import { getMilestoneTypes } from "@/lib/fetchers"
-import { Badge } from "./ui/badge"
 import { NotificationBubble } from "./notification-bubble"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 import { Store } from "lucide-react"
+import { Info } from "lucide-react"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -456,7 +454,7 @@ export function EditMilestoneForm({
                                                     Migrate to asset
                                                     <Tooltip>
                                                         <TooltipTrigger className="ml-auto">
-                                                            <FaInfoCircle/>
+                                                            <Info />
                                                         </TooltipTrigger>
                                                         <TooltipContent className="max-w-80 text-wrap text-left">
                                                             {NODE_TYPE_OPTIONS.find(option => option.value === "ASSET")?.description}
@@ -477,7 +475,7 @@ export function EditMilestoneForm({
                                                     Migrate to project
                                                     <Tooltip>
                                                         <TooltipTrigger className="ml-auto">
-                                                            <FaInfoCircle/>
+                                                            <Info />
                                                         </TooltipTrigger>
                                                         <TooltipContent className="max-w-80 text-wrap text-left">
                                                             {NODE_TYPE_OPTIONS.find(option => option.value === "PROJECT")?.description}
@@ -498,7 +496,7 @@ export function EditMilestoneForm({
                                                     Migrate to RFP
                                                     <Tooltip>
                                                         <TooltipTrigger className="ml-auto">
-                                                            <FaInfoCircle/>
+                                                            <Info />
                                                         </TooltipTrigger>
                                                         <TooltipContent className="max-w-80 text-wrap text-left">
                                                             {NODE_TYPE_OPTIONS.find(option => option.value === "RFP")?.description}

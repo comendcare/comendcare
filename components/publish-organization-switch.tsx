@@ -4,11 +4,9 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {toast} from "sonner"
-import {Button} from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -17,8 +15,8 @@ import {Switch} from "@/components/ui/switch"
 import {toggleOrganizationPublished} from "@/lib/actions"
 import {Organization} from "@prisma/client";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import {FaInfoCircle} from "react-icons/fa";
 import React from "react";
+import { Info } from "lucide-react"
 
 const FormSchema = z.object({
     published: z.boolean().default(false).optional(),
@@ -72,7 +70,7 @@ export function PublishOrganizationSwitch({organization}: { organization: Organi
                                         {field.value ? "Published" : "Unpublished"}
                                         <Tooltip delayDuration={0}>
                                             <TooltipTrigger>
-                                                <FaInfoCircle/>
+                                                <Info />
                                             </TooltipTrigger>
                                             <TooltipContent className="max-w-80 text-wrap text-left">
                                                 {`Published profiles are viewable to visitors and users via your public URL and in our marketplace.`}

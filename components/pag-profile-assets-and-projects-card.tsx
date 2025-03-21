@@ -13,9 +13,9 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { NODE_TYPE_OPTIONS } from "@/lib/types";
+import { Info } from "lucide-react";
 
 // Define types for statuses and environments
 type Status = 'offline' | 'online' | 'error';
@@ -125,7 +125,7 @@ export const PAGProfileAssetsAndProjectsCard = () => {
                         {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET") && (
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <FaInfoCircle />
+                                    <Info />
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80 text-wrap text-left">
                                         {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET")?.description}

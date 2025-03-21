@@ -21,7 +21,6 @@ import { Button, buttonVariants } from "./ui/button"
 import { cn, sleep } from "@/lib/utils"
 import Link from "next/link"
 import { FaArrowUpRightFromSquare, FaFileImport, FaPlus } from "react-icons/fa6"
-import { FaInfoCircle } from "react-icons/fa"
 import {
     Dialog,
     DialogContent,
@@ -29,7 +28,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "./ui/dialog"
-import { Redo2, Undo2 } from "lucide-react"
+import { Info, Redo2, Undo2 } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import Papa from "papaparse"
 import { toast } from "sonner"
@@ -191,7 +190,7 @@ export function Roadmap() {
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <div className="ml-auto">
-                                            <FaInfoCircle />
+                                            <Info />
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-80 text-wrap text-left">

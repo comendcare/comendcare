@@ -21,6 +21,7 @@ import Loading from "@/app/loading";
 import Spinner from "@/components/ui/spinner"
 import logo from "@/public/Full logo.png"
 import { useSearchParams } from "next/navigation";
+import { Info } from "lucide-react";
 
 const selector = (state: CROSearchState) => ({
     recommendations: state.recommendations,
@@ -138,7 +139,7 @@ export function CROSearchResults() {
                                             Start a research plan to view recommendations
                                             <Tooltip>
                                                 <TooltipTrigger>
-                                                    <FaInfoCircle className="h-4 w-4"/>
+                                                    <Info />
                                                 </TooltipTrigger>
                                                 <TooltipContent className="max-w-80 !text-xs">
                                                     <p>

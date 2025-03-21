@@ -19,8 +19,8 @@ import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS} from "@/lib/t
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
-import { FaInfoCircle } from "react-icons/fa"
 import { useEffect } from "react"
+import { Info } from "lucide-react"
 
 const selector = (state: CROSearchState) => ({
     filters: state.filters,
@@ -77,7 +77,7 @@ export function CROFilters() {
                                 Service categories
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle/>
+                                        <Info />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The service categories provided by the CRO.`}
@@ -111,7 +111,7 @@ export function CROFilters() {
                                 Business types
                                 {/* <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle/>
+                                        <Info />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The service categories provided by the CRO.`}
@@ -145,7 +145,7 @@ export function CROFilters() {
                                 Certifications
                                 {/* <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle/>
+                                        <Info />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The service categories provided by the CRO.`}

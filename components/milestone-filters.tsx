@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -17,10 +16,9 @@ import { Button } from "./ui/button"
 import { defaultFilters, MilestoneSearchState, useMilestoneSearchStore } from "@/state/search/milestoneSearchStore"
 import { MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS } from "@/lib/types"
 import MultipleSelector from "./ui/multiple-selector"
-import { Checkbox } from "./ui/checkbox"
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
-import { FaInfoCircle } from "react-icons/fa"
 import { useEffect } from "react"
+import { Info } from "lucide-react"
 
 const selector = (state: MilestoneSearchState) => ({
     filters: state.filters,
@@ -78,7 +76,7 @@ export function MilestoneFilters() {
                                 Milestone types
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle/>
+                                        <Info />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`Types of milestones an organization may have in their research plan`}
@@ -112,7 +110,7 @@ export function MilestoneFilters() {
                                 Milestone status
                                 {/* <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle/>
+                                        <Info />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`Types of milestones an organization may have in their research plan`}
@@ -153,7 +151,7 @@ export function MilestoneFilters() {
                                 Milestone class
                                 {/* <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle/>
+                                        <Info />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`Types of milestones an organization may have in their research plan`}

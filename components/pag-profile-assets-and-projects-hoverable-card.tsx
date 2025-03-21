@@ -23,11 +23,11 @@ import { useStoreApi, Node } from "@xyflow/react";
 import { getNodesEdgesAndMilestones, getRoadmap } from "@/lib/fetchers";
 import { useSession } from "next-auth/react";
 import { createRoadmap } from "@/lib/actions";
-import { FaInfoCircle } from "react-icons/fa";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { NODE_TYPE_OPTIONS } from "@/lib/types";
 import { initializeRoadmapState } from "@/lib/initialize-client-state";
 import { toast } from "sonner";
+import { Info } from "lucide-react";
 
 // Define types for statuses and environments
 type Recency = 'Due' | 'New';
@@ -69,7 +69,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             {/* {NODE_TYPE_OPTIONS.find(value => value.value === "RFP") && (
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle />
+                                        <Info />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left">
                                             {NODE_TYPE_OPTIONS.find(value => value.value === "RFP")?.description}
@@ -160,7 +160,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             {/* {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET") && (
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle />
+                                        <Info />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left">
                                             {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET")?.description}

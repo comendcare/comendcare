@@ -17,8 +17,8 @@ import {Switch} from "@/components/ui/switch"
 import {toggleBiopharmaConsentSettings} from "@/lib/actions"
 import {Organization} from "@prisma/client";
 import {TooltipProvider, Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import {FaInfoCircle} from "react-icons/fa";
 import React from "react";
+import { Info } from "lucide-react"
 
 const FormSchema = z.object({
     biopharmaConsentSettings: z.boolean().default(false).optional(),
@@ -68,7 +68,7 @@ export function BiopharmaConsentSwitch({organization}: { organization: Organizat
                                         {field.value ? "Biopharma consented" : "Biopharma not consented"}
                                         <Tooltip delayDuration={0}>
                                             <TooltipTrigger>
-                                                <FaInfoCircle/>
+                                                <Info />
                                             </TooltipTrigger>
                                             <TooltipContent className="max-w-80 text-wrap text-left">
                                                 {`Enabling this setting enables us to connect you with biopharma partners based on your profile.`}

@@ -10,8 +10,8 @@ import { getMilestoneTypes } from "@/lib/fetchers"
 import { NODE_TYPE_OPTIONS, NodeType } from "@/lib/types"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
-import { FaInfoCircle } from "react-icons/fa"
 import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
+import { Info } from "lucide-react"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
@@ -96,7 +96,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                             {label}
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <FaInfoCircle/>
+                                    <Info />
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80 text-wrap text-left">
                                     {description}
