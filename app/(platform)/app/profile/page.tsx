@@ -283,9 +283,13 @@ export default async function ProfilePage() {
                                 <EditPAGContactEmailDialog organization={organization}/>
                             </div>
                             {organization.contactEmail && organization.contactEmail.trim() !== "" ?
-                                <p>{organization.contactEmail}</p>
+                                <p className="truncate">
+                                    {organization.contactEmail}
+                                </p>
                                 :
-                                <p className="text-muted-foreground">No contact email set</p>
+                                <p className="text-muted-foreground">
+                                    No contact email set
+                                </p>
                             }
                         </div>
                     </CardContent>
