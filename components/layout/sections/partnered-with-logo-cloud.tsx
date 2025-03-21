@@ -7,6 +7,7 @@ import logoNextAI from "@/public/logos/affiliations/NextAI.png"
 import logoOpenTreatments from "@/public/logos/affiliations/Open Treatments.png"
 import logo11ElevenLabsGrants from "@/public/logos/affiliations/11ElevenLabsGrants.png"
 import logoCuresDev from "@/public/logos/affiliations/CuresDev.png"
+import logoOdylia from "@/public/logos/affiliations/Odylia.png"
 import logoOUAG from "@/public/logos/affiliations/OUAG.png"
 import logoWABS from "@/public/logos/affiliations/WABS.png"
 import Image from "next/image"
@@ -43,8 +44,8 @@ export function PartneredWithLogoCloud() {
         //     src: logo11ElevenLabsGrants
         // },
         {
-            name: "Cures Dev",
-            src: logoCuresDev
+            name: "Odylia",
+            src: logoOdylia
         }
         // {
         //     name: "OUAG",

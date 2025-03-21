@@ -8,15 +8,15 @@ const FAQs = [
         contactLink: false,
     },
     {
-        question: "How do we make money?",
+        question: "What does it cost?",
         answer:
-            "We do not currently plan to charge patient groups for access to the platform and are extremely intentional about aligning our incentives. To sustain and grow our platform, we’ll attach fees to industry profiles, generate market research, and do revenue sharing on IP produced through our platform. Have thoughts? Let us know.",
+            "Comend is free for patient groups. We make money by helping biopharma identify opportunities in rare diseases.",
         contactLink: true,
     },
     {
         question: "What do we do with your data?",
         answer:
-            "We do not currently capture patient-level data, but meet GDPR standards for data privacy and security. With your consent, we will use information you share with us to create reports that will help biopharma launch new rare disease initiatives and partner with you.",
+            "In short — only what you consent to! We can currently collect and analyze data to improve our product, identify successful research strategies, and make the case for biopharma initiatives to support rare disease research. Note: Comend does not currently store patient-level data.",
         contactLink: false,
     },
     {
@@ -27,13 +27,15 @@ const FAQs = [
     },
     {
         question: "What happens if we shut down?",
-        answer: "We know how detrimental it can be when companies in the rare disease space wind down. We are committed to establishing and sharing plans to safeguard and return your data and efforts in the unfortunate case that we cannot sustain our operations. We will be proactive about informing the community on challenges that arise for our future.",
+        answer: "We’ve seen companies wind down in the rare disease space and understand how big of a set back that can be to you and your community. We are committed to preserving and returning your data as much as possible and will be forthright about significant risks to our operations.",
         contactLink: false
     },
     {
         question: `What does "Comend" mean?`,
         answer:
-            "Pronounced KH-oh-mend. It means to work together to fix things. Particularly, in relation to patient-centricity, translational research, and drug development.",
+            "Pronounced “KH-oh-mend”, Comend means to work together to fix things. \n" +
+            "\n" +
+            "We bring together the rare community and traditional life sciences ecosystem to forge a path toward precision medicines at scale.",
         contactLink: false,
     },
   ];
