@@ -20,7 +20,7 @@ import {
 import {encode} from "qss"
 import {imgHeight, imgWidth} from "@/components/layout/sections/tabs-features"
 import {PulsatingButton} from "@/components/ui/pulsating-button";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Button} from "@/components/ui/button";
 
@@ -120,6 +120,7 @@ export const LandingNavbar: React.FC = () => {
 
 const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
     const session = useSession()
+    const pathname = usePathname();
     const router = useRouter()
     const [hovered, setHovered] = useState<number | null>(null)
     const [active, setActive] = useState<string | null>(null)
@@ -169,7 +170,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                                     className="w-full h-full absolute inset-0 bg-gray-100 dark:bg-neutral-800 rounded-full"
                                 />
                             )}
-                            <span className="relative z-20">
+                            <span className="text-base relative z-20">
                                 {navItem.name}
                             </span>
                         </Link>
@@ -180,7 +181,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                                 active={active}
                                 item="Products"
                             >
-                                <div className="text-sm grid grid-cols-2 gap-10 p-4">
+                                <div className="text-base grid grid-cols-2 gap-10 p-4">
                                     {navItem.items?.map((item, idx) => (
                                         <ProductItem
                                             key={idx}
@@ -208,7 +209,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                     className="flex space-x-4 justify-end"
                 >
                     <Button
-                        className="w-fit"
+                        className="w-fit text-base"
                         onClick={() => router.push("/login")}
                         variant="ghost"
                     >
@@ -217,10 +218,16 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                     <PulsatingButton
                         className="w-fit"
                         onClick={() => {
-                            window.scrollTo({
-                                top: document.documentElement.scrollHeight,
-                                behavior: 'smooth' // Makes it scroll smoothly
-                            });
+                            if (pathname === "/") {
+                                // If we're on the landing page, scroll to the bottom
+                                window.scrollTo({
+                                    top: document.documentElement.scrollHeight,
+                                    behavior: 'smooth'
+                                });
+                            } else {
+                                // Otherwise, redirect to the landing page with the anchor
+                                router.push("/#contact");
+                            }
                         }}
                     >
                         Schedule a demo
