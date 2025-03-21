@@ -277,7 +277,7 @@ export const CloudHeroSection = () => {
                     className="flex flex-col justify-center items-center mx-auto space-y-4"
                 >
                     <p className="max-w-screen-sm text-2xl">
-                        {`Build your research plan, discover partners, and share your progress.`}
+                        {`Translate research into impact — strategize, collaborate, and showcase your progress.`}
                     </p>
                     <PulsatingButton
                         className="w-fit"

@@ -1,12 +1,12 @@
 import { FAQsWithGrid } from "@/components/layout/sections/faq"
 
 const FAQs = [
-    {
-        question: "Where does our data come from?",
-        answer:
-            "We have seeded our network using existing databases like PubMed. Soon, researchers and contractors will be able to claim and edit their pages.",
-        contactLink: false,
-    },
+    // {
+    //     question: "Where does our data come from?",
+    //     answer:
+    //         "We have seeded our network using existing databases like PubMed. Soon, researchers and contractors will be able to claim and edit their pages.",
+    //     contactLink: false,
+    // },
     {
         question: "What does it cost?",
         answer:

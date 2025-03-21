@@ -32,6 +32,8 @@ import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import FeedbackForm from "@/components/feedback-form";
 import React from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
+import ContactPAGDialog from "@/components/contact-pag-dialog";
+import {PencilIcon} from "lucide-react";
 
 export async function generateMetadata({
                                            params
@@ -304,15 +306,20 @@ export default async function OrganizationRoadmapPage({
                                         url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}/>
                                 },
                                 {
-                                    title: "Report an issue",
-                                    icon: <IconFlag/>,
-                                    sheet: <>
-                                        <SheetHeader>
-                                            <SheetTitle>Send Feedback</SheetTitle>
-                                        </SheetHeader>
-                                        <FeedbackForm/>
-                                    </>
-                                }
+                                    title: "Contact patient group",
+                                    icon: <PencilIcon/>,
+                                    dialog: <ContactPAGDialog organization={organization}/>
+                                },
+                                // {
+                                //     title: "Report an issue",
+                                //     icon: <IconFlag/>,
+                                //     sheet: <>
+                                //         <SheetHeader>
+                                //             <SheetTitle>Send Feedback</SheetTitle>
+                                //         </SheetHeader>
+                                //         <FeedbackForm/>
+                                //     </>
+                                // }
                             ]}
                             orientation="vertical"
                             desktopClassName="right-4"
