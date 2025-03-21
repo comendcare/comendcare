@@ -103,22 +103,6 @@ export const useRoadmapStore = create<RoadmapState>()(
         },
         setMilestones: async (milestones: Milestone[]) => {
             console.log(`set milestones`)
-            // const milestones = get().milestones.map(milestone =>
-            //     milestone.nodeId === nodeId
-            //         ? { ...milestone, ...newProperties }
-            //         : milestone
-            // )
-            // if (newProperties.nodeType) {
-            //     // if the type has been updated, we also update the node type
-            //     const nodes = get().nodes.map(node => (
-            //         node.id === nodeId 
-            //             ? { ...node, type: newProperties.nodeType }
-            //             : node
-            //     ))
-            //     set({ milestones, nodes })
-            // } else {
-            //     set({ milestones })
-            // }
             const updatedMilestones = get().milestones.map(oldMilestone => {
                 const newMilestone = milestones.find(m => m.id === oldMilestone.id)
                 if (newMilestone) {
