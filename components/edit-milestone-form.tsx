@@ -113,19 +113,10 @@ const editMilestoneForm = z.object({
         .string()
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
-    // types: z.array(optionSchema).optional(),
     types: z.array(z.custom<MilestoneType>()).optional(),
     otherTypeDetails: z.string().optional(),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
-    // startDate: z.object({
-    //     month: z.string().optional(),
-    //     year: z.string().min(4, "Year must be 4 digits").max(4, "Year must be 4 digits").optional(),
-    // }),
-    // endDate: z.object({
-    //     month: z.string().optional(),
-    //     year: z.string().min(4, "Year must be 4 digits").max(4, "Year must be 4 digits").optional()
-    // }),
     budget: z.number().max(2147483647).min(0).optional(),
     attachments: z.array(z.custom<AttachmentType>()).optional(),
     status: z.string(),

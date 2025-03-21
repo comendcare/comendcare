@@ -1701,14 +1701,12 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                 const node = await prisma.node.create({
                     data: {
                         roadmapId: roadmap.id,
-                        // type: milestone.nodeType || 'PROJECT',
                         positionX: index * 500,
                         positionY: 0,
                         data: {
                             create: {
                                 roadmapId: roadmap.id,
                                 organizationId,
-                                // types: milestone.types || [],
                                 status: milestone.status || "PLANNED",
                                 title: milestone.title,
                                 ...(milestone.description ? {description: milestone.description} : undefined),
@@ -1883,7 +1881,6 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                         roadmap: {
                             connect: {id: roadmapId}
                         },
-                        // type: node.type,
                         positionX: node.position?.x,
                         positionY: node.position?.y,
                         origin: node.origin,
@@ -2080,7 +2077,6 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                         roadmap: {
                             connect: {id: roadmapId}
                         },
-                        // type: node.type,
                         positionX: node.position?.x,
                         positionY: node.position?.y,
                         origin: node.origin,
@@ -2316,11 +2312,6 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         openTo: milestone.openTo || [],
                         status: milestone.status || "PLANNED",
                         private: milestone.private || false,
-                        // node: {
-                        //     update: {
-                        //         type: milestone.nodeType
-                        //     }
-                        // },
                         notes: milestone.notes,
                         nodeType: milestone.nodeType || "PROJECT"
                     }
