@@ -318,13 +318,13 @@ export function Roadmap() {
                             value="flow"
                             className="m-0 h-[calc(100vh-6rem)]"
                         >
-                            {/* {milestones.length > 0 ? (
+                            {milestones.length > 0 ? (
                                 <PrivateFlowView
                                     width={defaultLayout[0]}
                                 />
                             ): (
                                 <NoMilestonesCard setNewMilestoneIsOpen={setNewMilestoneIsOpen} />
-                            )} */}
+                            )}
                         </TabsContent>
                         
                         {/* Timeline view */}
