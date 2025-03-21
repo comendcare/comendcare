@@ -15,17 +15,17 @@ export default function LandingFooter() {
 
                     {/* Ensure icons are centered on mobile and justified on larger screens */}
                     <ul className="flex justify-center gap-6">
-                        <li>
-                            <a
-                                href="https://www.facebook.com/comendcare/"
-                                rel="noreferrer"
-                                target="_blank"
-                                className="text-gray-700 transition hover:opacity-75"
-                            >
-                                <span className="sr-only">Facebook</span>
-                                <FaFacebook className="size-8" />
-                            </a>
-                        </li>
+                        {/*<li>*/}
+                        {/*    <a*/}
+                        {/*        href="https://www.facebook.com/comendcare/"*/}
+                        {/*        rel="noreferrer"*/}
+                        {/*        target="_blank"*/}
+                        {/*        className="text-gray-700 transition hover:opacity-75"*/}
+                        {/*    >*/}
+                        {/*        <span className="sr-only">Facebook</span>*/}
+                        {/*        <FaFacebook className="size-8" />*/}
+                        {/*    </a>*/}
+                        {/*</li>*/}
 
                         <li>
                             <a
@@ -51,17 +51,17 @@ export default function LandingFooter() {
                             </a>
                         </li>
 
-                        <li>
-                            <a
-                                href="https://twitter.com/comendcare"
-                                rel="noreferrer"
-                                target="_blank"
-                                className="text-gray-700 transition hover:opacity-75"
-                            >
-                                <span className="sr-only">Twitter</span>
-                                <FaTwitter className="size-8" />
-                            </a>
-                        </li>
+                        {/*<li>*/}
+                        {/*    <a*/}
+                        {/*        href="https://twitter.com/comendcare"*/}
+                        {/*        rel="noreferrer"*/}
+                        {/*        target="_blank"*/}
+                        {/*        className="text-gray-700 transition hover:opacity-75"*/}
+                        {/*    >*/}
+                        {/*        <span className="sr-only">Twitter</span>*/}
+                        {/*        <FaTwitter className="size-8" />*/}
+                        {/*    </a>*/}
+                        {/*</li>*/}
                     </ul>
                 </div>
 

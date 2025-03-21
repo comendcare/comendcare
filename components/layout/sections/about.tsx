@@ -16,33 +16,24 @@ export default function About() {
                     </h2>
                     <p className="mt-6 text-base/7 text-gray-600">
                         Who are we, and why are we doing this? We get that question a lot.
-                        When Flawnson and I founded Comend in 2023, we had a simple motivation: to make translational
-                        research — critical early-stage work with real-world impact — accessible to everyone, not just
-                        experts.
+                        When Flawnson and Albert founded Comend in 2023, we had a simple motivation: to make translational research — early-stage work with real-world impact — accessible to everyone, not just experts.
                     </p>
                     <p className="mt-6 text-base/7 text-gray-600">
-                        Drawing from our experiences in drug discovery and healthcare, we saw firsthand the critical
-                        benefits of involving patients and their loved ones directly in the development of new
-                        solutions. Frankly, it still surprises us that this isn’t common practice.
-                        We firmly believed and still do, that while good science doesn’t come from everywhere, it can
-                        come from anywhere.
+                        Drawing from our experiences in drug discovery and healthcare, we saw firsthand the critical benefits of involving patients and their loved ones directly in the development of new solutions. Frankly, it still surprises us that this isn’t common practice.
+
+                        We firmly believed and still do, that while good science doesn’t come from everywhere, it can come from anywhere.
                     </p>
 
                     {showMore && (
                         <>
                             <p className="mt-6 text-base/7 text-gray-600">
-                                This belief naturally drew us to the rare disease community, where this kind of collaboration
-                                isn’t just an ideal — it’s a necessity. Patient groups are the champions for drug development
-                                for thousands of overlooked and often life-threatening genetic diseases, many affecting
-                                children.
-                                Our mission became clear: to build software that empowers these patient groups, hand-in-hand
-                                with patient groups.
+                                This belief naturally drew us to the rare disease community, where this kind of collaboration isn’t just an ideal — it’s a necessity. Patient groups are the champions for drug development for thousands of overlooked and often life-threatening genetic diseases, many affecting children.
+
+                                Our mission became clear: to build software that empowers these patient groups, hand-in-hand with patient groups.
                             </p>
                             <p className="mt-6 text-base/7 text-gray-600">
-                                We’re convinced that forging new treatment options for our loved ones can and should be much
-                                easier. That backing those who care the most about these 10,000 diseases affecting over 400
-                                million patients is the most effective way to address these vast unmet medical needs — and will
-                                prove that precision medicine can be achieved for countless more people and conditions.
+                                We’re convinced that forging new treatment options for our loved ones can and should be much easier. That backing those who care the most about these 10,000 diseases affecting over 400 million patients is the most effective way to address these vast unmet medical needs — and will prove that precision medicine can be achieved for countless more people and conditions.
+
                                 Keep scrolling to meet the passionate team behind Comend.
                             </p>
                         </>

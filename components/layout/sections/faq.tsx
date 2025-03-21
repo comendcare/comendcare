@@ -29,9 +29,9 @@ export function FAQsWithGrid({
             </h2>
             <p className="max-w-lg text-center text-xl text-muted-foreground mb-8">
                 We are here to help you with any questions you may have. If you
-                don&apos;t find what you need, please contact us through our{" "}
-                <a href="/contact" className="text-blue-500 underline">
-                    contact page
+                don&apos;t find what you need, please {" "}
+                <a href="/#contact" className="text-blue-500 underline">
+                    contact us
                 </a>
                 .
             </p>
