@@ -22,6 +22,7 @@ import {imgHeight, imgWidth} from "@/components/layout/sections/tabs-features"
 import {PulsatingButton} from "@/components/ui/pulsating-button";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
+import {Button} from "@/components/ui/button";
 
 interface NavbarItem {
     name: string
@@ -204,13 +205,25 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
 
             {session &&
                 <div
-                    className="flex justify-end"
+                    className="flex space-x-4 justify-end"
                 >
-                    <PulsatingButton
+                    <Button
                         className="w-fit"
                         onClick={() => router.push("/login")}
+                        variant="ghost"
                     >
                         Sign in
+                    </Button>
+                    <PulsatingButton
+                        className="w-fit"
+                        onClick={() => {
+                            window.scrollTo({
+                                top: document.documentElement.scrollHeight,
+                                behavior: 'smooth' // Makes it scroll smoothly
+                            });
+                        }}
+                    >
+                        Schedule a demo
                     </PulsatingButton>
                 </div>
             }

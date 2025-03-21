@@ -39,12 +39,12 @@ export default function App() {
         <>
             {/*<HeroSection/>*/}
             <CloudHeroSection />
-            <JoinWaitlistSection
-                isSubscribedCallback={betaSubscribeCallback}
-                isSubscribed={isSubscribed}
-            />
+            {/*<JoinWaitlistSection*/}
+            {/*    isSubscribedCallback={betaSubscribeCallback}*/}
+            {/*    isSubscribed={isSubscribed}*/}
+            {/*/>*/}
             {/*<HowItWorks/>*/}
-            <ClientsLogoCloud />
+            {/*<ClientsLogoCloud />*/}
             <TabsFeaturesSection />
             <MoreFeaturesSection />
             {/*<WhoSection/>*/}

@@ -4,7 +4,7 @@ import React, { useEffect, useId, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useOutsideClick } from "@/lib/hooks/use-outside-click"
 import Albert from "@/public/profiles/Albert.jpeg"
-import Flawnson from "@/public/profiles/Flawnson.jpg"
+import Flawnson from "@/public/profiles/Flawnson2.jpeg"
 import Sierra from "@/public/profiles/Sierra.jpeg"
 import Bruce from "@/public/profiles/Bruce.jpg"
 import Sanath from "@/public/profiles/Sanath.jpg"
@@ -43,13 +43,10 @@ export function TeamSection() {
 
     return (
         <section className="relative container w-full mx-auto">
-            <div className="max-w-7xl gap-8 mx-auto py-24 md:py-24 mt-16">
+            <div className="max-w-7xl gap-8 mx-auto py-24">
                 <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
                     Meet the team
                 </h2>
-                <p className="text-center text-xl text-muted-foreground dark:text-neutral-300 mt-4 mb-10">
-                    {`Want to chat or collaborate? We're all ears!`}
-                </p>
                 <AnimatePresence>
                     {active && (
                         <motion.div
@@ -177,7 +174,7 @@ export function TeamSection() {
                             onClick={() => setActive(card)}
                             className="p-4 flex flex-col hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
                         >
-                            <div className="flex gap-4 flex-col w-full">
+                            <div className="flex gap-4 flex-col w-full items-center justify-center">
                                 <motion.div
                                     layoutId={`image-${card.name}-${id}`}
                                 >
@@ -188,10 +185,10 @@ export function TeamSection() {
                                         height={100}
                                         src={card.src}
                                         alt={card.name}
-                                        className="object-center h-60 w-full rounded-lg object-cover"
+                                        className="object-center size-60 rounded-full object-cover"
                                     />
                                 </motion.div>
-                                <div className="flex justify-center items-center flex-col">
+                                <div className="flex flex-col justify-center items-center">
                                     <motion.h3
                                         layoutId={`name-${card.name}-${id}`}
                                         className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left text-base"
@@ -199,11 +196,17 @@ export function TeamSection() {
                                         {card.name}
                                     </motion.h3>
                                     <motion.p
-                                        layoutId={`title-${card.name}-${id}`}
-                                        className="text-neutral-600 dark:text-neutral-400 text-center md:text-left text-base"
+                                        layoutId={`title-${card.title}-${id}`}
+                                        className="text-neutral-600 dark:text-neutral-400 text-center text-base"
                                     >
                                         {card.title}
                                     </motion.p>
+                                    <motion.a
+                                        layout
+                                        layoutId={`title-${card.linkedInURL}-${id}`}
+                                    >
+                                        <FaLinkedin className="h-6 w-6" />
+                                    </motion.a>
                                 </div>
                             </div>
                         </motion.div>
