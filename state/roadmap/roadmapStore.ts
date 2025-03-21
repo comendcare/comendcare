@@ -192,7 +192,6 @@ export const useRoadmapStore = create<RoadmapState>()(
             if (response?.success && response?.data) {
                 const newNodes = response.data.nodes.map(n => ({
                     id: n.id,
-                    type: n.type,
                     position: { x: n.positionX, y: n.positionY },
                     origin: n.origin
                 })) as Node[]
