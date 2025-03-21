@@ -45,10 +45,27 @@ import Image from "next/image"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
 import { Separator } from "@radix-ui/react-separator"
 import { NewMilestoneDialogForm } from "./new-milestone-dialog"
-import { MilestoneType } from "@prisma/client"
 import { Option } from "@/lib/types"
 import { CROSearchState, useCROSearchStore } from "@/state/search/croSearchStore"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import {
+    Roadmap as PrismaRoadmap,
+    Node as PrismaNode,
+    Milestone as PrismaMilestone,
+    Edge as PrismaEdge,
+    Organization,
+    MilestoneType,
+} from "@prisma/client";
+
+export type RoadmapWithDetails = PrismaRoadmap & {
+    nodes: PrismaNode[];
+    milestones: (PrismaMilestone & {
+        node: PrismaNode | null;
+        types: { milestoneType: MilestoneType }[];
+    })[];
+    edges: PrismaEdge[];
+    organization: Organization | null;
+};
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -67,7 +84,7 @@ const recommendationsSelector = (state: CROSearchState) => ({
     recommendations: state.recommendations
 })
 
-export function Roadmap({data}: {data: any}) {
+export function Roadmap({data}: {data: RoadmapWithDetails | undefined}) {
     // Zustand state management
     const { defaultLayout } = useSidebarStore()
     const { 
