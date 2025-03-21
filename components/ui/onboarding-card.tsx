@@ -67,7 +67,6 @@ const OnboardingCard: React.FC<CardComponentProps> = ({ step, currentStep, total
             // if there are no nodes, we create one to use for the onboarding flow
             if (nodes.length <= 0) {
                 const newNode = await addMilestones([{
-                    types: [],
                     title: `New Milestone`,
                     status: "PLANNED",
                 }])

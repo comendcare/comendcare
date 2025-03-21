@@ -239,7 +239,7 @@ export const PrivateFlowView = ({
                         nodeType: milestone.nodeType || milestone.nodeType,
                         title: milestone.title,
                         description: milestone.description,
-                        types: milestone.types.map((type: any) => type.milestoneTypeId || type.milestoneType.id),
+                        types: milestone.types || [],
                         status: milestone.status
                     }])
                 }
