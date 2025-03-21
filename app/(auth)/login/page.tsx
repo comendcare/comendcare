@@ -3,7 +3,7 @@
 import Image from "next/image";
 import LoginForm from "@/components/login-form";
 import {Suspense, useEffect} from "react";
-import fullLogo from "@/public/logos/comend-full-logo.svg"
+import fullLogo from "@/public/logos/affiliations/comend-full-logo.svg"
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 
