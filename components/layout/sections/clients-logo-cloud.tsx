@@ -10,22 +10,20 @@ import logoCuresDev from "@/public/logos/affiliations/CuresDev.png"
 import logoOUAG from "@/public/logos/affiliations/OUAG.png"
 import { motion } from "framer-motion"
 import logoWABS from "@/public/logos/affiliations/WABS.png"
+import logoYellowForYiannis from "@/public/logos/affiliations/yellow-for-yiannis.png"
+import logoSMOC1 from "@/public/logos/affiliations/smoc1.png"
 import Image from "next/image"
 import React from "react"
 
 export function ClientsLogoCloud() {
     const logos = [
         {
-            name: "WABS",
-            src: logoWABS,
+            name: "Yellow for Yiannis",
+            src: logoYellowForYiannis,
         },
         {
-            name: "WABS",
-            src: logoWABS,
-        },
-        {
-            name: "WABS",
-            src: logoWABS,
+            name: "SMOC1",
+            src: logoSMOC1,
         },
     ]
 
