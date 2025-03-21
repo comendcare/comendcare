@@ -66,7 +66,7 @@ export function RFPDetails({ rfp, isPublic }: { rfp: MilestoneType, isPublic: bo
                     >
                         <div className="flex flex-col justify-between min-w-0 w-full">
                             <div className="flex items-center gap-x-3 w-full">
-                                <TypeBadge type={rfp?.node?.type || "RFP"} iconOnly={true}/>
+                                <TypeBadge type={rfp?.nodeType || "RFP"} iconOnly={true}/>
                                 <h2 className="text-sm font-semibold truncate text-wrap break-words">
                                     {rfp?.title}
                                 </h2>

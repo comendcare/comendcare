@@ -1,7 +1,7 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod"
-import React, {useCallback, useEffect, useRef, useState} from "react"
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {
@@ -162,6 +162,9 @@ export function EditTaskForm({
         }
 
         fetchData()
+
+    // missing dependencies disabled - we only want to run this once on initialization
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const formData = {
@@ -175,22 +178,6 @@ export function EditTaskForm({
         priority: form.watch("priority"),
         isPrivate: form.watch("private"),
     }
-
-    // callback ensures we're not creating a new debounce every time this is called
-    const debounceUpdates = useCallback(
-        debounce((updatedValues) => handleFormSubmit(updatedValues), 500), []
-    )
-
-    // // Allow update once form is initialized
-    // useEffect(() => {
-    //     initializing.current = false;
-    // }, []);
-
-    // Watch form changes, don't watch while initializing
-    useEffect(() => {
-        const subscription = form.watch((values) => debounceUpdates(values))
-        return () => subscription.unsubscribe();
-    }, [form.watch])
 
     const handleFormSubmit = async (values: z.infer<typeof editTaskForm>) => {
         const {
@@ -243,6 +230,23 @@ export function EditTaskForm({
         // })
         onClose()
     }
+
+    const handleFormSubmitCallback = useCallback(
+        handleFormSubmit, 
+        [session?.user.organizationId, onClose, taskData?.id, updateTask]
+    )
+
+    // memo ensures we're not creating a new debounce every time this is called
+    const debounceUpdates = useMemo(() => 
+        debounce((updatedValues) => handleFormSubmitCallback(updatedValues), 500), 
+        [handleFormSubmitCallback]
+    )
+
+    // Watch form changes, don't watch while initializing
+    useEffect(() => {
+        const subscription = form.watch((values) => debounceUpdates(values))
+        return () => subscription.unsubscribe();
+    }, [form.watch, debounceUpdates, form])
 
     const sensors = useSensors(
         useSensor(MouseSensor),

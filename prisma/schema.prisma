@@ -210,7 +210,6 @@ model Node {
   id        String     @id @unique @default(uuid())
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now()) @updatedAt
-  type      String
   positionX Int
   positionY Int
   origin    Float[]    @default([0.0, 0.0])
@@ -238,6 +237,7 @@ model Milestone {
   attachments      ExternalAttachment[]
   contacts         ExternalContact[]
   timelineOrder    Int                        @default(0)
+  nodeType         String                     @default("PROJECT")
 
   roadmapId      String
   roadmap        Roadmap      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)

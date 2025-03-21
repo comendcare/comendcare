@@ -1,7 +1,7 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod"
-import React, {useCallback, useEffect, useRef, useState} from "react"
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react"
 import {useForm, UseFormReturn} from "react-hook-form"
 import {z} from "zod"
 import {
@@ -37,7 +37,7 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {Milestone, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
+import {MilestoneType, MilestoneTypeOnMilestone, PlatformNotification, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
@@ -113,7 +113,8 @@ const editMilestoneForm = z.object({
         .string()
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
-    types: z.array(optionSchema).optional(),
+    // types: z.array(optionSchema).optional(),
+    types: z.array(z.custom<MilestoneType>()).optional(),
     otherTypeDetails: z.string().optional(),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
@@ -138,7 +139,7 @@ export function EditMilestoneForm({
     milestoneData,
     onClose
 }: {
-    milestoneData: any
+    milestoneData: Milestone
     onClose: () => void
 }) {
     const { setMilestone } = useRoadmapStore(useShallow(selector))
@@ -148,20 +149,20 @@ export function EditMilestoneForm({
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
-    const [milestoneTypes, setMilestoneTypes] = useState<any[]>([])
+    const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
     const [tab, setTab] = useState<"edit" | "recommendations">("edit")
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
         mode: "onChange",
         resolver: zodResolver(editMilestoneForm),
         defaultValues: {
-            nodeType: milestoneData?.nodeType || milestoneData?.node?.type || "PROJECT",
+            nodeType: milestoneData?.nodeType || "PROJECT",
             title: milestoneData?.title || "",
             description: milestoneData?.description || "",
             types: ((milestoneData?.types || []).map((type: any) => type.milestoneType) || []),
             otherTypeDetails: milestoneData?.otherTypeDetails || undefined,
-            startDate: milestoneData?.startDate,
-            endDate: milestoneData?.endDate,
+            startDate: milestoneData?.startDate || undefined,
+            endDate: milestoneData?.endDate || undefined,
             budget: milestoneData?.budget || undefined,
             attachments: milestoneData?.attachments || undefined,
             status: milestoneData?.status || "PLANNED",
@@ -189,26 +190,99 @@ export function EditMilestoneForm({
         notes: form.watch("notes")
     }
 
-    // callback ensures we're not creating a new debounce every time this is called
-    const debounceUpdates = useCallback(
-        debounce((updatedValues) => handleMilestoneFormSubmit(updatedValues), 500), []
+    const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
+        const {
+            nodeType,
+            title,
+            description,
+            types,
+            otherTypeDetails,
+            startDate,
+            endDate,
+            budget,
+            attachments,
+            // tasks,
+            status,
+            isPrivate,
+            contacts,
+            openTo,
+            notes
+        } = values;
+
+        console.log(`types`, types)
+
+        const updateData: Milestone = {
+            ...milestoneData,
+            nodeType,
+            title,
+            ...(description !== undefined && description !== null ? {description} : undefined),
+            ...(startDate ? {startDate} : undefined),
+            ...(endDate ? {endDate} : undefined),
+            ...(budget ? {budget} : undefined),
+            ...(attachments ? {attachments} : undefined),
+            types: (types || []).map((type) => {
+                return ({ 
+                    milestoneId: milestoneData.id,
+                    milestoneTypeId: type.id,
+                    milestoneType: type
+                })  
+            }).filter((type) => type !== undefined),
+            ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
+            status,
+            private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
+            ...(contacts ? {contacts} : undefined),
+            ...(openTo ? {openTo} : undefined),
+            ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)}: undefined)
+        }
+
+        if (milestoneData?.nodeId) setMilestone(milestoneData.nodeId, updateData)
+
+        // update recommendations
+        if (milestoneData) {
+            await setRecommendations([{
+                ...milestoneData,
+                ...updateData
+            } as Milestone], {limit: 3})
+        }
+
+        // Mixpanel tracking for "Other" field
+        // only send to mixpanel if the details explaining the 'other' type have been updated
+        if (otherTypeDetails && otherTypeDetails !== milestoneData?.otherTypeDetails && session?.user.organizationId) {
+            const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
+
+            mixpanel.track("Milestone has other type", {
+                orgName: response?.data?.name || "Unknown Org",
+                milestoneTitle: title,
+                milestoneType: otherTypeDetails,
+            });
+        }
+
+        // toast('Success!', {
+        //     position: "bottom-left",
+        //     description: 'The changes to your milestone have been successfully saved.'
+        // })
+        setIsMigrating(false)
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+        // Prevent form submission if Enter is pressed inside an input
+        if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
+            e.preventDefault()
+        }
+    }
+
+    const handleMilestoneFormSubmitCallback = useCallback(
+        handleMilestoneFormSubmit, 
+        [milestoneData, session?.user.organizationId, setMilestone, setRecommendations, milestoneTypes]
     )
 
-    // when switching to recommendations tab, set notifications as viewed
-    useEffect(() => {
-        if (tab === "recommendations") {
-            const relevantNotifications = recommendations?.map(({content, milestone}) => (
-                notifications.find((notification: any) => (
-                    notification.type === "NEW_RECOMMENDATION" &&
-                    notification.metadata?.companyId === content.id &&
-                    notification.metadata?.milestoneId === milestone.id
-                ))
-            )).filter(n => n !== undefined) || []
-            setNotificationsViewed(relevantNotifications)
-        }
-    }, [tab])
+    // memo ensures we're not creating a new debounce every time this is called
+    const debounceUpdates = useMemo(() => 
+        debounce((updatedValues) => handleMilestoneFormSubmitCallback(updatedValues), 500), 
+        [handleMilestoneFormSubmitCallback]
+    )
 
-    // Allow update once form is initialized
+    // Initialization - Allow update once form is initialized
     useEffect(() => {
         const init = async () => {
             if (session?.user.organizationId) {
@@ -237,7 +311,25 @@ export function EditMilestoneForm({
         }
 
         init()
-    }, []);
+
+    // missing dependencies disabled - we only want to run this once on initialization
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    // when switching to recommendations tab, set notifications as viewed
+    useEffect(() => {
+        if (tab === "recommendations") {
+            const relevantNotifications = recommendations?.map(({content, milestone}) => (
+                notifications.find((notification: any) => (
+                    notification.type === "NEW_RECOMMENDATION" &&
+                    notification.metadata?.companyId === content.id &&
+                    notification.metadata?.milestoneId === milestone.id && 
+                    notification.lastViewed
+                ))
+            )).filter(n => n !== undefined) || []
+            if (relevantNotifications.length > 0) setNotificationsViewed(relevantNotifications)
+        }
+    }, [tab, notifications, recommendations, setNotificationsViewed])
 
     useEffect(() => {
         const setupNotifications = async () => {
@@ -279,91 +371,15 @@ export function EditMilestoneForm({
         }
 
         setupNotifications()
-    }, [recommendations, notificationsInitialized])
+    // missing dependencies disabled - we only want to run this once on shortly after the notifications are initialized
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [recommendations, notificationsInitialized, addNotification])
 
     // Watch form changes, don't watch while initializing
     useEffect(() => {
         const subscription = form.watch((values) => debounceUpdates(values))
         return () => subscription.unsubscribe();
-    }, [form.watch])
-
-    const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
-        const {
-            nodeType,
-            title,
-            description,
-            types,
-            otherTypeDetails,
-            startDate,
-            endDate,
-            budget,
-            attachments,
-            // tasks,
-            status,
-            isPrivate,
-            contacts,
-            openTo,
-            notes
-        } = values;
-
-        const updateData = {
-            nodeType,
-            title,
-            ...(description !== undefined && description !== null ? {description} : undefined),
-            ...(startDate ? {startDate} : undefined),
-            ...(endDate ? {endDate} : undefined),
-            ...(budget ? {budget} : undefined),
-            ...(attachments ? {attachments} : undefined),
-            ...(types ? {
-                types: types.map((type: any) => ({
-                    milestoneId: milestoneData.id,
-                    milestoneTypeId: type.id,
-                    milestoneType: type
-                }))
-            } : undefined),
-            ...(otherTypeDetails !== undefined && otherTypeDetails !== null ? {otherTypeDetails} : undefined),
-            status,
-            private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
-            ...(contacts ? {contacts} : undefined),
-            ...(openTo ? {openTo} : undefined),
-            ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)}: undefined)
-        }
-
-        setMilestone(milestoneData?.nodeId, updateData)
-
-        // update recommendations
-        if (milestoneData) {
-            await setRecommendations([{
-                ...milestoneData,
-                ...updateData
-            } as Milestone], {limit: 3})
-        }
-
-        // Mixpanel tracking for "Other" field
-        // only send to mixpanel if the details explaining the 'other' type have been updated
-        if (otherTypeDetails && otherTypeDetails !== milestoneData?.otherTypeDetails && session?.user.organizationId) {
-            const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
-
-            mixpanel.track("Milestone has other type", {
-                orgName: response?.data?.name || "Unknown Org",
-                milestoneTitle: title,
-                milestoneType: otherTypeDetails,
-            });
-        }
-
-        // toast('Success!', {
-        //     position: "bottom-left",
-        //     description: 'The changes to your milestone have been successfully saved.'
-        // })
-        setIsMigrating(false)
-    }
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
-        // Prevent form submission if Enter is pressed inside an input
-        if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
-            e.preventDefault();
-        }
-    };
+    }, [form.watch, debounceUpdates, form])
 
     return (
         <Form {...form}>
@@ -723,7 +739,7 @@ const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTy
                 )}
             />
 
-            {types.map((type: any) => type.value).includes("OTHER") && (
+            {types.map((type: any) => type?.value).includes("OTHER") && (
                 <>
                     <div>
                         <FormLabel className="text-md">{`Type Description`}</FormLabel>
