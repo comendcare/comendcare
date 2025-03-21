@@ -88,7 +88,7 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
 
     useEffect(() => {
         fetchOrganizations()
-    }, [session])
+    }, [fetchOrganizations, session])
 
     return (
         <Sidebar collapsible="icon" {...props}>
