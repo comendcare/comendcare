@@ -238,7 +238,7 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
                 </Button>
             )}
             <span className="flex items-center justify-center rounded-full mt-3">
-                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
+                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/>
             </span>
             <div 
                 className={cn(
@@ -259,7 +259,7 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
                 <p className={"mb-2 text-base font-normal text-gray-500 dark:text-gray-400 line-clamp-2"}>
                     {milestone.description}
                 </p>
-                <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.node?.type || "PROJECT"}/>
+                <TimelineCardContents milestoneData={milestone} nodeType={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/>
             </div>
         </li>
     )

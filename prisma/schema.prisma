@@ -210,7 +210,6 @@ model Node {
   id        String     @id @unique @default(uuid())
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now()) @updatedAt
-  type      String
   positionX Int
   positionY Int
   origin    Float[]    @default([0.0, 0.0])
