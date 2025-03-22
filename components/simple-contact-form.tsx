@@ -92,7 +92,7 @@ export function SimpleContactForm() {
                                             </Label>
                                             <FancyInput
                                                 id="firstname"
-                                                placeholder="Spongebob"
+                                                placeholder="Jane"
                                                 type="text"
                                                 {...field}
                                             />
@@ -115,7 +115,7 @@ export function SimpleContactForm() {
                                             </Label>
                                             <FancyInput
                                                 id="lastname"
-                                                placeholder="Squarepants"
+                                                placeholder="Smith"
                                                 type="text"
                                                 {...field}
                                             />
@@ -139,7 +139,7 @@ export function SimpleContactForm() {
                                         </Label>
                                         <FancyInput
                                             id="email"
-                                            placeholder="spongebob.squarepants@gmail.com"
+                                            placeholder="jane.smith@gmail.com"
                                             type="email"
                                             {...field}
                                         />
