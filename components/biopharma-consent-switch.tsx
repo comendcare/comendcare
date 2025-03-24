@@ -71,7 +71,7 @@ export function BiopharmaConsentSwitch({organization}: { organization: Organizat
                                                 <FaInfoCircle/>
                                             </TooltipTrigger>
                                             <TooltipContent className="max-w-80 text-wrap text-left">
-                                                {`Enabling this setting allows biopharma partners to access organization data.`}
+                                                {`Enabling this setting enables us to connect you with biopharma partners based on your profile.`}
                                             </TooltipContent>
                                         </Tooltip>
                                     </FormLabel>
