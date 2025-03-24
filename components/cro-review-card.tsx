@@ -42,7 +42,7 @@ import {Textarea} from "@/components/ui/textarea";
 import {StarRatingSelector} from "@/components/star-rating-selector";
 import {useSession} from "next-auth/react";
 import {FaEllipsisVertical, FaFlag, FaLinkSlash, FaPencil, FaTrash} from "react-icons/fa6";
-import {editReview, deleteReview} from "@/lib/actions";
+import {editReview, deleteReview, submitFeedback} from "@/lib/actions";
 import {useRouter} from "next/navigation";
 import {toast} from "sonner";
 import va from "@vercel/analytics"
@@ -122,6 +122,32 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
             });
 
             editReview(cro.id, formData).then((res: any) => {
+                if (res.error) {
+                    toast.error(res.error);
+                } else {
+                    va.track("Edited review");
+                    router.refresh();
+                    toast.success("Successfully edited review!");
+                }
+            });
+        } catch (error) {
+            toast.error("An error occurred while editing your review.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleFeedbackSubmit = async (values: z.infer<typeof reviewForm>) => {
+        setLoading(true);
+        try {
+            const formData = new FormData();
+            Object.entries(values).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    formData.append(key, value.toString());
+                }
+            });
+
+            submitFeedback(review.id, true).then((res: any) => {
                 if (res.error) {
                     toast.error(res.error);
                 } else {

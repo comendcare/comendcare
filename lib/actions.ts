@@ -219,12 +219,12 @@ export const createCondition = async (formData: FormData) => {
     } catch (error: any) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === "P2002") {
-                return { success: false, error: "A condition with this name already exists." };
+                return {success: false, error: "A condition with this name already exists."};
             }
         }
 
         console.error("Error creating condition:", error);
-        return { success: false, error: "Database error. Please try again later." };
+        return {success: false, error: "Database error. Please try again later."};
     }
 }
 
@@ -1782,7 +1782,7 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: { include: { milestoneType: true } }
+                    types: {include: {milestoneType: true}}
                 }
             },
             nodes: true,
@@ -1950,7 +1950,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: { include: { milestoneType: true } }
+                types: {include: {milestoneType: true}}
             },
             where: {roadmapId}
         })
@@ -1966,7 +1966,7 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
     }
 }
 
-export async function createMilestones({roadmapId, milestones}: {roadmapId: string | null, milestones: Milestone[]}) {
+export async function createMilestones({roadmapId, milestones}: { roadmapId: string | null, milestones: Milestone[] }) {
     try {
         const updatedMilestones: Milestone[] = []
 
@@ -1989,7 +1989,7 @@ export async function createMilestones({roadmapId, milestones}: {roadmapId: stri
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: { include: { milestoneType: true } }
+                        types: {include: {milestoneType: true}}
                     },
                     data: {
                         id: milestone?.id,
@@ -2003,7 +2003,7 @@ export async function createMilestones({roadmapId, milestones}: {roadmapId: stri
                         types: {
                             create: (milestone?.types || []).map((type: any) => ({
                                 milestoneType: {
-                                    connect: { id: type.milestoneTypeId }
+                                    connect: {id: type.milestoneTypeId}
                                 }
                             }))
                         },
@@ -2098,7 +2098,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                                 types: {
                                     create: (node.data?.types || []).map((type: any) => ({
                                         milestoneType: {
-                                            connect: { id: type.milestoneTypeId }
+                                            connect: {id: type.milestoneTypeId}
                                         }
                                     }))
                                 },
@@ -2133,7 +2133,7 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: { include: { milestoneType: true } }
+                types: {include: {milestoneType: true}}
             },
             where: {roadmapId}
         })
@@ -2260,7 +2260,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: { include: { milestoneType: true } }
+                        types: {include: {milestoneType: true}}
                     }
                 })
 
@@ -2276,7 +2276,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: { include: { milestoneType: true } }
+                        types: {include: {milestoneType: true}}
                     },
                     data: {
                         title: milestone.title,
@@ -2284,7 +2284,7 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                             deleteMany: {},
                             create: (milestone.types || []).map((type: any) => ({
                                 milestoneType: {
-                                    connect: { id: type.milestoneTypeId || type.milestoneType.id }
+                                    connect: {id: type.milestoneTypeId || type.milestoneType.id}
                                 }
                             }))
                         },
@@ -2379,7 +2379,11 @@ export async function createKanban(orgId: string) {
 }
 
 /* HANDLE KANBAN COLUMNS - create, update, delete ------------------------------------------------------------------------ */
-export async function kanbanSync({kanbanId, columns, tasks}: {kanbanId: string | undefined, columns: Column[], tasks: Task[]}) {
+export async function kanbanSync({kanbanId, columns, tasks}: {
+    kanbanId: string | undefined,
+    columns: Column[],
+    tasks: Task[]
+}) {
     try {
         if (!kanbanId) return
 
@@ -2387,7 +2391,7 @@ export async function kanbanSync({kanbanId, columns, tasks}: {kanbanId: string |
         // return
 
         await prisma.column.deleteMany({
-            where: { kanbanId }
+            where: {kanbanId}
         })
 
         // Save or update nodes
@@ -2626,7 +2630,7 @@ export async function createNotification({notificationData}: { notificationData:
     }
 }
 
-export async function createNotifications({notificationsList}: {notificationsList: any[]}) {
+export async function createNotifications({notificationsList}: { notificationsList: any[] }) {
     try {
         const session = await getSession()
         if (!session) throw new Error("No session data")
@@ -2724,12 +2728,14 @@ export async function updateTasks({tasks}: { tasks: Task[] }) {
                             // don't create a notification for the user creating the task
                             if (stakeholder.userId === session?.user.id) return
 
-                            let n = await createNotification({notificationData: {
-                                type: "NEW_TASK",
-                                title: "New task assigned",
-                                message: `${newTask.name} was assigned to you.`,
-                                metadata: { taskId: stakeholder.taskId, stakeholderId: stakeholder.id }
-                            }})
+                            let n = await createNotification({
+                                notificationData: {
+                                    type: "NEW_TASK",
+                                    title: "New task assigned",
+                                    message: `${newTask.name} was assigned to you.`,
+                                    metadata: {taskId: stakeholder.taskId, stakeholderId: stakeholder.id}
+                                }
+                            })
                         })
                     )
                 }
@@ -2793,7 +2799,7 @@ export const createReview = async (companyId: string, formData: FormData): Promi
         });
 
         if (existingReview) {
-            return { success: false, error: "You have already created a review for this company." };
+            return {success: false, error: "You have already created a review for this company."};
         }
 
         const title = formData.get("title") as string;
@@ -2808,24 +2814,24 @@ export const createReview = async (companyId: string, formData: FormData): Promi
                     title,
                     body,
                     rating,
-                    author: { connect: { id: session.user.id } },
-                    company: { connect: { id: companyId } },
-                    organization: { connect: { id: session.user.organizationId } },
+                    author: {connect: {id: session.user.id}},
+                    company: {connect: {id: companyId}},
+                    organization: {connect: {id: session.user.organizationId}},
                 },
             });
 
             // Calculate new avgRating
             const aggregated = await tx.review.aggregate({
-                where: { companyId },
-                _avg: { rating: true },
+                where: {companyId},
+                _avg: {rating: true},
             });
 
             const newAvgRating = aggregated._avg.rating ?? 0;
 
             // Update the company's avgRating
             const updatedCompany = await tx.company.update({
-                where: { id: companyId },
-                data: { avgRating: newAvgRating },
+                where: {id: companyId},
+                data: {avgRating: newAvgRating},
             });
 
             if (review && updatedCompany) {
@@ -2846,10 +2852,10 @@ export const createReview = async (companyId: string, formData: FormData): Promi
 
         revalidatePath("app/cro/");
 
-        return { success: true, data: result };
+        return {success: true, data: result};
     } catch (error: any) {
         console.error("Error creating review:", error);
-        return { success: false, error: "Database error. Please try again later." };
+        return {success: false, error: "Database error. Please try again later."};
     }
 };
 
@@ -2872,7 +2878,7 @@ export const editReview = async (companyId: string, formData: FormData): Promise
         });
 
         if (!existingReview) {
-            return { success: false, error: "No existing review found to update." };
+            return {success: false, error: "No existing review found to update."};
         }
 
         const title = formData.get("title") as string;
@@ -2884,27 +2890,27 @@ export const editReview = async (companyId: string, formData: FormData): Promise
         const result = await prisma.$transaction(async (tx) => {
             // Update the review
             const updatedReview = await tx.review.update({
-                where: { id: existingReview.id },
+                where: {id: existingReview.id},
                 data: {
                     title,
                     body,
                     rating,
-                    milestones: milestoneId ? { connect: { id: milestoneId } } : undefined,
+                    milestones: milestoneId ? {connect: {id: milestoneId}} : undefined,
                 },
             });
 
             // Calculate new avgRating
             const aggregated = await tx.review.aggregate({
-                where: { companyId },
-                _avg: { rating: true },
+                where: {companyId},
+                _avg: {rating: true},
             });
 
             const newAvgRating = aggregated._avg.rating ?? 0;
 
             // Update the company's avgRating
             const updatedCompany = await tx.company.update({
-                where: { id: companyId },
-                data: { avgRating: newAvgRating },
+                where: {id: companyId},
+                data: {avgRating: newAvgRating},
             });
 
             if (updatedReview && updatedCompany) {
@@ -2925,10 +2931,10 @@ export const editReview = async (companyId: string, formData: FormData): Promise
 
         revalidatePath("app/cro/");
 
-        return { success: true, data: result };
+        return {success: true, data: result};
     } catch (error: any) {
         console.error("Error updating review:", error);
-        return { success: false, error: "Database error. Please try again later." };
+        return {success: false, error: "Database error. Please try again later."};
     }
 };
 
@@ -3007,13 +3013,13 @@ export async function editSavedCRO(savedCROId: string, milestoneId: string, enga
 
         if (!response) {
             console.error("Error saving edits to saved company.")
-            return { success: false, error: "Database error. Please try again later." }
+            return {success: false, error: "Database error. Please try again later."}
         }
 
-        return { success: true, data: response }
+        return {success: true, data: response}
     } catch (error: any) {
         console.error("Error editing saved company:", error)
-        return { success: false, error: "Database error. Please try again later." }
+        return {success: false, error: "Database error. Please try again later."}
     }
 }
 
@@ -3022,6 +3028,33 @@ export async function unsaveCRO(savedCompanyId: string) {
         const response = prisma.savedCompany.delete({
             where: {id: savedCompanyId},
         });
+
+        if (!response) {
+            console.error("Error unsaving company.")
+            return {success: false, error: "Database error. please try again later."}
+        }
+
+        return {success: true, data: response}
+    } catch (error: any) {
+        console.error("Error unsaving company:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function submitFeedback(reviewId: string, isHelpful: boolean) {
+    try {
+        let response
+        if (isHelpful) {
+            response = await prisma.review.update({
+                where: {id: reviewId},
+                data: {helpfulCount: {increment: 1}}
+            });
+        } else {
+            response = await prisma.review.update({
+                where: {id: reviewId},
+                data: {notHelpfulCount: {increment: 1}}
+            });
+        }
 
         if (!response) {
             console.error("Error unsaving company.")
