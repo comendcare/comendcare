@@ -1,27 +1,15 @@
 import React from "react";
-import {notFound, useSearchParams} from "next/navigation"
+import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
-import {getRoadmapData, getOrganizationData, getRoadmapsForOrganization, getMilestoneDetails} from "@/lib/fetchers"
-import BlogCard from "@/components/blog-card"
-import BlurImage from "@/components/blur-image"
-import MDX from "@/components/mdx"
-import {cn, createDicebearAvatar, formatMoney, standardizeYear} from "@/lib/utils"
+import {getOrganizationData, getRoadmapsForOrganization} from "@/lib/fetchers"
+import {formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
 import {Button} from "@/components/ui/button"
-import {RoadmapCard} from "@/components/public-roadmap-card"
-import {PublicMilestoneDetails} from "@/components/public-milestone-details"
-import {FaArrowLeft, FaCalendar, FaCircleDollarToSlot, FaCity, FaPeopleGroup, FaPlus} from "react-icons/fa6"
-import {BackButton} from "@/components/back-button"
-import PAGPublicRoadmapBreadcrumb from "@/components/pag-public-roadmap-breadcrumb";
-import {Organization} from "@prisma/client";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
-import PublicProfileDropdown from "@/components/public-profile-dropdown";
-import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
-import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
 import {Post} from "@/app/condition/[slug]/page";
 import {FloatingDock} from "@/components/floating-dock";
-import {IconFlag, IconShare, IconShare2} from "@tabler/icons-react";
+import {IconFlag, IconShare} from "@tabler/icons-react";
 import {
     DialogDescription,
     DialogFooter,
@@ -33,7 +21,7 @@ import {Label} from "@/components/ui/label"
 import ShareDialog from "@/components/share-dialog";
 import {PublicRoadmapContent} from "@/components/public-roadmap-content";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
-import {PencilIcon} from "lucide-react";
+import { Building2, Calendar, HandCoins, PencilIcon } from "lucide-react";
 import ContactPAGDialog from "@/components/contact-pag-dialog";
 
 export async function generateMetadata({
@@ -228,7 +216,7 @@ export default async function OrganizationRoadmapPage({
                                             className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                                             {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
                                                 <div className="mt-2 flex items-center text-gray-500">
-                                                    <FaCircleDollarToSlot
+                                                    <HandCoins
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"
                                                     />
@@ -237,14 +225,14 @@ export default async function OrganizationRoadmapPage({
                                             }
                                             {organization?.yearFounded && (
                                                 <div className="mt-2 flex items-center text-gray-500">
-                                                    <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                    <Calendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                                 aria-hidden="true"/>
                                                     Founded in {standardizeYear(organization?.yearFounded ?? "")}
                                                 </div>
                                             )}
                                             {organization?.incorporationStatus === "YES" &&
                                                 <div className="mt-2 flex items-center text-gray-500">
-                                                    <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                                    <Building2 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                             aria-hidden="true"/>
                                                     {`501(c)(3)`}
                                                 </div>

@@ -3,12 +3,10 @@
 import React from "react"
 import {getDates} from "./pag-profile-research-plan-card"
 import {PrivateBadge} from "./private-badge"
-import { FaDollarSign, FaUser} from "react-icons/fa6"
 import { cn, formatMoney } from "@/lib/utils"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { Button } from "./ui/button"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { ScrollArea } from "./ui/scroll-area"
 import { TypeBadge } from "./type-badge"
 import { AttachmentsTag } from "./private-milestone-node"
@@ -32,7 +30,7 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {GripVertical} from "lucide-react"
+import {CircleDollarSign, GripVertical, User} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -283,19 +281,19 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                     if (contact.name && contact.email) {
                         return (
                             <li key={index} className="flex gap-2 items-center">
-                                <FaUser/>
+                                <User />
                                 <p>{contact.name} &bull; {contact.email}</p>
                             </li>)
                     } else if (contact.name) {
                         return (
                             <li key={index} className="flex gap-2 items-center w-full">
-                                <FaUser/>
+                                <User />
                                 <p>{contact.name}</p>
                             </li>)
                     } else if (contact.email) {
                         return (
                             <li key={index} className="flex gap-2 items-center">
-                                <FaUser/>
+                                <User />
                                 <p>{contact.email}</p>
                             </li>)
                     }
@@ -327,7 +325,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                     if (contact.affiliation) {
                         return (
                             <li key={index} className="flex gap-2 items-center">
-                                <FaUser/>
+                                <User />
                                 <p>{contact.affiliation}</p>
                             </li>
                         )
@@ -347,7 +345,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                 ))}
                 {milestoneData?.budget && (
                     <li className="flex gap-2 items-center">
-                        <FaDollarSign/>
+                        <CircleDollarSign />
                         {formatMoney(milestoneData?.budget)} budget
                     </li>
                 )}

@@ -2,23 +2,13 @@
 import {Button} from "@/components/ui/button";
 import {useSession} from "next-auth/react"
 import {useRouter} from "next/navigation";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "./ui/carousel";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { createRoadmap } from "@/lib/actions";
-import { FaCheck } from "react-icons/fa6";
-import { ScrollArea } from "./ui/scroll-area";
 import { useState } from "react";
-import { CheckBubble } from "./check-bubble";
-import { templateMilestones, templateRoadmaps, emptyMilestoneTemplate, emptyRoadmapTemplate } from '@/lib/templates'
+import { emptyMilestoneTemplate, emptyRoadmapTemplate } from '@/lib/templates'
 import ComendLoadingSpinner from "./comend-loading-spinner";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { toast } from "sonner";
-import { Badge } from "./ui/badge";
-import { NODE_TYPE_OPTIONS } from "@/lib/types";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { FaInfoCircle } from "react-icons/fa";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { MilestoneTemplateTabs } from "./roadmap-templates";
 
 const selector = (state: RoadmapState) => ({

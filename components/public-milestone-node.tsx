@@ -8,15 +8,13 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import { FaArrowUpRightFromSquare } from "react-icons/fa6"
-import StatusButton from "./milestone-status-button"
 import { truncate, cn } from "@/lib/utils"
 import { PrivateBadge } from "./private-badge"
-import { Badge } from "./ui/badge"
 import { StatusType } from "@/lib/types"
 import { CardContents } from "./private-milestone-node"
 import { TypeBadge } from "./type-badge"
 import { MilestoneType } from "@prisma/client"
+import { ExternalLink } from "lucide-react"
 
 export type PublicMilestoneNode = Node<
     {
@@ -65,7 +63,7 @@ function PublicMilestoneNodeContents({props}: {props: NodeProps<PublicMilestoneN
             <CardHeader>
                 <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
                     <TypeBadge type={props.type}/>
-                    {!props.data?.private && props.data.externalLink && <FaArrowUpRightFromSquare className="h-[20px] w-[20px]"/>}
+                    {!props.data?.private && props.data.externalLink && <ExternalLink className="h-[20px] w-[20px]"/>}
                 </div>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">

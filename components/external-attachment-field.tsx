@@ -1,7 +1,7 @@
-import { FaTrash } from "react-icons/fa6"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { Prisma } from "@prisma/client"
+import { Trash } from "lucide-react"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{
     select: { name: true, link: true }
@@ -52,7 +52,7 @@ export const ExternalAttachmentField = ({
             />
             </div>
             <Button className="w-[40px]" variant="secondary" onClick={deleteElement}>
-                <FaTrash />
+                <Trash />
             </Button>
         </li>
     )

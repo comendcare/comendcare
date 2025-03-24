@@ -8,9 +8,9 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {FaGear} from "react-icons/fa6";
 import UserEditForm from "@/components/user-edit-form";
 import UserSettings from "@/components/user-settings";
+import { Settings } from "lucide-react";
 
 export default function UserEditSettingsDialog() {
 
@@ -18,7 +18,7 @@ export default function UserEditSettingsDialog() {
         <Dialog>
             <DialogTrigger asChild>
                 <Button className="gap-x-2 w-min">
-                    <FaGear/>
+                    <Settings />
                     Settings
                 </Button>
             </DialogTrigger>

@@ -1,14 +1,12 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Condition, Organization} from "@prisma/client";
-import {FaArrowUpRightFromSquare} from "react-icons/fa6";
-import Link from "next/link";
 import {Badge} from "@/components/ui/badge";
 import {concat} from "lodash";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {FaQuestionCircle} from "react-icons/fa";
 import React from "react";
 import EditPAGProfileConditionCardDialog from "@/components/edit-pag-profile-condition-card-dialog";
+import { Info } from "lucide-react";
 
 export const PAGProfileConditionsCard = ({conditions, organization, showEditDialog}: { conditions: Condition[] | null, organization: Organization, showEditDialog: boolean }) => {
 
@@ -40,7 +38,7 @@ export const PAGProfileConditionsCard = ({conditions, organization, showEditDial
                                         <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
                                             {condition.name}
                                         </h3>
-                                        {/*    <FaArrowUpRightFromSquare/>*/}
+                                        {/*    <ExternalLink />*/}
                                         {/*</Link>*/}
                                     </div>
                                     <p>
@@ -54,7 +52,7 @@ export const PAGProfileConditionsCard = ({conditions, organization, showEditDial
                                         <Tooltip delayDuration={0}>
                                             {/*disabled to make the tooltip unclickable*/}
                                             <TooltipTrigger disabled>
-                                                <FaQuestionCircle
+                                                <Info 
                                                     className="text-black size-3 inline-block align-baseline mx-1"/>
                                             </TooltipTrigger>
                                             <TooltipContent>

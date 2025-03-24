@@ -1,6 +1,6 @@
-import { FaBullhorn, FaFileLines, FaStar } from "react-icons/fa6"
 import { Badge } from "./ui/badge"
 import { cn } from "@/lib/utils"
+import { FileText, Megaphone, Star } from "lucide-react"
 
 const style = "h-8 text-sm flex justify-center gap-2 border-none text-blue-dark bg-blue-light"
 
@@ -14,19 +14,19 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
         <Badge variant="outline" className={cn(iconOnly ? "w-8" : "", style, className)}>
             {type === "ASSET" && (
                 <>
-                    <FaStar/>
+                    <Star />
                     {!iconOnly && "Asset"}
                 </>
             )}
             {type === "PROJECT" && (
                 <>
-                    <FaFileLines/>
+                    <FileText />
                     {!iconOnly && "Project"}
                 </>
             )}
             {type === "RFP" && (
                 <>
-                    <FaBullhorn/>
+                    <Megaphone />
                     {!iconOnly && "RFP"}
                 </>
             )}
@@ -38,7 +38,7 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
     //     return (
     //         <Badge variant="outline"
     //                className={cn("p-1 h-8 text-sm flex gap-2 border-none text-asset-foreground bg-asset", className)}>
-    //             <FaStar/>
+    //             <Star />
     //             {!iconOnly && "Asset"}
     //         </Badge>
     //     )
@@ -48,7 +48,7 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
     //     return (
     //         <Badge variant="outline"
     //                className={cn("p-1 h-8 text-sm flex gap-2 border-none text-project-foreground bg-project", className)}>
-    //             <FaFileLines/>
+    //             <FileText />
     //             {!iconOnly && "Project"}
     //         </Badge>
     //     )
@@ -57,7 +57,7 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
     // if (type === "RFP") {
     //     return (
     //         <Badge variant="outline" className={cn("p-1 h-8 text-sm flex gap-2 border-none text-rfp-foreground bg-rfp", className)}>
-    //             <FaBullhorn/>
+    //             <Megaphone />
     //             {!iconOnly && "RFP"}
     //         </Badge>
     //     )

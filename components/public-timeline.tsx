@@ -11,6 +11,7 @@ import {usePathname} from "next/navigation"
 import {TypeBadge} from "./type-badge"
 import {TimelineCardContents} from "./private-timeline"
 import {ScrollArea} from "@/components/ui/scroll-area";
+import {ExternalLink} from "lucide-react"
 
 export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilestone, setUrlMilestone}: {
     roadmap: any,
@@ -98,7 +99,7 @@ const TimelineElementContent = ({item, externalLinkIcon}: { item: any, externalL
                     {item.title}
                 </h3>
                 {item.private && <PrivateBadge iconOnly={true}/>}
-                {!item.private && externalLinkIcon && <FaArrowUpRightFromSquare size={12}/>}
+                {!item.private && externalLinkIcon && <ExternalLink size={12}/>}
                 <time
                     className="ml-auto block font-semibold leading-none dark:text-gray-500">
                     {getDates(item)}

@@ -1,12 +1,11 @@
 "use client";
 
 import * as React from "react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { Input, InputProps } from "@/components/ui/input";
-import {FaPaperPlane} from "react-icons/fa6";
+import { Send } from "lucide-react";
 
 interface CommentInputProps extends InputProps {
     onSubmit: () => void;
@@ -42,7 +41,7 @@ const CommentInput = React.forwardRef<HTMLInputElement, CommentInputProps>(
                             aria-hidden="true"
                         />
                     ) : (
-                        <FaPaperPlane className="h-4 w-4" aria-hidden="true" />
+                        <Send className="h-4 w-4" aria-hidden="true" />
                     )}
                     <span className="sr-only">Send comment</span>
                 </Button>

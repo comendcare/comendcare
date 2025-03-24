@@ -1,7 +1,7 @@
 import logo from "@/public/logos/comend-full-logo.png"
+import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa6"
 
 export default function LandingFooter() {
     return (
@@ -23,7 +23,7 @@ export default function LandingFooter() {
                         {/*        className="text-gray-700 transition hover:opacity-75"*/}
                         {/*    >*/}
                         {/*        <span className="sr-only">Facebook</span>*/}
-                        {/*        <FaFacebook className="size-8" />*/}
+                        {/*        <Facebook className="size-8" />*/}
                         {/*    </a>*/}
                         {/*</li>*/}
 
@@ -35,7 +35,7 @@ export default function LandingFooter() {
                                 className="text-gray-700 transition hover:opacity-75"
                             >
                                 <span className="sr-only">Instagram</span>
-                                <FaInstagram className="size-8" />
+                                <Instagram className="size-8" />
                             </a>
                         </li>
 
@@ -47,7 +47,7 @@ export default function LandingFooter() {
                                 className="text-gray-700 transition hover:opacity-75"
                             >
                                 <span className="sr-only">LinkedIn</span>
-                                <FaLinkedin className="size-8" />
+                                <Linkedin className="size-8" />
                             </a>
                         </li>
 
@@ -59,7 +59,7 @@ export default function LandingFooter() {
                         {/*        className="text-gray-700 transition hover:opacity-75"*/}
                         {/*    >*/}
                         {/*        <span className="sr-only">Twitter</span>*/}
-                        {/*        <FaTwitter className="size-8" />*/}
+                        {/*        <Twitter className="size-8" />*/}
                         {/*    </a>*/}
                         {/*</li>*/}
                     </ul>

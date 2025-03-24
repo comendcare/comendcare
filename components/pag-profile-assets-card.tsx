@@ -1,15 +1,5 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {cn} from "@/lib/utils";
-import {FaChevronRight, FaPaperclip} from "react-icons/fa6";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog";
 import {faker} from "@faker-js/faker";
 
 // Define types for statuses and environments

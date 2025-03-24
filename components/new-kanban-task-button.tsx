@@ -3,6 +3,7 @@ import {Button} from "@/components/ui/button";
 import {Column} from "@prisma/client";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore";
 import { useShallow } from "zustand/react/shallow";
+import { Plus } from "lucide-react";
 
 const kanbanSelector = (state: KanbanState) => ({
     addTask: state.addTask
@@ -25,7 +26,7 @@ export default function NewKanbanTaskButton({column, assignTo}: { column: Column
             variant="outline"
             onClick={createTask}
         >
-            <FaPlus/>
+            <Plus />
             New task
         </Button>
     )

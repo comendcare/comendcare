@@ -1,11 +1,9 @@
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import {FaPaperPlane} from "react-icons/fa6";
 import {CardContent, CardFooter} from "@/components/ui/card";
 import {Separator} from "@/components/ui/separator";
-import {faker} from "@faker-js/faker";
 import { ProfilePhoto } from "./profile-photo";
+import { Send } from "lucide-react";
 
 interface FeedCardSocialSectionProps {
     text?: string
@@ -45,7 +43,7 @@ export const UserFeedCardSocialSection = ({text}: FeedCardSocialSectionProps) =>
                     className="p-3 disabled:opacity-50"
                     disabled={text?.length === 0}
                 >
-                    <FaPaperPlane/>
+                    <Send />
                 </Button>
             </CardFooter>
         </div>

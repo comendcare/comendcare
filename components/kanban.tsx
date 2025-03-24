@@ -16,7 +16,6 @@ import {
     UniqueIdentifier,
     TouchSensor,
     MouseSensor,
-    closestCorners,
     CollisionDetection,
     pointerWithin
 } from "@dnd-kit/core"
@@ -24,7 +23,6 @@ import {SortableContext, arrayMove} from "@dnd-kit/sortable"
 import {type Task, TaskCard} from "@/components/task-card"
 import {hasDraggableData} from "@/lib/utils"
 import {coordinateGetter} from "@/lib/multiple-containers-keyboard-preset"
-import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
 import {KanbanState, useKanbanStore} from "@/state/kanban/kanbanStore";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
@@ -33,9 +31,9 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "./u
 import {Column} from "@/lib/actions"
 import NewColumnDialog from "./new-column-dialog"
 import { ScrollArea, ScrollBar } from "./ui/scroll-area"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "./ui/button"
-import { FaRedo, FaUndo } from "react-icons/fa"
+import { Redo2, Undo2 } from "lucide-react"
 
 export type ColumnId = string
 
@@ -109,7 +107,7 @@ export function KanbanView() {
                             saveState() // save state to update database
                             setMountKey(prev => prev + 1)
                         }} size={"icon"} variant={"ghost"}>
-                            <FaUndo />
+                            <Undo2 />
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-80">
@@ -124,7 +122,7 @@ export function KanbanView() {
                             saveState() // save state to update database
                             setMountKey(prev => prev + 1)
                         }} size={"icon"} variant={"ghost"}>
-                            <FaRedo />
+                            <Redo2 />
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-80">

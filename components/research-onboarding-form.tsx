@@ -1,4 +1,5 @@
 "use client"
+
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
@@ -7,30 +8,17 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
 import {connectOrganizationToCondition, createCondition, updateOrganization} from "@/lib/actions";
-import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
-import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import MultipleSelector from "@/components/ui/multiple-selector";
-import {Slider} from "@/components/ui/slider";
-import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
-import {Separator} from "@/components/ui/separator";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {FaQuestionCircle} from "react-icons/fa";
-import {CalendarDays, Timer} from "lucide-react";
-import {Skeleton} from "@/components/ui/skeleton";
-import {cn, formatMoney, formatNumberWithCommas, nameToInitials} from "@/lib/utils";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {FaBuildingNgo, FaCalendar, FaUserPlus, FaUsersViewfinder} from "react-icons/fa6";
-import {Badge} from "@/components/ui/badge";
+import {Info} from "lucide-react";
 import React, {useEffect, useState} from "react";
 import {faker} from "@faker-js/faker";
 import LoadingDots from "@/components/icons/loading-dots";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {Organization} from "@prisma/client";
-import {concat} from "lodash";
-import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@/lib/types";
+import {MODALITIES, MOLECULAR_MECHANISMS, Option} from "@/lib/types";
 import mixpanel from "mixpanel-browser";
 
 export const optionSchema = z.object({
@@ -473,7 +461,7 @@ export default function ResearchOnboardingForm(
                                             <Tooltip delayDuration={0}>
                                                 {/*disabled to make the tooltip unclickable*/}
                                                 <TooltipTrigger disabled>
-                                                    <FaQuestionCircle
+                                                    <Info 
                                                         className="text-black h-4 inline-block align-baseline mx-1"/>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
@@ -722,7 +710,7 @@ export default function ResearchOnboardingForm(
                 {/*                                        <div*/}
                 {/*                                            className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">*/}
                 {/*                                            <div className="mt-1 flex items-center text-gray-500">*/}
-                {/*                                                <FaCalendar*/}
+                {/*                                                <Calendar */}
                 {/*                                                    className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"*/}
                 {/*                                                    aria-hidden="true"/>*/}
                 {/*                                                Founded in {organization?.yearFounded.split("-")[0]}*/}
@@ -734,7 +722,7 @@ export default function ResearchOnboardingForm(
                 {/*                                        <div*/}
                 {/*                                            className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">*/}
                 {/*                                            <div className="mt-1 flex items-center text-gray-500">*/}
-                {/*                                                <FaBuildingNgo*/}
+                {/*                                                <Building2 */}
                 {/*                                                    className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"*/}
                 {/*                                                    aria-hidden="true"/>*/}
                 {/*                                                {"501(c)(3)"}*/}

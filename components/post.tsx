@@ -2,9 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import {User} from "@prisma/client";
-import {AnimatePresence, MotionConfig, motion} from "framer-motion";
-import {format} from "date-fns";
+import {MotionConfig} from "framer-motion";
 import {
     Card,
     CardContent,
@@ -14,29 +12,21 @@ import {
 import {Icons} from "@/components/icons";
 import {PostWithAuthorAndComments} from "@/lib/types";
 import {Button} from "@/components/ui/button";
-import {Separator} from "@/components/ui/separator";
 import {cn, formatDates} from "@/lib/utils";
-import {CommentForm} from "@/components/comment-form";
 import {useLike} from "@/lib/hooks/use-like";
-// import {UserName} from "@/components/user/user-name";
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-// import {ImagePreview} from "@/components/image/image-preview";
 import useMeasure from "react-use-measure";
-import {setTransition} from "@/lib/transition";
-// import {UserTooltip} from "@/components/user-tooltip";
 import {ProfilePhoto} from "@/components/profile-photo"
-import {IconShare, IconThumbUp, IconThumbUpFilled} from "@tabler/icons-react";
 import {useSession} from "next-auth/react";
-import {FaEllipsis} from "react-icons/fa6";
 import {deletePost} from "@/lib/actions";
 import {useRouter} from "next/navigation";
-import {CommentList} from "@/components/comment-list";
 import {PostDialog} from "@/components/post-dialog";
 import PostActionBar from "@/components/post-action-bar";
+import { Ellipsis } from "lucide-react";
 
 interface PostProps {
     data: PostWithAuthorAndComments;
@@ -116,7 +106,7 @@ export function Post({data}: PostProps) {
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button variant="ghost" className="rounded-full">
-                                        <FaEllipsis className="w-4 h-4"/>
+                                        <Ellipsis className="w-4 h-4"/>
                                     </Button>
                                 </PopoverTrigger>
                                 <PopoverContent

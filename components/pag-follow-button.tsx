@@ -1,11 +1,11 @@
 "use client"
 
 import {useEffect, useState} from "react";
-import {FaCheck, FaPlus} from "react-icons/fa6";
 import {Button} from "@/components/ui/button";
 import {createFollow} from "@/lib/actions";
 import {toast} from "sonner";
 import {isUserFollowing} from "@/lib/fetchers";
+import { Check, Plus } from "lucide-react";
 
 export default function PAGFollowButton({organizationId}: { organizationId: string }) {
     const [isFollowing, setIsFollowing] = useState<boolean | null>(null); // Use state to track following status
@@ -67,12 +67,12 @@ export default function PAGFollowButton({organizationId}: { organizationId: stri
                 <>Loading...</>
             ) : isFollowing ? (
                 <>
-                    <FaCheck />
+                    <Check />
                     Following
                 </>
             ) : (
                 <>
-                    <FaPlus />
+                    <Plus />
                     Follow
                 </>
             )}

@@ -29,6 +29,7 @@ import {
 import {FaUserPlus} from "react-icons/fa6";
 import {toast} from "sonner";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import { UserPlus } from "lucide-react";
 
 const invitationFormSchema = z.object({
     email: z.string().min(3, {
@@ -95,7 +96,7 @@ export default function InviteUserToOrgDialog() {
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 <Button className="gap-x-2">
-                    <FaUserPlus/>
+                    <UserPlus />
                     Invite user
                 </Button>
             </DialogTrigger>

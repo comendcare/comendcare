@@ -14,8 +14,6 @@ import { Button, buttonVariants } from "./ui/button";
 import Link from "next/link";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import { FaQuestion } from "react-icons/fa6";
-import { FaInfoCircle } from "react-icons/fa";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import Loading from "@/app/loading";
 import Spinner from "@/components/ui/spinner"

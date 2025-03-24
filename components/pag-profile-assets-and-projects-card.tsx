@@ -1,7 +1,6 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
-import {FaArrowUpRightFromSquare, FaChevronRight, FaPaperclip, FaPen} from "react-icons/fa6";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
@@ -15,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { NODE_TYPE_OPTIONS } from "@/lib/types";
-import { Info } from "lucide-react";
+import { ChevronRight, ExternalLink, Info, Paperclip } from "lucide-react";
 
 // Define types for statuses and environments
 type Status = 'offline' | 'online' | 'error';
@@ -112,7 +111,7 @@ export const PAGProfileAssetsAndProjectsCard = () => {
                     className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                 >
                     Edit research plan
-                    <FaArrowUpRightFromSquare/>
+                    <ExternalLink />
                 </Button>
             </CardHeader>
 
@@ -209,7 +208,7 @@ export const PAGProfileAssetsAndProjectsCard = () => {
                                                 {rfp.environment}
                                             </div>
                                         }
-                                        <FaChevronRight aria-hidden="true" className="h-3 w-3 flex-none text-gray-400"/>
+                                        <ChevronRight aria-hidden="true" className="h-3 w-3 flex-none text-gray-400"/>
                                     </li>
                                 ))}
                             </DialogTrigger>
@@ -258,7 +257,7 @@ export const PAGProfileAssetsAndProjectsCard = () => {
                                                         className="divide-y divide-gray-100 rounded-md border border-gray-200">
                                                         <li className="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6">
                                                             <div className="flex w-0 flex-1 items-center">
-                                                                <FaPaperclip aria-hidden="true"
+                                                                <Paperclip aria-hidden="true"
                                                                              className="h-5 w-5 shrink-0 text-gray-400"/>
                                                                 <div className="ml-4 flex min-w-0 flex-1 gap-2">
                                                                     <span
@@ -275,7 +274,7 @@ export const PAGProfileAssetsAndProjectsCard = () => {
                                                         </li>
                                                         <li className="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6">
                                                             <div className="flex w-0 flex-1 items-center">
-                                                                <FaPaperclip aria-hidden="true"
+                                                                <Paperclip aria-hidden="true"
                                                                              className="h-5 w-5 shrink-0 text-gray-400"/>
                                                                 <div className="ml-4 flex min-w-0 flex-1 gap-2">
                                                                     <span

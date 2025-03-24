@@ -1,17 +1,17 @@
 "use client"
 import {useEffect} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {cn, isOnboarded, nameToInitials, setOnboarded} from "@/lib/utils";
+import {isOnboarded, nameToInitials, setOnboarded} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
 import {Member, Organization, User} from "@prisma/client";
 import Link from "next/link";
-import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {toast} from "sonner";
 import {useOnborda} from "@/components/onborda/OnbordaContext";
 import {usePathname} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import EditPagProfileAboutCardDialog from "@/components/edit-pag-profile-about-card-dialog";
+import { ExternalLink } from "lucide-react";
 
 export const PagProfileAboutCard = ({organization, editable}: {
     organization: Organization & { members: (Member & { user: User })[] } | null
@@ -86,7 +86,7 @@ export const PagProfileAboutCard = ({organization, editable}: {
                                 <span className="truncate block max-w-[180px] overflow-hidden whitespace-nowrap">
                                     {organization?.website}
                                 </span>
-                                <FaArrowUpRightFromSquare/>
+                                <ExternalLink />
                             </Link>
                             : (
                                 <p className="text-gray-400">

@@ -7,24 +7,14 @@ import {
     FormField,
     FormLabel,
     FormItem,
-    FormMessage,
 } from "./ui/form"
 import { Input } from "./ui/input"
 import { Textarea } from "./ui/textarea"
 import { UseFormReturn } from "react-hook-form"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { Separator } from "./ui/separator"
-import { FaT, FaTrash } from "react-icons/fa6"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from "./ui/select"
-import { RFP_OPEN_TO_TYPE_OPTIONS } from "@/lib/types"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Trash } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Calendar } from "./ui/calendar"
@@ -300,7 +290,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                     form.setValue("RFP", undefined)
                                 }}
                             >
-                                <FaTrash />
+                                <Trash />
                                 {`Remove Project`}
                             </Button>
                         </CardFooter>

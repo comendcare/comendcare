@@ -18,16 +18,15 @@ import {
     DialogTrigger,
     DialogFooter
 } from "@/components/ui/dialog"
-import {Button, buttonVariants} from "@/components/ui/button"
-import {FaPlus} from "react-icons/fa6"
+import {Button} from "@/components/ui/button"
 import {useForm} from "react-hook-form"
 import * as z from "zod"
 import {zodResolver} from "@hookform/resolvers/zod"
 import {Input} from "@/components/ui/input"
 import {getNewColumnFormSchema} from "@/lib/schemas";
-import {cn} from "@/lib/utils";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
+import { Plus } from "lucide-react"
 
 const kanbanSelector = (state: KanbanState) => ({
     columns: state.columns,
@@ -66,7 +65,7 @@ export default function NewColumnDialog() {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button className="ml-auto">
-                    <FaPlus />
+                    <Plus />
                     Add new column
                 </Button>
             </DialogTrigger>

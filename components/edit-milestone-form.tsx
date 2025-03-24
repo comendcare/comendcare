@@ -20,7 +20,6 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import {FaAngleDown, FaBullhorn, FaCalendar, FaEllipsis, FaFileLines, FaGlobe, FaLock, FaPlus, FaStar, FaX} from "react-icons/fa6"
 import {
     Select,
     SelectContent,
@@ -37,7 +36,7 @@ import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {Milestone, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {MilestoneType, MilestoneTypeOnMilestone, PlatformNotification, Prisma} from "@prisma/client"
+import {MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
@@ -70,8 +69,7 @@ import Loading from "@/app/loading"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { NotificationBubble } from "./notification-bubble"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
-import { Store } from "lucide-react"
-import { Info } from "lucide-react"
+import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store } from "lucide-react"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -383,7 +381,7 @@ export function EditMilestoneForm({
                         e.preventDefault()
                         onClose()
                     }}>
-                        <FaX/>
+                        <X />
                     </Button>
 
                     <EditTitle form={form}/>
@@ -416,23 +414,23 @@ export function EditMilestoneForm({
                                     <Button className="font-semibold h-8 text-sm flex justify-center gap-2 border-none text-blue-dark bg-blue-light hover:bg-blue-light rounded-full">
                                         {formData.nodeType === "ASSET" && (
                                             <>
-                                                <FaStar/>
+                                                <Star />
                                                 {"Asset"}
                                             </>
                                         )}
                                         {formData.nodeType === "PROJECT" && (
                                             <>
-                                                <FaFileLines/>
+                                                <FileText />
                                                 {"Project"}
                                             </>
                                         )}
                                         {formData.nodeType === "RFP" && (
                                             <>
-                                                <FaBullhorn/>
+                                                <Megaphone />
                                                 {"RFP"}
                                             </>
                                         )}
-                                        <FaAngleDown />
+                                        <ChevronDown />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
@@ -786,7 +784,7 @@ const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any,
                                             <Tooltip disableHoverableContent={disabled}>
                                                 <TooltipTrigger disabled={disabled} asChild>
                                                     <FormLabel className="font-normal flex gap-1 items-center">
-                                                        <FaLock />
+                                                        <Lock />
                                                         {`Private`}
                                                     </FormLabel>
                                                 </TooltipTrigger>
@@ -806,7 +804,7 @@ const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any,
                                             <Tooltip disableHoverableContent={disabled}>
                                             <TooltipTrigger disabled={disabled} asChild>
                                                 <FormLabel className="font-normal flex gap-1 items-center">
-                                                    <FaGlobe />
+                                                    <Globe />
                                                     {`Public`}
                                                 </FormLabel>
                                             </TooltipTrigger>
@@ -1022,7 +1020,7 @@ const StartDateFormField = ({form}: { form: any }) => {
                                 !field.value && "text-muted-foreground"
                             )}
                         >
-                            <FaCalendar className="mr-2 h-4 w-4"/>
+                            <Calendar className="mr-2 h-4 w-4"/>
                             {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                         </Button>
                     </PopoverTrigger>
@@ -1095,7 +1093,7 @@ export function AttachmentsFormField({form, attachments}: { form: UseFormReturn<
                                                 ])
                                             }}
                                         >
-                                            <FaPlus />
+                                            <Plus />
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
@@ -1160,7 +1158,7 @@ const ContactsFormField = ({form}: { form: any }) => {
                                         ])
                                     }}
                                 >
-                                    <FaPlus />
+                                    <Plus />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent className="max-w-80 text-wrap text-left font-normal">

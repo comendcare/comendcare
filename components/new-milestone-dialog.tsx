@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react"
 import { MilestoneTemplates } from "./roadmap-templates"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog"
 import { Button } from "./ui/button"
-import { FaPlus } from "react-icons/fa6"
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore"
 import { useShallow } from "zustand/react/shallow"
 import { useStoreApi } from "@xyflow/react"
@@ -11,7 +10,7 @@ import { NODE_TYPE_OPTIONS, NodeType } from "@/lib/types"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { MilestoneType, MilestoneTypeOnMilestone } from "@prisma/client"
-import { Info } from "lucide-react"
+import { Info, Plus } from "lucide-react"
 
 const selector = (state: RoadmapState) => ({
     addMilestones: state.addMilestones
@@ -137,7 +136,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                                 }))
                             }}
                         >
-                            <FaPlus />
+                            <Plus />
                             Create selected milestone
                         </Button>
                     </DialogClose>

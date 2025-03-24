@@ -1,13 +1,13 @@
 import { cn } from "@/lib/utils";
-import { FaEye, FaGlobe, FaUnlock } from "react-icons/fa6";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { Globe } from "lucide-react";
 
 export function PublicBadge({ className = "", iconOnly = false }: { className?: string, iconOnly?: boolean }) {
     if (iconOnly) {
         return (
             <Tooltip>
                 <TooltipTrigger className={cn(className, "text-sm")}>
-                <FaGlobe />
+                <Globe />
                 </TooltipTrigger>
                 <TooltipContent className="max-w-80 text-wrap text-left">
                     <p className={cn(className, "text-normal")}>
@@ -21,7 +21,7 @@ export function PublicBadge({ className = "", iconOnly = false }: { className?: 
 
     return(
         <p className={cn(className, "mt-0 inline-flex items-center gap-x-2 text-sm")}>
-            <FaGlobe />
+            <Globe />
             {!iconOnly && `Public`}
         </p>
     )

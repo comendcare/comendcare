@@ -1,8 +1,8 @@
 import ResearchOnboardingForm from "@/components/research-onboarding-form";
 import {Timer} from "lucide-react";
 import {Separator} from "@/components/ui/separator";
-import {FaQuestionCircle} from "react-icons/fa";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
+import {TooltipProvider} from "@/components/ui/tooltip";
 
 
 export default function OrganizationOnboardingResearchPage() {
@@ -32,7 +32,7 @@ export default function OrganizationOnboardingResearchPage() {
                         {/*        {" "}*/}
                         {/*        <Tooltip delayDuration={0}>*/}
                         {/*            <TooltipTrigger>*/}
-                        {/*                <FaQuestionCircle className="h-4 inline-block align-baseline mx-1"/>*/}
+                        {/*                <Info className="h-4 inline-block align-baseline mx-1"/>*/}
                         {/*            </TooltipTrigger>*/}
                         {/*            <TooltipContent>*/}
                         {/*                <p>Hello there!</p>*/}

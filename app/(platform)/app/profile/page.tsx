@@ -1,29 +1,11 @@
-import {
-    FaArrowUpRightFromSquare,
-    FaCalendar, FaCircleDollarToSlot, FaCity, FaEllipsis, FaEye, FaPen,
-    FaPencil, FaPeopleGroup, FaPhone, FaPlus,
-} from "react-icons/fa6";
-import {Button, buttonVariants} from "@/components/ui/button";
-import {LineChartCard} from "@/components/line-chart-card";
-import {DonutChartCard} from "@/components/donut-chart-card";
-import {UserFeedTextCard} from "@/components/user-feed-text-card";
-import {UserNewPostCard} from "@/components/user-new-post-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
-import {cn, formatMoney, standardizeYear} from "@/lib/utils";
-import PrivateProfileDropdown from "@/components/private-profile-dropdown";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {formatMoney, standardizeYear} from "@/lib/utils";
+import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {getSession} from "@/lib/auth";
-import Image from "next/image"
 import Link from "next/link";
-import {PAGProfileAssetsCard} from "@/components/pag-profile-assets-card";
-import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import prisma from "@/lib/prisma"
-import {PAGProfileOpenRFPsCard} from "@/components/pag-profile-open-rfps-card";
-import EditPAGProfileDialog from "@/components/edit-pag-profile-page-dialog";
 import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {toast} from "sonner";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {PAGBannerPhoto} from "@/components/pag-banner-photo";
@@ -36,16 +18,14 @@ import {BiopharmaConsentSwitch} from "@/components/biopharma-consent-switch";
 import EditPAGProfileHeaderDialog from "@/components/edit-pag-profile-header-dialog";
 import {ProfileCompletionCard} from "@/components/profile-completion-card";
 import EditPagProfileSubdomainDialog from "@/components/edit-pag-profile-subdomain-dialog";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {FaInfoCircle} from "react-icons/fa";
 import EditPAGContactEmailDialog from "@/components/edit-pag-contact-email-dialog";
+import { Building2, Calendar, ExternalLink, HandCoins } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default async function ProfilePage() {
     const session = await getSession()
 
     let organization = null
-    // let dbMilestones = []
     if (session?.user.organizationId) {
         const response = await getOrganizationFromOrganizationId(session?.user.organizationId)
         if (response.success) {
@@ -157,7 +137,7 @@ export default async function ProfilePage() {
                                                     className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                                                     {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
                                                         <div className="mt-2 flex items-center text-gray-500">
-                                                            <FaCircleDollarToSlot
+                                                            <HandCoins
                                                                 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                                 aria-hidden="true"
                                                             />
@@ -166,7 +146,7 @@ export default async function ProfilePage() {
                                                     }
                                                     {organization?.yearFounded && (
                                                         <div className="mt-2 flex items-center text-gray-500">
-                                                            <FaCalendar
+                                                            <Calendar
                                                                 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                                 aria-hidden="true"/>
                                                             Founded
@@ -175,7 +155,7 @@ export default async function ProfilePage() {
                                                     )}
                                                     {organization?.incorporationStatus === "YES" &&
                                                         <div className="mt-2 flex items-center text-gray-500">
-                                                            <FaCity
+                                                            <Building2
                                                                 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                                 aria-hidden="true"/>
                                                             {`501(c)(3)`}
@@ -275,7 +255,7 @@ export default async function ProfilePage() {
                                 <span className="truncate block max-w-[150px] overflow-hidden whitespace-nowrap">
                                     {organization.subdomain}.comend.io
                                 </span>
-                                <FaArrowUpRightFromSquare className="flex-shrink-0"/>
+                                <ExternalLink className="flex-shrink-0"/>
                             </Link>
                         </div>
                     </CardHeader>
