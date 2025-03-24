@@ -28,7 +28,7 @@ export default function NewOrganizationEmail ({ user, organization }: WaitlistEm
                 <Body className="bg-white my-auto mx-auto font-sans">
                     <Container className="my-10 mx-auto p-5 w-[465px]">
                         <Img
-                            className="w-full"
+                            className="w-1/2 my-0 mx-auto"
                             src="https://storage.googleapis.com/comend-app-public-permanent/Full%20logo.png"
                             alt="Comend logo"
                         />

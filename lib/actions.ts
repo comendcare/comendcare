@@ -1606,7 +1606,7 @@ export async function acceptInvitation(invitationId: string) {
             return {success: false, error: "failed to follow organization"};
         }
 
-        // Process invitation: create membership and mark invitation as accepted
+        // Process invitation: create membership and delete memebership (mark invitation as accepted)
         await prisma.$transaction([
             prisma.member.create({
                 data: {
@@ -1616,14 +1616,19 @@ export async function acceptInvitation(invitationId: string) {
                     userId: session.user.id,
                 },
             }),
-            prisma.invitation.update({
+            prisma.invitation.delete({
                 where: {
                     id: invitationId,
                 },
-                data: {
-                    accepted: true,
-                },
             }),
+            // prisma.invitation.update({
+            //     where: {
+            //         id: invitationId,
+            //     },
+            //     data: {
+            //         accepted: true,
+            //     },
+            // }),
         ]);
 
         revalidatePath("/app/profile")

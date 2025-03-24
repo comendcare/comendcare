@@ -25,7 +25,7 @@ export default function PAGContactEmail({ name, message, sendingEmail, receiving
                 <Body className="bg-white my-auto mx-auto font-sans">
                     <Container className="my-10 mx-auto p-5 w-[465px] border border-gray-200 rounded-lg shadow-sm">
                         <Img
-                            className="w-full mb-4"
+                            className="w-1/2 mb-4 mx-auto"
                             src="https://storage.googleapis.com/comend-app-public-permanent/Full%20logo.png"
                             alt="Comend logo"
                         />
