@@ -719,21 +719,23 @@ model RFI {
 }
 
 model Review {
-  id             String              @id @default(uuid())
-  title          String
-  body           String
-  rating         Float               @default(0.0) // Stores the rating given by the user (can be 1-5, 1-10, etc.)
-  authorId       String
-  author         User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  companyId      String
-  company        Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  organizationId String?
-  organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-  replies        Reply[]             @relation("ReviewToReply")
-  reports        ReportOnReview[]
-  milestones     MilestoneToReview[]
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @updatedAt
+  id              String              @id @default(uuid())
+  title           String
+  body            String
+  rating          Float               @default(0.0) // Stores the rating given by the user (can be 1-5, 1-10, etc.)
+  authorId        String
+  author          User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  companyId       String
+  company         Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  organizationId  String?
+  organization    Organization?       @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  replies         Reply[]             @relation("ReviewToReply")
+  reports         ReportOnReview[]
+  milestones      MilestoneToReview[]
+  helpfulCount    Int                 @default(0)
+  notHelpfulCount Int                 @default(0)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
 
   @@unique([authorId, companyId, organizationId]) // Ensures one review per user per company per organization
 }
