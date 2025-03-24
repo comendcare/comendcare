@@ -246,7 +246,7 @@ export default async function OrganizationRoadmapPage({
                                                 <div className="mt-2 flex items-center text-gray-500">
                                                     <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                             aria-hidden="true"/>
-                                                    {`501c3`}
+                                                    {`501(c)(3)`}
                                                 </div>
                                             }
                                         </div>

@@ -27,11 +27,8 @@ export default function OnboardingWelcomePage() {
                     <p>
                         {`This should take ~5 minutes if you're creating an organization for the first time.`}
                     </p>
-                    <p>
-                        {`All questions in this form are optional unless marked as (required), and you can edit your information at any time after signing up.`}
-                    </p>
                     <p className="font-semibold">
-                        {`You choose what information is shared publicly. We will never share your data externally without your consent.`}
+                        {`You will have detailed control over your data privacy once you finish signing up.`}
                     </p>
                 </div>
 
