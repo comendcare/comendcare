@@ -3041,29 +3041,53 @@ export async function unsaveCRO(savedCompanyId: string) {
     }
 }
 
-export async function submitFeedback(reviewId: string, isHelpful: boolean) {
+export async function submitFeedback(reviewId: string, userId: string, isHelpful: boolean) {
     try {
-        let response
-        if (isHelpful) {
-            response = await prisma.review.update({
-                where: {id: reviewId},
-                data: {helpfulCount: {increment: 1}}
+        // Check if the user has already provided feedback for this review
+        const existingFeedback = await prisma.reviewFeedback.findUnique({
+            where: {
+                reviewId_userId: {
+                    reviewId,
+                    userId,
+                },
+            },
+        });
+
+        if (existingFeedback) {
+            // If feedback exists, update it
+            const response = await prisma.reviewFeedback.update({
+                where: {
+                    id: existingFeedback.id,
+                },
+                data: {
+                    helpful: isHelpful,
+                },
             });
+
+            return { success: true, data: response };
         } else {
-            response = await prisma.review.update({
-                where: {id: reviewId},
-                data: {notHelpfulCount: {increment: 1}}
+            // Otherwise, create new feedback
+            const response = await prisma.reviewFeedback.create({
+                data: {
+                    reviewId,
+                    userId,
+                    helpful: isHelpful,
+                },
             });
-        }
 
-        if (!response) {
-            console.error("Error unsaving company.")
-            return {success: false, error: "Database error. please try again later."}
-        }
+            // Also update helpfulCount or notHelpfulCount in the Review model
+            await prisma.review.update({
+                where: { id: reviewId },
+                data: {
+                    helpfulCount: isHelpful ? { increment: 1 } : undefined,
+                    notHelpfulCount: !isHelpful ? { increment: 1 } : undefined,
+                },
+            });
 
-        return {success: true, data: response}
+            return { success: true, data: response };
+        }
     } catch (error: any) {
-        console.error("Error unsaving company:", error)
-        return {success: false, error: "Database error. please try again later."}
+        console.error("Error submitting feedback:", error);
+        return { success: false, error: "Database error. Please try again later." };
     }
 }

@@ -63,6 +63,7 @@ model User {
   repliess              Reply[]
   reportOnReviews       ReportOnReview[]
   reportOnReplys        ReportOnReply[]
+  reviewFeedbacks       ReviewFeedback[]
 }
 
 model PlatformNotification {
@@ -719,25 +720,36 @@ model RFI {
 }
 
 model Review {
-  id              String              @id @default(uuid())
-  title           String
-  body            String
-  rating          Float               @default(0.0) // Stores the rating given by the user (can be 1-5, 1-10, etc.)
-  authorId        String
-  author          User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  companyId       String
-  company         Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  organizationId  String?
-  organization    Organization?       @relation(fields: [organizationId], references: [id], onDelete: SetNull)
-  replies         Reply[]             @relation("ReviewToReply")
-  reports         ReportOnReview[]
-  milestones      MilestoneToReview[]
-  helpfulCount    Int                 @default(0)
-  notHelpfulCount Int                 @default(0)
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
+  id             String              @id @default(uuid())
+  title          String
+  body           String
+  rating         Float               @default(0.0) // Stores the rating given by the user (can be 1-5, 1-10, etc.)
+  authorId       String
+  author         User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  companyId      String
+  company        Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  replies        Reply[]             @relation("ReviewToReply")
+  reports        ReportOnReview[]
+  milestones     MilestoneToReview[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  feedbacks      ReviewFeedback[]
 
   @@unique([authorId, companyId, organizationId]) // Ensures one review per user per company per organization
+}
+
+model ReviewFeedback {
+  id        String   @id @default(uuid())
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  helpful   Boolean // true if the user found the review helpful, false otherwise
+  createdAt DateTime @default(now())
+
+  @@unique([reviewId, userId]) // Ensures a user can only provide feedback once per review
 }
 
 model Reply {

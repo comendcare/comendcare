@@ -93,7 +93,8 @@ export async function getCROData(id: string) {
             reviews: {
                 include: {
                     author: true,
-                    organization: true
+                    organization: true,
+                    feedbacks: true
                 },
             }
         }

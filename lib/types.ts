@@ -1,4 +1,18 @@
-import {User, Post, Comment, Prisma, Review, Organization, Member, Company, SavedCompany, MilestoneType, ExternalContact, ExternalAttachment} from "@prisma/client";
+import {
+    User,
+    Post,
+    Comment,
+    Prisma,
+    Review,
+    Organization,
+    Member,
+    Company,
+    SavedCompany,
+    MilestoneType,
+    ExternalContact,
+    ExternalAttachment,
+    ReviewFeedback
+} from "@prisma/client";
 
 export type Milestone = Omit<Prisma.MilestoneGetPayload<{
     include: {
@@ -42,6 +56,7 @@ export type MembershipWithOrganization = Member & {
 export interface ReviewWithAuthor extends Review {
     author: User;
     organization: Organization;
+    feedbacks: ReviewFeedback[];
 }
 
 export type MemberWithUser = Prisma.MemberGetPayload<{
