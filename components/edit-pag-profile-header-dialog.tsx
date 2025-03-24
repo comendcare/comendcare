@@ -82,6 +82,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
 
         // Map form values to Prisma schema fields
         const fieldMapping: Record<string, string> = {
+            name: "name",
             subdomain: "subdomain",
             looking: "interestedModalities",
             founded: "yearFounded",
