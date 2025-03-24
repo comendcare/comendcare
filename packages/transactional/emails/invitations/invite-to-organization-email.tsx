@@ -56,10 +56,8 @@ export const InviteToOrganizationEmail = ({
                         <Section className="mt-[32px]">
                             <Img
                                 src="https://storage.googleapis.com/comend-app-public-permanent/Full%20logo.png"
-                                width="40"
-                                height="37"
                                 alt="Comend"
-                                className="my-0 mx-auto"
+                                className="w-1/2 my-0 mx-auto"
                             />
                         </Section>
                         <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
