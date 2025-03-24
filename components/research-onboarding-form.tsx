@@ -48,9 +48,9 @@ export const researchFormSchema = z.object({
             message: "The name of your condition needs to be shorter than 60 characters",
         }),
     summary: z.string()
-        .min(30, {
-            message: "The summary of your condition needs to be longer than 30 characters",
-        })
+        // .min(30, {
+        //     message: "The summary of your condition needs to be longer than 30 characters",
+        // })
         .max(500, {
             message: "The name of your condition needs to be shorter than 500 characters",
         })

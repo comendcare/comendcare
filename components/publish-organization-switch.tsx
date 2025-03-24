@@ -75,7 +75,7 @@ export function PublishOrganizationSwitch({organization}: { organization: Organi
                                                 <FaInfoCircle/>
                                             </TooltipTrigger>
                                             <TooltipContent className="max-w-80 text-wrap text-left">
-                                                {`Published organizations have public pages and are visible in the marketplace.`}
+                                                {`Published profiles are viewable to visitors and users via your public URL and in our marketplace.`}
                                             </TooltipContent>
                                         </Tooltip>
                                     </FormLabel>

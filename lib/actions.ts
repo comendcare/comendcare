@@ -187,6 +187,9 @@ export const createCondition = async (formData: FormData) => {
     const assetsUnderDevelopment = formData.get("assetsUnderDevelopment")
         ? (formData.get("assetsUnderDevelopment") as string).split(",")
         : [];
+    const therapeuticsInDevelopment = formData.get("therapeuticsInDevelopment")
+        ? (formData.get("therapeuticsInDevelopment") as string).split(",")
+        : [];
 
     try {
         const condition = await prisma.condition.create({
@@ -207,6 +210,7 @@ export const createCondition = async (formData: FormData) => {
                 associatedSignsAndSymptoms,
                 existingDatabasesAndStudies,
                 assetsUnderDevelopment,
+                therapeuticsInDevelopment,
             }
         });
 
@@ -277,6 +281,7 @@ export const createOrganization = async (formData: FormData) => {
     const description = formData.get("description") as string;
     const subdomain = formData.get("subdomain") as string;
     const website = formData.get("website") as string | null;
+    const contactEmail = formData.get("contactEmail") as string | null;
     const title = formData.get("title") as string | null;
     const founded = formData.get("founded") as string | null;
     const incorporationStatus = formData.get("incorporationStatus") as "YES" | "NO" | "INPROGRESS" | null;
@@ -301,6 +306,7 @@ export const createOrganization = async (formData: FormData) => {
                 description,
                 subdomain,
                 yearFounded: founded?.toString(),
+                contactEmail,
                 website,
                 incorporationStatus,
                 address1,
