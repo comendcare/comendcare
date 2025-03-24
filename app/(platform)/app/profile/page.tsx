@@ -39,6 +39,7 @@ import EditPagProfileSubdomainDialog from "@/components/edit-pag-profile-subdoma
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {FaInfoCircle} from "react-icons/fa";
 import EditPAGContactEmailDialog from "@/components/edit-pag-contact-email-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default async function ProfilePage() {
     const session = await getSession()
@@ -98,8 +99,8 @@ export default async function ProfilePage() {
         return (
             <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
                 <main className="col-span-4 flex flex-col items-center">
-                    <div className="w-full flex flex-col mx-4 space-y-2">
-                        <div className="w-full flex flex-col space-y-4">
+                    <ScrollArea id="profile-scroll-area" className="w-full flex flex-col mx-4 space-y-2">
+                        <div className="w-full h-fit flex flex-col space-y-4">
                             <Card className="pb-4">
                                 <PAGBannerPhoto
                                     img={organization.headerImage}
@@ -251,7 +252,7 @@ export default async function ProfilePage() {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </ScrollArea>
                 </main>
                 <Card className="col-span-1 flex flex-col space-y-4 h-fit">
                     <CardHeader className="flex flex-col gap-4 pb-0">

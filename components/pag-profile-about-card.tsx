@@ -58,9 +58,9 @@ export const PagProfileAboutCard = ({organization, editable}: {
     }, [pathname, startOnbordaAndRemoveToast])
 
     return (
-        <Card>
+        <Card className="organization-profile-tour-step1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight organization-profile-tour-step1">
+                <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
                     About
                 </CardTitle>
                 {(organization && editable) &&
