@@ -14,54 +14,22 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
         <Badge variant="outline" className={cn(iconOnly ? "w-8" : "", style, className)}>
             {type === "ASSET" && (
                 <>
-                    <Star />
+                    <Star className="h-5 w-5"/>
                     {!iconOnly && "Asset"}
                 </>
             )}
             {type === "PROJECT" && (
                 <>
-                    <FileText />
+                    <FileText className="h-5 w-5"/>
                     {!iconOnly && "Project"}
                 </>
             )}
             {type === "RFP" && (
                 <>
-                    <Megaphone />
+                    <Megaphone className="h-5 w-5"/>
                     {!iconOnly && "RFP"}
                 </>
             )}
         </Badge>
     )
-
-
-    // if (type === "ASSET") {
-    //     return (
-    //         <Badge variant="outline"
-    //                className={cn("p-1 h-8 text-sm flex gap-2 border-none text-asset-foreground bg-asset", className)}>
-    //             <Star />
-    //             {!iconOnly && "Asset"}
-    //         </Badge>
-    //     )
-    // }
-
-    // if (type === "PROJECT") {
-    //     return (
-    //         <Badge variant="outline"
-    //                className={cn("p-1 h-8 text-sm flex gap-2 border-none text-project-foreground bg-project", className)}>
-    //             <FileText />
-    //             {!iconOnly && "Project"}
-    //         </Badge>
-    //     )
-    // }
-
-    // if (type === "RFP") {
-    //     return (
-    //         <Badge variant="outline" className={cn("p-1 h-8 text-sm flex gap-2 border-none text-rfp-foreground bg-rfp", className)}>
-    //             <Megaphone />
-    //             {!iconOnly && "RFP"}
-    //         </Badge>
-    //     )
-    // }
-
-    // return
 }
