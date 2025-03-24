@@ -62,6 +62,10 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
     const [loading, setLoading] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
+    const [userFeedback, setUserFeedback] = useState<null | boolean>(null);
+    const [helpfulCount, setHelpfulCount] = useState(review.feedbacks.filter(feedback => feedback.helpful === true).length);
+    const [notHelpfulCount, setNotHelpfulCount] = useState(review.feedbacks.filter(feedback => feedback.helpful === false).length);
+
 
     const form = useForm<z.infer<typeof reviewForm>>({
         mode: "onChange",
@@ -104,12 +108,17 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
             } else {
                 console.error(milestonesResponse.error)
             }
-            // Allow update once form is initialized
             initializing.current = false;
         }
 
-        fetchData()
-    }, [])
+        // Set user feedback state if feedbacks array contains feedback from the current user
+        const userFeedbackEntry = review.feedbacks.find(feedback => feedback.userId === session?.user?.id);
+        if (userFeedbackEntry) {
+            setUserFeedback(userFeedbackEntry.helpful);
+        }
+
+        fetchData();
+    }, [session?.user?.id, review.feedbacks]);
 
     const handleFormSubmit = async (values: z.infer<typeof reviewForm>) => {
         setLoading(true);
@@ -137,27 +146,50 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
         }
     };
 
-    const handleFeedbackSubmit = async (values: z.infer<typeof reviewForm>) => {
-        setLoading(true);
-        try {
-            const formData = new FormData();
-            Object.entries(values).forEach(([key, value]) => {
-                if (value !== undefined) {
-                    formData.append(key, value.toString());
-                }
-            });
+    const handleFeedbackSubmit = async (isHelpful: boolean) => {
+        if (!session?.user?.id) {
+            toast.error("You must be logged in to provide feedback.");
+            return;
+        }
 
-            submitFeedback(review.id, true).then((res: any) => {
-                if (res.error) {
-                    toast.error(res.error);
-                } else {
-                    va.track("Edited review");
-                    router.refresh();
-                    toast.success("Successfully edited review!");
-                }
-            });
+        setLoading(true);
+
+        // Save previous state to revert if the request fails
+        const previousUserFeedback = userFeedback;
+        const previousHelpfulCount = helpfulCount;
+        const previousNotHelpfulCount = notHelpfulCount;
+
+        // Optimistically update the counts
+        setUserFeedback(isHelpful);
+
+        if (isHelpful) {
+            setHelpfulCount(prev => prev + 1);
+            if (previousUserFeedback === false) setNotHelpfulCount(prev => prev - 1);
+        } else {
+            setNotHelpfulCount(prev => prev + 1);
+            if (previousUserFeedback === true) setHelpfulCount(prev => prev - 1);
+        }
+
+        try {
+            const response = await submitFeedback(review.id, session.user.id, isHelpful);
+
+            if (response.success) {
+                toast.success("Thanks for your feedback!");
+            } else {
+                // Revert the optimistic update if the server request fails
+                setUserFeedback(previousUserFeedback);
+                setHelpfulCount(previousHelpfulCount);
+                setNotHelpfulCount(previousNotHelpfulCount);
+                toast.error(response.error || "An error occurred while submitting feedback.");
+            }
         } catch (error) {
-            toast.error("An error occurred while editing your review.");
+            console.error("Feedback error:", error);
+            toast.error("An error occurred while submitting feedback.");
+
+            // Revert the optimistic update if the request fails
+            setUserFeedback(previousUserFeedback);
+            setHelpfulCount(previousHelpfulCount);
+            setNotHelpfulCount(previousNotHelpfulCount);
         } finally {
             setLoading(false);
         }
@@ -245,15 +277,25 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
                     {review.body}
                 </p>
                 <aside className="flex items-center mt-3 space-x-4">
-                    <a href="#"
-                       className="inline-flex items-center text-sm font-medium text-blue-600 hover:underline dark:text-blue-500">
-                        Helpful
-                    </a>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleFeedbackSubmit(true)}
+                        disabled={loading}
+                        className={userFeedback === true ? "border-green-500 text-green-500" : ""}
+                    >
+                        Helpful ({helpfulCount})
+                    </Button>
 
-                    <a href="#"
-                       className="inline-flex items-center text-sm font-medium text-blue-600 hover:underline dark:text-blue-500 group">
-                        Not helpful
-                    </a>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleFeedbackSubmit(false)}
+                        disabled={loading}
+                        className={userFeedback === false ? "border-red-500 text-red-500" : ""}
+                    >
+                        Not Helpful ({notHelpfulCount})
+                    </Button>
 
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 
