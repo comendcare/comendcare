@@ -89,7 +89,10 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             website: "website",
             incorporationStatus: "incorporationStatus",
             image: "image",
-            headerImage: "headerImage"
+            headerImage: "headerImage",
+            raised: "moneyRaised",
+            budget: "researchBudget",
+            deployed: "moneyDeployed",
         };
 
         // Populate FormData with mapped fields
