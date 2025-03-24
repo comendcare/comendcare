@@ -3075,15 +3075,6 @@ export async function submitFeedback(reviewId: string, userId: string, isHelpful
                 },
             });
 
-            // Also update helpfulCount or notHelpfulCount in the Review model
-            await prisma.review.update({
-                where: { id: reviewId },
-                data: {
-                    helpfulCount: isHelpful ? { increment: 1 } : undefined,
-                    notHelpfulCount: !isHelpful ? { increment: 1 } : undefined,
-                },
-            });
-
             return { success: true, data: response };
         }
     } catch (error: any) {
