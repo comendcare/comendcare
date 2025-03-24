@@ -38,6 +38,7 @@ import CROMarketplaceProfileReviewsTab from "@/components/cro-marketplace-profil
 import {cn} from "@/lib/utils";
 import SaveCRODialog from "@/components/save-cro-dialog";
 import {CompanyWithReviews} from "@/lib/types";
+import { Store } from "lucide-react";
 
 const companyTypeIcons: Record<string, JSX.Element> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
@@ -94,7 +95,8 @@ export default async function CompanyHomePage({
                     className="inline-flex items-center gap-x-2 hover:underline"
                 >
                     <FaArrowLeftLong/>
-                    Back to marketplace
+                    <Store />
+                    Return to marketplace
                 </Link>
                 <main className="flex flex-col w-full max-w-7xl mx-auto space-y-8">
                     <div className="grid grid-cols-5 gap-8">
