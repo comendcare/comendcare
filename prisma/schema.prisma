@@ -272,11 +272,11 @@ model MilestoneTypeOnMilestone {
 }
 
 model MilestoneType {
-  id          String   @id // value
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          String    @id // value
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   label       String
-  services    String[]
+  services    Service[]
   categories  String[]
   description String?
 
@@ -688,11 +688,12 @@ model Site {
 }
 
 model Service {
-  id          String  @id @default(uuid())
-  name        String
-  description String?
-  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId   String
+  id             String          @id @default(uuid())
+  name           String
+  description    String?
+  company        Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId      String
+  milestoneTypes MilestoneType[]
 }
 
 model Certification {

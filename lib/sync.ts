@@ -367,6 +367,14 @@ export const syncToTypesense = async (env: {
                     store: true,
                     facet: true,
                     optional: true
+                },
+                {
+                    name: "services",
+                    type: "object[]",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
                 }
             ],
         };
@@ -404,7 +412,8 @@ export const syncToTypesense = async (env: {
                 headquarters: true,
                 companyType: true,
                 categories: true,
-                simplifiedCertifications: true
+                simplifiedCertifications: true,
+                services: true
             }
         });
 

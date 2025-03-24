@@ -1,3 +1,7 @@
+export const SERVICE_TYPE_OPTIONS: any[] = [
+
+]
+
 export const MILESTONE_TYPE_OPTIONS: any[] = [
     {
         id: 'BASICSCIENCE',

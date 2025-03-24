@@ -59,6 +59,11 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
+    services: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     // moneyDeployed: number[],
     // genes: {
     //     label: string,
@@ -71,6 +76,7 @@ export const defaultFilters = {
     categories: [],
     types: [],
     certifications: [],
+    services: [],
     // moneyDeployed: [0, 10000000],
     // genes: []
 }
@@ -114,6 +120,24 @@ function generateFiltersString(filters: FiltersType): string {
     return typesenseFilters;
 }
 
+function generateRecommendationsString(filters: FiltersType): string {
+    let filtersList: string[] = [];
+
+    // Services (Array Field)
+    if (filters?.services  && filters.services.length > 0) {
+        const serviceFilter = filters.services
+            .map(service => `services:=["${service.value}"]`)
+            .join(" || ");
+        filtersList.push(`(${serviceFilter})`);
+    }
+
+    // Combine all filters with `&&`
+    const typesenseFilters = filtersList.length > 0 ? filtersList.join(" && ") : "";
+
+    console.log(`Typesense filters: ${typesenseFilters}`);
+    return typesenseFilters;
+}
+
 const sortByFilters: { [key: string]: string } = {
     "alphabetical": "title:asc",
     "highest-rated": "avgRating:desc",
@@ -135,7 +159,7 @@ const generateRecommendations = async (milestones: Milestone[]) => {
                 types: [],
                 certifications: []
             }
-            const newSearchResults = await getUpdatedSearchResults({
+            const newSearchResults = await getUpdatedRecommendationsResults({
                 searchTerm: '',
                 sortBy: undefined,
                 filters: newFilters,
@@ -153,6 +177,50 @@ const generateRecommendations = async (milestones: Milestone[]) => {
 
     return recommendationResults
 }
+
+const getUpdatedRecommendationsResults = async (state: any, isNewSearch: boolean = true) => {
+    try {
+        const filtersString = generateRecommendationsString(state.filters)
+
+        const searchParameters = {
+            q: "",
+            // query_by: "title",
+            // per_page: 10,
+            // page: state.lastFetchedPage,
+            ...(filtersString ? { filter_by: filtersString } : undefined),
+            ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
+        };
+
+        const results = await typesense
+            .collections("companies")
+            .documents()
+            .search(searchParameters);
+
+        const typeSenseHits = results.hits || [];
+        // @ts-ignore
+        const ids = typeSenseHits.map(hit => hit.document.id);
+
+        if (ids.length === 0) {
+            return isNewSearch ? [] : state.searchResults;
+        }
+
+        const prismaResponse = await fetch('/api/companies', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids }),
+        });
+
+        const prismaResults = await prismaResponse.json();
+
+        const enrichedResults = ids.map(id => prismaResults.find((company: any) => company.id === id) || null).filter(Boolean);
+
+        return isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults];
+
+    } catch (error) {
+        console.error("Search error:", error);
+        return [];
+    }
+};
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
     try {
