@@ -195,7 +195,7 @@ export function Roadmap() {
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-80 text-wrap text-left">
-                                            {"Position of milestones in flow view is controlled manually via drag & drop."}
+                                            {"An interactive whiteboard that lets you easily view and organize research plans with visual elements."}
                                         </TooltipContent>
                                     </Tooltip>
                                 </TabsTrigger>
