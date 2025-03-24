@@ -143,7 +143,7 @@ export default function EditPagProfileSubdomainDialog({organization}: { organiza
                 <DialogHeader>
                     <DialogTitle>Organization Abbreviation (required)</DialogTitle>
                     <DialogDescription>
-                        {`Enter an acronym, short form, or nickname for your organization.`}
+                        {`Choose the URL for your custom profile site.`}
                         <br/>
                         {editOrgForm.watch("subdomain") &&
                             !editOrgForm.formState.errors.subdomain && (

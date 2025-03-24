@@ -78,7 +78,7 @@ export const newOrgFormSchema = z.object({
         message: "Your organization's website.",
     }).optional(),
     incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"], {
-        required_error: "You need to select a 501c3 status.",
+        required_error: "You need to select a 501(c)(3) status.",
     }).optional(),
     address1: z.string().optional(),
     address2: z.string().optional(),
@@ -510,7 +510,7 @@ export default function OrganizationOnboardingForm(
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                         {/*<div className="w-full flex flex-row justify-between">*/}
                                             <FormDescription>
-                                                {`Enter an acronym, short form, or nickname for your organization.`}
+                                                {`Choose the URL for your custom profile site.`}
                                                 <br/>
                                                 {newOrgForm.watch("subdomain") &&
                                                     !newOrgForm.formState.errors.subdomain && (
@@ -683,7 +683,7 @@ export default function OrganizationOnboardingForm(
                                 name="incorporationStatus"
                                 render={({field}) => (
                                     <FormItem className="space-y-3">
-                                        <FormLabel>{`What is your 501c3 status?`}</FormLabel>
+                                        <FormLabel>{`What is your 501(c)(3) status?`}</FormLabel>
                                         {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
                                         <FormControl>
                                             <RadioGroup
@@ -697,7 +697,7 @@ export default function OrganizationOnboardingForm(
                                                         <RadioGroupItem value="YES"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
-                                                        {`Yes, I have a 501c3`}
+                                                        {`Yes, I have a 501(c)(3)`}
                                                     </FormLabel>
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
@@ -713,7 +713,7 @@ export default function OrganizationOnboardingForm(
                                                         <RadioGroupItem value="NO"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
-                                                        {`No, I don't have a 501c3`}
+                                                        {`No, I don't have a 501(c)(3)`}
                                                     </FormLabel>
                                                 </FormItem>
                                             </RadioGroup>

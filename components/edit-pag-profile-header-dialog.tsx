@@ -194,7 +194,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                     name="incorporationStatus"
                                     render={({field}) => (
                                         <FormItem className="space-y-3">
-                                            <FormLabel>{`What is your 501c3 status`}</FormLabel>
+                                            <FormLabel>{`What is your 501(c)(3) status?`}</FormLabel>
                                             {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
                                             <FormControl>
                                                 <RadioGroup
@@ -208,7 +208,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                                             <RadioGroupItem value="YES"/>
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
-                                                            {`Yes, I have a 501c3`}
+                                                            {`Yes, I have a 501(c)(3)`}
                                                         </FormLabel>
                                                     </FormItem>
                                                     <FormItem className="flex items-center space-x-3 space-y-0">
@@ -224,7 +224,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                                             <RadioGroupItem value="NO"/>
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
-                                                            {`No, I don't have a 501c3`}
+                                                            {`No, I don't have a 501(c)(3)`}
                                                         </FormLabel>
                                                     </FormItem>
                                                 </RadioGroup>

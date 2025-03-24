@@ -91,7 +91,7 @@ const milestones = [
     {text: "Contact registry available"},
     {text: "Natural history study ", highlight: "ongoing"},
     {text: "Gene therapy trial ", highlight: "1 month ago"},
-    {text: "Patient advocacy group ", highlight: "501c3 status designated"},
+    {text: "Patient advocacy group ", highlight: "501(c)(3) status designated"},
     // {text: "Published in a peer-reviewed journal ", highlight: "last year"},
     // {text: "FDA orphan drug status approved"}
 ]

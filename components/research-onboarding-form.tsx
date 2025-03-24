@@ -737,7 +737,7 @@ export default function ResearchOnboardingForm(
                 {/*                                                <FaBuildingNgo*/}
                 {/*                                                    className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"*/}
                 {/*                                                    aria-hidden="true"/>*/}
-                {/*                                                {"501c3"}*/}
+                {/*                                                {"501(c)(3)"}*/}
                 {/*                                            </div>*/}
                 {/*                                        </div>*/}
                 {/*                                    }*/}
