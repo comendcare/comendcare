@@ -73,6 +73,7 @@ import { getMilestoneTypes } from "@/lib/fetchers"
 import { Badge } from "./ui/badge"
 import { NotificationBubble } from "./notification-bubble"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
+import { Store } from "lucide-react"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -687,7 +688,10 @@ export function EditMilestoneForm({
                                 )}
 
                                 <Link href={`/app/marketplace/cro?milestone=${milestoneData.id}&expanded=true`}>
-                                    <Button className="pl-0" variant={"link"}>Explore the marketplace</Button>
+                                    <Button className="pl-0" variant={"link"}>
+                                        <Store />
+                                        Explore Marketplace
+                                    </Button>
                                 </Link>
                             </TabsContent>
                             </>
