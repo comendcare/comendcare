@@ -36,7 +36,7 @@ export function OrganizationMarketplaceListElement({ organization }: { organizat
                         ))}
                     </span>
                 )}
-                {organization?.moneyRaised &&
+                {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
                     <div className="m-0 flex items-center text-gray-500">
                         <FaCircleDollarToSlot
                             className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
