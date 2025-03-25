@@ -18,44 +18,44 @@ export const PagProfileAboutCard = ({organization, editable}: {
     editable: boolean
 }) => {
     faker.seed(235)
-    const {startOnborda} = useOnborda()
-    const pathname = usePathname();
+    // const {startOnborda} = useOnborda()
+    // const pathname = usePathname();
 
-    const startOnbordaAndRemoveToast = () => {
-        startOnborda('organization-profile-tour')
-        setOnboarded('organization-profile-tour')
-        toast.dismiss()
-    }
+    // const startOnbordaAndRemoveToast = () => {
+    //     startOnborda('organization-profile-tour')
+    //     setOnboarded('organization-profile-tour')
+    //     toast.dismiss()
+    // }
 
-    useEffect(() => {
-        // Only start tour if user is new and is on the /app/profile page
-        if (pathname === "/app/profile" && !isOnboarded('organization-profile-tour')) {
-            toast("Welcome to Comend!", {
-                id: "onborda",
-                duration: 300000,
-                description: `Would you like to take a quick tour?`,
-                action: (
-                    <div className="flex flex-col space-y-2 ml-4">
-                        <Button
-                            onClick={startOnbordaAndRemoveToast}
-                            variant="secondary"
-                        >
-                            {`Yes please!`}
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                toast.dismiss()
-                                setOnboarded('organization-profile-tour')
-                            }}
-                            variant="ghost"
-                        >
-                            {`No thanks!`}
-                        </Button>
-                    </div>
-                )
-            })
-        }
-    }, [pathname, startOnbordaAndRemoveToast])
+    // useEffect(() => {
+    //     // Only start tour if user is new and is on the /app/profile page
+    //     if (pathname === "/app/profile" && !isOnboarded('organization-profile-tour')) {
+    //         toast("Welcome to Comend!", {
+    //             id: "onborda",
+    //             duration: 300000,
+    //             description: `Would you like to take a quick tour?`,
+    //             action: (
+    //                 <div className="flex flex-col space-y-2 ml-4">
+    //                     <Button
+    //                         onClick={startOnbordaAndRemoveToast}
+    //                         variant="secondary"
+    //                     >
+    //                         {`Yes please!`}
+    //                     </Button>
+    //                     <Button
+    //                         onClick={() => {
+    //                             toast.dismiss()
+    //                             setOnboarded('organization-profile-tour')
+    //                         }}
+    //                         variant="ghost"
+    //                     >
+    //                         {`No thanks!`}
+    //                     </Button>
+    //                 </div>
+    //             )
+    //         })
+    //     }
+    // }, [pathname, startOnbordaAndRemoveToast])
 
     return (
         <Card className="organization-profile-tour-step1">
