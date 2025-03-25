@@ -119,7 +119,7 @@ export default async function PAGSettingsInvitationsTab() {
                                                         src={createDicebearAvatar(person.email, 50, 40, "identicon")}
                                                         alt=""
                                                     /> */}
-                                                    <ProfilePhoto 
+                                                    <ProfilePhoto
                                                         img={person?.image}
                                                         name={person?.name}
                                                         className="h-11 w-11 rounded-full"

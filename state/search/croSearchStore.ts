@@ -1,21 +1,60 @@
 import { typesense } from '@/lib/typesense';
+import { nanoid } from 'nanoid';
 import { temporal } from 'zundo';
 import { create } from 'zustand';
+import { ASSOCIATED_CATEGORIES, Milestone } from '@/lib/types'
+
+export const sampleCROs: any[] = [
+    {
+        content: {
+            id: nanoid(),
+            title: "Sample CRO 1",
+            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+            url: "comend.io",
+            scientistDotComURL: null,
+            yearEstablished: 2023,
+            website: "https://comend.io/",
+            headquarters: "Austin, Texas",
+            companyType: "startup",
+        },
+        milestone: {
+            nodeType: "RFP",
+            title: "Sample Milestone 1"
+        }
+    },
+    {
+        content: {
+            id: nanoid(),
+            title: "Sample CRO 2",
+            description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+            url: "comend.io",
+            scientistDotComURL: null,
+            yearEstablished: 2023,
+            website: "https://comend.io/",
+            headquarters: "Toronto, Ontario",
+            companyType: "startup",
+        },
+        milestone: {
+            nodeType: "PROJECT",
+            title: "Sample Milestone 2"
+        }
+    }
+]
 
 export type ViewType = 'grid' | 'list'
 
 export type FiltersType = {
-    mechanisms: {
+    categories: {
         label: string,
         value: string,
         disable?: boolean,
     }[],
-    systems: {
+    types: {
         label: string,
         value: string,
         disable?: boolean,
     }[],
-    modalities: {
+    certifications: {
         label: string,
         value: string,
         disable?: boolean,
@@ -29,76 +68,103 @@ export type FiltersType = {
 }
 
 export const defaultFilters = {
-    mechanisms: [],
-    systems: [],
-    modalities: [],
+    categories: [],
+    types: [],
+    certifications: [],
     // moneyDeployed: [0, 10000000],
     // genes: []
 }
 
-function generateFiltersString(filters: FiltersType) {
-    let filtersList: string[] = []
-    let typesenseFilters = ""
+export type Recommendation = {
+    content: any
+    milestone: Milestone
+}
 
-    // addative filters
-    if (filters.systems.length > 0) {
-        filters.systems.forEach(system => {
-            filtersList.push(`condition.condition.associatedSystems:=[${system.value}]`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.associatedSystems:=[${system.value}]`)
-        })
+function generateFiltersString(filters: FiltersType): string {
+    let filtersList: string[] = [];
+
+    // Categories (Array Field)
+    if (filters?.categories  && filters.categories.length > 0) {
+        const categoryFilter = filters.categories
+            .map(category => `categories:=["${category.value}"]`)
+            .join(" && ");
+        filtersList.push(`(${categoryFilter})`);
     }
 
-    if (filters.mechanisms.length > 0) {
-        filters.mechanisms.forEach(mechanism => {
-            filtersList.push(`condition.condition.relevantDiseaseMechanisms:=[${mechanism.value}]`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.relevantDiseaseMechanisms:=[${mechanism.value}]`)
-        })
+    // Company Types (Single String Field)
+    if (filters?.types && filters.types.length > 0) {
+        const typeFilter = filters.types
+            .map(type => `companyType:="${type.value}"`) // Ensure quotes around value
+            .join(" && ");
+        filtersList.push(`(${typeFilter})`);
     }
 
-    if (filters.modalities.length > 0) {
-        filters.modalities.forEach(modality => {
-            filtersList.push(`condition.condition.interestedModalities:=[${modality.value}]`)
-            typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '||' : '('}condition.condition.interestedModalities:=[${modality.value}]`)
-        })
+    // Certifications (Array Field)
+    if (filters?.certifications && filters.certifications.length > 0) {
+        const certificationFilter = filters.certifications
+            .map(cert => `simplifiedCertifications:=["${cert.value}"]`)
+            .join(" && ");
+        filtersList.push(`(${certificationFilter})`);
     }
 
-    if (typesenseFilters.length > 0) typesenseFilters = typesenseFilters.concat(")")
+    // Combine all filters with `&&`
+    const typesenseFilters = filtersList.length > 0 ? filtersList.join(" && ") : "";
 
-    // subtractive filters
-    // if (filters.moneyDeployed) {
-    //     filtersList.push(`moneyDeployed:>=${filters.moneyDeployed[0]}`)
-    //     filtersList.push(`moneyDeployed:<${filters.moneyDeployed[1]}`)
-    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:>=${filters.moneyDeployed[0]}`)
-    //     typesenseFilters = typesenseFilters.concat(`${typesenseFilters.length > 0 ? '&&' : ''}moneyDeployed:<${filters.moneyDeployed[1]}`)
-    // }
-
-    console.log(`typesense filters: `, typesenseFilters)
-    return typesenseFilters
+    console.log(`Typesense filters: ${typesenseFilters}`);
+    return typesenseFilters;
 }
 
 const sortByFilters: { [key: string]: string } = {
-    "alphabetical": "name:asc",
-    // "patients-low-high": "condition.numberOfIdentifiedPatients:asc",
-    // "patients-high-low": "condition.numberOfIdentifiedPatients:desc",
-    // "prevalence-low-high": "prevalenceRatio:asc",
-    // "prevalence-high-low": "prevalenceRatio:desc",
-    // "money-raised-low-high": "moneyRaised:asc",
-    // "money-raised-high-low": "moneyRaised:desc",
-    "money-deployed-low-high": "moneyDeployed:asc",
-    "money-deployed-high-low": "moneyDeployed:desc",
-    "patients-engaged-low-high": "firstConditionPatientsEngaged:asc",
-    "patients-engaged-high-low": "firstConditionPatientsEngaged:desc"
+    "alphabetical": "title:asc",
+    "highest-rated": "avgRating:desc",
+    // "most-reviewed": "moneyDeployed:desc",
+}
+
+const generateRecommendations = async (milestones: Milestone[]) => {
+    let recommendationResults: Recommendation[] = []
+
+    await Promise.all(
+        milestones.map(async (milestone) => {
+            const newFilters = {
+                categories: Array.from(
+                    new Set((milestone?.types || []).flatMap(type => type?.milestoneType?.categories || []))
+                )
+                    .map(categoryValue => (ASSOCIATED_CATEGORIES.find(c => c.value === categoryValue)))
+                    .filter(c => c !== undefined)
+                    .map(c => ({label: c?.label, value: c?.value})),
+                types: [],
+                certifications: []
+            }
+            const newSearchResults = await getUpdatedSearchResults({
+                searchTerm: '',
+                sortBy: undefined,
+                filters: newFilters,
+                lastFetchedPage: 1,
+            }, true)
+
+            recommendationResults = recommendationResults.concat(newSearchResults.map((result: any) => {
+                return ({
+                    content: result,
+                    milestone
+                } as Recommendation)
+            }))
+        })
+    )
+
+    return recommendationResults
 }
 
 const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
     try {
+        const filtersString = generateFiltersString(state.filters)
+
         const searchParameters = {
             q: state.searchTerm,
             query_by: "title",
             per_page: 10,
             page: state.lastFetchedPage,
-            // ...(generateFiltersString(state.filters) ? { filter_by: generateFiltersString(state.filters) } : undefined),
-            // ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
+            ...(filtersString ? { filter_by: filtersString } : undefined),
+            ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
         };
 
         const results = await typesense
@@ -134,7 +200,14 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
     }
 };
 
+type SetRecommendationsOptions = {
+    limit?: number,
+    priority?: string // milestone id
+}
+
 export interface CROSearchState {
+    initialized: boolean,
+    initState: () => void,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | undefined,
@@ -148,19 +221,30 @@ export interface CROSearchState {
     searchResults: any[] | undefined
     setSearchResults: (results: any[]) => void
     filters: FiltersType,
-    setFilters: (updatedFilters: FiltersType) => void
+    setFilters: (updatedFilters: FiltersType) => void,
+    recommendations: Recommendation[] | undefined
+    setRecommendations: (milestones: Milestone[], options?: SetRecommendationsOptions) => Promise<Recommendation[]>
 }
 
 export const useCROSearchStore = create<CROSearchState>()(
     temporal((set, get) => ({
+            initialized: false,
+            initState: () => {
+                set({ initialized: true, recommendations: [] })
+            },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
+                console.log(`set search term`)
                 const newSearchResults = await getUpdatedSearchResults({
                     ...get(),
                     searchTerm: newSearch,
                     lastFetchedPage: 1,
                 }, true)
-                set({ searchTerm: newSearch, searchResults: newSearchResults, lastFetchedPage: 1 })
+                set({ 
+                    searchTerm: newSearch, 
+                    searchResults: newSearchResults, 
+                    lastFetchedPage: 1
+                })
             },
             sortBy: undefined,
             setSortBy: async (sortBy: string | undefined) => {
@@ -201,6 +285,27 @@ export const useCROSearchStore = create<CROSearchState>()(
                     lastFetchedPage: 1,
                     searchResults: newSearchResults
                 })
+            },
+            recommendations: undefined,
+            setRecommendations: async (milestones: Milestone[], options?: SetRecommendationsOptions) => {
+                console.log(`get recommendations`, options)
+                set({recommendations: undefined})
+                const recommendationResults = await generateRecommendations(
+                    options?.priority 
+                        // ? milestones.sort(function(x,y){ return x == first ? -1 : y == first ? 1 : 0; })
+                        ? milestones.sort((x, y) => x.id === options.priority ? -1 : y.id === options.priority ? 1 : 0)
+                        : milestones
+                )
+
+                // remove duplicates before returning
+                const prunedRecommendations = options?.limit
+                    ? Array.from(new Set(recommendationResults)).slice(0, options.limit) 
+                    : Array.from(new Set(recommendationResults))
+
+                set({
+                    recommendations: prunedRecommendations
+                })
+                return prunedRecommendations
             }
         }),
         {

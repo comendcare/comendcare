@@ -13,6 +13,7 @@ import gif1 from "@/public/onboarding-gif-1.gif"
 import Image from "next/image"
 import { FeedbackSheet } from "@/components/feedback"
 import { Suspense } from "react"
+import Loading from "./loading";
 
 // Set up Playfair Display and Source Sans 3 fonts
 const poppins = Poppins({
@@ -172,9 +173,9 @@ const steps: Tour[] = [
             {
                 icon: <>👋</>,
                 title: "Updating your organization",
-                content: <>{`If you'd like to update your organization's information, click the "Edit profile" button.`}</>,
+                content: <>{`If you'd like to update your organization's information, click the pencil icon near the content you want to edit.`}</>,
                 selector: ".organization-profile-tour-step3",
-                side: "left" as any,
+                side: "bottom" as any,
                 showControls: true,
                 pointerPadding: 10,
                 pointerRadius: 10,
@@ -225,6 +226,7 @@ export default function RootLayout({
             className={`${poppins.variable} ${sourceSans3.variable}`}
         >
             <body>
+                <Suspense fallback={<Loading />}>
                 <Providers>
                     <ThemeProvider
                         attribute="class"
@@ -233,14 +235,13 @@ export default function RootLayout({
                         disableTransitionOnChange
                     >
                         <Onborda steps={steps} cardComponent={OnboardingCard}>
-                            <Suspense>
                             {children}
                             {/* <FeedbackForm /> */}
                             <Analytics />
-                            </Suspense>
                         </Onborda>
                     </ThemeProvider>
                 </Providers>
+                </Suspense>
             </body>
         </html>
     )

@@ -1,6 +1,6 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
-import {MILESTONE_STATUS_OPTIONS, MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS} from "@/lib/types";
+import {MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS} from "@/lib/types";
 import {Badge} from "./ui/badge";
 import {DateView} from "./miletone-date-view";
 import {getOrganizationFromOrganizationId, getOrganizationFromRoadmapId} from "@/lib/fetchers";
@@ -10,10 +10,11 @@ import {cn, formatMoney, truncate} from "@/lib/utils";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {Separator} from "@/components/ui/separator";
 import {BookCheck, Paperclip, TestTube, UserCheck} from "lucide-react";
-import {CardContents, TypeBadge} from "@/components/private-milestone-node";
+import {CardContents} from "@/components/private-milestone-node";
 import { PrivateBadge } from "./private-badge";
 import { PublicMilestoneNode } from "./public-milestone-node";
 import { NodeProps } from "@xyflow/react";
+import { TypeBadge } from "./type-badge";
 
 const StatusData: Record<"PLANNED" | "INPROGRESS" | "COMPLETED", { text: string; styling: string }> = {
     PLANNED: {
@@ -38,23 +39,21 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
     const getLink = () => {
         if (organization?.subdomain) {
             // if (organization.roadmaps?.filter((roadmap: any) => roadmap.id === milestone?.roadmapId).length > 0) {
-            //     return `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${milestone?.id}&view=flow`
+            //     return `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/?milestone=${milestone?.id}`
             // }
             //
             // return `http://${organization?.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan`
 
             if (organization.roadmaps?.filter((roadmap: any) => roadmap.id === milestone?.roadmapId).length > 0) {
-                return `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${organization.subdomain}/research-plan?milestone=${milestone?.id}&view=flow`
+                return `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${organization.subdomain}/research-plan?milestone=${milestone?.id}`
             }
 
-            return `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${organization.subdomain}/research-plan?milestone=${milestone?.id}&view=flow`
+            return `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/organization/${organization.subdomain}/research-plan?milestone=${milestone?.id}`
         }
 
         return '#'
     }
 
-    // const milestoneType = MILESTONE_TYPE_OPTIONS.find((option) => option.value === milestone.type)?.label;
-    const milestoneTypes = milestone?.types.map((type: any) => MILESTONE_TYPE_OPTIONS.find(option => option.value === type)?.label)
     const status = MILESTONE_STATUS_OPTIONS.find((option) => option.value === milestone.status)?.label;
 
     const statusKey = milestone.status as keyof typeof StatusData;
@@ -74,7 +73,7 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
                     </CardDescription>
                     <Separator className="my-2"/>
                     <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
-                        <TypeBadge type={milestone.node.type}/>
+                        <TypeBadge type={milestone.nodeType}/>
                         {!milestone.private && <FaArrowUpRightFromSquare className="h-[12px] w-[12px]"/>}
                     </div>
                 </CardHeader>
@@ -90,7 +89,7 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
     
                     <div className="flex flex-col gap-4 justify-end grow">
                         <CardContents props={{
-                            type: milestone.node.type,
+                            type: milestone.nodeType,
                             data: milestone
                         } as NodeProps<PublicMilestoneNode>}/>
                     </div>

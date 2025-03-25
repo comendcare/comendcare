@@ -19,10 +19,10 @@ import {
     getRoadmapId
 } from "@/lib/fetchers";
 import {toast} from "sonner";
-import {initializeKanbanState, initializeNotificationsState, initializeRoadmapState} from "@/lib/initialize-client-state";
+import {initializeCROSearch, initializeMilestoneSearch, initializeNotificationsState, initializeOrganizationSearch, initializeRoadmapState} from "@/lib/initialize-client-state";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
-import { createKanban } from "@/lib/actions";
+import { createKanban, createRoadmap } from "@/lib/actions";
 import { FeedbackSheet } from "@/components/feedback";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import { useOnborda } from "@/components/onborda/OnbordaContext";
@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
+import { cn, sleep } from "@/lib/utils";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -40,44 +41,24 @@ interface AppLayoutProps {
 }
 
 const selector = (state: RoadmapState) => ({
-    roadmapId: state.roadmapId,
-    nodes: state.nodes,
-    edges: state.edges,
-    selectedView: state.selectedView,
-    setSelectedView: state.setSelectedView,
-    selectedNodeId: state.selectedNodeId,
-    setSelectedNodeId: state.setSelectedNodeId,
-    milestones: state.milestones,
-})
-
-const notificationsSelector = (state: NotificationsState) => ({
-    setNotificationsViewed: state.setNotificationsViewed
+    setSelectedNodeId: state.setSelectedNodeId
 })
 
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
     const [isLoading, setIsLoading] = useState(true)
     const searchParams = useSearchParams()
-    const prevSessionRef: any = useRef()
+    const prevSessionRef: React.MutableRefObject<typeof session | undefined | null> = useRef()
     const { startOnborda } = useOnborda()
     const pathname = usePathname()
-    const { 
-        selectedNodeId, 
-        setSelectedNodeId
-    } = useRoadmapStore(useShallow(selector))
-    const { setNotificationsViewed } = useNotificationsStore(useShallow(notificationsSelector))
-    const [sidebarOpen, setSidebarOpen] = useState(selectedNodeId === null)
-
-    useEffect(() => {
-        if (selectedNodeId !== null) setSidebarOpen(false)
-    }, [selectedNodeId])
+    const { setSelectedNodeId } = useRoadmapStore(useShallow(selector))
 
     useEffect(() => {
         // Handle loading state for the session
         if (status === "loading") {
             setIsLoading(true);
         } else {
-            setIsLoading(false);
+            // setIsLoading(false);
 
             // Redirect if unauthenticated
             if (status === "unauthenticated") {
@@ -98,8 +79,62 @@ export default function AppLayout({children}: AppLayoutProps) {
                 return
             }
 
-            const response = await getRoadmapId(session.user.organizationId)
+            console.log(`Start initialization... for org ${session.user.organizationId}`)
+
+            // Init Notifications Store
+            let notifications = await getAllNotifications()
+            if (notifications.success && notifications.data) {
+                initializeNotificationsState({
+                    notifications: notifications.data
+                })
+            } else {
+                console.error(notifications.error)
+                toast.error(notifications.error)
+            }
+            console.log(`Notificaions initialized...`)
+            
+            // let kanban = await getKanbanFromOrganizationId()
+            // if (!kanban.data && session.user.organizationId) {
+            //     // kanban was not found, create it
+            //     kanban = await createKanban(session.user.organizationId)
+            // }
+
+            // if (kanban.success) {
+            //     const kanbanResponse = await getColumns(session.user.organizationId)
+            //     if (kanbanResponse.success) {
+            //         initializeKanbanState({
+            //             columns: kanbanResponse.data.columns,
+            //             kanbanId: kanban?.data?.id
+            //         })
+            //     }
+            // } else {
+            //     console.error(kanban.error)
+            //     toast.error(kanban.error)
+            // }
+
+            // Init CRO Search Store
+            initializeCROSearch()
+            console.log(`CRO search initialized...`)
+
+            // Init Milestone Search Store
+            initializeMilestoneSearch()
+            console.log(`Milestone search initialized...`)
+
+            // Init Organization/PAG Search Store
+            initializeOrganizationSearch()
+            console.log(`Organization search initialized...`)
+
+            // Init Research Plan Store
+            let response = await getRoadmapId(session.user.organizationId)
             if (response.success) {
+                // if we're on the research plan page and the resarch plan doesn't exist, create it, then initialize
+                if (pathname === "/app/research-plan" && !response.data) {
+                    console.log(`research plan doesn't exist, create it`)
+                    const roadmap =  await createRoadmap(session.user.organizationId, {})
+                    console.log(`roadmap`, roadmap)
+                    response = await getRoadmapId(session.user.organizationId)
+                }
+
                 const nodesResponse = await getNodesEdgesAndMilestones(response.data)
                 const urlNode = searchParams.get("milestone")
                 const urlView = searchParams.get("view")
@@ -112,67 +147,55 @@ export default function AppLayout({children}: AppLayoutProps) {
                         selectedView: urlView,
                         selectedNodeId: urlNode 
                     })
+                } else {
+                    // init state, but research plan has not been created yet
+                    initializeRoadmapState({
+                        roadmapId: null,
+                        nodes: [],
+                        edges: [],
+                        milestones: [],
+                        selectedView: null,
+                        selectedNodeId: null 
+                    })
                 }
+                console.log(`Research Plan initialized...`)
             } else {
                 console.error(response.error)
                 toast.error(response.error)
             }
 
-            let notifications = await getAllNotifications()
-            if (notifications.success && notifications.data) {
-                initializeNotificationsState({
-                    notifications: notifications.data
-                })
-
-                // if we're going to the kanban set notifications to viewed
-                if (pathname === '/app/task-board') {
-                    setNotificationsViewed(notifications.data.filter(notification => notification.type === "NEW_TASK"))
-                }
-            }
-
-            let kanban = await getKanbanFromOrganizationId()
-            if (!kanban.data && session.user.organizationId) {
-                // kanban was not found, create it
-                kanban = await createKanban(session.user.organizationId)
-            }
-
-            if (kanban.success) {
-                const kanbanResponse = await getColumns(session.user.organizationId)
-                if (kanbanResponse.success) {
-                    initializeKanbanState({
-                        columns: kanbanResponse.data.columns
-                    })
-                }
-            } else {
-                console.error(kanban.error)
-                toast.error(kanban.error)
-            }
-
-            console.log(`Research plan, kanban, and notifications zustand states initialized successfully!`)
+            console.log(`Initialization completed successfully!`)
             setIsLoading(false)
         }
     }
 
     useEffect(() => {
-        // Only run if the session data has changed
-        if (JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)) {
+        // Only run if the session data has changed or the session has not yet been set up
+        console.log(`session changed:`, session, `\nauthenticated: ${status === "authenticated"}\nsession has changed: ${JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)}`)
+        if (
+            // !isLoading &&
+            status !== "authenticated" || 
+            !session || 
+            JSON.stringify(prevSessionRef?.current?.user) != JSON.stringify(session?.user)
+        ) {
             handleSessionUpdate()
         }
 
         // Update the ref to the latest session
         prevSessionRef.current = session
-    }, [session]);
+    }, [session]); // For some reason, adding status and handleSessionUpdate as dependencies causes switching orgs to fail.
 
     if (status === "authenticated" && session) {
         return (
-            <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
+            <SidebarProvider>
                 <AppSidebar />
                 <SidebarInset className="w-full max-w-full overflow-hidden">
-                    <header className="sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden">
+                    <header className="bg-white sticky top-0 flex h-12 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-10 border-b bg-background w-full z-50 overflow-hidden">
                         <div className="w-full flex items-center justify-between gap-4 px-4">
                             <SidebarTrigger className="-ml-1" />
                             <div className="flex items-center">
                                 <Button 
+                                    className={cn(!pathname.includes('app/profile') && !pathname.includes('app/research-plan') ? "hidden" : "")}
                                     disabled={!pathname.includes('app/profile') && !pathname.includes('app/research-plan')}
                                     variant="ghost"
                                     onClick={() => {
@@ -199,11 +222,12 @@ export default function AppLayout({children}: AppLayoutProps) {
                         </div>
                     </header>
                     <div className="flex h-[calc(100vh-3.5rem)] max-h-screen w-full overflow-hidden overflow-y-auto">
-                        {isLoading ? <Loading /> : (children)}
-                        {/* {children} */}
+                        {status !== "authenticated" || !session || isLoading  ? <Loading /> : (children)}
                     </div>
                 </SidebarInset>
             </SidebarProvider>
         )
     }
+
+    return <Loading />
 }

@@ -11,6 +11,7 @@ import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {toast} from "sonner";
 import {useSession} from "next-auth/react";
 import Image from "next/image"
+import {CROFilters} from "@/components/cro-filters";
 
 // export const metadata: Metadata = {
 //     title: "Comend",
@@ -85,7 +86,7 @@ export default function ProjectLayout({children}: ProjectLayoutProps) {
                     defaultSize={defaultLayout[1]}
                     minSize={15}
                     maxSize={30}
-                    className="p-8 flex flex-col gap-4"
+                    className="bg-white p-8 flex flex-col gap-4"
                 >
                     <FiltersPanel/>
                 </ResizablePanel>
@@ -99,6 +100,8 @@ const FiltersPanel = () => {
 
     if (pathname.endsWith('/milestones')) {
         return <MilestoneFilters/>
+    } else if (pathname.endsWith('/cro')){
+        return <CROFilters/>
     } else {
         return <PAGFilters/>
     }

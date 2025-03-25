@@ -341,6 +341,31 @@ export const syncToTypesense = async (env: {
                     type: "string",
                     index: true,
                     store: true,
+                    facet: true,
+                    optional: true
+                },
+                {
+                    name: "avgRating",
+                    type: "float",
+                    index: true,
+                    sort: true,
+                    store: true,
+                    optional: true
+                },
+                {
+                    name: "simplifiedCertifications",
+                    type: "string[]",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                },
+                {
+                    name: "categories",
+                    type: "string[]",
+                    index: true,
+                    store: true,
+                    facet: true,
                     optional: true
                 }
             ],
@@ -377,7 +402,9 @@ export const syncToTypesense = async (env: {
                 yearEstablished: true,
                 website: true,
                 headquarters: true,
-                companyType: true
+                companyType: true,
+                categories: true,
+                simplifiedCertifications: true
             }
         });
 
@@ -433,7 +460,7 @@ export const syncToTypesense = async (env: {
 
                 return {
                     ...milestone,
-                    nodeType: milestone.node?.type,
+                    nodeType: milestone.nodeType,
                     updatedAt: new Date(milestone.updatedAt).getTime(), // Convert to int64
                 }
             }))

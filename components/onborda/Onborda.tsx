@@ -446,7 +446,7 @@ const Onborda: React.FC<OnbordaProps> = ({
         <Portal>
           <motion.div
             data-name="onborda-overlay"
-            className="absolute inset-0 "
+            className="absolute inset-0"
             initial="hidden"
             animate={isOnbordaVisible ? "visible" : "hidden"}
             variants={variants}

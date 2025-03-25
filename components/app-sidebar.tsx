@@ -7,7 +7,9 @@ import {
     Newspaper,
     Pin,
     Store, User, Workflow,
+    Bookmark
 } from "lucide-react"
+import { FaRegBookmark } from "react-icons/fa6"
 
 import {NavMain} from "@/components/nav-main"
 import {NavUser} from "@/components/nav-user"
@@ -32,49 +34,37 @@ import { KANBAN_NOTIFICATIONS } from "@/lib/types"
 const data = {
     navMain: [
         {
-            title: "Organization Profile",
-            icon: User,
+            title: "Marketplace",
+            icon: Store,
             variant: "ghost",
-            url: "/app/profile"
+            url: "/app/marketplace/cro",
+            subPages: [{
+                title: "Saves",
+                icon: Bookmark,
+                variant: "ghost",
+                url: "/app/saves"
+            }]
         },
         {
             title: "Research Planner",
             icon: Workflow,
             variant: "ghost",
-            url: `/app/research-plan`
+            url: `/app/research-plan`,
+            subPages: []
         },
         {
-            title: "Task Board",
-            icon: Pin,
+            title: "Organization Profile",
+            icon: User,
             variant: "ghost",
-            url: "/app/task-board",
-            notificationKeys: KANBAN_NOTIFICATIONS
-        },
-        {
-            title: "Marketplace",
-            icon: Store,
-            variant: "ghost",
-            url: "/app/marketplace/patient-groups",
-        },
-        {
-            title: "Analytics",
-            icon: LayoutDashboard,
-            variant: "ghost",
-            url: "/app/analytics",
-            comingSoon: true
-        },
-        {
-            title: "Feed",
-            icon: Newspaper,
-            variant: "ghost",
-            url: "/app/feed",
-            comingSoon: true
+            url: "/app/profile",
+            subPages: []
         },
         {
             title: "Organization Settings",
             icon: Cog,
             variant: "ghost",
-            url: "/app/settings"
+            url: "/app/settings",
+            subPages: []
         },
     ]
 }
@@ -83,20 +73,20 @@ export function AppSidebar({...props}: React.ComponentProps<typeof Sidebar>) {
     const {data: session} = useSession()
     const [memberships, setMemberships] = useState<MemberWithOrganization[]>([]);
 
-    const fetchOrganizations = async () => {
-        if (session) {
-            const response = await getAllMembershipsFromUserId(session.user.id);
-            if (response.success) {
-                const orgs = response.data ?? []
-                setMemberships(orgs)
-            } else {
-                console.error(response.error)
-                toast.error(response.error)
-            }
-        }
-    };
-
     useEffect(() => {
+        const fetchOrganizations = async () => {
+            if (session) {
+                const response = await getAllMembershipsFromUserId(session.user.id);
+                if (response.success) {
+                    const orgs = response.data ?? []
+                    setMemberships(orgs)
+                } else {
+                    console.error(response.error)
+                    toast.error(response.error)
+                }
+            }
+        };
+        
         fetchOrganizations()
     }, [session])
 

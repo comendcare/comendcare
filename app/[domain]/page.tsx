@@ -28,6 +28,8 @@ import FeedbackForm from "@/components/feedback-form";
 import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import React from "react";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
+import ContactPAGDialog from "@/components/contact-pag-dialog";
+import {PencilIcon} from "lucide-react";
 
 export async function generateStaticParams() {
     const allOrganizations = await prisma.organization.findMany({
@@ -73,15 +75,10 @@ export default async function OrganizationHomePage({
     dbMilestones = await prisma.milestone.findMany({
         where: {roadmapId: organization.roadmaps?.[0]?.id},
         include: {
-            attachments: true,
+            node: true,
             contacts: true,
-            tasks: {
-                orderBy: {orderPosition: 'asc'},
-                include: {
-                    checklist: {orderBy: {orderPosition: 'asc'}}
-                }
-            },
-            node: true
+            attachments: true,
+            types: { include: { milestoneType: true } }
         }
     })
 
@@ -133,8 +130,8 @@ export default async function OrganizationHomePage({
                         <div className="md:col-span-4 flex flex-col space-y-4">
                             <PAGProfileAssetsAndRFPsHoverableCard
                                 isPrivate={false}
-                                assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "ASSET")}
-                                rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.node?.type === "RFP")}
+                                assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "ASSET")}
+                                rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "RFP")}
                                 // assets={(roadmaps?.[0]?.milestones.filter(milestone => milestone.asset) || []).map(milestone => milestone.asset)}
                                 // rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
                             />
@@ -181,15 +178,20 @@ export default async function OrganizationHomePage({
                         dialog: <ShareDialog url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`}/>
                     },
                     {
-                        title: "Report an issue",
-                        icon: <IconFlag/>,
-                        sheet: <>
-                            <SheetHeader>
-                                <SheetTitle>Send Feedback</SheetTitle>
-                            </SheetHeader>
-                            <FeedbackForm/>
-                        </>
-                    }
+                        title: "Contact patient group",
+                        icon: <PencilIcon/>,
+                        dialog: <ContactPAGDialog organization={organization}/>
+                    },
+                    // {
+                    //     title: "Report an issue",
+                    //     icon: <IconFlag/>,
+                    //     sheet: <>
+                    //         <SheetHeader>
+                    //             <SheetTitle>Send Feedback</SheetTitle>
+                    //         </SheetHeader>
+                    //         <FeedbackForm/>
+                    //     </>
+                    // }
                 ]}
                 orientation="vertical"
                 desktopClassName="right-4"

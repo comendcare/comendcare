@@ -1,10 +1,13 @@
 'use client';
 
-import {usePathname} from 'next/navigation';
+import {usePathname, useRouter} from 'next/navigation';
 import {FaCheck} from 'react-icons/fa';
 import {useOnboardingStore} from '@/state/onboarding/onboardingStore';
 import {useSession} from 'next-auth/react';
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {useEffect, useState} from "react";
+import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
+import {toast} from "sonner";
 
 type StepStatus = 'complete' | 'current' | 'upcoming' | 'disabled';
 
@@ -48,22 +51,26 @@ const allSteps: Step[] = [
 ];
 
 export default function OnboardingSteps() {
+    const router = useRouter();
     const pathname = usePathname();
     const session = useSession();
+    const [invitations, setInvitations] = useState<any[]>([]);
     const isNewOrganization = useOnboardingStore((state) => state.isNewOrganization);
 
     // Check if user has an organization
     const hasOrganization = Boolean(session.data?.user.organizationId);
+    const hasInvitations = invitations.length > 0;
 
-    // Determine which steps to show based on `isNewOrganization` and `hasOrganization`
-    const steps = isNewOrganization
-        ? allSteps.map((step) =>
-            // If user is creating a new organization but no organizationId exists, disable "Finances" and "Research"
-            !hasOrganization && ['Finances', 'Research'].includes(step.name)
-                ? {...step, status: 'disabled'}
-                : step
-        )
-        : allSteps.filter((step) => !['Finances', 'Research'].includes(step.name)); // Filter out if not a new organization
+    // If user has invitations, only show the first two steps
+    const steps = hasInvitations
+        ? allSteps.slice(0, 2)
+        : isNewOrganization
+            ? allSteps.map((step) =>
+                !hasOrganization && ['Finances', 'Research'].includes(step.name)
+                    ? {...step, status: 'disabled'}
+                    : step
+            )
+            : allSteps.filter((step) => !['Finances', 'Research'].includes(step.name));
 
     // Determine the status of each step dynamically
     const updatedSteps = steps.map((step, index) => {
@@ -77,6 +84,32 @@ export default function OnboardingSteps() {
             status: isCurrent ? 'current' : isComplete ? 'complete' : 'upcoming',
         };
     });
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await getInvitations();
+
+                if (response.success && response.data) {
+                    const invitationsWithDetails = await Promise.all(
+                        response.data.map(async (invitation) => {
+                            const orgResponse = await getOrganizationFromOrganizationId(invitation.organizationId);
+                            return {
+                                ...invitation,
+                                organization: orgResponse.success ? orgResponse.data : null,
+                            };
+                        })
+                    );
+
+                    setInvitations(invitationsWithDetails);
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            }
+        };
+
+        fetchUserData()
+    }, [session, router]);
 
     return (
         <TooltipProvider>
@@ -95,13 +128,13 @@ export default function OnboardingSteps() {
                                     {stepIdx !== updatedSteps.length - 1 && (
                                         <div
                                             aria-hidden="true"
-                                            className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-indigo-600"
+                                            className="absolute left-4 top-4 -ml-px mt-0.5 h-full w-0.5 bg-blue-dark"
                                         />
                                     )}
                                     <a href={step.href} className="group relative flex items-start">
                                         <span className="flex h-9 items-center">
                                             <span
-                                                className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 group-hover:bg-indigo-800">
+                                                className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-blue-dark group-hover:bg-blue-900">
                                                 <FaCheck aria-hidden="true" className="h-5 w-5 text-white"/>
                                             </span>
                                         </span>
@@ -122,12 +155,12 @@ export default function OnboardingSteps() {
                                     <a href={step.href} aria-current="step" className="group relative flex items-start">
                                         <span aria-hidden="true" className="flex h-9 items-center">
                                             <span
-                                                className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-indigo-600 bg-white">
-                                                <span className="h-2.5 w-2.5 rounded-full bg-indigo-600"/>
+                                                className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-blue-dark bg-white">
+                                                <span className="h-2.5 w-2.5 rounded-full bg-blue-dark"/>
                                             </span>
                                         </span>
                                         <span className="ml-4 flex min-w-0 flex-col">
-                                            <span className="text-xl font-semibold text-indigo-600">{step.name}</span>
+                                            <span className="text-xl font-semibold text-blue-dark">{step.name}</span>
                                             <span className="text-sm text-gray-500">{step.description}</span>
                                         </span>
                                     </a>

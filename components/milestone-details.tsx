@@ -5,7 +5,6 @@ import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
 import {FaArrowUpRightFromSquare, FaDollarSign, FaPaperclip} from "react-icons/fa6"
 import {Label} from "./ui/label"
-import {TaskType, TypeBadge} from "./private-milestone-node"
 import {
     Card,
     CardContent,
@@ -14,7 +13,7 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import {MILESTONE_TYPE_OPTIONS, NODE_TYPE_OPTIONS} from "@/lib/types"
+import {NODE_TYPE_OPTIONS} from "@/lib/types"
 import {Badge} from "./ui/badge"
 import {DateView} from "./miletone-date-view"
 import {BudgetView} from "./milestone-budget-view"
@@ -24,6 +23,8 @@ import {Separator} from "./ui/separator"
 import Link from "next/link"
 import {RFPDetails} from "./rfp-details.tsx"
 import {Button} from "./ui/button"
+import { TypeBadge } from "./type-badge"
+import { MilestoneTypeBadge } from "./milestone-type-badge"
 
 export function MilestoneDetails({milestone}: { milestone: any }) {
     return (
@@ -36,9 +37,9 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                             {milestone.title}
                         </CardTitle>
 
-                        {milestone.node.type && (
+                        {milestone.nodeType && (
                             <TypeBadge className="w-fit"
-                                       type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone.node.type))?.value || "PROJECT"}/>
+                                       type={NODE_TYPE_OPTIONS.find((option) => (option.value === milestone.nodeType))?.value || "PROJECT"}/>
                         )}
                     </div>
 
@@ -79,22 +80,16 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                             className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
                             disabled={true}
                             status={milestone.status}
-                            onStatusChange={() => {
-                            }}
+                            onStatusChange={() => {}}
                         />
                     }
-                    {(milestone.types || []).sort((a: any, b: any) => a.length - b.length).map((milestoneType: any, index: number) => (
-                        <Badge variant="secondary" className="text-sm h-7 rounded-md px-2 py-1 font-medium" key={index}>
-                            {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === milestoneType))?.label || "No type"}
-                        </Badge>
+                    {(milestone.types || []).sort((a: any, b: any) => a?.milestoneType?.length - b?.milestoneType?.length).map((milestoneType: any, index: number) => (
+                        <MilestoneTypeBadge
+                            key={index}
+                            label={milestoneType?.milestoneType?.label}
+                        />
                     ))}
                 </span>
-
-                {/*{(milestone.types || []).map((type: string, index: number) => (*/}
-                {/*    <Badge className="flex text-sm h-[30px] w-fit" key={index}>*/}
-                {/*        {MILESTONE_TYPE_OPTIONS.find((option) => (option.value === type))?.label || "No type"}*/}
-                {/*    </Badge>*/}
-                {/*))}*/}
 
                 {milestone.attachments && milestone.attachments.length > 0 && (
                     <div className="flex flex-col gap-4">

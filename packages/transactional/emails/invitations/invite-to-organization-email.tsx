@@ -56,10 +56,8 @@ export const InviteToOrganizationEmail = ({
                         <Section className="mt-[32px]">
                             <Img
                                 src="https://storage.googleapis.com/comend-app-public-permanent/Full%20logo.png"
-                                width="40"
-                                height="37"
                                 alt="Comend"
-                                className="my-0 mx-auto"
+                                className="w-1/2 my-0 mx-auto"
                             />
                         </Section>
                         <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
@@ -92,12 +90,12 @@ export const InviteToOrganizationEmail = ({
                                     }
                                 </Column>
                                 <Column align="center">
-                                    <Img
-                                        src={`${baseUrl}/static/vercel-arrow.png`}
-                                        width="12"
-                                        height="9"
-                                        alt="invited you to"
-                                    />
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                         stroke-linejoin="round" className="lucide lucide-arrow-big-right-dash">
+                                        <path d="M5 9v6"/>
+                                        <path d="M9 9h3V5l7 7-7 7v-4H9V9z"/>
+                                    </svg>
                                 </Column>
                                 <Column align="left">
                                     <Img
@@ -128,10 +126,10 @@ export const InviteToOrganizationEmail = ({
                         </Text>
                         <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
                         <Text className="text-[#666666] text-[12px] leading-[24px]">
-                            This invite was sent from <span className="text-black">{inviteFromIp}</span>. If you
+                            This invite was sent from <span className="text-black">{inviteFromIp}</span>. {`If you
                             were not expecting this invitation, you can ignore this email. If
                             you are concerned about your account's safety, please reply to
-                            this email to get in touch with us.
+                            this email to get in touch with us.`}
                         </Text>
                     </Container>
                 </Body>
@@ -143,10 +141,10 @@ export const InviteToOrganizationEmail = ({
 InviteToOrganizationEmail.PreviewProps = {
     username: "alanturing",
     userImage: `${baseUrl}/static/vercel-user.png`,
+    organizationName: "Test organization name",
+    organizationImage: `${baseUrl}/static/vercel-user.png`,
     invitedByUsername: "Alan",
     invitedByEmail: "alan.turing@example.com",
-    teamName: "Enigma",
-    teamImage: `${baseUrl}/static/vercel-team.png`,
     inviteLink: "https://vercel.com/teams/invite/foo",
     inviteFromIp: "204.13.186.218",
     inviteFromLocation: "São Paulo, Brazil",

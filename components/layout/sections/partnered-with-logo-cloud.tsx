@@ -7,12 +7,13 @@ import logoNextAI from "@/public/logos/affiliations/NextAI.png"
 import logoOpenTreatments from "@/public/logos/affiliations/Open Treatments.png"
 import logo11ElevenLabsGrants from "@/public/logos/affiliations/11ElevenLabsGrants.png"
 import logoCuresDev from "@/public/logos/affiliations/CuresDev.png"
+import logoOdylia from "@/public/logos/affiliations/Odylia.png"
 import logoOUAG from "@/public/logos/affiliations/OUAG.png"
 import logoWABS from "@/public/logos/affiliations/WABS.png"
 import Image from "next/image"
 import React from "react"
 
-export function LogoCloud() {
+export function PartneredWithLogoCloud() {
     const logos = [
         {
             name: "Character",
@@ -43,8 +44,8 @@ export function LogoCloud() {
         //     src: logo11ElevenLabsGrants
         // },
         {
-            name: "Cures Dev",
-            src: logoCuresDev
+            name: "Odylia",
+            src: logoOdylia
         }
         // {
         //     name: "OUAG",
@@ -58,7 +59,7 @@ export function LogoCloud() {
 
     return (
         <div className="relative px-4 md:px-8 py-24 w-full overflow-hidden space-y-8">
-            <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 mx-auto text-center">
                 Partnered with:
             </h2>
             <div className="grid grid-cols-3 gap-10 w-full max-w-3xl mx-auto  relative">
@@ -72,7 +73,7 @@ export function LogoCloud() {
                             alt={logo.name}
                             width={100}
                             height={100}
-                            className="w-full object-contain select-none dark:filter dark:invert"
+                            className="w-3/4 object-contain select-none dark:filter dark:invert"
                             draggable={false}
                         />
                     </div>

@@ -91,7 +91,7 @@ const milestones = [
     {text: "Contact registry available"},
     {text: "Natural history study ", highlight: "ongoing"},
     {text: "Gene therapy trial ", highlight: "1 month ago"},
-    {text: "Patient advocacy group ", highlight: "501c3 status designated"},
+    {text: "Patient advocacy group ", highlight: "501(c)(3) status designated"},
     // {text: "Published in a peer-reviewed journal ", highlight: "last year"},
     // {text: "FDA orphan drug status approved"}
 ]
@@ -103,7 +103,7 @@ export const PAGProfileAssetsAndProjectsCard = () => {
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
                     Milestones
                 </CardTitle>
                 <Button

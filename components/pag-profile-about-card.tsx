@@ -18,8 +18,14 @@ export const PagProfileAboutCard = ({organization, editable}: {
     editable: boolean
 }) => {
     faker.seed(235)
-    const { startOnborda } = useOnborda()
+    const {startOnborda} = useOnborda()
     const pathname = usePathname();
+
+    const startOnbordaAndRemoveToast = () => {
+        startOnborda('organization-profile-tour')
+        setOnboarded('organization-profile-tour')
+        toast.dismiss()
+    }
 
     useEffect(() => {
         // Only start tour if user is new and is on the /app/profile page
@@ -32,6 +38,7 @@ export const PagProfileAboutCard = ({organization, editable}: {
                     <div className="flex flex-col space-y-2 ml-4">
                         <Button
                             onClick={startOnbordaAndRemoveToast}
+                            variant="secondary"
                         >
                             {`Yes please!`}
                         </Button>
@@ -40,6 +47,7 @@ export const PagProfileAboutCard = ({organization, editable}: {
                                 toast.dismiss()
                                 setOnboarded('organization-profile-tour')
                             }}
+                            variant="ghost"
                         >
                             {`No thanks!`}
                         </Button>
@@ -47,18 +55,12 @@ export const PagProfileAboutCard = ({organization, editable}: {
                 )
             })
         }
-    }, [])
-
-    const startOnbordaAndRemoveToast = () => {
-        startOnborda('organization-profile-tour')
-        setOnboarded('organization-profile-tour')
-        toast.dismiss()
-    }
+    }, [pathname, startOnbordaAndRemoveToast])
 
     return (
         <Card className="organization-profile-tour-step1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
                     About
                 </CardTitle>
                 {(organization && editable) &&
@@ -72,6 +74,24 @@ export const PagProfileAboutCard = ({organization, editable}: {
                         <p>
                             {organization?.description}
                         </p>
+                        {organization?.website ?
+                            <Link
+                                href={organization.website.startsWith("http")
+                                    ? organization.website
+                                    : `https://${organization.website}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
+                            >
+                                {organization?.website}
+                                <FaArrowUpRightFromSquare/>
+                            </Link>
+                            : (
+                                <p className="text-gray-400">
+                                    {`No website.`}
+                                </p>
+                            )
+                        }
                     </div>
 
                     <div className="space-y-2">
@@ -121,29 +141,7 @@ export const PagProfileAboutCard = ({organization, editable}: {
                         }
                     </div>
 
-                    <div className="space-y-2">
-                        <h3 className="scroll-m-20 text-xl tracking-tight font-semibold">
-                            Website
-                        </h3>
-                        {organization?.website ?
-                            <Link
-                                href={organization.website.startsWith("http")
-                                    ? organization.website
-                                    : `https://${organization.website}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="w-min inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
-                            >
-                                {organization?.website}
-                                <FaArrowUpRightFromSquare />
-                            </Link>
-                            : (
-                                <p className="text-gray-400">
-                                    {`No website.`}
-                                </p>
-                            )
-                        }
-                    </div>
+
                 </div>
 
             </CardContent>

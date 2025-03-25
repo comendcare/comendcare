@@ -31,7 +31,7 @@ export function UserFeedTextCard({content, blockquote}: UserFeedTextCardProps) {
                                         <AvatarImage src={createDicebearAvatar("", 50, 40, "identicon")}/>
                                         <AvatarFallback>CN</AvatarFallback>
                                     </Avatar> */}
-                                    <ProfilePhoto 
+                                    <ProfilePhoto
                                         img={undefined}
                                         name={undefined}
                                         className="h-11 w-11 rounded-full"

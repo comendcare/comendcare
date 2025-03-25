@@ -29,7 +29,7 @@ import {cn, createDicebearAvatar, getPublicFile, nameToInitials} from "@/lib/uti
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 import {FaUpload} from "react-icons/fa6";
-import {getUser} from "@/lib/fetchers";
+import {getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
 import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 
@@ -54,11 +54,38 @@ export default function UserOnboardingForm() {
     const {data: session} = useSession();
     const [loading, setLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
-    const [isDialogOpen, setDialogOpen] = useState(false);
+    const [invitations, setInvitations] = useState<any[]>([]);
+    const hasInvitations = invitations.length > 0;
 
     useEffect(() => {
         console.log(`selected file`, selectedFile)
     }, [selectedFile])
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await getInvitations();
+
+                if (response.success && response.data) {
+                    const invitationsWithDetails = await Promise.all(
+                        response.data.map(async (invitation) => {
+                            const orgResponse = await getOrganizationFromOrganizationId(invitation.organizationId);
+                            return {
+                                ...invitation,
+                                organization: orgResponse.success ? orgResponse.data : null,
+                            };
+                        })
+                    );
+
+                    setInvitations(invitationsWithDetails);
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+            }
+        };
+
+        fetchUserData()
+    }, [session, router]);
 
     // const onDrop = useCallback(
     //     (acceptedFiles: FileWithPath[]) => {
@@ -195,7 +222,11 @@ export default function UserOnboardingForm() {
 
             toast.success("Successfully updated user profile!");
             router.refresh();
-            router.push("/onboarding/organization");
+            if (hasInvitations) {
+                router.push("/app/profile");
+            } else {
+                router.push("/onboarding/organization");
+            }
         } catch (error) {
             toast.error("An error occurred while updating your profile.");
         } finally {

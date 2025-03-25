@@ -25,7 +25,7 @@ import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import React, {useEffect, useState} from "react";
 import MoneyInput from "@/components/money-input";
-import {FaPen} from "react-icons/fa6";
+import {FaPencil} from "react-icons/fa6";
 import {years} from "@/lib/utils";
 
 const editOrgFormSchema = z.object({
@@ -34,7 +34,9 @@ const editOrgFormSchema = z.object({
     incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"]).optional(),
     description: z.string().max(500).optional(),
     website: z.string().url().optional(),
-    raised: z.number().optional()
+    raised: z.number().optional(),
+    deployed: z.number().optional(),
+    budget: z.number().optional()
 });
 
 export default function EditPAGProfileHeaderDialog({organization}: { organization: Organization }) {
@@ -51,7 +53,9 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             incorporationStatus: organization.incorporationStatus || undefined,
             description: organization.description || "",
             website: organization.website || "",
-            raised: organization.moneyRaised || 0
+            raised: organization.moneyRaised || 0,
+            deployed: organization.moneyDeployed || 0,
+            budget: organization.researchBudget || 0
         }
     });
 
@@ -62,7 +66,9 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             incorporationStatus: organization.incorporationStatus || undefined,
             description: organization.description || "",
             website: organization.website || "",
-            raised: organization.moneyRaised || 0
+            raised: organization.moneyRaised || 0,
+            deployed: organization.moneyDeployed || 0,
+            budget: organization.researchBudget || 0
         });
     }, [organization, editOrgForm]);
 
@@ -76,6 +82,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
 
         // Map form values to Prisma schema fields
         const fieldMapping: Record<string, string> = {
+            name: "name",
             subdomain: "subdomain",
             looking: "interestedModalities",
             founded: "yearFounded",
@@ -83,7 +90,10 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             website: "website",
             incorporationStatus: "incorporationStatus",
             image: "image",
-            headerImage: "headerImage"
+            headerImage: "headerImage",
+            raised: "moneyRaised",
+            budget: "researchBudget",
+            deployed: "moneyDeployed",
         };
 
         // Populate FormData with mapped fields
@@ -115,8 +125,9 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
             <DialogTrigger asChild>
                 <Button
                     variant="ghost"
+                    className="organization-profile-tour-step3"
                 >
-                    <FaPen/>
+                    <FaPencil/>
                 </Button>
             </DialogTrigger>
             <DialogContent>
@@ -183,7 +194,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                     name="incorporationStatus"
                                     render={({field}) => (
                                         <FormItem className="space-y-3">
-                                            <FormLabel>{`What is your 501c3 status`}</FormLabel>
+                                            <FormLabel>{`What is your 501(c)(3) status?`}</FormLabel>
                                             {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
                                             <FormControl>
                                                 <RadioGroup
@@ -197,7 +208,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                                             <RadioGroupItem value="YES"/>
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
-                                                            {`Yes, I have a 501c3`}
+                                                            {`Yes, I have a 501(c)(3)`}
                                                         </FormLabel>
                                                     </FormItem>
                                                     <FormItem className="flex items-center space-x-3 space-y-0">
@@ -213,7 +224,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                                             <RadioGroupItem value="NO"/>
                                                         </FormControl>
                                                         <FormLabel className="font-normal">
-                                                            {`No, I don't have a 501c3`}
+                                                            {`No, I don't have a 501(c)(3)`}
                                                         </FormLabel>
                                                     </FormItem>
                                                 </RadioGroup>
@@ -235,6 +246,21 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                                     description="The total amount of funding raised to date by your patient group."
                                     name="raised"
                                 />
+
+                                <MoneyInput
+                                    form={editOrgForm}
+                                    label="Total funds deployed to research"
+                                    description="The total amount of money deployed to research to date."
+                                    name="deployed"
+                                />
+
+                                <MoneyInput
+                                    form={editOrgForm}
+                                    label="Annual research budget"
+                                    description="The amount of money allocated to advancing research this year."
+                                    name="budget"
+                                />
+
                                 <Button type="submit">Save</Button>
                             </form>
                         </Form>

@@ -12,14 +12,14 @@ import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {usePathname, useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
+import MultipleSelector from "@/components/ui/multiple-selector";
 import {useCallback, useEffect, useState} from "react";
 import {Label} from "@/components/ui/label";
 import {Switch} from "@/components/ui/switch";
 import {Separator} from "@/components/ui/separator";
 import {useOnboardingStore} from "@/state/onboarding/onboardingStore";
 import {AutocompleteComponent} from "@/components/autocomplete";
-import {AddressType} from "@/lib/types";
+import {AddressType, Option} from "@/lib/types";
 import {useDebounce} from "use-debounce";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Bold, Italic} from "lucide-react";
@@ -63,6 +63,9 @@ export const newOrgFormSchema = z.object({
     }).max(60, {
         message: "Your organization's nickname must be a maximum of 50 characters."
     }),
+    contactEmail: z.string().email({
+        message: "Please enter a valid email address.",
+    }).optional(),
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
     looking: z.string().min(0).optional(),
     founded: z.string().optional(),
@@ -75,7 +78,7 @@ export const newOrgFormSchema = z.object({
         message: "Your organization's website.",
     }).optional(),
     incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"], {
-        required_error: "You need to select a 501c3 status.",
+        required_error: "You need to select a 501(c)(3) status.",
     }).optional(),
     address1: z.string().optional(),
     address2: z.string().optional(),
@@ -376,6 +379,7 @@ export default function OrganizationOnboardingForm(
                         title: currentUserTitle,  // Title of the user at the org
                         subdomain: organizationData.subdomain || "",
                         website: organizationData.website || "",
+                        contactEmail: organizationData.contactEmail || "",
                         address1: organizationData.address1 || "",
                         address2: organizationData.address2 || "",
                         formattedAddress: organizationData.formattedAddress || "",
@@ -506,7 +510,7 @@ export default function OrganizationOnboardingForm(
                                         <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                         {/*<div className="w-full flex flex-row justify-between">*/}
                                             <FormDescription>
-                                                {`Enter an acronym, short form, or nickname for your organization.`}
+                                                {`Choose the URL for your custom profile site.`}
                                                 <br/>
                                                 {newOrgForm.watch("subdomain") &&
                                                     !newOrgForm.formState.errors.subdomain && (
@@ -553,6 +557,28 @@ export default function OrganizationOnboardingForm(
                                             />
                                         </FormControl>
                                         <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={newOrgForm.control}
+                                name="contactEmail"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Contact Email</FormLabel>
+                                        <FormDescription>
+                                            The main email contact for your organization.
+                                        </FormDescription>
+                                        <FormControl>
+                                            <Input
+                                                type="email"
+                                                id="contactEmail"
+                                                placeholder="name@example.com"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -657,7 +683,7 @@ export default function OrganizationOnboardingForm(
                                 name="incorporationStatus"
                                 render={({field}) => (
                                     <FormItem className="space-y-3">
-                                        <FormLabel>{`What is your 501c3 status?`}</FormLabel>
+                                        <FormLabel>{`What is your 501(c)(3) status?`}</FormLabel>
                                         {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
                                         <FormControl>
                                             <RadioGroup
@@ -671,7 +697,7 @@ export default function OrganizationOnboardingForm(
                                                         <RadioGroupItem value="YES"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
-                                                        {`Yes, I have a 501c3`}
+                                                        {`Yes, I have a 501(c)(3)`}
                                                     </FormLabel>
                                                 </FormItem>
                                                 <FormItem className="flex items-center space-x-3 space-y-0">
@@ -687,7 +713,7 @@ export default function OrganizationOnboardingForm(
                                                         <RadioGroupItem value="NO"/>
                                                     </FormControl>
                                                     <FormLabel className="font-normal">
-                                                        {`No, I don't have a 501c3`}
+                                                        {`No, I don't have a 501(c)(3)`}
                                                     </FormLabel>
                                                 </FormItem>
                                             </RadioGroup>
@@ -760,7 +786,7 @@ export default function OrganizationOnboardingForm(
                                     </Button>
                                 </div>
                                 {showSkip &&
-                                    <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                    <Button variant="ghost" onClick={() => router.push("/app/marketplace/cro")}>
                                         Skip for now
                                     </Button>
                                 }
@@ -814,7 +840,7 @@ export default function OrganizationOnboardingForm(
                                         Join Organization
                                     </Button>
                                     {showSkip &&
-                                        <Button variant="ghost" onClick={() => router.push("/app/profile")}>
+                                        <Button variant="ghost" onClick={() => router.push("/app/marketplace/cro")}>
                                             Skip for now
                                         </Button>
                                     }
