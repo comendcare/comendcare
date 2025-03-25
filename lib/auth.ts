@@ -253,12 +253,11 @@ export function withOrganizationAuth(action: any) {
         const organization = await prisma.organization.findUnique({
             where: {
                 id: organizationId
-            }
+            },
+            include: { members: true }
         })
-        if (!organization || organization.userId !== session.user.id) {
-            return {
-                error: "Not authorized"
-            }
+        if (!organization || !(organization.members.map(member => member.userId).includes(session.user.id))) {
+            return { error: "Not authorized" }
         }
 
         return action(formData, organization)

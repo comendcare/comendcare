@@ -36,7 +36,7 @@ import { toast } from "sonner"
 import Image from "next/image"
 import { NewMilestoneDialogForm } from "./new-milestone-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
-import { Milestone } from "@/lib/types"
+import { Milestone, NodeType } from "@/lib/types"
 import Loading from "@/app/loading"
 import { MilestoneType } from "@prisma/client"
 import { useSession } from "next-auth/react"
@@ -383,92 +383,68 @@ export function Roadmap() {
                                     // parse CSV file
                                     Papa.parse(file, {
                                         complete: (result) => {
-                                            const newMilestones: Partial<Milestone>[] = []
+                                            try {
+                                                const newMilestones: Partial<Milestone>[] = []
 
-                                            const isValidFormat = (entry: any) => {
-                                                const errors = []
-
-                                                if (!(entry.title && typeof entry.title === "string")) {
-                                                    errors.push({
-                                                        type: "title",
-                                                        message: "Field 'title' is not formatted properly"
-                                                    })
+                                                const isValidFormat = (entry: any) => {
+                                                    const errors = []
+    
+                                                    // only title is a required field
+                                                    if (!(entry.title && typeof entry.title === "string")) {
+                                                        errors.push({
+                                                            type: "title",
+                                                            message: "Field 'title' is not formatted properly"
+                                                        })
+                                                    }
+    
+                                                    if (errors.length > 0) return { isValid: false, errors: errors }
+                                                    return { isValid: true }
                                                 }
-
-                                                // description is optional, so we don't check it
-
-                                                if (!(entry.type && typeof entry.type === "string" || entry.type === null)) {
-                                                    errors.push({
-                                                        type: "type",
-                                                        message: "Field 'type' is not formatted properly"
-                                                    })
-                                                }
-
-                                                if (!(milestoneTypes.find(type => type.label === entry.type))) {
-                                                    errors.push({
-                                                        type: "type",
-                                                        message: `Type ${entry.type} not found in database`
-                                                    })
-                                                }
-
-                                                if (!(entry.category && typeof entry.category === "string")) {
-                                                    errors.push({
-                                                        type: "category",
-                                                        message: "Field 'category' is not formated properly"
-                                                    })
-                                                }
-
-                                                if (!(entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET")) {
-                                                    errors.push({
-                                                        type: "category",
-                                                        message: `Category ${entry.category} is not a valid category`
-                                                    })
-                                                }
-
-                                                if (errors.length > 0) return { isValid: false, errors: errors }
-                                                return { isValid: true }
-                                            }
-
-                                            let errors: {type: string, message: string}[] = []
-                                            result.data.forEach((entry: any) => {
-                                                // validate milestone format - don't include the milestone if it doesn't have all the
-                                                // proper fields or if the fields are not of the correct type
-                                                const validate = isValidFormat(entry)
-                                                if (validate.isValid && !validate.errors) {
-                                                    const foundType = milestoneTypes.find(type => type.label === entry.type)
-                                                    newMilestones.push({
-                                                        title: entry.title || 'New Milestone',
-                                                        description: entry.description || '', // description is optional
-                                                        types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
-                                                        nodeType: entry.category
-                                                    })
-                                                } else {
-                                                    console.error(`Invalid milestone format`, entry);
-                                                    (validate.errors || []).forEach((error: {type: string, message: string}) => {
-                                                        console.error(`Format validation error: `, error.message)
-                                                    })
-
-                                                    errors = errors.concat(validate.errors || [])
-
-                                                    const foundType = milestoneTypes.find(type => type.label === entry.type)
-                                                    // attempt to create anyways
-                                                    newMilestones.push({
-                                                        title: entry.title && typeof entry.title === 'string' ? entry.title : 'New milestone',
-                                                        description: '',
-                                                        types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
-                                                        nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT"
-                                                    })
-                                                }
-                                            })
-
-                                            if (errors.length > 0) {
-                                                toast('Error!', {
-                                                    duration: 4000,
-                                                    description: `Some milestones were not formatted properly. Some milestones have not been imported.`
+    
+                                                let errors: {type: string, message: string}[] = []
+                                                result.data.forEach((entry: any) => {
+                                                    // validate milestone format
+                                                    const validate = isValidFormat(entry)
+                                                    if (validate.isValid && !validate.errors) {
+                                                        const foundType = milestoneTypes.find(type => type.label === entry.type)
+                                                        newMilestones.push({
+                                                            title: entry.title || 'New Milestone',
+                                                            description: entry.description || '', // description is optional
+                                                            types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [], // types are optional
+                                                            nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT" // category is optional, default to project
+                                                        })
+                                                    } else {
+                                                        errors = errors.concat(validate.errors || [])
+    
+                                                        const foundType = milestoneTypes.find(type => type.label === entry.type)
+                                                        // attempt to create anyways
+                                                        newMilestones.push({
+                                                            title: entry.title && typeof entry.title === 'string' ? entry.title : 'New milestone',
+                                                            description: entry.description || '',
+                                                            types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
+                                                            nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT"
+                                                        })
+                                                    }
                                                 })
+    
+                                                if (errors.length > 0) {
+                                                    toast('Warning!', {
+                                                        position: "bottom-left",
+                                                        duration: 4000,
+                                                        description: `Missing fields in import file: A title is required for each milestone. Please ensure all milestones have titles before importing.`
+                                                    })
+                                                    console.error("Error: imported milestones are missing required fields", errors)
+                                                }
+    
+                                                addMilestones(newMilestones)
+                                            } catch (e) {
+                                                toast('Error!', {
+                                                    position: "bottom-left",
+                                                    duration: 4000,
+                                                    description: `Import failed. Please try again. If the problem continues, contact us at support@comendcare.com`
+                                                })
+                                                console.error("Error: failed to import milestones", e)
                                             }
-
-                                            addMilestones(newMilestones)
                                         },
                                         header: true,
                                         skipEmptyLines: true,
