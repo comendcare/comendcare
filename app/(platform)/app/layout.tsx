@@ -195,16 +195,21 @@ export default function AppLayout({children}: AppLayoutProps) {
                             <SidebarTrigger className="-ml-1" />
                             <div className="flex items-center">
                                 <Button 
-                                    className={cn(!pathname.includes('app/profile') && !pathname.includes('app/research-plan') ? "hidden" : "")}
-                                    disabled={!pathname.includes('app/profile') && !pathname.includes('app/research-plan')}
+                                    // className={cn(!pathname.includes('app/profile') && !pathname.includes('app/research-plan') ? "hidden" : "")}
+                                    className={cn(!pathname.includes('app/research-plan') ? "hidden" : "")}
+                                    // disabled={!pathname.includes('app/profile') && !pathname.includes('app/research-plan')}
+                                    disabled={!pathname.includes('app/research-plan')}
                                     variant="ghost"
                                     onClick={() => {
-                                        console.log(`pathname`, pathname)
-                                        if (pathname.includes('app/profile')) {
-                                            startOnborda('organization-profile-tour')
-                                        } else if (pathname.includes('app/research-plan')) {
+                                        // if (pathname.includes('app/profile')) {
+                                        //     startOnborda('organization-profile-tour')
+                                        // } else if (pathname.includes('app/research-plan')) {
+                                        //     setSelectedNodeId(null)
+                                        //     startOnborda('research-plan-tour')
+                                        // }
+                                        if (pathname.includes('app/research-plan')) {
                                             setSelectedNodeId(null)
-                                            startOnborda('research-plan-tour')
+                                            startOnborda('research-plan-toru')
                                         }
                                     }}>
                                     <FaWandMagicSparkles/>
