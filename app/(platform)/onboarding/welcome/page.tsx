@@ -19,19 +19,16 @@ export default function OnboardingWelcomePage() {
             <div className="w-full space-y-4">
                 <div className="space-y-2">
                     <h1 className="text-xl font-semibold">
-                        Welcome to Comend, {session?.user.name?.split(" ")[0]}!
+                        Welcome to Comend{session?.user.name ? `, ${session.user.name.split(" ")[0]}!` : "!"}
                     </h1>
                     <p>
                         {`To create your profile and help us understand how we can best support you, we have some questions.`}
                     </p>
                     <p>
-                        {`This should take ~10 minutes.`}
-                    </p>
-                    <p>
-                        {`All questions in this form are optional unless marked as (required), and you can edit your information at any time after signing up.`}
+                        {`This should take ~5 minutes if you're creating an organization for the first time.`}
                     </p>
                     <p className="font-semibold">
-                        {`You choose what information is shared publicly. We will never share your data externally without your consent.`}
+                        {`You will have detailed control over your data privacy once you finish signing up.`}
                     </p>
                 </div>
 

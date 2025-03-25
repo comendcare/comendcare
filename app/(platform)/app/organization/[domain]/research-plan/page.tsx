@@ -33,6 +33,8 @@ import {Label} from "@/components/ui/label"
 import ShareDialog from "@/components/share-dialog";
 import {PublicRoadmapContent} from "@/components/public-roadmap-content";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
+import {PencilIcon} from "lucide-react";
+import ContactPAGDialog from "@/components/contact-pag-dialog";
 
 export async function generateMetadata({
                                            params
@@ -244,7 +246,7 @@ export default async function OrganizationRoadmapPage({
                                                 <div className="mt-2 flex items-center text-gray-500">
                                                     <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                             aria-hidden="true"/>
-                                                    {`501c3`}
+                                                    {`501(c)(3)`}
                                                 </div>
                                             }
                                         </div>
@@ -304,26 +306,31 @@ export default async function OrganizationRoadmapPage({
                                         url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}/>
                                 },
                                 {
-                                    title: "Report an issue",
-                                    icon: <IconFlag/>,
-                                    dialog: (
-                                        <>
-                                            <DialogHeader>
-                                                <DialogTitle>Edit profile</DialogTitle>
-                                                <DialogDescription>
-                                                    {`Make changes to your profile here. Click save when you're done.`}
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                            <div className="grid gap-4 py-4">
-                                                <Label htmlFor="name">Name</Label>
-                                                <Input id="name" defaultValue="John Doe"/>
-                                            </div>
-                                            <DialogFooter>
-                                                <Button type="submit">Save changes</Button>
-                                            </DialogFooter>
-                                        </>
-                                    ),
-                                }
+                                    title: "Contact patient group",
+                                    icon: <PencilIcon/>,
+                                    dialog: <ContactPAGDialog organization={organization}/>
+                                },
+                                // {
+                                //     title: "Report an issue",
+                                //     icon: <IconFlag/>,
+                                //     dialog: (
+                                //         <>
+                                //             <DialogHeader>
+                                //                 <DialogTitle>Edit profile</DialogTitle>
+                                //                 <DialogDescription>
+                                //                     {`Make changes to your profile here. Click save when you're done.`}
+                                //                 </DialogDescription>
+                                //             </DialogHeader>
+                                //             <div className="grid gap-4 py-4">
+                                //                 <Label htmlFor="name">Name</Label>
+                                //                 <Input id="name" defaultValue="John Doe"/>
+                                //             </div>
+                                //             <DialogFooter>
+                                //                 <Button type="submit">Save changes</Button>
+                                //             </DialogFooter>
+                                //         </>
+                                //     ),
+                                // }
                             ]}
                             orientation="vertical"
                             desktopClassName="right-4"

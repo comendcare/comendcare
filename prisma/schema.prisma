@@ -7,6 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ReviewReplyReportReason {
+  HARASSMENT
+  FALSE
+  SPAM
+  SALES
+  HATE
+  OTHER
+}
+
+enum OrganizationToCompanyEngagement {
+  EXPLORING
+  QUOTE
+  COLLABORATING
+  COLLABORATED
+}
+
 model User {
   id                    String                 @id @default(cuid())
   name                  String?
@@ -43,11 +59,17 @@ model User {
   sessions              Session[]
   stakeholders          TaskStakeholder[]
   platformNotifications PlatformNotification[]
+  reviews               Review[]
+  repliess              Reply[]
+  reportOnReviews       ReportOnReview[]
+  reportOnReplys        ReportOnReply[]
+  reviewFeedbacks       ReviewFeedback[]
 }
 
 model PlatformNotification {
   id             String       @id @default(uuid())
-  type           String
+  type           String // Stores the notification type (e.g. "NEW_TASK", "NEW_RECOMMENDATION")
+  metadata       Json? // Stores additional information associated with this notification, e.g. for recommendations - company & milestone id
   title          String
   message        String?
   link           String?
@@ -189,7 +211,6 @@ model Node {
   id        String     @id @unique @default(uuid())
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now()) @updatedAt
-  type      String
   positionX Int
   positionY Int
   origin    Float[]    @default([0.0, 0.0])
@@ -199,23 +220,25 @@ model Node {
 }
 
 model Milestone {
-  id               String               @id @unique @default(uuid())
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @default(now()) @updatedAt
+  id               String                     @id @unique @default(uuid())
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @default(now()) @updatedAt
   title            String
   description      String?
   notes            String?
-  status           String?              @default("PLANNED")
+  status           String?                    @default("PLANNED")
   budget           Int?
   endDate          DateTime?
   startDate        DateTime?
-  private          Boolean              @default(true)
-  types            String[]             @default([])
+  private          Boolean                    @default(true)
+  types            MilestoneTypeOnMilestone[]
   otherTypeDetails String?
   openTo           String[]
   tasks            Task[]
   attachments      ExternalAttachment[]
   contacts         ExternalContact[]
+  timelineOrder    Int                        @default(0)
+  nodeType         String                     @default("PROJECT")
 
   roadmapId      String
   roadmap        Roadmap      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
@@ -223,6 +246,41 @@ model Milestone {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   nodeId         String?      @unique
   node           Node?        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+  reviews        MilestoneToReview[]
+  savedCompanies SavedCompany[]
+}
+
+model MilestoneToReview {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  milestoneId String
+  milestone   Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  reviewId    String
+  review      Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+}
+
+model MilestoneTypeOnMilestone {
+  id              String        @id @default(uuid())
+  milestoneTypeId String
+  milestoneId     String
+  milestoneType   MilestoneType @relation(fields: [milestoneTypeId], references: [id], onDelete: Cascade)
+  milestone       Milestone     @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
+
+  @@unique([milestoneTypeId, milestoneId])
+}
+
+model MilestoneType {
+  id          String   @id // value
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  label       String
+  services    String[]
+  categories  String[]
+  description String?
+
+  milestones MilestoneTypeOnMilestone[]
 }
 
 model Kanban {
@@ -354,49 +412,53 @@ model Edge {
 }
 
 model Organization {
-  id                   String                    @id @default(cuid())
-  public               Boolean                   @default(true)
-  verified             Boolean                   @default(false)
-  published            Boolean                   @default(false)
-  name                 String?
-  description          String?                   @db.Text
-  logo                 String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
-  font                 String                    @default("font-cal")
-  image                String?                   @db.Text
-  imageBlurhash        String?                   @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
-  headerImage          String?                   @db.Text
-  subdomain            String?                   @unique
-  customDomain         String?                   @unique
-  message404           String?                   @default("Blimey! You've found a page that doesn't exist.") @db.Text
-  statedGoal           Goal?
-  yearFounded          String?
-  incorporationStatus  IncorporationStatus?
-  website              String?
-  moneyRaised          Int?
-  moneyDeployed        Int?
-  researchBudget       Int?
-  address1             String?
-  address2             String?
-  formattedAddress     String?
-  city                 String?
-  region               String?
-  postalCode           String?
-  country              String?
-  lat                  String?
-  lng                  String?
-  createdAt            DateTime                  @default(now())
-  updatedAt            DateTime                  @updatedAt
-  user                 User?                     @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
-  userId               String?
-  roadmaps             Roadmap[]
-  members              Member[]
-  client               Client[]
-  invitation           Invitation[]
-  membershipRequest    MemberRequest[]
-  condition            ConditionToOrganization[]
-  Kanban               Kanban?
-  Milestone            Milestone[]
-  PlatformNotification PlatformNotification[]
+  id                       String                    @id @default(cuid())
+  public                   Boolean                   @default(true)
+  verified                 Boolean                   @default(false)
+  published                Boolean                   @default(true)
+  name                     String?
+  description              String?                   @db.Text
+  contactEmail             String?
+  logo                     String?                   @default("https://public.blob.vercel-storage.com/eEZHAoPTOBSYGBE3/JRajRyC-PhBHEinQkupt02jqfKacBVHLWJq7Iy.png") @db.Text
+  font                     String                    @default("font-cal")
+  image                    String?                   @db.Text
+  imageBlurhash            String?                   @default("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAhCAYAAACbffiEAAAACXBIWXMAABYlAAAWJQFJUiTwAAABfUlEQVR4nN3XyZLDIAwE0Pz/v3q3r55JDlSBplsIEI49h76k4opexCK/juP4eXjOT149f2Tf9ySPgcjCc7kdpBTgDPKByKK2bTPFEdMO0RDrusJ0wLRBGCIuelmWJAjkgPGDSIQEMBDCfA2CEPM80+Qwl0JkNxBimiaYGOTUlXYI60YoehzHJDEm7kxjV3whOQTD3AaCuhGKHoYhyb+CBMwjIAFz647kTqyapdV4enGINuDJMSScPmijSwjCaHeLcT77C7EC0C1ugaCTi2HYfAZANgj6Z9A8xY5eiYghDMNQBJNCWhASot0jGsSCUiHWZcSGQjaWWCDaGMOWnsCcn2QhVkRuxqqNxMSdUSElCDbp1hbNOsa6Ugxh7xXauF4DyM1m5BLtCylBXgaxvPXVwEoOBjeIFVODtW74oj1yBQah3E8tyz3SkpolKS9Geo9YMD1QJR1Go4oJkgO1pgbNZq0AOUPChyjvh7vlXaQa+X1UXwKxgHokB2XPxbX+AnijwIU4ahazAAAAAElFTkSuQmCC") @db.Text
+  headerImage              String?                   @db.Text
+  biopharmaConsentSettings Boolean                   @default(false)
+  subdomain                String?                   @unique
+  customDomain             String?                   @unique
+  message404               String?                   @default("Blimey! You've found a page that doesn't exist.") @db.Text
+  statedGoal               Goal?
+  yearFounded              String?
+  incorporationStatus      IncorporationStatus?
+  website                  String?
+  moneyRaised              Int?
+  moneyDeployed            Int?
+  researchBudget           Int?
+  address1                 String?
+  address2                 String?
+  formattedAddress         String?
+  city                     String?
+  region                   String?
+  postalCode               String?
+  country                  String?
+  lat                      String?
+  lng                      String?
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  user                     User?                     @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  userId                   String?
+  roadmaps                 Roadmap[]
+  members                  Member[]
+  client                   Client[]
+  invitation               Invitation[]
+  membershipRequest        MemberRequest[]
+  condition                ConditionToOrganization[]
+  Kanban                   Kanban?
+  Milestone                Milestone[]
+  PlatformNotification     PlatformNotification[]
+  reviews                  Review[]
+  savedCompanies           SavedCompany[]
 
   @@index([userId])
 }
@@ -589,17 +651,39 @@ model Company {
   headquarters       String?
   companyType        String?
 
-  sites          Site[]
-  services       Service[]
-  certifications Certification[]
-  rfis           RFI[]
+  sites                    Site[]
+  services                 Service[]
+  certifications           Certification[]
+  simplifiedCertifications String[]
+  rfis                     RFI[]
+  reviews                  Review[]
+  avgRating                Float?          @default(0.0) // Stores the average rating of the company
+  categories               String[]
+  savedByOrganizations     SavedCompany[]
+}
+
+model SavedCompany {
+  id             String                          @id @default(uuid())
+  organizationId String
+  companyId      String
+  milestoneId    String
+  engagement     OrganizationToCompanyEngagement
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  milestone    Milestone    @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@unique([organizationId, companyId]) // Ensures an organization can't save the same company more than once
 }
 
 model Site {
   id        String  @id @default(uuid())
   name      String
   address   String
-  company   Company @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
 }
 
@@ -607,14 +691,14 @@ model Service {
   id          String  @id @default(uuid())
   name        String
   description String?
-  company     Company @relation(fields: [companyId], references: [id])
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId   String
 }
 
 model Certification {
   id        String  @id @default(uuid())
   name      String
-  company   Company @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId String
   files     File[]
 }
@@ -623,7 +707,7 @@ model File {
   id              String        @id @default(uuid())
   fileName        String
   fileUrl         String
-  certification   Certification @relation(fields: [certificationId], references: [id])
+  certification   Certification @relation(fields: [certificationId], references: [id], onDelete: Cascade)
   certificationId String
 }
 
@@ -631,6 +715,73 @@ model RFI {
   id          String    @id @default(uuid())
   name        String
   submittedOn DateTime?
-  company     Company   @relation(fields: [companyId], references: [id])
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId   String
+}
+
+model Review {
+  id             String              @id @default(uuid())
+  title          String
+  body           String
+  rating         Float               @default(0.0) // Stores the rating given by the user (can be 1-5, 1-10, etc.)
+  authorId       String
+  author         User                @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  companyId      String
+  company        Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  replies        Reply[]             @relation("ReviewToReply")
+  reports        ReportOnReview[]
+  milestones     MilestoneToReview[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  feedbacks      ReviewFeedback[]
+
+  @@unique([authorId, companyId, organizationId]) // Ensures one review per user per company per organization
+}
+
+model ReviewFeedback {
+  id        String   @id @default(uuid())
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  helpful   Boolean // true if the user found the review helpful, false otherwise
+  createdAt DateTime @default(now())
+
+  @@unique([reviewId, userId]) // Ensures a user can only provide feedback once per review
+}
+
+model Reply {
+  id        String          @id @default(uuid())
+  body      String
+  authorId  String
+  author    User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reviewId  String
+  review    Review          @relation("ReviewToReply", fields: [reviewId], references: [id], onDelete: Cascade)
+  reports   ReportOnReply[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model ReportOnReview {
+  id          String                  @id @default(uuid())
+  userId      String
+  reviewId    String
+  reason      ReviewReplyReportReason
+  description String?
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  review      Review                  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt   DateTime                @default(now())
+}
+
+model ReportOnReply {
+  id          String                  @id @default(uuid())
+  userId      String
+  replyId     String
+  reason      ReviewReplyReportReason
+  description String?
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reply       Reply                   @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime                @default(now())
 }

@@ -57,16 +57,8 @@ export default function CROSearchBar() {
                 <SelectContent>
                     <SelectGroup>
                         <SelectItem value="alphabetical">Alphabetical (A-Z)</SelectItem>
-                        {/* <SelectItem value="patients-low-high">Patients (Low-High)</SelectItem>
-                        <SelectItem value="patients-high-low">Patients (High-Low)</SelectItem>
-                        <SelectItem value="prevalence-low-high">Prevalence (Low-High)</SelectItem>
-                        <SelectItem value="prevalence-high-low">Prevalence (High-Low)</SelectItem> */}
-                        <SelectItem value="money-raised-low-high">$ Raised (Low-High)</SelectItem>
-                        <SelectItem value="money-raised-high-low">$ Raised (High-Low)</SelectItem>
-                        <SelectItem value="money-deployed-low-high">$ Deployed (Low-High)</SelectItem>
-                        <SelectItem value="money-deployed-high-low">$ Deployed (High-Low)</SelectItem>
-                        <SelectItem value="patients-engaged-low-hight">Patients engaged (Low-High)</SelectItem>
-                        <SelectItem value="patients-engaged-high-low">Patients engaged (High-Low)</SelectItem>
+                        <SelectItem value="highest-rated">Highest rated</SelectItem>
+                        {/*<SelectItem value="most-reviewed">Most reviewed</SelectItem>*/}
                     </SelectGroup>
                 </SelectContent>
             </Select>

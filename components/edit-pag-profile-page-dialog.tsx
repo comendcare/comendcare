@@ -7,13 +7,13 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {updateOrganization, updateCondition} from "@/lib/actions";
-import {AddressType, ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
+import {AddressType, ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@/lib/types";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPreview, ImageCropper} from "@/components/image-cropper";
-import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
+import MultipleSelector from "@/components/ui/multiple-selector";
 import {Button} from "@/components/ui/button";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {FileWithPath, useDropzone} from "react-dropzone";
@@ -97,7 +97,7 @@ const editOrgFormSchema = z.object({
         message: "Your organization's website.",
     }).optional(),
     incorporationStatus: z.enum(["YES", "NO", "INPROGRESS"], {
-        required_error: "You need to select a 501c3 status.",
+        required_error: "You need to select a 501(c)(3) status.",
     }).optional(),
     address1: z.string().optional(),
     address2: z.string().optional(),
@@ -607,7 +607,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                 <DialogTrigger asChild>
                     <Button
                         variant="secondary"
-                        className="gap-x-2 organization-profile-tour-step3"
+                        className="gap-x-2"
                     >
                         <FaPen/>
                         Edit profile
@@ -666,7 +666,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                             <FormItem>
                                                 <FormLabel>{`Organization Abbreviation (required)`}</FormLabel>
                                                 <FormDescription>
-                                                    {`Enter an acronym, short form, or nickname for your organization.`}
+                                                    {`Choose the URL for your custom profile site.`}
                                                     <br/>
                                                     {editOrgForm.watch("subdomain") &&
                                                         !editOrgForm.formState.errors.subdomain && (
@@ -778,7 +778,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                         name="incorporationStatus"
                                         render={({field}) => (
                                             <FormItem className="space-y-3">
-                                                <FormLabel>{`What is your 501c3 status`}</FormLabel>
+                                                <FormLabel>{`What is your 501(c)(3) status?`}</FormLabel>
                                                 {/*<FormDescription>{`Whether you have incorporated your patient group as a non-profit yet.`}</FormDescription>*/}
                                                 <FormControl>
                                                     <RadioGroup
@@ -792,7 +792,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                                 <RadioGroupItem value="YES"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
-                                                                {`Yes, I have a 501c3`}
+                                                                {`Yes, I have a 501(c)(3)`}
                                                             </FormLabel>
                                                         </FormItem>
                                                         <FormItem className="flex items-center space-x-3 space-y-0">
@@ -808,7 +808,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                                 <RadioGroupItem value="NO"/>
                                                             </FormControl>
                                                             <FormLabel className="font-normal">
-                                                                {`No, I don't have a 501c3`}
+                                                                {`No, I don't have a 501(c)(3)`}
                                                             </FormLabel>
                                                         </FormItem>
                                                     </RadioGroup>

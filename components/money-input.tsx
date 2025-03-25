@@ -12,42 +12,49 @@ import {Input} from "@/components/ui/input"; // ShadCN UI Input
 import {UseFormReturn} from "react-hook-form";
 import {cn, formatMoney} from "@/lib/utils";
 
+
 type TextInputProps = {
     form: UseFormReturn<any>;
     name: string;
     label?: string;
     description?: string;
     placeholder?: string;
+    cents?: boolean;
 };
 
 // U.S. currency config
-const moneyFormatter = Intl.NumberFormat("en-US", {
+const createMoneyFormatter = (cents: boolean) => Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: cents ? 2 : 0,
+    maximumFractionDigits: cents ? 2 : 0,
 });
 
 export default function MoneyInput(props: TextInputProps & {className?: string}) {
-    const initialValue = props.form.getValues()[props.name]
-        ? moneyFormatter.format(props.form.getValues()[props.name])
+    const { form, name, cents = false } = props;
+    const moneyFormatter = createMoneyFormatter(cents);
+
+    const initialValue = form.getValues()[name]
+        ? moneyFormatter.format(form.getValues()[name])
         : "";
 
     const [value, setValue] = useReducer((_: any, next: string) => {
         const digits = next.replace(/\D/g, "");
-        return moneyFormatter.format(Number(digits) / 100);
+        const factor = cents ? 100 : 1;
+        return moneyFormatter.format(Number(digits) / factor);
     }, initialValue);
 
     function handleChange(realChangeFn: Function, formattedValue: string) {
         const digits = formattedValue.replace(/\D/g, "");
-        const realValue = Number(digits) / 100;
+        const factor = cents ? 100 : 1;
+        const realValue = Number(digits) / factor;
         realChangeFn(realValue);
     }
 
     return (
         <FormField
-            control={props.form.control}
-            name={props.name}
+            control={form.control}
+            name={name}
             render={({field}) => {
                 field.value = value;
                 const _change = field.onChange;

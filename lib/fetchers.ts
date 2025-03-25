@@ -90,6 +90,13 @@ export async function getCROData(id: string) {
                 }
             },
             rfis: true,
+            reviews: {
+                include: {
+                    author: true,
+                    organization: true,
+                    feedbacks: true
+                },
+            }
         }
     })
 }
@@ -122,9 +129,10 @@ export async function getRoadmapsForOrganization(domain: string) {
                 include: {
                     data: {
                         include: {
+                            node: true,
                             contacts: true,
                             attachments: true,
-                            node: true
+                            types: { include: { milestoneType: true } }
                         }
                     }
                 },
@@ -138,9 +146,10 @@ export async function getRoadmapsForOrganization(domain: string) {
                     private: false
                 },
                 include: {
+                    node: true,
                     contacts: true,
                     attachments: true,
-                    node: true
+                    types: { include: { milestoneType: true } }
                 }
             },
         },
@@ -150,7 +159,6 @@ export async function getRoadmapsForOrganization(domain: string) {
             }
         ]
     })
-    console.log(`roadmaps`, roadmaps)
     return roadmaps
 
     // return await unstable_cache(
@@ -485,7 +493,14 @@ export async function getRoadmap(orgId: string | null | undefined) {
             where: {organizationId: organization.id},
             include: {
                 nodes: true,
-                milestones: true,
+                milestones: {
+                    include: {
+                        node: true,
+                        contacts: true,
+                        attachments: true,
+                        types: { include: { milestoneType: true } }
+                    }
+                },
                 edges: true,
                 organization: true
             }
@@ -678,7 +693,6 @@ export async function checkSubdomainAvailability(nickname: string) {
         const existingOrg = await prisma.organization.findUnique({
             where: {subdomain: nickname},
         });
-        console.log(`serverside: ${existingOrg}`)
 
         return !existingOrg
     } catch (error: any) {
@@ -687,15 +701,26 @@ export async function checkSubdomainAvailability(nickname: string) {
     }
 }
 
+export async function getMilestoneTypes() {
+    try {
+        const types = await prisma.milestoneType.findMany({})
+
+        return {success: true, data: types}
+    } catch (error: any) {
+        console.error("Database error finding milestone types:", error)
+        return {success: false, error: "Database error. please try again later."}
+    }
+}
+
 export async function getMilestoneDetails(id: string) {
     try {
         const milestone = await prisma.milestone.findUnique({
             where: {id},
             include: {
-                tasks: true,
-                attachments: true,
+                node: true,
                 contacts: true,
-                node: true
+                attachments: true,
+                types: { include: { milestoneType: true } }
             }
         })
 
@@ -736,11 +761,10 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                         include: {data: true}
                     })
                 ).map(async node => {
-                    const {id, type, positionX, positionY, origin, createdAt, updatedAt} = node
+                    const {id, positionX, positionY, origin, createdAt, updatedAt} = node
 
                     return {
                         id,
-                        type,
                         position: {
                             x: positionX,
                             y: positionY
@@ -769,15 +793,10 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
             const dbMilestones = await prisma.milestone.findMany({
                 where: {roadmapId: roadmapId},
                 include: {
-                    attachments: true,
+                    node: true,
                     contacts: true,
-                    tasks: {
-                        orderBy: {orderPosition: 'asc'},
-                        include: {
-                            checklist: {orderBy: {orderPosition: 'asc'}}
-                        }
-                    },
-                    node: true
+                    attachments: true,
+                    types: { include: { milestoneType: true } }
                 }
             })
 
@@ -889,5 +908,33 @@ export async function isUserFollowing(id: string) {
     } catch (error: any) {
         console.error("Database error finding comments:", error)
         return {success: false, error: "Database error. please try again later."}
+    }
+}
+
+export async function getSavedCompaniesFromOrganizationId(organizationId: string | undefined) {
+    if (!organizationId) {
+        return {success: false, error: "No organization id provided."};
+    }
+
+    try {
+        const savedCompanies = await prisma?.savedCompany.findMany({
+            where: {organizationId},
+            include: {
+                company: true,
+                milestone: true
+            }
+        })
+
+        if (!savedCompanies) {
+            return {success: false, error: "Saved companies not found"};
+        }
+
+        return {
+            success: true,
+            data: savedCompanies
+        };
+    } catch (error: any) {
+        logError("Error fetching saved companies", error);
+        return {success: false, error: "Internal server error"};
     }
 }

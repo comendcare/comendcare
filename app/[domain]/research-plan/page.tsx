@@ -14,7 +14,6 @@ import PAGPublicRoadmapBreadcrumb from "@/components/pag-public-roadmap-breadcru
 import {Organization} from "@prisma/client";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
-import PublicProfileDropdown from "@/components/public-profile-dropdown";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
 import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-profile-recent-activity-card";
 import {Post} from "@/app/condition/[slug]/page";
@@ -33,6 +32,8 @@ import {SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import FeedbackForm from "@/components/feedback-form";
 import React from "react";
 import { PublicRoadmapContent } from "@/components/public-roadmap-content"
+import ContactPAGDialog from "@/components/contact-pag-dialog";
+import {PencilIcon} from "lucide-react";
 
 export async function generateMetadata({
                                            params
@@ -244,7 +245,7 @@ export default async function OrganizationRoadmapPage({
                                                 <div className="mt-2 flex items-center text-gray-500">
                                                     <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                             aria-hidden="true"/>
-                                                    {`501c3`}
+                                                    {`501(c)(3)`}
                                                 </div>
                                             }
                                         </div>
@@ -305,15 +306,20 @@ export default async function OrganizationRoadmapPage({
                                         url={`${organization.subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan/${roadmaps[0].id}`}/>
                                 },
                                 {
-                                    title: "Report an issue",
-                                    icon: <IconFlag/>,
-                                    sheet: <>
-                                        <SheetHeader>
-                                            <SheetTitle>Send Feedback</SheetTitle>
-                                        </SheetHeader>
-                                        <FeedbackForm/>
-                                    </>
-                                }
+                                    title: "Contact patient group",
+                                    icon: <PencilIcon/>,
+                                    dialog: <ContactPAGDialog organization={organization}/>
+                                },
+                                // {
+                                //     title: "Report an issue",
+                                //     icon: <IconFlag/>,
+                                //     sheet: <>
+                                //         <SheetHeader>
+                                //             <SheetTitle>Send Feedback</SheetTitle>
+                                //         </SheetHeader>
+                                //         <FeedbackForm/>
+                                //     </>
+                                // }
                             ]}
                             orientation="vertical"
                             desktopClassName="right-4"

@@ -3,7 +3,7 @@
 import * as React from "react";
 import {ChevronsUpDown, Plus, Check} from "lucide-react";
 import {useSession} from "next-auth/react";
-import {useRouter} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 
 import {
     DropdownMenu,
@@ -24,13 +24,14 @@ import {MemberWithOrganization} from "@/app/(platform)/app/layout";
 import {ProfilePhoto} from "@/components/profile-photo";
 
 export function OrganizationSwitcher({
-                                 memberships,
-                             }: {
+                                         memberships,
+                                     }: {
     memberships: MemberWithOrganization[];
 }) {
     const {isMobile} = useSidebar();
     const router = useRouter();
     const {data: session, update} = useSession();
+    const pathname = usePathname()
     const [activeOrganization, setActiveOrganization] = React.useState<MemberWithOrganization | null>(null);
 
     React.useEffect(() => {
@@ -43,20 +44,29 @@ export function OrganizationSwitcher({
     }, [memberships, session?.user?.organizationId]);
 
     const handleOrganizationChange = async (membership: MemberWithOrganization) => {
-        setActiveOrganization(membership);
+        // setActiveOrganization(membership);
         // await update({
         //     ...session,
         //     organizationId: membership.organizationId,
         //     membership: membership,
         // });
+        console.log(`UPDATE ORGANIZATION: ${membership.organization.name} (${membership.organization.id})`)
+        // await update({
+        //     user: {
+        //         ...session?.user,
+        //         organizationId: membership.organization.id, // Ensure the correct org ID is set
+        //         membership: membership, // Explicitly set membership
+        //     }
+        // });
+
         await update({
-            user: {
-                ...session?.user,
-                organizationId: membership.organization.id, // Ensure the correct org ID is set
-                membership: membership, // Explicitly set membership
-            }
+            ...session,
+            organizationId: membership.organizationId,
+            membership: membership,
         });
-        router.refresh();
+        if (pathname === "/app/profile" || pathname === "/app/settings") {
+            router.refresh()
+        }
     };
 
     return (
@@ -101,13 +111,11 @@ export function OrganizationSwitcher({
                                 className="gap-2 p-2"
                             >
                                 <div className="flex size-6 items-center justify-center">
-                                    {activeOrganization &&
-                                        <ProfilePhoto
-                                            img={activeOrganization?.organization?.image}
-                                            name={activeOrganization?.organization?.name}
-                                            className="size-4 shrink-0"
-                                        />
-                                    }
+                                    <ProfilePhoto
+                                        img={membership?.organization?.image}
+                                        name={membership?.organization?.name}
+                                        className="size-4 shrink-0"
+                                    />
                                 </div>
                                 {membership.organization.name}
                                 {activeOrganization?.id === membership.id && (

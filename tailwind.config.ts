@@ -32,7 +32,8 @@ const config: Config = {
     			},
     			secondary: {
     				DEFAULT: 'hsl(var(--secondary))',
-    				foreground: 'hsl(var(--secondary-foreground))'
+    				foreground: 'hsl(var(--secondary-foreground))',
+					background: 'hsl(var(--secondary-background))'
     			},
     			muted: {
     				DEFAULT: 'hsl(var(--muted))',
@@ -78,7 +79,35 @@ const config: Config = {
     			highlight: {
     				DEFAULT: 'hsl(var(--highlight))',
     				foreground: 'hsl(var(--highlight-foreground))'
-    			}
+    			},
+				asset: {
+    				DEFAULT: 'hsl(var(--asset))',
+    				foreground: 'hsl(var(--asset-foreground))'
+    			},
+				project: {
+    				DEFAULT: 'hsl(var(--project))',
+    				foreground: 'hsl(var(--project-foreground))'
+    			},
+				rfp: {
+    				DEFAULT: 'hsl(var(--rfp))',
+    				foreground: 'hsl(var(--rfp-foreground))'
+    			},
+				planned: {
+    				DEFAULT: 'hsl(var(--planned))',
+    				foreground: 'hsl(var(--planned-foreground))'
+    			},
+				inprogress: {
+    				DEFAULT: 'hsl(var(--inprogress))',
+    				foreground: 'hsl(var(--inprogress-foreground))'
+    			},
+				completed: {
+    				DEFAULT: 'hsl(var(--completed))',
+    				foreground: 'hsl(var(--completed-foreground))'
+    			},
+				blue: {
+					dark: 'hsl(var(--blue-dark))',
+					light: 'hsl(var(--blue-light))'
+				}
     		},
     		boxShadow: {
     			input: '`0px 2px 3px -1px rgba(0,0,0,0.1), 0px 1px 0px 0px rgba(25,28,33,0.02), 0px 0px 0px 1px rgba(25,28,33,0.08)`'

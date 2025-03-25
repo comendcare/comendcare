@@ -17,7 +17,7 @@ export function OrganizationMarketplaceListElement({ organization }: { organizat
         <Card className="h-full w-full text-left">
             <CardHeader className="w-full">
                 <CardTitle className="flex flex-row gap-2 items-center">
-                    <ProfilePhoto 
+                    <ProfilePhoto
                         img={organization?.image}
                         name={organization?.name}
                         className="h-10 w-10"
@@ -49,7 +49,7 @@ export function OrganizationMarketplaceListElement({ organization }: { organizat
                     <div className="m-0 flex items-center text-gray-500">
                         <FaBuildingNgo className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                     aria-hidden="true"/>
-                        501C3
+                        501(c)(3)
                     </div>
                 )}
                 {/* <div className="w-full m-0 flex items-center text-gray-500">

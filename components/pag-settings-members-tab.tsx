@@ -91,7 +91,7 @@ export default async function PAGSettingsMembersTab() {
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
                                 {fetchedMembers?.map((person) => (
-                                    <tr key={person.email}>
+                                    <tr key={person?.email}>
                                         <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                             <div className="flex items-center">
                                                 <div className="h-11 w-11 flex-shrink-0">
@@ -99,7 +99,7 @@ export default async function PAGSettingsMembersTab() {
                                                          src={person.user?.image || createDicebearAvatar(person.user?.name || faker.string.uuid(), 50, 40, "identicon")}
                                                          alt={`${person.user?.name}'s profile picture`}
                                                     /> */}
-                                                    <ProfilePhoto 
+                                                    <ProfilePhoto
                                                         img={person?.user?.image}
                                                         name={person?.user?.name}
                                                         className="h-11 w-11 rounded-full"
@@ -107,8 +107,8 @@ export default async function PAGSettingsMembersTab() {
                                                 </div>
                                                 <div className="ml-4">
                                                     <div
-                                                        className="font-medium text-gray-900">{person.user?.name}</div>
-                                                    <div className="mt-1 text-gray-500">{person.email}</div>
+                                                        className="font-medium text-gray-900">{person?.user?.name}</div>
+                                                    <div className="mt-1 text-gray-500">{person?.email}</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -120,13 +120,13 @@ export default async function PAGSettingsMembersTab() {
                                         {/*    </span>*/}
                                         {/*</td>*/}
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                            {person.title}
+                                            {person?.title}
                                         </td>
                                         <td className="capitalize whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                            {person.role}
+                                            {person?.role}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
-                                            {new Date(person.createdAt).toDateString()}
+                                            {new Date(person?.createdAt).toDateString()}
                                         </td>
                                         <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                                             <MembersDropdown member={person} />

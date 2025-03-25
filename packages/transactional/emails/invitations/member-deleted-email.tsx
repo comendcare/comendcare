@@ -47,10 +47,8 @@ export const MemberDeletedEmail = ({
                         <Section className="mt-[32px]">
                             <Img
                                 src="https://storage.googleapis.com/comend-app-public-permanent/Full%20logo.png"
-                                width="40"
-                                height="37"
-                                alt="Comend"
-                                className="my-0 mx-auto"
+                                alt="Comend logo"
+                                className="w-1/2 my-0 mx-auto"
                             />
                         </Section>
                         <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
@@ -61,7 +59,7 @@ export const MemberDeletedEmail = ({
                         </Text>
                         <Text className="text-black text-[14px] leading-[24px]">
                             {`You've been removed from `} <strong>{organizationName}</strong> on{" "}
-                            <strong>Comend</strong>. If you believe this was a mistake, please contact the admin of your organization.
+                            <strong>Comend</strong>. If you believe this was a mistake, please contact the owners of your organization.
                         </Text>
                         <Section>
                             <Row>

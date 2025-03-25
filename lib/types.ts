@@ -1,5 +1,63 @@
-import type { Option } from "@/components/ui/multiple-selector"
-import {User, Post, Comment, Prisma} from "@prisma/client";
+import {
+    User,
+    Post,
+    Comment,
+    Prisma,
+    Review,
+    Organization,
+    Member,
+    Company,
+    SavedCompany,
+    MilestoneType,
+    ExternalContact,
+    ExternalAttachment,
+    ReviewFeedback
+} from "@prisma/client";
+
+export type Milestone = Omit<Prisma.MilestoneGetPayload<{
+    include: {
+        node: true,
+        contacts: true,
+        attachments: true,
+        types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } }
+    }
+}>, "types"> & {
+    types: Array<{
+        milestoneType?: MilestoneType; // Optional
+        milestoneId?: string; // Optional
+        milestoneTypeId: string; // Required
+    }>;
+};
+
+export interface Option {
+    value: string;
+    label: string;
+    disable?: boolean;
+    /** fixed option that can't be removed. */
+    fixed?: boolean;
+
+    /** Group the options by providing key. */
+    [key: string]: string | boolean | undefined;
+}
+
+export type SavedCompanyData = SavedCompany & {
+    company: Company;
+    milestone: Milestone;
+};
+
+export interface CompanyWithReviews extends Company {
+    reviews: ReviewWithAuthor[];
+}
+
+export type MembershipWithOrganization = Member & {
+    organization?: Organization | null; // Optional because the organization might be null if not fetched
+};
+
+export interface ReviewWithAuthor extends Review {
+    author: User;
+    organization: Organization;
+    feedbacks: ReviewFeedback[];
+}
 
 export type MemberWithUser = Prisma.MemberGetPayload<{
     include: { user: true };
@@ -20,7 +78,9 @@ export type PostWithAuthorAndComments = Post & {
 
 export type PriorityType = 'HIGH' | 'MEDIUM' | 'LOW'
 
-export type NotificationType = 'NEW_TASK'
+export type NotificationType = 'NEW_TASK' | 'NEW_RECOMMENDATION'
+
+export type NodeType = 'ASSET' | 'PROJECT' | 'RFP'
 
 export const KANBAN_NOTIFICATIONS: NotificationType[] = ["NEW_TASK"]
 
@@ -243,6 +303,159 @@ export const ASSOCIATED_SYSTEMS: Option[] = [
     },
 ]
 
+export const ASSOCIATED_CATEGORIES: { id: string; label: string; value: string; description: string }[] = [
+    {
+        id: '1',
+        label: 'Discovery',
+        value: 'discovery',
+        description: 'Focuses on early-stage research, hypothesis generation, and initial identification of potential treatments.',
+    },
+    {
+        id: '2',
+        label: 'Preclinical',
+        value: 'preclinical',
+        description: 'Covers laboratory and animal studies to assess the safety and efficacy of new treatments before clinical trials.',
+    },
+    {
+        id: '3',
+        label: 'Clinical Study',
+        value: 'clinical study',
+        description: 'Involves human trials to evaluate the safety, efficacy, and outcomes of new medical interventions.',
+    },
+    {
+        id: '4',
+        label: 'Disease Models',
+        value: 'disease models',
+        description: 'Utilizes experimental models to study disease mechanisms and test potential treatments.',
+    },
+    {
+        id: '5',
+        label: 'Design & Manufacturing',
+        value: 'design & manufacturing',
+        description: 'Focuses on the engineering, production, and optimization of medical products and therapeutics.',
+    },
+    {
+        id: '6',
+        label: 'Regulatory',
+        value: 'regulatory',
+        description: 'Covers compliance, approval processes, and regulatory frameworks governing medical treatments and interventions.',
+    },
+];
+
+export const BUSINESS_TYPES: { id: string; label: string; value: string; description: string }[] = [
+    {
+        id: '1',
+        label: 'Mid-Sized Business (10-100M TTM Revenue)',
+        value: 'Mid-Sized Business (10-100M TTM Revenue)',
+        description: 'Businesses with total trailing twelve-month revenue between $10M and $100M.',
+    },
+    {
+        id: '2',
+        label: 'Small Business (1-10M TTM Revenue)',
+        value: 'Small Business (1-10M TTM Revenue)',
+        description: 'Businesses with total trailing twelve-month revenue between $1M and $10M.',
+    },
+    {
+        id: '3',
+        label: 'Academic Core Facility',
+        value: 'Academic Core Facility',
+        description: 'Facilities within academic institutions providing research services and resources.',
+    },
+    {
+        id: '4',
+        label: 'New Startup (0-1M TTM Revenue)',
+        value: 'New Startup (0-1M TTM Revenue)',
+        description: 'Early-stage companies with total trailing twelve-month revenue below $1M.',
+    },
+    {
+        id: '5',
+        label: 'Consultant (5 or more employees)',
+        value: 'Consultant (5 or more employees)',
+        description: 'Consulting firms with at least five employees providing specialized services.',
+    },
+    {
+        id: '6',
+        label: 'Large Business (>100M TTM Revenue)',
+        value: 'Large Business (>100M TTM Revenue)',
+        description: 'Businesses with total trailing twelve-month revenue exceeding $100M.',
+    },
+    {
+        id: '7',
+        label: 'Consultant (<5 employees)',
+        value: 'Consultant (<5 employees)',
+        description: 'Independent consultants or small consulting firms with fewer than five employees.',
+    },
+];
+
+export const CRO_CERTIFICATIONS: { id: string; label: string; value: string; description: string }[] = [
+    {
+        id: '1',
+        label: 'Good Clinical Practice (GCP)',
+        value: 'Good Clinical Practice (GCP)',
+        description: 'A set of ethical and scientific quality standards for designing, conducting, recording, and reporting clinical trials.',
+    },
+    {
+        id: '2',
+        label: 'Good Laboratory Practice (GLP)',
+        value: 'Good Laboratory Practice (GLP)',
+        description: 'Regulations ensuring the quality and integrity of non-clinical laboratory studies used for research and regulatory submissions.',
+    },
+    {
+        id: '3',
+        label: 'Good Manufacturing Practice (GMP)',
+        value: 'Good Manufacturing Practice (GMP)',
+        description: 'Regulations ensuring that products are consistently produced and controlled according to quality standards.',
+    },
+    {
+        id: '4',
+        label: 'Clinical Laboratory Improvement Amendments (CLIA)',
+        value: 'Clinical Laboratory Improvement Amendments (CLIA)',
+        description: 'Federal regulations establishing quality standards for laboratory testing to ensure accuracy, reliability, and timeliness of results.',
+    },
+    {
+        id: '5',
+        label: 'Good Clinical Laboratory Practice (GCLP)College of American Pathologists (CAP)',
+        value: 'Good Clinical Laboratory Practice (GCLP)College of American Pathologists (CAP)',
+        description: 'Guidelines ensuring clinical laboratory studies are conducted under regulatory and quality standards for patient safety.',
+    },
+    {
+        id: '6',
+        label: 'American Society for Clinical Pathology (ASCP)',
+        value: 'American Society for Clinical Pathology (ASCP)',
+        description: 'A professional association for pathologists and laboratory professionals setting standards for certification and practice.',
+    },
+    {
+        id: '7',
+        label: 'Diplomate of the American Board of Toxicology  (DABT)',
+        value: 'Diplomate of the American Board of Toxicology  (DABT)',
+        description: 'A certification credential for toxicologists demonstrating expertise in the field of toxicology.',
+    },
+    {
+        id: '8',
+        label: 'Assessment and Accreditation of Laboratory Animal Care (AAALAC)',
+        value: 'Assessment and Accreditation of Laboratory Animal Care (AAALAC)',
+        description: 'A voluntary accreditation organization promoting humane treatment and care of research animals in laboratories.',
+    },
+    {
+        id: '9',
+        label: 'Institutional animal care and use committee (IACUC)',
+        value: 'Institutional animal care and use committee (IACUC)',
+        description: 'A committee overseeing and evaluating all aspects of an institution’s animal care and use program.',
+    },
+    {
+        id: '10',
+        label: 'Office of Laboratory Animal Welfare (OLAW)',
+        value: 'Office of Laboratory Animal Welfare (OLAW)',
+        description: 'A division of the NIH overseeing compliance with policies related to the humane care and use of laboratory animals.',
+    },
+    {
+        id: '11',
+        label: 'United States Department of Agriculture (USDA)',
+        value: 'United States Department of Agriculture (USDA)',
+        description: 'A government agency regulating animal welfare, food safety, and agricultural research to ensure public health and safety.',
+    },
+];
+
 export const MOLECULAR_MECHANISMS: Option[] = [
     {
         id: '1',
@@ -278,9 +491,9 @@ export const MOLECULAR_MECHANISMS: Option[] = [
 
 export const NODE_TYPE_OPTIONS: Option[] = [
     { 
-        label: 'RFP (Request for Proposals)', 
-        value: 'RFP',
-        description: 'An RFP is a milestone you’re interested in supporting through funding and/or other resources.'
+        label: 'Asset', 
+        value: 'ASSET',
+        description: 'An asset is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
     },
     { 
         label: 'Project', 
@@ -288,49 +501,10 @@ export const NODE_TYPE_OPTIONS: Option[] = [
         description: 'A project is a milestone that is being planned or is under development.'
     },
     { 
-        label: 'Asset', 
-        value: 'ASSET',
-        description: 'An asset is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.'
+        label: 'RFP (Request for Proposals)', 
+        value: 'RFP',
+        description: 'An RFP is a milestone you’re interested in supporting through funding and/or other resources.'
     },
-]
-
-export const MILESTONE_TYPE_OPTIONS: Option[] = [
-    { label: 'Basic science', value: 'BASICSCIENCE' },
-    { label: 'Functional study', value: 'FUNCTIONALSTUDY' },
-    { label: 'Patient-derived cell line', value: 'PATIENTDERIVEDCELLLINE' },
-    { label: 'Engineered cell line', value: 'ENGINEEREDCELLLINE' },
-    { label: 'Other cell line', value: 'OTHERCELLLINE' },
-    { label: 'Zebrafish model', value: 'ZEBRAFISHMODEL' },
-    { label: 'Yeast model', value: 'YEASTMODEL' },
-    { label: 'Mouse model', value: 'MOUSEMODEL' },
-    { label: 'Other animal model', value: 'OTHERANIMALMODEL' },
-    { label: 'Organoid', value: 'ORGANOID' },
-    { label: 'Patient registry', value: 'PATIENTREGISTRY' },
-    { label: 'Natural history study', value: 'NATURALHISTORYSTUDY' },
-    { label: 'Biobank', value: 'BIOBANK' },
-    { label: 'Literature review', value: 'LITERATUREREVIEW' },
-    { label: 'Assay', value: 'ASSAY' },
-    { label: 'Construct design', value: 'CONSTRUCTDESIGN' },
-    { label: 'Plasmid production', value: 'PLASMIDPRODUCTION' },
-    { label: 'AAV production', value: 'AAVPRODUCTION' },
-    { label: 'Target identification', value: 'TARGETIDENTIFICATION' },
-    { label: 'Drug screen', value: 'DRUGSCREEN' },
-    { label: 'In-vitro verification', value: 'INVITROVERIFICATION' },
-    { label: 'In-vivo verification', value: 'INVIVOVERIFICATION' },
-    { label: 'Proof-of-concept', value: 'PROOFOFCONCEPT' },
-    { label: 'GMP manufacturing', value: 'GMPMANUFACTURING' },
-    { label: 'Dosing', value: 'DOSING' },
-    { label: 'Efficacy', value: 'EFFICACY' },
-    { label: 'Pharmacology', value: 'PHARMACOLOGY' },
-    { label: 'Toxicology', value: 'TOXICOLOGY' },
-    { label: 'Biomarker', value: 'BIOMARKER' },
-    { label: 'Outcome measure', value: 'OUTCOMEMEASURE' },
-    { label: 'Orphan drug designation', value: 'ORPHANDRUGDESIGNATION' },
-    { label: 'INTERACT meeting', value: 'INTERACTMEETING' },
-    { label: 'FDA listening session', value: 'FDALISTENINGSESSION' },
-    { label: 'IND submission', value: 'INDSUBMISSION' },
-    { label: 'IND approval', value: 'INDAPPROVAL' },
-    { label: 'Other', value: 'OTHER' },
 ]
 
 export type StatusType = 'PLANNED' | 'INPROGRESS' | 'COMPLETED'

@@ -36,7 +36,7 @@ export default function InvitationForm() {
                 toast.error(response.error)
             }
         })
-    }, [setOrganization]);
+    }, [params?.id, setOrganization]);
 
     const form = useForm<z.infer<typeof invitationFormSchema>>({
         mode: "onChange",

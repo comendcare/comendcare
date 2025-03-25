@@ -1,10 +1,10 @@
 "use client"
 import Image from "next/image"
-import React, { useEffect, useId, useRef, useState } from "react"
-import { AnimatePresence, motion } from "framer-motion"
-import { useOutsideClick } from "@/lib/hooks/use-outside-click"
-import Albert from "@/public/profiles/Albert.jpeg"
-import Flawnson from "@/public/profiles/Flawnson.jpg"
+import React, {useEffect, useId, useRef, useState} from "react"
+import {AnimatePresence, motion} from "framer-motion"
+import {useOutsideClick} from "@/lib/hooks/use-outside-click"
+import Albert from "@/public/profiles/Albert.jpg"
+import Flawnson from "@/public/profiles/Flawnson2.jpeg"
 import Sierra from "@/public/profiles/Sierra.jpeg"
 import Bruce from "@/public/profiles/Bruce.jpg"
 import Sanath from "@/public/profiles/Sanath.jpg"
@@ -15,7 +15,7 @@ import Betty from "@/public/profiles/Betty.jpeg"
 import Megan from "@/public/profiles/Megan.png"
 import Tuongvi from "@/public/profiles/Tuongvi.jpeg"
 import Link from "next/link"
-import { FaInstagram, FaLinkedin } from "react-icons/fa6"
+import {FaInstagram, FaLinkedin} from "react-icons/fa6"
 
 export function TeamSection() {
     const [active, setActive] = useState<(typeof cards)[number] | null>(null)
@@ -43,19 +43,16 @@ export function TeamSection() {
 
     return (
         <section className="relative container w-full mx-auto">
-            <div className="max-w-7xl gap-8 mx-auto py-24 md:py-24 mt-16">
-                <h2 className="text-center text-2xl md:text-5xl font-bold pb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-900 to-neutral-600 dark:from-white dark:to-neutral-600">
+            <div className="max-w-7xl gap-8 mx-auto py-24">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4 mx-auto text-center">
                     Meet the team
                 </h2>
-                <p className="text-center text-xl text-muted-foreground dark:text-neutral-300 mt-4 mb-10">
-                    {`Want to chat or collaborate? We're all ears!`}
-                </p>
                 <AnimatePresence>
                     {active && (
                         <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            exit={{opacity: 0}}
                             className="fixed inset-0 bg-black/20 h-full w-full z-10"
                         />
                     )}
@@ -81,7 +78,7 @@ export function TeamSection() {
                                 className="flex absolute top-2 right-2 lg:hidden items-center justify-center bg-white rounded-full h-6 w-6"
                                 onClick={() => setActive(null)}
                             >
-                                <CloseIcon />
+                                <CloseIcon/>
                             </motion.button>
                             <motion.div
                                 layoutId={`card-${active.name}-${id}`}
@@ -124,27 +121,27 @@ export function TeamSection() {
                                             {active.linkedInURL && (
                                                 <motion.a
                                                     layout
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                    exit={{ opacity: 0 }}
+                                                    initial={{opacity: 0}}
+                                                    animate={{opacity: 1}}
+                                                    exit={{opacity: 0}}
                                                     href={active.linkedInURL}
                                                     target="_blank"
                                                     className="text-gray-600 hover:text-gray-800"
                                                 >
-                                                    <FaLinkedin className="h-6 w-6" />
+                                                    <FaLinkedin className="h-6 w-6"/>
                                                 </motion.a>
                                             )}
                                             {active.instagramURL && (
                                                 <motion.a
                                                     layout
-                                                    initial={{ opacity: 0 }}
-                                                    animate={{ opacity: 1 }}
-                                                    exit={{ opacity: 0 }}
+                                                    initial={{opacity: 0}}
+                                                    animate={{opacity: 1}}
+                                                    exit={{opacity: 0}}
                                                     href={active.instagramURL}
                                                     target="_blank"
                                                     className="text-gray-600 hover:text-gray-800"
                                                 >
-                                                    <FaInstagram className="h-6 w-6" />
+                                                    <FaInstagram className="h-6 w-6"/>
                                                 </motion.a>
                                             )}
                                         </div>
@@ -152,9 +149,9 @@ export function TeamSection() {
                                     <div className="pt-4 relative px-4">
                                         <motion.div
                                             layout
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
+                                            initial={{opacity: 0}}
+                                            animate={{opacity: 1}}
+                                            exit={{opacity: 0}}
                                             className="text-neutral-600 text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto dark:text-neutral-400 [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
                                         >
                                             {typeof active.content ===
@@ -177,7 +174,7 @@ export function TeamSection() {
                             onClick={() => setActive(card)}
                             className="p-4 flex flex-col hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
                         >
-                            <div className="flex gap-4 flex-col w-full">
+                            <div className="flex gap-4 flex-col w-full items-center justify-center">
                                 <motion.div
                                     layoutId={`image-${card.name}-${id}`}
                                 >
@@ -188,10 +185,10 @@ export function TeamSection() {
                                         height={100}
                                         src={card.src}
                                         alt={card.name}
-                                        className="object-center h-60 w-full rounded-lg object-cover"
+                                        className="object-center size-52 rounded-full object-cover"
                                     />
                                 </motion.div>
-                                <div className="flex justify-center items-center flex-col">
+                                <div className="flex flex-col justify-center items-center">
                                     <motion.h3
                                         layoutId={`name-${card.name}-${id}`}
                                         className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left text-base"
@@ -199,11 +196,17 @@ export function TeamSection() {
                                         {card.name}
                                     </motion.h3>
                                     <motion.p
-                                        layoutId={`title-${card.name}-${id}`}
-                                        className="text-neutral-600 dark:text-neutral-400 text-center md:text-left text-base"
+                                        layoutId={`title-${card.title}-${id}`}
+                                        className="text-neutral-600 dark:text-neutral-400 text-center text-base"
                                     >
                                         {card.title}
                                     </motion.p>
+                                    <motion.a
+                                        layout
+                                        layoutId={`title-${card.linkedInURL}-${id}`}
+                                    >
+                                        <FaLinkedin className="h-6 w-6"/>
+                                    </motion.a>
                                 </div>
                             </div>
                         </motion.div>
@@ -240,9 +243,9 @@ export const CloseIcon = () => {
             strokeLinejoin="round"
             className="h-4 w-4 text-black"
         >
-            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-            <path d="M18 6l-12 12" />
-            <path d="M6 6l12 12" />
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <path d="M18 6l-12 12"/>
+            <path d="M6 6l12 12"/>
         </motion.svg>
     )
 }
@@ -257,10 +260,7 @@ const cards = [
         content: () => {
             return (
                 <p>
-                    {`I went to school for biomedical engineering, have worked with deep tech
-                    startups and in life sciences research, and spent a past life
-                    volunteering with kids. On the weekend, I try to catch up with the
-                    happenings in genomics.`}
+                    {`Once upon a time, I was an aspiring pediatric neurologist. After 5 years in academic, healthcare, and startup roles, I came to believe that there ought to be better ways — for those who care — to move the needle in medicine.`}
                 </p>
             )
         }
@@ -377,11 +377,7 @@ const cards = [
         content: () => {
             return (
                 <p>
-                    {`Experienced C-suite executive and a thought leader in drug development,
-                    philanthropy, and patient advocacy with professional experience in all
-                    areas of executive management, including strategy, advocacy, medical
-                    affairs, legal, operations, finance, sales, marketing, and IT; success
-                    in small, mid-size, and large businesses, and entrepreneurial ventures.`}
+                    {`Entrepreneur based in Toronto.`}
                 </p>
             )
         }

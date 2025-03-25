@@ -31,12 +31,7 @@ import {deleteUser, leaveOrganization} from "@/lib/actions";
 import {useSession} from "next-auth/react";
 import {revalidatePath} from "next/cache";
 import { signOut } from "next-auth/react"
-
-const FormSchema = z.object({
-    organizationName: z.string().min(2, {
-        message: "Username must be at least 2 characters.",
-    }),
-});
+import {getAllMembershipsFromUserId} from "@/lib/fetchers";
 
 export default function UserSettings() {
     const {data: session, update} = useSession()
@@ -44,30 +39,46 @@ export default function UserSettings() {
     const [isLeaving, setIsLeaving] = useState(false); // Track API call state
 
     const handleLeaveOrganization = async () => {
-        setIsLeaving(true); // Disable the button
-
         try {
-            const response = await leaveOrganization(session, session?.user.organizationId || "")
+            const response = await leaveOrganization(session, session?.user.organizationId || "");
 
-            if (response.success) {
+            if (session && response.success) {
+                // Fetch the latest memberships after leaving
+                const updatedMembershipsResponse = await getAllMembershipsFromUserId(session.user.id);
 
-                await update({
-                    user: {
-                        ...session?.user,
-                        organizationId: null,
-                        membership: null,
+                if (updatedMembershipsResponse.success && updatedMembershipsResponse.data) {
+                    if (updatedMembershipsResponse.data.length > 0) {
+                        // Assign to another membership (pick the first one)
+                        const newMembership = updatedMembershipsResponse.data[0];
+
+                        await update({
+                            user: {
+                                ...session?.user,
+                                organizationId: newMembership.organizationId,
+                                membership: newMembership,
+                            },
+                        });
+
+                        toast.success(`Switched to ${newMembership.organization?.name || "another organization"} successfully.`);
                     }
-                });
+                } else {
+                    // No other memberships left, reset to null
+                    await update({
+                        user: {
+                            ...session?.user,
+                            organizationId: null,
+                            membership: null,
+                        },
+                    });
 
-                revalidatePath("/app/profile")
-                toast.success("Removed from Organization successfully");
+                    toast.success("Removed from Organization successfully.");
+                }
             } else {
                 toast.error("Failed to leave organization. Please try again.");
             }
         } catch (error) {
+            console.error("Error leaving organization:", error);
             toast.error("An error occurred. Please try again later.");
-        } finally {
-            setIsLeaving(false); // Re-enable the button
         }
     };
 
@@ -103,47 +114,47 @@ export default function UserSettings() {
                 </p>
             </div>
 
-            <div className="border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between gap-4">
-                <span className="flex flex-grow flex-col">
-                    <span className="text-sm font-medium leading-6 text-gray-900">
-                        Leave Organization
-                    </span>
-                    <span className="text-sm text-gray-500">
-                        You will be removed from this organization. Your account will remain.
-                    </span>
-                </span>
+            {/*<div className="border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between gap-4">*/}
+            {/*    <span className="flex flex-grow flex-col">*/}
+            {/*        <span className="text-sm font-medium leading-6 text-gray-900">*/}
+            {/*            Leave Organization*/}
+            {/*        </span>*/}
+            {/*        <span className="text-sm text-gray-500">*/}
+            {/*            You will be removed from this organization. Your account will remain.*/}
+            {/*        </span>*/}
+            {/*    </span>*/}
 
-                <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                        <Button variant="destructive">
-                            Leave organization
-                        </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>
-                                Are you absolutely sure?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                                This action cannot be undone. This will remove your membership
-                                from this organization. You will have to rejoin to access it again.
-                            </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction asChild>
-                                <Button
-                                    variant="destructive"
-                                    onClick={handleLeaveOrganization}
-                                    disabled={isLeaving}
-                                >
-                                    {isLeaving ? "Leaving..." : "Continue"}
-                                </Button>
-                            </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            </div>
+            {/*    <AlertDialog>*/}
+            {/*        <AlertDialogTrigger asChild>*/}
+            {/*            <Button variant="destructive">*/}
+            {/*                Leave organization*/}
+            {/*            </Button>*/}
+            {/*        </AlertDialogTrigger>*/}
+            {/*        <AlertDialogContent>*/}
+            {/*            <AlertDialogHeader>*/}
+            {/*                <AlertDialogTitle>*/}
+            {/*                    Are you absolutely sure?*/}
+            {/*                </AlertDialogTitle>*/}
+            {/*                <AlertDialogDescription>*/}
+            {/*                    This action cannot be undone. This will remove your membership*/}
+            {/*                    from this organization. You will have to rejoin to access it again.*/}
+            {/*                </AlertDialogDescription>*/}
+            {/*            </AlertDialogHeader>*/}
+            {/*            <AlertDialogFooter>*/}
+            {/*                <AlertDialogCancel>Cancel</AlertDialogCancel>*/}
+            {/*                <AlertDialogAction asChild>*/}
+            {/*                    <Button*/}
+            {/*                        variant="destructive"*/}
+            {/*                        onClick={handleLeaveOrganization}*/}
+            {/*                        disabled={isLeaving}*/}
+            {/*                    >*/}
+            {/*                        {isLeaving ? "Leaving..." : "Continue"}*/}
+            {/*                    </Button>*/}
+            {/*                </AlertDialogAction>*/}
+            {/*            </AlertDialogFooter>*/}
+            {/*        </AlertDialogContent>*/}
+            {/*    </AlertDialog>*/}
+            {/*</div>*/}
 
             <div className="border rounded-md p-8 border-red-200 pt-6 flex items-center justify-between gap-4">
                 <span className="flex flex-grow flex-col">

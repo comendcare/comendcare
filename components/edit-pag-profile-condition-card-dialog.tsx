@@ -6,17 +6,17 @@ import {useForm, UseFormReturn} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useEffect, useState} from "react";
 import {updateCondition} from "@/lib/actions";
-import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
+import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@/lib/types";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
-import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
+import MultipleSelector from "@/components/ui/multiple-selector";
 import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import { getConditionsFromOrganizationId } from "@/lib/fetchers";
-import {FaPen, FaUpload} from "react-icons/fa6";
+import {FaPencil} from "react-icons/fa6";
 import {
     Dialog,
     DialogContent,
@@ -65,8 +65,10 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                         const fetchedValues = conditions.map((condition) => ({
                             disorder: condition.name || "",
                             summary: condition.summary || "",
+                            therapeutics: condition.therapeuticsInDevelopment.map((ther) => ({label: ther, value: ther})) || [],
                             categories: condition.diseaseCategories.map((cat) => ({label: cat, value: cat})) || [],
                             modalities: condition.interestedModalities.map((mod) => ({label: mod, value: mod})) || [],
+                            causal: condition.causalGenes.map((gene) => ({label: gene, value: gene})) || [],
                             genes: condition.associatedGenes.map((gene) => ({label: gene, value: gene})) || [],
                             systems: condition.associatedSystems.map((system) => ({
                                 label: system,
@@ -122,8 +124,8 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 prevalenceNumerator: values.prevalenceNumerator ? values.prevalenceNumerator : null,
                 prevalenceDenominator: values.prevalenceDenominator ? values.prevalenceDenominator : null,
                 numberOfPatientsEngaged: values.engaged ? parseInt(values.engaged, 10) : null,
-                nationalEstimatedPopulation: values.engaged ? parseInt(values.national ?? "0", 10) : null,
-                globalEstimatedPopulation: values.engaged ? parseInt(values.global ?? "0", 10) : null,
+                nationalEstimatedPopulation: values.national ? parseInt(values.national, 10) || null : null,
+                globalEstimatedPopulation: values.global ? parseInt(values.global, 10) || null : null,
                 relevantDiseaseMechanisms: values.mechanisms || [],
                 causalGenes: values.causal?.map((item) => item.label) || [],
                 associatedGenes: values.genes?.map((item) => item.label) || [],
@@ -221,18 +223,18 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                 <DialogTrigger asChild>
                     <Button
                         variant="ghost"
-                        className="gap-x-2 organization-profile-tour-step3"
+                        className="gap-x-2"
                     >
-                        <FaPen/>
+                        <FaPencil/>
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
-                            Edit organization profile
+                            Edit condition
                         </DialogTitle>
                         <DialogDescription>
-                            {`Make changes to your profile here. Click save when you're done.`}
+                            {`Make changes to your condition here. Click save when you're done.`}
                         </DialogDescription>
                     </DialogHeader>
                     <Form {...editResearchForm}>

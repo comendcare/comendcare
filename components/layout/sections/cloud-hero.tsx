@@ -3,54 +3,56 @@ import {
     HeroHighlight,
     Highlight
 } from "@/components/layout/sections/hero-highlight"
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion"
-import { Label } from "@/components/ui/label"
-import { FancyInput } from "@/components/ui/fancy-input"
-import React, { useEffect, useRef, useState } from "react"
-import { LabelInputContainer } from "@/components/contact-form"
-import { LinkPreview } from "@/components/link-preview"
+import {motion, useMotionValue, useSpring, useTransform} from "framer-motion"
+import {Label} from "@/components/ui/label"
+import {FancyInput} from "@/components/ui/fancy-input"
+import React, {useEffect, useRef, useState} from "react"
+import {LabelInputContainer} from "@/components/contact-form"
+import {LinkPreview} from "@/components/link-preview"
 import Image from "next/image"
 import librareyLogo from "@/public/logos/librarey-logo.svg"
 import scimanticLogo from "@/public/logos/scimantic-logo.png"
-import { BetaSignup } from "@/components/beta-signup"
+import {BetaSignup} from "@/components/beta-signup"
+import {PulsatingButton} from "@/components/ui/pulsating-button";
+import {useRouter} from "next/navigation";
 
 const bubbles = [
-    { title: "Patient groups", href: "#" },
-    { title: "CROs", href: "#" },
-    { title: "CDMOs", href: "#" },
-    { title: "Biotechs", href: "#" },
-    { title: "Pharma", href: "#" },
-    // { title: "Labs", href: "#" },
-    // { title: "PIs", href: "#" },
-    // { title: "Post-docs", href: "#" },
-    // { title: "Consultants", href: "#" },
-    { title: "Grants", href: "#" },
-    // { title: "Research agreements", href: "#" },
-    // { title: "IP licenses", href: "#" },
-    { title: "Animal models", href: "#" },
-    { title: "Cell lines", href: "#" },
-    { title: "Organoids", href: "#" },
-    { title: "Registries", href: "#" },
-    { title: "Natural history", href: "#" },
-    { title: "Biomarkers", href: "#" },
-    { title: "Biobanks", href: "#" },
-    { title: "AAVs", href: "#" },
-    // { title: "Nanoparticles", href: "#" },
-    { title: "Gene editing", href: "#" },
-    { title: "CRISPR", href: "#" },
-    { title: "ASOs", href: "#" },
-    { title: "RNA therapy", href: "#" },
-    { title: "Prime editing", href: "#" },
-    { title: "Epilepsy", href: "#" },
-    { title: "Autism", href: "#" },
-    { title: "Mitochondrial diseases", href: "#" },
-    { title: "Neurodegeneration", href: "#" }
-    // { title: "Lawyers", href: "#" },
-    // { title: "Accountants", href: "#" },
-    // { title: "Web designers", href: "#" },
-]
+    {title: "Basic science", href: "#"},
+    {title: "Functional study", href: "#"},
+    {title: "Natural history study", href: "#"},
+    {title: "Patient registry", href: "#"},
+    {title: "Biomarker", href: "#"},
+    {title: "Outcome measure", href: "#"},
+    {title: "Biobank", href: "#"},
+    {title: "Patient-derived cell line", href: "#"},
+    {title: "Engineered cell line", href: "#"},
+    {title: "Mouse model", href: "#"},
+    {title: "Other disease model", href: "#"},
+    {title: "Target validation", href: "#"},
+    {title: "Assay development", href: "#"},
+    {title: "Drug screen", href: "#"},
+    {title: "Efficacy study", href: "#"},
+    {title: "Dose finding study", href: "#"},
+    {title: "Toxicology study", href: "#"},
+    {title: "Biodistribution study", href: "#"},
+    {title: "Gene therapy production", href: "#"},
+    {title: "GMP manufacturing", href: "#"},
+    {title: "INTERACT meeting", href: "#"},
+    {title: "Pre-IND meeting", href: "#"},
+    {title: "IND submission", href: "#"},
+    {title: "Site selection", href: "#"},
+    {title: "Patient recruitment", href: "#"},
+    {title: "Trial design", href: "#"},
+    {title: "Phase 1", href: "#"},
+    {title: "Phase 1/2", href: "#"},
+    {title: "Phase 2", href: "#"},
+    {title: "Phase 3", href: "#"},
+    {title: "FDA approval", href: "#"},
+    {title: "Phase 4", href: "#"}
+];
 
 export const CloudHeroSection = () => {
+    const router = useRouter()
     const containerRef = useRef<HTMLDivElement>(null)
     const heroRef = useRef<HTMLDivElement>(null) // Ref for hero section
     const [isHeroInView, setIsHeroInView] = useState(false) // State to track if hero is in view
@@ -108,8 +110,8 @@ export const CloudHeroSection = () => {
                     Math.random() < 0.5
                         ? marginX + Math.random() * (containerWidth * 0.2) // Left side
                         : containerWidth -
-                          marginX -
-                          Math.random() * (containerWidth * 0.2) // Right side
+                        marginX -
+                        Math.random() * (containerWidth * 0.2) // Right side
                 // Random y position within the entire height
                 y = marginY + Math.random() * (containerHeight * spreadFactorY)
             } else {
@@ -118,8 +120,8 @@ export const CloudHeroSection = () => {
                     Math.random() < 0.5
                         ? marginY + Math.random() * (containerHeight * 0.2) // Top side
                         : containerHeight -
-                          marginY -
-                          Math.random() * (containerHeight * 0.2) // Bottom side
+                        marginY -
+                        Math.random() * (containerHeight * 0.2) // Bottom side
                 // Random x position within the entire width
                 x = marginX + Math.random() * (containerWidth * spreadFactorX)
             }
@@ -127,11 +129,11 @@ export const CloudHeroSection = () => {
             x -= 100 // move a little left
 
             isValidPosition = !cloudPositions.some(bubble =>
-                areBubblesTooClose(bubble, { x, y })
+                areBubblesTooClose(bubble, {x, y})
             )
         }
 
-        cloudPositions.push({ x, y })
+        cloudPositions.push({x, y})
     })
 
     useEffect(() => {
@@ -166,7 +168,7 @@ export const CloudHeroSection = () => {
                 const entry = entries[0]
                 setIsHeroInView(entry.isIntersecting) // Set state when hero content is in view
             },
-            { threshold: 0.5 } // Adjust threshold to when the hero is 50% in view
+            {threshold: 0.5} // Adjust threshold to when the hero is 50% in view
         )
 
         if (heroRef.current) {
@@ -195,7 +197,7 @@ export const CloudHeroSection = () => {
         const x = useTransform(distX, val => val / 20 + bubbleX)
         const y = useTransform(distY, val => val / 20 + bubbleY)
 
-        return { x, y }
+        return {x, y}
     }
 
     return (
@@ -212,9 +214,9 @@ export const CloudHeroSection = () => {
             >
                 {/* Decorative banner with attribution */}
                 <motion.div
-                    initial={{ opacity: 0, y: 50 }} // More pronounced drop effect
-                    animate={{ opacity: 1, y: [50, -10, 0] }}
-                    transition={{ duration: 0.8, ease: [0.4, 0.0, 0.2, 1] }}
+                    initial={{opacity: 0, y: 50}} // More pronounced drop effect
+                    animate={{opacity: 1, y: [50, -10, 0]}}
+                    transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                     className="mt-8 flex justify-center sm:justify-start"
                 >
                     <div
@@ -255,40 +257,53 @@ export const CloudHeroSection = () => {
                 <HeroHighlight>
                     <motion.h1
                         id="hero-section"
-                        initial={{ opacity: 0, y: 50 }}
-                        animate={{ opacity: 1, y: [50, -10, 0] }}
-                        transition={{ duration: 0.8, ease: [0.4, 0.0, 0.2, 1] }}
+                        initial={{opacity: 0, y: 50}}
+                        animate={{opacity: 1, y: [50, -10, 0]}}
+                        transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                         className="max-w-screen-md text-4xl md:text-5xl lg:text-6xl font-bold text-neutral-700 dark:text-white leading-relaxed lg:leading-snug"
                     >
                         Where patient groups
                         <Highlight className="text-black dark:text-white">
-                            drive research
+                            advance treatments
                         </Highlight>
                     </motion.h1>
                 </HeroHighlight>
 
-                <motion.p
+                <motion.div
                     id="hero-description"
                     initial={{opacity: 0, y: 50}}
                     animate={{opacity: 1, y: [50, -10, 0]}}
                     transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
-                    className="max-w-screen-sm text-2xl"
+                    className="flex flex-col justify-center items-center mx-auto space-y-4"
                 >
-                    {`Build your research plan, discover partners, and launch new projects.`}
-                </motion.p>
+                    <p className="max-w-screen-sm text-2xl">
+                        {`Translate research into impact — strategize, collaborate, and showcase your progress.`}
+                    </p>
+                    <PulsatingButton
+                        className="w-fit"
+                        onClick={() => {
+                            window.scrollTo({
+                                top: document.documentElement.scrollHeight,
+                                behavior: 'smooth' // Makes it scroll smoothly
+                            });
+                        }}
+                    >
+                        Schedule a demo
+                    </PulsatingButton>
+                </motion.div>
             </div>
 
             {/* Render bubbles whether or not the hero is in view, but hide them until hero is in view */}
             <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: [50, -10, 0] }}
-                transition={{ duration: 0.8, ease: [0.4, 0.0, 0.2, 1] }}
+                initial={{opacity: 0, y: 50}}
+                animate={{opacity: 1, y: [50, -10, 0]}}
+                transition={{duration: 0.8, ease: [0.4, 0.0, 0.2, 1]}}
                 className="hidden sm:block absolute inset-0 z-0 pointer-events-none opacity-50"
                 ref={containerRef}
                 aria-hidden="true"
             >
                 {bubbles.map((bubble, index) => {
-                    const { x, y } = CalculateMovement(
+                    const {x, y} = CalculateMovement(
                         cloudPositions[index].x,
                         cloudPositions[index].y
                     )
@@ -304,8 +319,8 @@ export const CloudHeroSection = () => {
                                 zIndex: -1,
                                 opacity: isHeroInView ? 1 : 0
                             }} // Control visibility here
-                            whileHover={{ scale: 1.4 }} // Increased scale on hover
-                            whileTap={{ scale: 0.8 }} // More exaggerated tap feedback
+                            whileHover={{scale: 1.4}} // Increased scale on hover
+                            whileTap={{scale: 0.8}} // More exaggerated tap feedback
                             transition={{
                                 type: "spring",
                                 stiffness: 100,

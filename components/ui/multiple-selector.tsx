@@ -14,17 +14,7 @@ import {cn} from '@/lib/utils';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {useMutationObserver} from "@/lib/hooks/use-mutation-observer";
 import { ScrollArea } from './scroll-area';
-
-export interface Option {
-    value: string;
-    label: string;
-    disable?: boolean;
-    /** fixed option that can't be removed. */
-    fixed?: boolean;
-
-    /** Group the options by providing key. */
-    [key: string]: string | boolean | undefined;
-}
+import { Option } from '@/lib/types';
 
 interface GroupOption {
     [key: string]: Option[];
@@ -456,10 +446,10 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 }}
             >
                 <div className="relative flex flex-wrap gap-1">
-                {selected.map((option) => {
+                {selected.map((option, index) => {
                     return (
                         <Badge
-                            key={option.value}
+                            key={index}
                             className={cn(
                                 'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
                                 'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
@@ -549,7 +539,10 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                 <CommandList>
                     {open && (
                         <div className="absolute top-0 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
-                            <ScrollArea className="max-h-[300px] overflow-auto">
+                            <ScrollArea 
+                                className="max-h-[300px] overflow-auto"
+                                onMouseDown={(e) => e.preventDefault()} // Prevent focus loss on input
+                            >
                                 {isLoading && (
                                     <>{loadingIndicator}</>
                                 )}
@@ -560,9 +553,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                         className="h-full"
                                     >
                                         {Object.entries(selectables).flatMap(value => value[1]).length > 0 && (
-                                            Object.entries(selectables).flatMap(value => value[1]).map(framework => {
+                                            Object.entries(selectables).flatMap(value => value[1]).map((framework, index) => {
                                                 return (
-                                                    <HoverCard openDelay={0} closeDelay={0}>
+                                                    <HoverCard openDelay={0} closeDelay={0} key={index}>
                                                         <HoverCardTrigger>
                                                         <CommandItem
                                                             key={framework.value}
@@ -571,9 +564,12 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                                 e.stopPropagation();
                                                             }}
                                                             onSelect={(value) => {
-                                                            setInputValue("");
-                                                            setSelected((prev) => [...prev, framework]);
-                                                                if (selected.length + 1 >= maxSelected) setOpen(false)
+                                                                setInputValue("")
+                                                                setSelected((prev) => {
+                                                                    if (selected.length + 1 >= maxSelected) setOpen(false)
+                                                                    onChange?.([...prev, framework])
+                                                                    return [...prev, framework]
+                                                                });
                                                             }}
                                                             className={"cursor-pointer multiselect-item"}
                                                         >

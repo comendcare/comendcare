@@ -38,15 +38,7 @@ const environments: Record<Recency, string> = {
 };
 
 const selector = (state: RoadmapState) => ({
-    selectedNodeId: state.selectedNodeId,
-    setSelectedNodeId: state.setSelectedNodeId,
-    milestones: state.milestones,
-    nodes: state.nodes,
-    setNodes: state.setNodes,
-    edges: state.edges,
-    onEdgesChange: state.onEdgesChange,
-    onConnect: state.onConnect,
-    addNodes: state.addNodes,
+    addMilestones: state.addMilestones
 })
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }: { assets: any[], rfps: any[], isPrivate: boolean }) => {
@@ -55,65 +47,20 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
     const pathname = usePathname()
     const store = useStoreApi()
     const {
-        selectedNodeId,
-        setSelectedNodeId,
-        milestones,
-        nodes,
-        setNodes: setDbNodes,
-        edges,
-        onEdgesChange,
-        addNodes,
-        onConnect,
+        addMilestones
     } = useRoadmapStore(useShallow(selector))
     const {data: session} = useSession()
-
-    // Add a empty milestone node
-    // if a position is provided, place at the given coordinates
-    // if a position is not provided, place in the center
-    const addMilestone = async (type: "ASSET" | "RFP", title: string) => {
-        // get center of viewport: https://stackoverflow.com/questions/76349086/how-can-i-prevent-nodes-from-being-added-outside-the-view-area-in-react-flow
-        const {
-            height,
-            width,
-            transform: [transformX, transformY, zoomLevel]
-        } = store.getState()
-
-        const zoomMultiplier = 1 / zoomLevel
-        const centerX =
-            -transformX * zoomMultiplier + (width * zoomMultiplier) / 2
-        const centerY =
-            -transformY * zoomMultiplier + (height * zoomMultiplier) / 2
-
-        const id = nanoid()
-        const newNode = {
-            id: id,
-            type,
-            position: {
-                x: centerX,
-                y: centerY
-            },
-            data: {
-                id: nanoid(),
-                nodeId: id,
-                title,
-                private: true
-            }
-        }
-
-        await addNodes([newNode])
-        return newNode
-    }
 
     if (assets && rfps) {
         return (
             <Card className="organization-profile-tour-step5">
-                <CardHeader className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                    <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
-                        Milestones
-                    </CardTitle>
-                </CardHeader>
+                {/*<CardHeader className="flex flex-col md:flex-row items-center justify-between space-y-0">*/}
+                {/*    <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">*/}
+                {/*        Milestones*/}
+                {/*    </CardTitle>*/}
+                {/*</CardHeader>*/}
 
-                <CardContent className="grid md:grid-cols-2 gap-4">
+                <CardContent className="grid md:grid-cols-2 gap-4 mt-8">
                     <div className="flex flex-col space-y-4">
                         <span className="flex gap-2">
                             <h3 className={cn("scroll-m-20 text-xl tracking-tight font-semibold")}>
@@ -141,15 +88,19 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             <div className="flex flex-col gap-2">
                                 <Button
                                     className="w-fit"
+                                    variant={"secondary"}
                                     onClick={async () => {
                                         if (session?.user?.organizationId) {
                                             const response = await getRoadmap(session.user.organizationId)
                                             if (response.success && response.data && response.data?.id) {
-                                                const newRFP = await addMilestone("RFP", "New RFP")
+                                                const newRFPs = await addMilestones([{
+                                                    nodeType: "RFP",
+                                                    title: "New RFP"
+                                                }])
 
-                                                if (newRFP?.id) {
+                                                if (newRFPs?.[0]?.id) {
                                                     await sleep(100)
-                                                    router.push(`/app/research-plan?milestone=${newRFP.id}`)
+                                                    router.push(`/app/research-plan?milestone=${newRFPs?.[0]?.id}`)
                                                     router.refresh()
                                                 }
                                             } else {
@@ -231,15 +182,19 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             <div className="flex flex-col gap-2">
                                 <Button
                                     className="w-fit"
+                                    variant={"secondary"}
                                     onClick={async () => {
                                         if (session?.user?.organizationId) {
                                             const response = await getRoadmap(session.user.organizationId)
                                             if (response.success && response.data && response.data?.id) {
-                                                const newAsset = await addMilestone("ASSET", "New Asset")
+                                                const newAssets = await addMilestones([{
+                                                    nodeType: "ASSET",
+                                                    title: "New Asset"
+                                                }])
         
-                                                if (newAsset) {
+                                                if (newAssets?.[0]) {
                                                     await sleep(100)
-                                                    router.push(`/app/research-plan?milestone=${newAsset.id}`)
+                                                    router.push(`/app/research-plan?milestone=${newAssets?.[0]?.id}`)
                                                     router.refresh()
                                                 }
                                             } else {

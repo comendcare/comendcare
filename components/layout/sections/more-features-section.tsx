@@ -5,12 +5,12 @@ import {FaCircleCheck} from "react-icons/fa6";
 
 
 const features = [
-    "Multi-tenancy and member controls",
-    "Analytics and data insights",
-    "Task board and project management",
-    "Research plan and milestone templates",
-    "Sharable research plans",
-    "Privacy controls",
+    "Shareable patient group profiles",
+    "Team workspaces",
+    "Detailed privacy controls",
+    "Biosample management",
+    "Analytics and data visualizations",
+    "AI recommendations",
 ]
 
 export default function MoreFeaturesSection() {
@@ -26,7 +26,7 @@ export default function MoreFeaturesSection() {
             <div className="flex flex-col justify-center items-center md:w-1/2 mx-auto text-center">
                 <div>
                     <h3 className="text-3xl md:text-4xl font-bold mb-4">
-                        Powerful features to accelerate research
+                        Intuitive features for modern patient groups
                     </h3>
                 </div>
             </div>

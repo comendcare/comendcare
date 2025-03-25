@@ -12,7 +12,7 @@ import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
+import MultipleSelector from "@/components/ui/multiple-selector";
 import {Slider} from "@/components/ui/slider";
 import {Separator} from "@/components/ui/separator";
 import {FaQuestionCircle} from "react-icons/fa";
@@ -22,6 +22,7 @@ import {useEffect, useState} from "react";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {formatMoney} from "@/lib/utils";
 import MoneyInput from "@/components/money-input";
+import { Option } from "@/lib/types";
 
 export const financesFormSchema = z.object({
     // raising: z.enum(["yes", "no-but", "no"]).optional(),
@@ -77,7 +78,7 @@ export default function FinancesOnboardingForm(
         try {
             const response = await updateOrganization(formData, session.data.user.organizationId);
             toast.success("Organization updated successfully!");
-            router.push("/app/profile");
+            router.push("/app/marketplace/cro");
         } catch (error) {
             toast.error("Failed to update organization.");
         }

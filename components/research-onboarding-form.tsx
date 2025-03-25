@@ -12,7 +12,7 @@ import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import MultipleSelector, {Option} from "@/components/ui/multiple-selector";
+import MultipleSelector from "@/components/ui/multiple-selector";
 import {Slider} from "@/components/ui/slider";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Separator} from "@/components/ui/separator";
@@ -30,7 +30,7 @@ import LoadingDots from "@/components/icons/loading-dots";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {Organization} from "@prisma/client";
 import {concat} from "lodash";
-import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS} from "@/lib/types";
+import {ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS, Option} from "@/lib/types";
 import mixpanel from "mixpanel-browser";
 
 export const optionSchema = z.object({
@@ -48,9 +48,9 @@ export const researchFormSchema = z.object({
             message: "The name of your condition needs to be shorter than 60 characters",
         }),
     summary: z.string()
-        .min(30, {
-            message: "The summary of your condition needs to be longer than 30 characters",
-        })
+        // .min(30, {
+        //     message: "The summary of your condition needs to be longer than 30 characters",
+        // })
         .max(500, {
             message: "The name of your condition needs to be shorter than 500 characters",
         })
@@ -737,7 +737,7 @@ export default function ResearchOnboardingForm(
                 {/*                                                <FaBuildingNgo*/}
                 {/*                                                    className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"*/}
                 {/*                                                    aria-hidden="true"/>*/}
-                {/*                                                {"501c3"}*/}
+                {/*                                                {"501(c)(3)"}*/}
                 {/*                                            </div>*/}
                 {/*                                        </div>*/}
                 {/*                                    }*/}

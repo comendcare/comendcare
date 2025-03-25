@@ -19,7 +19,7 @@ export default function CreateOrganizationFinancesPage() {
 
                         <Separator/>
                         <FinancesOnboardingForm
-                            nextLink={"/app/profile"}
+                            nextLink={"/app/marketplace/cro"}
                             previousLink={"/app/create/new-organization-research"}
                             showSkip={false}
                         />

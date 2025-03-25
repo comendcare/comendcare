@@ -51,7 +51,7 @@ export const RoadmapCard = ({
             <Card className="organization-profile-tour-step4">
                 <CardHeader className="w-full pt-6 pb-2 space-y-4">
                     <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                        <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                        <CardTitle className="scroll-m-20 text-2xl font-bold tracking-tight">
                             Research Plan
                         </CardTitle>
                         {pathname === "/app/profile" &&
@@ -115,10 +115,10 @@ export const NoResearchPlanCard = ({isPublic}: {isPublic: Boolean}) => {
                         height={400}
                     />
                     <p className="text-lg text-stone-500">
-                        You do not have any research plans yet. Create one to get started.
+                        You do not have a research plan yet. Create one to get started.
                     </p>
                     {!isPublic && (
-                        <Link 
+                        <a 
                             href={"/app/research-plan"}
                             className={cn(
                                 buttonVariants({ variant: "default" }),
@@ -127,7 +127,7 @@ export const NoResearchPlanCard = ({isPublic}: {isPublic: Boolean}) => {
                         >
                                 <FaPlus />
                                 Create a research plan
-                        </Link>
+                        </a>
                     )}
                 </div>
             </CardContent>
@@ -142,7 +142,7 @@ export const UnderDevelopmentCard = ({isPublic}: {isPublic: Boolean}) => {
         <Card className="organization-profile-tour-step4">
             <CardHeader className="w-full pt-6 pb-2 space-y-4">
                 <div className="flex flex-col md:flex-row items-center justify-between space-y-0">
-                    <CardTitle className={cn("scroll-m-20 text-3xl font-bold tracking-tight")}>
+                    <CardTitle className="scroll-m-20 text-3xl font-bold tracking-tight">
                         Research Plan
                     </CardTitle>
                     {!isPublic &&

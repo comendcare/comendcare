@@ -60,7 +60,7 @@ export default function Profile({isCollapsed = false}: {isCollapsed?: boolean })
                         alt={session?.user?.name ?? "User avatar"}
                         className="h-8 w-8 rounded-full"
                     /> */}
-                    <ProfilePhoto 
+                    <ProfilePhoto
                         img={userData?.data?.image}
                         name={userData?.data?.name}
                         className="h-8 w-8 rounded-full"
@@ -95,7 +95,7 @@ export default function Profile({isCollapsed = false}: {isCollapsed?: boolean })
                     alt={session?.user?.name ?? "User avatar"}
                     className="h-6 w-6 rounded-full"
                 /> */}
-                <ProfilePhoto 
+                <ProfilePhoto
                     img={userData?.data?.image}
                     name={userData?.data?.name}
                     className="h-8 w-8 rounded-full"
