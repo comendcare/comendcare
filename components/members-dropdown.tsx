@@ -35,7 +35,6 @@ const formSchema = z.object({
 
 export default async function MembersDropdown({member}: { member: MemberWithUser }) {
     const {data: session, update} = useSession()
-    const [memberships, setMemberships] = useState<MembershipWithOrganization[]>();
     console.log(session)
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -55,7 +54,6 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
 
                     // Map the response to the correct structure if needed
                     if (response.success && response.data) {
-                        setMemberships(response.data);
                     } else {
                         console.error(response.error)
                         toast.error(response.error)
@@ -77,6 +75,19 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
 
             if (response.success && response.data) {
                 toast.success(`Successfully updated your membership.`)
+
+                if (session.user.id === member.user.id) {
+                    await update({
+                        user: {
+                            ...session.user,  // Keep all existing properties intact
+                            membership: {
+                                ...session.user.membership, // Preserve existing membership details
+                                title: values.title,
+                                role: values.role
+                            }
+                        }
+                    });
+                }
             } else {
                 console.error(response.error)
                 toast.error(response.error)
@@ -140,6 +151,14 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
             toast.error("An error occurred. Please try again later.");
         }
     };
+
+    const canEditMembership = session?.user?.id === member?.user?.id || session?.user?.membership?.role === "owner";
+    const canLeaveOrganization = session?.user?.id === member?.user?.id;
+    const canRevokeMembership = session?.user?.membership?.role === "owner" && session?.user?.id !== member?.user?.id;
+
+    const showDropdownTrigger = canEditMembership || canLeaveOrganization || canRevokeMembership;
+
+    if (!showDropdownTrigger) return null;
 
     return (
         <Dialog>

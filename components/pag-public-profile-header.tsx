@@ -68,7 +68,7 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                                 </div>
                                 <div
                                     className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
-                                    {organization?.moneyRaised &&
+                                    {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
                                         <div className="mt-2 flex items-center text-gray-500">
                                             <FaCircleDollarToSlot
                                                 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
