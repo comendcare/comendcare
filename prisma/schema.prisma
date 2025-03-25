@@ -220,9 +220,10 @@ model Node {
 }
 
 model Milestone {
-  id               String                     @id @unique @default(uuid())
-  createdAt        DateTime                   @default(now())
-  updatedAt        DateTime                   @default(now()) @updatedAt
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
   title            String
   description      String?
   notes            String?
@@ -240,6 +241,9 @@ model Milestone {
   timelineOrder    Int                        @default(0)
   nodeType         String                     @default("PROJECT")
 
+  assets Asset[]
+  rfps   RFP[]
+
   roadmapId      String
   roadmap        Roadmap      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
   organizationId String
@@ -249,6 +253,47 @@ model Milestone {
 
   reviews        MilestoneToReview[]
   savedCompanies SavedCompany[]
+}
+
+model Asset {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  title       String
+  description String?
+  private     Boolean              @default(true)
+  budget      Int?
+  attachments ExternalAttachment[]
+  contacts    ExternalContact[]
+  notes       String?
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  milestoneId    String?
+  milestone      Milestone?   @relation(fields: milestoneId, references: [id])
+}
+
+model RFP {
+  id        String   @id @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  title       String
+  description String?
+  private     Boolean              @default(true)
+  budget      Int?
+  endDate     DateTime?
+  startDate   DateTime?
+  openTo      String[]
+  attachments ExternalAttachment[]
+  contacts    ExternalContact[]
+  notes       String?
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  milestoneId    String?
+  milestone      Milestone?   @relation(fields: milestoneId, references: [id])
 }
 
 model MilestoneToReview {
@@ -348,31 +393,6 @@ model ChecklistItem {
   task          Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
-model RFP {
-  id            String               @id @unique @default(uuid())
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-  name          String
-  funding       Int
-  description   String?
-  researchFocus String               @default("NOTYPE")
-  openTo        String[]
-  startDate     DateTime?
-  endDate       DateTime?
-  attachments   ExternalAttachment[]
-  contacts      ExternalContact[]
-}
-
-model Asset {
-  id          String               @id @unique @default(uuid())
-  name        String
-  description String?
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  attachments ExternalAttachment[]
-  contacts    ExternalContact[]
-}
-
 model ExternalAttachment {
   id   String  @id @unique @default(uuid())
   name String?
@@ -459,6 +479,8 @@ model Organization {
   PlatformNotification     PlatformNotification[]
   reviews                  Review[]
   savedCompanies           SavedCompany[]
+  Asset                    Asset[]
+  RFP                      RFP[]
 
   @@index([userId])
 }
