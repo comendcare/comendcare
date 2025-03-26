@@ -9,7 +9,6 @@ import {
     CardFooter,
     CardHeader,
 } from "@/components/ui/card";
-import {Icons} from "@/components/icons";
 import {PostWithAuthorAndComments} from "@/lib/types";
 import {Button} from "@/components/ui/button";
 import {cn, formatDates} from "@/lib/utils";
@@ -26,7 +25,8 @@ import {deletePost} from "@/lib/actions";
 import {useRouter} from "next/navigation";
 import {PostDialog} from "@/components/post-dialog";
 import PostActionBar from "@/components/post-action-bar";
-import { Ellipsis } from "lucide-react";
+import { Ellipsis, Trash } from "lucide-react";
+import Spinner from "./ui/spinner";
 
 interface PostProps {
     data: PostWithAuthorAndComments;
@@ -121,9 +121,9 @@ export function Post({data}: PostProps) {
                                         className="rounded-md w-full flex flex-row justify-start"
                                     >
                                         {isDeletingPost ? (
-                                            <Icons.spinner className="w-4 h-4 mr-2 animate-spin"/>
+                                            <Spinner className="w-4 h-4 mr-2 animate-spin"/>
                                         ) : (
-                                            <Icons.trash className="w-4 h-4 mr-2"/>
+                                            <Trash className="w-4 h-4 mr-2"/>
                                         )}
                                         <span className="font-medium text-sm">
                                             Delete Post
