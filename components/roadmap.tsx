@@ -302,7 +302,7 @@ export function Roadmap() {
                                         )}
                                         target={"_blank"}
                                     >
-                                        <ExternalLink />
+                                        <ExternalLink className="h-4 w-4"/>
                                     </Link>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">

@@ -1,6 +1,5 @@
 "use client"
 
-import { FaArrowUpRightFromSquare, FaCalendar, FaCircleDollarToSlot, FaCity } from "react-icons/fa6";
 import ComendVerifiedBadge from "./comend-verified-badge";
 import EditPAGProfileHeaderDialog from "./edit-pag-profile-header-dialog";
 import { PAGBannerPhoto } from "./pag-banner-photo";
@@ -18,6 +17,7 @@ import { BiopharmaConsentSwitch } from "./biopharma-consent-switch";
 import EditPagProfileSubdomainDialog from "./edit-pag-profile-subdomain-dialog";
 import Link from "next/link";
 import EditPAGContactEmailDialog from "./edit-pag-contact-email-dialog";
+import { Building2, Calendar, ExternalLink, HandCoins } from "lucide-react";
 
 export function ProfilePageClient({organization, conditions, roadmaps}: {organization: any, conditions: any[] | null, roadmaps: any[]}) {
     return (
@@ -81,7 +81,7 @@ export function ProfilePageClient({organization, conditions, roadmaps}: {organiz
                                             className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                                             {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
                                                 <div className="mt-2 flex items-center text-gray-500">
-                                                    <FaCircleDollarToSlot
+                                                    <HandCoins
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"
                                                     />
@@ -90,7 +90,7 @@ export function ProfilePageClient({organization, conditions, roadmaps}: {organiz
                                             }
                                             {organization?.yearFounded && (
                                                 <div className="mt-2 flex items-center text-gray-500">
-                                                    <FaCalendar
+                                                    <Calendar
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"/>
                                                     Founded
@@ -99,7 +99,7 @@ export function ProfilePageClient({organization, conditions, roadmaps}: {organiz
                                             )}
                                             {organization?.incorporationStatus === "YES" &&
                                                 <div className="mt-2 flex items-center text-gray-500">
-                                                    <FaCity
+                                                    <Building2
                                                         className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"/>
                                                     {`501c3`}
@@ -197,7 +197,7 @@ export function ProfilePageClient({organization, conditions, roadmaps}: {organiz
                         className="w-full inline-flex flex-row justify-start items-center gap-x-2 text-base truncate rounded-md bg-stone-100 px-2 py-1 font-medium text-stone-600 transition-colors hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-400 dark:hover:bg-stone-700"
                     >
                         <span className="truncate">{organization.subdomain}.comend.io</span>
-                        <FaArrowUpRightFromSquare className="flex-shrink-0 h-4 w-4"/>
+                        <ExternalLink className="flex-shrink-0 h-4 w-4"/>
                     </Link>
                 </div>
             </CardHeader>

@@ -1,4 +1,3 @@
-import {FaPlus} from "react-icons/fa6";
 import {Button} from "@/components/ui/button";
 import {Column} from "@prisma/client";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore";

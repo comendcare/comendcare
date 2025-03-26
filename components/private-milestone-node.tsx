@@ -373,7 +373,7 @@ export const AttachmentsTag = ({attachments}: { attachments: any[] }) => {
                 "text-sm w-min inline-flex flex-row justify-start items-center gap-x-2 truncate rounded-md px-2 py-1 font-medium"
             )}
         >
-            <ExternalLink />
+            <ExternalLink className="h-4 w-4"/>
             {attachments.length > 1 ? `${attachments.length} Links` : `${attachments.length} Link`}
         </div>
     )

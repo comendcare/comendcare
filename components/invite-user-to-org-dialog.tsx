@@ -26,7 +26,6 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {FaUserPlus} from "react-icons/fa6";
 import {toast} from "sonner";
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import { UserPlus } from "lucide-react";

@@ -255,7 +255,7 @@ export default async function ProfilePage() {
                                 <span className="truncate block max-w-[150px] overflow-hidden whitespace-nowrap">
                                     {organization.subdomain}.comend.io
                                 </span>
-                                <ExternalLink className="flex-shrink-0"/>
+                                <ExternalLink className="flex-shrink-0 h-4 w-4"/>
                             </Link>
                         </div>
                     </CardHeader>

@@ -83,7 +83,7 @@ export default async function CompanyHomePage({
                     className="inline-flex items-center gap-x-2 hover:underline"
                 >
                     <ArrowLeft />
-                    <Store />
+                    <Store className="h-4 w-4"/>
                     Return to marketplace
                 </Link>
                 <main className="flex flex-col w-full max-w-7xl mx-auto space-y-8">
@@ -141,7 +141,7 @@ export default async function CompanyHomePage({
                                 className={cn(buttonVariants({variant: "secondary"}), "w-fit")}
                                 target="_blank"
                             >
-                                <ExternalLink />
+                                <ExternalLink className="h-4 w-4"/>
                                 Visit website
                             </Link>
                             <SaveCRODialog cro={cro} type={"page"}/>

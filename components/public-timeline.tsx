@@ -3,7 +3,6 @@
 import React, {ReactNode} from "react"
 import {getDates} from "./pag-profile-research-plan-card"
 import {PrivateBadge} from "./private-badge"
-import {FaArrowUpRightFromSquare} from "react-icons/fa6"
 import {cn} from "@/lib/utils"
 import {Card, CardContent} from "./ui/card"
 import {Button} from "./ui/button"
