@@ -1,7 +1,7 @@
-import { FaTrash, FaUser } from "react-icons/fa6"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { Prisma } from "@prisma/client"
+import { Trash, User } from "lucide-react"
 
 type ContactType = Prisma.ExternalContactGetPayload<{
     select: { name: true, role: true, email: true, affiliation: true }
@@ -25,7 +25,7 @@ export const ExternalContactField = ({
 
     return (
         <li key={index} className="grid grid-cols-[20px_auto_40px] lg:grid-cols-[20px_auto_auto_40px] gap-2 items-center">
-            <FaUser className="row-start-1 col-start-1"/>
+            <User className="row-start-1 col-start-1"/>
             <div className="h-full w-full grow row-start-1 col-start-2">
             <Input
                 className="h-full"
@@ -66,7 +66,7 @@ export const ExternalContactField = ({
             />
             </div>
             <Button className="row-start-1 col-start-3 lg:col-start-4" variant="secondary" onClick={deleteElement}>
-                <FaTrash />
+                <Trash />
             </Button>
         </li>
     )

@@ -1,7 +1,7 @@
 "use client"
 
 import React, {useEffect, useRef, useState} from "react";
-import {Review, User, Organization, Milestone, Company} from "@prisma/client";
+import {Milestone, Company} from "@prisma/client";
 import {StarRatingIndicator} from "@/components/star-rating-indicator";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {
@@ -16,7 +16,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -41,7 +40,6 @@ import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {StarRatingSelector} from "@/components/star-rating-selector";
 import {useSession} from "next-auth/react";
-import {FaEllipsisVertical, FaFlag, FaLinkSlash, FaPencil, FaTrash} from "react-icons/fa6";
 import {editReview, deleteReview, submitFeedback} from "@/lib/actions";
 import {useRouter} from "next/navigation";
 import {toast} from "sonner";
@@ -53,6 +51,7 @@ import {getMilestones} from "@/lib/fetchers";
 import { reviewForm } from "./cro-review-dialog";
 import {Button} from "@/components/ui/button";
 import {ReviewWithAuthor} from "@/lib/types";
+import { EllipsisVertical, Flag, Link2Off, Pencil, Trash } from "lucide-react";
 
 
 export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Company }) => {
@@ -301,20 +300,20 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
 
                         <DropdownMenu modal={false}>
                             <DropdownMenuTrigger>
-                                <FaEllipsisVertical/>
+                                <EllipsisVertical />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
                                 {session?.user.id === review.author.id &&
                                     <DialogTrigger asChild>
                                         <DropdownMenuItem>
-                                            <FaPencil/>
+                                            <Pencil />
                                             Edit review
                                         </DropdownMenuItem>
                                     </DialogTrigger>
                                 }
                                 {session?.user.id !== review.author.id &&
                                     <DropdownMenuItem>
-                                        <FaFlag/>
+                                        <Flag />
                                         Report review
                                     </DropdownMenuItem>
                                 }
@@ -322,7 +321,7 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
                                 <DropdownMenuItem
                                     onClick={() => handleDeleteReview(review)}
                                 >
-                                    <FaTrash/>
+                                    <Trash />
                                     Delete review
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -418,7 +417,7 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
                                                         }}
                                                         disabled={!field.value}
                                                     >
-                                                        <FaLinkSlash/>
+                                                        <Link2Off />
                                                     </Button>
                                                 </div>
                                             </FormItem>

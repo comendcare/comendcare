@@ -1,7 +1,7 @@
 "use client"
+
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {cn} from "@/lib/utils";
-import {FaChevronRight, FaPaperclip} from "react-icons/fa6";
 import {
     Dialog,
     DialogContent,
@@ -10,6 +10,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
+import { ChevronRight, Paperclip } from "lucide-react";
 
 // Define types for statuses and environments
 type Status = 'offline' | 'online' | 'error';
@@ -129,7 +130,7 @@ export const PAGProfileOpenRFPsCard = () => {
                                             {rfp.environment}
                                         </div>
                                     }
-                                    <FaChevronRight aria-hidden="true" className="h-3 w-3 flex-none text-gray-400"/>
+                                    <ChevronRight aria-hidden="true" className="h-3 w-3 flex-none text-gray-400"/>
                                 </li>
                             ))}
                         </DialogTrigger>
@@ -173,7 +174,7 @@ export const PAGProfileOpenRFPsCard = () => {
                                                 <ul role="list" className="divide-y divide-gray-100 rounded-md border border-gray-200">
                                                     <li className="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6">
                                                         <div className="flex w-0 flex-1 items-center">
-                                                            <FaPaperclip aria-hidden="true" className="h-5 w-5 shrink-0 text-gray-400" />
+                                                            <Paperclip aria-hidden="true" className="h-5 w-5 shrink-0 text-gray-400" />
                                                             <div className="ml-4 flex min-w-0 flex-1 gap-2">
                                                                 <span className="truncate font-medium">study_overview.pdf</span>
                                                                 <span className="shrink-0 text-gray-400">1.2mb</span>
@@ -187,7 +188,7 @@ export const PAGProfileOpenRFPsCard = () => {
                                                     </li>
                                                     <li className="flex items-center justify-between py-4 pl-4 pr-5 text-sm/6">
                                                         <div className="flex w-0 flex-1 items-center">
-                                                            <FaPaperclip aria-hidden="true" className="h-5 w-5 shrink-0 text-gray-400" />
+                                                            <Paperclip aria-hidden="true" className="h-5 w-5 shrink-0 text-gray-400" />
                                                             <div className="ml-4 flex min-w-0 flex-1 gap-2">
                                                                 <span className="truncate font-medium">budget_summary.pdf</span>
                                                                 <span className="shrink-0 text-gray-400">500kb</span>

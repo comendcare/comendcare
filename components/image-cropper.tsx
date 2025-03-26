@@ -19,10 +19,8 @@ import {
 } from "@/components/ui/dialog"
 
 import "react-image-crop/dist/ReactCrop.css"
-import { CropIcon, Trash2Icon } from "lucide-react"
+import { CropIcon, Pencil, Trash2Icon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { toast } from "sonner"
-import { FaPencil } from "react-icons/fa6"
 
 export type FileWithPreview = File & { preview: string }
 
@@ -205,7 +203,7 @@ export function ImageCropper({
                         variant={"outline"}
                         onClick={handleFileSelectOpen}
                     >
-                        <FaPencil />
+                        <Pencil />
                         Select New Photo
                     </Button>
                     <Button type="submit" size={"sm"} className="w-fit" onClick={onCrop}>

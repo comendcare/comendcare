@@ -26,7 +26,6 @@ import {Bold, Italic} from "lucide-react";
 import {FileWithPreview} from "@/components/image-cropper";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {FaBuildingNgo, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup, FaUpload} from "react-icons/fa6";
 import {acceptedFiletypes, getPublicFile, nameToInitials, years} from "@/lib/utils";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
@@ -41,6 +40,7 @@ import {handleImageUpload} from "@/lib/upload";
 import LoadingDots from "@/components/icons/loading-dots";
 import mixpanel from "mixpanel-browser";
 import {Member, Organization } from "@prisma/client";
+import { Calendar, Building2 } from "lucide-react";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -904,7 +904,7 @@ export default function OrganizationOnboardingForm(
             {/*                                            <div*/}
             {/*                                                className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">*/}
             {/*                                                <div className="mt-1 flex items-center text-gray-500">*/}
-            {/*                                                    <FaCalendar*/}
+            {/*                                                    <Calendar*/}
             {/*                                                        className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"*/}
             {/*                                                        aria-hidden="true"/>*/}
             {/*                                                    Founded in {newOrgForm.watch("founded")?.split("-")[0]}*/}
@@ -916,7 +916,7 @@ export default function OrganizationOnboardingForm(
             {/*                                            <div*/}
             {/*                                                className="flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6 text-xs">*/}
             {/*                                                <div className="mt-1 flex items-center text-gray-500">*/}
-            {/*                                                    <FaBuildingNgo*/}
+            {/*                                                    <Building2 */}
             {/*                                                        className="mr-1.5 h-3 w-3 flex-shrink-0 text-gray-400"*/}
             {/*                                                        aria-hidden="true"/>*/}
             {/*                                                    {"501c3"}*/}

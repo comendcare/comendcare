@@ -1,21 +1,5 @@
 import { Prisma } from "@prisma/client"
-import { ExternalAttachmentField } from "./external-attachment-field"
-import { ExternalContactField } from "./external-contact-field"
-import { Button } from "./ui/button"
-import {
-    FormControl,
-    FormField,
-    FormLabel,
-    FormItem,
-    FormMessage,
-} from "./ui/form"
-import { Input } from "./ui/input"
-import { Textarea } from "./ui/textarea"
-import { UseFormReturn } from "react-hook-form"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card"
-import { Separator } from "./ui/separator"
-import { FaArrowUpRightFromSquare, FaTrash } from "react-icons/fa6"
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
+import { HoverCard } from "@/components/ui/hover-card";
 import { PrivateBadge } from "./private-badge"
 import { TypeBadge } from "./type-badge"
 import { PublicBadge } from "./public-badge"
@@ -130,7 +114,7 @@ export function RFPDetails({ rfp, isPublic }: { rfp: MilestoneType, isPublic: bo
         //                                     className="flex flex-row gap-2 items-center"
         //                                 >
         //                                     {`${index + 1}. ${attachment.name || attachment.link}`}
-        //                                     <FaArrowUpRightFromSquare size={15} />
+        //                                     <ExternalLink size={15} />
         //                                 </a>
         //                             </li>
         //                         ))}
