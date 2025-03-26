@@ -47,15 +47,15 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                         <ProfilePhoto img={image} name={name} className="h-10 w-10"/>
                         {name}
                     </CardTitle>
-                    {(moneyDeployed || numberOfPatientsEngaged) && (
+                    {(moneyDeployed > 0 || numberOfPatientsEngaged > 0) && (
                         <div className="w-full grid gap-2 grid-cols-2">
-                            {moneyDeployed && (
+                            {moneyDeployed > 0 && (
                                 <div className="text-sm text-gray-700 m-0 flex items-center">
                                     <FaCircleDollarToSlot className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
                                     {formatMoney(moneyDeployed)} deployed
                                 </div>
                             )}
-                            {numberOfPatientsEngaged && (
+                            {numberOfPatientsEngaged > 0 && (
                                 <div className="text-sm text-gray-700 m-0 flex items-center">
                                     <FaUsers className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
                                     {numberOfPatientsEngaged} patients
