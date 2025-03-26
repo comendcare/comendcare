@@ -86,7 +86,7 @@ export const PagProfileAboutCard = ({organization, editable}: {
                                 <span className="truncate block max-w-[180px] overflow-hidden whitespace-nowrap">
                                     {organization?.website}
                                 </span>
-                                <ExternalLink />
+                                <ExternalLink className="h-4 w-4"/>
                             </Link>
                             : (
                                 <p className="text-gray-400">

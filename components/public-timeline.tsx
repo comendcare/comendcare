@@ -99,7 +99,7 @@ const TimelineElementContent = ({item, externalLinkIcon}: { item: any, externalL
                     {item.title}
                 </h3>
                 {item.private && <PrivateBadge iconOnly={true}/>}
-                {!item.private && externalLinkIcon && <ExternalLink size={12}/>}
+                {!item.private && externalLinkIcon && <ExternalLink className="h-4 w-4"/>}
                 <time
                     className="ml-auto block font-semibold leading-none dark:text-gray-500">
                     {getDates(item)}

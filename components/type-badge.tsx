@@ -11,7 +11,7 @@ export const TypeBadge = ({type, iconOnly = false, className}: {
 }) => {
 
     return (
-        <Badge variant="outline" className={cn(iconOnly ? "w-8" : "", style, className)}>
+        <Badge variant="outline" className={cn(iconOnly ? "w-8 p-2" : "", style, className)}>
             {type === "ASSET" && (
                 <>
                     <Star className="h-5 w-5"/>

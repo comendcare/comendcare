@@ -236,7 +236,7 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
                 </Button>
             )}
             <span className="flex items-center justify-center rounded-full mt-3">
-                <TypeBadge className="w-8 p-2" iconOnly={true} type={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/>
+                <TypeBadge iconOnly={true} type={milestone?.nodeType || milestone?.nodeType || "PROJECT"}/>
             </span>
             <div 
                 className={cn(
