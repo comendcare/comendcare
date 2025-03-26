@@ -7,7 +7,7 @@ export function PrivateBadge({ iconOnly = false, className = "" }: { iconOnly?: 
         return (
             <Tooltip>
                 <TooltipTrigger className={cn(className, "text-sm")}>
-                    <Lock />
+                    <Lock className="h-4 w-4"/>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-80 text-wrap text-left">
                     <p className={cn(className, "text-normal")}>
@@ -21,7 +21,7 @@ export function PrivateBadge({ iconOnly = false, className = "" }: { iconOnly?: 
     
     return(
         <p className={cn(className, "mt-0 inline-flex items-center gap-x-2 text-sm")}>
-            <Lock />
+            <Lock className="h-4 w-4"/>
             {!iconOnly && `Only visible to your team`}
         </p>
     )

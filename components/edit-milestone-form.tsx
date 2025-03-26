@@ -784,7 +784,7 @@ const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any,
                                             <Tooltip disableHoverableContent={disabled}>
                                                 <TooltipTrigger disabled={disabled} asChild>
                                                     <FormLabel className="font-normal flex gap-1 items-center">
-                                                        <Lock />
+                                                        <Lock className="h-4 w-4"/>
                                                         {`Private`}
                                                     </FormLabel>
                                                 </TooltipTrigger>
@@ -804,7 +804,7 @@ const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any,
                                             <Tooltip disableHoverableContent={disabled}>
                                             <TooltipTrigger disabled={disabled} asChild>
                                                 <FormLabel className="font-normal flex gap-1 items-center">
-                                                    <Globe />
+                                                    <Globe className="h-4 w-4"/>
                                                     {`Public`}
                                                 </FormLabel>
                                             </TooltipTrigger>

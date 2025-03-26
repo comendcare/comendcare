@@ -189,7 +189,7 @@ export function Roadmap() {
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <div className="ml-auto">
-                                            <Info />
+                                            <Info className="h-5 w-5"/>
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-80 text-wrap text-left">
