@@ -85,7 +85,7 @@ export function PAGFilters() {
                                 Associated systems
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <Info />
+                                        <Info className="h-5 w-5" />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The systems affected by a condition.`}
@@ -119,7 +119,7 @@ export function PAGFilters() {
                                 Mechanisms of action
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <Info />
+                                        <Info className="h-5 w-5" />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The type of condition a patient advocacy group focuses on.`}
@@ -153,7 +153,7 @@ export function PAGFilters() {
                                 Modalities of interest
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <Info />
+                                        <Info className="h-5 w-5" />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The treatment modalities of interest to an organization.`}

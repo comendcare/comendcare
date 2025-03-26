@@ -76,7 +76,7 @@ export function MilestoneFilters() {
                                 Milestone types
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <Info />
+                                        <Info className="h-5 w-5" />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`Types of milestones an organization may have in their research plan`}
@@ -110,7 +110,7 @@ export function MilestoneFilters() {
                                 Milestone status
                                 {/* <Tooltip>
                                     <TooltipTrigger>
-                                        <Info />
+                                        <Info className="h-5 w-5" />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`Types of milestones an organization may have in their research plan`}
@@ -151,7 +151,7 @@ export function MilestoneFilters() {
                                 Milestone class
                                 {/* <Tooltip>
                                     <TooltipTrigger>
-                                        <Info />
+                                        <Info className="h-5 w-5"/>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`Types of milestones an organization may have in their research plan`}

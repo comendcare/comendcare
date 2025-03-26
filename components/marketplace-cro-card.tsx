@@ -108,6 +108,7 @@ export function CROCardHeaderContents({cro}: { cro: Company }) {
                         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
                         : `http://localhost:3000/app/cro/${id}`
                 }
+                className="flex flex-col gap-2"
             >
                 {companyType && (
                     <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
