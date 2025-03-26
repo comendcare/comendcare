@@ -47,13 +47,13 @@ export const PAGProfileConditionsCard = ({conditions, organization, showEditDial
                                 </div>
 
                                 <div className="space-y-2">
-                                    <div className="flex flex-row items-baseline justify-start w-full">
+                                    <div className="flex flex-row items-center justify-start w-full gap-2">
                                         <h4 className="scroll-m-20 text-base font-semibold">Epidemiology</h4>
                                         <Tooltip delayDuration={0}>
                                             {/*disabled to make the tooltip unclickable*/}
                                             <TooltipTrigger disabled>
                                                 <Info 
-                                                    className="text-black size-3 inline-block align-baseline mx-1"/>
+                                                    className="text-black h-4 w-4"/>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>

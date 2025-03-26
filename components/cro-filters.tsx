@@ -77,7 +77,7 @@ export function CROFilters() {
                                 Service categories
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <Info className="h-5 w-5" />
+                                        <Info className="h-4 w-4" />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The service categories provided by the CRO.`}
@@ -111,7 +111,7 @@ export function CROFilters() {
                                 Business types
                                 {/* <Tooltip>
                                     <TooltipTrigger>
-                                        <Info className="h-5 w-5" />
+                                        <Info className="h-4 w-4" />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The service categories provided by the CRO.`}
@@ -145,7 +145,7 @@ export function CROFilters() {
                                 Certifications
                                 {/* <Tooltip>
                                     <TooltipTrigger>
-                                        <Info className="h-5 w-5" />
+                                        <Info className="h-4 w-4" />
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The service categories provided by the CRO.`}

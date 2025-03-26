@@ -95,7 +95,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                             {label}
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <Info />
+                                    <Info className="h-4 w-4"/>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80 text-wrap text-left">
                                     {description}

@@ -68,7 +68,7 @@ export function BiopharmaConsentSwitch({organization}: { organization: Organizat
                                         {field.value ? "Biopharma consented" : "Biopharma not consented"}
                                         <Tooltip delayDuration={0}>
                                             <TooltipTrigger>
-                                                <Info />
+                                                <Info className="h-4 w-4"/>
                                             </TooltipTrigger>
                                             <TooltipContent className="max-w-80 text-wrap text-left">
                                                 {`Enabling this setting enables us to connect you with biopharma partners based on your profile.`}

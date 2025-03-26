@@ -41,7 +41,7 @@ const CommentInput = React.forwardRef<HTMLInputElement, CommentInputProps>(
                             aria-hidden="true"
                         />
                     ) : (
-                        <Send className="h-4 w-4" aria-hidden="true" />
+                        <Send aria-hidden="true" />
                     )}
                     <span className="sr-only">Send comment</span>
                 </Button>

@@ -137,7 +137,7 @@ export function CROSearchResults() {
                                             Start a research plan to view recommendations
                                             <Tooltip>
                                                 <TooltipTrigger>
-                                                    <Info />
+                                                    <Info className="h-4 w-4"/>
                                                 </TooltipTrigger>
                                                 <TooltipContent className="max-w-80 !text-xs">
                                                     <p>

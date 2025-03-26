@@ -70,7 +70,7 @@ export function PublishOrganizationSwitch({organization}: { organization: Organi
                                         {field.value ? "Published" : "Unpublished"}
                                         <Tooltip delayDuration={0}>
                                             <TooltipTrigger>
-                                                <Info />
+                                                <Info className="h-4 w-4"/>
                                             </TooltipTrigger>
                                             <TooltipContent className="max-w-80 text-wrap text-left">
                                                 {`Published profiles are viewable to visitors and users via your public URL and in our marketplace.`}

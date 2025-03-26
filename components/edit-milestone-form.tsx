@@ -452,7 +452,7 @@ export function EditMilestoneForm({
                                                     Migrate to asset
                                                     <Tooltip>
                                                         <TooltipTrigger className="ml-auto">
-                                                            <Info />
+                                                            <Info className="h-4 w-4"/>
                                                         </TooltipTrigger>
                                                         <TooltipContent className="max-w-80 text-wrap text-left">
                                                             {NODE_TYPE_OPTIONS.find(option => option.value === "ASSET")?.description}
@@ -473,7 +473,7 @@ export function EditMilestoneForm({
                                                     Migrate to project
                                                     <Tooltip>
                                                         <TooltipTrigger className="ml-auto">
-                                                            <Info />
+                                                            <Info className="h-4 w-4"/>
                                                         </TooltipTrigger>
                                                         <TooltipContent className="max-w-80 text-wrap text-left">
                                                             {NODE_TYPE_OPTIONS.find(option => option.value === "PROJECT")?.description}
@@ -494,7 +494,7 @@ export function EditMilestoneForm({
                                                     Migrate to RFP
                                                     <Tooltip>
                                                         <TooltipTrigger className="ml-auto">
-                                                            <Info />
+                                                            <Info className="h-4 w-4"/>
                                                         </TooltipTrigger>
                                                         <TooltipContent className="max-w-80 text-wrap text-left">
                                                             {NODE_TYPE_OPTIONS.find(option => option.value === "RFP")?.description}
@@ -1020,7 +1020,7 @@ const StartDateFormField = ({form}: { form: any }) => {
                                 !field.value && "text-muted-foreground"
                             )}
                         >
-                            <Calendar className="mr-2 h-4 w-4"/>
+                            <Calendar className="mr-2"/>
                             {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                         </Button>
                     </PopoverTrigger>

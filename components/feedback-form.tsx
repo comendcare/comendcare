@@ -195,7 +195,7 @@ export default function FeedbackForm () {
                                                 className="p-0 h-auto"
                                                 variant="ghost"
                                             >
-                                                <Info className="inline" />
+                                                <Info className="inline h-4 w-4" />
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-64">

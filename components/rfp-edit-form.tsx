@@ -231,7 +231,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                                     !field.value && "text-muted-foreground"
                                                 )}
                                                 >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                <CalendarIcon className="mr-2" />
                                                 {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                                                 </Button>
                                             </PopoverTrigger>
@@ -263,7 +263,7 @@ export function RFPEditForm({ form, RFP }: { form: UseFormReturn<any>, RFP: RFPT
                                                     !field.value && "text-muted-foreground"
                                                 )}
                                                 >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                <CalendarIcon className="mr-2" />
                                                 {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                                                 </Button>
                                             </PopoverTrigger>
