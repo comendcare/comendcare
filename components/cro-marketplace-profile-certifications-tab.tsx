@@ -59,7 +59,7 @@ export default function CROMarketplaceProfileCertificationsTab({ croCertificatio
                                                             asChild
                                                         >
                                                             <a href={file.fileUrl} download>
-                                                                {file.fileName} <Download className="ml-2 h-4 w-4" />
+                                                                {file.fileName} <Download className="ml-2" />
                                                             </a>
                                                         </Button>
                                                     ))}

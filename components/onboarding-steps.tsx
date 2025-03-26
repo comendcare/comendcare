@@ -1,13 +1,12 @@
 'use client';
 
 import {usePathname, useRouter} from 'next/navigation';
-import {FaCheck} from 'react-icons/fa';
 import {useOnboardingStore} from '@/state/onboarding/onboardingStore';
 import {useSession} from 'next-auth/react';
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
 import {useEffect, useState} from "react";
-import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
-import {toast} from "sonner";
+import {getInvitations, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import { Check } from 'lucide-react';
 
 type StepStatus = 'complete' | 'current' | 'upcoming' | 'disabled';
 
@@ -135,7 +134,7 @@ export default function OnboardingSteps() {
                                         <span className="flex h-9 items-center">
                                             <span
                                                 className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-blue-dark group-hover:bg-blue-900">
-                                                <FaCheck aria-hidden="true" className="h-5 w-5 text-white"/>
+                                                <Check aria-hidden="true" className="h-5 w-5 text-white"/>
                                             </span>
                                         </span>
                                         <span className="ml-4 flex min-w-0 flex-col">

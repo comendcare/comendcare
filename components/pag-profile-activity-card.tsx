@@ -1,11 +1,11 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
-import {FaArrowUpRightFromSquare, FaPen} from "react-icons/fa6";
 import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import {UserNewPostCard} from "@/components/user-new-post-card";
 import {UserFeedTextCard} from "@/components/user-feed-text-card";
+import { ExternalLink } from "lucide-react";
 
 export const PAGProfileActivityCard = () => {
     const router = useRouter();
@@ -22,7 +22,7 @@ export const PAGProfileActivityCard = () => {
                     className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                 >
                     View feed
-                    <FaArrowUpRightFromSquare/>
+                    <ExternalLink />
                 </Button>
             </CardHeader>
             <CardContent className="space-y-4">

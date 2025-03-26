@@ -1,8 +1,7 @@
-import { MouseEventHandler, useState } from "react";
-import { Checkbox } from "./ui/checkbox"
-import { FaCheck, FaPlus } from "react-icons/fa6";
+import { MouseEventHandler } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
+import { Check, Plus } from "lucide-react";
 
 export function CheckBubble({ isChecked, onCheckedChanged }: { isChecked: boolean, onCheckedChanged: MouseEventHandler<HTMLButtonElement> }) {    
     return (
@@ -14,9 +13,9 @@ export function CheckBubble({ isChecked, onCheckedChanged }: { isChecked: boolea
             onClick={onCheckedChanged}
         >
             {isChecked ? (
-                <FaCheck className="text-white" /> // Checked indicator
+                <Check className="text-white" /> // Checked indicator
             ) : (
-                <FaPlus className="text-primary" /> // Unchecked indicator
+                <Plus className="text-primary" /> // Unchecked indicator
             )}
         </Button>
     )

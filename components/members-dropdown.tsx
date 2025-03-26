@@ -5,7 +5,6 @@ import {MemberWithUser} from "@/lib/types";
 import {deleteMember, leaveOrganization, updateMember} from "@/lib/actions";
 import {toast} from "sonner";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
-import {FaEllipsis, FaUserPen, FaUserXmark} from "react-icons/fa6";
 import {useSession} from "next-auth/react";
 import {
     Dialog,
@@ -14,7 +13,6 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-    DialogFooter
 } from "@/components/ui/dialog"
 import {Button} from "@/components/ui/button"
 import {useForm} from "react-hook-form";
@@ -22,11 +20,10 @@ import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@/components/ui/input";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {revalidatePath} from "next/cache";
 import {useEffect, useState} from "react";
-import {getAllMembershipsFromUserId, getInvitations, getOrganizationFromOrganizationId, getUser} from "@/lib/fetchers";
+import {getAllMembershipsFromUserId} from "@/lib/fetchers";
 import {MembershipWithOrganization} from "@/lib/types";
-
+import { Ellipsis, Pencil, UserX } from "lucide-react";
 
 const formSchema = z.object({
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
@@ -164,14 +161,14 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
         <Dialog>
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger>
-                    <FaEllipsis/>
+                    <Ellipsis />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     {
                         (session?.user?.id === member?.user?.id || session?.user?.membership?.role === "owner") && (
                             <DialogTrigger asChild>
                                 <DropdownMenuItem>
-                                    <FaUserPen/>
+                                    <Pencil />
                                     Edit membership
                                 </DropdownMenuItem>
                             </DialogTrigger>
@@ -185,7 +182,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                                 onClick={handleLeaveOrganization}
                                 className="text-red-600 hover:text-red-800"
                             >
-                                <FaUserXmark/>
+                                <UserX />
                                 Leave organization
                             </DropdownMenuItem>
                         ) : session?.user?.membership?.role === "owner" ? (
@@ -194,7 +191,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                                 onClick={() => revokeMembership(member)}
                                 className="text-red-600 hover:text-red-800"
                             >
-                                <FaUserXmark/>
+                                <UserX />
                                 Revoke membership
                             </DropdownMenuItem>
                         ) : null // Case 3: The user is neither the owner nor the same user, show nothing

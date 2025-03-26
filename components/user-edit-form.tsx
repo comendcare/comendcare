@@ -19,13 +19,10 @@ import {toast} from "sonner";
 import {useRouter} from "next/navigation";
 import {editUser} from "@/lib/actions";
 import {Checkbox} from "@/components/ui/checkbox";
-import {AutocompleteComponent} from "@/components/autocomplete";
 import {AddressType} from "@/lib/types";
 import {useCallback, useEffect, useState} from "react";
 import {FileWithPreview} from "@/components/image-cropper";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {FileWithPath, useDropzone} from "react-dropzone";
-import {FaUpload} from "react-icons/fa6";
 import {getUser} from "@/lib/fetchers";
 import { acceptedFiletypes, getPublicFile } from "@/lib/utils";
 import { handleImageUpload } from "@/lib/upload";
@@ -279,7 +276,7 @@ export default function UserEditForm() {
                                             <input {...getInputProps()} />
                                             <AvatarFallback
                                                 className="text-center flex flex-col justify-center gap-y-4">
-                                                <FaUpload/>
+                                                <Upload />
                                                 Click or drop!
                                             </AvatarFallback>
                                         </Avatar>

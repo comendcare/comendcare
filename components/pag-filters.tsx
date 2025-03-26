@@ -5,22 +5,19 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
     FormMessage
 } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
-import { DoubleSliderBarChart } from "./ui/slider-double"
 import { ScrollArea } from "./ui/scroll-area"
 import { Button } from "./ui/button"
 import MultipleSelector from "./ui/multiple-selector"
 import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types"
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
-import { FaInfoCircle } from "react-icons/fa"
 import { useEffect } from "react"
+import { Info } from "lucide-react"
 
 const selector = (state: OrganizationSearchState) => ({
     filters: state.filters,
@@ -88,7 +85,7 @@ export function PAGFilters() {
                                 Associated systems
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle/>
+                                        <Info className="h-4 w-4"/>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The systems affected by a condition.`}
@@ -122,7 +119,7 @@ export function PAGFilters() {
                                 Mechanisms of action
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle/>
+                                        <Info className="h-4 w-4"/>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The type of condition a patient advocacy group focuses on.`}
@@ -156,7 +153,7 @@ export function PAGFilters() {
                                 Modalities of interest
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle/>
+                                        <Info className="h-4 w-4"/>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
                                         {`The treatment modalities of interest to an organization.`}

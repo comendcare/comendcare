@@ -1,4 +1,4 @@
-import {FaSuitcase, FaFlaskVial, FaUsers} from "react-icons/fa6";
+import { Briefcase, FlaskConical, Users } from "lucide-react"
 
 export const bioassets = [
     {
@@ -172,17 +172,17 @@ export const types = [
     {
         value: "pag",
         label: "Patient group",
-        icon: FaUsers,
+        icon: Users,
     },
     {
         value: "researcher",
         label: "Researcher",
-        icon: FaFlaskVial,
+        icon: FlaskConical,
     },
     {
         value: "cro",
         label: "Contractor",
-        icon: FaSuitcase,
+        icon: Briefcase,
     },
 ]
 

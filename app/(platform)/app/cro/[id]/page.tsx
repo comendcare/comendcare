@@ -1,18 +1,7 @@
 import {notFound} from "next/navigation"
 import {getCROData} from "@/lib/fetchers"
 import Link from "next/link";
-import {
-    FaArrowLeftLong,
-    FaBuilding,
-    FaCalendar,
-    FaCity,
-    FaIndustry,
-    FaRocket,
-    FaUserTie,
-    FaArrowUpRightFromSquare, FaBriefcase, FaPencil, FaFileContract, FaMap, FaUsers, FaListCheck, FaLocationPin,
-} from "react-icons/fa6";
 import {companyTypeMap} from "@/components/marketplace-cro-card";
-import {FaUniversity} from "react-icons/fa";
 import React from "react";
 import {buttonVariants} from "@/components/ui/button";
 import {
@@ -23,7 +12,6 @@ import {
 } from "@/components/ui/tabs"
 import {
     Tooltip,
-    TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
@@ -38,16 +26,16 @@ import CROMarketplaceProfileReviewsTab from "@/components/cro-marketplace-profil
 import {cn} from "@/lib/utils";
 import SaveCRODialog from "@/components/save-cro-dialog";
 import {CompanyWithReviews} from "@/lib/types";
-import { Store } from "lucide-react";
+import { ArrowLeft, Briefcase, BriefcaseBusiness, Building, Building2, Calendar, ExternalLink, Factory, MapPin, Map, Rocket, University, Users, Store } from "lucide-react";
 
 const companyTypeIcons: Record<string, JSX.Element> = {
-    "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
-    "Small Business (1-10M TTM Revenue)": <FaBuilding className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
-    "Academic Core Facility": <FaUniversity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
-    "New Startup (0-1M TTM Revenue)": <FaRocket className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
-    "Consultant (5 or more employees)": <FaUserTie className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
-    "Large Business (>100M TTM Revenue)": <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
-    "Consultant (<5 employees)": <FaUserTie className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "Mid-Sized Business (10-100M TTM Revenue)": <Factory className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "Small Business (1-10M TTM Revenue)": <Building className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "Academic Core Facility": <University className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "New Startup (0-1M TTM Revenue)": <Rocket className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "Consultant (5 or more employees)": <BriefcaseBusiness className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "Large Business (>100M TTM Revenue)": <Building2 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
+    "Consultant (<5 employees)": <BriefcaseBusiness className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
 };
 
 export default async function CompanyHomePage({
@@ -94,8 +82,8 @@ export default async function CompanyHomePage({
                     }
                     className="inline-flex items-center gap-x-2 hover:underline"
                 >
-                    <FaArrowLeftLong/>
-                    <Store />
+                    <ArrowLeft />
+                    <Store className="h-4 w-4"/>
                     Return to marketplace
                 </Link>
                 <main className="flex flex-col w-full max-w-7xl mx-auto space-y-8">
@@ -110,7 +98,7 @@ export default async function CompanyHomePage({
                                 className="flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
                                 {cro.headquarters &&
                                     <div className="flex items-center text-gray-500">
-                                        <FaLocationPin
+                                        <MapPin
                                             className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                             aria-hidden="true"
                                         />
@@ -118,7 +106,7 @@ export default async function CompanyHomePage({
                                     </div>
                                 }
                                 {cro.yearEstablished && (
-                                    <div className="flex items-center text-gray-500"> <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                    <div className="flex items-center text-gray-500"> <Calendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                     aria-hidden="true"/>
                                         Founded in {cro.yearEstablished}
                                     </div>
@@ -126,7 +114,7 @@ export default async function CompanyHomePage({
                                 {cro.companyType && (
                                     <div className="flex items-center text-gray-500">
                                         {companyTypeIcons[cro.companyType] ||
-                                            <FaBuilding className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                            <Building className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                         aria-hidden="true"/>}
                                         {companyTypeMap[cro.companyType] || cro.companyType}
                                     </div>
@@ -153,7 +141,7 @@ export default async function CompanyHomePage({
                                 className={cn(buttonVariants({variant: "secondary"}), "w-fit")}
                                 target="_blank"
                             >
-                                <FaArrowUpRightFromSquare/>
+                                <ExternalLink className="h-4 w-4"/>
                                 Visit website
                             </Link>
                             <SaveCRODialog cro={cro} type={"page"}/>
@@ -163,7 +151,7 @@ export default async function CompanyHomePage({
                     <Tabs defaultValue="services" className="space-y-4 w-full">
                         <TabsList variant="outline">
                             <TabsTrigger value="services" variant="outline" className="px-8">
-                                <FaBriefcase className="mr-1.5 h-4 w-4 flex-shrink-0"/>
+                                <Briefcase className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                                 Services
                                 {cro.services.length !== undefined && (
                                     <div
@@ -174,7 +162,7 @@ export default async function CompanyHomePage({
                                 )}
                             </TabsTrigger>
                             {/*<TabsTrigger value="sites" variant="outline" className="px-8">*/}
-                            {/*    <FaMap className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
+                            {/*    <Map className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
                             {/*    Sites*/}
                             {/*    {cro.sites.length && (*/}
                             {/*        <div*/}
@@ -207,7 +195,7 @@ export default async function CompanyHomePage({
                             {/*    )}*/}
                             {/*</TabsTrigger>*/}
                             <TabsTrigger value="reviews" variant="outline" className="px-8">
-                                <FaUsers className="mr-1.5 h-4 w-4 flex-shrink-0"/>
+                                <Users className="mr-1.5 h-4 w-4 flex-shrink-0"/>
                                 Reviews
                                 {cro.reviews.length !== undefined && (
                                     <div

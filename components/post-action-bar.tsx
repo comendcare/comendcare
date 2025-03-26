@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {AnimatePresence, motion} from "framer-motion";
-import {Icons} from "@/components/icons";
 import {Button} from "@/components/ui/button";
 import {Separator} from "@/components/ui/separator";
 import {cn, formatDates} from "@/lib/utils";
@@ -13,6 +12,7 @@ import {CommentList} from "@/components/comment-list";
 import {useLike} from "@/lib/hooks/use-like";
 import useMeasure from "react-use-measure";
 import {PostWithAuthorAndComments} from "@/lib/types";
+import {MessageCircle} from "lucide-react"
 
 export default function PostActionBar({data}: {data: PostWithAuthorAndComments}) {
     const postId = data.id;
@@ -41,7 +41,7 @@ export default function PostActionBar({data}: {data: PostWithAuthorAndComments})
                         <div>
                             <span className="flex items-center gap-1">
                                 <p>{data.comments.length}</p>
-                                <Icons.comment className="w-4 h-4 md:hidden"/>
+                                <MessageCircle className="w-4 h-4 md:hidden"/>
                                 <p className="hidden md:block">Comments</p>
                             </span>
                         </div>
@@ -70,7 +70,7 @@ export default function PostActionBar({data}: {data: PostWithAuthorAndComments})
                     className="flex-1 active:scale-95"
                     onClick={toggleComment}
                 >
-                    <Icons.comment className="w-5 h-5 md:w-6 md:h-6 mr-2"/>
+                    <MessageCircle className="w-5 h-5 md:w-6 md:h-6 mr-2"/>
                     <span>Comment</span>
                 </Button>
                 <Button

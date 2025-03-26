@@ -1,27 +1,12 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
-import {
-    FaBuilding,
-    FaBullhorn,
-    FaLocationDot,
-    FaCity,
-    FaFileLines,
-    FaIndustry,
-    FaRocket,
-    FaUsers,
-    FaUserTie,
-    FaBookmark,
-    FaRegBookmark
-} from "react-icons/fa6";
 import {truncate} from "@/lib/utils";
 import React from "react";
-import {Company, Milestone} from "@prisma/client";
-import {FaSave, FaUniversity} from "react-icons/fa";
+import {Company} from "@prisma/client";
 import {Separator} from "./ui/separator";
 import {TypeBadge} from "./type-badge";
-import {Button} from "./ui/button";
-import {FiShare2} from "react-icons/fi"
 import SaveCRODialog from "@/components/save-cro-dialog";
+import { Briefcase, Building, Building2, Factory, FileText, Rocket, University } from "lucide-react";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -46,13 +31,13 @@ export const companyTypeMap: Record<string, string> = {
 };
 
 const companyTypeIcons: Record<string, JSX.Element> = {
-    "Mid-Sized Business (10-100M TTM Revenue)": <FaIndustry className="size-4 text-gray-500 dark:text-gray-400"/>,
-    "Small Business (1-10M TTM Revenue)": <FaBuilding className="size-4 text-gray-500 dark:text-gray-400"/>,
-    "Academic Core Facility": <FaUniversity className="size-4 text-gray-500 dark:text-gray-400"/>,
-    "New Startup (0-1M TTM Revenue)": <FaRocket className="size-4 text-gray-500 dark:text-gray-400"/>,
-    "Consultant (5 or more employees)": <FaUserTie className="size-4 text-gray-500 dark:text-gray-400"/>,
-    "Large Business (>100M TTM Revenue)": <FaCity className="size-4 text-gray-500 dark:text-gray-400"/>,
-    "Consultant (<5 employees)": <FaUserTie className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "Mid-Sized Business (10-100M TTM Revenue)": <Factory className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "Small Business (1-10M TTM Revenue)": <Building className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "Academic Core Facility": <University className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "New Startup (0-1M TTM Revenue)": <Rocket className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "Consultant (5 or more employees)": <Briefcase className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "Large Business (>100M TTM Revenue)": <Building2 className="size-4 text-gray-500 dark:text-gray-400"/>,
+    "Consultant (<5 employees)": <Briefcase className="size-4 text-gray-500 dark:text-gray-400"/>,
 };
 
 export function CRORecommendationCard({cro, milestone}: { cro: Company, milestone: any }) {
@@ -123,11 +108,12 @@ export function CROCardHeaderContents({cro}: { cro: Company }) {
                         ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
                         : `http://localhost:3000/app/cro/${id}`
                 }
+                className="flex flex-col gap-2"
             >
                 {companyType && (
                     <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
                         {companyTypeIcons[companyType] ||
-                            <FaBuilding className="size-4 text-gray-500 dark:text-gray-400"/>}
+                            <Building className="size-4 text-gray-500 dark:text-gray-400"/>}
                         {companyTypeMap[companyType] || companyType}
                     </div>
                 )}
@@ -145,11 +131,11 @@ export function CROCardContents({cro}: { cro: Company }) {
     const categoryCounts = countCategories(cro);
 
     const categoryLabels = [
-        {key: "services", icon: FaFileLines, label: "Services"},
-        {key: "reviews", icon: FaFileLines, label: "Reviews"},
-        // {key: "certifications", icon: FaUsers, label: "Certifications"},
-        // {key: "rfis", icon: FaBullhorn, label: "RFIs"},
-        // {key: "sites", icon: FaLocationDot, label: "Sites"}
+        {key: "services", icon: FileText, label: "Services"},
+        {key: "reviews", icon: FileText, label: "Reviews"},
+        // {key: "certifications", icon: Users, label: "Certifications"},
+        // {key: "rfis", icon: Megaphone, label: "RFIs"},
+        // {key: "sites", icon: MapPin, label: "Sites"}
     ];
 
     return (

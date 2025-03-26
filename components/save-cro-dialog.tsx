@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { Company, OrganizationToCompanyEngagement, Milestone, SavedCompany } from "@prisma/client";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -24,6 +23,7 @@ import { Form, FormField, FormItem, FormLabel, FormMessage, FormControl } from "
 import va from "@vercel/analytics"
 import {saveCRO} from "@/lib/actions";
 import {useRouter} from "next/navigation";
+import { Bookmark, BookmarkCheck } from "lucide-react";
 
 const formSchema = z.object({
     engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
@@ -102,11 +102,11 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
             <DialogTrigger asChild>
                 {type === "page" ? (
                     <Button variant="secondary" className="w-fit">
-                        {isSaved ? <FaBookmark className="mr-2" /> : <FaRegBookmark className="mr-2" />} Save CRO
+                        {isSaved ? <BookmarkCheck className="mr-2" /> : <Bookmark className="mr-2" />} Save CRO
                     </Button>
                 ) : (
                     <Button variant="ghost" className="w-fit">
-                        {isSaved ? <FaBookmark /> : <FaRegBookmark />}
+                        {isSaved ? <BookmarkCheck /> : <Bookmark />}
                     </Button>
                 )}
             </DialogTrigger>

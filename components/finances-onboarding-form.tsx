@@ -1,28 +1,15 @@
 "use client"
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
+import {Form} from "@/components/ui/form";
 import {Button} from "@/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSession} from "next-auth/react"
 import {updateOrganization} from "@/lib/actions";
-import {Textarea} from "@/components/ui/textarea";
 import {toast} from "sonner";
-import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
-import MultipleSelector from "@/components/ui/multiple-selector";
-import {Slider} from "@/components/ui/slider";
-import {Separator} from "@/components/ui/separator";
-import {FaQuestionCircle} from "react-icons/fa";
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {Timer} from "lucide-react";
-import {useEffect, useState} from "react";
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
-import {formatMoney} from "@/lib/utils";
+import {useState} from "react";
 import MoneyInput from "@/components/money-input";
-import { Option } from "@/lib/types";
 
 export const financesFormSchema = z.object({
     // raising: z.enum(["yes", "no-but", "no"]).optional(),

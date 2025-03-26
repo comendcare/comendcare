@@ -2,7 +2,7 @@
 
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {z} from "zod";
-import {useForm, UseFormReturn} from "react-hook-form";
+import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useDebounce} from "use-debounce";
 import React, {useCallback, useEffect, useRef, useState} from "react";
@@ -18,14 +18,12 @@ import {Button} from "@/components/ui/button";
 import {AutocompleteComponent} from "@/components/autocomplete";
 import {FileWithPath, useDropzone} from "react-dropzone";
 import {toast} from "sonner";
-import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {
     checkSubdomainAvailability, getConditionsFromOrganizationId,
     getOrganizationFromOrganizationId,
 } from "@/lib/fetchers";
-import {FaPen, FaUpload} from "react-icons/fa6";
 import {
     Dialog,
     DialogContent,
@@ -38,38 +36,13 @@ import {acceptedFiletypes, cn, formatNumberWithCommas, getPublicFile, sleep, yea
 import {handleImageUpload} from "@/lib/upload";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {Slider} from "@/components/ui/slider";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {FaQuestionCircle} from "react-icons/fa";
 import {financesFormSchema} from "@/components/finances-onboarding-form";
 import {researchFormSchema} from "@/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
 import MoneyInput from "@/components/money-input";
-
-const OPTIONS: Option[] = [
-    {
-        id: '1',
-        label: 'nextjs',
-        value: 'Nextjs',
-        description: 'A React framework for building server-side rendered (SSR) and static web applications. It simplifies routing, API handling, and rendering optimizations.',
-        strengths: 'Out-of-the-box SSR and static site generation (SSG), built-in API routes, and strong developer tooling with performance optimizations.',
-    },
-    {
-        id: '2',
-        label: 'React',
-        value: 'react',
-        description: 'A popular JavaScript library for building user interfaces, especially for single-page applications (SPAs). React focuses on the component-based architecture.',
-        strengths: 'Highly reusable components, vast community support, and strong performance with Virtual DOM rendering.',
-    },
-    {
-        id: '3',
-        label: 'Remix',
-        value: 'remix',
-        description: 'A modern framework focused on seamless data fetching and SSR for web applications. Remix emphasizes web standards and progressive enhancement.',
-        strengths: 'Provides full-stack capabilities with SSR, optimized for caching and streaming, and excellent support for nested routing.',
-    },
-];
+import { Info, Pencil, Upload } from "lucide-react";
 
 const optionSchema = z.object({
     label: z.string(),
@@ -609,7 +582,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                         variant="secondary"
                         className="gap-x-2"
                     >
-                        <FaPen/>
+                        <Pencil />
                         Edit profile
                     </Button>
                 </DialogTrigger>
@@ -1130,7 +1103,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                                     {`The treatment modalities of interest of your organization. Select all that apply.`}
                                                     <Tooltip delayDuration={0}>
                                                         <TooltipTrigger>
-                                                            <FaQuestionCircle
+                                                            <Info
                                                                 className="text-black h-4 inline-block align-baseline mx-1"/>
                                                         </TooltipTrigger>
                                                         <TooltipContent>
@@ -1295,7 +1268,7 @@ export default function EditPAGProfileDialog({organization}: { organization: Org
                                     {/*                {`Are you currently raising money?`}*/}
                                     {/*                <Tooltip delayDuration={0}>*/}
                                     {/*                    <TooltipTrigger>*/}
-                                    {/*                        <FaQuestionCircle*/}
+                                    {/*                        <Info*/}
                                     {/*                            className="text-black h-4 inline-block align-baseline mx-1"/>*/}
                                     {/*                    </TooltipTrigger>*/}
                                     {/*                    <TooltipContent*/}
@@ -1526,7 +1499,7 @@ export const FormImageCropper = ({
                                     <AvatarFallback
                                         onClick={handleClick}
                                         className={cn("text-center flex flex-col justify-center gap-y-4", className)}>
-                                        <FaUpload/>
+                                        <Upload />
                                         Click or drop!
                                     </AvatarFallback>
                                 </Avatar>

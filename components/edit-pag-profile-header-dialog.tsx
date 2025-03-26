@@ -14,7 +14,6 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Button} from "@/components/ui/button";
@@ -25,8 +24,8 @@ import {useSession} from "next-auth/react";
 import {Organization} from "@prisma/client";
 import React, {useEffect, useState} from "react";
 import MoneyInput from "@/components/money-input";
-import {FaPencil} from "react-icons/fa6";
 import {years} from "@/lib/utils";
+import { Pencil } from "lucide-react";
 
 const editOrgFormSchema = z.object({
     name: z.string().min(2).max(60),
@@ -127,7 +126,7 @@ export default function EditPAGProfileHeaderDialog({organization}: { organizatio
                     variant="ghost"
                     className="organization-profile-tour-step3"
                 >
-                    <FaPencil/>
+                    <Pencil />
                 </Button>
             </DialogTrigger>
             <DialogContent>

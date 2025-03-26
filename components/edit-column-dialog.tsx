@@ -19,7 +19,6 @@ import {
     DialogFooter
 } from "@/components/ui/dialog"
 import {Button} from "@/components/ui/button"
-import {FaPencil} from "react-icons/fa6"
 import {useForm} from "react-hook-form"
 import * as z from "zod"
 import {zodResolver} from "@hookform/resolvers/zod"
@@ -29,6 +28,7 @@ import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
 import { DropdownMenuItem } from "./ui/dropdown-menu"
 import { Column } from "@prisma/client"
+import { Pencil } from "lucide-react"
 
 const kanbanSelector = (state: KanbanState) => ({
     updateColumn: state.updateColumn
@@ -62,7 +62,7 @@ export default function EditColumnDialog({column}: {column: Column}) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger>
                 <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(true) }}>
-                    <FaPencil />
+                    <Pencil />
                     Edit column
                 </DropdownMenuItem>
             </DialogTrigger>

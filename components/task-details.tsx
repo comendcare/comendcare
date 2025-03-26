@@ -3,9 +3,7 @@
 import React from "react"
 import { ScrollArea } from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
-import { FaDollarSign } from "react-icons/fa6"
 import { Label } from "./ui/label"
-import { TaskType } from "./private-milestone-node"
 import { Checkbox } from "./ui/checkbox"
 
 export function TaskDetails({ taskData }: { taskData: any }) {
