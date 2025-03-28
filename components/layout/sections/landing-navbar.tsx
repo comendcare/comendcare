@@ -227,7 +227,7 @@ const DesktopNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                             }
                         }}
                     >
-                        Schedule a demo
+                        Contact us
                     </PulsatingButton>
                 </div>
             }
