@@ -4,7 +4,6 @@ import {Button} from "@/components/ui/button"
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -14,24 +13,18 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {EmojiPicker} from "@/components/emoji-picker"
 import {Textarea} from "@/components/ui/textarea";
-import {getSession} from "@/lib/auth";
-import {FaGlobe} from "react-icons/fa6";
 import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -39,9 +32,10 @@ import {useSession} from "next-auth/react";
 import Link from "next/link";
 import {Separator} from "@/components/ui/separator";
 import {ProfilePhoto} from "@/components/profile-photo"
-import {createPost, updateOrganization} from "@/lib/actions";
+import {createPost} from "@/lib/actions";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
+import { Globe } from "lucide-react"
 
 
 const formSchema = z.object({
@@ -144,7 +138,7 @@ export default async function NewPostDialog() {
                         <DialogFooter className="flex flex-row sm:justify-between w-full">
                             <DropdownMenu>
                                 <DropdownMenuTrigger className="flex flex-row items-center gap-x-2">
-                                    <FaGlobe/>
+                                    <Globe />
                                     Everyone can comment
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>

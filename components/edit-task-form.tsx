@@ -13,7 +13,6 @@ import {
     FormMessage,
 } from "./ui/form"
 import {Input} from "./ui/input"
-import {Textarea} from "./ui/textarea"
 import {Button} from "./ui/button"
 import {ScrollArea, ScrollBar} from "./ui/scroll-area"
 import {
@@ -22,13 +21,9 @@ import {
     DialogTrigger
 } from "./ui/dialog"
 import {DeleteTaskDialogContent} from "./delete-task-dialog-content"
-import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
 import {useShallow} from "zustand/react/shallow"
-import StatusButton from "./milestone-status-button"
 import {nanoid} from "nanoid"
-import {FaLinkSlash, FaPlus, FaTrash} from "react-icons/fa6"
 import {Checkbox} from "./ui/checkbox"
-import {toast} from "sonner"
 import {
     arrayMove,
     SortableContext,
@@ -36,43 +31,34 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {CalendarIcon, GripVertical} from "lucide-react"
+import {CalendarIcon, GripVertical, Link2Off, Plus, Trash} from "lucide-react"
 import {
     DndContext,
-    type DragEndEvent,
-    type DragOverEvent,
-    DragOverlay,
-    type DragStartEvent,
     useSensor,
     useSensors,
     KeyboardSensor,
     Announcements,
-    UniqueIdentifier,
     TouchSensor,
     MouseSensor,
     closestCorners
 } from "@dnd-kit/core"
 import {CSS} from "@dnd-kit/utilities"
-import {coordinateGetter} from "@/lib/multiple-containers-keyboard-preset"
 import {cva} from "class-variance-authority"
 import {debounce} from "lodash"
 import {SettingsProvider} from "@/components/editor/settings";
 import {PlateEditor} from "@/components/editor/plate-editor";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
-import { getMembers, getMilestones, getOrganizationData } from "@/lib/fetchers"
-import MultiSelect from "./multi-select"
+import { getMembers, getMilestones } from "@/lib/fetchers"
 import MultipleSelector from "./ui/multiple-selector"
-import { Member, Milestone, TaskStakeholder, User } from "@prisma/client"
+import { Milestone, User } from "@prisma/client"
 import { useSession } from "next-auth/react"
 import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "./ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Calendar } from "./ui/calendar"
-import { PrivateBadge } from "./private-badge"
-import { Switch } from "./ui/switch"
 import {Separator} from "./ui/separator"
-import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
 import { StatusType } from "@/lib/types"
 
 const statusTypeSchema: z.ZodType<StatusType> = z.enum(['PLANNED', 'INPROGRESS', 'COMPLETED'])
@@ -404,7 +390,7 @@ export function EditTaskForm({
                                                 !field.value && "text-muted-foreground"
                                             )}
                                         >
-                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                            <CalendarIcon className="mr-2" />
                                             {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                                         </Button>
                                     </PopoverTrigger>
@@ -455,7 +441,7 @@ export function EditTaskForm({
                                         }}
                                         disabled={!field.value}
                                     >
-                                        <FaLinkSlash />
+                                        <Link2Off />
                                     </Button>
                                 </div>
                             </FormItem>
@@ -580,7 +566,7 @@ export function EditTaskForm({
                                                             }]
                                                         )
                                                     }}>
-                                                    <FaPlus />
+                                                    <Plus />
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>
@@ -686,7 +672,7 @@ const ChecklistField = ({
                 />
             </div>
             <Button variant="secondary" size="icon" onClick={deleteTask}>
-                <FaTrash/>
+                <Trash />
             </Button>
         </li>
     )

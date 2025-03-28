@@ -23,7 +23,7 @@ import {updateOrganization} from "@/lib/actions";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@/components/ui/button";
-import {FaPencil} from "react-icons/fa6";
+import { Pencil } from "lucide-react";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().optional(),
@@ -115,7 +115,7 @@ export function ProfilePhoto({
                             variant="ghost"
                             className="absolute bottom-0 right-0 p-0.5 bg-white shadow-md rounded-full"
                         >
-                            <FaPencil className="w-1 h-1"/>
+                            <Pencil className="w-1 h-1"/>
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="max-h-[80vh] overflow-y-auto">

@@ -1,14 +1,12 @@
 "use client"
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
-import {Organization, User, Invitation, Member} from "@prisma/client";
+import {Organization, User, Invitation} from "@prisma/client";
 import {cn} from "@/lib/utils";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import Loading from "@/app/loading";
 import Link from "next/link";
-import {FaArrowLeft, FaArrowLeftLong} from "react-icons/fa6";
 import UserEditSettingsDialog from "@/components/user-edit-settings-dialog";
-import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {toast} from "sonner";
@@ -24,6 +22,7 @@ import {acceptInvitation} from "@/lib/actions";
 import Image from "next/image"
 import {useRouter} from "next/navigation";
 import {MembershipWithOrganization} from "@/lib/types";
+import { ArrowLeft } from "lucide-react";
 
 type InvitationWithOrganization = Invitation & {
     organization?: Organization | null; // Optional because the organization might be null if not fetched
@@ -148,7 +147,7 @@ export default function UserProfilePage() {
                         href="/app/profile"
                         className="inline-flex items-center gap-x-2"
                     >
-                        <FaArrowLeftLong/>
+                        <ArrowLeft />
                         Back to organization
                     </Link>
 

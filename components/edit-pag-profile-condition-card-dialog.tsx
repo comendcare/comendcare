@@ -2,7 +2,7 @@
 
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {z} from "zod";
-import {useForm, UseFormReturn} from "react-hook-form";
+import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import React, {useEffect, useState} from "react";
 import {updateCondition} from "@/lib/actions";
@@ -12,11 +12,9 @@ import {Textarea} from "@/components/ui/textarea";
 import MultipleSelector from "@/components/ui/multiple-selector";
 import {Button} from "@/components/ui/button";
 import {toast} from "sonner";
-import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import { getConditionsFromOrganizationId } from "@/lib/fetchers";
-import {FaPencil} from "react-icons/fa6";
 import {
     Dialog,
     DialogContent,
@@ -27,10 +25,10 @@ import {
 } from "@/components/ui/dialog";
 import {formatNumberWithCommas} from "@/lib/utils";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {FaQuestionCircle} from "react-icons/fa";
 import {researchFormSchema} from "@/components/research-onboarding-form";
 import mixpanel from "mixpanel-browser";
 import {Organization} from "@prisma/client";
+import { Info, Pencil } from "lucide-react";
 
 export default function EditPAGProfileConditionCardDialog({organization}: { organization: Organization }) {
     const {data: session} = useSession()
@@ -225,7 +223,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                         variant="ghost"
                         className="gap-x-2"
                     >
-                        <FaPencil/>
+                        <Pencil />
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="max-h-[80vh] overflow-y-auto">
@@ -474,7 +472,7 @@ export default function EditPAGProfileConditionCardDialog({organization}: { orga
                                             {`The treatment modalities of interest of your organization. Select all that apply.`}
                                             <Tooltip delayDuration={0}>
                                                 <TooltipTrigger>
-                                                    <FaQuestionCircle
+                                                    <Info
                                                         className="text-black h-4 inline-block align-baseline mx-1"/>
                                                 </TooltipTrigger>
                                                 <TooltipContent>

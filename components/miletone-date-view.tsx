@@ -1,6 +1,6 @@
 import React from "react"
-import { FaCalendar } from "react-icons/fa6"
 import {monthsList} from "@/lib/data";
+import { Calendar } from "lucide-react";
 
 export function DateView({startDate, endDate, startLabel, endLabel}: {startDate: Date | undefined, endDate: Date | undefined, startLabel?: string | undefined, endLabel?: string | undefined}) {
     if (startDate && endDate) {
@@ -9,7 +9,7 @@ export function DateView({startDate, endDate, startLabel, endLabel}: {startDate:
 
         return (
             <span className="flex items-center gap-2 text-bottom">
-                <FaCalendar 
+                <Calendar 
                     aria-hidden="true"
                 />
                 <p>{`${monthsList[startDate.getMonth()]} ${startDate.getFullYear()} - ${monthsList[endDate.getMonth()]} ${endDate.getFullYear()}`}</p>
@@ -20,7 +20,7 @@ export function DateView({startDate, endDate, startLabel, endLabel}: {startDate:
 
         return (
             <span className="flex items-center gap-2 text-bottom">
-                <FaCalendar
+                <Calendar 
                     aria-hidden="true"
                 />
                 <p>{`${startLabel || "Starting:"} ${monthsList[startDate.getMonth()]} ${startDate.getFullYear()}`}</p>
@@ -31,7 +31,7 @@ export function DateView({startDate, endDate, startLabel, endLabel}: {startDate:
 
         return (
             <span className="flex items-center gap-2 text-bottom">
-                <FaCalendar
+                <Calendar 
                     aria-hidden="true"
                 />
                 <p>{`${endLabel || "Ending:"} ${monthsList[endDate.getMonth()]} ${endDate.getFullYear()}`}</p>

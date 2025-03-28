@@ -1,8 +1,8 @@
 "use client"
 
-import { FaArrowLeft } from "react-icons/fa6";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 export function BackButton() {
     const router = useRouter()
@@ -14,7 +14,7 @@ export function BackButton() {
                 router.back()
             }}
         >
-            <FaArrowLeft />
+            <ArrowLeft />
             {`Back`}
         </Button>
     )

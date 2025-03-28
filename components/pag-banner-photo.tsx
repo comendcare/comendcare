@@ -10,7 +10,6 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 import {Form} from "@/components/ui/form";
-import {cn} from "@/lib/utils";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -22,7 +21,7 @@ import {updateOrganization} from "@/lib/actions";
 import {useSession} from "next-auth/react";
 import {useRouter} from "next/navigation";
 import {Button} from "@/components/ui/button";
-import {FaPencil} from "react-icons/fa6";
+import { Pencil } from "lucide-react";
 
 const editOrgProfileImageSchema = z.object({
     image: z.string().optional(),
@@ -104,7 +103,7 @@ export function PAGBannerPhoto({
                             variant="ghost"
                             className="absolute top-2 right-2 p-2 bg-white shadow-md rounded-full"
                         >
-                            <FaPencil className="w-4 h-4"/>
+                            <Pencil className="w-4 h-4"/>
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="max-h-[80vh] overflow-y-auto">

@@ -20,8 +20,6 @@ import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
 import { cn, sleep } from "@/lib/utils"
 import Link from "next/link"
-import { FaArrowUpRightFromSquare, FaFileImport, FaPlus } from "react-icons/fa6"
-import { FaInfoCircle } from "react-icons/fa"
 import {
     Dialog,
     DialogContent,
@@ -29,7 +27,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "./ui/dialog"
-import { Redo2, Undo2 } from "lucide-react"
+import { ExternalLink, Import, Info, Plus, Redo2, Undo2 } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import Papa from "papaparse"
 import { toast } from "sonner"
@@ -191,7 +189,7 @@ export function Roadmap() {
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <div className="ml-auto">
-                                            <FaInfoCircle />
+                                            <Info className="h-4 w-4"/>
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-80 text-wrap text-left">
@@ -225,7 +223,7 @@ export function Roadmap() {
                                         className="research-plan-tour-step1" 
                                         onClick={() => setNewMilestoneIsOpen(true)}
                                     >
-                                        <FaPlus />
+                                        <Plus />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
@@ -244,7 +242,7 @@ export function Roadmap() {
                                         size={"icon"} 
                                         variant={"ghost"}
                                     >
-                                        <FaFileImport />
+                                        <Import />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
@@ -300,11 +298,11 @@ export function Roadmap() {
                                         href={orgSubdomain ? `http://${orgSubdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/research-plan` : "/"}
                                         className={cn(
                                             buttonVariants({ variant: "ghost" }),
-                                            "flex items-center"
+                                            "flex items-center w-[40px]"
                                         )}
                                         target={"_blank"}
                                     >
-                                        <FaArrowUpRightFromSquare size={12}/>
+                                        <ExternalLink className="h-4 w-4"/>
                                     </Link>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
@@ -519,7 +517,7 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val:
                 You do not have any milestones yet. Create one to get started.
             </p>
             <Button variant={"cta"} onClick={() => setNewMilestoneIsOpen(true)}>
-                <FaPlus />
+                <Plus />
                 Create milestone
             </Button>
         </div>

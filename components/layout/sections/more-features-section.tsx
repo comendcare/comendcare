@@ -1,7 +1,7 @@
 "use client"
 import React from "react"
 import {motion} from "framer-motion"
-import {FaCircleCheck} from "react-icons/fa6";
+import { CircleCheck } from "lucide-react";
 
 
 const features = [
@@ -38,7 +38,7 @@ export default function MoreFeaturesSection() {
                         key={feature}
                         className="flex items-center space-x-4 ml-36" // Not going to bother figuring out how to properly center this :|
                     >
-                        <FaCircleCheck
+                        <CircleCheck
                             className="w-8 h-8 text-[#87EBA4] dark:text-[#87EBA4] rounded-full bg-green-600 flex-shrink-0"
                         />
                         <p className="text-2xl">

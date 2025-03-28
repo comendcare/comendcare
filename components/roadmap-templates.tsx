@@ -7,13 +7,11 @@ import { SetStateAction, useState } from "react";
 import { templateMilestones } from '@/lib/templates'
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
-import { nanoid } from "nanoid";
-import type { Node } from "@xyflow/react"
 import ComendLoadingSpinner from "./comend-loading-spinner";
 import { MilestoneTemplateCardMultiSelect, MilestoneTemplateCardSingleSelect } from "./milestone-template-card";
-import { FaPlus } from "react-icons/fa";
 import { Card, CardContent, CardTitle } from "./ui/card";
 import { DialogClose } from "./ui/dialog";
+import { Plus } from "lucide-react";
 
 const selector = (state: RoadmapState) => ({
     milestones: state.milestones,
@@ -134,7 +132,7 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
                     <Card className="h-full w-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
                         <CardContent className="flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
                             <CardTitle>{`Create an empty milestone`}</CardTitle>
-                            <FaPlus />
+                            <Plus />
                         </CardContent>
                     </Card>
                 </Button>
@@ -152,7 +150,7 @@ const EmptyMilestoneCard = ({handleClick, inDialog}: {handleClick: (event: any) 
             <Card className="h-full bg-white shadow-sm rounded-lg overflow-hidden text-left overflow-visible">
                 <CardContent className="flex flex-col justify-center items-center gap-4 p-10 m-0 text-wrap text-center">
                     <CardTitle>{`Create an empty milestone`}</CardTitle>
-                    <FaPlus />
+                    <Plus />
                 </CardContent>
             </Card>
         </Button>

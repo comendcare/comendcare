@@ -6,12 +6,10 @@ import { Task, TaskCard } from "@/components/task-card"
 import { cva } from "class-variance-authority"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "./ui/button"
-import { GripVertical } from "lucide-react"
-import { ScrollArea, ScrollBar } from "./ui/scroll-area"
+import { Ellipsis, GripVertical, Trash } from "lucide-react"
+import { ScrollArea } from "./ui/scroll-area"
 import { cn } from "@/lib/utils"
 import {Column} from "@prisma/client";
-import NewColumnDialog from "./new-column-dialog"
-import { Badge } from "./ui/badge"
 import NewKanbanTaskButton from "@/components/new-kanban-task-button";
 import {
     DropdownMenu,
@@ -19,7 +17,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {FaEllipsis, FaTrash} from "react-icons/fa6";
 import { KanbanState, useKanbanStore } from "@/state/kanban/kanbanStore"
 import { useShallow } from "zustand/react/shallow"
 import EditColumnDialog from "./edit-column-dialog"
@@ -35,7 +32,6 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
 
 export type ColumnType = "Column"
 
@@ -140,7 +136,7 @@ export function BoardColumn({ column, tasks, isOverlay, filter, mountKey }: Boar
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost">
-                                <FaEllipsis/>
+                                <Ellipsis />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
@@ -150,7 +146,7 @@ export function BoardColumn({ column, tasks, isOverlay, filter, mountKey }: Boar
                                     <DropdownMenuItem
                                         onSelect={(e) => e.preventDefault()}
                                     >
-                                        <FaTrash/>
+                                        <Trash />
                                         Delete column
                                     </DropdownMenuItem>
                                 </AlertDialogTrigger>

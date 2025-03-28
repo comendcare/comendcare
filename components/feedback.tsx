@@ -9,9 +9,8 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { FaComment } from "react-icons/fa6"
-import { uploadFeedbackImg } from "@/lib/g-cloud"
 import FeedbackForm from "@/components/feedback-form";
+import { MessageCircle } from "lucide-react"
 
 interface FeedbackProps {
     className?: string
@@ -23,8 +22,8 @@ export const FeedbackSheet: React.FC<FeedbackProps> = () => {
         <Sheet>
             <SheetTrigger asChild>
                 <Button variant="ghost">
-                    <FaComment />
-                    <span>Submit feedback</span>
+                    <MessageCircle aria-hidden={true} />
+                    Submit feedback
                 </Button>
             </SheetTrigger>
             <SheetContent onOpenAutoFocus={event => event.preventDefault()}>

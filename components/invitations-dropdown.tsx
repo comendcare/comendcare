@@ -3,9 +3,9 @@
 import {deleteInvitation} from "@/lib/actions";
 import {toast} from "sonner";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
-import {FaEllipsis, FaUserXmark} from "react-icons/fa6";
 import {useSession} from "next-auth/react";
 import {Invitation} from "@prisma/client";
+import { Ellipsis, UserX } from "lucide-react";
 
 export default async function InvitationsDropdown({invitation}: { invitation: Invitation }) {
     const session = useSession()
@@ -26,14 +26,14 @@ export default async function InvitationsDropdown({invitation}: { invitation: In
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
-                <FaEllipsis/>
+                <Ellipsis />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuItem
                     className="text-red-600"
                     onClick={() => revokeInvite(invitation)}
                 >
-                    <FaUserXmark />
+                    <UserX />
                     Revoke invitation
                 </DropdownMenuItem>
             </DropdownMenuContent>

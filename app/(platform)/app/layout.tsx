@@ -24,13 +24,13 @@ import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sid
 import {AppSidebar} from "@/components/app-sidebar";
 import { createKanban, createRoadmap } from "@/lib/actions";
 import { FeedbackSheet } from "@/components/feedback";
-import { FaWandMagicSparkles } from "react-icons/fa6";
 import { useOnborda } from "@/components/onborda/OnbordaContext";
 import { Button } from "@/components/ui/button";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
 import { cn, sleep } from "@/lib/utils";
+import { Wand2 } from "lucide-react";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -212,8 +212,8 @@ export default function AppLayout({children}: AppLayoutProps) {
                                             startOnborda('research-plan-toru')
                                         }
                                     }}>
-                                    <FaWandMagicSparkles/>
-                                    <span>Take a tour</span>
+                                    <Wand2 aria-hidden={true} />
+                                    Take a tour
                                 </Button>
                                 <FeedbackSheet />
                                 <Button

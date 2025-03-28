@@ -1,10 +1,9 @@
-import type {UniqueIdentifier} from "@dnd-kit/core"
 import {useSortable} from "@dnd-kit/sortable"
 import {CSS} from "@dnd-kit/utilities"
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card"
 import {Button} from "@/components/ui/button"
 import {cva} from "class-variance-authority"
-import {ArrowUpLeft, CornerLeftUp, GripVertical} from "lucide-react"
+import {Calendar, CornerLeftUp, GripVertical, SquareCheck} from "lucide-react"
 import {Badge} from "@/components/ui/badge"
 import {
     Dialog,
@@ -12,27 +11,14 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-    DialogFooter,
-    DialogDescription
 } from "./ui/dialog"
 import {EditTaskForm} from "./edit-task-form"
 import {useEffect, useState} from "react"
-import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
-import {useShallow} from "zustand/react/shallow"
-import {usePathname, useRouter, useSearchParams} from "next/navigation"
-import {Checkbox} from "./ui/checkbox"
-import {Label} from "@/components/ui/label";
-import {Input} from "@/components/ui/input";
-import { DisplayPlateEditor } from "./editor/display-plate-editor"
-import { ScrollArea } from "./ui/scroll-area"
 import { Milestone } from "@prisma/client"
 import { ProfilePhoto } from "./profile-photo"
-import { FaCheckSquare } from "react-icons/fa"
-import { FaCalendar } from "react-icons/fa6"
 import { truncate } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip"
 import { PriorityType, StatusType } from "@/lib/types"
-import { useKanbanStore } from "@/state/kanban/kanbanStore"
 
 export interface Task {
     columnId: string;
@@ -180,7 +166,7 @@ export function TaskCard({task, isOverlay, mountKey}: TaskCardProps) {
                                     <Tooltip>
                                         <TooltipTrigger>
                                         <span className="flex gap-2 items-center">
-                                            <FaCalendar className="mb-1"/>
+                                            <Calendar className="mb-1"/>
                                             <p className="text-md">{task.endDate.toDateString().split(" ").slice(1).join(" ")}</p>
                                         </span>
                                         </TooltipTrigger>
@@ -193,7 +179,7 @@ export function TaskCard({task, isOverlay, mountKey}: TaskCardProps) {
                                     <Tooltip>
                                         <TooltipTrigger>
                                         <span className="flex gap-2 items-center">
-                                            <FaCheckSquare />
+                                            <SquareCheck />
                                             <p className="text-md">{`${task.checklist.filter(item => item.complete).length}/${task.checklist.length}`}</p>
                                         </span>
                                         </TooltipTrigger>

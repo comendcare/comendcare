@@ -18,34 +18,12 @@ import {
     CardHeader,
     CardTitle
 } from "./ui/card"
-import {
-    FaArrowRight,
-    FaArrowUpRightFromSquare,
-    FaBullhorn,
-    FaCalendar,
-    FaDollarSign,
-    FaEllipsis,
-    FaFileLines,
-    FaPaperclip,
-    FaPlus,
-    FaStar,
-    FaTrash,
-    FaUser
-} from "react-icons/fa6"
 import StatusButton from "./milestone-status-button"
 import {truncate, cn, formatMoney} from "@/lib/utils"
 import {DateView} from "./miletone-date-view"
 import {PrivateBadge} from "./private-badge"
-import {monthsList} from "@/lib/data";
-import {Badge, badgeVariants} from "./ui/badge"
+import {badgeVariants} from "./ui/badge"
 import {StatusType} from "@/lib/types"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuTrigger
-} from "./ui/dropdown-menu"
 import {PopoverClose, PopoverContent, PopoverTrigger} from "@radix-ui/react-popover"
 import {Popover} from "./plate-ui/popover"
 import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
@@ -54,7 +32,7 @@ import {PublicMilestoneNode} from "./public-milestone-node"
 import { TypeBadge } from "./type-badge"
 import { MilestoneType } from "@prisma/client"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
-// import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { CircleDollarSign, Ellipsis, ExternalLink, Plus, Trash, User } from "lucide-react"
 
 export type PrivateMilestoneNode = Node<
     {
@@ -131,7 +109,7 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
                                 variant="ghost"
                                 className="p-2 h-auto justify-end h-full z-20"
                             >
-                                <FaEllipsis/>
+                                <Ellipsis />
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-40 z-20">
@@ -260,7 +238,7 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
                 variant="ghost"
                 className="hover:bg-secondary h-8 w-8 rounded-full pointer-events-none"
             >
-                <FaPlus className="pointer-events-none"/>
+                <Plus className="pointer-events-none"/>
             </Button>
             {isHovering && (
                 <Button
@@ -268,7 +246,7 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
                     className="h-8 w-8 rounded-full hover:bg-white"
                     onClick={handleTrashClick}
                 >
-                    <FaTrash/>
+                    <Trash />
                 </Button>
             )}
         </Handle>
@@ -284,19 +262,19 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                         if (contact.name && contact.email) {
                             return (
                                 <li key={index} className="flex gap-2 items-center">
-                                    <FaUser/>
+                                    <User />
                                     <p className="w-[90%] text-wrap break-words">{contact.name} &bull; {contact.email}</p>
                                 </li>)
                         } else if (contact.name) {
                             return (
                                 <li key={index} className="flex gap-2 items-center w-full">
-                                    <FaUser/>
+                                    <User />
                                     <p className="w-[90%] text-wrap break-words">{contact.name}</p>
                                 </li>)
                         } else if (contact.email) {
                             return (
                                 <li key={index} className="flex gap-2 items-center">
-                                    <FaUser/>
+                                    <User />
                                     <p className="w-[90%] text-wrap break-words">{contact.email}</p>
                                 </li>)
                         }
@@ -325,7 +303,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                         if (contact.affiliation) {
                             return (
                                 <li key={index} className="flex gap-2 items-center">
-                                    <FaUser/>
+                                    <User />
                                     <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
                                 </li>
                             )
@@ -367,7 +345,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                     )}
                     {props?.data?.budget && (
                         <li className="flex gap-2 items-center">
-                            <FaDollarSign/>
+                            <CircleDollarSign />
                             {formatMoney(props?.data?.budget)} budget
                         </li>
                     )}
@@ -395,7 +373,7 @@ export const AttachmentsTag = ({attachments}: { attachments: any[] }) => {
                 "text-sm w-min inline-flex flex-row justify-start items-center gap-x-2 truncate rounded-md px-2 py-1 font-medium"
             )}
         >
-            <FaArrowUpRightFromSquare/>
+            <ExternalLink className="h-4 w-4"/>
             {attachments.length > 1 ? `${attachments.length} Links` : `${attachments.length} Link`}
         </div>
     )
