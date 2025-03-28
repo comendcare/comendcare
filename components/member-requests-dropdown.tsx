@@ -5,8 +5,8 @@ import {MemberRequestWithUser} from "@/lib/types";
 import {approveMemberRequestAndCreateMember, deleteMemberRequest} from "@/lib/actions";
 import {toast} from "sonner";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
-import {FaEllipsis, FaUserCheck, FaUserXmark} from "react-icons/fa6";
 import {useSession} from "next-auth/react";
+import { Ellipsis, UserCheck, UserX } from "lucide-react";
 
 export default async function MemberRequestsDropdown({memberRequest}: { memberRequest: MemberRequestWithUser }) {
     const session = useSession()
@@ -40,20 +40,20 @@ export default async function MemberRequestsDropdown({memberRequest}: { memberRe
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
-                <FaEllipsis/>
+                <Ellipsis />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuItem
                     onClick={() => approveMemberRequest(memberRequest)}
                 >
-                    <FaUserCheck/>
+                    <UserCheck />
                     Approve request
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     onClick={() => denyMemberRequest(memberRequest)}
                     className="text-red-600 hover:text-red-800"
                 >
-                    <FaUserXmark/>
+                    <UserX />
                     Deny request
                 </DropdownMenuItem>
             </DropdownMenuContent>

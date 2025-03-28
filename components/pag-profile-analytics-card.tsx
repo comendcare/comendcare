@@ -1,10 +1,6 @@
 "use client"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
-import {FaPen} from "react-icons/fa6";
-import {useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
-import {Line, LineChart, ResponsiveContainer} from "recharts";
 import {PrivateBadge} from "./private-badge";
 import PAGAnalyticsLineChart from "@/components/pag-analytics-line-chart";
 

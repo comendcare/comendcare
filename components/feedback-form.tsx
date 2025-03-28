@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { FaCircleInfo } from "react-icons/fa6"
 import {
     TooltipProvider,
     Tooltip,
@@ -31,6 +30,7 @@ import {createFeedbackTicket} from "@/lib/notion";
 import {toast} from "sonner";
 import {z} from "zod";
 import {uploadFeedbackImg} from "@/lib/g-cloud";
+import { Info } from "lucide-react"
 
 async function getBase64(file: File) {
     return new Promise((resolve, reject) => {
@@ -195,7 +195,7 @@ export default function FeedbackForm () {
                                                 className="p-0 h-auto"
                                                 variant="ghost"
                                             >
-                                                <FaCircleInfo className="inline" />
+                                                <Info className="inline h-4 w-4" />
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-64">

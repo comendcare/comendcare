@@ -14,13 +14,12 @@ import { Button, buttonVariants } from "./ui/button";
 import Link from "next/link";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import { FaQuestion } from "react-icons/fa6";
-import { FaInfoCircle } from "react-icons/fa";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import Loading from "@/app/loading";
 import Spinner from "@/components/ui/spinner"
 import logo from "@/public/Full logo.png"
 import { useSearchParams } from "next/navigation";
+import { Info } from "lucide-react";
 
 const selector = (state: CROSearchState) => ({
     recommendations: state.recommendations,
@@ -138,7 +137,7 @@ export function CROSearchResults() {
                                             Start a research plan to view recommendations
                                             <Tooltip>
                                                 <TooltipTrigger>
-                                                    <FaInfoCircle className="h-4 w-4"/>
+                                                    <Info className="h-4 w-4"/>
                                                 </TooltipTrigger>
                                                 <TooltipContent className="max-w-80 !text-xs">
                                                     <p>

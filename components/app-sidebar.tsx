@@ -3,14 +3,9 @@
 import * as React from "react"
 import {
     Cog,
-    LayoutDashboard,
-    Newspaper,
-    Pin,
     Store, User, Workflow,
     Bookmark
 } from "lucide-react"
-import { FaRegBookmark } from "react-icons/fa6"
-
 import {NavMain} from "@/components/nav-main"
 import {NavUser} from "@/components/nav-user"
 import {OrganizationSwitcher} from "@/components/organization-switcher"
@@ -28,7 +23,6 @@ import {toast} from "sonner";
 import {useEffect, useState} from "react";
 import {useSession} from "next-auth/react";
 import {MemberWithOrganization} from "@/app/(platform)/app/layout";
-import { KANBAN_NOTIFICATIONS } from "@/lib/types"
 
 // This is sample data.
 const data = {

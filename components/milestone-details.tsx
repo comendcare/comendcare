@@ -1,30 +1,23 @@
 "use client"
 
 import React from "react"
-import {ScrollArea} from "./ui/scroll-area"
 import StatusButton from "./milestone-status-button"
-import {FaArrowUpRightFromSquare, FaDollarSign, FaPaperclip} from "react-icons/fa6"
-import {Label} from "./ui/label"
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle
 } from "./ui/card"
 import {NODE_TYPE_OPTIONS} from "@/lib/types"
-import {Badge} from "./ui/badge"
 import {DateView} from "./miletone-date-view"
 import {BudgetView} from "./milestone-budget-view"
-import {AssetEditForm} from "./asset-edit-form"
-import {AssetDetails} from "./asset-details"
 import {Separator} from "./ui/separator"
 import Link from "next/link"
-import {RFPDetails} from "./rfp-details.tsx"
 import {Button} from "./ui/button"
 import { TypeBadge } from "./type-badge"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
+import { ExternalLink } from "lucide-react"
 
 export function MilestoneDetails({milestone}: { milestone: any }) {
     return (
@@ -99,8 +92,7 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                             {milestone?.attachments?.map((attachment: any, index: number) => (
                                 <Link href={attachment.link} key={index} target="_blank">
                                     <Button variant="secondary">
-                                        {/* <FaPaperclip/> */}
-                                        <FaArrowUpRightFromSquare/>
+                                        <ExternalLink />
                                         {attachment.name || attachment.link}
                                     </Button>
                                 </Link>

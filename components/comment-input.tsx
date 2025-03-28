@@ -1,12 +1,11 @@
 "use client";
 
 import * as React from "react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
 import { Input, InputProps } from "@/components/ui/input";
-import {FaPaperPlane} from "react-icons/fa6";
+import { Send } from "lucide-react";
+import Spinner from "./ui/spinner";
 
 interface CommentInputProps extends InputProps {
     onSubmit: () => void;
@@ -37,12 +36,12 @@ const CommentInput = React.forwardRef<HTMLInputElement, CommentInputProps>(
                     className="absolute right-0 -top-1 md:top-0 bottom-0 px-3 py-2 text-muted-foreground disabled:cursor-not-allowed disabled:pointer-events-auto hover:bg-inherit"
                 >
                     {isLoading ? (
-                        <Icons.spinner
+                        <Spinner
                             className="h-4 w-4 animate-spin"
                             aria-hidden="true"
                         />
                     ) : (
-                        <FaPaperPlane className="h-4 w-4" aria-hidden="true" />
+                        <Send aria-hidden="true" />
                     )}
                     <span className="sr-only">Send comment</span>
                 </Button>

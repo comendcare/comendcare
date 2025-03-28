@@ -2,15 +2,13 @@ import React from "react";
 import {
     Card,
     CardContent,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth";
 import { getConditionsFromOrganizationId, getOrganizationFromOrganizationId } from "@/lib/fetchers";
-import { FaGlobe, FaMoneyBill, FaFile, FaImage, FaMap } from "react-icons/fa6";
 import {PrivateBadge} from "@/components/private-badge";
+import { Banknote, File, Globe, Image, Map } from "lucide-react";
 
 // Define the possible milestone keys explicitly
 type MilestoneKey =
@@ -52,27 +50,27 @@ interface Condition {
 const milestoneMessages: Record<MilestoneKey, { message: string; icon: JSX.Element }> = {
     "Add website and description": {
         message: "Add your organization's website and description to improve visibility.",
-        icon: <FaGlobe className="size-4" />,
+        icon: <Globe className="size-4" />,
     },
     "Provide financial & incorporation details": {
         message: "Provide financial and incorporation details to enhance credibility.",
-        icon: <FaMoneyBill className="size-4" />,
+        icon: <Banknote className="size-4" />,
     },
     "Complete condition data": {
         message: "Complete condition details to help researchers understand your focus.",
-        icon: <FaFile className="size-4" />,
+        icon: <File className="size-4" />,
     },
     "Upload profile image": {
         message: "Upload a profile image to personalize your organization's profile.",
-        icon: <FaImage className="size-4" />,
+        icon: <Image className="size-4" />,
     },
     "Upload header image": {
         message: "Upload a header image to make your profile more visually appealing.",
-        icon: <FaImage className="size-4" />,
+        icon: <Image className="size-4" />,
     },
     "Add roadmap": {
         message: "Add a research roadmap to showcase your planned initiatives.",
-        icon: <FaMap className="size-4" />,
+        icon: <Map className="size-4" />,
     },
 };
 

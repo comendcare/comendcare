@@ -1,6 +1,5 @@
 "use client"
 import {cn} from "@/lib/utils"
-import {FaBars, FaX} from "react-icons/fa6"
 import {
     motion,
     AnimatePresence,
@@ -9,7 +8,6 @@ import {
 } from "framer-motion"
 import Link from "next/link"
 import React, {useRef, useState} from "react"
-import {buttonVariants} from "@/components/ui/button"
 import logo from "@/public/logos/comend-full-logo.png"
 import Image from "next/image"
 import {
@@ -17,11 +15,10 @@ import {
     MenuItem,
     ProductItem
 } from "@/components/layout/sections/navbar-menu"
-import {encode} from "qss"
-import {imgHeight, imgWidth} from "@/components/layout/sections/tabs-features"
 import {PulsatingButton} from "@/components/ui/pulsating-button";
 import {usePathname, useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
+import { X, Menu as MenuIcon } from "lucide-react"
 import {Button} from "@/components/ui/button";
 
 interface NavbarItem {
@@ -275,12 +272,12 @@ const MobileNav: React.FC<NavbarProps> = ({navItems, visible}) => {
                         />
                     </Link>
                     {open ? (
-                        <FaX
+                        <X
                             className="text-black dark:text-white"
                             onClick={() => setOpen(!open)}
                         />
                     ) : (
-                        <FaBars
+                        <MenuIcon
                             className="text-black dark:text-white"
                             onClick={() => setOpen(!open)}
                         />

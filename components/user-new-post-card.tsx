@@ -3,14 +3,13 @@
 import {useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {Card, CardHeader, CardTitle} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import {FaPaperPlane} from "react-icons/fa6";
 import * as z from "zod";
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import { ProfilePhoto } from "./profile-photo";
+import { Send } from "lucide-react";
 
 const newPostSchema = z.object({
     text: z
@@ -82,7 +81,7 @@ export const UserNewPostCard = () => {
                         className="p-3 disabled:opacity-50"
                         disabled={form.watch("text")?.length === 0}
                     >
-                        <FaPaperPlane/>
+                        <Send />
                     </Button>
 
                 </CardTitle>

@@ -4,7 +4,6 @@ import {signOut, useSession} from "next-auth/react"
 import {useEffect, useState} from "react"
 import {useRouter} from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import LogoutButton from "./logout-button"
 import {
     DropdownMenu,
@@ -13,10 +12,10 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import {FaArrowRightFromBracket} from "react-icons/fa6";
 import Loading from "@/app/loading";
 import { getUser } from "@/lib/fetchers"
 import { ProfilePhoto } from "@/components/profile-photo"
+import { LogOut } from "lucide-react"
 
 export default function Profile({isCollapsed = false}: {isCollapsed?: boolean }) {
     const {data: session, status} = useSession()
@@ -76,7 +75,7 @@ export default function Profile({isCollapsed = false}: {isCollapsed?: boolean })
                     <DropdownMenuItem
                         onClick={() => signOut()}
                     >
-                        <FaArrowRightFromBracket/>
+                        <LogOut />
                         <span>Logout</span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>

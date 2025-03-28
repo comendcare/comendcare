@@ -1,9 +1,6 @@
 import FinancesOnboardingForm from "@/components/finances-onboarding-form";
 import {Separator} from "@/components/ui/separator";
-import {FaQuestionCircle} from "react-icons/fa";
 import {TooltipProvider} from "@/components/ui/tooltip";
-import {Timer} from "lucide-react";
-
 
 export default function FinancesOnboardingPage() {
     return (

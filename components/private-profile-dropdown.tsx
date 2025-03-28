@@ -3,13 +3,10 @@
 import {
     DropdownMenu,
     DropdownMenuContent, DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
-import {FaEllipsis, FaEye, FaRegCircleCheck, FaGlasses, FaWandMagicSparkles} from "react-icons/fa6";
-import {useOnborda} from "@/components/onborda/OnbordaContext";
+import { Ellipsis, Globe } from "lucide-react";
 
 
 export default function PrivateProfileDropdown({subdomain}: { subdomain: string | null }) {
@@ -21,14 +18,14 @@ export default function PrivateProfileDropdown({subdomain}: { subdomain: string 
                     variant="outline"
                     className="block xl:hidden gap-x-2"
                 >
-                    <FaEllipsis className="size-6"/>
+                    <Ellipsis className="size-6"/>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
                 <DropdownMenuItem asChild>
                     <a href={`http://${subdomain}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`} target="_blank"
                        rel="noopener noreferrer" className="flex items-center gap-2">
-                        <FaEye/>
+                        <Globe />
                         <span>Public view</span>
                     </a>
                 </DropdownMenuItem>

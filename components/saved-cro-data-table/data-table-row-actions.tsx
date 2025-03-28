@@ -5,16 +5,15 @@ import {Row} from "@tanstack/react-table"
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem, DropdownMenuRadioGroup, DropdownMenuRadioItem,
-    DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {FaBookmark, FaRegBookmark} from "react-icons/fa6";
-import {Company, OrganizationToCompanyEngagement, Milestone, SavedCompany} from "@prisma/client";
+import {OrganizationToCompanyEngagement, Milestone, SavedCompany} from "@prisma/client";
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {
     Dialog,
@@ -31,9 +30,8 @@ import {getMilestones, getSavedCompaniesFromOrganizationId} from "@/lib/fetchers
 import {signOut, useSession} from "next-auth/react";
 import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl} from "@/components/ui/form";
 import va from "@vercel/analytics"
-import {deleteUser, editSavedCRO, saveCRO, unsaveCRO} from "@/lib/actions";
+import {editSavedCRO, unsaveCRO} from "@/lib/actions";
 import {useRouter} from "next/navigation";
-import {revalidatePath} from "next/cache";
 import {SavedCompanyData} from "@/lib/types";
 
 const formSchema = z.object({
