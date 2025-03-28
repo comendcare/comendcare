@@ -21,11 +21,11 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import MultipleSelector from "@/components/ui/multiple-selector";
 import {ToggleGroup, ToggleGroupItem} from "@/components/ui/toggle-group";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {FaQuestionCircle} from "react-icons/fa";
 import React from "react";
 import LoadingDots from "@/components/icons/loading-dots";
 import {researchFormSchema} from "@/components/research-onboarding-form";
 import { Option } from "@/lib/types";
+import { Info } from "lucide-react";
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -516,7 +516,7 @@ export default function EditConditionProfileDialog() {
                                     {`What type of disorder is ${'disoder name'}`}
                                     <Tooltip delayDuration={0}>
                                         <TooltipTrigger>
-                                            <FaQuestionCircle
+                                            <Info
                                                 className="text-black h-4 inline-block align-baseline mx-1"/>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -554,7 +554,7 @@ export default function EditConditionProfileDialog() {
                                     {`The treatment modalities of interest by your organization.`}
                                     <Tooltip delayDuration={0}>
                                         <TooltipTrigger>
-                                            <FaQuestionCircle
+                                            <Info
                                                 className="text-black h-4 inline-block align-baseline mx-1"/>
                                         </TooltipTrigger>
                                         <TooltipContent>

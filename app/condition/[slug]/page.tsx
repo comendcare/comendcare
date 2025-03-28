@@ -1,46 +1,25 @@
 import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
-import {getConditionData, getConditionsDataFromOrgId} from "@/lib/fetchers"
-import {cn, formatDate, toDateString} from "@/lib/utils"
-import * as domain from "node:domain";
+import {getConditionData} from "@/lib/fetchers"
+import {cn, toDateString} from "@/lib/utils"
 import {
-    Breadcrumb, BreadcrumbEllipsis,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList, BreadcrumbPage,
-    BreadcrumbSeparator
-} from "@/components/ui/breadcrumb";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {
-    Dialog,
-    DialogContent,
     DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import {Button} from "@/components/ui/button";
-import {ExternalDiseaseProfilesTable} from "@/components/external-disease-profiles-table";
 import {promises as fs} from "fs";
 import path from "path";
 import {z} from "zod";
-import {UserFormsDataTable} from "@/components/organizations-data-table/user-forms-data-table";
-import {userFormsTableColumns} from "@/components/organizations-data-table/user-forms-data-table-columns";
 import {formSchema} from "@/lib/schemas";
 import React from "react";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import Overview from "@/app/(admin)/admin/page";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
-import {FaUserCheck, FaUserPlus, FaUsersViewfinder} from "react-icons/fa6";
-import HumanAnatomyMap from "@/components/human-anatomy-map";
 import {Badge} from "@/components/ui/badge";
-import {CalendarDays, FolderOpen} from "lucide-react";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import {FolderOpen, UserSearch} from "lucide-react";
 import {faker} from "@faker-js/faker";
-import {bioassets} from "@/lib/data";
-import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 import {Condition, Organization} from "@prisma/client";
 import {Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious} from "@/components/ui/carousel";
 import ConditionProfilePatientGroupCard from "@/components/condition-profile-patient-group-card";
@@ -48,7 +27,7 @@ import {ConditionProfileRecentActivityCard} from "@/components/ui/condition-prof
 import PublicPageFooter from "@/components/public-page-footer";
 import Link from "next/link";
 import {FloatingDock} from "@/components/floating-dock";
-import {IconBrandGithub, IconEdit, IconFlag, IconHome, IconShare, IconShare2, IconShare3} from "@tabler/icons-react";
+import {IconEdit, IconFlag, IconShare} from "@tabler/icons-react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import ShareDialog from "@/components/share-dialog";
@@ -382,7 +361,7 @@ export default async function ConditionPage({
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </CardTitle>
-                                            <FaUsersViewfinder/>
+                                            <UserSearch />
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-2xl font-bold">

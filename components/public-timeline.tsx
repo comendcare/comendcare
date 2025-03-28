@@ -3,7 +3,6 @@
 import React, {ReactNode} from "react"
 import {getDates} from "./pag-profile-research-plan-card"
 import {PrivateBadge} from "./private-badge"
-import {FaArrowUpRightFromSquare} from "react-icons/fa6"
 import {cn} from "@/lib/utils"
 import {Card, CardContent} from "./ui/card"
 import {Button} from "./ui/button"
@@ -11,6 +10,7 @@ import {usePathname} from "next/navigation"
 import {TypeBadge} from "./type-badge"
 import {TimelineCardContents} from "./private-timeline"
 import {ScrollArea} from "@/components/ui/scroll-area";
+import {ExternalLink} from "lucide-react"
 
 export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilestone, setUrlMilestone}: {
     roadmap: any,
@@ -98,7 +98,7 @@ const TimelineElementContent = ({item, externalLinkIcon}: { item: any, externalL
                     {item.title}
                 </h3>
                 {item.private && <PrivateBadge iconOnly={true}/>}
-                {!item.private && externalLinkIcon && <FaArrowUpRightFromSquare size={12}/>}
+                {!item.private && externalLinkIcon && <ExternalLink className="h-4 w-4"/>}
                 <time
                     className="ml-auto block font-semibold leading-none dark:text-gray-500">
                     {getDates(item)}

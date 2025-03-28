@@ -1,7 +1,5 @@
 import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog";
 import { getSession } from "@/lib/auth";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { FaUserXmark } from "react-icons/fa6";
 import Image from "next/image";
 import {getInvitees} from "@/lib/fetchers";
 import {toast} from "sonner";

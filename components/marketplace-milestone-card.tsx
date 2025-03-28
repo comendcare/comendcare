@@ -1,17 +1,12 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
 import {MILESTONE_STATUS_OPTIONS, NODE_TYPE_OPTIONS} from "@/lib/types";
-import {Badge} from "./ui/badge";
-import {DateView} from "./miletone-date-view";
-import {getOrganizationFromOrganizationId, getOrganizationFromRoadmapId} from "@/lib/fetchers";
-import React, {useEffect, useState} from "react";
-import {FaArrowUpRightFromSquare, FaMoneyBill} from "react-icons/fa6";
+import React from "react";
 import {cn, formatMoney, truncate} from "@/lib/utils";
 import {ProfilePhoto} from "@/components/profile-photo";
 import {Separator} from "@/components/ui/separator";
-import {BookCheck, Paperclip, TestTube, UserCheck} from "lucide-react";
+import {Banknote, ExternalLink} from "lucide-react";
 import {CardContents} from "@/components/private-milestone-node";
-import { PrivateBadge } from "./private-badge";
 import { PublicMilestoneNode } from "./public-milestone-node";
 import { NodeProps } from "@xyflow/react";
 import { TypeBadge } from "./type-badge";
@@ -74,7 +69,7 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
                     <Separator className="my-2"/>
                     <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
                         <TypeBadge type={milestone.nodeType}/>
-                        {!milestone.private && <FaArrowUpRightFromSquare className="h-[12px] w-[12px]"/>}
+                        {!milestone.private && <ExternalLink className="h-[12px] w-[12px]"/>}
                     </div>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4 grow">
@@ -146,7 +141,7 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
 
                         {/*{milestone.budget &&*/}
                         {/*    <div className="m-0 flex items-center">*/}
-                        {/*        <FaMoneyBill className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>*/}
+                        {/*        <Banknote className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>*/}
                         {/*        {formatMoney(milestone.budget)} budget*/}
                         {/*    </div>*/}
                         {/*}*/}
@@ -156,7 +151,7 @@ export function MilestoneMarketplaceCard({milestone}: { milestone: any }) {
                 {milestone.budget &&
                     <CardFooter className="justify-self-end">
                         <div className="m-0 flex items-center">
-                            <FaMoneyBill className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
+                            <Banknote className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>
                             {formatMoney(milestone.budget)} budget
                         </div>
                         {/*<div className="flex flex-row space-x-2">*/}

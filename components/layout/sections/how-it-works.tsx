@@ -1,11 +1,6 @@
 import React from "react"
 import HowItWorksCard from "@/components/how-it-works-card"
-import {
-    FaCircleArrowRight,
-    FaHandHoldingHeart,
-    FaHandshakeSimple,
-    FaUsers
-} from "react-icons/fa6"
+import { CircleArrowRight } from "lucide-react"
 
 const steps = [
     {
@@ -56,7 +51,7 @@ const HowItWorks = () => {
                         />
                         {/* Conditionally render the caret, but not after the last card */}
                         {index < steps.length - 1 && (
-                            <FaCircleArrowRight className="size-36" />
+                            <CircleArrowRight className="size-36" />
                         )}
                     </React.Fragment>
                 ))}

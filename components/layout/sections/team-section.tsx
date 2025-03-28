@@ -15,7 +15,7 @@ import Betty from "@/public/profiles/Betty.jpeg"
 import Megan from "@/public/profiles/Megan.png"
 import Tuongvi from "@/public/profiles/Tuongvi.jpeg"
 import Link from "next/link"
-import {FaInstagram, FaLinkedin} from "react-icons/fa6"
+import {Instagram, Linkedin} from "lucide-react"
 
 export function TeamSection() {
     const [active, setActive] = useState<(typeof cards)[number] | null>(null)
@@ -128,7 +128,7 @@ export function TeamSection() {
                                                     target="_blank"
                                                     className="text-gray-600 hover:text-gray-800"
                                                 >
-                                                    <FaLinkedin className="h-6 w-6"/>
+                                                    <Linkedin className="h-6 w-6"/>
                                                 </motion.a>
                                             )}
                                             {active.instagramURL && (
@@ -141,7 +141,7 @@ export function TeamSection() {
                                                     target="_blank"
                                                     className="text-gray-600 hover:text-gray-800"
                                                 >
-                                                    <FaInstagram className="h-6 w-6"/>
+                                                    <Instagram className="h-6 w-6"/>
                                                 </motion.a>
                                             )}
                                         </div>
@@ -205,7 +205,7 @@ export function TeamSection() {
                                         layout
                                         layoutId={`title-${card.linkedInURL}-${id}`}
                                     >
-                                        <FaLinkedin className="h-6 w-6"/>
+                                        <Linkedin className="h-6 w-6"/>
                                     </motion.a>
                                 </div>
                             </div>

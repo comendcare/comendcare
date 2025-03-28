@@ -14,7 +14,7 @@ import { Textarea } from "./ui/textarea"
 import { UseFormReturn } from "react-hook-form"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { Separator } from "./ui/separator"
-import { FaTrash } from "react-icons/fa6"
+import { Trash } from "lucide-react"
 
 type AssetType = Prisma.AssetGetPayload<{ 
     omit: { id: true, createdAt: true, updatedAt: true }
@@ -175,7 +175,7 @@ export function AssetEditForm({ form, asset }: { form: UseFormReturn<any>, asset
                                     form.setValue("asset", undefined)
                                 }}
                             >
-                                <FaTrash />
+                                <Trash />
                                 {`Remove Asset`}
                             </Button>
                         </CardFooter>

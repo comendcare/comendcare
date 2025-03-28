@@ -8,12 +8,11 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
+import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
 import {updateOrganization} from "@/lib/actions";
 import {toast} from "sonner";
@@ -21,10 +20,9 @@ import {useRouter} from "next/navigation";
 import {useSession} from "next-auth/react";
 import {Member, Organization, User} from "@prisma/client";
 import {useEffect, useState} from "react";
-import {FaPencil} from "react-icons/fa6";
 import {useDebounce} from "use-debounce";
 import {checkSubdomainAvailability, getOrganizationFromOrganizationId} from "@/lib/fetchers";
-import {getPublicFile} from "@/lib/utils";
+import { Pencil } from "lucide-react";
 
 const editSubdomainFormSchema = z.object({
     subdomain: z.string().min(2, {
@@ -136,7 +134,7 @@ export default function EditPagProfileSubdomainDialog({organization}: { organiza
                 <Button
                     variant="ghost"
                 >
-                    <FaPencil/>
+                    <Pencil />
                 </Button>
             </DialogTrigger>
             <DialogContent>
