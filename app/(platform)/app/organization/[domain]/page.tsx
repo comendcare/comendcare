@@ -10,7 +10,6 @@ import {Card, CardContent} from "@/components/ui/card";
 import Image from "next/image";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import Link from "next/link";
-import {FaArrowLeftLong} from "react-icons/fa6";
 import UnpublishedOrganizationPage from "@/components/unpublished-organization-page";
 import MarketplaceBreadcrumb from "@/components/marketplace-breadcrumb";
 

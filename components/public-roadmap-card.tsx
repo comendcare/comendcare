@@ -1,6 +1,6 @@
 "use client"
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {usePathname, useRouter} from "next/navigation";
 import {cn} from "@/lib/utils";
 import "@xyflow/react/dist/base.css"
 import {PublicFlowView} from "./public-flow";
@@ -8,9 +8,9 @@ import {PublicTimelineView} from "./public-timeline";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "./ui/tabs";
 import Image from "next/image"
 import {Button} from "@/components/ui/button";
-import {FaArrowUpRightFromSquare, FaPlus} from "react-icons/fa6";
 import Link from "next/link";
 import { buttonVariants } from "./plate-ui/button";
+import { ExternalLink, Plus } from "lucide-react";
 
 export const RoadmapCard = ({
     roadmap, 
@@ -61,7 +61,7 @@ export const RoadmapCard = ({
                                 className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                             >
                                 Edit research plan
-                                <FaArrowUpRightFromSquare/>
+                                <ExternalLink />
                             </Button>
                         }
                     </div>
@@ -125,7 +125,7 @@ export const NoResearchPlanCard = ({isPublic}: {isPublic: Boolean}) => {
                                 "h-10 mt-4"
                             )}
                         >
-                                <FaPlus />
+                                <Plus />
                                 Create a research plan
                         </a>
                     )}
@@ -152,7 +152,7 @@ export const UnderDevelopmentCard = ({isPublic}: {isPublic: Boolean}) => {
                             className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                         >
                             Edit research plan
-                            <FaArrowUpRightFromSquare/>
+                            <ExternalLink />
                         </Button>
                     }
                 </div>
@@ -181,7 +181,7 @@ export const UnderDevelopmentCard = ({isPublic}: {isPublic: Boolean}) => {
                                 "h-10"
                             )}
                         >
-                                <FaPlus />
+                                <Plus />
                                 Create a milestone
                         </Link>
                     )}

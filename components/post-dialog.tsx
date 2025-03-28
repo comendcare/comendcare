@@ -16,19 +16,17 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import {Icons} from "@/components/icons";
 import {useSession} from "next-auth/react";
-import {FaEllipsis} from "react-icons/fa6";
 import Link from "next/link";
 import {formatDates} from "@/lib/utils";
 import {createComment, deletePost} from "@/lib/actions";
 import {useRouter, useSearchParams} from "next/navigation";
 import Image from "next/image"
-import {CommentList} from "@/components/comment-list";
-import {CommentInput} from "@/components/comment-input";
 import {useState} from "react";
 import {toast} from "sonner";
 import PostActionBar from "@/components/post-action-bar";
+import { Ellipsis, Trash } from "lucide-react";
+import Spinner from "./ui/spinner";
 
 export function PostDialog(
     {
@@ -133,7 +131,7 @@ export function PostDialog(
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <Button variant="ghost" className="rounded-full">
-                                            <FaEllipsis className="w-4 h-4"/>
+                                            <Ellipsis className="w-4 h-4"/>
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent
@@ -148,9 +146,9 @@ export function PostDialog(
                                             className="rounded-md w-full flex flex-row justify-start"
                                         >
                                             {isDeletingPost ? (
-                                                <Icons.spinner className="w-4 h-4 mr-2 animate-spin"/>
+                                                <Spinner className="w-4 h-4 mr-2 animate-spin"/>
                                             ) : (
-                                                <Icons.trash className="w-4 h-4 mr-2"/>
+                                                <Trash className="w-4 h-4 mr-2"/>
                                             )}
                                             <span className="font-medium text-sm">
                                                 Delete Post

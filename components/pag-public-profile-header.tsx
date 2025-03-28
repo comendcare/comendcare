@@ -1,10 +1,9 @@
 import {formatMoney, standardizeYear} from "@/lib/utils";
-import {FaCity, FaCalendar, FaCircleDollarToSlot, FaPeopleGroup} from "react-icons/fa6";
 import {Organization} from "@prisma/client";
 import {ProfilePhoto} from "./profile-photo";
 import {BackButton} from "./back-button";
 import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
-import PAGFollowButton from "@/components/pag-follow-button";
+import { Building2, Calendar, HandCoins } from "lucide-react";
 
 export default function PAGPublicProfileHeader({organization, showBackButton}: {
     organization: Organization,
@@ -70,7 +69,7 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                                     className="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
                                     {organization?.moneyRaised !== null && organization?.moneyRaised > 0 &&
                                         <div className="mt-2 flex items-center text-gray-500">
-                                            <FaCircleDollarToSlot
+                                            <HandCoins
                                                 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                 aria-hidden="true"
                                             />
@@ -78,13 +77,13 @@ export default function PAGPublicProfileHeader({organization, showBackButton}: {
                                         </div>
                                     }
                                     <div className="mt-2 flex items-center text-gray-500">
-                                        <FaCalendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                        <Calendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                     aria-hidden="true"/>
                                         Founded in {standardizeYear(organization?.yearFounded ?? "")}
                                     </div>
                                     {organization?.incorporationStatus === "YES" &&
                                         <div className="mt-2 flex items-center text-gray-500">
-                                            <FaCity className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                            <Building2 className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                                                     aria-hidden="true"/>
                                             {`501(c)(3)`}
                                         </div>

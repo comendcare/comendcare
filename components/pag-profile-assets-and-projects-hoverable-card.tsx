@@ -1,33 +1,20 @@
 "use client"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Card, CardContent} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
-import {FaArrowUpRightFromSquare, FaChevronRight, FaPaperclip, FaPen, FaPlus} from "react-icons/fa6";
 import {usePathname, useRouter} from "next/navigation";
-import {cn, setOnboarded, sleep} from "@/lib/utils";
+import {cn, sleep} from "@/lib/utils";
 import {faker} from "@faker-js/faker";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog";
-import {HoverCard, HoverCardContent, HoverCardTrigger} from "@/components/ui/hover-card";
 import { AssetDetails } from "./asset-details";
 import { RFPDetails } from "./rfp-details.tsx";
 import { RoadmapState, useRoadmapStore } from "@/state/roadmap/roadmapStore";
 import { useShallow } from "zustand/react/shallow";
-import { nanoid } from "nanoid";
-import { useStoreApi, Node } from "@xyflow/react";
+import { useStoreApi } from "@xyflow/react";
 import { getNodesEdgesAndMilestones, getRoadmap } from "@/lib/fetchers";
 import { useSession } from "next-auth/react";
 import { createRoadmap } from "@/lib/actions";
-import { FaInfoCircle } from "react-icons/fa";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { NODE_TYPE_OPTIONS } from "@/lib/types";
 import { initializeRoadmapState } from "@/lib/initialize-client-state";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
 
 // Define types for statuses and environments
 type Recency = 'Due' | 'New';
@@ -69,7 +56,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             {/* {NODE_TYPE_OPTIONS.find(value => value.value === "RFP") && (
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle />
+                                        <Info className="h-4 w-4"/>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left">
                                             {NODE_TYPE_OPTIONS.find(value => value.value === "RFP")?.description}
@@ -142,7 +129,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                         }
                                     }}
                                 >
-                                    <FaPlus />
+                                    <Plus />
                                     {`Create an RFP`}
                                 </Button>
                             </div>
@@ -160,7 +147,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             {/* {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET") && (
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <FaInfoCircle />
+                                        <Info className="h-4 w-4"/>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left">
                                             {NODE_TYPE_OPTIONS.find(value => value.value === "ASSET")?.description}
@@ -238,7 +225,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                         }
                                     }}
                                 >
-                                    <FaPlus />
+                                    <Plus />
                                     {`Create an asset`}
                                 </Button>
                             </div>

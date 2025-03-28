@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -39,15 +39,14 @@ import {
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {createReview} from "@/lib/actions";
-import {Company, Milestone, User} from "@prisma/client";
+import {Company, Milestone} from "@prisma/client";
 import {toast} from "sonner";
 import va from "@vercel/analytics";
 import {useRouter} from "next/navigation";
 import {StarRatingSelector} from "@/components/star-rating-selector";
-import {FaPenAlt} from "react-icons/fa";
-import {getMembers, getMilestones} from "@/lib/fetchers";
+import {getMilestones} from "@/lib/fetchers";
 import {useSession} from "next-auth/react";
-import {FaLinkSlash} from "react-icons/fa6";
+import { Link2Off, PencilLine } from "lucide-react";
 
 export const reviewForm = z.object({
     title: z
@@ -138,7 +137,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                                 className="w-fit"
                                 disabled
                             >
-                                <FaPenAlt/>
+                                <PencilLine />
                                 Write a Review
                             </Button>
                         </HoverCardTrigger>
@@ -150,7 +149,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                         variant="cta"
                         className="w-fit"
                     >
-                        <FaPenAlt/>
+                        <PencilLine />
                         Write a Review
                     </Button>
                 }
@@ -247,7 +246,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                                             }}
                                             disabled={!field.value}
                                         >
-                                            <FaLinkSlash/>
+                                            <Link2Off />
                                         </Button>
                                     </div>
                                 </FormItem>

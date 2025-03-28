@@ -1,6 +1,6 @@
 import { motion } from "framer-motion"
+import { Mail, Video } from "lucide-react"
 import { Dispatch, SetStateAction } from "react"
-import { FaCamera, FaEnvelope, FaVideo } from "react-icons/fa6"
 
 const TOGGLE_CLASSES =
     "text-sm font-medium flex items-center gap-2 px-4 py-3 md:py-1.5 transition-colors relative z-10"
@@ -28,7 +28,7 @@ const SliderToggle = ({
                     setSelected(leftText)
                 }}
             >
-                <FaEnvelope className="relative z-10 text-lg md:text-sm" />
+                <Mail className="relative z-10 text-lg md:text-sm" />
                 <span className="relative z-10 capitalize">{leftText}</span>
             </button>
             <button
@@ -39,7 +39,7 @@ const SliderToggle = ({
                     setSelected(rightText)
                 }}
             >
-                <FaVideo className="relative z-10 text-lg md:text-sm" />
+                <Video className="relative z-10 text-lg md:text-sm" />
                 <span className="relative z-10 capitalize">{rightText}</span>
             </button>
             <div
