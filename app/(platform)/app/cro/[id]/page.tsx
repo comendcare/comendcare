@@ -137,7 +137,7 @@ export default async function CompanyHomePage({
                         </div>
                         <div className="flex flex-col justify-start items-end space-y-2 col-span-1 w-full justify-self-end">
                             <Link
-                                href={cro.website || ""}
+                                href={cro.url || ""}
                                 className={cn(buttonVariants({variant: "secondary"}), "w-fit")}
                                 target="_blank"
                             >
