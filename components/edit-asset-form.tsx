@@ -225,7 +225,7 @@ export function EditAssetForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className={"max-h-[600px] -mr-2 pr-3"}>
+            <ScrollArea className={"max-h-[600px] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}

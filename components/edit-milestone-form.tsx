@@ -915,130 +915,110 @@ export const TimelineFormField = ({
     endLabel?: string
 }) => {
     return (
-        <span className="w-full flex flex-col gap-z align-center mt-2">
-            <FormItem
-                className="w-full grid grid-rows[auto_auto] grid-cols-[180px_120px_auto] space-y-0 gap-2 items-center">
-                <FormLabel>{startLabel ? startLabel : `Start`}</FormLabel>
-                <FormField
-                    control={form.control}
-                    name="startDate"
-                    render={({field}) => (
-                        <FormItem>
-                            <Select
-                                defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
-                                onValueChange={(value) => {
-                                    const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
-                                    const monthIndex = monthsList.indexOf(value)
-                                    const newStartDate: Date = new Date(previousStartDate.setMonth(monthIndex))
-                                    form.setValue('startDate', newStartDate)
-                                }}
-                            >
-                                <FormControl>
-                                    <SelectTrigger className="h-[32px]">
-                                        <SelectValue placeholder="Month"/>
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {monthsList.map(
-                                        (
-                                            month: string,
-                                            index: number
-                                        ) => (
-                                            <SelectItem
-                                                value={month}
-                                                key={index}
-                                            >
-                                                {month}
-                                            </SelectItem>
-                                        )
-                                    )}
-                                </SelectContent>
-                            </Select>
-                        </FormItem>
-                    )}
-                />
+        <>
+            <FormLabel>{startLabel ? startLabel : `Start`}</FormLabel>
+            <FormField
+                control={form.control}
+                name="startDate"
+                render={({field}) => (
+                    <div className="flex gap-2 mt-2">
+                        <Select
+                            defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
+                            onValueChange={(value) => {
+                                const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                const monthIndex = monthsList.indexOf(value)
+                                const newStartDate: Date = new Date(previousStartDate.setMonth(monthIndex))
+                                form.setValue('startDate', newStartDate)
+                            }}
+                        >
+                            <FormControl>
+                                <SelectTrigger className="h-[32px]">
+                                    <SelectValue placeholder="Month"/>
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                {monthsList.map(
+                                    (
+                                        month: string,
+                                        index: number
+                                    ) => (
+                                        <SelectItem
+                                            value={month}
+                                            key={index}
+                                        >
+                                            {month}
+                                        </SelectItem>
+                                    )
+                                )}
+                            </SelectContent>
+                        </Select>
 
-                <FormField
-                    control={form.control}
-                    name="startDate"
-                    render={({field}) => (
-                        <FormItem className="w-full grow">
-                            <Input
-                                className="w-full"
-                                placeholder="Year"
-                                maxLength={4}
-                                defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
-                                onChange={(event) => {
-                                    const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
-                                    const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
-                                    form.setValue('startDate', newStartDate)
-                                }}
-                            />
-                        </FormItem>
-                    )}
-                />
+                        <Input
+                            placeholder="Year"
+                            maxLength={4}
+                            defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
+                            onChange={(event) => {
+                                const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
+                                const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
+                                form.setValue('startDate', newStartDate)
+                            }}
+                        />
+                    </div>
+                )}
+            />
 
-                <FormLabel>{endLabel ? endLabel : `End`}</FormLabel>
-                <FormField
-                    control={form.control}
-                    name="endDate"
-                    render={({field}) => (
-                        <FormItem>
-                            <Select
-                                defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
-                                onValueChange={(value) => {
-                                    const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
-                                    const monthIndex = monthsList.indexOf(value)
-                                    const newEndDate: Date = new Date(previousEndDate.setMonth(monthIndex))
-                                    form.setValue('endDate', newEndDate)
-                                }}
-                            >
-                                <FormControl>
-                                    <SelectTrigger className="h-[32px]">
-                                        <SelectValue placeholder="Month"/>
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {monthsList.map(
-                                        (
-                                            month: string,
-                                            index: number
-                                        ) => (
-                                            <SelectItem
-                                                value={month}
-                                                key={index}
-                                            >
-                                                {month}
-                                            </SelectItem>
-                                        )
-                                    )}
-                                </SelectContent>
-                            </Select>
-                        </FormItem>
-                    )}
-                />
+            <FormLabel>{endLabel ? endLabel : `End`}</FormLabel>
+            <FormField
+                control={form.control}
+                name="endDate"
+                render={({field}) => (
+                    <div className="flex gap-2 mt-2">
+                        <Select
+                            defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
+                            onValueChange={(value) => {
+                                const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
+                                const monthIndex = monthsList.indexOf(value)
+                                const newEndDate: Date = new Date(previousEndDate.setMonth(monthIndex))
+                                form.setValue('endDate', newEndDate)
+                            }}
+                        >
+                            <FormControl>
+                                <SelectTrigger className="h-[32px]">
+                                    <SelectValue placeholder="Month"/>
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                {monthsList.map(
+                                    (
+                                        month: string,
+                                        index: number
+                                    ) => (
+                                        <SelectItem
+                                            value={month}
+                                            key={index}
+                                        >
+                                            {month}
+                                        </SelectItem>
+                                    )
+                                )}
+                            </SelectContent>
+                        </Select>
 
-                <FormField
-                    control={form.control}
-                    name="endDate"
-                    render={({field}) => (
-                        <FormItem className="w-full grow">
-                            <Input
-                                placeholder="Year"
-                                maxLength={4}
-                                defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
-                                onChange={(event) => {
-                                    const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
-                                    const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
-                                    form.setValue('endDate', newEndDate)
-                                }}
-                            />
-                        </FormItem>
-                    )}
-                />
-                <FormMessage/>
-            </FormItem>
-        </span>
+                        <Input
+                            placeholder="Year"
+                            maxLength={4}
+                            defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
+                            onChange={(event) => {
+                                const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
+                                const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
+                                form.setValue('endDate', newEndDate)
+                            }}
+                        />
+                    </div>
+                )}
+            />
+            <FormMessage/>
+        </>
     )
 }
 

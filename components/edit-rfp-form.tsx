@@ -181,13 +181,6 @@ export function EditRFPForm({
             return;
         }
 
-        // const formData = new FormData();
-        // Object.entries(updateData).forEach(([key, value]) => {
-        //     if (value) {
-        //         formData.append(key, updateData);
-        //     }
-        // });
-
         try {
             await createOrUpdateRFP(updateData, session.user.organizationId);
             toast.success("Organization profile updated successfully!");
@@ -240,11 +233,11 @@ export function EditRFPForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className={"max-h-[600px]"}>
+            <ScrollArea className={"max-h-[600px] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="space-y-6"
+                    className="space-y-6 m-1"
                 >
                     <FormField
                         control={form.control}
