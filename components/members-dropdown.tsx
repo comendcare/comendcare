@@ -27,12 +27,13 @@ import { Ellipsis, Pencil, UserX } from "lucide-react";
 
 const formSchema = z.object({
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
-    role: z.enum(["admin", "owner"], {message: "Role must be either Admin or Owner."}),
+    role: z.enum(["member", "owner"], {message: "Role must be either Member or Owner."}),
 })
 
-export default async function MembersDropdown({member}: { member: MemberWithUser }) {
+
+export default function MembersDropdown({member}: { member: MemberWithUser }) {
     const {data: session, update} = useSession()
-    console.log(session)
+    const [isLastOwner, setIsLastOwner] = useState(false)
 
     const form = useForm<z.infer<typeof formSchema>>({
         mode: "onChange",
@@ -51,6 +52,15 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
 
                     // Map the response to the correct structure if needed
                     if (response.success && response.data) {
+                        const currentOrgId = session.user.organizationId;
+                        const currentOrgMemberships = response.data.filter(
+                            (m: MembershipWithOrganization) => m.organizationId === currentOrgId
+                        );
+                        const ownerCount = currentOrgMemberships.filter((m) => m.role === "owner").length;
+
+                        if (ownerCount === 1 && session.user.id === member.user.id && member.role === "owner") {
+                            setIsLastOwner(true);
+                        }
                     } else {
                         console.error(response.error)
                         toast.error(response.error)
@@ -64,7 +74,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
         }
 
         fetchOrgData()
-    }, [session]);
+    }, [session, member]);
 
     async function onEditMembershipSubmit(values: z.infer<typeof formSchema>) {
         if (session?.user.organizationId) {
@@ -192,7 +202,7 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                                 className="text-red-600 hover:text-red-800"
                             >
                                 <UserX />
-                                Revoke membership
+                                Remove membership
                             </DropdownMenuItem>
                         ) : null // Case 3: The user is neither the owner nor the same user, show nothing
                     }
@@ -231,24 +241,26 @@ export default async function MembersDropdown({member}: { member: MemberWithUser
                                 <FormField
                                     control={form.control}
                                     name="role"
-                                    render={({field}) => (
+                                    render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Role</FormLabel>
                                             <FormDescription>
-                                                Choose the role for this organization member.
+                                                {isLastOwner
+                                                    ? "You are the last owner. Every organization must have at least one owner. You cannot change your role."
+                                                    : "Choose the role for this organization member."}
                                             </FormDescription>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLastOwner}>
                                                 <FormControl>
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Select a role"/>
+                                                        <SelectValue placeholder="Select a role" />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="admin">Admin</SelectItem>
+                                                    <SelectItem value="member">Member</SelectItem>
                                                     <SelectItem value="owner">Owner</SelectItem>
                                                 </SelectContent>
                                             </Select>
-                                            <FormMessage/>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
