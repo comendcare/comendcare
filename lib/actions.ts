@@ -38,7 +38,7 @@ import {
     sendMemberDeletedEmail,
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone} from "@/lib/types";
+import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@/lib/types";
 import {includes} from "lodash"
 
 export type Node = Prisma.NodeGetPayload<{}>
@@ -1694,6 +1694,134 @@ export async function updateCondition(formData: FormData, organizationId: string
     } catch (error: any) {
         console.error("Error updating condition:", error);
         return {success: false, error: error.message || "Failed to update condition."};
+    }
+}
+
+export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizationId: string) => {
+    try {
+        const response = await prisma.asset.upsert({
+            where: {
+                id: assetData.id || nanoid()
+            },
+            update: {
+                title: assetData.title,
+                description: assetData.description,
+                attachments: {
+                    deleteMany: {}, // clear all existing attachments
+                    createMany: {
+                        data: (assetData?.attachments || []).map((attachment: any) => ({
+                            link: attachment.link,
+                            ...(attachment.name ? {name: attachment.name} : undefined)
+                        }))
+                    }
+                },
+                contacts: {
+                    deleteMany: {},
+                    createMany: {
+                        data: (assetData?.contacts || []).map((contact: any) => ({
+                            name: contact.name,
+                            email: contact.email,
+                            ...(contact.role ? {role: contact.role} : undefined),
+                            ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                        }))
+                    }
+                },
+                private: assetData.private || false,
+            },
+            create: {
+                title: assetData.title || "",
+                description: assetData.description,
+                attachments: {
+                    createMany: {
+                        data: (assetData?.attachments || []).map((attachment: any) => ({
+                            link: attachment.link,
+                            ...(attachment.name ? {name: attachment.name} : undefined)
+                        }))
+                    }
+                },
+                contacts: {
+                    createMany: {
+                        data: (assetData?.contacts || []).map((contact: any) => ({
+                            name: contact.name,
+                            email: contact.email,
+                            ...(contact.role ? {role: contact.role} : undefined),
+                            ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                        }))
+                    }
+                },
+                private: assetData.private || false,
+                organization: { connect: {id: organizationId} }
+            },
+        })
+
+        return response
+    } catch (error: any) {
+        console.error("Error creating or updating asset:", error.message);
+        throw new Error(error.message || "Failed to create or update asset.");
+    }
+}
+
+export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: string) => {
+    try {
+        const response = await prisma.asset.upsert({
+            where: {
+                id: rfpData.id || nanoid()
+            },
+            update: {
+                title: rfpData.title,
+                description: rfpData.description,
+                attachments: {
+                    deleteMany: {}, // clear all existing attachments
+                    createMany: {
+                        data: (rfpData?.attachments || []).map((attachment: any) => ({
+                            link: attachment.link,
+                            ...(attachment.name ? {name: attachment.name} : undefined)
+                        }))
+                    }
+                },
+                contacts: {
+                    deleteMany: {},
+                    createMany: {
+                        data: (rfpData?.contacts || []).map((contact: any) => ({
+                            name: contact.name,
+                            email: contact.email,
+                            ...(contact.role ? {role: contact.role} : undefined),
+                            ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                        }))
+                    }
+                },
+                private: rfpData.private || false,
+            },
+            create: {
+                title: rfpData.title || "",
+                description: rfpData.description,
+                attachments: {
+                    createMany: {
+                        data: (rfpData?.attachments || []).map((attachment: any) => ({
+                            link: attachment.link,
+                            ...(attachment.name ? {name: attachment.name} : undefined)
+                        }))
+                    }
+                },
+                contacts: {
+                    createMany: {
+                        data: (rfpData?.contacts || []).map((contact: any) => ({
+                            name: contact.name,
+                            email: contact.email,
+                            ...(contact.role ? {role: contact.role} : undefined),
+                            ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                        }))
+                    }
+                },
+                private: rfpData.private || false,
+                organization: { connect: {id: organizationId} }
+            },
+        })
+
+        return response
+    } catch (error: any) {
+        console.error("Error creating or updating RFP:", error.message);
+        throw new Error(error.message || "Failed to create or update RFP.");
     }
 }
 

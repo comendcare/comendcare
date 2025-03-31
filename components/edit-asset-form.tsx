@@ -1,0 +1,283 @@
+"use client"
+
+import {zodResolver} from "@hookform/resolvers/zod"
+import React, {useCallback, useEffect, useMemo, useRef, useState} from "react"
+import {useForm, UseFormReturn} from "react-hook-form"
+import {z} from "zod"
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormLabel,
+    FormItem,
+    FormMessage,
+    FormDescription,
+} from "./ui/form"
+import {Input} from "./ui/input"
+import {AutosizeTextarea, Textarea} from "./ui/textarea"
+import {Button} from "./ui/button"
+import {ScrollArea, ScrollBar} from "./ui/scroll-area"
+import StatusButton from "./milestone-status-button"
+import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
+import {useShallow} from "zustand/react/shallow"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from "./ui/select"
+import {
+    Dialog,
+    DialogClose,
+    DialogTrigger
+} from "./ui/dialog"
+import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
+import {PrivateBadge} from "./private-badge"
+import {debounce} from "lodash"
+import {monthsList} from "@/lib/data";
+import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
+import {MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
+import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
+import mixpanel from "mixpanel-browser"
+import {useSession} from "next-auth/react"
+import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
+import {ExternalContactField} from "./external-contact-field"
+import {ExternalAttachmentField} from "./external-attachment-field"
+import {Popover, PopoverContent, PopoverTrigger} from "./ui/popover"
+import {cn, sleep} from "@/lib/utils"
+import {format} from "date-fns"
+import {Calendar} from "./ui/calendar"
+import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
+import MoneyInput from "@/components/money-input";
+import MultipleSelector from "./ui/multiple-selector"
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { PlateEditor } from "./editor/plate-editor"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
+import { CROSearchState, Recommendation, useCROSearchStore } from "@/state/search/croSearchStore"
+import { Card, CardContent } from "./ui/card"
+import Image from "next/image"
+import { CROMarketplaceCard  } from "./marketplace-cro-card"
+import Link from "next/link"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { TypeBadge } from "./type-badge"
+import Loading from "@/app/loading"
+import { getMilestoneTypes } from "@/lib/fetchers"
+import { NotificationBubble } from "./notification-bubble"
+import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
+import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store } from "lucide-react"
+import { AttachmentsFormField, ContactsFormField, EditTitle, PrivatePublicFormField, StatusFormField } from "./edit-milestone-form"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
+import { createOrUpdateAsset } from "@/lib/actions"
+
+
+type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
+type ContactType = Prisma.ExternalContactGetPayload<{}>
+
+export const optionSchema = z.object({
+    label: z.string(),
+    value: z.string(),
+    description: z.string().optional()
+    // disable: z.boolean().optional(),
+});
+
+const editAssetForm = z.object({
+    nodeType: z.string(),
+    title: z
+        .string({
+            required_error: "Please provide a title"
+        })
+        .min(1, "Title is required")
+        .max(100, "Title must be less than 100 characters"),
+    description: z
+        .string()
+        .max(1000, "Description must be less than 1000 characters")
+        .optional(),
+    attachments: z.array(z.custom<AttachmentType>()).optional(),
+    isPrivate: z.boolean(),
+    contacts: z.array(z.custom<any>()).optional(),
+})
+
+export function EditAssetForm({
+    assetData,
+}: {
+    assetData: Partial<Asset>
+}) {
+    const router = useRouter()
+    const initializing = useRef(true)
+    const {data: session} = useSession()
+    const [orgIsPublished, setOrgIsPublished] = useState(false)
+
+    const form = useForm<z.infer<typeof editAssetForm>>({
+        mode: "onChange",
+        resolver: zodResolver(editAssetForm),
+        defaultValues: {
+            title: assetData?.title || "",
+            description: assetData?.description || "",
+            attachments: assetData?.attachments || undefined,
+            isPrivate: assetData?.private || true,
+            contacts: assetData?.contacts || undefined,
+        }
+    })
+
+    const formData = {
+        nodeType: form.watch("nodeType"),
+        title: form.watch("title"),
+        description: form.watch("description"),
+        attachments: form.watch("attachments"),
+        isPrivate: form.watch("isPrivate"),
+        contacts: form.watch("contacts"),
+    }
+
+    const handleFormSubmit = async (values: z.infer<typeof editAssetForm>) => {
+        console.log(`handle form submit`, values)
+        const {
+            title,
+            description,
+            attachments,
+            isPrivate,
+            contacts,
+        } = values;
+
+        const updateData: Partial<Asset> = {
+            ...assetData,
+            title,
+            private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
+            ...(description !== undefined && description !== null ? {description} : undefined),
+            ...(attachments ? {attachments} : undefined),
+            ...(contacts ? {contacts} : undefined),
+        }
+
+        console.log(`updateData`, updateData)
+
+        if (!session?.user?.organizationId) {
+            toast.error("You're not signed into an organization right now.");
+            return;
+        }
+
+        // const formData = new FormData();
+        // Object.entries(updateData).forEach(([key, value]) => {
+        //     if (value) {
+        //         formData.append(key, updateData);
+        //     }
+        // });
+
+        try {
+            await createOrUpdateAsset(updateData, session.user.organizationId);
+            toast.success("Organization profile updated successfully!");
+            router.refresh();
+        } catch (error) {
+            console.error("Error updating organization:", error);
+            toast.error("Failed to update organization profile.");
+        }
+    }
+
+    // Initialization - Allow update once form is initialized
+    useEffect(() => {
+        const init = async () => {
+            if (session?.user.organizationId) {
+                const response = await getOrganizationFromOrganizationId(session.user.organizationId)
+                if (response.success && response.data) {
+                    setOrgIsPublished(response.data.published)
+                }
+            }
+
+            initializing.current = false
+        }
+
+        init()
+
+    // missing dependencies disabled - we only want to run this once on initialization
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    return (
+        <Form {...form}>
+            <ScrollArea className={"max-h-[600px]"}>
+                <ScrollBar />
+                <form
+                    onSubmit={form.handleSubmit(handleFormSubmit)}
+                    className="space-y-6"
+                >
+                    <FormField
+                        control={form.control}
+                        name="title"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>{`Title`}</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        id="title"
+                                        placeholder={`Enter a title`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="description"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel >{`Description`}</FormLabel>
+                                <FormControl>
+                                    <Textarea
+                                        id="description"
+                                        placeholder={`Enter a description...`}
+                                        {...field}
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormItem>
+                        <FormLabel>Visibility</FormLabel>
+                        <FormDescription>
+                            {`Changing the visiblity of your asset allows you show or hide it from your organization profile.`}
+                        </FormDescription>
+                        <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
+                    </FormItem>
+
+                    <ContactsFormField form={form} />
+                    <AttachmentsFormField form={form} />
+
+                    <div className="space-y-4 w-full h-full">
+
+                        {/* spacer for buttons */}
+                        <div className="h-12" /> 
+
+                        <span className="flex justify-end gap-4 flex-wrap absolute bottom-2 right-0 m-4">
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button type="button" variant="destructive">
+                                        Delete Asset
+                                    </Button>
+                                </DialogTrigger>
+                                {/* <DeleteAssetDialogContent assetData={assetData}/> */}
+                            </Dialog>
+                            <Button
+                                onClick={() => {
+                                    handleFormSubmit(form.getValues())
+                                    // onClose()
+                                }}
+                            >
+                                Save Changes
+                            </Button>
+                        </span>
+                    </div>
+                </form>
+            </ScrollArea>
+        </Form>
+    )
+}

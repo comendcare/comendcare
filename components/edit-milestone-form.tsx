@@ -629,10 +629,7 @@ export function EditMilestoneForm({
 
                                 <ContactsFormField form={form}/>
 
-                                <AttachmentsFormField
-                                    form={form}
-                                    attachments={formData.attachments as AttachmentType[]}
-                                />
+                                <AttachmentsFormField form={form}/>
 
                                 <FormField
                                     control={form.control}
@@ -740,7 +737,7 @@ export function EditMilestoneForm({
     )
 }
 
-const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTypes: any[] }) => {
+export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTypes: any[] }) => {
     const types = form.watch("types")
 
     return (
@@ -800,7 +797,7 @@ const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTy
     )
 }
 
-const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any, formData: any, disabled?: boolean }) => {
+export const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any, formData: any, disabled?: boolean }) => {
     return (
         <FormField
             control={form.control}
@@ -874,7 +871,7 @@ const PrivatePublicFormField = ({form, formData, disabled = false}: { form: any,
     )
 }
 
-const StatusFormField = ({form}: { form: any }) => {
+export const StatusFormField = ({form}: { form: any }) => {
     return (
         <FormField
             control={form.control}
@@ -897,7 +894,7 @@ const StatusFormField = ({form}: { form: any }) => {
     )
 }
 
-const BudgetFormField = ({form}: { form: any }) => {
+export const BudgetFormField = ({form}: { form: any }) => {
     return (
         <MoneyInput
             className="h-[40px] -mt-2"
@@ -907,7 +904,7 @@ const BudgetFormField = ({form}: { form: any }) => {
     )
 }
 
-const TimelineFormField = ({
+export const TimelineFormField = ({
                                form,
                                startLabel,
                                endLabel
@@ -1046,7 +1043,7 @@ const TimelineFormField = ({
     )
 }
 
-const StartDateFormField = ({form}: { form: any }) => {
+export const StartDateFormField = ({form}: { form: any }) => {
     return (
         <FormField
             control={form.control}
@@ -1079,7 +1076,7 @@ const StartDateFormField = ({form}: { form: any }) => {
     )
 }
 
-const OpenToFormField = ({form}: { form: any }) => {
+export const OpenToFormField = ({form}: { form: any }) => {
     return (
         <FormField
             control={form.control}
@@ -1108,7 +1105,7 @@ const OpenToFormField = ({form}: { form: any }) => {
     )
 }
 
-export function AttachmentsFormField({form, attachments}: { form: UseFormReturn<any>, attachments: AttachmentType[] }) {
+export function AttachmentsFormField({form}: { form: UseFormReturn<any>}) {
     return (
         <FormField
             control={form.control}
@@ -1118,9 +1115,10 @@ export function AttachmentsFormField({form, attachments}: { form: UseFormReturn<
                     <FormControl>
                         <>
                             <div className="flex flex-row justify-between items-center">
-                                <FormLabel className="text-2xl font-semibold leading-none tracking-tight">
-                                    {`Links`}
-                                </FormLabel>
+                                <div>
+                                    <FormLabel>{`Links`}</FormLabel>
+                                    <FormDescription>{`Add any links that are not on the Comend platform.`}</FormDescription>
+                                </div>
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <Button
@@ -1175,7 +1173,7 @@ export function AttachmentsFormField({form, attachments}: { form: UseFormReturn<
     )
 }
 
-const ContactsFormField = ({form}: { form: any }) => {
+export const ContactsFormField = ({form}: { form: any }) => {
     return (
         <FormField
             control={form.control}
@@ -1183,14 +1181,16 @@ const ContactsFormField = ({form}: { form: any }) => {
             render={({field}) => (
                 <FormItem>
                     <div className="flex flex-row justify-between items-center">
-                        <FormLabel className="text-2xl font-semibold leading-none tracking-tight">
-                            {`Contacts`}
-                        </FormLabel>
+                        <div className="flex flex-col">
+                        <FormLabel>{`Contacts`}</FormLabel>
+                        <FormDescription>{`Add any external contacts that are not on the Comend platform.`}</FormDescription>
+                        </div>
                         <Tooltip>
                             <TooltipTrigger>
                                 <Button
                                     variant="secondary"
-                                    className="w-[40px]"
+                                    // className="w-[40px]"
+                                    size={"icon"}
                                     onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                         e.preventDefault()
                                         form.setValue("contacts", [
@@ -1238,7 +1238,7 @@ const ContactsFormField = ({form}: { form: any }) => {
     )
 }
 
-const EditTitle = ({form}: { form: any }) => {
+export const EditTitle = ({form}: { form: any }) => {
     // const contentRef = useRef<HTMLHeadingElement>(null);
 
     // const handleInput = (e: React.FormEvent<HTMLHeadingElement>) => {

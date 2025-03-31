@@ -14,6 +14,30 @@ import {
     ReviewFeedback, Service
 } from "@prisma/client";
 
+export type Asset = Prisma.AssetGetPayload<{
+    include: {
+        contacts: true,
+        attachments: true,
+        milestones: {
+            include: {
+                milestone: true
+            }
+        }
+    }
+}>
+
+export type RFP = Prisma.RFPGetPayload<{
+    include: {
+        contacts: true,
+        attachments: true,
+        milestones: {
+            include: {
+                milestone: true
+            }
+        }
+    }
+}>
+
 export type Milestone = Omit<Prisma.MilestoneGetPayload<{
     include: {
         node: true,
