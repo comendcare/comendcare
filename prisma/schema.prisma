@@ -241,8 +241,8 @@ model Milestone {
   timelineOrder    Int                        @default(0)
   nodeType         String                     @default("PROJECT")
 
-  assets Asset[]
-  rfps   RFP[]
+  assets AssetToMilestone[]
+  rfps   RFPToMilestone[]
 
   roadmapId      String
   roadmap        Roadmap      @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
@@ -262,16 +262,24 @@ model Asset {
 
   title       String
   description String?
-  private     Boolean              @default(true)
-  budget      Int?
-  attachments ExternalAttachment[]
   contacts    ExternalContact[]
-  notes       String?
+  attachments ExternalAttachment[]
+  private     Boolean              @default(true)
 
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  milestoneId    String?
-  milestone      Milestone?   @relation(fields: milestoneId, references: [id])
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  milestones     AssetToMilestone[]
+}
+
+model AssetToMilestone {
+  id          String  @id @default(uuid())
+  assetId     String?
+  milestoneId String?
+
+  asset     Asset?     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  milestone Milestone? @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+
+  @@unique([assetId, milestoneId])
 }
 
 model RFP {
@@ -281,19 +289,28 @@ model RFP {
 
   title       String
   description String?
-  private     Boolean              @default(true)
-  budget      Int?
-  endDate     DateTime?
-  startDate   DateTime?
   openTo      String[]
-  attachments ExternalAttachment[]
+  startDate   DateTime? // request opens
+  endDate     DateTime? // deadline for proposals
   contacts    ExternalContact[]
-  notes       String?
+  attachments ExternalAttachment[]
+  budget      Int?
+  private     Boolean              @default(true)
 
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  milestoneId    String?
-  milestone      Milestone?   @relation(fields: milestoneId, references: [id])
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  milestones     RFPToMilestone[]
+}
+
+model RFPToMilestone {
+  id          String  @id @default(uuid())
+  rfpId       String?
+  milestoneId String?
+
+  rfp       RFP?       @relation(fields: [rfpId], references: [id], onDelete: Cascade)
+  milestone Milestone? @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+
+  @@unique([rfpId, milestoneId])
 }
 
 model MilestoneToReview {
