@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { NODE_TYPE_OPTIONS } from "@/lib/types";
-import { ChevronRight, ExternalLink, Info, Paperclip } from "lucide-react";
+import { ChevronRight, ExternalLink, Info, Paperclip, Pencil } from "lucide-react";
 
 // Define types for statuses and environments
 type Status = 'offline' | 'online' | 'error';
@@ -111,7 +111,7 @@ export const PAGProfileAssetsAndProjectsCard = () => {
                     className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                 >
                     Edit research plan
-                    <ExternalLink />
+                    <Pencil />
                 </Button>
             </CardHeader>
 

@@ -2,7 +2,7 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {useRouter} from "next/navigation";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Pencil } from "lucide-react";
 
 export const getDates = (milestone: any) => {
     if (milestone.startDate && milestone.endDate) {
@@ -53,7 +53,7 @@ export const PAGProfileResearchPlanCard = ({ roadmapItems }: { roadmapItems: any
                     className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                 >
                     Edit research plan
-                    <ExternalLink />
+                    <Pencil />
                 </Button>
             </CardHeader>
 
