@@ -12,6 +12,7 @@ declare module "next-auth" {
             membership?: any
         } & DefaultSession["user"]
         terminate?: boolean
+        roleChanged?: boolean
     }
     interface User {
         id: string
