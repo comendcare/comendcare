@@ -6,7 +6,7 @@ import {Company} from "@prisma/client";
 import {Separator} from "./ui/separator";
 import {TypeBadge} from "./type-badge";
 import SaveCRODialog from "@/components/save-cro-dialog";
-import { Briefcase, Building, Building2, Factory, FileText, Rocket, University } from "lucide-react";
+import {Briefcase, Building, Building2, Factory, FileText, Rocket, Star, University} from "lucide-react";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -84,7 +84,7 @@ export function CROMarketplaceCard({cro}: { cro: Company }) {
 }
 
 export function CROCardHeaderContents({cro}: { cro: Company }) {
-    const {id, title, description, companyType} = cro;
+    const {id, title, description, companyType, avgRating} = cro;
 
     return (
         <>
@@ -110,13 +110,21 @@ export function CROCardHeaderContents({cro}: { cro: Company }) {
                 }
                 className="flex flex-col gap-2"
             >
-                {companyType && (
-                    <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
-                        {companyTypeIcons[companyType] ||
-                            <Building className="size-4 text-gray-500 dark:text-gray-400"/>}
-                        {companyTypeMap[companyType] || companyType}
-                    </div>
-                )}
+                <div className="flex flex-row justify-between items-center">
+                    {companyType && (
+                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
+                            {companyTypeIcons[companyType] ||
+                                <Building className="size-4 text-gray-500 dark:text-gray-400"/>}
+                            {companyTypeMap[companyType] || companyType}
+                        </div>
+                    )}
+                    {typeof avgRating === "number" && avgRating > 0 && (
+                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
+                            <Star className="size-4 text-gray-500 dark:text-gray-400" />
+                            {avgRating}
+                        </div>
+                    )}
+                </div>
                 {description && description.trim() && (
                     <CardDescription className="text-wrap break-words line-clamp-2">
                         {truncate(description, 200)}
