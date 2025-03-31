@@ -510,7 +510,7 @@ export function EditMilestoneForm({
                             <Loading />
                         ): (
                             <>
-                            <TabsContent value="edit" className="space-y-4 w-full h-full">
+                            <TabsContent value="edit" className="space-y-6 w-full h-full">
                                 {/* <FormItem>
 
                                 <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
@@ -584,48 +584,49 @@ export function EditMilestoneForm({
                                 )}
                                 </FormItem> */}
 
-
-                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
-                                    <FormLabel className="text-md mt-2">Visibility</FormLabel>
+                                <div className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
+                                    <div>
+                                        <FormLabel>Visibility</FormLabel>
+                                        {/* <FormDescription>
+                                            {`Changing the visiblity of your asset allows you show or hide it from your organization profile.`}
+                                        </FormDescription> */}
+                                    </div>
                                     <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
-                                </FormItem>
 
-                                <FormField
-                                    control={form.control}
-                                    name="description"
-                                    render={({field}) => (
-                                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
-                                            <FormLabel className="text-md mt-2">
-                                                {`Description`}
-                                            </FormLabel>
-                                            <FormControl>
+                                    <div>
+                                        <FormLabel >{`Description`}</FormLabel>
+                                    </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="description"
+                                        render={({field}) => (
+                                            <FormControl className="mt-2">
                                                 <Textarea
                                                     id="description"
                                                     placeholder={`Enter a description...`}
-                                                    // defaultValue={field.value}
                                                     {...field}
                                                 />
                                             </FormControl>
-                                            <FormMessage/>
-                                        </FormItem>
-                                    )}
-                                />
+                                        )}
+                                    />
 
-                                <div className="w-full grid grid-cols-[180px_auto] gap-2 items-center">
                                     <div>
-                                    <FormLabel className="text-md mt-2">{`Project Type`}</FormLabel>
-                                    {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
+                                        <FormLabel>{`Project Type`}</FormLabel>
+                                        {formData?.types?.length === 3 && <FormDescription>{`Maximum selection is 3 types.`}</FormDescription>}
                                     </div>
                                     <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
 
-                                    <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
+                                    <div>
+                                        <FormLabel>{`Project Status`}</FormLabel>
+                                        {/* <FormDescription>{`The status of your project. Click to change the status.`}</FormDescription> */}
+                                    </div>
                                     <StatusFormField form={form}/>
 
-                                    <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
-                                    <span className="mt-2"><BudgetFormField form={form}/></span>
-                                </div>
+                                    <FormLabel>{`Budget`}</FormLabel>
+                                    <BudgetFormField form={form}/>
 
-                                <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
+                                    <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
+                                </div>
 
                                 <ContactsFormField form={form}/>
 
@@ -635,13 +636,14 @@ export function EditMilestoneForm({
                                     control={form.control}
                                     name="notes"
                                     render={({field}) => (
-                                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
-                                            <FormLabel
-                                                className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
-                                            >
+                                        <FormItem className="w-full">
+                                            <FormLabel className="flex gap-2 items-center">
                                                 {`Notes`}
                                                 <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
                                             </FormLabel>
+                                            <FormDescription>
+                                                {`Add any internal notes about this project. Notes are always private, and will never be shown on your profile.`}
+                                            </FormDescription>
                                             <FormControl>
                                                 <div className="w-full col-span-2" data-registry="plate">
                                                         <PlateEditor
@@ -746,7 +748,7 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                 control={form.control}
                 name="types"
                 render={({field}) => (
-                    <FormItem className="w-full">
+                    <FormItem className="w-full mt-2">
                         <FormControl>
                             <MultipleSelector
                                 {...field}
@@ -897,7 +899,6 @@ export const StatusFormField = ({form}: { form: any }) => {
 export const BudgetFormField = ({form}: { form: any }) => {
     return (
         <MoneyInput
-            className="h-[40px] -mt-2"
             form={form}
             name="budget"
         />
@@ -914,7 +915,7 @@ export const TimelineFormField = ({
     endLabel?: string
 }) => {
     return (
-        <span className="flex flex-col gap-z align-center">
+        <span className="w-full flex flex-col gap-z align-center mt-2">
             <FormItem
                 className="w-full grid grid-rows[auto_auto] grid-cols-[180px_120px_auto] space-y-0 gap-2 items-center">
                 <FormLabel>{startLabel ? startLabel : `Start`}</FormLabel>
@@ -933,7 +934,7 @@ export const TimelineFormField = ({
                                 }}
                             >
                                 <FormControl>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="h-[32px]">
                                         <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
@@ -961,8 +962,9 @@ export const TimelineFormField = ({
                     control={form.control}
                     name="startDate"
                     render={({field}) => (
-                        <FormItem>
+                        <FormItem className="w-full grow">
                             <Input
+                                className="w-full"
                                 placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
@@ -992,7 +994,7 @@ export const TimelineFormField = ({
                                 }}
                             >
                                 <FormControl>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="h-[32px]">
                                         <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
@@ -1020,7 +1022,7 @@ export const TimelineFormField = ({
                     control={form.control}
                     name="endDate"
                     render={({field}) => (
-                        <FormItem>
+                        <FormItem className="w-full grow">
                             <Input
                                 placeholder="Year"
                                 maxLength={4}
@@ -1118,7 +1120,7 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any>}) {
                 <FormItem className="flex flex-col grow">
                     <FormControl>
                         <>
-                            <div className="flex flex-row justify-between items-center">
+                            <div className="flex flex-row justify-between gap-2 items-center">
                                 <div>
                                     <FormLabel>{`Links`}</FormLabel>
                                     <FormDescription>{`Add any links that are not on the Comend platform.`}</FormDescription>
@@ -1126,7 +1128,7 @@ export function AttachmentsFormField({form}: { form: UseFormReturn<any>}) {
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <Button
-                                            className="w-[40px]"
+                                            size={"icon"}
                                             variant="secondary"
                                             onClick={(e: any) => {
                                                 e.preventDefault()
@@ -1184,7 +1186,7 @@ export const ContactsFormField = ({form}: { form: any }) => {
             name="contacts"
             render={({field}) => (
                 <FormItem>
-                    <div className="flex flex-row justify-between items-center">
+                    <div className="flex flex-row justify-between gap-2 items-center">
                         <div className="flex flex-col">
                         <FormLabel>{`Contacts`}</FormLabel>
                         <FormDescription>{`Add any external contacts that are not on the Comend platform.`}</FormDescription>
@@ -1193,7 +1195,6 @@ export const ContactsFormField = ({form}: { form: any }) => {
                             <TooltipTrigger>
                                 <Button
                                     variant="secondary"
-                                    // className="w-[40px]"
                                     size={"icon"}
                                     onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                         e.preventDefault()
@@ -1213,7 +1214,7 @@ export const ContactsFormField = ({form}: { form: any }) => {
                     </div>
 
                     {field?.value && field.value.length > 0 && (
-                        <ol className="flex flex-col gap-2">
+                        <ol className="flex flex-col gap-4">
                             {field.value.map((contact: ContactType, index: number) => (
                                 <ExternalContactField
                                     key={index}
