@@ -30,6 +30,11 @@ import {
 import {
     Dialog,
     DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
     DialogTrigger
 } from "./ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
@@ -74,7 +79,7 @@ import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Sto
 import { AttachmentsFormField, ContactsFormField, EditTitle, PrivatePublicFormField, StatusFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { createOrUpdateAsset } from "@/lib/actions"
+import { createOrUpdateAsset, deleteAsset } from "@/lib/actions"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -170,11 +175,32 @@ export function EditAssetForm({
 
         try {
             await createOrUpdateAsset(updateData, session.user.organizationId);
-            toast.success("Organization profile updated successfully!");
+            toast.success("Asset created or updated successfully!");
             router.refresh();
         } catch (error) {
-            console.error("Error updating organization:", error);
-            toast.error("Failed to update organization profile.");
+            console.error("Error creating or updating asset:", error);
+            toast.error("Failed to create or update asset.");
+        }
+    }
+
+    const handleDeleteAsset = async () => {
+        if (!session?.user?.organizationId) {
+            toast.error("You're not signed into an organization right now.")
+            return
+        }
+
+        if (!assetData.id) {
+            toast.error("This asset does not have an id.")
+            return
+        }
+
+        try {
+            await deleteAsset(assetData.id)
+            toast.success("Asset deleted successfully!");
+            router.refresh();
+        } catch (error) {
+            console.error("Error deleting asset:", error);
+            toast.error("Failed to delete asset.");
         }
     }
 
@@ -199,11 +225,11 @@ export function EditAssetForm({
 
     return (
         <Form {...form}>
-            <ScrollArea className={"max-h-[600px]"}>
+            <ScrollArea className={"max-h-[600px] -mr-2 pr-3"}>
                 <ScrollBar />
                 <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
-                    className="space-y-6"
+                    className="space-y-6 m-1"
                 >
                     <FormField
                         control={form.control}
@@ -252,30 +278,52 @@ export function EditAssetForm({
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
 
-                    <div className="space-y-4 w-full h-full">
-
-                        {/* spacer for buttons */}
-                        <div className="h-12" /> 
-
-                        <span className="flex justify-end gap-4 flex-wrap absolute bottom-2 right-0 m-4">
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button type="button" variant="destructive">
-                                        Delete Asset
-                                    </Button>
-                                </DialogTrigger>
-                                {/* <DeleteAssetDialogContent assetData={assetData}/> */}
-                            </Dialog>
-                            <Button
-                                onClick={() => {
-                                    handleFormSubmit(form.getValues())
-                                    // onClose()
-                                }}
-                            >
-                                Save Changes
-                            </Button>
-                        </span>
-                    </div>
+                    <span className="flex gap-2 w-full justify-end">
+                        <DialogClose asChild>
+                            <Button variant={"secondary"}>Cancel</Button>
+                        </DialogClose>
+                        <Dialog>
+                            <DialogTrigger asChild className={cn(assetData.id ? "" : "hidden")}>
+                                <Button type="button" variant="destructive">
+                                    Delete Asset
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        Are you absolutely sure?
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        {`This action cannot be undone. This will permanently delete your Asset and it's data.`}
+                                    </DialogDescription>
+                                    <DialogFooter>
+                                        <DialogClose>
+                                            <Button type="button">
+                                                Cancel
+                                            </Button>
+                                        </DialogClose>
+                                        <DialogClose>
+                                            <Button
+                                                type="button"
+                                                variant={"destructive"}
+                                                onClick={handleDeleteAsset}
+                                            >
+                                                Delete Asset
+                                            </Button>
+                                        </DialogClose>
+                                    </DialogFooter>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+                        <Button
+                            onClick={() => {
+                                handleFormSubmit(form.getValues())
+                                // onClose()
+                            }}
+                        >
+                            Save Changes
+                        </Button>
+                    </span>
                 </form>
             </ScrollArea>
         </Form>

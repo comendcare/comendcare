@@ -1697,6 +1697,19 @@ export async function updateCondition(formData: FormData, organizationId: string
     }
 }
 
+export const deleteAsset = async (assetId: string) => {
+    try {
+        const response = await prisma.asset.delete({
+            where: { id: assetId }
+        })
+
+        return response
+    } catch (error: any) {
+        console.error("Error deleting asset:", error.message);
+        throw new Error(error.message || "Failed to delete asset.");
+    }
+}
+
 export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizationId: string) => {
     try {
         const response = await prisma.asset.upsert({
@@ -1758,6 +1771,19 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
     } catch (error: any) {
         console.error("Error creating or updating asset:", error.message);
         throw new Error(error.message || "Failed to create or update asset.");
+    }
+}
+
+export const deleteRFP = async (rfpId: string) => {
+    try {
+        const response = await prisma.rFP.delete({
+            where: { id: rfpId }
+        })
+
+        return response
+    } catch (error: any) {
+        console.error("Error deleting RFP:", error.message);
+        throw new Error(error.message || "Failed to delete RFP.");
     }
 }
 

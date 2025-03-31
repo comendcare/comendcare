@@ -30,6 +30,11 @@ import {
 import {
     Dialog,
     DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
     DialogTrigger
 } from "./ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
@@ -74,7 +79,7 @@ import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Sto
 import { AttachmentsFormField, ContactsFormField, EditTitle, OpenToFormField, PrivatePublicFormField, StatusFormField, TimelineFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { createOrUpdateAsset, createOrUpdateRFP } from "@/lib/actions"
+import { createOrUpdateAsset, createOrUpdateRFP, deleteRFP } from "@/lib/actions"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -193,6 +198,27 @@ export function EditRFPForm({
         }
     }
 
+    const handleDeleteRFP = async () => {
+        if (!session?.user?.organizationId) {
+            toast.error("You're not signed into an organization right now.")
+            return
+        }
+
+        if (!rfpData.id) {
+            toast.error("This RFP does not have an id.")
+            return
+        }
+
+        try {
+            await deleteRFP(rfpData.id)
+            toast.success("Organization profile updated successfully!");
+            router.refresh();
+        } catch (error) {
+            console.error("Error updating organization:", error);
+            toast.error("Failed to update organization profile.");
+        }
+    }
+
     // Initialization - Allow update once form is initialized
     useEffect(() => {
         const init = async () => {
@@ -270,30 +296,52 @@ export function EditRFPForm({
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
 
-                    <div className="space-y-4 w-full h-full">
-
-                        {/* spacer for buttons */}
-                        <div className="h-12" /> 
-
-                        <span className="flex justify-end gap-4 flex-wrap absolute bottom-2 right-0 m-4">
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <Button type="button" variant="destructive">
-                                        Delete RFP
-                                    </Button>
-                                </DialogTrigger>
-                                {/* <DeleteAssetDialogContent assetData={assetData}/> */}
-                            </Dialog>
-                            <Button
-                                onClick={() => {
-                                    handleFormSubmit(form.getValues())
-                                    // onClose()
-                                }}
-                            >
-                                Save Changes
-                            </Button>
-                        </span>
-                    </div>
+                    <span className="flex gap-2 w-full justify-end">
+                        <DialogClose asChild>
+                            <Button variant={"secondary"}>Cancel</Button>
+                        </DialogClose>
+                        <Dialog>
+                            <DialogTrigger asChild className={cn(rfpData.id ? "" : "hidden")}>
+                                <Button type="button" variant="destructive">
+                                    Delete RFP
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        Are you absolutely sure?
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        {`This action cannot be undone. This will permanently delete your RFP and it's data.`}
+                                    </DialogDescription>
+                                    <DialogFooter>
+                                        <DialogClose>
+                                            <Button type="button">
+                                                Cancel
+                                            </Button>
+                                        </DialogClose>
+                                        <DialogClose>
+                                            <Button
+                                                type="button"
+                                                variant={"destructive"}
+                                                onClick={handleDeleteRFP}
+                                            >
+                                                Delete RFP
+                                            </Button>
+                                        </DialogClose>
+                                    </DialogFooter>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+                        <Button
+                            onClick={() => {
+                                handleFormSubmit(form.getValues())
+                                // onClose()
+                            }}
+                        >
+                            Save Changes
+                        </Button>
+                    </span>
                 </form>
             </ScrollArea>
         </Form>
