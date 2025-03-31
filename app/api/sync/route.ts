@@ -345,6 +345,22 @@ const syncToTypesense = async (env: {
                     optional: true
                 },
                 {
+                    name: "avgRating",
+                    type: "float",
+                    index: true,
+                    sort: true,
+                    store: true,
+                    optional: true
+                },
+                {
+                    name: "simplifiedCertifications",
+                    type: "string[]",
+                    index: true,
+                    store: true,
+                    facet: true,
+                    optional: true
+                },
+                {
                     name: "categories",
                     type: "string[]",
                     index: true,
@@ -387,7 +403,9 @@ const syncToTypesense = async (env: {
                 website: true,
                 headquarters: true,
                 companyType: true,
-                categories: true
+                categories: true,
+                avgRating: true,
+                simplifiedCertifications: true
             }
         });
 

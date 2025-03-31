@@ -34,7 +34,7 @@ const invitationFormSchema = z.object({
     email: z.string().min(3, {
         message: "Email must be at least 3 characters.",
     }),
-    role: z.enum(["admin", "owner"], { message: "Role must be either Admin or Owner." }),
+    role: z.enum(["member", "owner"], { message: "Role must be either Member or Owner." }),
 })
 
 export default function InviteUserToOrgDialog() {
@@ -60,7 +60,7 @@ export default function InviteUserToOrgDialog() {
         mode: "onChange",
         resolver: zodResolver(invitationFormSchema),
         defaultValues: {
-            role: "admin"
+            role: "member"
         }
     })
 
@@ -147,7 +147,7 @@ export default function InviteUserToOrgDialog() {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            <SelectItem value="admin">Admin</SelectItem>
+                                            <SelectItem value="member">Member</SelectItem>
                                             <SelectItem value="owner">Owner</SelectItem>
                                         </SelectContent>
                                     </Select>
