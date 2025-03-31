@@ -613,7 +613,7 @@ export function EditMilestoneForm({
 
                                 <div className="w-full grid grid-cols-[180px_auto] gap-2 items-center">
                                     <div>
-                                    <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
+                                    <FormLabel className="text-md mt-2">{`Project Type`}</FormLabel>
                                     {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
                                     </div>
                                     <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
@@ -758,7 +758,7 @@ const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTy
                                 options={milestoneTypes.map(type => ({...type, value: type.id}))}
                                 hidePlaceholderWhenSelected={true}
                                 showHoverCard={false}
-                                placeholder="Milestone type"
+                                placeholder="Project type"
                                 emptyIndicator={
                                     <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                         no results found.
@@ -785,7 +785,7 @@ const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, milestoneTy
                                 <FormControl>
                                     <Textarea
                                         id="otherTypeDetails"
-                                        placeholder={`Please enter a short description of your milestone type.`}
+                                        placeholder={`Please enter a short description of your project type.`}
                                         // defaultValue={field.value}
                                         {...field}
                                     />

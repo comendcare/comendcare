@@ -227,7 +227,7 @@ export function Roadmap() {
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
-                                    <p>{`Create a milestone`}</p>
+                                    <p>{`Create a project`}</p>
                                 </TooltipContent>
                             </Tooltip>
 
@@ -246,7 +246,7 @@ export function Roadmap() {
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
-                                    <p>{`Import milestones from .csv`}</p>
+                                    <p>{`Import projects from .csv`}</p>
                                 </TooltipContent>
                             </Tooltip>
 
@@ -367,10 +367,10 @@ export function Roadmap() {
                     <DialogContent className="flex flex-col justify-start">
                         <DialogHeader>
                             <DialogTitle className="text-2xl">
-                                Import milestones
+                                Import projects
                             </DialogTitle>
                             <DialogDescription>
-                                Import multiple milestones at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">Milestone input template</Link>, filling it out, downloading it as a CSV, and uploading it.
+                                Import multiple projects at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">Milestone input template</Link>, filling it out, downloading it as a CSV, and uploading it.
                             </DialogDescription>
                         </DialogHeader>
 

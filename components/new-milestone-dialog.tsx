@@ -58,7 +58,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
             >
                 <DialogHeader>
                     <DialogTitle className="text-2xl">
-                        Create a milestone
+                        Create a project
                     </DialogTitle>
                 </DialogHeader>
 
@@ -140,7 +140,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                             }}
                         >
                             <Plus />
-                            Create selected milestone
+                            Create selected project
                         </Button>
                     </DialogClose>
                 </DialogFooter>
