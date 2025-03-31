@@ -404,6 +404,7 @@ export const syncToTypesense = async (env: {
                 headquarters: true,
                 companyType: true,
                 categories: true,
+                avgRating: true,
                 simplifiedCertifications: true
             }
         });

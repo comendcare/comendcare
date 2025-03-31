@@ -184,6 +184,13 @@ export const authOptions: NextAuthOptions = {
                 ) {
                     // If membership exists but isn't in the user's memberships, reset it
                     membership = null;
+                } else if (membership) {
+                    const matchingMembership = dbUser.memberships.find((m) => m.id === membership?.id);
+
+                    if (matchingMembership && matchingMembership.role !== membership.role) {
+                        // Role has changed — terminate the session such that user must log back in
+                        session.roleChanged = true;
+                    }
                 }
             }
 
@@ -226,6 +233,7 @@ export const authOptions: NextAuthOptions = {
 
 export function getSession() {
     return getServerSession(authOptions) as Promise<{
+        roleChanged: boolean;
         terminate: boolean;
         user: {
             id: string

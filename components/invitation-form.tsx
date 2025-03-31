@@ -48,7 +48,7 @@ export default function InvitationForm() {
             const response = await inviteUser(
                 session.data,
                 form.getValues("email"),
-                "admin",
+                "member",
                 await getIp(),
                 {
                     organizationId: params?.id as string,

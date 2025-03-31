@@ -112,7 +112,7 @@ export default async function ProfilePage() {
                                                     className="flex flex-col xl:flex-row items-baseline mt-6 min-w-0 flex-1 truncate text-3xl font-bold text-gray-900 gap-x-2">
                                                     <HoverCard openDelay={0} closeDelay={0}>
                                                         <HoverCardTrigger asChild>
-                                                            <h1 className="truncate w-3/5">
+                                                            <h1 className="truncate w-4/5">
                                                                 {organization?.name}
                                                             </h1>
                                                         </HoverCardTrigger>
@@ -128,7 +128,7 @@ export default async function ProfilePage() {
                                                         </HoverCardContent>
                                                     </HoverCard>
 
-                                                    <ComendVerifiedBadge verified={organization.verified}/>
+                                                    {/*<ComendVerifiedBadge verified={organization.verified}/>*/}
 
                                                     <EditPAGProfileHeaderDialog organization={organization}/>
 

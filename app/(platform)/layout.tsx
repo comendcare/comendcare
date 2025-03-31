@@ -19,6 +19,8 @@ export default async function PlatformLayout({children}: PlatformLayoutProps) {
         redirect("/signed-out?reason=not_whitelisted");
     } else if (session.terminate) {
         redirect("/signed-out?reason=terminated");
+    } else if (session.roleChanged) {
+        redirect("/signed-out?reason=roleChanged");
     }
 
     return (

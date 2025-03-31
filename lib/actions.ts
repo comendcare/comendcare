@@ -82,7 +82,7 @@ export const createMemberRequest = async (organizationId: string): Promise<ApiRe
         const memberRequest = await prisma.memberRequest.create({
             data: {
                 email: session.user.email,
-                role: "admin",
+                role: "member",
                 user: {
                     connect: {
                         id: session.user.id
@@ -1016,7 +1016,7 @@ export const editUser = async (
 export async function inviteUser(
     session: Session | null,
     email: string = "therealflawnsontong@gmail.com",
-    role: string = "admin",
+    role: string = "member",
     ip: string,
     organization: {
         organizationId: string
@@ -1215,7 +1215,7 @@ export async function approveMemberRequestAndCreateMember(
                 data: {
                     email: memberRequest.email,
                     organizationId: memberRequest.organizationId,
-                    role: "admin",
+                    role: "member",
                     userId: memberRequest.userId,
                 },
                 include: {
@@ -1618,7 +1618,7 @@ export async function acceptInvitation(invitationId: string) {
                 data: {
                     email: invitation.email,
                     organizationId: invitation.organizationId,
-                    role: invitation.role || "admin",
+                    role: invitation.role || "member",
                     userId: session.user.id,
                 },
             }),
