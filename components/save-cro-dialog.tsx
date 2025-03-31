@@ -48,6 +48,7 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([]);
     const [savedCompanies, setSavedCompanies] = useState<SavedCompany[]>([]);
     const [isSaved, setIsSaved] = useState(false);
+    const [open, setOpen] = useState(false); // New state for dialog open/close
 
     const form = useForm<SaveCROFormData>({
         resolver: zodResolver(formSchema),
@@ -84,6 +85,7 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
                 va.track("Saved CRO");
                 router.refresh();
                 toast.success("Successfully saved cro!");
+                setOpen(false)
             } else {
                 toast.error(response.error);
             }
@@ -98,7 +100,7 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
     };
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {type === "page" ? (
                     <Button variant="secondary" className="w-fit">
