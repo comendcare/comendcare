@@ -10,7 +10,7 @@ import Image from "next/image"
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
 import { buttonVariants } from "./plate-ui/button";
-import { ExternalLink, Plus } from "lucide-react";
+import { ExternalLink, Pencil, Plus } from "lucide-react";
 
 export const RoadmapCard = ({
     roadmap, 
@@ -61,7 +61,7 @@ export const RoadmapCard = ({
                                 className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                             >
                                 Edit research plan
-                                <ExternalLink />
+                                <Pencil />
                             </Button>
                         }
                     </div>
@@ -152,7 +152,7 @@ export const UnderDevelopmentCard = ({isPublic}: {isPublic: Boolean}) => {
                             className="inline-flex flex-row justify-center items-center gap-x-2 text-base"
                         >
                             Edit research plan
-                            <ExternalLink />
+                            <Pencil />
                         </Button>
                     }
                 </div>
