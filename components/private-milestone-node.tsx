@@ -254,48 +254,48 @@ export const NodeHandle = (props: HandleProps & { node: NodeProps<PrivateMilesto
 }
 
 export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | PublicMilestoneNode> }) => {
-    if (props?.type === "ASSET") {
-        return (
-            <>
-                <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
-                    {props.data?.contacts && props.data.contacts.length > 0 && (props.data?.contacts || []).map((contact, index) => {
-                        if (contact.name && contact.email) {
-                            return (
-                                <li key={index} className="flex gap-2 items-center">
-                                    <User />
-                                    <p className="w-[90%] text-wrap break-words">{contact.name} &bull; {contact.email}</p>
-                                </li>)
-                        } else if (contact.name) {
-                            return (
-                                <li key={index} className="flex gap-2 items-center w-full">
-                                    <User />
-                                    <p className="w-[90%] text-wrap break-words">{contact.name}</p>
-                                </li>)
-                        } else if (contact.email) {
-                            return (
-                                <li key={index} className="flex gap-2 items-center">
-                                    <User />
-                                    <p className="w-[90%] text-wrap break-words">{contact.email}</p>
-                                </li>)
-                        }
-                    })}
-                </ul>
+    // if (props?.type === "ASSET") {
+    //     return (
+    //         <>
+    //             <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
+    //                 {props.data?.contacts && props.data.contacts.length > 0 && (props.data?.contacts || []).map((contact, index) => {
+    //                     if (contact.name && contact.email) {
+    //                         return (
+    //                             <li key={index} className="flex gap-2 items-center">
+    //                                 <User />
+    //                                 <p className="w-[90%] text-wrap break-words">{contact.name} &bull; {contact.email}</p>
+    //                             </li>)
+    //                     } else if (contact.name) {
+    //                         return (
+    //                             <li key={index} className="flex gap-2 items-center w-full">
+    //                                 <User />
+    //                                 <p className="w-[90%] text-wrap break-words">{contact.name}</p>
+    //                             </li>)
+    //                     } else if (contact.email) {
+    //                         return (
+    //                             <li key={index} className="flex gap-2 items-center">
+    //                                 <User />
+    //                                 <p className="w-[90%] text-wrap break-words">{contact.email}</p>
+    //                             </li>)
+    //                     }
+    //                 })}
+    //             </ul>
 
-                <span className="w-full flex gap-2 flex-wrap text-wrap">
-                    {props?.data?.attachments && props.data?.attachments?.length > 0 && (
-                        <AttachmentsTag attachments={props.data.attachments}/>
-                    )}
-                    {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} key={index} />
-                    ))}
-                </span>
-            </>
-        )
+    //             <span className="w-full flex gap-2 flex-wrap text-wrap">
+    //                 {props?.data?.attachments && props.data?.attachments?.length > 0 && (
+    //                     <AttachmentsTag attachments={props.data.attachments}/>
+    //                 )}
+    //                 {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
+    //                     <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} key={index} />
+    //                 ))}
+    //             </span>
+    //         </>
+    //     )
 
-        return
-    }
+    //     return
+    // }
 
-    if (props?.type === "PROJECT") {
+    // if (props?.type === "PROJECT") {
         return (
             <>
                 <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
@@ -331,34 +331,34 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
             </>
 
         )
-    }
+    // }
 
-    if (props?.type === "RFP") {
-        return (
-            <>
-                <ul className="flex flex-col gap-2 text-sm">
-                    {(props?.data?.startDate || props?.data?.endDate) && (
-                        <li>
-                            <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}
-                                      startLabel={"Request Opens:"} endLabel={"Deadline for Proposals:"}/>
-                        </li>
-                    )}
-                    {props?.data?.budget && (
-                        <li className="flex gap-2 items-center">
-                            <CircleDollarSign />
-                            {formatMoney(props?.data?.budget)} budget
-                        </li>
-                    )}
-                </ul>
+    // if (props?.type === "RFP") {
+    //     return (
+    //         <>
+    //             <ul className="flex flex-col gap-2 text-sm">
+    //                 {(props?.data?.startDate || props?.data?.endDate) && (
+    //                     <li>
+    //                         <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}
+    //                                   startLabel={"Request Opens:"} endLabel={"Deadline for Proposals:"}/>
+    //                     </li>
+    //                 )}
+    //                 {props?.data?.budget && (
+    //                     <li className="flex gap-2 items-center">
+    //                         <CircleDollarSign />
+    //                         {formatMoney(props?.data?.budget)} budget
+    //                     </li>
+    //                 )}
+    //             </ul>
 
-                <span className="w-full flex gap-2 flex-wrap text-wrap">
-                    {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
-                        <MilestoneTypeBadge key={index} label={milestoneType?.milestoneType?.label} />
-                    ))}
-            </span>
-            </>
-        )
-    }
+    //             <span className="w-full flex gap-2 flex-wrap text-wrap">
+    //                 {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
+    //                     <MilestoneTypeBadge key={index} label={milestoneType?.milestoneType?.label} />
+    //                 ))}
+    //         </span>
+    //         </>
+    //     )
+    // }
 
     return (
         <div>error</div>

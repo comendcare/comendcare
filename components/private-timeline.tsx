@@ -264,47 +264,47 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
 }
 
 export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData: Milestone, nodeType: string }) => {
-    if (nodeType === "ASSET") {
-        return (
-            <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).map((milestoneType, index) => (
-                    <li key={index}>
-                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
-                    </li>
-                ))}
-                {milestoneData?.attachments && milestoneData?.attachments?.length > 0 && (
-                    <li>
-                        <AttachmentsTag attachments={milestoneData.attachments}/>
-                    </li>
-                )}
-                {milestoneData?.contacts && milestoneData.contacts.length > 0 && (milestoneData?.contacts || []).map((contact, index) => {
-                    if (contact.name && contact.email) {
-                        return (
-                            <li key={index} className="flex gap-2 items-center">
-                                <User />
-                                <p>{contact.name} &bull; {contact.email}</p>
-                            </li>)
-                    } else if (contact.name) {
-                        return (
-                            <li key={index} className="flex gap-2 items-center w-full">
-                                <User />
-                                <p>{contact.name}</p>
-                            </li>)
-                    } else if (contact.email) {
-                        return (
-                            <li key={index} className="flex gap-2 items-center">
-                                <User />
-                                <p>{contact.email}</p>
-                            </li>)
-                    }
-                })}
-            </ul>
-        )
+    // if (nodeType === "ASSET") {
+    //     return (
+    //         <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
+    //             {(milestoneData?.types || []).map((milestoneType, index) => (
+    //                 <li key={index}>
+    //                     <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
+    //                 </li>
+    //             ))}
+    //             {milestoneData?.attachments && milestoneData?.attachments?.length > 0 && (
+    //                 <li>
+    //                     <AttachmentsTag attachments={milestoneData.attachments}/>
+    //                 </li>
+    //             )}
+    //             {milestoneData?.contacts && milestoneData.contacts.length > 0 && (milestoneData?.contacts || []).map((contact, index) => {
+    //                 if (contact.name && contact.email) {
+    //                     return (
+    //                         <li key={index} className="flex gap-2 items-center">
+    //                             <User />
+    //                             <p>{contact.name} &bull; {contact.email}</p>
+    //                         </li>)
+    //                 } else if (contact.name) {
+    //                     return (
+    //                         <li key={index} className="flex gap-2 items-center w-full">
+    //                             <User />
+    //                             <p>{contact.name}</p>
+    //                         </li>)
+    //                 } else if (contact.email) {
+    //                     return (
+    //                         <li key={index} className="flex gap-2 items-center">
+    //                             <User />
+    //                             <p>{contact.email}</p>
+    //                         </li>)
+    //                 }
+    //             })}
+    //         </ul>
+    //     )
 
-        return
-    }
+    //     return
+    // }
 
-    if (nodeType === "PROJECT") {
+    // if (nodeType === "PROJECT") {
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
                 <li>
@@ -333,25 +333,25 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                 })}
             </ul>
         )
-    }
+    // }
 
-    if (nodeType === "RFP") {
-        return (
-            <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).map((milestoneType, index) => (
-                    <li key={index}>
-                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
-                    </li>
-                ))}
-                {milestoneData?.budget && (
-                    <li className="flex gap-2 items-center">
-                        <CircleDollarSign />
-                        {formatMoney(milestoneData?.budget)} budget
-                    </li>
-                )}
-            </ul>
-        )
-    }
+    // if (nodeType === "RFP") {
+    //     return (
+    //         <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
+    //             {(milestoneData?.types || []).map((milestoneType, index) => (
+    //                 <li key={index}>
+    //                     <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
+    //                 </li>
+    //             ))}
+    //             {milestoneData?.budget && (
+    //                 <li className="flex gap-2 items-center">
+    //                     <CircleDollarSign />
+    //                     {formatMoney(milestoneData?.budget)} budget
+    //                 </li>
+    //             )}
+    //         </ul>
+    //     )
+    // }
 
     return (
         <div>error</div>

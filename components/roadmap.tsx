@@ -409,7 +409,8 @@ export function Roadmap() {
                                                             title: entry.title || 'New Milestone',
                                                             description: entry.description || '', // description is optional
                                                             types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [], // types are optional
-                                                            nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT" // category is optional, default to project
+                                                            // nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT" // category is optional, default to project
+                                                            nodeType: "PROJECT"
                                                         })
                                                     } else {
                                                         errors = errors.concat(validate.errors || [])
@@ -420,7 +421,8 @@ export function Roadmap() {
                                                             title: entry.title && typeof entry.title === 'string' ? entry.title : 'New milestone',
                                                             description: entry.description || '',
                                                             types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
-                                                            nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT"
+                                                            // nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT"
+                                                            nodeType: "PROJECT"
                                                         })
                                                     }
                                                 })

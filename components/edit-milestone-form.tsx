@@ -407,10 +407,8 @@ export function EditMilestoneForm({
                                     }
                                 </TabsTrigger>
                             </TabsList>
-                            {/* <TypeBadge type={formData.nodeType}/> */}
-                            <DropdownMenu>
+                            {/* <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    {/* Modified version of type-badge.tsx */}
                                     <Button className="font-semibold h-8 text-sm flex justify-center gap-2 border-none text-blue-dark bg-blue-light hover:bg-blue-light rounded-full">
                                         {formData.nodeType === "ASSET" && (
                                             <>
@@ -506,14 +504,14 @@ export function EditMilestoneForm({
                                         )}
                                     />
                                 </DropdownMenuContent>
-                            </DropdownMenu>
+                            </DropdownMenu> */}
                         </div>
                         {isMigrating ? (
                             <Loading />
                         ): (
                             <>
                             <TabsContent value="edit" className="space-y-4 w-full h-full">
-                                <FormItem>
+                                {/* <FormItem>
 
                                 <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
                                     <FormLabel className="text-md mt-2">Visibility</FormLabel>
@@ -584,7 +582,50 @@ export function EditMilestoneForm({
                                     <TimelineFormField form={form} startLabel={"Request Opens"}
                                                     endLabel={"Deadline for Proposals"}/>
                                 )}
+                                </FormItem> */}
+
+
+                                <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
+                                    <FormLabel className="text-md mt-2">Visibility</FormLabel>
+                                    <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
                                 </FormItem>
+
+                                <FormField
+                                    control={form.control}
+                                    name="description"
+                                    render={({field}) => (
+                                        <FormItem className="w-full grid grid-cols-[180px_auto] gap-x-2 items-start">
+                                            <FormLabel className="text-md mt-2">
+                                                {`Description`}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    id="description"
+                                                    placeholder={`Enter a description...`}
+                                                    // defaultValue={field.value}
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <div className="w-full grid grid-cols-[180px_auto] gap-2 items-center">
+                                    <div>
+                                    <FormLabel className="text-md mt-2">{`Milestone Type`}</FormLabel>
+                                    {formData?.types?.length === 3 && <FormDescription className="text-sm text-gray-500">{`Maximum selection is 3 types.`}</FormDescription>}
+                                    </div>
+                                    <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
+
+                                    <FormLabel className="text-md mt-2">{`Project Status`}</FormLabel>
+                                    <StatusFormField form={form}/>
+
+                                    <FormLabel className="text-md mt-2">{`Budget`}</FormLabel>
+                                    <span className="mt-2"><BudgetFormField form={form}/></span>
+                                </div>
+
+                                <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
 
                                 <ContactsFormField form={form}/>
 
@@ -876,7 +917,7 @@ const TimelineFormField = ({
     endLabel?: string
 }) => {
     return (
-        <span className="flex flex-col gap-2 align-center">
+        <span className="flex flex-col gap-z align-center">
 
             <FormItem
                 className="w-full grid grid-rows[auto_auto] grid-cols-[180px_120px_auto] space-y-0 gap-2 items-center">
