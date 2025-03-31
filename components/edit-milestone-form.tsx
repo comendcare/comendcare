@@ -584,18 +584,11 @@ export function EditMilestoneForm({
                                 )}
                                 </FormItem> */}
 
-                                <div className="w-full grid grid-cols-[180px_auto] gap-x-2 items-center">
-                                    <div>
-                                        <FormLabel>Visibility</FormLabel>
-                                        {/* <FormDescription>
-                                            {`Changing the visiblity of your asset allows you show or hide it from your organization profile.`}
-                                        </FormDescription> */}
-                                    </div>
+                                <div className="w-full grid grid-cols-[100px_auto] gap-x-2 items-center">
+                                    <FormLabel>Visibility</FormLabel>
                                     <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
 
-                                    <div>
-                                        <FormLabel >{`Description`}</FormLabel>
-                                    </div>
+                                    <FormLabel >{`Description`}</FormLabel>
                                     <FormField
                                         control={form.control}
                                         name="description"
@@ -616,10 +609,7 @@ export function EditMilestoneForm({
                                     </div>
                                     <MilestoneTypeFormField form={form} milestoneTypes={milestoneTypes}/>
 
-                                    <div>
-                                        <FormLabel>{`Project Status`}</FormLabel>
-                                        {/* <FormDescription>{`The status of your project. Click to change the status.`}</FormDescription> */}
-                                    </div>
+                                    <FormLabel>{`Project Status`}</FormLabel>
                                     <StatusFormField form={form}/>
 
                                     <FormLabel>{`Budget`}</FormLabel>
@@ -1254,7 +1244,7 @@ export const EditTitle = ({form}: { form: any }) => {
                 <FormItem className="flex flex-col grow mr-10">
                     <FormControl>
                         <AutosizeTextarea
-                            className="overflow-hidden font-semibold text-3xl"
+                            className="overflow-hidden font-semibold text-xl"
                             id="title"
                             placeholder={`Enter a title`}
                             defaultValue={field.value}
