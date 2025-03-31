@@ -1763,7 +1763,7 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
 
 export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: string) => {
     try {
-        const response = await prisma.asset.upsert({
+        const response = await prisma.rFP.upsert({
             where: {
                 id: rfpData.id || nanoid()
             },
@@ -1791,6 +1791,9 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                     }
                 },
                 private: rfpData.private || false,
+                openTo: rfpData.openTo || [],
+                startDate: rfpData.startDate,
+                endDate: rfpData.endDate
             },
             create: {
                 title: rfpData.title || "",
@@ -1814,6 +1817,9 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                     }
                 },
                 private: rfpData.private || false,
+                openTo: rfpData.openTo || [],
+                startDate: rfpData.startDate,
+                endDate: rfpData.endDate,
                 organization: { connect: {id: organizationId} }
             },
         })

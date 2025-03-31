@@ -915,15 +915,14 @@ export const TimelineFormField = ({
 }) => {
     return (
         <span className="flex flex-col gap-z align-center">
-
             <FormItem
                 className="w-full grid grid-rows[auto_auto] grid-cols-[180px_120px_auto] space-y-0 gap-2 items-center">
-                <FormLabel className="text-md h-fit w-fit">{startLabel ? startLabel : `Start`}</FormLabel>
+                <FormLabel>{startLabel ? startLabel : `Start`}</FormLabel>
                 <FormField
                     control={form.control}
                     name="startDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px]">
+                        <FormItem>
                             <Select
                                 defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                                 onValueChange={(value) => {
@@ -934,7 +933,7 @@ export const TimelineFormField = ({
                                 }}
                             >
                                 <FormControl>
-                                    <SelectTrigger className="h-[40px]">
+                                    <SelectTrigger>
                                         <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
@@ -962,9 +961,8 @@ export const TimelineFormField = ({
                     control={form.control}
                     name="startDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px]">
+                        <FormItem>
                             <Input
-                                className="h-[40px]"
                                 placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
@@ -978,12 +976,12 @@ export const TimelineFormField = ({
                     )}
                 />
 
-                <FormLabel className="text-md h-fit w-fit">{endLabel ? endLabel : `End`}</FormLabel>
+                <FormLabel>{endLabel ? endLabel : `End`}</FormLabel>
                 <FormField
                     control={form.control}
                     name="endDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px]">
+                        <FormItem>
                             <Select
                                 defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
                                 onValueChange={(value) => {
@@ -994,7 +992,7 @@ export const TimelineFormField = ({
                                 }}
                             >
                                 <FormControl>
-                                    <SelectTrigger className="h-[40px]">
+                                    <SelectTrigger>
                                         <SelectValue placeholder="Month"/>
                                     </SelectTrigger>
                                 </FormControl>
@@ -1022,9 +1020,8 @@ export const TimelineFormField = ({
                     control={form.control}
                     name="endDate"
                     render={({field}) => (
-                        <FormItem className="h-[40px]">
+                        <FormItem>
                             <Input
-                                className="h-[40px]"
                                 placeholder="Year"
                                 maxLength={4}
                                 defaultValue={field.value ? new Date(field.value).getFullYear() : undefined}
@@ -1082,24 +1079,31 @@ export const OpenToFormField = ({form}: { form: any }) => {
             control={form.control}
             name="openTo"
             render={({field}) => (
-                <ToggleGroup
-                    type="multiple"
-                    variant="outline"
-                    value={field.value}
-                    onValueChange={
-                        field.onChange
-                    }
-                    className="w-fit flex flex-wrap gap-2 justify-start mt-2"
-                >
-                    {RFP_OPEN_TO_TYPE_OPTIONS.map(type => (
-                        <ToggleGroupItem
-                            key={type.value}
-                            value={type.value}
+                <FormItem>
+                    <FormLabel >{`Open to`}</FormLabel>
+                    <FormDescription>{`Specify which parties you wish to source proposals from.`}</FormDescription>
+                    <FormControl>
+                        <ToggleGroup
+                            type="multiple"
+                            variant="outline"
+                            value={field.value}
+                            onValueChange={
+                                field.onChange
+                            }
+                            className="w-fit flex flex-wrap gap-2 justify-start mt-2"
                         >
-                            {type.label}
-                        </ToggleGroupItem>
-                    ))}
-                </ToggleGroup>
+                            {RFP_OPEN_TO_TYPE_OPTIONS.map(type => (
+                                <ToggleGroupItem
+                                    key={type.value}
+                                    value={type.value}
+                                >
+                                    {type.label}
+                                </ToggleGroupItem>
+                            ))}
+                        </ToggleGroup>
+                    </FormControl>
+                    <FormMessage/>
+                </FormItem>
             )}
         />
     )

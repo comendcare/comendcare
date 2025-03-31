@@ -70,8 +70,8 @@ import Loading from "@/app/loading"
 import { getMilestoneTypes } from "@/lib/fetchers"
 import { NotificationBubble } from "./notification-bubble"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
-import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store } from "lucide-react"
-import { AttachmentsFormField, ContactsFormField, EditTitle, PrivatePublicFormField, StatusFormField } from "./edit-milestone-form"
+import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store, Calendar as CalendarIcon } from "lucide-react"
+import { AttachmentsFormField, ContactsFormField, EditTitle, OpenToFormField, PrivatePublicFormField, StatusFormField, TimelineFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { createOrUpdateAsset, createOrUpdateRFP } from "@/lib/actions"
@@ -102,6 +102,9 @@ const editRFPForm = z.object({
     attachments: z.array(z.custom<AttachmentType>()).optional(),
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
+    openTo: z.array(z.string()).optional(),
+    startDate: z.date().optional(),
+    endDate: z.date().optional(),
 })
 
 export function EditRFPForm({
@@ -123,6 +126,9 @@ export function EditRFPForm({
             attachments: rfpData?.attachments || undefined,
             isPrivate: rfpData?.private || true,
             contacts: rfpData?.contacts || undefined,
+            openTo: rfpData?.openTo || [],
+            startDate: rfpData?.startDate || undefined,
+            endDate: rfpData?.endDate || undefined,
         }
     })
 
@@ -133,6 +139,9 @@ export function EditRFPForm({
         attachments: form.watch("attachments"),
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
+        openTo: form.watch("openTo"),
+        startDate: form.watch("startDate"),
+        endDate: form.watch("endDate"),
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editRFPForm>) => {
@@ -143,6 +152,9 @@ export function EditRFPForm({
             attachments,
             isPrivate,
             contacts,
+            openTo,
+            startDate,
+            endDate
         } = values;
 
         const updateData: Partial<RFP> = {
@@ -152,6 +164,9 @@ export function EditRFPForm({
             ...(description !== undefined && description !== null ? {description} : undefined),
             ...(attachments ? {attachments} : undefined),
             ...(contacts ? {contacts} : undefined),
+            ...(openTo ? {openTo} : undefined),
+            ...(startDate ? {startDate} : undefined),
+            ...(endDate ? {endDate} : undefined)
         }
 
         console.log(`updateData`, updateData)
@@ -249,6 +264,9 @@ export function EditRFPForm({
                         <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
                     </FormItem>
 
+                    <OpenToFormField form={form}/>
+                    <ProposalTimelineInput form={form}/>
+
                     <ContactsFormField form={form} />
                     <AttachmentsFormField form={form} />
 
@@ -279,5 +297,79 @@ export function EditRFPForm({
                 </form>
             </ScrollArea>
         </Form>
+    )
+}
+
+const ProposalTimelineInput = ({form}: {form: any}) => {
+    return (
+        <>
+        <FormField
+            control={form.control}
+            name="startDate"
+            render={({field}) => (
+                <FormItem>
+                    <FormLabel>{`Request Opens`}</FormLabel>
+                    <FormDescription>{`The date you'll begin accepting proposals.`}</FormDescription>
+                    <div>
+                        <Popover >
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                        "w-full justify-start text-left font-normal",
+                                        !field.value && "text-muted-foreground"
+                                    )}
+                                >
+                                <CalendarIcon className="mr-2" />
+                                {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                    mode="single"
+                                    selected={field.value || new Date()}
+                                    onSelect={field.onChange}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                </FormItem>
+            )}
+        />
+
+        <FormField
+            control={form.control}
+            name="endDate"
+            render={({field}) => (
+                <FormItem>
+                    <FormLabel>{`Deadline for Proposals`}</FormLabel>
+                    <FormDescription>{`The last day you will be accepting proposals.`}</FormDescription>
+                    <Popover >
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                )}
+                            >
+                            <CalendarIcon className="mr-2" />
+                            {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                            <Calendar
+                                mode="single"
+                                selected={field.value || new Date()}
+                                onSelect={field.onChange}
+                                initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
+                </FormItem>
+            )}
+        />
+        </>
     )
 }

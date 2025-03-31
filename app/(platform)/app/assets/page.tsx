@@ -50,10 +50,10 @@ export default async function AssetsPage() {
                             <DialogContent>
                                 <DialogHeader>
                                     <DialogTitle>
-                                        Edit or Create Asset
+                                        Create an Asset
                                     </DialogTitle>
                                     <DialogDescription>
-                                        {`Make changes to or create your asset here. Click save when you're done.`}
+                                        {`Create your Asset here. Click save when you're done.`}
                                     </DialogDescription>
                                 </DialogHeader>
                                 <EditAssetForm assetData={{}} />
@@ -68,6 +68,14 @@ export default async function AssetsPage() {
                                 </Button>
                             </DialogTrigger>
                             <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>
+                                        Edit an Asset
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                        {`Edit your Asset here. Click save when you're done.`}
+                                    </DialogDescription>
+                                </DialogHeader>
                                 <EditAssetForm assetData={asset} />
                             </DialogContent>
                         </Dialog>
