@@ -43,7 +43,7 @@ import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
 import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
 import {MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
+import {getMilestones, getOrganizationFromOrganizationId} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
 import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
@@ -80,6 +80,7 @@ import { AttachmentsFormField, ContactsFormField, EditTitle, OpenToFormField, Pr
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { createOrUpdateAsset, createOrUpdateRFP, deleteRFP } from "@/lib/actions"
+import { Option } from "@/lib/types"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -110,6 +111,7 @@ const editRFPForm = z.object({
     openTo: z.array(z.string()).optional(),
     startDate: z.date().optional(),
     endDate: z.date().optional(),
+    milestones: z.array(z.custom<Milestone>()).optional()
 })
 
 export function EditRFPForm({
@@ -121,6 +123,7 @@ export function EditRFPForm({
     const initializing = useRef(true)
     const {data: session} = useSession()
     const [orgIsPublished, setOrgIsPublished] = useState(false)
+    const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
 
     const form = useForm<z.infer<typeof editRFPForm>>({
         mode: "onChange",
@@ -134,6 +137,7 @@ export function EditRFPForm({
             openTo: rfpData?.openTo || [],
             startDate: rfpData?.startDate || undefined,
             endDate: rfpData?.endDate || undefined,
+            milestones: (rfpData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
         }
     })
 
@@ -147,6 +151,7 @@ export function EditRFPForm({
         openTo: form.watch("openTo"),
         startDate: form.watch("startDate"),
         endDate: form.watch("endDate"),
+        milestones: form.watch("milestones")
     }
 
     const handleFormSubmit = async (values: z.infer<typeof editRFPForm>) => {
@@ -159,13 +164,20 @@ export function EditRFPForm({
             contacts,
             openTo,
             startDate,
-            endDate
+            endDate,
+            milestones
         } = values;
 
         const updateData: Partial<RFP> = {
             ...rfpData,
             title,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
+            milestones: (milestones || []).map((milestone) => {
+                return ({
+                    milestoneId: milestone.id,
+                    rfpId: rfpData.id  || '',
+                })
+            }),
             ...(description !== undefined && description !== null ? {description} : undefined),
             ...(attachments ? {attachments} : undefined),
             ...(contacts ? {contacts} : undefined),
@@ -220,6 +232,13 @@ export function EditRFPForm({
                 if (response.success && response.data) {
                     setOrgIsPublished(response.data.published)
                 }
+            }
+
+            const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
+            if (milestonesResponse.success) {
+                setFetchedMilestones(milestonesResponse?.data as Milestone[])
+            } else {
+                console.error(milestonesResponse.error)
             }
 
             initializing.current = false
@@ -282,6 +301,34 @@ export function EditRFPForm({
                         </FormDescription>
                         <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
                     </FormItem>
+
+                    <FormField
+                        control={form.control}
+                        name="milestones"
+                        render={({field}) => (
+                            <FormItem className="w-full mt-2">
+                                <FormLabel >{`Linked Projects`}</FormLabel>
+                                <FormControl>
+                                    <MultipleSelector
+                                        value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title}))}
+                                        onChange={field.onChange}
+                                        maxSelected={3}
+                                        defaultOptions={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
+                                        options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
+                                        hidePlaceholderWhenSelected={true}
+                                        showHoverCard={false}
+                                        placeholder="Link projects"
+                                        emptyIndicator={
+                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                no results found.
+                                            </p>
+                                        }
+                                    />
+                                </FormControl>
+                                <FormMessage className="text-primary"/>
+                            </FormItem>
+                        )}
+                    />
 
                     <OpenToFormField form={form}/>
                     <ProposalTimelineInput form={form}/>

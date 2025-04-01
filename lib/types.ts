@@ -16,7 +16,7 @@ import {
     RFP as DBRFP
 } from "@prisma/client";
 
-export type Asset = Prisma.AssetGetPayload<{
+export type Asset = Omit<Prisma.AssetGetPayload<{
     include: {
         contacts: true,
         attachments: true,
@@ -26,9 +26,15 @@ export type Asset = Prisma.AssetGetPayload<{
             }
         }
     }
-}>
+}>, "milestones"> & {
+    milestones: Array<{
+        asset?: DBAsset,
+        milestoneId?: string,
+        assetId: string
+    }>
+}
 
-export type RFP = Prisma.RFPGetPayload<{
+export type RFP = Omit<Prisma.RFPGetPayload<{
     include: {
         contacts: true,
         attachments: true,
@@ -38,7 +44,13 @@ export type RFP = Prisma.RFPGetPayload<{
             }
         }
     }
-}>
+}>, "milestones"> & {
+    milestones: Array<{
+        rfp?: DBRFP,
+        milestoneId?: string,
+        rfpId: string
+    }>
+}
 
 export type Milestone = Omit<Prisma.MilestoneGetPayload<{
     include: {

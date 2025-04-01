@@ -1739,6 +1739,14 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                         }))
                     }
                 },
+                milestones: {
+                    deleteMany: {},
+                    create: (assetData.milestones || []).map((milestone: any) => ({
+                        milestone: {
+                            connect: {id: milestone.milestoneId}
+                        }
+                    }))
+                },
                 private: assetData.private || false,
             },
             create: {
@@ -1761,6 +1769,13 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
                             ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
                         }))
                     }
+                },
+                milestones: {
+                    create: (assetData.milestones || []).map((milestone: any) => ({
+                        milestone: {
+                            connect: {id: milestone.milestoneId}
+                        }
+                    }))
                 },
                 private: assetData.private || false,
                 organization: { connect: {id: organizationId} }
@@ -1819,7 +1834,15 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                 private: rfpData.private || false,
                 openTo: rfpData.openTo || [],
                 startDate: rfpData.startDate,
-                endDate: rfpData.endDate
+                endDate: rfpData.endDate,
+                milestones: {
+                    deleteMany: {},
+                    create: (rfpData.milestones || []).map((milestone: any) => ({
+                        milestone: {
+                            connect: {id: milestone.milestoneId}
+                        }
+                    }))
+                },
             },
             create: {
                 title: rfpData.title || "",
@@ -1846,6 +1869,13 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                 openTo: rfpData.openTo || [],
                 startDate: rfpData.startDate,
                 endDate: rfpData.endDate,
+                milestones: {
+                    create: (rfpData.milestones || []).map((milestone: any) => ({
+                        milestone: {
+                            connect: {id: milestone.milestoneId}
+                        }
+                    }))
+                },
                 organization: { connect: {id: organizationId} }
             },
         })
