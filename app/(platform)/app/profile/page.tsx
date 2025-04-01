@@ -58,7 +58,9 @@ export default async function ProfilePage() {
                                 node: true,
                                 contacts: true,
                                 attachments: true,
-                                types: { include: { milestoneType: true } }
+                                types: { include: { milestoneType: true } },
+                                assets: { include: { asset: true } },
+                                rfps: { include: { rfp: true } }
                             }
                         }
                     }
@@ -69,7 +71,9 @@ export default async function ProfilePage() {
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: { include: { milestoneType: true } }
+                        types: { include: { milestoneType: true } },
+                        assets: { include: { asset: true } },
+                        rfps: { include: { rfp: true } }
                     }
                 }
             }

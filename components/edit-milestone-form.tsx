@@ -35,9 +35,9 @@ import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
 import {debounce} from "lodash"
 import {monthsList} from "@/lib/data";
-import {Milestone, NODE_TYPE_OPTIONS, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
-import {getOrganizationFromOrganizationId} from "@/lib/fetchers"
+import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType, Option} from "@/lib/types"
+import {AssetToMilestone, MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
+import {getAssets, getOrganizationFromOrganizationId, getRFPs} from "@/lib/fetchers"
 import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
 import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
@@ -70,6 +70,7 @@ import { getMilestoneTypes } from "@/lib/fetchers"
 import { NotificationBubble } from "./notification-bubble"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store } from "lucide-react"
+import { toast } from "sonner"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -120,6 +121,8 @@ const editMilestoneForm = z.object({
     isPrivate: z.boolean(),
     contacts: z.array(z.custom<any>()).optional(),
     openTo: z.array(z.string()).optional(),
+    assets: z.array(z.custom<Asset>()).optional(),
+    rfps: z.array(z.custom<RFP>()).optional(),
     notes: z.array(z.record(z.any()))
 })
 
@@ -138,6 +141,8 @@ export function EditMilestoneForm({
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [isMigrating, setIsMigrating] = useState(false)
     const [milestoneTypes, setMilestoneTypes] = useState<MilestoneType[]>([])
+    const [fetchedAssets, setFetchedAssets] = useState<Asset[]>([])
+    const [fetchedRFPs, setFetchedRFPs] = useState<RFP[]>([])
     const [tab, setTab] = useState<"edit" | "recommendations">("edit")
 
     const form = useForm<z.infer<typeof editMilestoneForm>>({
@@ -157,6 +162,9 @@ export function EditMilestoneForm({
             isPrivate: milestoneData?.private || false,
             contacts: milestoneData?.contacts || undefined,
             openTo: milestoneData?.openTo || [],
+            assets: (milestoneData?.assets || []).map((asset: any) => asset.asset) || [],
+            rfps: (milestoneData?.rfps || []).map((rfp: any) => rfp.rfp) || [],
+            // assets: (milestoneData?.assets || []).map(asset => ({label: asset.assetId, value: asset.assetId})), // map to type Option for use in form
             notes: JSON.parse(milestoneData?.notes || "[]") || [],
         }
     })
@@ -175,6 +183,8 @@ export function EditMilestoneForm({
         isPrivate: form.watch("isPrivate"),
         contacts: form.watch("contacts"),
         openTo: form.watch("openTo"),
+        assets: form.watch("assets"),
+        rfps: form.watch("rfps"),
         notes: form.watch("notes")
     }
 
@@ -194,10 +204,14 @@ export function EditMilestoneForm({
             isPrivate,
             contacts,
             openTo,
+            assets,
+            rfps,
             notes
         } = values;
 
         console.log(`types`, types)
+        console.log(`assets`, assets)
+        console.log(`rfps`, rfps)
 
         const updateData: Milestone = {
             ...milestoneData,
@@ -220,6 +234,20 @@ export function EditMilestoneForm({
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             ...(contacts ? {contacts} : undefined),
             ...(openTo ? {openTo} : undefined),
+            assets: (assets || []).map((asset) => {
+                return ({
+                    milestoneId: milestoneData.id,
+                    assetId: asset.id,
+                    asset: asset
+                })
+            }).filter((asset) => asset !== undefined),
+            rfps: (rfps || []).map((rfp) => {
+                return ({
+                    milestoneId: milestoneData.id,
+                    rfpId: rfp.id,
+                    rfp: rfp
+                })
+            }).filter((rfp) => rfp !== undefined),
             ...(notes !== undefined && notes !== null ? {notes: JSON.stringify(notes)}: undefined)
         }
 
@@ -277,6 +305,18 @@ export function EditMilestoneForm({
                 const response = await getOrganizationFromOrganizationId(session.user.organizationId)
                 if (response.success && response.data) {
                     setOrgIsPublished(response.data.published)
+                }
+
+                const assetsResponse = await getAssets(session.user.organizationId)
+                if (assetsResponse.success && assetsResponse.data) {
+                    // setFetchedAssets((assetsResponse.data || []).map(asset => ({label: asset.title, value: asset.id})))
+                    setFetchedAssets(assetsResponse.data || [])
+                }
+
+                const rfpsResponse = await getRFPs(session.user.organizationId)
+                if (rfpsResponse.success && rfpsResponse.data) {
+                    // setFetchedRFPs((rfpsResponse.data || []).map(rfp => ({label: rfp.title, value: rfp.id})))
+                    setFetchedRFPs(rfpsResponse.data || [])
                 }
             }
 
@@ -621,6 +661,60 @@ export function EditMilestoneForm({
                                 <ContactsFormField form={form}/>
 
                                 <AttachmentsFormField form={form}/>
+
+                                <FormField
+                                    control={form.control}
+                                    name="assets"
+                                    render={({field}) => (
+                                        <FormItem className="w-full mt-2">
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    value={field.value?.map(asset => ({...asset, value: asset.id, label: asset.title}))}
+                                                    onChange={field.onChange}
+                                                    maxSelected={3}
+                                                    defaultOptions={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
+                                                    options={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
+                                                    hidePlaceholderWhenSelected={true}
+                                                    showHoverCard={false}
+                                                    placeholder="Link assets"
+                                                    emptyIndicator={
+                                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                            no results found.
+                                                        </p>
+                                                    }
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-primary"/>
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <FormField
+                                    control={form.control}
+                                    name="rfps"
+                                    render={({field}) => (
+                                        <FormItem className="w-full mt-2">
+                                            <FormControl>
+                                                <MultipleSelector
+                                                    value={field.value?.map(rfp => ({...rfp, value: rfp.id, label: rfp.title}))}
+                                                    onChange={field.onChange}
+                                                    maxSelected={3}
+                                                    defaultOptions={fetchedRFPs.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as any))}
+                                                    options={fetchedRFPs.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as any))}
+                                                    hidePlaceholderWhenSelected={true}
+                                                    showHoverCard={false}
+                                                    placeholder="Link RFPs"
+                                                    emptyIndicator={
+                                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                            no results found.
+                                                        </p>
+                                                    }
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-primary"/>
+                                        </FormItem>
+                                    )}
+                                />
 
                                 <FormField
                                     control={form.control}
@@ -1270,3 +1364,435 @@ export const EditTitle = ({form}: { form: any }) => {
         />
     );
 };
+
+// const TasksFormField = ({
+//                              form,
+//                              formData,
+//                              announcements,
+//                              sensors,
+//                              milestoneData
+//                          }: {
+//      form: any,
+//      // formData: z.infer<typeof editMilestoneForm>,
+//      formData: any,
+//      announcements: Announcements,
+//      sensors: SensorDescriptor<SensorOptions>[],
+//      milestoneData: any
+//  }) => {
+//     //  const {
+//     //      columns: kanbanColumns,
+//     //      tasks: kanbanTasks,
+//     //      setTasks,
+//     //      addTask,
+//     //      deleteTask,
+//     //      addColumn
+//     //  } = useKanbanStore(useShallow(kanbanSelector))
+//      const { addNotification } = useNotificationsStore(useShallow(notificationsSelector))
+//      const {data: session} = useSession()
+ 
+//      const debounceSetTasks = useCallback(
+//          debounce(async (updatedValues) => {
+//             //  await setTasks(updatedValues)
+//              // toast('Success!', {
+//              //     position: "bottom-left",
+//              //     description: 'The changes to your tasks have been successfully saved.'
+//              // })
+//          }, 500), []
+//      )
+ 
+//      return (
+//          <FormField
+//              control={form.control}
+//              name="tasks"
+//              render={({field}) => (
+//                  <FormItem className="flex flex-col grow">
+//                      <FormControl>
+//                          <>
+//                              <div className="flex flex-row justify-between items-center gap-4">
+//                                  <FormLabel
+//                                      className="h-full text-2xl font-semibold leading-none tracking-tight flex items-center gap-2"
+//                                  >
+//                                      {`Tasks`}
+//                                      <PrivateBadge className="font-normal text-gray-500" iconOnly={true}/>
+//                                  </FormLabel>
+ 
+//                                  <div className="h-full flex flex-row flex-wrap justify-end items-end gap-2">
+//                                      <LinkTask
+//                                          milestoneId={milestoneData?.id}
+//                                          kanbanTasks={kanbanTasks}
+//                                          onLink={async (taskId) => {
+//                                              const newTask = kanbanTasks?.find((task) => task.id === taskId)
+//                                              addNotification({
+//                                                  type: "NEW_TASK",
+//                                                  title: "New task assigned",
+//                                                  message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+//                                              })
+//                                              form.setValue(
+//                                                  'tasks',
+//                                                  [...field?.value || [], {
+//                                                      ...newTask,
+//                                                      milestoneId: milestoneData?.id,
+//                                                      milestone: {id: milestoneData?.id}
+//                                                  }]
+//                                              )
+//                                              debounceSetTasks(kanbanTasks.map(t => {
+//                                                  if (t.id === newTask.id) {
+//                                                      return ({
+//                                                          ...t,
+//                                                          milestoneId: milestoneData?.id,
+//                                                          milestone: {id: milestoneData?.id}
+//                                                      })
+//                                                  }
+//                                                  return t
+//                                              }))
+//                                          }}
+//                                      />
+ 
+//                                      <Button
+//                                          variant={'secondary'}
+//                                          onClick={async (e) => {
+//                                              e.preventDefault()
+//                                              // if kanban doesn't exist or kanban has no columns
+//                                              if (kanbanColumns.length === 0) {
+//                                                  const response = await getKanbanFromOrganizationId()
+ 
+//                                                  if (response.success && response.data) {
+//                                                      // kanban found, add column
+//                                                      const column = await addColumn({
+//                                                          name: 'Unsorted Tasks'
+//                                                      })
+ 
+//                                                      if (!column) return
+ 
+//                                                      const newTask = await addTask(column.id)
+//                                                      addNotification({
+//                                                          type: "NEW_TASK",
+//                                                          title: "New task assigned",
+//                                                          message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+//                                                      })
+//                                                      if (newTask) {
+//                                                          const updatedTasks = [...form.getValues().tasks || [], {
+//                                                              ...newTask,
+//                                                              milestoneId: milestoneData?.id,
+//                                                              milestone: {id: milestoneData?.id},
+//                                                              stakeholders: [{userId: session?.user.id}]
+//                                                          }]
+//                                                          form.setValue('tasks', updatedTasks)
+//                                                      }
+ 
+//                                                      return
+//                                                  }
+//                                              }
+ 
+//                                              const columnId = kanbanColumns[0].id
+ 
+//                                              const newTask = await addTask(columnId)
+//                                              // if (newTask) {
+//                                              //     const updatedTasks = [...form.getValues().tasks || [], {
+//                                              //         ...newTask,
+//                                              //         milestoneId: milestoneData?.id,
+//                                              //         milestone: {id: milestoneData?.id}
+//                                              //     }]
+//                                              //     form.setValue('tasks', updatedTasks)
+//                                              // }
+//                                              addNotification({
+//                                                  type: "NEW_TASK",
+//                                                  title: "New task assigned",
+//                                                  message: `${newTask?.name || 'A new task'} was assigned to you via the research plan.`,
+//                                              })
+//                                              const newTasks = await setTasks([
+//                                                  ...kanbanTasks,
+//                                                  {
+//                                                      ...newTask,
+//                                                      milestoneId: milestoneData?.id,
+//                                                      milestone: {id: milestoneData?.id},
+//                                                      stakeholders: [{userId: session?.user.id}]
+//                                                  }
+//                                              ].map(t => {
+//                                                  if (t.id === newTask?.id) {
+//                                                      return ({
+//                                                          ...t,
+//                                                          milestoneId: milestoneData?.id,
+//                                                          stakeholders: [{userId: session?.user.id}]
+//                                                      })
+//                                                  }
+//                                                  return t
+//                                              }))
+//                                              form.setValue('tasks', newTasks?.filter((task: any) => task.milestoneId && task.milestoneId === milestoneData?.id) || [])
+ 
+//                                          }}
+//                                      >
+//                                          {`Add a new task`}
+//                                      </Button>
+//                                  </div>
+//                              </div>
+ 
+//                              <DndContext
+//                                  accessibility={{
+//                                      announcements
+//                                  }}
+//                                  collisionDetection={closestCorners}
+//                                  sensors={sensors}
+//                                  onDragEnd={(event) => {
+//                                      const {active, over} = event
+ 
+//                                      if (active.id === over?.id) return
+ 
+//                                      const originalPosition = field?.value?.findIndex((item: any) => item.id === active.id) || 0
+//                                      const newPosition = field?.value?.findIndex((item: any) => item.id === over?.id) || 0
+ 
+//                                      form.setValue('tasks', arrayMove(field?.value || [], originalPosition, newPosition))
+//                                  }}
+//                              >
+//                                  <ol className="flex flex-col gap-2">
+//                                      <SortableContext
+//                                          items={field?.value?.map((item: any) => item.id) || []}
+//                                          strategy={verticalListSortingStrategy}>
+//                                          {field?.value?.map((task: any, index: number) => (
+//                                              <TaskField
+//                                                  key={task.id}
+//                                                  index={index}
+//                                                  task={task}
+//                                                  onUnlink={async () => {
+//                                                      form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
+//                                                      debounceSetTasks(kanbanTasks.map(t => {
+//                                                          if (t.id === task.id) {
+//                                                              return ({
+//                                                                  ...t,
+//                                                                  milestone: undefined,
+//                                                                  milestoneId: undefined
+//                                                              })
+//                                                          }
+ 
+//                                                          return t
+//                                                      }))
+//                                                  }}
+//                                                  onDelete={async () => {
+//                                                      await deleteTask(task.id)
+//                                                      form.setValue('tasks', field?.value?.filter((t: any, i: number) => i !== index))
+//                                                  }}
+//                                                  onNameChange={async (newName) => {
+//                                                      form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
+//                                                          ...t,
+//                                                          name: newName
+//                                                      } : t))
+//                                                      debounceSetTasks(kanbanTasks.map(t => {
+//                                                          if (t.id === task.id) {
+//                                                              return ({
+//                                                                  ...t,
+//                                                                  name: newName
+//                                                              })
+//                                                          }
+ 
+//                                                          return t
+//                                                      }))
+//                                                  }}
+//                                                  onColumnChange={async (newColumnId) => {
+//                                                      form.setValue('tasks', field?.value?.map((t: any, i: number) => i === index ? {
+//                                                          ...t,
+//                                                          columnId: newColumnId
+//                                                      } : t))
+//                                                      debounceSetTasks(kanbanTasks.map(t => {
+//                                                          if (t.id === task.id) {
+//                                                              return ({
+//                                                                  ...t,
+//                                                                  columnId: newColumnId
+//                                                              })
+//                                                          }
+ 
+//                                                          return t
+//                                                      }))
+//                                                  }}
+//                                                  kanbanColumns={kanbanColumns}
+//                                              />
+//                                          ))}
+//                                      </SortableContext>
+//                                  </ol>
+//                              </DndContext>
+//                          </>
+//                      </FormControl>
+//                      <FormMessage/>
+//                  </FormItem>
+//              )}
+//          />
+//      )
+//  }
+
+//  const LinkTask = ({milestoneId, kanbanTasks, onLink}: {
+//     milestoneId: string,
+//     kanbanTasks: any[],
+//     onLink: (id: string) => void
+// }) => {
+//     const [isLinking, setIsLinking] = useState(false)
+
+//     if (isLinking) {
+//         return (
+//             <Select
+//                 onValueChange={(value: string) => {
+//                     onLink(value)
+//                     setIsLinking(false)
+//                 }}
+//             >
+//                 <SelectTrigger className="w-full">
+//                     <SelectValue placeholder={'Select a task'}/>
+//                 </SelectTrigger>
+//                 <SelectContent>
+//                     {kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).map(task => (
+//                         <SelectItem key={task.id} value={task.id}>{task.name}</SelectItem>
+//                     ))}
+//                 </SelectContent>
+//             </Select>
+//         )
+//     }
+
+//     return (
+//         <Button
+//             disabled={kanbanTasks?.filter((task: any) => task.milestoneId !== milestoneId).length === 0}
+//             variant={'secondary'}
+//             onClick={() => {
+//                 setIsLinking(true)
+//             }}
+//         >
+//             {kanbanTasks?.filter((task: any) => task.milestoneId === milestoneId).length === 0 ? (
+//                 `Link task`
+//             ) : (
+//                 `Link another task`
+//             )}
+//         </Button>
+//     )
+// }
+
+// const TaskField = ({
+//                        index,
+//                        task,
+//                        onUnlink,
+//                        onDelete,
+//                        onNameChange,
+//                        onColumnChange,
+//                        kanbanColumns,
+//                    }: {
+//     index: number
+//     task: TaskType
+//     onUnlink: () => void
+//     onDelete: () => void
+//     onNameChange: (newName: string) => void
+//     onColumnChange: (newColumnId: string) => void
+//     kanbanColumns: any[]
+// }) => {
+//     const {
+//         attributes,
+//         listeners,
+//         setNodeRef,
+//         transform,
+//         transition,
+//         isDragging
+//     } = useSortable({id: task.id || ""})
+//     const style = {
+//         transition,
+//         transform: CSS.Translate.toString(transform)
+//     }
+
+//     const unlinkTask = (e: React.MouseEvent<HTMLElement>) => {
+//         e.preventDefault()
+//         onUnlink()
+//     }
+
+//     const deleteTask = (e: React.MouseEvent<HTMLElement>) => {
+//         e.preventDefault()
+//         onDelete()
+//     }
+
+//     const nameChanged = (e: React.FormEvent<HTMLInputElement>) => {
+//         onNameChange(e.currentTarget.value)
+//     }
+
+//     const columnChanged = (newColumnId: string) => {
+//         onColumnChange(newColumnId)
+//     }
+
+//     const variants = cva("flex flex-row gap-2 items-center", {
+//         variants: {
+//             dragging: {
+//                 overlay: "ring-2 ring-primary"
+//             }
+//         }
+//     })
+
+//     return (
+//         <li
+//             key={index}
+//             ref={setNodeRef}
+//             style={style}
+//             className={cn(
+//                 "grid grid-cols-4",
+//                 variants({
+//                     dragging: isDragging ? "overlay" : undefined
+//                 })
+//             )}
+//         >
+//             {/* move task */}
+//             <Button
+//                 type="button"
+//                 variant={"ghost"}
+//                 {...attributes}
+//                 {...listeners}
+//                 className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
+//             >
+//                 <span className="sr-only">Move task</span>
+//                 <GripVertical/>
+//             </Button>
+
+//             {/* select kanban column */}
+//             <Select onValueChange={(value: string) => columnChanged(value)} value={task.columnId}>
+//                 <SelectTrigger className="w-[120px]">
+//                     <SelectValue/>
+//                 </SelectTrigger>
+//                 <SelectContent>
+//                     {kanbanColumns.map(column => (
+//                         <SelectItem
+//                             key={column.id}
+//                             value={column.id}
+//                             // defaultValue={column.id}
+//                         >
+//                             {column.name}
+//                         </SelectItem>
+//                     ))}
+//                 </SelectContent>
+//             </Select>
+
+//             {/* task name */}
+//             <div className="grow">
+//                 <Input
+//                     placeholder={task.name}
+//                     defaultValue={task.name}
+//                     // value={task.name}
+//                     onChange={nameChanged}
+//                     className="h-full"
+//                 />
+//             </div>
+
+//             <DropdownMenu>
+//                 <DropdownMenuTrigger asChild>
+//                     <Button size="icon" variant="secondary">
+//                         <FaEllipsis/>
+//                     </Button>
+//                 </DropdownMenuTrigger>
+//                 <DropdownMenuContent side="left">
+//                     <DropdownMenuItem onClick={deleteTask}>
+//                         <FaTrash/>
+//                         Delete task
+//                     </DropdownMenuItem>
+//                     <DropdownMenuItem onClick={unlinkTask}>
+//                         <FaLinkSlash/>
+//                         Unlink from milestone
+//                     </DropdownMenuItem>
+//                 </DropdownMenuContent>
+//             </DropdownMenu>
+
+//             {/* unlink task */}
+//             {/* <Button variant="secondary" size="icon" onClick={unlinkTask}>
+//                 <FaLinkSlash/>
+//             </Button> */}
+//         </li>
+//     )
+// }

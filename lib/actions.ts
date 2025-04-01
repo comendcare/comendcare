@@ -1953,7 +1953,9 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: {include: {milestoneType: true}}
+                    types: {include: {milestoneType: true}},
+                    assets: { include: { asset: true } },
+                    rfps: { include: { rfp: true } }
                 }
             },
             nodes: true,
@@ -2121,7 +2123,9 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: {include: {milestoneType: true}}
+                types: {include: {milestoneType: true}},
+                assets: { include: { asset: true } },
+                rfps: { include: { rfp: true } }
             },
             where: {roadmapId}
         })
@@ -2155,12 +2159,14 @@ export async function createMilestones({roadmapId, milestones}: { roadmapId: str
 
         await Promise.all(
             milestones.map(async (milestone: Milestone, index: number) => {
-                const m = await prisma.milestone.create({
+                const m: Milestone = await prisma.milestone.create({
                     include: {
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: {include: {milestoneType: true}}
+                        types: {include: {milestoneType: true}},
+                        assets: {include: {asset: true}},
+                        rfps: {include: {rfp: true}}
                     },
                     data: {
                         id: milestone?.id,
@@ -2175,6 +2181,20 @@ export async function createMilestones({roadmapId, milestones}: { roadmapId: str
                             create: (milestone?.types || []).map((type: any) => ({
                                 milestoneType: {
                                     connect: {id: type.milestoneTypeId}
+                                }
+                            }))
+                        },
+                        assets: {
+                            create: (milestone?.assets || []).map((asset: any) => ({
+                                asset: {
+                                    connect: {id: asset.assetId}
+                                }
+                            }))
+                        },
+                        rfps: {
+                            create: (milestone?.rfps || []).map((rfp: any) => ({
+                                rfp: {
+                                    connect: {id: rfp.rfpId}
                                 }
                             }))
                         },
@@ -2304,7 +2324,9 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: {include: {milestoneType: true}}
+                types: {include: {milestoneType: true}},
+                assets: { include: { asset: true } },
+                rfps: { include: { rfp: true } }
             },
             where: {roadmapId}
         })
@@ -2431,7 +2453,9 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: {include: {milestoneType: true}}
+                        types: {include: {milestoneType: true}},
+                        assets: {include: {asset: true}},
+                        rfps: {include: {rfp: true}}
                     }
                 })
 
@@ -2440,14 +2464,16 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`)
                 }
 
-                let m = await prisma.milestone.update({
+                let m: Milestone = await prisma.milestone.update({
                     where: {nodeId: milestone.nodeId},
                     // where: {id: milestone.id},
                     include: {
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: {include: {milestoneType: true}}
+                        types: {include: {milestoneType: true}},
+                        assets: {include: {asset: true}},
+                        rfps: {include: {rfp: true}}
                     },
                     data: {
                         title: milestone.title,
@@ -2456,6 +2482,22 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                             create: (milestone.types || []).map((type: any) => ({
                                 milestoneType: {
                                     connect: {id: type.milestoneTypeId || type.milestoneType.id}
+                                }
+                            }))
+                        },
+                        assets: {
+                            deleteMany: {},
+                            create: (milestone.assets || []).map((asset: any) => ({
+                                asset: {
+                                    connect: {id: asset.assetId || asset.asset.id}
+                                }
+                            }))
+                        },
+                        rfps: {
+                            deleteMany: {},
+                            create: (milestone.rfps || []).map((rfp: any) => ({
+                                rfp: {
+                                    connect: {id: rfp.rfpId || rfp.rfp.id}
                                 }
                             }))
                         },

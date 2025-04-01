@@ -303,7 +303,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                         if (contact.affiliation) {
                             return (
                                 <li key={index} className="flex gap-2 items-center">
-                                    <User />
+                                    <User className="h-4 w-4"/>
                                     <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
                                 </li>
                             )

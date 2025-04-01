@@ -325,7 +325,7 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                     if (contact.affiliation) {
                         return (
                             <li key={index} className="flex gap-2 items-center">
-                                <User />
+                                <User className="h-4 w-4"/>
                                 <p>{contact.affiliation}</p>
                             </li>
                         )

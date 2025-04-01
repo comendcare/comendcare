@@ -11,7 +11,9 @@ import {
     MilestoneType,
     ExternalContact,
     ExternalAttachment,
-    ReviewFeedback, Service
+    ReviewFeedback, Service,
+    Asset as DBAsset,
+    RFP as DBRFP
 } from "@prisma/client";
 
 export type Asset = Prisma.AssetGetPayload<{
@@ -43,14 +45,26 @@ export type Milestone = Omit<Prisma.MilestoneGetPayload<{
         node: true,
         contacts: true,
         attachments: true,
-        types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } }
+        types: { include: { milestoneType: true, milestoneTypeId: true, milestoneId: true } },
+        assets: { include: { asset: true, assetId: true, milestoneId: true } },
+        rfps: { include: { rfp: true, rfpId: true, milestoneId: true } }
     }
-}>, "types"> & {
+}>, ("types" | "assets" | "rfps")> & {
     types: Array<{
         milestoneType?: MilestoneType; // Optional
         milestoneId?: string; // Optional
         milestoneTypeId: string; // Required
-    }>;
+    }>,
+    assets: Array<{
+        asset?: DBAsset,
+        milestoneId?: string,
+        assetId: string
+    }>,
+    rfps: Array<{
+        rfp?: DBRFP,
+        milestoneId?: string,
+        rfpId: string,
+    }>
 };
 
 export interface Option {
@@ -61,7 +75,7 @@ export interface Option {
     fixed?: boolean;
 
     /** Group the options by providing key. */
-    [key: string]: string | boolean | undefined;
+    [key: string]: any;
 }
 
 export type SavedCompanyData = SavedCompany & {
