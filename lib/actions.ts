@@ -172,6 +172,9 @@ export const createCondition = async (formData: FormData) => {
     const relevantDiseaseMechanisms = formData.get("relevantDiseaseMechanisms")
         ? (formData.get("relevantDiseaseMechanisms") as string).split(",")
         : [];
+    const causalGenes = formData.get("causalGenes")
+        ? (formData.get("causalGenes") as string).split(",")
+        : [];
     const associatedGenes = formData.get("associatedGenes")
         ? (formData.get("associatedGenes") as string).split(",")
         : [];
@@ -205,6 +208,7 @@ export const createCondition = async (formData: FormData) => {
                 nationalEstimatedPopulation,
                 globalEstimatedPopulation,
                 relevantDiseaseMechanisms,
+                causalGenes,
                 associatedGenes,
                 associatedSystems,
                 associatedSignsAndSymptoms,
@@ -326,6 +330,7 @@ export const createOrganization = async (formData: FormData) => {
                 description,
                 subdomain,
                 yearFounded: founded?.toString(),
+                contactEmail,
                 website,
                 incorporationStatus,
                 address1,

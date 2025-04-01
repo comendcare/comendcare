@@ -393,7 +393,7 @@ export function EditMilestoneForm({
                                     Edit
                                 </TabsTrigger>
                                 <TabsTrigger className="relative" value="recommendations">
-                                    Relevant Results
+                                    Marketplace recommendations
                                     {
                                         notifications && 
                                         notifications
