@@ -25,9 +25,8 @@ export const ExternalAttachmentField = ({
 
     return (
         <li key={index} className="flex flex-row gap-2 items-center">
-            <div className="h-full w-full grow">
+            <div className="w-full grow">
             <Input
-                className="h-full"
                 placeholder={`Name`}
                 value={value.name || ""}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
@@ -38,9 +37,8 @@ export const ExternalAttachmentField = ({
                 }}
             />
             </div>
-            <div className="h-full w-full grow">
+            <div className="w-full grow">
             <Input
-                className="h-full"
                 placeholder={`Url`}
                 value={value.link}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
@@ -51,7 +49,7 @@ export const ExternalAttachmentField = ({
                 }}
             />
             </div>
-            <Button className="w-[40px]" variant="secondary" onClick={deleteElement}>
+            <Button className="h-full w-[34px]" variant="ghost" onClick={deleteElement}>
                 <Trash />
             </Button>
         </li>

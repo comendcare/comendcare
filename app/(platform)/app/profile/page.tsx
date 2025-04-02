@@ -4,7 +4,7 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {getSession} from "@/lib/auth";
 import Link from "next/link";
 import prisma from "@/lib/prisma"
-import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getAssetsForOrganization, getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
@@ -58,7 +58,9 @@ export default async function ProfilePage() {
                                 node: true,
                                 contacts: true,
                                 attachments: true,
-                                types: { include: { milestoneType: true } }
+                                types: { include: { milestoneType: true } },
+                                assets: { include: { asset: true } },
+                                rfps: { include: { rfp: true } }
                             }
                         }
                     }
@@ -69,10 +71,36 @@ export default async function ProfilePage() {
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: { include: { milestoneType: true } }
+                        types: { include: { milestoneType: true } },
+                        assets: { include: { asset: true } },
+                        rfps: { include: { rfp: true } }
                     }
                 }
             }
+        })
+
+        const assets = await prisma.asset.findMany({
+            where: {organizationId: organization?.id},
+            include: {
+                contacts: true,
+                attachments: true,
+                milestones: {
+                    include: {milestone: true}
+                }
+            },
+            orderBy: [{createdAt: "desc"}]
+        })
+
+        const rfps = await prisma.rFP.findMany({
+            where: {organizationId: organization?.id},
+            include: {
+                contacts: true,
+                attachments: true,
+                milestones: {
+                    include: {milestone: true}
+                }
+            },
+            orderBy: [{createdAt: "desc"}]
         })
 
         // Existing verified organization rendering logic
@@ -206,8 +234,10 @@ export default async function ProfilePage() {
                                     <div className="flex flex-col gap-4 relative">
                                         <PAGProfileAssetsAndRFPsHoverableCard
                                             isPrivate={true}
-                                            assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "ASSET")}
-                                            rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "RFP")}
+                                            assets={assets}
+                                            rfps={rfps}
+                                            // assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "ASSET")}
+                                            // rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "RFP")}
                                             // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
                                             // rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                                         />

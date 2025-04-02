@@ -11,6 +11,7 @@ export function DateView({startDate, endDate, startLabel, endLabel}: {startDate:
             <span className="flex items-center gap-2 text-bottom">
                 <Calendar 
                     aria-hidden="true"
+                    className="h-4 w-4"
                 />
                 <p>{`${monthsList[startDate.getMonth()]} ${startDate.getFullYear()} - ${monthsList[endDate.getMonth()]} ${endDate.getFullYear()}`}</p>
             </span>
@@ -22,6 +23,7 @@ export function DateView({startDate, endDate, startLabel, endLabel}: {startDate:
             <span className="flex items-center gap-2 text-bottom">
                 <Calendar 
                     aria-hidden="true"
+                    className="h-4 w-4"
                 />
                 <p>{`${startLabel || "Starting:"} ${monthsList[startDate.getMonth()]} ${startDate.getFullYear()}`}</p>
             </span>
@@ -33,6 +35,7 @@ export function DateView({startDate, endDate, startLabel, endLabel}: {startDate:
             <span className="flex items-center gap-2 text-bottom">
                 <Calendar 
                     aria-hidden="true"
+                    className="h-4 w-4"
                 />
                 <p>{`${endLabel || "Ending:"} ${monthsList[endDate.getMonth()]} ${endDate.getFullYear()}`}</p>
             </span>

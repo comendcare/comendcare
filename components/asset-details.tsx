@@ -23,6 +23,8 @@ type MilestoneType = Prisma.MilestoneGetPayload<{
         contacts: true,
         attachments: true,
         types: { include: { milestoneType: true } }
+        assets: { include: { asset: true } },
+        rfps: { include: { rfp: true } }
     }
 }>
 
@@ -41,7 +43,6 @@ export function AssetDetails({ asset, isPublic }: { asset: MilestoneType, isPubl
                     >
                         <div className="flex flex-col justify-start items-start min-w-0 flex-auto">
                             <div className="flex items-center gap-x-3 w-full">
-                                <TypeBadge type={asset?.nodeType || "ASSET"} iconOnly={true}/>
                                 <h2 className="text-sm font-semibold truncate text-wrap break-words">
                                     {asset?.title}
                                 </h2>

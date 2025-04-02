@@ -24,11 +24,10 @@ export const ExternalContactField = ({
     }
 
     return (
-        <li key={index} className="grid grid-cols-[20px_auto_40px] lg:grid-cols-[20px_auto_auto_40px] gap-2 items-center">
-            <User className="row-start-1 col-start-1"/>
-            <div className="h-full w-full grow row-start-1 col-start-2">
+        <li key={index} className="grid grid-cols-[20px_auto_34px] lg:grid-cols-[20px_auto_auto_34px] gap-2 items-center">
+            <User className="row-start-1 col-start-1 h-4 w-4"/>
+            <div className="h-fit w-full grow row-start-1 col-start-2">
             <Input
-                className="h-full"
                 placeholder={`Name`}
                 value={value.name}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
@@ -39,9 +38,8 @@ export const ExternalContactField = ({
                 }}
             />
             </div>
-            <div className="h-full w-full grow row-start-2 col-start-2 lg:row-start-1 lg:col-start-3">
+            <div className="h-fit w-full grow row-start-2 col-start-2 lg:row-start-1 lg:col-start-3">
             <Input
-                className="h-full"
                 placeholder={`Email`}
                 value={value.email}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
@@ -52,9 +50,8 @@ export const ExternalContactField = ({
                 }}
             />
             </div>
-            <div className="h-full w-full grow row-start-3 col-start-2 lg:row-start-2 lg:col-start-2 lg:col-span-2">
+            <div className="h-fit w-full grow row-start-3 col-start-2 lg:row-start-2 lg:col-start-2 lg:col-span-2">
             <Input
-                className="h-full"
                 placeholder={`Affiliation`}
                 value={value.affiliation || undefined}
                 onChange={(e: React.FormEvent<HTMLInputElement>) => {
@@ -65,7 +62,7 @@ export const ExternalContactField = ({
                 }}
             />
             </div>
-            <Button className="row-start-1 col-start-3 lg:col-start-4" variant="secondary" onClick={deleteElement}>
+            <Button className="row-start-1 col-start-3 lg:col-start-4 h-full w-[34px]" variant="ghost" onClick={deleteElement}>
                 <Trash />
             </Button>
         </li>
