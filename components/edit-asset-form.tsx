@@ -235,6 +235,8 @@ export function EditAssetForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    console.log(`fetched milestones`, fetchedMilestones)
+
     return (
         <Form {...form}>
             <ScrollArea className={"max-h-[600px] -mr-2 pr-3"} type={"always"}>

@@ -54,34 +54,36 @@ export const columns: ColumnDef<Asset>[] = [
         enableHiding: true,
         meta: { name: "Private" }
     },
-    // {
-    //     accessorKey: "asset.milestones",
-    //     header: ({ column }) => (
-    //         <DataTableColumnHeader column={column} title="Linked milestones" />
-    //     ),
-    //     cell: ({ row }) => (
-    //         <div>
-    //             {row.original.milestones.map(milestone => milestone.).join(', ')}
-    //         </div>
-    //     ),
-    //     enableHiding: true,
-    //     meta: { name: "Description" }
-    // },
+    {
+        accessorKey: "asset.milestones",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Linked Projects" />
+        ),
+        cell: ({ row }) => (
+            <ul className="flex flex-col gap-2">
+                {row.original.milestones.map((milestone, index) => (
+                    <li key={index}>
+                        {milestone.milestone?.title || undefined}
+                    </li>
+                ))}
+            </ul>
+        ),
+        enableHiding: true,
+        meta: { name: "Linked Projects" }
+    },
     {
         accessorKey: "asset.contacts",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Contacts" />
         ),
         cell: ({ row }) => (
-            <div>
-                <ul>
-                    {row.original.contacts.map((contact, index) => (
-                        <li key={index}>
-                            {contact.name || contact.email || contact.affiliation}
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            <ul className="flex flex-col gap-2">
+                {row.original.contacts.map((contact, index) => (
+                    <li key={index}>
+                        {contact.name || contact.email || contact.affiliation}
+                    </li>
+                ))}
+            </ul>
         ),
         enableHiding: true,
         meta: { name: "Contacts" }
@@ -92,15 +94,13 @@ export const columns: ColumnDef<Asset>[] = [
             <DataTableColumnHeader column={column} title="Links" />
         ),
         cell: ({ row }) => (
-            <div>
-                <ul>
-                    {row.original.attachments.map((attachment, index) => (
-                        <li key={index}>
-                            {attachment.name || attachment.link}
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            <ul className="flex flex-col gap-2">
+                {row.original.attachments.map((attachment, index) => (
+                    <li key={index}>
+                        {attachment.name || attachment.link}
+                    </li>
+                ))}
+            </ul>
         ),
         enableHiding: true,
         meta: { name: "Links" }

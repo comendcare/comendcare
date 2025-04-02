@@ -12,6 +12,7 @@ import {
     ExternalContact,
     ExternalAttachment,
     ReviewFeedback, Service,
+    Milestone as DBMilestone,
     Asset as DBAsset,
     RFP as DBRFP
 } from "@prisma/client";
@@ -29,8 +30,9 @@ export type Asset = Omit<Prisma.AssetGetPayload<{
 }>, "milestones"> & {
     milestones: Array<{
         asset?: DBAsset,
-        milestoneId?: string,
-        assetId: string
+        assetId: string,
+        milestone?: DBMilestone,
+        milestoneId: string,
     }>
 }
 
