@@ -101,6 +101,54 @@ export async function getCROData(id: string) {
     })
 }
 
+export async function getAssetsForOrganization(domain: string) {
+    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+        : domain
+
+    const assets = await prisma.asset.findMany({
+        where: {
+            organization: {
+                subdomain: subdomain
+            }
+        },
+        include: {
+            contacts: true,
+            attachments: true,
+            milestones: {
+                include: {milestone: true}
+            }
+        },
+        orderBy: [{createdAt: "desc"}]
+    })
+
+    return assets
+}
+
+export async function getRFPsForOrganization(domain: string) {
+    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+        : domain
+
+    const rfps = await prisma.rFP.findMany({
+        where: {
+            organization: {
+                subdomain: subdomain
+            }
+        },
+        include: {
+            contacts: true,
+            attachments: true,
+            milestones: {
+                include: {milestone: true}
+            }
+        },
+        orderBy: [{createdAt: "desc"}]
+    })
+
+    return rfps
+}
+
 export async function getRoadmapsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
@@ -132,7 +180,9 @@ export async function getRoadmapsForOrganization(domain: string) {
                             node: true,
                             contacts: true,
                             attachments: true,
-                            types: { include: { milestoneType: true } }
+                            types: { include: { milestoneType: true } },
+                            assets: { include: { asset: true } },
+                            rfps: { include: { rfp: true } }
                         }
                     }
                 },
@@ -149,7 +199,9 @@ export async function getRoadmapsForOrganization(domain: string) {
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: { include: { milestoneType: true } }
+                    types: { include: { milestoneType: true } },
+                    assets: { include: { asset: true } },
+                    rfps: { include: { rfp: true } }
                 }
             },
         },
@@ -314,6 +366,97 @@ export async function getMembers(organizationId: string | undefined) {
         return {success: false, error: "Internal server error"};
     }
 }
+
+export async function getAssets(organizationId: string | undefined) {
+    if (!organizationId) {
+        return {success: false, error: "No organization id provided."};
+    }
+
+    try {
+        const fetchedAssets = await prisma?.asset.findMany({
+            where: {organizationId},
+            include: {
+                contacts: true,
+                attachments: true,
+                milestones: {
+                    include: {
+                        milestone: true
+                    }
+                }
+            }
+        })
+
+        if (!fetchedAssets) {
+            return {success: false, error: "assets not found"}
+        }
+
+        return {
+            success: true,
+            data: fetchedAssets
+        }
+    } catch (error: any) {
+        logError("Error fetching assets", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+export async function getRFPs(organizationId: string | undefined) {
+    if (!organizationId) {
+        return {success: false, error: "No organization id provided."};
+    }
+
+    try {
+        const fetchedRFPs = await prisma?.rFP.findMany({
+            where: {organizationId},
+            include: {
+                contacts: true,
+                attachments: true,
+                milestones: {
+                    include: {
+                        milestone: true
+                    }
+                }
+            }
+        })
+
+        if (!fetchedRFPs) {
+            return {success: false, error: "RFPs not found"}
+        }
+
+        return {
+            success: true,
+            data: fetchedRFPs
+        }
+    } catch (error: any) {
+        logError("Error fetching RFPs", error);
+        return {success: false, error: "Internal server error"};
+    }
+}
+
+// export async function getAssets(organizationId: string | undefined) {
+//     if (!organizationId) {
+//         return {success: false, error: "No organization id provided."};
+//     }
+
+//     try {
+//         const fetchedAssets = await prisma?.asset.findMany({
+//             // include: {user: true},
+//             where: {organizationId}
+//         })
+
+//         if (!fetchedAssets) {
+//             return {success: false, error: "assets not found"};
+//         }
+
+//         return {
+//             success: true,
+//             data: fetchedAssets
+//         };
+//     } catch (error: any) {
+//         logError("Error fetching assets", error);
+//         return {success: false, error: "Internal server error"};
+//     }
+// }
 
 export async function getMilestones(organizationId: string | undefined) {
     if (!organizationId) {
@@ -498,7 +641,9 @@ export async function getRoadmap(orgId: string | null | undefined) {
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: { include: { milestoneType: true } }
+                        types: { include: { milestoneType: true } },
+                        assets: { include: { asset: true } },
+                        rfps: { include: { rfp: true } }
                     }
                 },
                 edges: true,
@@ -712,6 +857,7 @@ export async function getMilestoneTypes() {
     }
 }
 
+
 export async function getMilestoneDetails(id: string) {
     try {
         const milestone = await prisma.milestone.findUnique({
@@ -720,7 +866,9 @@ export async function getMilestoneDetails(id: string) {
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: { include: { milestoneType: true } }
+                types: { include: { milestoneType: true } },
+                assets: { include: { asset: true } },
+                rfps: { include: { rfp: true } }
             }
         })
 
@@ -796,7 +944,9 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: { include: { milestoneType: true } }
+                    types: { include: { milestoneType: true } },
+                    assets: {include: {asset: true}},
+                    rfps: {include: {rfp: true}}
                 }
             })
 

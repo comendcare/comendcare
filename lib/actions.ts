@@ -38,7 +38,7 @@ import {
     sendMemberDeletedEmail,
 } from "@/lib/emails";
 import {getKanbanFromOrganizationId} from "./fetchers"
-import {ApiResponse, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone} from "@/lib/types";
+import {ApiResponse, Asset, DEFAULT_KANBAN_COLUMNS, MemberRequestWithUser, Milestone, RFP} from "@/lib/types";
 import {includes} from "lodash"
 
 export type Node = Prisma.NodeGetPayload<{}>
@@ -1697,6 +1697,204 @@ export async function updateCondition(formData: FormData, organizationId: string
     }
 }
 
+export const deleteAsset = async (assetId: string) => {
+    try {
+        const response = await prisma.asset.delete({
+            where: { id: assetId }
+        })
+
+        return response
+    } catch (error: any) {
+        console.error("Error deleting asset:", error.message);
+        throw new Error(error.message || "Failed to delete asset.");
+    }
+}
+
+export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizationId: string | undefined | null) => {
+    try {
+        if (!organizationId) {
+            throw new Error("No organization id provided.")
+        }
+
+        const response = await prisma.asset.upsert({
+            where: {
+                id: assetData.id || nanoid()
+            },
+            update: {
+                title: assetData.title,
+                description: assetData.description,
+                attachments: {
+                    deleteMany: {}, // clear all existing attachments
+                    createMany: {
+                        data: (assetData?.attachments || []).map((attachment: any) => ({
+                            link: attachment.link,
+                            ...(attachment.name ? {name: attachment.name} : undefined)
+                        }))
+                    }
+                },
+                contacts: {
+                    deleteMany: {},
+                    createMany: {
+                        data: (assetData?.contacts || []).map((contact: any) => ({
+                            name: contact.name,
+                            email: contact.email,
+                            ...(contact.role ? {role: contact.role} : undefined),
+                            ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                        }))
+                    }
+                },
+                milestones: {
+                    deleteMany: {},
+                    create: (assetData.milestones || []).map((milestone: any) => ({
+                        milestone: {
+                            connect: {id: milestone.milestoneId}
+                        }
+                    }))
+                },
+                private: assetData.private || false,
+            },
+            create: {
+                title: assetData.title || "",
+                description: assetData.description,
+                attachments: {
+                    createMany: {
+                        data: (assetData?.attachments || []).map((attachment: any) => ({
+                            link: attachment.link,
+                            ...(attachment.name ? {name: attachment.name} : undefined)
+                        }))
+                    }
+                },
+                contacts: {
+                    createMany: {
+                        data: (assetData?.contacts || []).map((contact: any) => ({
+                            name: contact.name,
+                            email: contact.email,
+                            ...(contact.role ? {role: contact.role} : undefined),
+                            ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                        }))
+                    }
+                },
+                milestones: {
+                    create: (assetData.milestones || []).map((milestone: any) => ({
+                        milestone: {
+                            connect: {id: milestone.milestoneId}
+                        }
+                    }))
+                },
+                private: assetData.private || false,
+                organization: { connect: {id: organizationId} }
+            },
+        })
+
+        return response
+    } catch (error: any) {
+        console.error("Error creating or updating asset:", error.message);
+        throw new Error(error.message || "Failed to create or update asset.");
+    }
+}
+
+export const deleteRFP = async (rfpId: string) => {
+    try {
+        const response = await prisma.rFP.delete({
+            where: { id: rfpId }
+        })
+
+        return response
+    } catch (error: any) {
+        console.error("Error deleting RFP:", error.message);
+        throw new Error(error.message || "Failed to delete RFP.");
+    }
+}
+
+export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: string | undefined | null) => {
+    try {
+        if (!organizationId) {
+            throw new Error("No organization id provided.")
+        }
+
+        const response = await prisma.rFP.upsert({
+            where: {
+                id: rfpData.id || nanoid()
+            },
+            update: {
+                title: rfpData.title,
+                description: rfpData.description,
+                attachments: {
+                    deleteMany: {}, // clear all existing attachments
+                    createMany: {
+                        data: (rfpData?.attachments || []).map((attachment: any) => ({
+                            link: attachment.link,
+                            ...(attachment.name ? {name: attachment.name} : undefined)
+                        }))
+                    }
+                },
+                contacts: {
+                    deleteMany: {},
+                    createMany: {
+                        data: (rfpData?.contacts || []).map((contact: any) => ({
+                            name: contact.name,
+                            email: contact.email,
+                            ...(contact.role ? {role: contact.role} : undefined),
+                            ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                        }))
+                    }
+                },
+                private: rfpData.private || false,
+                openTo: rfpData.openTo || [],
+                startDate: rfpData.startDate,
+                endDate: rfpData.endDate,
+                milestones: {
+                    deleteMany: {},
+                    create: (rfpData.milestones || []).map((milestone: any) => ({
+                        milestone: {
+                            connect: {id: milestone.milestoneId}
+                        }
+                    }))
+                },
+            },
+            create: {
+                title: rfpData.title || "",
+                description: rfpData.description,
+                attachments: {
+                    createMany: {
+                        data: (rfpData?.attachments || []).map((attachment: any) => ({
+                            link: attachment.link,
+                            ...(attachment.name ? {name: attachment.name} : undefined)
+                        }))
+                    }
+                },
+                contacts: {
+                    createMany: {
+                        data: (rfpData?.contacts || []).map((contact: any) => ({
+                            name: contact.name,
+                            email: contact.email,
+                            ...(contact.role ? {role: contact.role} : undefined),
+                            ...(contact.affiliation ? {affiliation: contact.affiliation} : undefined)
+                        }))
+                    }
+                },
+                private: rfpData.private || false,
+                openTo: rfpData.openTo || [],
+                startDate: rfpData.startDate,
+                endDate: rfpData.endDate,
+                milestones: {
+                    create: (rfpData.milestones || []).map((milestone: any) => ({
+                        milestone: {
+                            connect: {id: milestone.milestoneId}
+                        }
+                    }))
+                },
+                organization: { connect: {id: organizationId} }
+            },
+        })
+
+        return response
+    } catch (error: any) {
+        console.error("Error creating or updating RFP:", error.message);
+        throw new Error(error.message || "Failed to create or update RFP.");
+    }
+}
+
 /* MILESTONE AND ROADMAP UPDATES ----------------------------------------------------------------------------------------- */
 export async function createRoadmap(organizationId: string, roadmapTemplate?: any | undefined) {
     const roadmap = await prisma.roadmap.create({
@@ -1793,7 +1991,9 @@ export async function createRoadmap(organizationId: string, roadmapTemplate?: an
                     node: true,
                     contacts: true,
                     attachments: true,
-                    types: {include: {milestoneType: true}}
+                    types: {include: {milestoneType: true}},
+                    assets: { include: { asset: true } },
+                    rfps: { include: { rfp: true } }
                 }
             },
             nodes: true,
@@ -1961,7 +2161,9 @@ export async function updateDBFlow({roadmapId, nodes, edges}: {
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: {include: {milestoneType: true}}
+                types: {include: {milestoneType: true}},
+                assets: { include: { asset: true } },
+                rfps: { include: { rfp: true } }
             },
             where: {roadmapId}
         })
@@ -1995,12 +2197,14 @@ export async function createMilestones({roadmapId, milestones}: { roadmapId: str
 
         await Promise.all(
             milestones.map(async (milestone: Milestone, index: number) => {
-                const m = await prisma.milestone.create({
+                const m: Milestone = await prisma.milestone.create({
                     include: {
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: {include: {milestoneType: true}}
+                        types: {include: {milestoneType: true}},
+                        assets: {include: {asset: true}},
+                        rfps: {include: {rfp: true}}
                     },
                     data: {
                         id: milestone?.id,
@@ -2015,6 +2219,20 @@ export async function createMilestones({roadmapId, milestones}: { roadmapId: str
                             create: (milestone?.types || []).map((type: any) => ({
                                 milestoneType: {
                                     connect: {id: type.milestoneTypeId}
+                                }
+                            }))
+                        },
+                        assets: {
+                            create: (milestone?.assets || []).map((asset: any) => ({
+                                asset: {
+                                    connect: {id: asset.assetId}
+                                }
+                            }))
+                        },
+                        rfps: {
+                            create: (milestone?.rfps || []).map((rfp: any) => ({
+                                rfp: {
+                                    connect: {id: rfp.rfpId}
                                 }
                             }))
                         },
@@ -2144,7 +2362,9 @@ export async function createNodes({roadmapId, nodes}: { roadmapId: string | null
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: {include: {milestoneType: true}}
+                types: {include: {milestoneType: true}},
+                assets: { include: { asset: true } },
+                rfps: { include: { rfp: true } }
             },
             where: {roadmapId}
         })
@@ -2271,7 +2491,9 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: {include: {milestoneType: true}}
+                        types: {include: {milestoneType: true}},
+                        assets: {include: {asset: true}},
+                        rfps: {include: {rfp: true}}
                     }
                 })
 
@@ -2280,14 +2502,16 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                     throw new Error(`Milestone (${milestone.title}) with ID ${milestone.id} does not exist.`)
                 }
 
-                let m = await prisma.milestone.update({
+                let m: Milestone = await prisma.milestone.update({
                     where: {nodeId: milestone.nodeId},
                     // where: {id: milestone.id},
                     include: {
                         node: true,
                         contacts: true,
                         attachments: true,
-                        types: {include: {milestoneType: true}}
+                        types: {include: {milestoneType: true}},
+                        assets: {include: {asset: true}},
+                        rfps: {include: {rfp: true}}
                     },
                     data: {
                         title: milestone.title,
@@ -2296,6 +2520,22 @@ export async function updateMilestones({milestones}: { milestones: Milestone[] }
                             create: (milestone.types || []).map((type: any) => ({
                                 milestoneType: {
                                     connect: {id: type.milestoneTypeId || type.milestoneType.id}
+                                }
+                            }))
+                        },
+                        assets: {
+                            deleteMany: {},
+                            create: (milestone.assets || []).map((asset: any) => ({
+                                asset: {
+                                    connect: {id: asset.assetId || asset.asset.id}
+                                }
+                            }))
+                        },
+                        rfps: {
+                            deleteMany: {},
+                            create: (milestone.rfps || []).map((rfp: any) => ({
+                                rfp: {
+                                    connect: {id: rfp.rfpId || rfp.rfp.id}
                                 }
                             }))
                         },

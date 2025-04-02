@@ -182,7 +182,7 @@ export const UnderDevelopmentCard = ({isPublic}: {isPublic: Boolean}) => {
                             )}
                         >
                                 <Plus />
-                                Create a milestone
+                                Create a project
                         </Link>
                     )}
                 </div>

@@ -73,7 +73,7 @@ export function MilestoneFilters() {
                     render={({field}) => (
                         <FormItem>
                             <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
-                                Milestone types
+                                Project types
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <Info className="h-4 w-4"/>
@@ -87,7 +87,7 @@ export function MilestoneFilters() {
                                 <MultipleSelector
                                     {...field}
                                     // defaultOptions={MILESTONE_TYPE_OPTIONS}
-                                    placeholder="Select milestone types..."
+                                    placeholder="Select project types..."
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                             no results found.
