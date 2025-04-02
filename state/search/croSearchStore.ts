@@ -168,7 +168,6 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             ...(filtersString ? { filter_by: filtersString } : undefined),
             ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
         };
-        console.log(searchParameters)
 
         const results = await typesense
             .collections("companies")
