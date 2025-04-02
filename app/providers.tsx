@@ -7,6 +7,7 @@ import {OnbordaProvider} from "@/components/onborda/OnbordaContext"
 import {ReactFlowProvider} from "@xyflow/react"
 import {MixpanelProvider} from "./mixpanel"
 import { SettingsProvider } from "@/components/editor/settings"
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 export function Providers({children}: { children: React.ReactNode }) {
     return (
@@ -22,15 +23,17 @@ export function Providers({children}: { children: React.ReactNode }) {
                 duration={5000}
             />
             <ModalProvider>
-                <ReactFlowProvider>
-                    <MixpanelProvider>
-                        <OnbordaProvider>
-                            <SettingsProvider>
-                            {children}
-                            </SettingsProvider>
-                        </OnbordaProvider>
-                    </MixpanelProvider>
-                </ReactFlowProvider>
+                <NuqsAdapter>
+                    <ReactFlowProvider>
+                        <MixpanelProvider>
+                            <OnbordaProvider>
+                                <SettingsProvider>
+                                    {children}
+                                </SettingsProvider>
+                            </OnbordaProvider>
+                        </MixpanelProvider>
+                    </ReactFlowProvider>
+                </NuqsAdapter>
             </ModalProvider>
         </SessionProvider>
     )

@@ -246,8 +246,9 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                                             <FormLabel>Role</FormLabel>
                                             <FormDescription>
                                                 {isLastOwner
-                                                    ? "You are the last owner. Every organization must have at least one owner. You cannot change your role."
-                                                    : "Choose the role for this organization member."}
+                                                    ? "You cannot change your role because you are the last owner. Every organization must have at least one owner."
+                                                    : <>Choose the role for this organization member. <strong>The user will be signed out and will have to sign back in.</strong></>}
+
                                             </FormDescription>
                                             <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLastOwner}>
                                                 <FormControl>

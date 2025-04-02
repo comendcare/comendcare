@@ -142,7 +142,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                             </Button>
                         </HoverCardTrigger>
                         <HoverCardContent>
-                            To leave a review you must have a roadmap with in progress or completed milestones.
+                            To leave a review you must have a research plan with in progress or completed milestones.
                         </HoverCardContent>
                     </HoverCard>
                     : <Button

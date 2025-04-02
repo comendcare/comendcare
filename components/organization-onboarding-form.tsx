@@ -367,8 +367,6 @@ export default function OrganizationOnboardingForm(
                     const currentUserMember = organizationData.members?.find(
                         (member) => member.userId === session.user.id
                     );
-                    console.log(organizationData.members)
-                    console.log(currentUserMember)
                     const currentUserTitle = currentUserMember?.title || "";
 
                     const fetchedValues = {

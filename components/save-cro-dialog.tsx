@@ -48,6 +48,7 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([]);
     const [savedCompanies, setSavedCompanies] = useState<SavedCompany[]>([]);
     const [isSaved, setIsSaved] = useState(false);
+    const [open, setOpen] = useState(false); // New state for dialog open/close
 
     const form = useForm<SaveCROFormData>({
         resolver: zodResolver(formSchema),
@@ -81,9 +82,10 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
             const response = await saveCRO(cro.id, data.milestoneId, data.engagement);
 
             if (response.success) {
-                va.track("Saved CRO");
+                va.track("Shortlisted CRO");
                 router.refresh();
                 toast.success("Successfully saved cro!");
+                setOpen(false)
             } else {
                 toast.error(response.error);
             }
@@ -98,7 +100,7 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
     };
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {type === "page" ? (
                     <Button variant="secondary" className="w-fit">
@@ -112,7 +114,7 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Save {cro.title}</DialogTitle>
+                    <DialogTitle>Save {cro.title} to shortlist</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -163,7 +165,7 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
                         />
 
                         <Button type="submit" disabled={isSubmitting} className="w-full">
-                            {isSubmitting ? "Saving..." : "Save Company"}
+                            {isSubmitting ? "Shortlisting..." : "Shortlist Company"}
                         </Button>
                     </form>
                 </Form>
