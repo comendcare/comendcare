@@ -103,7 +103,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
             if (response.success) {
                 va.track("Edited saved CRO");
                 router.refresh();
-                toast.success("Successfully saved cro!");
+                toast.success("Successfully edited saved cro!");
             } else {
                 toast.error(response.error);
             }
@@ -210,7 +210,7 @@ export function DataTableRowActions<TData extends SavedCompanyData>({
                     />
 
                     <Button type="submit" disabled={isSubmitting} className="w-full">
-                        {isSubmitting ? "Saving..." : "Save Company"}
+                        {isSubmitting ? "Shortlisting..." : "Shortlist Company"}
                     </Button>
                 </form>
             </Form>

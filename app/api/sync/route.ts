@@ -342,6 +342,7 @@ const syncToTypesense = async (env: {
                     type: "string",
                     index: true,
                     store: true,
+                    facet: true,
                     optional: true
                 },
                 {
