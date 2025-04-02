@@ -702,11 +702,11 @@ model Company {
 }
 
 model SavedCompany {
-  id             String                          @id @default(uuid())
+  id             String @id @default(uuid())
   organizationId String
   companyId      String
   milestoneId    String
-  engagement     OrganizationToCompanyEngagement
+  // engagement     OrganizationToCompanyEngagement
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)

@@ -19,16 +19,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { getMilestones, getSavedCompaniesFromOrganizationId } from "@/lib/fetchers";
 import { useSession } from "next-auth/react";
-import { Form, FormField, FormItem, FormLabel, FormMessage, FormControl } from "@/components/ui/form";
+import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDescription} from "@/components/ui/form";
 import va from "@vercel/analytics"
 import {saveCRO} from "@/lib/actions";
 import {useRouter} from "next/navigation";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 
 const formSchema = z.object({
-    engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
-        errorMap: () => ({ message: "Select a valid engagement type" })
-    }),
+    // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
+    //     errorMap: () => ({ message: "Select a valid engagement type" })
+    // }),
     milestoneId: z.string().min(1, "Please select a milestone"),
 });
 
@@ -79,7 +79,7 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
     const onSubmit = async (data: SaveCROFormData) => {
         setIsSubmitting(true);
         try {
-            const response = await saveCRO(cro.id, data.milestoneId, data.engagement);
+            const response = await saveCRO(cro.id, data.milestoneId);
 
             if (response.success) {
                 va.track("Shortlisted CRO");
@@ -118,26 +118,26 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="engagement"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Engagement Type</FormLabel>
-                                    <FormControl>
-                                        <RadioGroup onValueChange={field.onChange} value={field.value}>
-                                            {engagementOptions.map(({ id, label }) => (
-                                                <div key={id} className="flex items-center space-x-3">
-                                                    <RadioGroupItem value={id} />
-                                                    <Label className="font-normal">{label}</Label>
-                                                </div>
-                                            ))}
-                                        </RadioGroup>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {/*<FormField*/}
+                        {/*    control={form.control}*/}
+                        {/*    name="engagement"*/}
+                        {/*    render={({ field }) => (*/}
+                        {/*        <FormItem>*/}
+                        {/*            <FormLabel>Engagement Type</FormLabel>*/}
+                        {/*            <FormControl>*/}
+                        {/*                <RadioGroup onValueChange={field.onChange} value={field.value}>*/}
+                        {/*                    {engagementOptions.map(({ id, label }) => (*/}
+                        {/*                        <div key={id} className="flex items-center space-x-3">*/}
+                        {/*                            <RadioGroupItem value={id} />*/}
+                        {/*                            <Label className="font-normal">{label}</Label>*/}
+                        {/*                        </div>*/}
+                        {/*                    ))}*/}
+                        {/*                </RadioGroup>*/}
+                        {/*            </FormControl>*/}
+                        {/*            <FormMessage />*/}
+                        {/*        </FormItem>*/}
+                        {/*    )}*/}
+                        {/*/>*/}
 
                         <FormField
                             control={form.control}
@@ -145,6 +145,9 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Milestone</FormLabel>
+                                    <FormDescription>
+                                        For which milestone would you like to connect with this company?
+                                    </FormDescription>
                                     <FormControl>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <SelectTrigger>
