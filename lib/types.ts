@@ -11,7 +11,7 @@ import {
     MilestoneType,
     ExternalContact,
     ExternalAttachment,
-    ReviewFeedback
+    ReviewFeedback, Service
 } from "@prisma/client";
 
 export type Milestone = Omit<Prisma.MilestoneGetPayload<{
@@ -45,8 +45,9 @@ export type SavedCompanyData = SavedCompany & {
     milestone: Milestone;
 };
 
-export interface CompanyWithReviews extends Company {
+export interface CompanyWithReviewsAndServices extends Company {
     reviews: ReviewWithAuthor[];
+    services: Service[]
 }
 
 export type MembershipWithOrganization = Member & {

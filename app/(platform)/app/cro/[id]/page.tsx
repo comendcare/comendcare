@@ -5,12 +5,6 @@ import {companyTypeMap} from "@/components/marketplace-cro-card";
 import React from "react";
 import {buttonVariants} from "@/components/ui/button";
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-} from "@/components/ui/tabs"
-import {
     Tooltip,
     TooltipProvider,
     TooltipTrigger,
@@ -25,8 +19,10 @@ import {CertificationBadge} from "@/components/certification-badge";
 import CROMarketplaceProfileReviewsTab from "@/components/cro-marketplace-profile-reviews-tab";
 import {cn} from "@/lib/utils";
 import SaveCRODialog from "@/components/save-cro-dialog";
-import {CompanyWithReviews} from "@/lib/types";
+import {CompanyWithReviewsAndServices} from "@/lib/types";
 import { ArrowLeft, Briefcase, BriefcaseBusiness, Building, Building2, Calendar, ExternalLink, Factory, MapPin, Map, Rocket, University, Users, Store } from "lucide-react";
+import {Star} from "@/components/cro-rating-section";
+import CROPageTabs from "@/components/cro-page-tabs";
 
 const companyTypeIcons: Record<string, JSX.Element> = {
     "Mid-Sized Business (10-100M TTM Revenue)": <Factory className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
@@ -94,6 +90,24 @@ export default async function CompanyHomePage({
                                     {cro.title}
                                 </h1>
                             </div>
+                            <Link
+                                href={"?tab=reviews"}
+                                className="flex items-center mb-2"
+                            >
+                                {[...Array(5)].map((_, index) => (
+                                    <Star
+                                        key={index}
+                                        filled={cro.avgRating ? index < Math.round(cro.avgRating) : false}
+                                    />
+                                ))}
+                                <p className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    {cro.reviews.length > 0 && typeof cro.avgRating === "number"
+                                        ? Number.isInteger(cro.avgRating)
+                                            ? `${cro.avgRating} out of 5`
+                                            : `${cro.avgRating.toFixed(2)} out of 5`
+                                        : "No reviews yet"}
+                                </p>
+                            </Link>
                             <div
                                 className="flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
                                 {cro.headquarters &&
@@ -148,80 +162,7 @@ export default async function CompanyHomePage({
                         </div>
                     </div>
 
-                    <Tabs defaultValue="services" className="space-y-4 w-full">
-                        <TabsList variant="outline">
-                            <TabsTrigger value="services" variant="outline" className="px-8">
-                                <Briefcase className="mr-1.5 h-4 w-4 flex-shrink-0"/>
-                                Services
-                                {cro.services.length !== undefined && (
-                                    <div
-                                        className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
-                                    >
-                                        {cro.services.length}
-                                    </div>
-                                )}
-                            </TabsTrigger>
-                            {/*<TabsTrigger value="sites" variant="outline" className="px-8">*/}
-                            {/*    <Map className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
-                            {/*    Sites*/}
-                            {/*    {cro.sites.length && (*/}
-                            {/*        <div*/}
-                            {/*            className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'*/}
-                            {/*        >*/}
-                            {/*            {cro.sites.length}*/}
-                            {/*        </div>*/}
-                            {/*    )}*/}
-                            {/*</TabsTrigger>*/}
-                            {/*<TabsTrigger value="rfis" variant="outline" className="px-8">*/}
-                            {/*    <FaFileContract className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
-                            {/*    RFIs*/}
-                            {/*    {cro.rfis.length && (*/}
-                            {/*        <div*/}
-                            {/*            className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'*/}
-                            {/*        >*/}
-                            {/*            {cro.rfis.length}*/}
-                            {/*        </div>*/}
-                            {/*    )}*/}
-                            {/*</TabsTrigger>*/}
-                            {/*<TabsTrigger value="certifications" variant="outline" className="px-8">*/}
-                            {/*    <FaListCheck className="mr-1.5 h-4 w-4 flex-shrink-0"/>*/}
-                            {/*    Certifications*/}
-                            {/*    {cro.certifications.length && (*/}
-                            {/*        <div*/}
-                            {/*            className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'*/}
-                            {/*        >*/}
-                            {/*            {cro.certifications.length}*/}
-                            {/*        </div>*/}
-                            {/*    )}*/}
-                            {/*</TabsTrigger>*/}
-                            <TabsTrigger value="reviews" variant="outline" className="px-8">
-                                <Users className="mr-1.5 h-4 w-4 flex-shrink-0"/>
-                                Reviews
-                                {cro.reviews.length !== undefined && (
-                                    <div
-                                        className='bg-gray-100 text-gray-900 ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block'
-                                    >
-                                        {cro.reviews.length}
-                                    </div>
-                                )}
-                            </TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="services" className="space-y-4 w-full">
-                            <CROMarketplaceProfileServicesTab croServices={cro.services}/>
-                        </TabsContent>
-                        {/*<TabsContent value="sites" className="space-y-4 w-full">*/}
-                        {/*    <CROMarketplaceProfileSitesTab croSites={cro.sites}/>*/}
-                        {/*</TabsContent>*/}
-                        {/*<TabsContent value="rfis" className="space-y-4 w-full">*/}
-                        {/*    <CROMarketplaceProfileRFIsTab croRFIs={cro.rfis}/>*/}
-                        {/*</TabsContent>*/}
-                        {/*<TabsContent value="certifications" className="space-y-4 w-full">*/}
-                        {/*    <CROMarketplaceProfileCertificationsTab croCertifications={cro.certifications}/>*/}
-                        {/*</TabsContent>*/}
-                        <TabsContent value="reviews" className="space-y-4 w-full">
-                            <CROMarketplaceProfileReviewsTab cro={cro as CompanyWithReviews}/>
-                        </TabsContent>
-                    </Tabs>
+                    <CROPageTabs cro={cro as CompanyWithReviewsAndServices}/>
                 </main>
             </div>
         </TooltipProvider>

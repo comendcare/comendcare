@@ -1,7 +1,7 @@
 import React from "react";
 import { Review } from "@prisma/client";
 
-const Star = ({ filled }: { filled: boolean }) => (
+export const Star = ({ filled }: { filled: boolean }) => (
     <svg
         className={`w-4 h-4 ${filled ? "text-yellow-300" : "text-gray-300 dark:text-gray-500"} me-1`}
         aria-hidden="true"
@@ -57,7 +57,7 @@ const CRORatingSection = ({ reviews }: { reviews: Review[] }) => {
                     <Star key={index} filled={index < Math.round(avgRating)} />
                 ))}
                 <p className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                    {totalReviews > 0 ? avgRating.toFixed(2) : "No reviews yet"} out of 5
+                    {totalReviews > 0 ? (Number.isInteger(avgRating) ? avgRating : avgRating.toFixed(2)) : "No reviews yet"} out of 5
                 </p>
             </div>
 
