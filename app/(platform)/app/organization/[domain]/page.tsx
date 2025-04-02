@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma"
 import {notFound} from "next/navigation"
-import {getRoadmapsForOrganization, getOrganizationData, getConditionsDataFromOrgId} from "@/lib/fetchers"
+import {getRoadmapsForOrganization, getOrganizationData, getConditionsDataFromOrgId, getAssetsForOrganization, getRFPs, getRFPsForOrganization} from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
 import {RoadmapCard} from "@/components/public-roadmap-card";
 import {PagProfileAboutCard} from "@/components/pag-profile-about-card";
@@ -44,9 +44,11 @@ export default async function OrganizationHomePage({
     params: { domain: string }
 }) {
     const domain = decodeURIComponent(params.domain)
-    const [organization, roadmaps] = await Promise.all([
+    const [organization, roadmaps, assets, rfps] = await Promise.all([
         getOrganizationData(domain),
-        getRoadmapsForOrganization(domain)
+        getRoadmapsForOrganization(domain),
+        getAssetsForOrganization(domain),
+        getRFPsForOrganization(domain)
     ])
 
     if (!organization) {
@@ -118,12 +120,8 @@ export default async function OrganizationHomePage({
                         <div className="md:col-span-4 flex flex-col space-y-4">
                             <PAGProfileAssetsAndRFPsHoverableCard
                                 isPrivate={false}
-                                assets={[]}
-                                rfps={[]}
-                                // assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "ASSET")}
-                                // rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "RFP")}
-                                // assets={(roadmaps?.[0]?.milestones.filter(milestone => milestone.asset) || []).map(milestone => milestone.asset)}
-                                // rfps={(roadmaps?.[0]?.milestones.filter(milestone => milestone.RFP) || []).map(milestone => milestone.RFP)}
+                                assets={assets}
+                                rfps={rfps}
                             />
                             {roadmaps.length > 0 ?
                                 <RoadmapCard

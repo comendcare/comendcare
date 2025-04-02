@@ -101,6 +101,54 @@ export async function getCROData(id: string) {
     })
 }
 
+export async function getAssetsForOrganization(domain: string) {
+    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+        : domain
+
+    const assets = await prisma.asset.findMany({
+        where: {
+            organization: {
+                subdomain: subdomain
+            }
+        },
+        include: {
+            contacts: true,
+            attachments: true,
+            milestones: {
+                include: {milestone: true}
+            }
+        },
+        orderBy: [{createdAt: "desc"}]
+    })
+
+    return assets
+}
+
+export async function getRFPsForOrganization(domain: string) {
+    const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+        ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
+        : domain
+
+    const rfps = await prisma.rFP.findMany({
+        where: {
+            organization: {
+                subdomain: subdomain
+            }
+        },
+        include: {
+            contacts: true,
+            attachments: true,
+            milestones: {
+                include: {milestone: true}
+            }
+        },
+        orderBy: [{createdAt: "desc"}]
+    })
+
+    return rfps
+}
+
 export async function getRoadmapsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")

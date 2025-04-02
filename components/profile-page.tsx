@@ -19,7 +19,7 @@ import Link from "next/link";
 import EditPAGContactEmailDialog from "./edit-pag-contact-email-dialog";
 import { Building2, Calendar, ExternalLink, HandCoins } from "lucide-react";
 
-export function ProfilePageClient({organization, conditions, roadmaps}: {organization: any, conditions: any[] | null, roadmaps: any[]}) {
+export function ProfilePageClient({organization, conditions, roadmaps, assets, rfps}: {organization: any, conditions: any[] | null, roadmaps: any[], assets: any[], rfps: any[]}) {
     return (
         <div className="grid grid-cols-5 px-4 w-full max-w-7xl my-4 mx-auto gap-4">
         <main className="col-span-4 flex flex-col items-center">
@@ -150,8 +150,8 @@ export function ProfilePageClient({organization, conditions, roadmaps}: {organiz
                             <div className="flex flex-col gap-4 relative">
                                 <PAGProfileAssetsAndRFPsHoverableCard
                                     isPrivate={true}
-                                    assets={[]}
-                                    rfps={[]}
+                                    assets={assets}
+                                    rfps={rfps}
                                     // assets={(roadmaps?.[0]?.milestones || []).filter((milestone: any) => milestone?.nodeType === "ASSET")}
                                     // rfps={(roadmaps?.[0]?.milestones || []).filter((milestone: any) => milestone?.nodeType === "RFP")}
                                     // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
