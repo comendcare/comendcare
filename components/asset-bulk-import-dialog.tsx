@@ -13,6 +13,7 @@ import { Asset } from "@/lib/types";
 import { toast } from "sonner";
 import { createOrUpdateAsset } from "@/lib/actions";
 import { useSession } from "next-auth/react";
+import { parseCSV, validateImport } from "@/lib/utils";
 
 export function AssetBulkImportDialog() {
     const router = useRouter()
@@ -22,71 +23,35 @@ export function AssetBulkImportDialog() {
     const handleImport = async (file: File | undefined) => {
         if (file && file.name.endsWith(".csv")) {
             // parse CSV file
-            Papa.parse(file, {
-                complete: async (result) => {
-                    try {
-                        const newAssets: Partial<Asset>[] = []
-
-                        const isValidFormat = (entry: any) => {
-                            const errors = []
-
-                            // only title is a required field
-                            if (!(entry.title && typeof entry.title === "string")) {
-                                errors.push({
-                                    type: "title",
-                                    message: "Field 'title' is not formatted properly"
-                                })
-                            }
-
-                            if (errors.length > 0) return { isValid: false, errors: errors }
-                            return { isValid: true }
-                        }
-
-                        let errors: {type: string, message: string}[] = []
-                        result.data.forEach((entry: any) => {
-                            // validate asset format
-                            const validate = isValidFormat(entry)
-                            if (validate.isValid && !validate.errors) {
-                                newAssets.push({
-                                    title: entry.title || 'New Asset',
-                                    description: entry.description || '', // description is optional
-                                })
-                            } else {
-                                errors = errors.concat(validate.errors || [])
-
-                                // attempt to create anyways
-                                newAssets.push({
-                                    title: entry.title && typeof entry.title === 'string' ? entry.title : 'New milestone',
-                                    description: entry.description || '',
-                                })
-                            }
-                        })
-
-                        if (errors.length > 0) {
-                            toast('Warning!', {
-                                position: "bottom-left",
-                                duration: 4000,
-                                description: `Missing fields in import file: A title is required for each Asset. Please ensure all Assets have titles before importing.`
-                            })
-                            console.error("Error: imported assets are missing required fields", errors)
-                        }
-
-                        await Promise.all(newAssets.map(async (asset) => {
-                            await createOrUpdateAsset(asset, session?.user.organizationId)
-                        }))
-                    } catch (e) {
-                        toast('Error!', {
-                            position: "bottom-left",
-                            duration: 4000,
-                            description: `Import failed. Please try again. If the problem continues, contact us at support@comendcare.com`
-                        })
-                        console.error("Error: failed to import milestones", e)
-                    }
-                    router.refresh()
-                },
-                header: true,
-                skipEmptyLines: true,
-            })
+            try {
+                const result = await parseCSV(
+                    file,
+                    [
+                        {key: 'title', required: true, defaultValue: 'Untitled Asset', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
+                        {key: 'description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'}
+                    ]
+                )
+    
+                if (result.errors.length > 0) {
+                    toast('Warning!', {
+                        position: "bottom-left",
+                        duration: 4000,
+                        description: `Missing fields in import file: A title is required for each Asset. Please ensure all Assets have titles before importing.`
+                    })
+                    console.error("Error: imported assets are missing required fields", result.errors)
+                }
+    
+                await Promise.all(result.values.map(async (asset) => {
+                    await createOrUpdateAsset(asset, session?.user.organizationId)
+                }))
+            } catch (e) {
+                toast('Error!', {
+                    position: "bottom-left",
+                    duration: 4000,
+                    description: `Import failed. Please try again. If the problem continues, contact us at support@comendcare.com`
+                })
+                console.error("Error: failed to import assets", e)
+            }
         } else {
             console.error("Please upload a valid CSV file.");
         }

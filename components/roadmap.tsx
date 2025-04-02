@@ -18,7 +18,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { getMilestoneTypes, getOrganizationFromOrganizationId } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
-import { cn, sleep } from "@/lib/utils"
+import { cn, parseCSV, sleep } from "@/lib/utils"
 import Link from "next/link"
 import {
     Dialog,
@@ -376,79 +376,46 @@ export function Roadmap() {
 
                         <FileUploadForm 
                             accept=".csv" 
-                            onSubmit={(file) => {
+                            onSubmit={async (file) => {
                                 if (file && file.name.endsWith(".csv")) {
                                     // parse CSV file
-                                    Papa.parse(file, {
-                                        complete: (result) => {
-                                            try {
-                                                const newMilestones: Partial<Milestone>[] = []
+                                    try {
+                                        const result = await parseCSV(
+                                            file,
+                                            [
+                                                {key: 'title', required: true, defaultValue: 'Untitled Milestone', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
+                                                {key: 'description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                                                {key: 'type', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string' && milestoneTypes.find(type => type.label === entry) !== undefined}
+                                            ]
+                                        )
+                            
+                                        if (result.errors.length > 0) {
+                                            toast('Warning!', {
+                                                position: "bottom-left",
+                                                duration: 4000,
+                                                description: `Missing fields in import file: A title is required for each project. Please ensure all projects have titles before importing.`
+                                            })
+                                            console.error("Error: imported milestones are missing required fields", result.errors)
+                                        }
 
-                                                const isValidFormat = (entry: any) => {
-                                                    const errors = []
-    
-                                                    // only title is a required field
-                                                    if (!(entry.title && typeof entry.title === "string")) {
-                                                        errors.push({
-                                                            type: "title",
-                                                            message: "Field 'title' is not formatted properly"
-                                                        })
-                                                    }
-    
-                                                    if (errors.length > 0) return { isValid: false, errors: errors }
-                                                    return { isValid: true }
-                                                }
-    
-                                                let errors: {type: string, message: string}[] = []
-                                                result.data.forEach((entry: any) => {
-                                                    // validate milestone format
-                                                    const validate = isValidFormat(entry)
-                                                    if (validate.isValid && !validate.errors) {
-                                                        const foundType = milestoneTypes.find(type => type.label === entry.type)
-                                                        newMilestones.push({
-                                                            title: entry.title || 'New Milestone',
-                                                            description: entry.description || '', // description is optional
-                                                            types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [], // types are optional
-                                                            // nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT" // category is optional, default to project
-                                                            nodeType: "PROJECT"
-                                                        })
-                                                    } else {
-                                                        errors = errors.concat(validate.errors || [])
-    
-                                                        const foundType = milestoneTypes.find(type => type.label === entry.type)
-                                                        // attempt to create anyways
-                                                        newMilestones.push({
-                                                            title: entry.title && typeof entry.title === 'string' ? entry.title : 'New milestone',
-                                                            description: entry.description || '',
-                                                            types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
-                                                            // nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT"
-                                                            nodeType: "PROJECT"
-                                                        })
-                                                    }
-                                                })
-    
-                                                if (errors.length > 0) {
-                                                    toast('Warning!', {
-                                                        position: "bottom-left",
-                                                        duration: 4000,
-                                                        description: `Missing fields in import file: A title is required for each milestone. Please ensure all milestones have titles before importing.`
-                                                    })
-                                                    console.error("Error: imported milestones are missing required fields", errors)
-                                                }
-    
-                                                addMilestones(newMilestones)
-                                            } catch (e) {
-                                                toast('Error!', {
-                                                    position: "bottom-left",
-                                                    duration: 4000,
-                                                    description: `Import failed. Please try again. If the problem continues, contact us at support@comendcare.com`
-                                                })
-                                                console.error("Error: failed to import milestones", e)
+                                        addMilestones(result.values.map(milestone => {
+                                            const foundType = milestoneTypes.find(type => type.label === milestone.type)
+
+                                            return {
+                                                title: milestone.title, 
+                                                description: milestone.description, 
+                                                types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
+                                                nodeType: "PROJECT"
                                             }
-                                        },
-                                        header: true,
-                                        skipEmptyLines: true,
-                                    })
+                                        }))
+                                    } catch (e) {
+                                        toast('Error!', {
+                                            position: "bottom-left",
+                                            duration: 4000,
+                                            description: `Import failed. Please try again. If the problem continues, contact us at support@comendcare.com`
+                                        })
+                                        console.error("Error: failed to import assets", e)
+                                    }
                                 } else {
                                     console.error("Please upload a valid CSV file.");
                                 }

@@ -61,8 +61,7 @@ export default async function RFPsPage() {
                             </DialogContent>
                         </Dialog>
 
-                        {/* Bulk import disabled for now */}
-                        {/* <RFPBulkImportDialog /> */}
+                        <RFPBulkImportDialog />
                     </div>
                     {rfps.map((rfp) => (
                         <Dialog>
