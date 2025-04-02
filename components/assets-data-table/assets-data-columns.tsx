@@ -15,33 +15,8 @@ declare module "@tanstack/react-table" {
 }
 
 export const columns: ColumnDef<Asset>[] = [
-    // {
-    //     id: "select",
-    //     header: ({ table }) => (
-    //         <Checkbox
-    //             checked={
-    //                 table.getIsAllPageRowsSelected() ||
-    //                 (table.getIsSomePageRowsSelected() && "indeterminate")
-    //             }
-    //             onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-    //             aria-label="Select all"
-    //             className="translate-y-[2px]"
-    //         />
-    //     ),
-    //     cell: ({ row }) => (
-    //         <Checkbox
-    //             checked={row.getIsSelected()}
-    //             onCheckedChange={(value) => row.toggleSelected(!!value)}
-    //             aria-label="Select row"
-    //             className="translate-y-[2px]"
-    //         />
-    //     ),
-    //     enableSorting: false,
-    //     enableHiding: false,
-    //     meta: { name: "Select" }
-    // },
     {
-        accessorKey: "company.title",
+        accessorKey: "asset.title",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Name" />
         ),
@@ -54,17 +29,81 @@ export const columns: ColumnDef<Asset>[] = [
         meta: { name: "Name" }
     },
     {
-        accessorKey: "company.description",
+        accessorKey: "asset.description",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Description" />
         ),
         cell: ({ row }) => (
-            <div className="line-clamp-3 w-96">
+            <div className="line-clamp-3">
                 {row.original.description}
             </div>
         ),
         enableHiding: true,
         meta: { name: "Description" }
+    },
+    {
+        accessorKey: "asset.private",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Private" />
+        ),
+        cell: ({ row }) => (
+            <div>
+                {row.original.private ? 'true' : 'false'}
+            </div>
+        ),
+        enableHiding: true,
+        meta: { name: "Private" }
+    },
+    // {
+    //     accessorKey: "asset.milestones",
+    //     header: ({ column }) => (
+    //         <DataTableColumnHeader column={column} title="Linked milestones" />
+    //     ),
+    //     cell: ({ row }) => (
+    //         <div>
+    //             {row.original.milestones.map(milestone => milestone.).join(', ')}
+    //         </div>
+    //     ),
+    //     enableHiding: true,
+    //     meta: { name: "Description" }
+    // },
+    {
+        accessorKey: "asset.contacts",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Contacts" />
+        ),
+        cell: ({ row }) => (
+            <div>
+                <ul>
+                    {row.original.contacts.map((contact, index) => (
+                        <li key={index}>
+                            {contact.name || contact.email || contact.affiliation}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        ),
+        enableHiding: true,
+        meta: { name: "Contacts" }
+    },
+    {
+        accessorKey: "asset.links",
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Links" />
+        ),
+        cell: ({ row }) => (
+            <div>
+                <ul>
+                    {row.original.attachments.map((attachment, index) => (
+                        <li key={index}>
+                            {attachment.name || attachment.link}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        ),
+        enableHiding: true,
+        meta: { name: "Links" }
     },
     {
         id: "actions",

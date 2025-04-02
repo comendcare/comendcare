@@ -18,16 +18,16 @@ export function DataTableToolbar<TData>({
     const isFiltered = table.getState().columnFilters.length > 0
 
     return (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-end">
             <div className="flex flex-1 items-center space-x-2">
-                <Input
+                {/* <Input
                     placeholder="Filter companies..."
                     value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
                         table.getColumn("name")?.setFilterValue(event.target.value)
                     }
                     className="h-8 w-[150px] lg:w-[250px]"
-                />
+                /> */}
                 {isFiltered && (
                     <Button
                         variant="ghost"
