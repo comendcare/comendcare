@@ -90,6 +90,10 @@ export interface Option {
     [key: string]: any;
 }
 
+export type AssetTableData = Asset & {
+    asset: Asset
+}
+
 export type SavedCompanyData = SavedCompany & {
     company: Company;
     milestone: Milestone;

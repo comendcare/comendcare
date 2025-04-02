@@ -433,6 +433,31 @@ export async function getRFPs(organizationId: string | undefined) {
     }
 }
 
+// export async function getAssets(organizationId: string | undefined) {
+//     if (!organizationId) {
+//         return {success: false, error: "No organization id provided."};
+//     }
+
+//     try {
+//         const fetchedAssets = await prisma?.asset.findMany({
+//             // include: {user: true},
+//             where: {organizationId}
+//         })
+
+//         if (!fetchedAssets) {
+//             return {success: false, error: "assets not found"};
+//         }
+
+//         return {
+//             success: true,
+//             data: fetchedAssets
+//         };
+//     } catch (error: any) {
+//         logError("Error fetching assets", error);
+//         return {success: false, error: "Internal server error"};
+//     }
+// }
+
 export async function getMilestones(organizationId: string | undefined) {
     if (!organizationId) {
         return {success: false, error: "No organization id provided."};

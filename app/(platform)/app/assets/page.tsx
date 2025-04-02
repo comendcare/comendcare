@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Plus } from "lucide-react";
 import { EditAssetForm } from "@/components/edit-asset-form";
 import { AssetBulkImportDialog } from "@/components/asset-bulk-import-dialog";
+import { AssetsDataTable } from "@/components/assets-data-table/assets-data-table";
+import { columns } from "@/components/assets-data-table/assets-data-columns";
 
 export default async function AssetsPage() {
     const session = await getSession()
@@ -38,53 +40,32 @@ export default async function AssetsPage() {
 
         // Existing verified organization rendering logic
         return (
-            <div className="px-4 w-full my-4 mx-auto gap-4">
-                <main className="col-span-4 flex flex-col items-center gap-4">
-                    <div className="flex gap-2 w-full justify-end">
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <Button>
-                                    <Plus />
-                                    Add an asset
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>
-                                        Create an Asset
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        {`Create your Asset here. Click save when you're done.`}
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <EditAssetForm assetData={{}} />
-                            </DialogContent>
-                        </Dialog>
+            <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto">
+                <div className="flex gap-2 w-full justify-end">
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button>
+                                <Plus />
+                                Add an asset
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    Create an Asset
+                                </DialogTitle>
+                                <DialogDescription>
+                                    {`Create your Asset here. Click save when you're done.`}
+                                </DialogDescription>
+                            </DialogHeader>
+                            <EditAssetForm assetData={{}} />
+                        </DialogContent>
+                    </Dialog>
 
-                        <AssetBulkImportDialog />
-                    </div>
-                    {assets.map((asset) => (
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <Button>
-                                    {asset.title}
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>
-                                        Edit an Asset
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        {`Edit your Asset here. Click save when you're done.`}
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <EditAssetForm assetData={asset} />
-                            </DialogContent>
-                        </Dialog>
-                    ))}
-                </main>
-            </div>
+                    <AssetBulkImportDialog />
+                </div>
+                <AssetsDataTable data={assets} columns={columns}/>
+            </main>
         )
     } else {
         return (
