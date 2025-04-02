@@ -13,17 +13,35 @@ import CROMarketplaceProfileServicesTab from "@/components/cro-marketplace-profi
 import {Company} from "@prisma/client";
 import CROMarketplaceProfileReviewsTab from "@/components/cro-marketplace-profile-reviews-tab";
 import {CompanyWithReviewsAndServices} from "@/lib/types";
+import {getCROData} from "@/lib/fetchers";
 
-export default function CROPageTabs({cro}: {cro: CompanyWithReviewsAndServices}) {
+export default function CROPageTabs() {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
     const [selectedTab, setSelectedTab] = useState("services")
+    const [cro, setCRO] = useState<any | null>(null)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const tabFromUrl = searchParams.get("tab") || "services"
         setSelectedTab(tabFromUrl)
     }, [searchParams])
+
+    useEffect(() => {
+        const fetchCRO = async () => {
+            setLoading(true)
+            const pathParts = pathname.split("/")
+            const id = decodeURIComponent(pathParts[pathParts.length - 1])
+            const data = await getCROData(id)
+            setCRO(data)
+            setLoading(false)
+        }
+
+        fetchCRO()
+    }, [pathname])
+
+    if (loading || !cro) return <div className="text-gray-500">Loading...</div>
 
     return (
         <Tabs
