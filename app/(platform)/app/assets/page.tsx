@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { EditAssetForm } from "@/components/edit-asset-form";
+import { AssetBulkImportDialog } from "@/components/asset-bulk-import-dialog";
 
 export default async function AssetsPage() {
     const session = await getSession()
@@ -37,9 +38,9 @@ export default async function AssetsPage() {
 
         // Existing verified organization rendering logic
         return (
-            <div className="px-4 w-full max-w-7xl my-4 mx-auto gap-4">
-                <main className="col-span-4 flex flex-col items-center">
-                    <div>
+            <div className="px-4 w-full my-4 mx-auto gap-4">
+                <main className="col-span-4 flex flex-col items-center gap-4">
+                    <div className="flex gap-2 w-full justify-end">
                         <Dialog>
                             <DialogTrigger asChild>
                                 <Button>
@@ -59,6 +60,8 @@ export default async function AssetsPage() {
                                 <EditAssetForm assetData={{}} />
                             </DialogContent>
                         </Dialog>
+
+                        <AssetBulkImportDialog />
                     </div>
                     {assets.map((asset) => (
                         <Dialog>

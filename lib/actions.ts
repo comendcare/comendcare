@@ -1710,8 +1710,12 @@ export const deleteAsset = async (assetId: string) => {
     }
 }
 
-export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizationId: string) => {
+export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizationId: string | undefined | null) => {
     try {
+        if (!organizationId) {
+            throw new Error("No organization id provided.")
+        }
+
         const response = await prisma.asset.upsert({
             where: {
                 id: assetData.id || nanoid()
@@ -1802,8 +1806,12 @@ export const deleteRFP = async (rfpId: string) => {
     }
 }
 
-export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: string) => {
+export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: string | undefined | null) => {
     try {
+        if (!organizationId) {
+            throw new Error("No organization id provided.")
+        }
+
         const response = await prisma.rFP.upsert({
             where: {
                 id: rfpData.id || nanoid()

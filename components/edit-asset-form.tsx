@@ -297,7 +297,6 @@ export function EditAssetForm({
                                     <MultipleSelector
                                         value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title}))}
                                         onChange={field.onChange}
-                                        maxSelected={3}
                                         defaultOptions={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
                                         options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
                                         hidePlaceholderWhenSelected={true}

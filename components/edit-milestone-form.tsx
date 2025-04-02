@@ -651,7 +651,7 @@ export function EditMilestoneForm({
 
                                     <TimelineFormField form={form} startLabel={"Start Date"} endLabel={"End Date"}/>
 
-                                    <FormLabel>Assets</FormLabel>
+                                    <FormLabel>Linked Assets</FormLabel>
                                     <FormField
                                         control={form.control}
                                         name="assets"
@@ -661,7 +661,6 @@ export function EditMilestoneForm({
                                                     <MultipleSelector
                                                         value={field.value?.map(asset => ({...asset, value: asset.id, label: asset.title}))}
                                                         onChange={field.onChange}
-                                                        maxSelected={3}
                                                         defaultOptions={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
                                                         options={fetchedAssets.map(asset => ({...asset, value: asset.id, label: asset.title} as Option))}
                                                         hidePlaceholderWhenSelected={true}
@@ -679,7 +678,7 @@ export function EditMilestoneForm({
                                         )}
                                     />
 
-                                    <FormLabel>RFPs</FormLabel>
+                                    <FormLabel>Linked RFPs</FormLabel>
                                     <FormField
                                         control={form.control}
                                         name="rfps"
@@ -689,7 +688,6 @@ export function EditMilestoneForm({
                                                     <MultipleSelector
                                                         value={field.value?.map(rfp => ({...rfp, value: rfp.id, label: rfp.title}))}
                                                         onChange={field.onChange}
-                                                        maxSelected={3}
                                                         defaultOptions={fetchedRFPs.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as any))}
                                                         options={fetchedRFPs.map(rfp => ({...rfp, value: rfp.id, label: rfp.title} as any))}
                                                         hidePlaceholderWhenSelected={true}

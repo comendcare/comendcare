@@ -195,11 +195,11 @@ export function EditRFPForm({
 
         try {
             await createOrUpdateRFP(updateData, session.user.organizationId);
-            toast.success("Organization profile updated successfully!");
+            toast.success("RFP created or updated successfully!");
             router.refresh();
         } catch (error) {
-            console.error("Error updating organization:", error);
-            toast.error("Failed to update organization profile.");
+            console.error("Error updating or createing RFP:", error);
+            toast.error("Failed to update or create RFP.");
         }
     }
 
@@ -312,7 +312,6 @@ export function EditRFPForm({
                                     <MultipleSelector
                                         value={field.value?.map(milestone => ({...milestone, value: milestone.id, label: milestone.title}))}
                                         onChange={field.onChange}
-                                        maxSelected={3}
                                         defaultOptions={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
                                         options={fetchedMilestones.map(milestone => ({...milestone, value: milestone.id, label: milestone.title} as Option))}
                                         hidePlaceholderWhenSelected={true}
