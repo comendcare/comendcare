@@ -83,10 +83,12 @@ export type Recommendation = {
 function generateFiltersString(filters: FiltersType): string {
     let filtersList: string[] = [];
 
+    const escapeValue = (value: string) => `\`${value}\``;
+
     // Categories (Array Field)
-    if (filters?.categories  && filters.categories.length > 0) {
+    if (filters?.categories && filters.categories.length > 0) {
         const categoryFilter = filters.categories
-            .map(category => `categories:=["${category.value}"]`)
+            .map(category => `categories:=[${escapeValue(category.value)}]`)
             .join(" && ");
         filtersList.push(`(${categoryFilter})`);
     }
@@ -94,7 +96,7 @@ function generateFiltersString(filters: FiltersType): string {
     // Company Types (Single String Field)
     if (filters?.types && filters.types.length > 0) {
         const typeFilter = filters.types
-            .map(type => `companyType:="${type.value}"`) // Ensure quotes around value
+            .map(type => `companyType:=${escapeValue(type.value)}`)
             .join(" && ");
         filtersList.push(`(${typeFilter})`);
     }
@@ -102,7 +104,7 @@ function generateFiltersString(filters: FiltersType): string {
     // Certifications (Array Field)
     if (filters?.certifications && filters.certifications.length > 0) {
         const certificationFilter = filters.certifications
-            .map(cert => `simplifiedCertifications:=["${cert.value}"]`)
+            .map(cert => `simplifiedCertifications:=[${escapeValue(cert.value)}]`)
             .join(" && ");
         filtersList.push(`(${certificationFilter})`);
     }
@@ -166,6 +168,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             ...(filtersString ? { filter_by: filtersString } : undefined),
             ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
         };
+        console.log(searchParameters)
 
         const results = await typesense
             .collections("companies")

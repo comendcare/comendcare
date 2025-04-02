@@ -414,8 +414,8 @@ export const CRO_CERTIFICATIONS: { id: string; label: string; value: string; des
     },
     {
         id: '5',
-        label: 'Good Clinical Laboratory Practice (GCLP)College of American Pathologists (CAP)',
-        value: 'Good Clinical Laboratory Practice (GCLP)College of American Pathologists (CAP)',
+        label: 'Good Clinical Laboratory Practice (GCLP)',
+        value: 'Good Clinical Laboratory Practice (GCLP)',
         description: 'Guidelines ensuring clinical laboratory studies are conducted under regulatory and quality standards for patient safety.',
     },
     {

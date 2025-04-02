@@ -1,6 +1,8 @@
-import { useShallow } from "zustand/react/shallow"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
+"use client"
+
+import {useShallow} from "zustand/react/shallow"
+import {z} from "zod"
+import {zodResolver} from "@hookform/resolvers/zod"
 import {
     Form,
     FormControl,
@@ -10,17 +12,19 @@ import {
     FormLabel,
     FormMessage
 } from "@/components/ui/form"
-import { useForm } from "react-hook-form"
-import { DoubleSliderBarChart } from "./ui/slider-double"
-import { ScrollArea } from "./ui/scroll-area"
-import { Button } from "./ui/button"
+import {useForm} from "react-hook-form"
+import {DoubleSliderBarChart} from "./ui/slider-double"
+import {ScrollArea} from "./ui/scroll-area"
+import {Button} from "./ui/button"
 import MultipleSelector from "./ui/multiple-selector"
 import {ASSOCIATED_CATEGORIES, BUSINESS_TYPES, CRO_CERTIFICATIONS} from "@/lib/types"
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
+import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
 import {defaultFilters, CROSearchState, useCROSearchStore} from "@/state/search/croSearchStore";
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
-import { useEffect } from "react"
-import { Info } from "lucide-react"
+import {useEffect} from "react"
+import {Info} from "lucide-react"
+import {useQueryState} from "nuqs"
+
 
 const selector = (state: CROSearchState) => ({
     filters: state.filters,
@@ -41,7 +45,29 @@ const filtersFormSchema = z.object({
 })
 
 export function CROFilters() {
-    const { filters, allResults, setFilters } = useCROSearchStore(useShallow(selector))
+    const {filters, allResults, setFilters} = useCROSearchStore(useShallow(selector))
+    // For URL sync
+    const [queryCategories, setQueryCategories] = useQueryState("categories", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    const [queryTypes, setQueryTypes] = useQueryState("types", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    const [queryCertifications, setQueryCertifications] = useQueryState("certifications", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    // Utility: Convert query string -> {label, value}[]
+    const parseQuery = (str: string | null) =>
+        str?.split(",").filter(Boolean).map((value) => ({label: value, value})) || []
     const form = useForm<z.infer<typeof filtersFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(filtersFormSchema),
@@ -50,6 +76,12 @@ export function CROFilters() {
 
     const handleSubmit = async (values: z.infer<typeof filtersFormSchema>) => {
         setFilters(values)
+
+        const stringify = (arr: { value: string }[]) => arr.map(x => x.value).join(",")
+
+        await setQueryCategories(values.categories.length ? stringify(values.categories) : null)
+        await setQueryTypes(values.types.length ? stringify(values.types) : null)
+        await setQueryCertifications(values.certifications.length ? stringify(values.certifications) : null)
     }
 
     useEffect(() => {
@@ -57,93 +89,73 @@ export function CROFilters() {
         return () => subscription.unsubscribe()
     }, [handleSubmit, form.watch])
 
+    useEffect(() => {
+        const parsedFilters = {
+            categories: parseQuery(queryCategories),
+            types: parseQuery(queryTypes),
+            certifications: parseQuery(queryCertifications),
+        }
+
+        setFilters(parsedFilters)
+        form.reset(parsedFilters)
+
+        // Force search on hydration
+        form.handleSubmit(handleSubmit)()
+    }, [])
+
     return (
         <Form {...form}>
             <ScrollArea className="w-full h-full">
-            <form
-                onSubmit={form.handleSubmit(handleSubmit)}
-                className="flex flex-col gap-8 px-1"
-            >
-                <h1 className={"scroll-m-20 text-2xl font-semibold tracking-tight"}>
-                    Filters
-                </h1>
+                <form
+                    onSubmit={form.handleSubmit(handleSubmit)}
+                    className="flex flex-col gap-8 px-1"
+                >
+                    <h1 className={"scroll-m-20 text-2xl font-semibold tracking-tight"}>
+                        Filters
+                    </h1>
 
-                <FormField
-                    control={form.control}
-                    name="categories"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
-                                Service categories
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <Info className="h-4 w-4" />
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                        {`The service categories provided by the CRO.`}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </FormLabel>
-                            <FormControl>
-                                <MultipleSelector
-                                    {...field}
-                                    defaultOptions={ASSOCIATED_CATEGORIES}
-                                    hidePlaceholderWhenSelected={true}
-                                    placeholder="Select associated categories..."
-                                    emptyIndicator={
-                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
-                                    }
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+                    <FormField
+                        control={form.control}
+                        name="categories"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                    Service categories
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Info className="h-4 w-4"/>
+                                        </TooltipTrigger>
+                                        <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                            {`The service categories provided by the CRO.`}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </FormLabel>
+                                <FormControl>
+                                    <MultipleSelector
+                                        {...field}
+                                        defaultOptions={ASSOCIATED_CATEGORIES}
+                                        hidePlaceholderWhenSelected={true}
+                                        placeholder="Select associated categories..."
+                                        emptyIndicator={
+                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                no results found.
+                                            </p>
+                                        }
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                <FormField
-                    control={form.control}
-                    name="types"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
-                                Business types
-                                {/* <Tooltip>
-                                    <TooltipTrigger>
-                                        <Info className="h-4 w-4" />
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                        {`The service categories provided by the CRO.`}
-                                    </TooltipContent>
-                                </Tooltip> */}
-                            </FormLabel>
-                            <FormControl>
-                                <MultipleSelector
-                                    {...field}
-                                    defaultOptions={BUSINESS_TYPES}
-                                    hidePlaceholderWhenSelected={true}
-                                    placeholder="Select associated categories..."
-                                    emptyIndicator={
-                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
-                                    }
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                <FormField
-                    control={form.control}
-                    name="certifications"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
-                                Certifications
-                                {/* <Tooltip>
+                    <FormField
+                        control={form.control}
+                        name="types"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                    Business types
+                                    {/* <Tooltip>
                                     <TooltipTrigger>
                                         <Info className="h-4 w-4" />
                                     </TooltipTrigger>
@@ -151,32 +163,66 @@ export function CROFilters() {
                                         {`The service categories provided by the CRO.`}
                                     </TooltipContent>
                                 </Tooltip> */}
-                            </FormLabel>
-                            <FormControl>
-                                <MultipleSelector
-                                    {...field}
-                                    defaultOptions={CRO_CERTIFICATIONS}
-                                    hidePlaceholderWhenSelected={true}
-                                    placeholder="Select associated categories..."
-                                    emptyIndicator={
-                                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
-                                            no results found.
-                                        </p>
-                                    }
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
+                                </FormLabel>
+                                <FormControl>
+                                    <MultipleSelector
+                                        {...field}
+                                        defaultOptions={BUSINESS_TYPES}
+                                        hidePlaceholderWhenSelected={true}
+                                        placeholder="Select associated categories..."
+                                        emptyIndicator={
+                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                no results found.
+                                            </p>
+                                        }
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
 
-                <span className="flex justify-end gap-4 flex-wrap">
+                    <FormField
+                        control={form.control}
+                        name="certifications"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
+                                    Certifications
+                                    {/* <Tooltip>
+                                    <TooltipTrigger>
+                                        <Info className="h-4 w-4" />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
+                                        {`The service categories provided by the CRO.`}
+                                    </TooltipContent>
+                                </Tooltip> */}
+                                </FormLabel>
+                                <FormControl>
+                                    <MultipleSelector
+                                        {...field}
+                                        defaultOptions={CRO_CERTIFICATIONS}
+                                        hidePlaceholderWhenSelected={true}
+                                        placeholder="Select associated categories..."
+                                        emptyIndicator={
+                                            <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
+                                                no results found.
+                                            </p>
+                                        }
+                                    />
+                                </FormControl>
+                                <FormMessage/>
+                            </FormItem>
+                        )}
+                    />
+
+                    <span className="flex justify-end gap-4 flex-wrap">
                     <Button type="submit" variant="secondary" onClick={() => {
                         setFilters(defaultFilters)
                         form.reset(defaultFilters)
                     }}>Clear All Filters</Button>
                 </span>
-            </form>
+                </form>
             </ScrollArea>
         </Form>
     )
