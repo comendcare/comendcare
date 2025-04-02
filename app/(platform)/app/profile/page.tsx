@@ -236,10 +236,6 @@ export default async function ProfilePage() {
                                             isPrivate={true}
                                             assets={assets}
                                             rfps={rfps}
-                                            // assets={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "ASSET")}
-                                            // rfps={(roadmaps?.[0]?.milestones || []).filter((milestone) => milestone?.nodeType === "RFP")}
-                                            // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
-                                            // rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                                         />
                                         <RoadmapCard
                                             roadmap={roadmaps[0]}
