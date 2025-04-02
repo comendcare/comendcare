@@ -63,20 +63,6 @@ const data = {
                 }
             ]
         },
-        // {
-        //     title: "Assets",
-        //     icon: Star,
-        //     variant: "ghost",
-        //     url: `/app/assets`,
-        //     subPages: []
-        // },
-        // {
-        //     title: "RFPs",
-        //     icon: Megaphone,
-        //     variant: "ghost",
-        //     url: `/app/rfps`,
-        //     subPages: []
-        // },
         {
             title: "Organization Profile",
             icon: User,

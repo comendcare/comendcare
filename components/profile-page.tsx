@@ -152,10 +152,6 @@ export function ProfilePageClient({organization, conditions, roadmaps, assets, r
                                     isPrivate={true}
                                     assets={assets}
                                     rfps={rfps}
-                                    // assets={(roadmaps?.[0]?.milestones || []).filter((milestone: any) => milestone?.nodeType === "ASSET")}
-                                    // rfps={(roadmaps?.[0]?.milestones || []).filter((milestone: any) => milestone?.nodeType === "RFP")}
-                                    // assets={roadmaps[0]?.milestones?.filter(milestone => milestone.asset).map(milestone => milestone.asset) || []}
-                                    // rfps={roadmaps[0]?.milestones?.filter(milestone => milestone.RFP).map(milestone => milestone.RFP) || []}
                                 />
                                 <RoadmapCard
                                     roadmap={roadmaps[0]}

@@ -308,13 +308,11 @@ export function EditMilestoneForm({
 
                 const assetsResponse = await getAssets(session.user.organizationId)
                 if (assetsResponse.success && assetsResponse.data) {
-                    // setFetchedAssets((assetsResponse.data || []).map(asset => ({label: asset.title, value: asset.id})))
                     setFetchedAssets(assetsResponse.data || [])
                 }
 
                 const rfpsResponse = await getRFPs(session.user.organizationId)
                 if (rfpsResponse.success && rfpsResponse.data) {
-                    // setFetchedRFPs((rfpsResponse.data || []).map(rfp => ({label: rfp.title, value: rfp.id})))
                     setFetchedRFPs(rfpsResponse.data || [])
                 }
             }
