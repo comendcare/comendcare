@@ -235,7 +235,7 @@ export function EditAssetForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    console.log(`fetched milestones`, fetchedMilestones)
+    console.log(`fetched projects`, fetchedMilestones)
 
     return (
         <Form {...form}>

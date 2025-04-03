@@ -395,7 +395,7 @@ export function Roadmap() {
                                                 duration: 6000,
                                                 description: `Missing fields in import file: A title is required for each project. Edit the Project to add title.`
                                             })
-                                            console.error("Error: imported milestones are missing required fields", result.errors)
+                                            console.error("Error: imported projects are missing required fields", result.errors)
                                         }
 
                                         addMilestones(result.values.map(milestone => {
@@ -475,19 +475,19 @@ const MilestoneDetailsPanel = ({
 const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val: boolean) => void}) => {
     return (
         <div className="h-full w-full flex flex-col justify-center items-center gap-4">
-            <h1 className="font-cal text-4xl">You do not have any milestones</h1>
+            <h1 className="font-cal text-4xl">You do not have any projects</h1>
             <Image
-                alt="missing milestones"
+                alt="No projects"
                 src="https://illustrations.popsy.co/gray/graphic-design.svg"
                 width={400}
                 height={400}
             />
             <p className="text-lg text-stone-500">
-                You do not have any milestones yet. Create one to get started.
+                You do not have any projects yet. Create one to get started.
             </p>
             <Button variant={"cta"} onClick={() => setNewMilestoneIsOpen(true)}>
                 <Plus />
-                Create milestone
+                Create a project
             </Button>
         </div>
     )

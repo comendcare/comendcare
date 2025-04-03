@@ -397,7 +397,7 @@ export const CROReviewCard = ({review, cro}: { review: ReviewWithAuthor, cro: Co
                                                             <SelectGroup>
                                                                 {fetchedMilestones.length === 0 ?
                                                                     <SelectLabel>
-                                                                        {`You don't have any in progress or completed milestones.`}
+                                                                        {`You don't have any in progress or completed projects.`}
                                                                     </SelectLabel>
                                                                     : fetchedMilestones.map((m: Milestone, index: number) => (
                                                                         <SelectItem value={m.id} key={index}>
