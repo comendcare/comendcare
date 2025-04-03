@@ -105,10 +105,10 @@ export const columns: ColumnDef<Asset>[] = [
         enableHiding: true,
         meta: { name: "Links" }
     },
-    {
-        id: "actions",
-        cell: ({ row }) => <DataTableRowActions row={row} />,
-        enableHiding: false,
-        meta: { name: "Actions" }
-    },
+    // {
+    //     id: "actions",
+    //     cell: ({ row }) => <DataTableRowActions row={row} />,
+    //     enableHiding: false,
+    //     meta: { name: "Actions" }
+    // },
 ]

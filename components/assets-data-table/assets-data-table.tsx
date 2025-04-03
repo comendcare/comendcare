@@ -19,6 +19,9 @@ import {
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
+import { EditAssetForm } from "../edit-asset-form"
+import { Asset } from "@/lib/types"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -85,19 +88,35 @@ export function AssetsDataTable<TData, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
+                                <Dialog>
+                                    <DialogTrigger asChild className="cursor-pointer">
+                                        <TableRow
+                                            key={row.id}
+                                            data-state={row.getIsSelected() && "selected"}
+                                        >
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext()
+                                                    )}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    </DialogTrigger>
+                        
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                Edit an Asset
+                                            </DialogTitle>
+                                            <DialogDescription>
+                                                {`Edit your Asset here. Click save when you're done.`}
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <EditAssetForm assetData={{...row.original} as Partial<Asset>} />
+                                    </DialogContent>
+                                </Dialog>
                             ))
                         ) : (
                             <TableRow>

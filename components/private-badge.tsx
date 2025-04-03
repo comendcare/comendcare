@@ -11,8 +11,7 @@ export function PrivateBadge({ iconOnly = false, className = "" }: { iconOnly?: 
                 </TooltipTrigger>
                 <TooltipContent className="max-w-80 text-wrap text-left">
                     <p className={cn(className, "text-normal")}>
-                        {/* {`Only visible to your team`} */}
-                        {`Private milestones are only visible to your team.`}
+                        {`Only visible to your team`}
                     </p>
                 </TooltipContent>
             </Tooltip>
