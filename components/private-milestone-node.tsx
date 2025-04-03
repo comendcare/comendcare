@@ -313,7 +313,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                     {(props.data?.contacts || []).map((contact, index) => {
                         if (contact.affiliation) {
                             return (
-                                <li key={index} className="flex gap-2 items-center">
+                                <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
                                     <User className="h-4 w-4"/>
                                     <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
                                 </li>
@@ -322,18 +322,18 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                     })}
 
                     {(props?.data?.startDate || props?.data?.endDate) && (
-                        <li>
+                        <li className="border-l-2 border-gray-300 pl-2">
                             <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
                         </li>
                     )}
                     {(props.data?.assets || []).map((asset, index) => (
-                        <li key={index} className="flex gap-2 items-center">
+                        <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
                             <Star className="h-4 w-4" />
                             <p>{asset.asset?.title}</p>
                         </li>
                     ))}
                     {(props.data?.rfps || []).map((rfp, index) => (
-                        <li key={index} className="flex gap-2 items-center">
+                        <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
                             <Megaphone className="h-4 w-4" />
                             <p>{rfp.rfp?.title}</p>
                         </li>
