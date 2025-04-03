@@ -392,8 +392,8 @@ export function Roadmap() {
                                         if (result.errors.length > 0) {
                                             toast('Warning!', {
                                                 position: "bottom-left",
-                                                duration: 4000,
-                                                description: `Missing fields in import file: A title is required for each project. Please ensure all projects have titles before importing.`
+                                                duration: 6000,
+                                                description: `Missing fields in import file: A title is required for each project. Edit the Project to add title.`
                                             })
                                             console.error("Error: imported milestones are missing required fields", result.errors)
                                         }
@@ -411,7 +411,7 @@ export function Roadmap() {
                                     } catch (e) {
                                         toast('Error!', {
                                             position: "bottom-left",
-                                            duration: 4000,
+                                            duration: 6000,
                                             description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
                                         })
                                         console.error("Error: failed to import assets", e)
