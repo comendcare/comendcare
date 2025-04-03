@@ -102,7 +102,7 @@ const NewRFPDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button>
+                <Button variant={"cta"}>
                     <Plus />
                     {!iconOnly && `Create an RFP`}
                 </Button>
