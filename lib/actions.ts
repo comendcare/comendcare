@@ -11,7 +11,7 @@ import {
     Condition,
     TaskStakeholder, Invitation,
     PlatformNotification,
-    Review, OrganizationToCompanyEngagement,
+    Review
 } from "@prisma/client"
 import {revalidatePath, revalidateTag} from "next/cache"
 import {withOrganizationAttributeAuth, withOrganizationAuth, withRoadmapAuth} from "./auth"
@@ -3207,7 +3207,7 @@ export async function deleteReview(review: Review) {
     }
 }
 
-export async function saveCRO(croId: string, milestoneId: string, engagement: string) {
+export async function saveCRO(croId: string, milestoneId: string) {
     const session = await getSession()
 
     try {
@@ -3228,7 +3228,7 @@ export async function saveCRO(croId: string, milestoneId: string, engagement: st
                         id: milestoneId
                     }
                 },
-                engagement: engagement as OrganizationToCompanyEngagement
+                // engagement: engagement as OrganizationToCompanyEngagement
             }
         });
 
@@ -3244,7 +3244,7 @@ export async function saveCRO(croId: string, milestoneId: string, engagement: st
     }
 }
 
-export async function editSavedCRO(savedCROId: string, milestoneId: string, engagement: string) {
+export async function editSavedCRO(savedCROId: string, milestoneId: string) {
     const session = await getSession()
 
     try {
@@ -3258,7 +3258,7 @@ export async function editSavedCRO(savedCROId: string, milestoneId: string, enga
                         id: milestoneId
                     }
                 },
-                engagement: engagement as OrganizationToCompanyEngagement
+                // engagement: engagement as OrganizationToCompanyEngagement
             }
         });
 

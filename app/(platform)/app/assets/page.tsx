@@ -10,6 +10,7 @@ import { EditAssetForm } from "@/components/edit-asset-form";
 import { AssetBulkImportDialog } from "@/components/asset-bulk-import-dialog";
 import { AssetsDataTable } from "@/components/assets-data-table/assets-data-table";
 import { columns } from "@/components/assets-data-table/assets-data-columns";
+import Image from "next/image";
 
 export default async function AssetsPage() {
     const session = await getSession()
@@ -42,29 +43,28 @@ export default async function AssetsPage() {
         return (
             <main className="flex gap-4 flex-col w-full max-w-7xl my-4 h-full items-center mx-auto">
                 <div className="flex gap-2 w-full justify-end">
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button>
-                                <Plus />
-                                Add an asset
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>
-                                    Create an Asset
-                                </DialogTitle>
-                                <DialogDescription>
-                                    {`Create your Asset here. Click save when you're done.`}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <EditAssetForm assetData={{}} />
-                        </DialogContent>
-                    </Dialog>
-
+                    <NewAssetDialog />
                     <AssetBulkImportDialog />
                 </div>
-                <AssetsDataTable data={assets} columns={columns}/>
+
+                {assets.length <= 0 && (
+                    <div className="h-full w-full flex flex-col justify-center items-center gap-4">
+                        <h1 className="font-cal text-4xl">You do not have any Assets</h1>
+                        <Image
+                            alt="No Assets"
+                            src="https://illustrations.popsy.co/gray/graphic-design.svg"
+                            width={400}
+                            height={400}
+                        />
+                        <p className="text-lg text-stone-500">
+                            You do not have any Assets yet. Create one to get started.
+                        </p>
+                        <NewAssetDialog />
+                    </div>
+                )}
+                {assets.length > 0 && (
+                    <AssetsDataTable data={assets} columns={columns}/>
+                )}
             </main>
         )
     } else {
@@ -72,4 +72,28 @@ export default async function AssetsPage() {
             <NoOrganization/>
         );
     }
+}
+
+const NewAssetDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant={"cta"}>
+                    <Plus />
+                    {!iconOnly && `Create an asset`}
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>
+                        Create an Asset
+                    </DialogTitle>
+                    <DialogDescription>
+                        {`Create your Asset here. Click save when you're done.`}
+                    </DialogDescription>
+                </DialogHeader>
+                <EditAssetForm assetData={{}} />
+            </DialogContent>
+        </Dialog>
+    )
 }

@@ -80,7 +80,6 @@ export function CROMarketplaceCard({cro}: { cro: Company }) {
             <CROCardContents cro={cro}/>
         </Card>
     )
-        ;
 }
 
 export function CROCardHeaderContents({cro}: { cro: Company }) {

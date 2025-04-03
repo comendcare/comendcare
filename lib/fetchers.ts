@@ -101,7 +101,7 @@ export async function getCROData(id: string) {
     })
 }
 
-export async function getAssetsForOrganization(domain: string) {
+export async function getPublicAssetsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
@@ -110,7 +110,8 @@ export async function getAssetsForOrganization(domain: string) {
         where: {
             organization: {
                 subdomain: subdomain
-            }
+            },
+            private: {equals: false}
         },
         include: {
             contacts: true,
@@ -125,7 +126,7 @@ export async function getAssetsForOrganization(domain: string) {
     return assets
 }
 
-export async function getRFPsForOrganization(domain: string) {
+export async function getPublicRFPsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
@@ -134,7 +135,8 @@ export async function getRFPsForOrganization(domain: string) {
         where: {
             organization: {
                 subdomain: subdomain
-            }
+            },
+            private: {equals: false}
         },
         include: {
             contacts: true,
