@@ -1,5 +1,5 @@
+import { getPublicRoadmapsForOrganization } from "@/lib/fetchers"
 import { headers } from "next/headers"
-import { getRoadmapsForOrganization } from "@/lib/fetchers"
 
 export default async function Sitemap() {
     const headersList = headers()
@@ -11,7 +11,7 @@ export default async function Sitemap() {
                 `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
             ) ?? "vercel.pub"
 
-    const posts = await getRoadmapsForOrganization(domain)
+    const posts = await getPublicRoadmapsForOrganization(domain)
 
     return [
         {

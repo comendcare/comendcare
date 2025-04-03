@@ -140,7 +140,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
     }
 }
 
-const AssetDetails = ({asset}: {asset: any}) => {
+export const AssetDetails = ({asset}: {asset: any}) => {
     return (
         <>
             <DialogHeader>
@@ -188,7 +188,7 @@ const AssetDetails = ({asset}: {asset: any}) => {
     )
 }
 
-const RFPDetails = ({rfp}: {rfp: any}) => {
+export const RFPDetails = ({rfp}: {rfp: any}) => {
     return (
         <>
             <DialogHeader>

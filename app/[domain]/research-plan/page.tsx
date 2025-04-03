@@ -1,6 +1,6 @@
 import {notFound} from "next/navigation"
 import prisma from "@/lib/prisma"
-import {getOrganizationData, getRoadmapsForOrganization} from "@/lib/fetchers"
+import {getOrganizationData, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
 import {formatMoney, standardizeYear} from "@/lib/utils"
 import Image from "next/image"
 import PAGPublicRoadmapBreadcrumb from "@/components/pag-public-roadmap-breadcrumb";
@@ -149,7 +149,7 @@ export default async function OrganizationRoadmapPage({
     // const data = await getRoadmapData(domain, slug)
     const [organization, roadmaps] = await Promise.all([
         getOrganizationData(domain),
-        getRoadmapsForOrganization(domain),
+        getPublicRoadmapsForOrganization(domain),
     ])
 
     if (!organization) {

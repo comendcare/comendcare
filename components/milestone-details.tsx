@@ -18,6 +18,18 @@ import {Button} from "./ui/button"
 import { TypeBadge } from "./type-badge"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
 import { ExternalLink } from "lucide-react"
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog"
+import { RFPCard } from "./rfp-card"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { PrivateBadge } from "./private-badge"
+import { AssetDetails, RFPDetails } from "./pag-profile-assets-and-projects-hoverable-card"
 
 export function MilestoneDetails({milestone}: { milestone: any }) {
     return (
@@ -45,27 +57,6 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
             <CardContent className="flex flex-col gap-4">
                 <DateView startDate={milestone.startDate} endDate={milestone.endDate}/>
                 <BudgetView budget={milestone.budget}/>
-
-                {/* {(milestone?.asset || milestone?.RFP) && (
-                    <>
-                        <Separator/>
-                        <div className="grid grid-cols-2 gap-4">
-                            {milestone.asset && (
-                                <div className="flex flex-col gap-4">
-                                    <h2 className="font-semibold text-xl">{`Assets`}</h2>
-                                    <AssetDetails asset={milestone.asset}/>
-                                </div>
-                            )}
-
-                            {milestone.RFP && (
-                                <div className="flex flex-col gap-4">
-                                    <h2 className="font-semibold text-xl">{`Projects`}</h2>
-                                    <RFPDetails rfp={milestone.RFP}/>
-                                </div>
-                            )}
-                        </div>
-                    </>
-                )} */}
 
                 <span className="w-full flex gap-2 flex-wrap text-wrap">
                     {milestone.status &&
@@ -98,6 +89,73 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                                 </Link>
                             ))}
                         </ol>
+                    </div>
+                )}
+
+                {milestone.rfps && milestone.rfps.length > 0 && (
+                    <div className="flex flex-col gap-4">
+                        <Separator/>
+                        <h2 className="font-semibold text-xl">{`Requests for Proposals`}</h2>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            {milestone.rfps?.map((rfp: any) => rfp.rfp)?.map((rfp: any, index: number) => (
+                                <Dialog>
+                                    <DialogTrigger>
+                                        <RFPCard rfp={rfp} />
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <RFPDetails rfp={rfp} />
+                                    </DialogContent>
+                                </Dialog>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {milestone.assets && milestone.assets.length > 0 && (
+                    <div className="flex flex-col gap-4">
+                        <Separator/>
+                        <h2 className="font-semibold text-xl">{`Assets`}</h2>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                <TableHead>Title</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead>Contacts</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {milestone.assets?.map((asset: any) => asset.asset)?.map((asset: any) => (
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <TableRow key={asset.id} className="cursor-pointer">
+                                                <TableCell>
+                                                    <div>
+                                                        {asset.title} {asset.private && <PrivateBadge iconOnly={true} />}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="line-clamp-3">
+                                                        {asset.description}
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <ul className="flex flex-col gap-2">
+                                                        {asset.contacts?.map((contact: any, index: number) => (
+                                                            <li key={index}>
+                                                                {contact.name || contact.email || contact.affiliation}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </TableCell>
+                                            </TableRow>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <AssetDetails asset={asset} />
+                                        </DialogContent>
+                                    </Dialog>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </div>
                 )}
             </CardContent>

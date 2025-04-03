@@ -151,7 +151,7 @@ export async function getPublicRFPsForOrganization(domain: string) {
     return rfps
 }
 
-export async function getRoadmapsForOrganization(domain: string) {
+export async function getPublicRoadmapsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
@@ -183,8 +183,8 @@ export async function getRoadmapsForOrganization(domain: string) {
                             contacts: true,
                             attachments: true,
                             types: { include: { milestoneType: true } },
-                            assets: { include: { asset: true } },
-                            rfps: { include: { rfp: true } }
+                            assets: { include: { asset: true }, where: { asset: {private: {equals: false}}} },
+                            rfps: { include: { rfp: true }, where: { rfp: {private: {equals: false}}} }
                         }
                     }
                 },
@@ -202,8 +202,8 @@ export async function getRoadmapsForOrganization(domain: string) {
                     contacts: true,
                     attachments: true,
                     types: { include: { milestoneType: true } },
-                    assets: { include: { asset: true } },
-                    rfps: { include: { rfp: true } }
+                    assets: { include: { asset: true }, where: { asset: {private: {equals: false}}} },
+                    rfps: { include: { rfp: true }, where: { rfp: {private: {equals: false}}} }
                 }
             },
         },
@@ -860,7 +860,7 @@ export async function getMilestoneTypes() {
 }
 
 
-export async function getMilestoneDetails(id: string) {
+export async function getPublicMilestoneDetails(id: string) {
     try {
         const milestone = await prisma.milestone.findUnique({
             where: {id},
@@ -869,8 +869,8 @@ export async function getMilestoneDetails(id: string) {
                 contacts: true,
                 attachments: true,
                 types: { include: { milestoneType: true } },
-                assets: { include: { asset: true } },
-                rfps: { include: { rfp: true } }
+                assets: { include: { asset: true }, where: { asset: {private: {equals: false}}} },
+                rfps: { include: { rfp: true }, where: { rfp: {private: {equals: false}}} }
             }
         })
 

@@ -32,7 +32,8 @@ import {PublicMilestoneNode} from "./public-milestone-node"
 import { TypeBadge } from "./type-badge"
 import { MilestoneType } from "@prisma/client"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
-import { CircleDollarSign, Ellipsis, ExternalLink, Plus, Trash, User } from "lucide-react"
+import { CircleDollarSign, Ellipsis, ExternalLink, Megaphone, Plus, Star, Trash, User } from "lucide-react"
+import { Asset as DBAsset, RFP as DBRFP } from "@prisma/client"
 
 export type PrivateMilestoneNode = Node<
     {
@@ -57,7 +58,17 @@ export type PrivateMilestoneNode = Node<
         handleDuplicate: (nodeId: string) => void,
         onboardingMilestone: boolean,
         private: boolean,
-        contacts: any[]
+        contacts: any[],
+        assets: Array<{
+                asset?: DBAsset,
+                milestoneId?: string,
+                assetId: string
+            }>,
+        rfps: Array<{
+                rfp?: DBRFP,
+                milestoneId?: string,
+                rfpId: string,
+            }>
     },
     "PROJECT" | "ASSET" | "RFP"
 >
@@ -315,6 +326,18 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                             <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
                         </li>
                     )}
+                    {(props.data?.assets || []).map((asset, index) => (
+                        <li key={index} className="flex gap-2 items-center">
+                            <Star className="h-4 w-4" />
+                            <p>{asset.asset?.title}</p>
+                        </li>
+                    ))}
+                    {(props.data?.rfps || []).map((rfp, index) => (
+                        <li key={index} className="flex gap-2 items-center">
+                            <Megaphone className="h-4 w-4" />
+                            <p>{rfp.rfp?.title}</p>
+                        </li>
+                    ))}
                 </ul>
                 <span className="w-full flex gap-2 flex-wrap text-wrap">
                     <StatusButton
@@ -327,7 +350,7 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                     {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
                         <MilestoneTypeBadge key={index} label={milestoneType?.milestoneType?.label} />
                     ))}
-            </span>
+                </span>
             </>
 
         )

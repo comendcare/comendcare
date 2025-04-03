@@ -15,6 +15,7 @@ import { CardContents } from "./private-milestone-node"
 import { TypeBadge } from "./type-badge"
 import { MilestoneType } from "@prisma/client"
 import { ExternalLink } from "lucide-react"
+import { Asset as DBAsset, RFP as DBRFP } from "@prisma/client"
 
 export type PublicMilestoneNode = Node<
     {
@@ -40,7 +41,17 @@ export type PublicMilestoneNode = Node<
         externalLink: boolean,
         focused: boolean
         contacts: any[],
-        setUrlMilestone?: (id: string) => void | undefined
+        setUrlMilestone?: (id: string) => void | undefined,
+            assets: Array<{
+                    asset?: DBAsset,
+                    milestoneId?: string,
+                    assetId: string
+                }>,
+            rfps: Array<{
+                    rfp?: DBRFP,
+                    milestoneId?: string,
+                    rfpId: string,
+                }>
     },
     "PROJECT" | "ASSET" | "RFP"
 >
