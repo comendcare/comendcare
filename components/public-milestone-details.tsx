@@ -21,16 +21,21 @@ export function PublicMilestoneDetails({roadmap, urlMilestone}: {roadmap: any, u
     const [milestone, setMilestone] = useState<any>()
 
     useEffect(() => {
-        if (urlMilestone) {
-            getPublicMilestoneDetails(urlMilestone).then(response => {
-                if (response.success) {
-                    setMilestone(response.data)
-                } else {
-                    console.error(response.error)
-                    toast.error(response.error)
-                }
-            })
+        const init = async () => {
+            if (urlMilestone) {
+                await getPublicMilestoneDetails(urlMilestone).then(response => {
+                    if (response.success) {
+                        console.log(`fetched milestone`, response.data)
+                        setMilestone(response.data)
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+                })
+            }
         }
+
+        init()
     }, [urlMilestone])
 
     if (milestone) {
