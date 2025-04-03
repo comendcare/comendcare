@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Company, OrganizationToCompanyEngagement, Milestone, SavedCompany } from "@prisma/client";
+import { Company, Milestone, SavedCompany } from "@prisma/client";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
     Dialog,
