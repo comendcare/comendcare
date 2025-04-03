@@ -7,6 +7,7 @@ import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
 import {ApiResponse} from "@/lib/types";
 import {logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
+import { equal } from "assert"
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
@@ -869,8 +870,60 @@ export async function getPublicMilestoneDetails(id: string) {
                 contacts: true,
                 attachments: true,
                 types: { include: { milestoneType: true } },
-                assets: { include: { asset: true }, where: { asset: {private: {equals: false}}} },
-                rfps: { include: { rfp: true }, where: { rfp: {private: {equals: false}}} }
+                assets: { 
+                    include: { 
+                        asset: {
+                            include: { 
+                                milestones: {
+                                    include: {
+                                        milestone: true
+                                    },
+                                    where: {
+                                        milestone: {
+                                            private: {
+                                                equals: false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }, 
+                    }, 
+                    where: { 
+                        asset: {
+                            private: {
+                                equals: false
+                            }
+                        }
+                    } 
+                },
+                rfps: { 
+                    include: { 
+                        rfp: {
+                            include: {
+                                milestones: {
+                                    include: {
+                                        milestone: true
+                                    },
+                                    where: {
+                                        milestone: {
+                                            private: {
+                                                equals: false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }, 
+                    }, 
+                    where: { 
+                        rfp: {
+                            private: {
+                                equals: false
+                            }
+                        }
+                    } 
+                }
             }
         })
 
