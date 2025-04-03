@@ -49,6 +49,11 @@ export type FiltersType = {
         value: string,
         disable?: boolean,
     }[],
+    milestoneTypes: {
+        label: string,
+        value: string,
+        disable?: boolean,
+    }[],
     types: {
         label: string,
         value: string,
@@ -69,6 +74,7 @@ export type FiltersType = {
 
 export const defaultFilters = {
     categories: [],
+    milestoneTypes: [],
     types: [],
     certifications: [],
     // moneyDeployed: [0, 10000000],
@@ -91,6 +97,14 @@ function generateFiltersString(filters: FiltersType): string {
             .map(category => `categories:=[${escapeValue(category.value)}]`)
             .join(" && ");
         filtersList.push(`(${categoryFilter})`);
+    }
+
+    // Milestone Types (Array Field)
+    if (filters?.milestoneTypes && filters.milestoneTypes.length > 0) {
+        const milestoneTypeFilter = filters.milestoneTypes
+            .map(milestoneType => `milestoneTypes:=[${escapeValue(milestoneType.value)}]`)
+            .join(" && ");
+        filtersList.push(`(${milestoneTypeFilter})`);
     }
 
     // Company Types (Single String Field)
@@ -162,7 +176,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
 
         const searchParameters = {
             q: state.searchTerm,
-            query_by: "title",
+            query_by: "title,description",
             per_page: 10,
             page: state.lastFetchedPage,
             ...(filtersString ? { filter_by: filtersString } : undefined),
