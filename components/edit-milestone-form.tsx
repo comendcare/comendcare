@@ -799,7 +799,12 @@ export function EditMilestoneForm({
                                     </>
                                 )}
 
-                                <Link href={`/app/marketplace/cro?milestone=${milestoneData.id}&expanded=true`}>
+                                {/*<Link href={`/app/marketplace/cro?milestone=${milestoneData.id}&expanded=true`}>*/}
+                                <Link
+                                    href={`/app/marketplace/cro?milestoneTypes=${(formData?.types || [])
+                                        .map((t: any) => t?.value || t?.id)
+                                        .join(",")}`}
+                                >
                                     <Button className="pl-0" variant={"link"}>
                                         <Store />
                                         Explore Marketplace
