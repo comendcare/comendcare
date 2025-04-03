@@ -46,7 +46,7 @@ import {useRouter} from "next/navigation";
 import {StarRatingSelector} from "@/components/star-rating-selector";
 import {getMilestones} from "@/lib/fetchers";
 import {useSession} from "next-auth/react";
-import { Link2Off, PencilLine } from "lucide-react";
+import {Link2Off, PencilLine} from "lucide-react";
 
 export const reviewForm = z.object({
     title: z
@@ -86,10 +86,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
         const fetchData = async () => {
             const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined)
             if (milestonesResponse.success) {
-                const filteredMilestones = milestonesResponse?.data?.filter(
-                    item => (item.status === "INPROGRESS" || item.status === "COMPLETED") && !item.private
-                )
-                setFetchedMilestones(filteredMilestones as Milestone[])
+                setFetchedMilestones(milestonesResponse?.data as Milestone[])
             } else {
                 console.error(milestonesResponse.error)
             }
@@ -137,19 +134,19 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                                 className="w-fit"
                                 disabled
                             >
-                                <PencilLine />
+                                <PencilLine/>
                                 Write a Review
                             </Button>
                         </HoverCardTrigger>
                         <HoverCardContent>
-                            To leave a review you must have a research plan with in progress or completed projects.
+                            To leave a review you must have a research plan.
                         </HoverCardContent>
                     </HoverCard>
                     : <Button
                         variant="cta"
                         className="w-fit"
                     >
-                        <PencilLine />
+                        <PencilLine/>
                         Write a Review
                     </Button>
                 }
@@ -224,15 +221,13 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                                             </FormControl>
                                             <SelectContent>
                                                 <SelectGroup>
-                                                    {fetchedMilestones.length === 0 ?
-                                                        <SelectLabel>
-                                                            {`You don't have any in progress or completed projects.`}
-                                                        </SelectLabel>
-                                                        : fetchedMilestones.map((m: Milestone, index: number) => (
+                                                    {
+                                                        fetchedMilestones.map((m: Milestone, index: number) => (
                                                             <SelectItem value={m.id} key={index}>
                                                                 {m.title}
                                                             </SelectItem>
-                                                        ))}
+                                                        ))
+                                                    }
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
@@ -246,7 +241,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                                             }}
                                             disabled={!field.value}
                                         >
-                                            <Link2Off />
+                                            <Link2Off/>
                                         </Button>
                                     </div>
                                 </FormItem>
