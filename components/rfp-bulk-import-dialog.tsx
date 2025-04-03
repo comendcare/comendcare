@@ -47,7 +47,7 @@ export function RFPBulkImportDialog() {
                 toast('Error!', {
                     position: "bottom-left",
                     duration: 4000,
-                    description: `Import failed. Please try again. If the problem continues, contact us at support@comendcare.com`
+                    description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
                 })
                 console.error("Error: failed to import assets", e)
             }
