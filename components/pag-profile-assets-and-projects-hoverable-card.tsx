@@ -23,9 +23,10 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { Building, FileText, GraduationCap, Link, User } from "lucide-react";
+import { Building, FileText, GraduationCap, Link as LinkIcon, User } from "lucide-react";
 import { DateView } from "./miletone-date-view";
 import { PrivateBadge } from "./private-badge";
+import Link from "next/link";
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }: { assets: any[], rfps: any[], isPrivate: boolean }) => {
     if (assets && rfps) {
@@ -37,93 +38,97 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                             <TabsTrigger value="rfps">Requests for Proposals</TabsTrigger>
                             <TabsTrigger value="assets">Assets</TabsTrigger>
                         </TabsList>
-                        <TabsContent value="rfps" className="mx-8">
+                        <TabsContent value="rfps">
                             {rfps.length > 0 && (
-                                <Carousel className="w-full" opts={{loop: true}}>
-                                    <CarouselContent>
-                                        {rfps.map((rfp, index) => (
-                                            <CarouselItem key={index} className="lg:basis-1/2">
-                                                <Dialog>
-                                                    <DialogTrigger>
-                                                        <RFPCard rfp={rfp} />
-                                                    </DialogTrigger>
-                                                    <DialogContent>
-                                                        <RFPDetails rfp={rfp} />
-                                                    </DialogContent>
-                                                </Dialog>
-                                            </CarouselItem>
-                                        ))}
-                                    </CarouselContent>
-                                    <CarouselPrevious />
-                                    <CarouselNext />
-                                </Carousel>
+                                <div className="w-full px-8">
+                                    <Carousel className="w-full" opts={{loop: true}}>
+                                        <CarouselContent>
+                                            {rfps.map((rfp, index) => (
+                                                <CarouselItem key={index} className="lg:basis-1/2">
+                                                    <Dialog>
+                                                        <DialogTrigger>
+                                                            <RFPCard rfp={rfp} />
+                                                        </DialogTrigger>
+                                                        <DialogContent>
+                                                            <RFPDetails rfp={rfp} />
+                                                        </DialogContent>
+                                                    </Dialog>
+                                                </CarouselItem>
+                                            ))}
+                                        </CarouselContent>
+                                        <CarouselPrevious />
+                                        <CarouselNext />
+                                    </Carousel>
+                                </div>
                             )}
                             {rfps.length <= 0 && (
                                 <p>{`No RFPs (Requests for Proposals) to show`}</p>
                             )}
                         </TabsContent>
                         <TabsContent value="assets">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                    <TableHead>Title</TableHead>
-                                    <TableHead>Description</TableHead>
-                                    {/* <TableHead>Linked Projects</TableHead> */}
-                                    <TableHead>Contacts</TableHead>
-                                    <TableHead>Links</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {assets.map((asset) => (
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <TableRow key={asset.id} className="cursor-pointer">
-                                                    <TableCell>
-                                                        <div>
-                                                            {asset.title} {asset.private && <PrivateBadge iconOnly={true} />}
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <div className="line-clamp-3">
-                                                            {asset.description}
-                                                        </div>
-                                                    </TableCell>
-                                                    {/* <TableCell>
-                                                        <ul className="flex flex-col gap-2">
-                                                            {asset.milestones.map((milestone: any, index: number) => (
-                                                                <li key={index} className="line-clamp-2">
-                                                                    {milestone.milestone?.title || undefined}
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </TableCell> */}
-                                                    <TableCell>
-                                                        <ul className="flex flex-col gap-2">
-                                                            {asset.contacts.map((contact: any, index: number) => (
-                                                                <li key={index}>
-                                                                    {contact.name || contact.email || contact.affiliation}
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <ul className="flex flex-col gap-2">
-                                                            {asset.attachments.map((attachment: any, index: number) => (
-                                                                <li key={index} className="line-clamp-2">
-                                                                    {attachment.name || attachment.link}
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </TableCell>
-                                                </TableRow>
-                                            </DialogTrigger>
-                                            <DialogContent>
-                                                <AssetDetails asset={asset} />
-                                            </DialogContent>
-                                        </Dialog>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                            {assets.length > 0 && (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                        <TableHead>Title</TableHead>
+                                        <TableHead>Description</TableHead>
+                                        {/* <TableHead>Linked Projects</TableHead> */}
+                                        <TableHead>Contacts</TableHead>
+                                        {/* <TableHead>Links</TableHead> */}
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {assets.map((asset) => (
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <TableRow key={asset.id} className="cursor-pointer">
+                                                        <TableCell>
+                                                            <div>
+                                                                {asset.title} {asset.private && <PrivateBadge iconOnly={true} />}
+                                                            </div>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <div className="line-clamp-3">
+                                                                {asset.description}
+                                                            </div>
+                                                        </TableCell>
+                                                        {/* <TableCell>
+                                                            <ul className="flex flex-col gap-2">
+                                                                {asset.milestones.map((milestone: any, index: number) => (
+                                                                    <li key={index} className="line-clamp-2">
+                                                                        {milestone.milestone?.title || undefined}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </TableCell> */}
+                                                        <TableCell>
+                                                            <ul className="flex flex-col gap-2">
+                                                                {asset.contacts.map((contact: any, index: number) => (
+                                                                    <li key={index}>
+                                                                        {contact.name || contact.email || contact.affiliation}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </TableCell>
+                                                        {/* <TableCell>
+                                                            <ul className="flex flex-col gap-2">
+                                                                {asset.attachments.map((attachment: any, index: number) => (
+                                                                    <li key={index} className="line-clamp-2">
+                                                                        {attachment.name || attachment.link}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </TableCell> */}
+                                                    </TableRow>
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                    <AssetDetails asset={asset} />
+                                                </DialogContent>
+                                            </Dialog>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
                             {assets.length <= 0 && (
                                 <p>{`No assets to show`}</p>
                             )}
@@ -148,7 +153,7 @@ const AssetDetails = ({asset}: {asset: any}) => {
                     return (
                         <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
                             <FileText className="h-4 w-4"/>
-                            <p className="w-[90%] text-wrap break-words">{milestone.milestone.title}</p>
+                            <p className="text-wrap break-words">{milestone.milestone.title}</p>
                         </li>
                     )
                 })}
@@ -157,7 +162,7 @@ const AssetDetails = ({asset}: {asset: any}) => {
                     return (
                         <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
                             <User className="h-4 w-4"/>
-                            <p className="w-[90%] text-wrap break-words">
+                            <p className="text-wrap break-words">
                                 {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
                             </p>
                         </li>
@@ -167,8 +172,14 @@ const AssetDetails = ({asset}: {asset: any}) => {
                 {(asset.attachments || []).map((attachment: any, index: number) => {
                     return (
                         <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                            <Link className="h-4 w-4"/>
-                            <a className="w-[90%] text-wrap break-words" href={attachment.link || "#"}>{attachment.name || attachment.link}</a>
+                            <LinkIcon className="h-4 w-4"/>
+                            <Link 
+                                target="_blank" 
+                                className="text-wrap break-words underline" 
+                                href={attachment.link || "#"}
+                            >
+                                {attachment.name || attachment.link}
+                            </Link>
                         </li>
                     )
                 })}
@@ -190,14 +201,20 @@ const RFPDetails = ({rfp}: {rfp: any}) => {
                     return (
                         <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
                             <FileText className="h-4 w-4"/>
-                            <p className="w-[90%] text-wrap break-words">{milestone.milestone.title}</p>
+                            <p className="text-wrap break-words">{milestone.milestone.title}</p>
                         </li>
                     )
                 })}
 
                 {(rfp.startDate || rfp.endDate) && (
                     <li className="border-l-2 border-gray-300 pl-2">
-                        <DateView startDate={rfp.startDate || undefined} endDate={rfp.endDate || undefined} startLabel="Request Opens:" endLabel="Deadline for Proposals:"/>
+                        <DateView 
+                            specific={true} 
+                            startDate={rfp.startDate || undefined} 
+                            endDate={rfp.endDate || undefined} 
+                            startLabel="Request Opens:" 
+                            endLabel="Deadline for Proposals:"
+                        />
                     </li>
                 )}
 
@@ -205,7 +222,7 @@ const RFPDetails = ({rfp}: {rfp: any}) => {
                     return (
                         <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
                             <User className="h-4 w-4"/>
-                            <p className="w-[90%] text-wrap break-words">
+                            <p className="text-wrap break-words">
                                 {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
                             </p>
                         </li>
@@ -215,8 +232,14 @@ const RFPDetails = ({rfp}: {rfp: any}) => {
                 {(rfp.attachments || []).map((attachment: any, index: number) => {
                     return (
                         <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                            <Link className="h-4 w-4"/>
-                            <a className="w-[90%] text-wrap break-words" href={attachment.link || "#"}>{attachment.name || attachment.link}</a>
+                            <LinkIcon className="h-4 w-4"/>
+                            <Link 
+                                target="_blank" 
+                                className="text-wrap break-words underline" 
+                                href={attachment.link || "#"}
+                            >
+                                {attachment.name || attachment.link}
+                            </Link>
                         </li>
                     )
                 })}

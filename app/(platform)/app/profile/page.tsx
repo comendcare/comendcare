@@ -4,7 +4,7 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {getSession} from "@/lib/auth";
 import Link from "next/link";
 import prisma from "@/lib/prisma"
-import {getAssetsForOrganization, getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
