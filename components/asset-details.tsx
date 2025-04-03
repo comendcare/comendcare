@@ -28,7 +28,7 @@ type MilestoneType = Prisma.MilestoneGetPayload<{
     }
 }>
 
-export function AssetDetails({ asset, isPublic }: { asset: MilestoneType, isPublic: boolean }) {
+export function AssetDetails({ asset, isPublic }: { asset: MilestoneType, isPublic?: boolean }) {
     return (
         <HoverCard
             key={asset?.id}
