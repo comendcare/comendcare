@@ -118,7 +118,8 @@ export async function getPublicAssetsForOrganization(domain: string) {
             contacts: true,
             attachments: true,
             milestones: {
-                include: {milestone: true}
+                include: {milestone: true},
+                where: {milestone: {private: {equals: false}}}
             }
         },
         orderBy: [{createdAt: "desc"}]
@@ -143,7 +144,8 @@ export async function getPublicRFPsForOrganization(domain: string) {
             contacts: true,
             attachments: true,
             milestones: {
-                include: {milestone: true}
+                include: {milestone: true},
+                where: {milestone: {private: {equals: false}}}
             }
         },
         orderBy: [{createdAt: "desc"}]
@@ -184,8 +186,60 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                             contacts: true,
                             attachments: true,
                             types: { include: { milestoneType: true } },
-                            assets: { include: { asset: true }, where: { asset: {private: {equals: false}}} },
-                            rfps: { include: { rfp: true }, where: { rfp: {private: {equals: false}}} }
+                            assets: { 
+                                include: { 
+                                    asset: {
+                                        include: { 
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {
+                                                        private: {
+                                                            equals: false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }, 
+                                }, 
+                                where: { 
+                                    asset: {
+                                        private: {
+                                            equals: false
+                                        }
+                                    }
+                                } 
+                            },
+                            rfps: { 
+                                include: { 
+                                    rfp: {
+                                        include: {
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {
+                                                        private: {
+                                                            equals: false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }, 
+                                }, 
+                                where: { 
+                                    rfp: {
+                                        private: {
+                                            equals: false
+                                        }
+                                    }
+                                } 
+                            }
                         }
                     }
                 },
@@ -203,8 +257,60 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                     contacts: true,
                     attachments: true,
                     types: { include: { milestoneType: true } },
-                    assets: { include: { asset: true }, where: { asset: {private: {equals: false}}} },
-                    rfps: { include: { rfp: true }, where: { rfp: {private: {equals: false}}} }
+                    assets: { 
+                        include: { 
+                            asset: {
+                                include: { 
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {
+                                                private: {
+                                                    equals: false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }, 
+                        }, 
+                        where: { 
+                            asset: {
+                                private: {
+                                    equals: false
+                                }
+                            }
+                        } 
+                    },
+                    rfps: { 
+                        include: { 
+                            rfp: {
+                                include: {
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {
+                                                private: {
+                                                    equals: false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }, 
+                        }, 
+                        where: { 
+                            rfp: {
+                                private: {
+                                    equals: false
+                                }
+                            }
+                        } 
+                    }
                 }
             },
         },
