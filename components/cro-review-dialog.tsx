@@ -142,7 +142,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                             </Button>
                         </HoverCardTrigger>
                         <HoverCardContent>
-                            To leave a review you must have a research plan with in progress or completed milestones.
+                            To leave a review you must have a research plan with in progress or completed projects.
                         </HoverCardContent>
                     </HoverCard>
                     : <Button
@@ -226,7 +226,7 @@ export default function CROReviewDialog({cro}: { cro: Company }) {
                                                 <SelectGroup>
                                                     {fetchedMilestones.length === 0 ?
                                                         <SelectLabel>
-                                                            {`You don't have any in progress or completed milestones.`}
+                                                            {`You don't have any in progress or completed projects.`}
                                                         </SelectLabel>
                                                         : fetchedMilestones.map((m: Milestone, index: number) => (
                                                             <SelectItem value={m.id} key={index}>
