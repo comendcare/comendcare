@@ -25,7 +25,13 @@ export const RFPCard = ({rfp}: {rfp: any}) => {
 
                     {(rfp.startDate || rfp.endDate) && (
                         <li className="border-l-2 border-gray-300 pl-2">
-                            <DateView startDate={rfp.startDate || undefined} endDate={rfp.endDate || undefined} startLabel="Request Opens:" endLabel="Deadline for Proposals:"/>
+                            <DateView 
+                                specific={true} 
+                                startDate={rfp.startDate || undefined} 
+                                endDate={rfp.endDate || undefined} 
+                                startLabel="Request Opens:" 
+                                endLabel="Deadline for Proposals:"
+                            />
                         </li>
                     )}
 
