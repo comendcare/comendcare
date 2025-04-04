@@ -157,7 +157,7 @@ export function CROCardContents({cro}: { cro: Company }) {
                 <CardContent className="flex flex-col items-start justify-center">
                     <div className="grid w-full gap-2 grid-cols-1 sm:grid-cols-2">
                         {categoryLabels
-                            .filter(({key}) => categoryCounts[key] > 0)
+                            // .filter(({key}) => categoryCounts[key] > 0)
                             .map(({key, icon: Icon, label}, index) => {
                                 const count = categoryCounts[key];
                                 const isReview = key === "reviews";
@@ -168,11 +168,15 @@ export function CROCardContents({cro}: { cro: Company }) {
                                     >
                                         <Icon className="size-4" />
                                         {isReview ? (
-                                            <div className="text-xs flex items-center gap-x-1">
-                                                {cro.avgRating != null
-                                                    ? `${Number(cro.avgRating % 1 === 0 ? cro.avgRating : cro.avgRating.toFixed(1))} (${count} ${count === 1 ? 'review' : 'reviews'})`
-                                                    : 'N/A'}
-                                            </div>
+                                            count > 0 ? (
+                                                <div className="text-xs flex items-center gap-x-1">
+                                                    {cro.avgRating != null
+                                                        ? `${Number(cro.avgRating % 1 === 0 ? cro.avgRating : cro.avgRating.toFixed(1))} (${count} ${count === 1 ? 'review' : 'reviews'})`
+                                                        : 'N/A'}
+                                                </div>
+                                            ) : (
+                                                <div className="text-xs">No reviews yet</div>
+                                            )
                                         ) : (
                                             <div className="flex flex-row text-xs">
                                                 {label}:&nbsp;
