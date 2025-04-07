@@ -27,7 +27,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "./ui/dialog"
-import { ExternalLink, Import, Info, Plus, Redo2, Undo2 } from "lucide-react"
+import { ExternalLink, Import, Info, Plus, Redo2, Undo2, Wand2, WandSparkles } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import Papa from "papaparse"
 import { toast } from "sonner"
@@ -38,6 +38,7 @@ import { Milestone, NodeType } from "@/lib/types"
 import Loading from "@/app/loading"
 import { MilestoneType } from "@prisma/client"
 import { useSession } from "next-auth/react"
+import { useOnborda } from "./onborda/OnbordaContext"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -84,9 +85,6 @@ export function Roadmap() {
             if (response.success && response.data) {
                 setMilestoneTypes(response.data || [])
             }
-
-            await sleep(300)
-            if (milestones.length <= 0 && initialized) setNewMilestoneIsOpen(true)
 
             if (session?.user.organizationId) {
                 let orgData = await getOrganizationFromOrganizationId(session.user.organizationId)
@@ -201,10 +199,20 @@ export function Roadmap() {
 
                             {selectedView === "timeline" || selectedView === null && (
                                 <div className="flex flex-row gap-4 items-center">
-                                    <p>Sort by:</p>
                                     <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
                                         <SelectTrigger className="w-[180px]">
-                                            <SelectValue defaultValue={'default'} placeholder={"Sort by"}/>
+                                            <SelectValue defaultValue={'custom'} placeholder={"Sort by"}>
+                                                {(() => {
+                                                    switch(sortBy) {
+                                                        case "start":
+                                                            return "Sort by: Start Date"
+                                                        case "end":
+                                                            return "Sort by: End Date"
+                                                        default:
+                                                            return "Sort by: Custom"
+                                                    }
+                                                })()}
+                                            </SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="custom">{`Custom`}</SelectItem>
@@ -347,7 +355,7 @@ export function Roadmap() {
                         <ResizablePanel
                             defaultSize={40}
                             minSize={25}
-                            className="bg-white h-full flex flex-col"
+                            className="bg-white h-full flex flex-col min-w-[400px]"
                         >
                             <MilestoneDetailsPanel
                                 remountKey={milestoneRemountKey}
@@ -473,22 +481,40 @@ const MilestoneDetailsPanel = ({
 }
 
 const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val: boolean) => void}) => {
+    const pathname = usePathname()
+    const { setSelectedNodeId } = useRoadmapStore(useShallow(selector))
+    const { startOnborda } = useOnborda()
+
     return (
         <div className="h-full w-full flex flex-col justify-center items-center gap-4">
             <h1 className="font-cal text-4xl">You do not have any projects</h1>
             <Image
                 alt="No projects"
                 src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                width={400}
-                height={400}
+                width={300}
+                height={300}
             />
             <p className="text-lg text-stone-500">
                 You do not have any projects yet. Create one to get started.
             </p>
+            <span className="flex gap-4">
+            <Button 
+                variant={"secondary"}
+                onClick={() => {
+                    if (pathname.includes('app/research-plan')) {
+                        setSelectedNodeId(null)
+                        startOnborda('research-plan-tour')
+                    }
+                }}
+        >
+                <Wand2 aria-hidden={true} />
+                Take a tour
+            </Button>
             <Button variant={"cta"} onClick={() => setNewMilestoneIsOpen(true)}>
                 <Plus />
                 Create a project
             </Button>
+            </span>
         </div>
     )
 }

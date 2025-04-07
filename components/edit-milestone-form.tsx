@@ -124,7 +124,13 @@ const editMilestoneForm = z.object({
     assets: z.array(z.custom<Asset>()).optional(),
     rfps: z.array(z.custom<RFP>()).optional(),
     notes: z.array(z.record(z.any()))
-})
+}).refine(
+    (m) => m.startDate && m.endDate ? m.startDate?.getTime() <= m.endDate?.getTime() : true, 
+    {
+        message: "Error: Please adjust the dates so the start date comes before the end date.",
+        path: ["endDate"]
+    }
+)
 
 export function EditMilestoneForm({
     milestoneData,
@@ -188,6 +194,9 @@ export function EditMilestoneForm({
     }
 
     const handleMilestoneFormSubmit = async (values: z.infer<typeof editMilestoneForm>) => {
+        // if form state is not valid, don't submit
+        if (!form.formState.isValid) return
+        
         const {
             nodeType,
             title,
@@ -739,12 +748,13 @@ export function EditMilestoneForm({
                                     <Dialog>
                                         <DialogTrigger asChild>
                                             <Button type="button" variant="destructive">
-                                                Delete Milestone
+                                                Delete Project
                                             </Button>
                                         </DialogTrigger>
                                         <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
                                     </Dialog>
                                     <Button
+                                        disabled={!form.formState.isValid}
                                         id="edit-milestone-scroll-area"
                                         className="research-plan-tour-step4"
                                         onClick={() => {
@@ -997,11 +1007,12 @@ export const TimelineFormField = ({
 }) => {
     return (
         <>
-            <FormLabel>{startLabel ? startLabel : `Start`}</FormLabel>
             <FormField
                 control={form.control}
                 name="startDate"
                 render={({field}) => (
+                    <>
+                    <FormLabel>{startLabel ? startLabel : `Start`}</FormLabel>
                     <div className="flex gap-2 mt-2">
                         <Select
                             defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
@@ -1009,7 +1020,7 @@ export const TimelineFormField = ({
                                 const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
                                 const monthIndex = monthsList.indexOf(value)
                                 const newStartDate: Date = new Date(previousStartDate.setMonth(monthIndex))
-                                form.setValue('startDate', newStartDate)
+                                form.setValue('startDate', newStartDate, { shouldValidate: true })
                             }}
                         >
                             <FormControl>
@@ -1041,18 +1052,21 @@ export const TimelineFormField = ({
                             onChange={(event) => {
                                 const previousStartDate: Date = field.value ? new Date(field.value) : new Date()
                                 const newStartDate: Date = new Date(previousStartDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
-                                form.setValue('startDate', newStartDate)
+                                form.setValue('startDate', newStartDate, { shouldValidate: true })
                             }}
                         />
                     </div>
+                    </>
                 )}
             />
 
-            <FormLabel>{endLabel ? endLabel : `End`}</FormLabel>
             <FormField
                 control={form.control}
                 name="endDate"
                 render={({field}) => (
+                    <>
+                    <FormLabel>{endLabel ? endLabel : `End`}</FormLabel>
+                    <div className="flex flex-col gap-2">
                     <div className="flex gap-2 mt-2">
                         <Select
                             defaultValue={field.value ? monthsList[new Date(field.value).getMonth()] : undefined}
@@ -1060,7 +1074,7 @@ export const TimelineFormField = ({
                                 const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
                                 const monthIndex = monthsList.indexOf(value)
                                 const newEndDate: Date = new Date(previousEndDate.setMonth(monthIndex))
-                                form.setValue('endDate', newEndDate)
+                                form.setValue('endDate', newEndDate, { shouldValidate: true })
                             }}
                         >
                             <FormControl>
@@ -1092,13 +1106,15 @@ export const TimelineFormField = ({
                             onChange={(event) => {
                                 const previousEndDate: Date = field.value ? new Date(field.value) : new Date()
                                 const newEndDate: Date = new Date(previousEndDate.setFullYear(JSON.parse(event.target.value || new Date().getFullYear().toString())))
-                                form.setValue('endDate', newEndDate)
+                                form.setValue('endDate', newEndDate, { shouldValidate: true })
                             }}
                         />
                     </div>
+                    <FormMessage />
+                    </div>
+                    </>
                 )}
             />
-            <FormMessage/>
         </>
     )
 }

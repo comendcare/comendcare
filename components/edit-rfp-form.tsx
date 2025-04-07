@@ -39,7 +39,7 @@ import {
 } from "./ui/dialog"
 import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
 import {PrivateBadge} from "./private-badge"
-import {debounce} from "lodash"
+import {debounce, isEmpty} from "lodash"
 import {monthsList} from "@/lib/data";
 import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
 import {MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
@@ -94,7 +94,6 @@ export const optionSchema = z.object({
 });
 
 const editRFPForm = z.object({
-    nodeType: z.string(),
     title: z
         .string({
             required_error: "Please provide a title"
@@ -112,7 +111,13 @@ const editRFPForm = z.object({
     startDate: z.date().optional(),
     endDate: z.date().optional(),
     milestones: z.array(z.custom<Milestone>()).optional()
-})
+}).refine(
+    (rfp) => rfp.startDate && rfp.endDate ? rfp.startDate?.getTime() <= rfp.endDate?.getTime() : true, 
+    {
+        message: "Error: Please adjust the dates so the acceptance date comes before the deadline.",
+        path: ["endDate"]
+    }
+)
 
 export function EditRFPForm({
     rfpData,
@@ -142,7 +147,6 @@ export function EditRFPForm({
     })
 
     const formData = {
-        nodeType: form.watch("nodeType"),
         title: form.watch("title"),
         description: form.watch("description"),
         attachments: form.watch("attachments"),
@@ -372,14 +376,16 @@ export function EditRFPForm({
                                 </DialogHeader>
                             </DialogContent>
                         </Dialog>
-                        <Button
-                            onClick={() => {
-                                handleFormSubmit(form.getValues())
-                                // onClose()
-                            }}
-                        >
-                            Save Changes
-                        </Button>
+                        <DialogClose disabled={!form.formState.isValid}>
+                            <Button
+                                disabled={!form.formState.isValid}
+                                onClick={() => {
+                                    handleFormSubmit(form.getValues())
+                                }}
+                            >
+                                Save Changes
+                            </Button>
+                        </DialogClose>
                     </span>
                 </form>
             </ScrollArea>
@@ -454,6 +460,7 @@ const ProposalTimelineInput = ({form}: {form: any}) => {
                             />
                         </PopoverContent>
                     </Popover>
+                    <FormMessage />
                 </FormItem>
             )}
         />

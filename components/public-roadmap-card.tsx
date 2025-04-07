@@ -111,8 +111,8 @@ export const NoResearchPlanCard = ({isPublic}: {isPublic: Boolean}) => {
                     <Image
                         alt="missing roadmap"
                         src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                        width={400}
-                        height={400}
+                        width={300}
+                        height={300}
                     />
                     <p className="text-lg text-stone-500">
                         You do not have a research plan yet. Create one to get started.
