@@ -748,7 +748,7 @@ export function EditMilestoneForm({
                                     <Dialog>
                                         <DialogTrigger asChild>
                                             <Button type="button" variant="destructive">
-                                                Delete Milestone
+                                                Delete Project
                                             </Button>
                                         </DialogTrigger>
                                         <DeleteMilestoneDialogContent milestoneData={milestoneData}/>
