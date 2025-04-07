@@ -111,7 +111,13 @@ const editRFPForm = z.object({
     startDate: z.date().optional(),
     endDate: z.date().optional(),
     milestones: z.array(z.custom<Milestone>()).optional()
-})
+}).refine(
+    (rfp) => rfp.startDate && rfp.endDate ? rfp.startDate?.getTime() <= rfp.endDate?.getTime() : true, 
+    {
+        message: "Error: Please adjust the dates so the acceptance date comes before the deadline.",
+        path: ["endDate"]
+    }
+)
 
 export function EditRFPForm({
     rfpData,
@@ -454,6 +460,7 @@ const ProposalTimelineInput = ({form}: {form: any}) => {
                             />
                         </PopoverContent>
                     </Popover>
+                    <FormMessage />
                 </FormItem>
             )}
         />
