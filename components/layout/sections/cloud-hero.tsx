@@ -221,7 +221,7 @@ export const CloudHeroSection = () => {
                 >
                     <div
                         className="bg-white inline-flex flex-wrap items-center text-center rounded-full px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base leading-5 sm:leading-6 text-gray-500 ring-1 ring-gray-900/10 hover:ring-gray-900/20"
-                        aria-label="From the creators of Librarey and Scimantic"
+                        // aria-label="From the creators of Librarey and Scimantic"
                     >
                         <span>From the creators of</span>
                         <LinkPreview
@@ -237,20 +237,20 @@ export const CloudHeroSection = () => {
                             />
                             <span>Librarey</span>
                         </LinkPreview>
-                        <span>and</span>
-                        <LinkPreview
-                            url={"https://scimantic.com/"}
-                            className="hover:underline inline-flex items-center mx-1 sm:mx-2 gap-x-1"
-                            target="_blank"
-                            aria-label="Visit Scimantic website"
-                        >
-                            <Image
-                                src={scimanticLogo}
-                                alt="Scimantic logo"
-                                className="self-center w-5 sm:w-6 h-5 sm:h-6"
-                            />
-                            <span>Scimantic</span>
-                        </LinkPreview>
+                        {/*<span>and</span>*/}
+                        {/*<LinkPreview*/}
+                        {/*    url={"https://scimantic.com/"}*/}
+                        {/*    className="hover:underline inline-flex items-center mx-1 sm:mx-2 gap-x-1"*/}
+                        {/*    target="_blank"*/}
+                        {/*    aria-label="Visit Scimantic website"*/}
+                        {/*>*/}
+                        {/*    <Image*/}
+                        {/*        src={scimanticLogo}*/}
+                        {/*        alt="Scimantic logo"*/}
+                        {/*        className="self-center w-5 sm:w-6 h-5 sm:h-6"*/}
+                        {/*    />*/}
+                        {/*    <span>Scimantic</span>*/}
+                        {/*</LinkPreview>*/}
                     </div>
                 </motion.div>
 
