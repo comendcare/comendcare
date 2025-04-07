@@ -122,6 +122,8 @@ export function EditAssetForm({
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
 
+    console.log(`asset data`, assetData)
+
     const form = useForm<z.infer<typeof editAssetForm>>({
         mode: "onChange",
         resolver: zodResolver(editAssetForm),
@@ -129,7 +131,7 @@ export function EditAssetForm({
             title: assetData?.title || "",
             description: assetData?.description || "",
             attachments: assetData?.attachments || undefined,
-            isPrivate: assetData?.private || true,
+            isPrivate: assetData?.private !== undefined ? assetData?.private : true,
             contacts: assetData?.contacts || undefined,
             milestones: (assetData?.milestones || []).map((milestone: any) => milestone.milestone) || [],
         }
@@ -155,6 +157,8 @@ export function EditAssetForm({
             contacts,
             milestones,
         } = values;
+
+        console.log(`save`, values)
 
         const updateData: Partial<Asset> = {
             ...assetData,
