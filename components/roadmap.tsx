@@ -489,8 +489,8 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val:
             <Image
                 alt="No projects"
                 src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                width={400}
-                height={400}
+                width={300}
+                height={300}
             />
             <p className="text-lg text-stone-500">
                 You do not have any projects yet. Create one to get started.
