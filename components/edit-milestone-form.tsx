@@ -799,7 +799,12 @@ export function EditMilestoneForm({
                                     </>
                                 )}
 
-                                <Link href={`/app/marketplace/cro?milestone=${milestoneData.id}&expanded=true`}>
+                                {/*<Link href={`/app/marketplace/cro?milestone=${milestoneData.id}&expanded=true`}>*/}
+                                <Link
+                                    href={`/app/marketplace/cro?milestoneTypes=${(formData?.types || [])
+                                        .map((t: any) => t?.value || t?.id)
+                                        .join(",")}`}
+                                >
                                     <Button className="pl-0" variant={"link"}>
                                         <Store />
                                         Explore Marketplace
@@ -906,7 +911,7 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                                                 </TooltipTrigger>
                                                 {!disabled && (
                                                     <TooltipContent className="max-w-80 text-wrap text-left">
-                                                        {`Private milestones are only visible to your team.`}
+                                                        {`Private projects are only visible to your team.`}
                                                     </TooltipContent>
                                                 )}
                                             </Tooltip>
@@ -926,7 +931,7 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                                             </TooltipTrigger>
                                             {!disabled && (
                                                 <TooltipContent className="max-w-80 text-wrap text-left">
-                                                    {`Public milestones are visible on your profile and discoverable in the marketplace.`}
+                                                    {`Public projects are visible on your profile and discoverable in the marketplace.`}
                                                 </TooltipContent>
                                             )}
                                         </Tooltip>
@@ -937,7 +942,7 @@ export const PrivatePublicFormField = ({form, formData, disabled = false}: { for
                         </TooltipTrigger>
                         {disabled && (
                             <TooltipContent className="max-w-80 text-wrap text-left">
-                                {`Publish your organization to create public milestones.`}
+                                {`Publish your organization to create public projects.`}
                             </TooltipContent>
                         )}
                     </Tooltip>

@@ -680,16 +680,15 @@ model Gene {
 }
 
 model Company {
-  id                 String  @id @default(uuid())
-  url                String
-  scientistDotComURL String?
-  title              String
-  description        String?
-  yearEstablished    Int?
-  website            String?
-  headquarters       String?
-  companyType        String?
-
+  id                       String          @id @default(uuid())
+  url                      String
+  scientistDotComURL       String?
+  title                    String
+  description              String?
+  yearEstablished          Int?
+  website                  String?
+  headquarters             String?
+  companyType              String?
   sites                    Site[]
   services                 Service[]
   certifications           Certification[]
@@ -698,6 +697,7 @@ model Company {
   reviews                  Review[]
   avgRating                Float?          @default(0.0) // Stores the average rating of the company
   categories               String[]
+  milestoneTypes           String[]
   savedByOrganizations     SavedCompany[]
 }
 

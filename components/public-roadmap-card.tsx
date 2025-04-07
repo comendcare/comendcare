@@ -169,8 +169,8 @@ export const UnderDevelopmentCard = ({isPublic}: {isPublic: Boolean}) => {
                     />
                     <p className="text-lg text-stone-500">
                         {isPublic 
-                            ? "This research plan does not have any public milestones."
-                            : "Your research plan does not have any milestones."
+                            ? "This research plan does not have any public projects."
+                            : "Your research plan does not have any projects."
                         }
                     </p>
                     {!isPublic && (

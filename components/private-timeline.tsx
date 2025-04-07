@@ -30,7 +30,7 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {CircleDollarSign, GripVertical, User} from "lucide-react"
+import {CircleDollarSign, GripVertical, Megaphone, Star, User} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
@@ -324,13 +324,25 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                 {(milestoneData?.contacts || []).map((contact, index) => {
                     if (contact.affiliation) {
                         return (
-                            <li key={index} className="flex gap-2 items-center">
+                            <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
                                 <User className="h-4 w-4"/>
                                 <p>{contact.affiliation}</p>
                             </li>
                         )
                     }
                 })}
+                {(milestoneData?.assets || []).map((asset, index) => (
+                    <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
+                        <Star className="h-4 w-4" />
+                        <p>{asset.asset?.title}</p>
+                    </li>
+                ))}
+                {(milestoneData?.rfps || []).map((rfp, index) => (
+                    <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
+                        <Megaphone className="h-4 w-4" />
+                        <p>{rfp.rfp?.title}</p>
+                    </li>
+                ))}
             </ul>
         )
     // }

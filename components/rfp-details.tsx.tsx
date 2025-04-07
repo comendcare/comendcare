@@ -37,7 +37,7 @@ const Details = ({ rfp }: { rfp: MilestoneType }) => {
     )
 }
 
-export function RFPDetails({ rfp, isPublic }: { rfp: MilestoneType, isPublic: boolean }) {
+export function RFPDetails({ rfp, isPublic }: { rfp: MilestoneType, isPublic?: boolean }) {
     return (
         <HoverCard
             key={rfp?.id}
