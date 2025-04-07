@@ -94,7 +94,6 @@ export const optionSchema = z.object({
 });
 
 const editAssetForm = z.object({
-    nodeType: z.string(),
     title: z
         .string({
             required_error: "Please provide a title"
@@ -138,7 +137,6 @@ export function EditAssetForm({
     })
 
     const formData = {
-        nodeType: form.watch("nodeType"),
         title: form.watch("title"),
         description: form.watch("description"),
         attachments: form.watch("attachments"),
@@ -360,14 +358,16 @@ export function EditAssetForm({
                                 </DialogHeader>
                             </DialogContent>
                         </Dialog>
-                        <Button
-                            onClick={() => {
-                                handleFormSubmit(form.getValues())
-                                // onClose()
-                            }}
-                        >
-                            Save Changes
-                        </Button>
+                        <DialogClose disabled={!form.formState.isValid}>
+                            <Button
+                                disabled={!form.formState.isValid}
+                                onClick={() => {
+                                    handleFormSubmit(form.getValues())
+                                }}
+                            >
+                                Save Changes
+                            </Button>
+                        </DialogClose>
                     </span>
                 </form>
             </ScrollArea>
