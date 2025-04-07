@@ -91,7 +91,7 @@ export const DonutChartCard = () => {
                                     >
                                         <Label
                                             className="font-semibold"
-                                            value={`${chartData.reduce((acc, item) => acc + item.value, 0)} milestones`}
+                                            value={`${chartData.reduce((acc, item) => acc + item.value, 0)} projects`}
                                             position="center"
                                         />
                                     </Pie>

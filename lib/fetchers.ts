@@ -7,6 +7,7 @@ import {replaceExamples, replaceTweets} from "@/lib/remark-plugins"
 import {ApiResponse} from "@/lib/types";
 import {logError} from "@/lib/utils";
 import {getSession} from "@/lib/auth";
+import { equal } from "assert"
 
 export async function getConditionData(slug: string): Promise<ApiResponse<any>> {
     try {
@@ -117,7 +118,8 @@ export async function getPublicAssetsForOrganization(domain: string) {
             contacts: true,
             attachments: true,
             milestones: {
-                include: {milestone: true}
+                include: {milestone: true},
+                where: {milestone: {private: {equals: false}}}
             }
         },
         orderBy: [{createdAt: "desc"}]
@@ -142,7 +144,8 @@ export async function getPublicRFPsForOrganization(domain: string) {
             contacts: true,
             attachments: true,
             milestones: {
-                include: {milestone: true}
+                include: {milestone: true},
+                where: {milestone: {private: {equals: false}}}
             }
         },
         orderBy: [{createdAt: "desc"}]
@@ -151,7 +154,7 @@ export async function getPublicRFPsForOrganization(domain: string) {
     return rfps
 }
 
-export async function getRoadmapsForOrganization(domain: string) {
+export async function getPublicRoadmapsForOrganization(domain: string) {
     const subdomain = domain.endsWith(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
         ? domain.replace(`.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`, "")
         : domain
@@ -183,8 +186,60 @@ export async function getRoadmapsForOrganization(domain: string) {
                             contacts: true,
                             attachments: true,
                             types: { include: { milestoneType: true } },
-                            assets: { include: { asset: true } },
-                            rfps: { include: { rfp: true } }
+                            assets: { 
+                                include: { 
+                                    asset: {
+                                        include: { 
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {
+                                                        private: {
+                                                            equals: false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }, 
+                                }, 
+                                where: { 
+                                    asset: {
+                                        private: {
+                                            equals: false
+                                        }
+                                    }
+                                } 
+                            },
+                            rfps: { 
+                                include: { 
+                                    rfp: {
+                                        include: {
+                                            milestones: {
+                                                include: {
+                                                    milestone: true
+                                                },
+                                                where: {
+                                                    milestone: {
+                                                        private: {
+                                                            equals: false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }, 
+                                }, 
+                                where: { 
+                                    rfp: {
+                                        private: {
+                                            equals: false
+                                        }
+                                    }
+                                } 
+                            }
                         }
                     }
                 },
@@ -202,8 +257,60 @@ export async function getRoadmapsForOrganization(domain: string) {
                     contacts: true,
                     attachments: true,
                     types: { include: { milestoneType: true } },
-                    assets: { include: { asset: true } },
-                    rfps: { include: { rfp: true } }
+                    assets: { 
+                        include: { 
+                            asset: {
+                                include: { 
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {
+                                                private: {
+                                                    equals: false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }, 
+                        }, 
+                        where: { 
+                            asset: {
+                                private: {
+                                    equals: false
+                                }
+                            }
+                        } 
+                    },
+                    rfps: { 
+                        include: { 
+                            rfp: {
+                                include: {
+                                    milestones: {
+                                        include: {
+                                            milestone: true
+                                        },
+                                        where: {
+                                            milestone: {
+                                                private: {
+                                                    equals: false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }, 
+                        }, 
+                        where: { 
+                            rfp: {
+                                private: {
+                                    equals: false
+                                }
+                            }
+                        } 
+                    }
                 }
             },
         },
@@ -860,7 +967,7 @@ export async function getMilestoneTypes() {
 }
 
 
-export async function getMilestoneDetails(id: string) {
+export async function getPublicMilestoneDetails(id: string) {
     try {
         const milestone = await prisma.milestone.findUnique({
             where: {id},
@@ -869,8 +976,60 @@ export async function getMilestoneDetails(id: string) {
                 contacts: true,
                 attachments: true,
                 types: { include: { milestoneType: true } },
-                assets: { include: { asset: true } },
-                rfps: { include: { rfp: true } }
+                assets: { 
+                    include: { 
+                        asset: {
+                            include: { 
+                                milestones: {
+                                    include: {
+                                        milestone: true
+                                    },
+                                    where: {
+                                        milestone: {
+                                            private: {
+                                                equals: false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }, 
+                    }, 
+                    where: { 
+                        asset: {
+                            private: {
+                                equals: false
+                            }
+                        }
+                    } 
+                },
+                rfps: { 
+                    include: { 
+                        rfp: {
+                            include: {
+                                milestones: {
+                                    include: {
+                                        milestone: true
+                                    },
+                                    where: {
+                                        milestone: {
+                                            private: {
+                                                equals: false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }, 
+                    }, 
+                    where: { 
+                        rfp: {
+                            private: {
+                                equals: false
+                            }
+                        }
+                    } 
+                }
             }
         })
 

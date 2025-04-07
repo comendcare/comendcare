@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma"
 import {notFound} from "next/navigation"
 import BlogCard from "@/components/blog-card"
-import {getRoadmapsForOrganization, getOrganizationData, getConditionsDataFromOrgId, getPublicRFPsForOrganization, getPublicAssetsForOrganization} from "@/lib/fetchers"
+import {getOrganizationData, getConditionsDataFromOrgId, getPublicRFPsForOrganization, getPublicAssetsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers"
 import PAGPublicProfileHeader from "@/components/pag-public-profile-header";
 import {RoadmapCard, UnderDevelopmentCard} from "@/components/public-roadmap-card";
 import {PAGProfileActivityCard} from "@/components/pag-profile-activity-card";
@@ -64,7 +64,7 @@ export default async function OrganizationHomePage({
     const domain = decodeURIComponent(params.domain)
     const [organization, roadmaps, assets, rfps] = await Promise.all([
         getOrganizationData(domain),
-        getRoadmapsForOrganization(domain),
+        getPublicRoadmapsForOrganization(domain),
         getPublicAssetsForOrganization(domain),
         getPublicRFPsForOrganization(domain)
     ])

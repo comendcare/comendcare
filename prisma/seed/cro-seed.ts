@@ -7,7 +7,7 @@ async function main() {
     console.log('Starting seed script...');
 
     // Load the JSON data
-    const companies = JSON.parse(await fs.readFile('data/cro_dataset_categorized_and_filtered.json', 'utf-8'));
+    const companies = JSON.parse(await fs.readFile('data/new_dataset.json', 'utf-8'));
 
     console.log(`Total records to process: ${companies.length}`);
 
@@ -66,6 +66,8 @@ async function main() {
                     simplifiedCertifications: company.simplifiedCertifications,
 
                     categories: company.categories,
+
+                    milestoneTypes: company.milestoneTypes,
 
                     avgRating: 0,
 

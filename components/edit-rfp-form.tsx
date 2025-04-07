@@ -132,7 +132,7 @@ export function EditRFPForm({
             title: rfpData?.title || "",
             description: rfpData?.description || "",
             attachments: rfpData?.attachments || undefined,
-            isPrivate: rfpData?.private || true,
+            isPrivate: rfpData?.private !== undefined ? rfpData?.private : true,
             contacts: rfpData?.contacts || undefined,
             openTo: rfpData?.openTo || [],
             startDate: rfpData?.startDate || undefined,

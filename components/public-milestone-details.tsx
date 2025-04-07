@@ -12,25 +12,30 @@ import {
     CardTitle
 } from "./ui/card"
 import { useSearchParams } from "next/navigation"
-import { getMilestoneDetails } from "@/lib/fetchers"
 import { toast } from "sonner"
 import { MilestoneDetails } from "./milestone-details"
+import { getPublicMilestoneDetails } from "@/lib/fetchers"
 
 export function PublicMilestoneDetails({roadmap, urlMilestone}: {roadmap: any, urlMilestone: string | null}) {
     const searchParams = useSearchParams()
     const [milestone, setMilestone] = useState<any>()
 
     useEffect(() => {
-        if (urlMilestone) {
-            getMilestoneDetails(urlMilestone).then(response => {
-                if (response.success) {
-                    setMilestone(response.data)
-                } else {
-                    console.error(response.error)
-                    toast.error(response.error)
-                }
-            })
+        const init = async () => {
+            if (urlMilestone) {
+                await getPublicMilestoneDetails(urlMilestone).then(response => {
+                    if (response.success) {
+                        console.log(`fetched milestone`, response.data)
+                        setMilestone(response.data)
+                    } else {
+                        console.error(response.error)
+                        toast.error(response.error)
+                    }
+                })
+            }
         }
+
+        init()
     }, [urlMilestone])
 
     if (milestone) {
