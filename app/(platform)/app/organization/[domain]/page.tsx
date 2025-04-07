@@ -137,8 +137,8 @@ export default async function OrganizationHomePage({
                                             <Image
                                                 alt="missing roadmap"
                                                 src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                                                width={400}
-                                                height={400}
+                                                width={300}
+                                                height={300}
                                             />
                                             <p className="text-lg text-stone-500">
                                                 {`${organization.name} doesn't have a roadmap yet.`}

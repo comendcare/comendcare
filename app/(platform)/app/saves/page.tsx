@@ -38,15 +38,15 @@ export default function SavesPage() {
                     <Image
                         alt="No saves"
                         src="https://illustrations.popsy.co/gray/digital-nomad.svg"
-                        width={400}
-                        height={400}
+                        width={300}
+                        height={300}
                         className="dark:hidden"
                     />
                     <Image
                         alt="No saves"
                         src="https://illustrations.popsy.co/white/digital-nomad.svg"
-                        width={400}
-                        height={400}
+                        width={300}
+                        height={300}
                         className="hidden dark:block"
                     />
                     <div className="flex flex-col justify-center items-center space-y-8">

@@ -209,7 +209,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                                         // }
                                         if (pathname.includes('app/research-plan')) {
                                             setSelectedNodeId(null)
-                                            startOnborda('research-plan-toru')
+                                            startOnborda('research-plan-tour')
                                         }
                                     }}>
                                     <Wand2 aria-hidden={true} />

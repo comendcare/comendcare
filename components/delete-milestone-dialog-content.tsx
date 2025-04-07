@@ -41,16 +41,18 @@ export function DeleteMilestoneDialogContent({
         await setSelectedNodeId(null)
         await deleteNode(milestoneData?.nodeId)
         toast(
-            <div className="relative p-2 flex flex-col">
-                <p className="font-semibold text-gray-900">
-                    {`Milestone Deleted`}
+            <div className="flex flex-col gap-2 w-full">
+                <span className="flex justify-between items-center">
+                    <p className="font-semibold text-gray-900">
+                        {`Project Deleted`}
+                    </p>
+                    <Button className="self-end" onClick={handleUndo}>Undo Delete</Button>
+                </span>
+                <p className="text-sm text-gray-500">
+                    {`Your project had been deleted successfully.`}
                 </p>
-                <p className="mt-1 text-sm text-gray-500">
-                    {`Your milestone had been deleted successfully.`}
-                </p>
-                <Button className="self-end mt-4" onClick={handleUndo}>Undo Delete</Button>
             </div>,
-            {position: "bottom-left"}
+            {position: "bottom-left", duration: 20000}
         )
     }
 
@@ -75,7 +77,7 @@ export function DeleteMilestoneDialogContent({
                             variant={"destructive"}
                             onClick={handleDeleteMilestone}
                         >
-                            Delete Milestone
+                            Delete Project
                         </Button>
                     </DialogClose>
                 </DialogFooter>
