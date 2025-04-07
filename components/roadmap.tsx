@@ -201,10 +201,20 @@ export function Roadmap() {
 
                             {selectedView === "timeline" || selectedView === null && (
                                 <div className="flex flex-row gap-4 items-center">
-                                    <p>Sort by:</p>
                                     <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
                                         <SelectTrigger className="w-[180px]">
-                                            <SelectValue defaultValue={'default'} placeholder={"Sort by"}/>
+                                            <SelectValue defaultValue={'custom'} placeholder={"Sort by"}>
+                                                {(() => {
+                                                    switch(sortBy) {
+                                                        case "start":
+                                                            return "Sort by: Start Date"
+                                                        case "end":
+                                                            return "Sort by: End Date"
+                                                        default:
+                                                            return "Sort by: Custom"
+                                                    }
+                                                })()}
+                                            </SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="custom">{`Custom`}</SelectItem>
