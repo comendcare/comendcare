@@ -336,6 +336,9 @@ export function EditMilestoneForm({
                 await setRecommendations([milestoneData as Milestone], { limit: 3 })
             }
 
+            // trigger a form validation, if the imported data is not valid, let the user know right away
+            form.trigger()
+
             initializing.current = false
         }
 
