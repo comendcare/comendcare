@@ -41,12 +41,12 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                         <TabsContent value="rfps">
                             {rfps.length > 0 && (
                                 <div className="w-full px-8">
-                                    <Carousel className="w-full" opts={{loop: true}}>
+                                    <Carousel className="w-full" opts={{loop: true, align: "start"}}>
                                         <CarouselContent>
                                             {rfps.map((rfp, index) => (
                                                 <CarouselItem key={index} className="lg:basis-1/2">
                                                     <Dialog>
-                                                        <DialogTrigger>
+                                                        <DialogTrigger className="w-full">
                                                             <RFPCard rfp={rfp} />
                                                         </DialogTrigger>
                                                         <DialogContent>
