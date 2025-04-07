@@ -347,7 +347,7 @@ export function Roadmap() {
                         <ResizablePanel
                             defaultSize={40}
                             minSize={25}
-                            className="bg-white h-full flex flex-col"
+                            className="bg-white h-full flex flex-col min-w-[400px]"
                         >
                             <MilestoneDetailsPanel
                                 remountKey={milestoneRemountKey}
