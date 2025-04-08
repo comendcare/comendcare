@@ -99,7 +99,7 @@ const editAssetForm = z.object({
             required_error: "Please provide a title"
         })
         .min(1, "Title is required")
-        .max(100, "Title must be less than 100 characters"),
+        .max(200, "Title must be less than 200 characters"),
     description: z
         .string()
         .max(1000, "Description must be less than 1000 characters")
@@ -227,6 +227,9 @@ export function EditAssetForm({
             } else {
                 console.error(milestonesResponse.error)
             }
+
+            // trigger a form validation if we're editing an asset, if the imported data is not valid, let the user know right away
+            if (Object.keys(assetData).length > 0) form.trigger()
 
             initializing.current = false
         }
