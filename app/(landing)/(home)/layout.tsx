@@ -9,7 +9,7 @@ export default async function LandingLayout({children}: AppLayoutProps) {
     const session = await getSession()
 
     if (session) {
-        redirect("/app/marketplace/cro")
+        redirect("/app/marketplace/service-providers")
     }
 
     return (

@@ -1,0 +1,66 @@
+"use client"
+
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
+import { ReactNode, useState } from "react";
+import { EditRFPForm } from "./edit-rfp-form";
+import { RFP } from "@/lib/types";
+
+export const NewRFPDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
+    const [isOpen, setIsOpen] = useState(false)
+
+    const closeDialog = () => {
+        setIsOpen(false)
+    }
+    
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <Button variant={"cta"}>
+                    <Plus />
+                    {!iconOnly && `Create an RFP`}
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>
+                        Create an RFP
+                    </DialogTitle>
+                    <DialogDescription>
+                        {`Create your RFP here. Click save when you're done.`}
+                    </DialogDescription>
+                </DialogHeader>
+                <EditRFPForm rfpData={{}} closeDialog={closeDialog}/>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+export const EditRFPDialog = ({children, data}: {children: ReactNode, data: Partial<RFP>}) => {
+    const [isOpen, setIsOpen] = useState(false)
+
+    const closeDialog = () => {
+        setIsOpen(false)
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild className="cursor-pointer">
+                {children}
+            </DialogTrigger>
+
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>
+                        Edit an RFP
+                    </DialogTitle>
+                    <DialogDescription>
+                        {`Edit your RFP here. Click save when you're done.`}
+                    </DialogDescription>
+                </DialogHeader>
+                <EditRFPForm rfpData={data} closeDialog={closeDialog}/>
+            </DialogContent>
+        </Dialog>
+    )
+}

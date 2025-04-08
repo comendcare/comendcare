@@ -15,6 +15,7 @@ import { DateView } from "@/components/miletone-date-view";
 import Image from "next/image"
 import { RFP } from "@/lib/types";
 import { RFPCard } from "@/components/rfp-card";
+import { EditRFPDialog, NewRFPDialog } from "@/components/edit-rfp-dialog";
 
 export default async function RFPsPage() {
     const session = await getSession()
@@ -40,7 +41,8 @@ export default async function RFPsPage() {
                         milestone: true
                     }
                 }
-            }
+            },
+            orderBy: [{ createdAt: "desc" }]
         })
 
         // Existing verified organization rendering logic
@@ -69,22 +71,9 @@ export default async function RFPsPage() {
                 {rfps.length > 0 && (
                     <div className={"w-full grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"}>
                         {rfps.map((rfp) => (
-                            <Dialog>
-                                <DialogTrigger>
-                                    <RFPCard rfp={rfp} />
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogHeader>
-                                        <DialogTitle>
-                                            Edit an RFP
-                                        </DialogTitle>
-                                        <DialogDescription>
-                                            {`Edit your RFP here. Click save when you're done.`}
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <EditRFPForm rfpData={rfp}/>
-                                </DialogContent>
-                            </Dialog>
+                            <EditRFPDialog data={rfp}>
+                                <RFPCard rfp={rfp} />
+                            </EditRFPDialog>
                         ))}
                     </div>
                 )}
@@ -96,28 +85,4 @@ export default async function RFPsPage() {
             <NoOrganization/>
         );
     }
-}
-
-const NewRFPDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant={"cta"}>
-                    <Plus />
-                    {!iconOnly && `Create an RFP`}
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>
-                        Create an RFP
-                    </DialogTitle>
-                    <DialogDescription>
-                        {`Create your RFP here. Click save when you're done.`}
-                    </DialogDescription>
-                </DialogHeader>
-                <EditRFPForm rfpData={{}}/>
-            </DialogContent>
-        </Dialog>
-    )
 }

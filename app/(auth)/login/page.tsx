@@ -14,7 +14,7 @@ export default function LoginPage() {
     useEffect(() => {
         if (session) {
             // Redirect to /app/marketplace/cro if the user is signed in
-            router.push("/app/marketplace/cro")
+            router.push("/app/marketplace/service-providers")
         }
     }, [session])
 
@@ -63,7 +63,7 @@ export default function LoginPage() {
                         }
                     >
                         <LoginForm
-                            callback="/app/marketplace/cro"
+                            callback="/app/marketplace/service-providers"
                         />
                     </Suspense>
                 </div>

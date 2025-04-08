@@ -3,14 +3,11 @@ import prisma from "@/lib/prisma"
 import {getOrganizationFromOrganizationId} from "@/lib/fetchers";
 import NoOrganization from "@/components/no-organization";
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
-import { EditAssetForm } from "@/components/edit-asset-form";
 import { AssetBulkImportDialog } from "@/components/asset-bulk-import-dialog";
 import { AssetsDataTable } from "@/components/assets-data-table/assets-data-table";
 import { columns } from "@/components/assets-data-table/assets-data-columns";
 import Image from "next/image";
+import { NewAssetDialog } from "@/components/edit-asset-dialog";
 
 export default async function AssetsPage() {
     const session = await getSession()
@@ -36,7 +33,8 @@ export default async function AssetsPage() {
                         milestone: true
                     }
                 }
-            }
+            },
+            orderBy: [{ createdAt: "desc" }]
         })
 
         // Existing verified organization rendering logic
@@ -72,28 +70,4 @@ export default async function AssetsPage() {
             <NoOrganization/>
         );
     }
-}
-
-const NewAssetDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant={"cta"}>
-                    <Plus />
-                    {!iconOnly && `Create an asset`}
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>
-                        Create an Asset
-                    </DialogTitle>
-                    <DialogDescription>
-                        {`Create your Asset here. Click save when you're done.`}
-                    </DialogDescription>
-                </DialogHeader>
-                <EditAssetForm assetData={{}} />
-            </DialogContent>
-        </Dialog>
-    )
 }

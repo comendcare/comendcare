@@ -29,7 +29,7 @@ const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
     //     errorMap: () => ({ message: "Select a valid engagement type" })
     // }),
-    milestoneId: z.string().min(1, "Please select a milestone"),
+    milestoneId: z.string().min(1, "Please select a project"),
 });
 
 type SaveCROFormData = z.infer<typeof formSchema>;
@@ -41,7 +41,7 @@ const engagementOptions = [
     { id: "COLLABORATED", label: "Previously Worked With" },
 ];
 
-export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card" | "page" }) {
+export default function SaveCRODialog({ cro, type, milestone }: { cro: Company, type: "card" | "page", milestone?: Milestone }) {
     const router = useRouter()
     const { data: session } = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,13 +52,16 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
 
     const form = useForm<SaveCROFormData>({
         resolver: zodResolver(formSchema),
+        defaultValues: {
+            milestoneId: milestone ? milestone.id : undefined
+        }
     });
 
     useEffect(() => {
         async function fetchData() {
             const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined);
             if (milestonesResponse.success) {
-                setFetchedMilestones(milestonesResponse.data as Milestone[]);
+                setFetchedMilestones(milestonesResponse.data as Milestone[])
             } else {
                 console.error(milestonesResponse.error);
             }
@@ -104,11 +107,11 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
             <DialogTrigger asChild>
                 {type === "page" ? (
                     <Button variant="secondary" className="w-fit">
-                        {isSaved ? <BookmarkCheck className="mr-2" /> : <Bookmark className="mr-2" />} Save CRO
+                        {isSaved ? <Bookmark fill="currentColor" className="mr-2" /> : <Bookmark className="mr-2" />} Save CRO
                     </Button>
                 ) : (
                     <Button variant="ghost" className="w-fit">
-                        {isSaved ? <BookmarkCheck /> : <Bookmark />}
+                        {isSaved ? <Bookmark fill="currentColor" /> : <Bookmark />}
                     </Button>
                 )}
             </DialogTrigger>
@@ -144,14 +147,14 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
                             name="milestoneId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Milestone</FormLabel>
+                                    <FormLabel>Project</FormLabel>
                                     <FormDescription>
-                                        For which milestone would you like to connect with this company?
+                                        For which project would you like to connect with this company?
                                     </FormDescription>
                                     <FormControl>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select a milestone" />
+                                                <SelectValue placeholder="Select a project" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {fetchedMilestones.map((milestone) => (

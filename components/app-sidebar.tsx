@@ -33,7 +33,7 @@ const data = {
             title: "Marketplace",
             icon: Store,
             variant: "ghost",
-            url: "/app/marketplace/cro",
+            url: "/app/marketplace/service-providers",
             subPages: [{
                 title: "Saves",
                 icon: Bookmark,

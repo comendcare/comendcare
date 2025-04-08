@@ -166,7 +166,7 @@ export const RFP_OPEN_TO_TYPE_OPTIONS: Option[] = [
     //     value: 'ALL',
     // },
     {
-        label: 'CROs',
+        label: 'Service Providers',
         value: 'CRO',
     },
     {
