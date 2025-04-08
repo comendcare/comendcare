@@ -56,7 +56,7 @@ export default function SavesPage() {
                         <PulsatingButton
                             className="bg-black"
                             pulseColor={"#9ca3af"}
-                            onClick={() => router.push("/app/marketplace/cro")}
+                            onClick={() => router.push("/app/marketplace/service-providers")}
                         >
                             Visit marketplace
                         </PulsatingButton>

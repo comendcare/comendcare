@@ -25,7 +25,7 @@ export default function FinancesOnboardingPage() {
                     <Separator/>
 
                     <FinancesOnboardingForm
-                        nextLink={"/app/marketplace/cro"}
+                        nextLink={"/app/marketplace/service-providers"}
                         previousLink={"/onboarding/research"}
                         showSkip={false}
                     />
