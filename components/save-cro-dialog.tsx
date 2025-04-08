@@ -104,11 +104,11 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
             <DialogTrigger asChild>
                 {type === "page" ? (
                     <Button variant="secondary" className="w-fit">
-                        {isSaved ? <BookmarkCheck className="mr-2" /> : <Bookmark className="mr-2" />} Save CRO
+                        {isSaved ? <Bookmark fill="currentColor" className="mr-2" /> : <Bookmark className="mr-2" />} Save CRO
                     </Button>
                 ) : (
                     <Button variant="ghost" className="w-fit">
-                        {isSaved ? <BookmarkCheck /> : <Bookmark />}
+                        {isSaved ? <Bookmark fill="currentColor" /> : <Bookmark />}
                     </Button>
                 )}
             </DialogTrigger>

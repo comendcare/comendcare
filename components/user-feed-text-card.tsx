@@ -69,7 +69,7 @@ export function UserFeedTextCard({content, blockquote}: UserFeedTextCardProps) {
 
                 {/*<div className="flex items-center space-x-1 rounded-md bg-secondary text-secondary-foreground">*/}
                 {/*    <Button variant="secondary" className="px-3 shadow-none">*/}
-                {/*        <BookmarkCheck className="mr-2 h-4 w-4"/>*/}
+                {/*        <Bookmark fill="currentColor" className="mr-2 h-4 w-4"/>*/}
                 {/*        Save*/}
                 {/*    </Button>*/}
                 {/*    <Separator orientation="vertical" className="h-[20px]"/>*/}
