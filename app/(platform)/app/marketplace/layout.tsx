@@ -100,7 +100,7 @@ const FiltersPanel = () => {
 
     if (pathname.endsWith('/milestones')) {
         return <MilestoneFilters/>
-    } else if (pathname.endsWith('/cro')){
+    } else if (pathname.endsWith('/service-providers')){
         return <CROFilters/>
     } else {
         return <PAGFilters/>

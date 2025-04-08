@@ -47,8 +47,8 @@ export function CRORecommendationCard({cro, milestone}: { cro: Company, mileston
         <Link
             href={
                 process.env.NEXT_PUBLIC_VERCEL_ENV
-                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
-                    : `http://localhost:3000/app/cro/${id}`
+                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${id}`
+                    : `http://localhost:3000/app/service-providers/${id}`
             }
         >
             <Card className="h-full w-full text-left flex flex-col justify-between">
@@ -91,8 +91,8 @@ export function CROCardHeaderContents({cro}: { cro: Company }) {
                 <Link
                     href={
                         process.env.NEXT_PUBLIC_VERCEL_ENV
-                            ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
-                            : `http://localhost:3000/app/cro/${id}`
+                            ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${id}`
+                            : `http://localhost:3000/app/service-providers/${id}`
                     }
                 >
                     <CardTitle className="text-xl flex flex-row gap-2 items-center">
@@ -104,8 +104,8 @@ export function CROCardHeaderContents({cro}: { cro: Company }) {
             <Link
                 href={
                     process.env.NEXT_PUBLIC_VERCEL_ENV
-                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${id}`
-                        : `http://localhost:3000/app/cro/${id}`
+                        ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${id}`
+                        : `http://localhost:3000/app/service-providers/${id}`
                 }
                 className="flex flex-col gap-2"
             >
@@ -149,8 +149,8 @@ export function CROCardContents({cro}: { cro: Company }) {
         <Link
             href={
                 process.env.NEXT_PUBLIC_VERCEL_ENV
-                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/cro/${cro.id}`
-                    : `http://localhost:3000/app/cro/${cro.id}`
+                    ? `https://${process.env.NEXT_PUBLIC_ROOT_DOMAIN}/app/service-providers/${cro.id}`
+                    : `http://localhost:3000/app/service-providers/${cro.id}`
             }
         >
             {Object.values(categoryCounts).some(count => count > 0) && (

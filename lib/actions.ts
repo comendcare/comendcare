@@ -3101,7 +3101,7 @@ export const createReview = async (companyId: string, formData: FormData): Promi
             return review;
         });
 
-        revalidatePath("app/cro/");
+        revalidatePath("app/service-providers/");
 
         return {success: true, data: result};
     } catch (error: any) {
@@ -3180,7 +3180,7 @@ export const editReview = async (companyId: string, formData: FormData): Promise
             return updatedReview;
         });
 
-        revalidatePath("app/cro/");
+        revalidatePath("app/service-providers/");
 
         return {success: true, data: result};
     } catch (error: any) {

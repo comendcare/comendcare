@@ -824,7 +824,7 @@ export function EditMilestoneForm({
 
                                 {/*<Link href={`/app/marketplace/cro?milestone=${milestoneData.id}&expanded=true`}>*/}
                                 <Link
-                                    href={`/app/marketplace/cro?milestoneTypes=${(formData?.types || [])
+                                    href={`/app/marketplace/service-providers?milestoneTypes=${(formData?.types || [])
                                         .map((t: any) => t?.value || t?.id)
                                         .join(",")}`}
                                 >
