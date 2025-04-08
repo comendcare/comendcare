@@ -76,11 +76,11 @@ import { getMilestoneTypes } from "@/lib/fetchers"
 import { NotificationBubble } from "./notification-bubble"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store, Calendar as CalendarIcon } from "lucide-react"
-import { AttachmentsFormField, ContactsFormField, EditTitle, OpenToFormField, PrivatePublicFormField, StatusFormField, TimelineFormField } from "./edit-milestone-form"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { createOrUpdateAsset, createOrUpdateRFP, deleteRFP } from "@/lib/actions"
 import { Option } from "@/lib/types"
+import { AttachmentsFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -99,7 +99,7 @@ const editRFPForm = z.object({
             required_error: "Please provide a title"
         })
         .min(1, "Title is required")
-        .max(100, "Title must be less than 100 characters"),
+        .max(200, "Title must be less than 200 characters"),
     description: z
         .string()
         .max(1000, "Description must be less than 1000 characters")
