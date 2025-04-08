@@ -118,12 +118,12 @@ export function CROCardHeaderContents({cro, milestone}: { cro: Company, mileston
                             {companyTypeMap[companyType] || companyType}
                         </div>
                     )}
-                    {typeof avgRating === "number" && avgRating > 0 && (
-                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
-                            <Star className="size-4 text-gray-500 dark:text-gray-400" />
-                            {avgRating}
-                        </div>
-                    )}
+                    {/*{typeof avgRating === "number" && avgRating > 0 && (*/}
+                    {/*    <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">*/}
+                    {/*        <Star className="size-4 text-gray-500 dark:text-gray-400" />*/}
+                    {/*        {avgRating}*/}
+                    {/*    </div>*/}
+                    {/*)}*/}
                 </div>
                 {description && description.trim() && (
                     <CardDescription className="text-wrap break-words line-clamp-2">
