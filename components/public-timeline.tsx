@@ -23,7 +23,26 @@ export const PublicTimelineView = ({roadmap, subdomain, externalLinks, urlMilest
         <ScrollArea className="h-[70vh]">
             <ol className="ml-4 relative border-s-4 border-blue-light dark:border-gray-700 flex flex-col gap-4">
                 {roadmap?.milestones?.sort((a: any, b: any) => {
-                    return a.startDate - b.startDate
+                    // sort by custom order
+                    return a.timelineOrder - b.timelineOrder
+
+                    // sort by start date
+                    // if (!!a.startDate && !!b.startDate) return a.startDate.getTime() - b.startDate.getTime()
+                                
+                    // // Keep relative order of items without a startDate
+                    // if (!a.startDate && !b.startDate) return 0
+            
+                    // // Move items without startDate to the end
+                    // return !!a.startDate ? -1 : 1
+
+                    // sort by end date
+                    // if (!!a.endDate && !!b.endDate) return a.endDate.getTime() - b.endDate.getTime()
+                                
+                    // // Keep relative order of items without a startDate
+                    // if (!a.endDate && !b.endDate) return 0
+            
+                    // // Move items without startDate to the end
+                    // return !!a.endDate ? -1 : 1
                 }).map((item: any, index: number) => (
                     externalLinks
                         ?

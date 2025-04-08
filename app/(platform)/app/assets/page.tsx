@@ -33,7 +33,8 @@ export default async function AssetsPage() {
                         milestone: true
                     }
                 }
-            }
+            },
+            orderBy: [{ createdAt: "desc" }]
         })
 
         // Existing verified organization rendering logic
