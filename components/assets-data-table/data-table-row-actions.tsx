@@ -28,8 +28,12 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData extends Asset>({row}: DataTableRowActionsProps<TData>) {
     const [isOpen, setIsOpen] = useState(false)
 
+    const closeDialog = () => {
+        setIsOpen(false)
+    }
+
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                     <Button
@@ -58,7 +62,7 @@ export function DataTableRowActions<TData extends Asset>({row}: DataTableRowActi
                         {`Edit your Asset here. Click save when you're done.`}
                     </DialogDescription>
                 </DialogHeader>
-                <EditAssetForm assetData={{...row.original}} />
+                <EditAssetForm assetData={{...row.original}} closeDialog={closeDialog}/>
             </DialogContent>
         </Dialog>
     )
