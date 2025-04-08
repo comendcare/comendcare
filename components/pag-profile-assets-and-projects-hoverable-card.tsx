@@ -255,7 +255,7 @@ export const RFPDetails = ({rfp}: {rfp: any}) => {
             {rfp.openTo && rfp.openTo.includes('CRO') && (
                 <li className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
                     <Building className="h-4 w-4"/>
-                    <p>Open to CROs</p>
+                    <p>Open to Service Providers</p>
                 </li>
             )}
         </ul>
