@@ -44,11 +44,11 @@ export const columns: ColumnDef<Asset>[] = [
     {
         accessorKey: "asset.private",
         header: ({ column }) => (
-            <DataTableColumnHeader column={column} title="Private" />
+            <DataTableColumnHeader column={column} title="Visibility" />
         ),
         cell: ({ row }) => (
             <div>
-                {row.original.private ? 'true' : 'false'}
+                {row.original.private ? 'Private' : 'Public'}
             </div>
         ),
         enableHiding: true,
