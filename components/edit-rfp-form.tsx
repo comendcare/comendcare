@@ -245,6 +245,9 @@ export function EditRFPForm({
                 console.error(milestonesResponse.error)
             }
 
+            // trigger a form validation if we're editing an RFP, if the imported data is not valid, let the user know right away
+            if (Object.keys(rfpData).length > 0) form.trigger()
+
             initializing.current = false
         }
 
