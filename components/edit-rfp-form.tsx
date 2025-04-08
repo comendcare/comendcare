@@ -257,6 +257,11 @@ export function EditRFPForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    useEffect(() => {
+        // Forces re-validation whenever startDate or endDate changes
+        if (initializing.current === false) form.trigger()
+    }, [formData.startDate, formData.endDate])
+
     return (
         <Form {...form}>
             <ScrollArea className={"max-h-[600px] -mr-2 pr-3"} type={"always"}>
@@ -382,7 +387,8 @@ export function EditRFPForm({
                         <DialogClose disabled={!form.formState.isValid}>
                             <Button
                                 disabled={!form.formState.isValid}
-                                onClick={() => {
+                                onClick={(e) => {
+                                    e.preventDefault()
                                     handleFormSubmit(form.getValues())
                                 }}
                             >
