@@ -29,7 +29,7 @@ const formSchema = z.object({
     // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
     //     errorMap: () => ({ message: "Select a valid engagement type" })
     // }),
-    milestoneId: z.string().min(1, "Please select a milestone"),
+    milestoneId: z.string().min(1, "Please select a project"),
 });
 
 type SaveCROFormData = z.infer<typeof formSchema>;
@@ -147,14 +147,14 @@ export default function SaveCRODialog({ cro, type, milestone }: { cro: Company, 
                             name="milestoneId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Milestone</FormLabel>
+                                    <FormLabel>Project</FormLabel>
                                     <FormDescription>
-                                        For which milestone would you like to connect with this company?
+                                        For which project would you like to connect with this company?
                                     </FormDescription>
                                     <FormControl>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select a milestone" />
+                                                <SelectValue placeholder="Select a project" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {fetchedMilestones.map((milestone) => (
