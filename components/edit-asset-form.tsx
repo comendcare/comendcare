@@ -121,8 +121,6 @@ export function EditAssetForm({
     const [orgIsPublished, setOrgIsPublished] = useState(false)
     const [fetchedMilestones, setFetchedMilestones] = useState<Milestone[]>([])
 
-    console.log(`asset data`, assetData)
-
     const form = useForm<z.infer<typeof editAssetForm>>({
         mode: "onChange",
         resolver: zodResolver(editAssetForm),
@@ -239,8 +237,6 @@ export function EditAssetForm({
     // missing dependencies disabled - we only want to run this once on initialization
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
-
-    console.log(`fetched projects`, fetchedMilestones)
 
     return (
         <Form {...form}>
