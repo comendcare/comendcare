@@ -413,6 +413,11 @@ export function EditMilestoneForm({
         return () => subscription.unsubscribe();
     }, [form.watch, debounceUpdates, form])
 
+    useEffect(() => {
+        // Forces re-validation whenever the startDate or endDate changes
+        if (initializing.current === false) form.trigger()
+    }, [formData.startDate, formData.endDate])
+
     return (
         <Form {...form}>
             <ScrollArea className="research-plan-tour-step3 px-8 pb-4 h-full">
