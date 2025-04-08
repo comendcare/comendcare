@@ -106,7 +106,7 @@ const editMilestoneForm = z.object({
             required_error: "Please provide a title"
         })
         .min(1, "Title is required")
-        .max(100, "Title must be less than 100 characters"),
+        .max(200, "Title must be less than 200 characters"),
     description: z
         .string()
         .max(1000, "Description must be less than 1000 characters")
@@ -335,6 +335,9 @@ export function EditMilestoneForm({
             if (milestoneData) {
                 await setRecommendations([milestoneData as Milestone], { limit: 3 })
             }
+
+            // trigger a form validation, if the imported data is not valid, let the user know right away
+            form.trigger()
 
             initializing.current = false
         }
@@ -629,18 +632,23 @@ export function EditMilestoneForm({
                                     <FormLabel>Visibility</FormLabel>
                                     <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
 
-                                    <FormLabel >{`Description`}</FormLabel>
                                     <FormField
                                         control={form.control}
                                         name="description"
                                         render={({field}) => (
-                                            <FormControl className="mt-2">
-                                                <Textarea
-                                                    id="description"
-                                                    placeholder={`Enter a description...`}
-                                                    {...field}
-                                                />
-                                            </FormControl>
+                                            <>
+                                            <FormLabel >{`Description`}</FormLabel>
+                                            <div className="flex flex-col gap-2">
+                                                <FormControl className="mt-2">
+                                                    <Textarea
+                                                        id="description"
+                                                        placeholder={`Enter a description...`}
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </div>
+                                            </>
                                         )}
                                     />
 
