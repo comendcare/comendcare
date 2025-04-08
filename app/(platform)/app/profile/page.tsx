@@ -4,7 +4,7 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {getSession} from "@/lib/auth";
 import Link from "next/link";
 import prisma from "@/lib/prisma"
-import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId} from "@/lib/fetchers";
+import {getConditionsDataFromOrgId, getOrganizationFromOrganizationId, getPublicAssetsForOrganization, getPublicRFPsForOrganization, getPublicRoadmapsForOrganization} from "@/lib/fetchers";
 import {PAGProfileConditionsCard} from "@/components/pag-profile-conditions-card";
 import {PAGProfileAssetsAndRFPsHoverableCard} from "@/components/pag-profile-assets-and-projects-hoverable-card";
 import {ProfilePhoto} from "@/components/profile-photo";
@@ -46,62 +46,12 @@ export default async function ProfilePage() {
         }
     }
 
-    if (organization) {
-
-        let roadmaps = await prisma.roadmap.findMany({
-            where: {organizationId: organization?.id},
-            include: {
-                nodes: {
-                    include: {
-                        data: {
-                            include: {
-                                node: true,
-                                contacts: true,
-                                attachments: true,
-                                types: { include: { milestoneType: true } },
-                                assets: { include: { asset: true } },
-                                rfps: { include: { rfp: true } }
-                            }
-                        }
-                    }
-                },
-                edges: true,
-                milestones: {
-                    include: {
-                        node: true,
-                        contacts: true,
-                        attachments: true,
-                        types: { include: { milestoneType: true } },
-                        assets: { include: { asset: true } },
-                        rfps: { include: { rfp: true } }
-                    }
-                }
-            }
-        })
-
-        const assets = await prisma.asset.findMany({
-            where: {organizationId: organization?.id},
-            include: {
-                contacts: true,
-                attachments: true,
-                milestones: {
-                    include: {milestone: true}
-                }
-            },
-            orderBy: [{createdAt: "desc"}]
-        })
-
-        const rfps = await prisma.rFP.findMany({
-            where: {organizationId: organization?.id},
-            include: {
-                contacts: true,
-                attachments: true,
-                milestones: {
-                    include: {milestone: true}
-                }
-            },
-            orderBy: [{createdAt: "desc"}]
-        })
+    if (organization && organization?.subdomain) {
+        const [roadmaps, assets, rfps] = await Promise.all([
+            getPublicRoadmapsForOrganization(organization.subdomain),
+            getPublicAssetsForOrganization(organization.subdomain),
+            getPublicRFPsForOrganization(organization.subdomain)
+        ])
 
         // Existing verified organization rendering logic
         return (

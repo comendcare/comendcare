@@ -816,7 +816,7 @@ export function EditMilestoneForm({
                                         <div className={cn("w-full grid gap-4 grid-cols-1")}>
                                             {(recommendations || []).map((result: Recommendation, index) => (
                                                 // <CRORecommendationCard cro={result.content} key={index} milestone={result.milestone} />
-                                                <CROMarketplaceCard cro={result.content} key={index} />
+                                                <CROMarketplaceCard cro={result.content} key={index} milestone={milestoneData}/>
                                             ))}
                                         </div>
                                     </>
@@ -824,7 +824,7 @@ export function EditMilestoneForm({
 
                                 {/*<Link href={`/app/marketplace/cro?milestone=${milestoneData.id}&expanded=true`}>*/}
                                 <Link
-                                    href={`/app/marketplace/cro?milestoneTypes=${(formData?.types || [])
+                                    href={`/app/marketplace/service-providers?milestoneTypes=${(formData?.types || [])
                                         .map((t: any) => t?.value || t?.id)
                                         .join(",")}`}
                                 >

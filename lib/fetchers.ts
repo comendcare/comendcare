@@ -245,7 +245,8 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                 },
                 where: {
                     data: {private: false}
-                }
+                },
+                orderBy: [{ createdAt: "desc" }]
             },
             edges: true,
             milestones: {
@@ -311,14 +312,11 @@ export async function getPublicRoadmapsForOrganization(domain: string) {
                             }
                         } 
                     }
-                }
+                },
+                orderBy: [{ createdAt: "desc" }]
             },
         },
-        orderBy: [
-            {
-                createdAt: "desc"
-            }
-        ]
+        orderBy: [{ createdAt: "desc" }]
     })
     return roadmaps
 
@@ -744,7 +742,9 @@ export async function getRoadmap(orgId: string | null | undefined) {
         const roadmap = await prisma.roadmap.findFirst({
             where: {organizationId: organization.id},
             include: {
-                nodes: true,
+                nodes: {
+                    orderBy: [{ createdAt: "desc" }]
+                },
                 milestones: {
                     include: {
                         node: true,
@@ -753,7 +753,8 @@ export async function getRoadmap(orgId: string | null | undefined) {
                         types: { include: { milestoneType: true } },
                         assets: { include: { asset: true } },
                         rfps: { include: { rfp: true } }
-                    }
+                    },
+                    orderBy: [{ createdAt: "desc" }]
                 },
                 edges: true,
                 organization: true
@@ -1067,7 +1068,8 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                 (
                     await prisma.node.findMany({
                         where: {roadmapId: roadmapId},
-                        include: {data: true}
+                        include: {data: true},
+                        orderBy: [{ createdAt: "desc" }]
                     })
                 ).map(async node => {
                     const {id, positionX, positionY, origin, createdAt, updatedAt} = node
@@ -1108,7 +1110,8 @@ export async function getNodesEdgesAndMilestones(roadmapId: string | null | unde
                     types: { include: { milestoneType: true } },
                     assets: {include: {asset: true}},
                     rfps: {include: {rfp: true}}
-                }
+                },
+                orderBy: [{ createdAt: "desc" }]
             })
 
             return {success: true, data: {nodes: dbNodes, edges: dbEdges, milestones: dbMilestones}}

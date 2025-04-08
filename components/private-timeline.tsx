@@ -140,19 +140,34 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
                     <SortableContext 
                         disabled={sortBy !== "custom"}
                         items={
-                            milestones ? milestones.sort((a, b) => {
-                                switch (sortBy) {
-                                    case "custom": 
-                                        return (a.timelineOrder - b.timelineOrder)
-                                    case "start":
-                                        if (a.startDate && b.startDate) return (a.startDate.getTime() - b.startDate.getTime())
-                                        return 0
-                                    case "end":
-                                        if (a.endDate && b.endDate) return (a.endDate.getTime() - b.endDate.getTime())
-                                        return 0
-                                    default:
-                                        return 0
-                                }
+                            milestones ? milestones
+                                .sort((a, b) => {
+                                    // pre sort by creation date
+                                    return ((a.createdAt?.getTime() || (new Date().getTime())) - (b.createdAt?.getTime() || (new Date().getTime())))
+                                })
+                                .sort((a, b) => {
+                                    switch (sortBy) {
+                                        case "custom": 
+                                            return a.timelineOrder - b.timelineOrder
+                                        case "start":
+                                            if (!!a.startDate && !!b.startDate) return a.startDate.getTime() - b.startDate.getTime()
+                                    
+                                            // Keep relative order of items without a startDate
+                                            if (!a.startDate && !b.startDate) return 0
+                                    
+                                            // Move items without startDate to the end
+                                            return !!a.startDate ? -1 : 1
+                                        case "end":
+                                            if (!!a.endDate && !!b.endDate) return a.endDate.getTime() - b.endDate.getTime()
+                                    
+                                            // Keep relative order of items without a startDate
+                                            if (!a.endDate && !b.endDate) return 0
+                                    
+                                            // Move items without startDate to the end
+                                            return !!a.endDate ? -1 : 1
+                                        default:
+                                            return 0
+                                    }
                             }).map(milestone => milestone.id) : []
                         }
                         strategy={verticalListSortingStrategy}
