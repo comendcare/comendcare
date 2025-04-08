@@ -41,7 +41,7 @@ const engagementOptions = [
     { id: "COLLABORATED", label: "Previously Worked With" },
 ];
 
-export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card" | "page" }) {
+export default function SaveCRODialog({ cro, type, milestone }: { cro: Company, type: "card" | "page", milestone?: Milestone }) {
     const router = useRouter()
     const { data: session } = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,13 +52,16 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
 
     const form = useForm<SaveCROFormData>({
         resolver: zodResolver(formSchema),
+        defaultValues: {
+            milestoneId: milestone ? milestone.id : undefined
+        }
     });
 
     useEffect(() => {
         async function fetchData() {
             const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined);
             if (milestonesResponse.success) {
-                setFetchedMilestones(milestonesResponse.data as Milestone[]);
+                setFetchedMilestones(milestonesResponse.data as Milestone[])
             } else {
                 console.error(milestonesResponse.error);
             }

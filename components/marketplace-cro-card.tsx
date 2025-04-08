@@ -7,6 +7,7 @@ import {Separator} from "./ui/separator";
 import {TypeBadge} from "./type-badge";
 import SaveCRODialog from "@/components/save-cro-dialog";
 import {Briefcase, Building, Building2, Factory, FileText, Rocket, Star, University} from "lucide-react";
+import { Milestone } from "@/lib/types";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -69,20 +70,20 @@ export function CRORecommendationCard({cro, milestone}: { cro: Company, mileston
     );
 }
 
-export function CROMarketplaceCard({cro}: { cro: Company }) {
+export function CROMarketplaceCard({cro, milestone}: { cro: Company, milestone?: Milestone }) {
     const {id} = cro;
 
     return (
         <Card className="h-full w-full text-left flex flex-col justify-between">
             <CardHeader className="gap-2">
-                <CROCardHeaderContents cro={cro}/>
+                <CROCardHeaderContents cro={cro} milestone={milestone}/>
             </CardHeader>
             <CROCardContents cro={cro}/>
         </Card>
     )
 }
 
-export function CROCardHeaderContents({cro}: { cro: Company }) {
+export function CROCardHeaderContents({cro, milestone}: { cro: Company, milestone?: Milestone }) {
     const {id, title, description, companyType, avgRating} = cro;
 
     return (
@@ -99,7 +100,7 @@ export function CROCardHeaderContents({cro}: { cro: Company }) {
                         {title}
                     </CardTitle>
                 </Link>
-                <SaveCRODialog cro={cro} type={"card"}/>
+                <SaveCRODialog cro={cro} type={"card"} milestone={milestone}/>
             </div>
             <Link
                 href={
