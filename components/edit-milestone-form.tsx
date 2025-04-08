@@ -632,18 +632,23 @@ export function EditMilestoneForm({
                                     <FormLabel>Visibility</FormLabel>
                                     <PrivatePublicFormField form={form} formData={formData} disabled={!orgIsPublished}/>
 
-                                    <FormLabel >{`Description`}</FormLabel>
                                     <FormField
                                         control={form.control}
                                         name="description"
                                         render={({field}) => (
-                                            <FormControl className="mt-2">
-                                                <Textarea
-                                                    id="description"
-                                                    placeholder={`Enter a description...`}
-                                                    {...field}
-                                                />
-                                            </FormControl>
+                                            <>
+                                            <FormLabel >{`Description`}</FormLabel>
+                                            <div className="flex flex-col gap-2">
+                                                <FormControl className="mt-2">
+                                                    <Textarea
+                                                        id="description"
+                                                        placeholder={`Enter a description...`}
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </div>
+                                            </>
                                         )}
                                     />
 
