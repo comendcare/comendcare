@@ -127,7 +127,7 @@ export const HeroSection = () => {
                         }}
                         className="max-w-screen-sm text-xl text-muted-foreground"
                     >
-                        {`Design your research roadmap. Connect with academics, CROs, and other patient groups who can help.`}
+                        {`Design your research roadmap. Connect with academics, Service Providers, and other patient groups who can help.`}
                     </motion.p>
 
                     <motion.div

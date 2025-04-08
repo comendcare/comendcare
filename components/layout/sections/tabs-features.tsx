@@ -41,7 +41,7 @@ const tabContent = {
             />
         ),
         description:
-            "Discover synergies with other patient groups. Find relevant CROs, leave or read reviews, and indicate interest."
+            "Discover synergies with other patient groups. Find relevant Service Providers, leave or read reviews, and indicate interest."
     },
     forums: {
         title: "Share your progress",
