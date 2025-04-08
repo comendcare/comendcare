@@ -1,8 +1,8 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod"
-import React, {useCallback, useEffect, useMemo, useRef, useState} from "react"
-import {useForm, UseFormReturn} from "react-hook-form"
+import React, {useEffect, useRef, useState} from "react"
+import {useForm} from "react-hook-form"
 import {z} from "zod"
 import {
     Form,
@@ -14,19 +14,9 @@ import {
     FormDescription,
 } from "./ui/form"
 import {Input} from "./ui/input"
-import {AutosizeTextarea, Textarea} from "./ui/textarea"
+import {Textarea} from "./ui/textarea"
 import {Button} from "./ui/button"
 import {ScrollArea, ScrollBar} from "./ui/scroll-area"
-import StatusButton from "./milestone-status-button"
-import {RoadmapState, useRoadmapStore} from "@/state/roadmap/roadmapStore"
-import {useShallow} from "zustand/react/shallow"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue
-} from "./ui/select"
 import {
     Dialog,
     DialogClose,
@@ -37,51 +27,21 @@ import {
     DialogTitle,
     DialogTrigger
 } from "./ui/dialog"
-import {DeleteMilestoneDialogContent} from "./delete-milestone-dialog-content"
-import {PrivateBadge} from "./private-badge"
-import {debounce, isEmpty} from "lodash"
-import {monthsList} from "@/lib/data";
-import {Asset, Milestone, NODE_TYPE_OPTIONS, RFP, RFP_OPEN_TO_TYPE_OPTIONS, StatusType} from "@/lib/types"
-import {MilestoneType, PlatformNotification, Prisma} from "@prisma/client"
+import {Milestone, RFP} from "@/lib/types"
+import {Prisma} from "@prisma/client"
 import {getMilestones, getOrganizationFromOrganizationId} from "@/lib/fetchers"
-import mixpanel from "mixpanel-browser"
 import {useSession} from "next-auth/react"
-import {ToggleGroup, ToggleGroupItem} from "./ui/toggle-group"
-import {ExternalContactField} from "./external-contact-field"
-import {ExternalAttachmentField} from "./external-attachment-field"
 import {Popover, PopoverContent, PopoverTrigger} from "./ui/popover"
-import {cn, sleep} from "@/lib/utils"
+import {cn} from "@/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "./ui/calendar"
-import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
-import MoneyInput from "@/components/money-input";
 import MultipleSelector from "./ui/multiple-selector"
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
-import { PlateEditor } from "./editor/plate-editor"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
-import { CROSearchState, Recommendation, useCROSearchStore } from "@/state/search/croSearchStore"
-import { Card, CardContent } from "./ui/card"
-import Image from "next/image"
-import { CROMarketplaceCard  } from "./marketplace-cro-card"
-import Link from "next/link"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { TypeBadge } from "./type-badge"
-import Loading from "@/app/loading"
-import { getMilestoneTypes } from "@/lib/fetchers"
-import { NotificationBubble } from "./notification-bubble"
-import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
-import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store, Calendar as CalendarIcon } from "lucide-react"
+import { Calendar as CalendarIcon } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { createOrUpdateAsset, createOrUpdateRFP, deleteRFP } from "@/lib/actions"
+import { createOrUpdateRFP, deleteRFP } from "@/lib/actions"
 import { Option } from "@/lib/types"
 import { AttachmentsFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
-
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
@@ -121,8 +81,10 @@ const editRFPForm = z.object({
 
 export function EditRFPForm({
     rfpData,
+    closeDialog
 }: {
-    rfpData: Partial<RFP>
+    rfpData: Partial<RFP>,
+    closeDialog?: () => void
 }) {
     const router = useRouter()
     const initializing = useRef(true)
@@ -220,6 +182,7 @@ export function EditRFPForm({
 
         try {
             await deleteRFP(rfpData.id)
+            if (closeDialog) closeDialog()
             toast.success("Organization profile updated successfully!");
             router.refresh();
         } catch (error) {
@@ -349,7 +312,12 @@ export function EditRFPForm({
 
                     <span className="flex gap-2 w-full justify-end">
                         <DialogClose asChild>
-                            <Button variant={"secondary"}>Cancel</Button>
+                            <Button 
+                                variant={"secondary"}
+                                onClick={() => {if (closeDialog) closeDialog()}}
+                            >
+                                Cancel
+                            </Button>
                         </DialogClose>
                         <Dialog>
                             <DialogTrigger asChild className={cn(rfpData.id ? "" : "hidden")}>
@@ -390,6 +358,7 @@ export function EditRFPForm({
                                 onClick={(e) => {
                                     e.preventDefault()
                                     handleFormSubmit(form.getValues())
+                                    if (closeDialog) closeDialog()
                                 }}
                             >
                                 Save Changes
