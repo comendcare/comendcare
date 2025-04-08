@@ -1796,7 +1796,7 @@ export const createOrUpdateAsset = async (assetData: Partial<Asset>, organizatio
 export const deleteRFP = async (rfpId: string) => {
     try {
         const response = await prisma.rFP.delete({
-            where: { id: rfpId }
+            where: { id: rfpId },
         })
 
         return response
