@@ -1,6 +1,6 @@
-import { typesense } from '@/lib/typesense';
-import { temporal } from 'zundo';
-import { create } from 'zustand';
+import {typesense} from '@/lib/typesense';
+import {temporal} from 'zundo';
+import {create} from 'zustand';
 
 export type ViewType = 'grid' | 'list'
 
@@ -97,8 +97,8 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
             query_by: "name",
             per_page: 10,
             page: state.lastFetchedPage,
-            ...(generateFiltersString(state.filters) ? { filter_by: generateFiltersString(state.filters) } : undefined),
-            ...(state.sortBy ? { sort_by: sortByFilters[state.sortBy] } : undefined),
+            ...(generateFiltersString(state.filters) ? {filter_by: generateFiltersString(state.filters)} : undefined),
+            ...(state.sortBy ? {sort_by: sortByFilters[state.sortBy]} : undefined),
         };
 
         const results = await typesense
@@ -118,15 +118,18 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
 
         const prismaResponse = await fetch('/api/organizations', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ids }),
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ids}),
         });
 
         const prismaResults = await prismaResponse.json();
 
         const enrichedResults = ids.map(id => prismaResults.find((org: any) => org.id === id) || null).filter(Boolean);
 
-        return isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults];
+        return {
+            results: isNewSearch ? enrichedResults : [...state.searchResults, ...enrichedResults],
+            total: results.found || 0,
+        };
 
     } catch (error) {
         console.error("Search error:", error);
@@ -150,66 +153,76 @@ export interface OrganizationSearchState {
     searchResults: any[] | undefined
     setSearchResults: (results: any[]) => void
     filters: FiltersType,
-    setFilters: (updatedFilters: FiltersType) => void
+    setFilters: (updatedFilters: FiltersType) => void,
+    totalResults: number,
+    setTotalResults: (total: number) => void,
 }
 
 export const useOrganizationSearchStore = create<OrganizationSearchState>()(
     temporal((set, get) => ({
             initialized: false,
             initState: () => {
-                set({ initialized: true })
+                set({initialized: true})
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
-                const newSearchResults = await getUpdatedSearchResults({
+                const {results: newSearchResults, total} = await getUpdatedSearchResults({
                     ...get(),
                     searchTerm: newSearch,
                     lastFetchedPage: 1,
                 }, true)
-                set({ searchTerm: newSearch, searchResults: newSearchResults, lastFetchedPage: 1 })
+                set({
+                    searchTerm: newSearch,
+                    searchResults: newSearchResults,
+                    lastFetchedPage: 1,
+                    totalResults: total,
+                })
             },
             sortBy: undefined,
             setSortBy: async (sortBy: string | undefined) => {
-                const newSearchResults = await getUpdatedSearchResults({
+                const {results: newSearchResults, total} = await getUpdatedSearchResults({
                     ...get(),
                     sortBy,
                     lastFetchedPage: 1,
                 }, true)
-                set({ sortBy, searchResults: newSearchResults, lastFetchedPage: 1 })
+                set({sortBy, searchResults: newSearchResults, lastFetchedPage: 1, totalResults: total})
             },
             lastFetchedPage: 1, // page numbers in TypeSense start at 1
             setLastFetchedPage: async (page: number) => {
-                const updateSearchResults = await getUpdatedSearchResults({ 
+                const {results: updateSearchResults} = await getUpdatedSearchResults({
                     ...get(),
                     lastFetchedPage: page
                 }, false)
-                set({ lastFetchedPage: page, searchResults: updateSearchResults })
+                set({lastFetchedPage: page, searchResults: updateSearchResults})
             },
             view: 'grid',
-            setView: (view: ViewType) => set({ view }),
+            setView: (view: ViewType) => set({view}),
             allResults: [],
-            setAllResults: (results: any[]) => set({ allResults: results }),
+            setAllResults: (results: any[]) => set({allResults: results}),
             searchResults: undefined,
-            setSearchResults: (results: any[]) => set({ searchResults: results }),
+            setSearchResults: (results: any[]) => set({searchResults: results}),
             filters: defaultFilters,
             setFilters: async (updatedFilters: FiltersType) => {
                 const newFilters = {
                     ...get().filters,
                     ...updatedFilters
                 }
-                const newSearchResults = await getUpdatedSearchResults({
+                const {results: newSearchResults, total} = await getUpdatedSearchResults({
                     ...get(),
                     filters: newFilters,
                     lastFetchedPage: 1,
                 }, true)
-                set({ 
-                    filters: newFilters, 
+                set({
+                    filters: newFilters,
                     lastFetchedPage: 1,
-                    searchResults: newSearchResults
+                    searchResults: newSearchResults,
+                    totalResults: total,
                 })
-            }
+            },
+            totalResults: 0,
+            setTotalResults: (total: number) => set({totalResults: total}),
         }),
         {
             limit: 100, // limit the stored history states to 100
         })
-    )
+)
