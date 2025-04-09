@@ -24,6 +24,7 @@ import {useEffect, useState} from "react";
 import {getAllMembershipsFromUserId} from "@/lib/fetchers";
 import {MembershipWithOrganization} from "@/lib/types";
 import { Ellipsis, Pencil, UserX } from "lucide-react";
+import {useRouter} from "next/navigation";
 
 const formSchema = z.object({
     title: z.string().optional().or(z.literal("")), // Allow title to be empty or null
@@ -32,7 +33,9 @@ const formSchema = z.object({
 
 
 export default function MembersDropdown({member}: { member: MemberWithUser }) {
+    const router = useRouter()
     const {data: session, update} = useSession()
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isLastOwner, setIsLastOwner] = useState(false)
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -81,7 +84,8 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
             const response = await updateMember(member.id, values)
 
             if (response.success && response.data) {
-                toast.success(`Successfully updated your membership.`)
+                const isSelf = session.user.id === member.user.id;
+                toast.success(`Successfully updated ${isSelf ? "your" : `${member.user.name}'s`} membership.`);
 
                 if (session.user.id === member.user.id) {
                     await update({
@@ -95,6 +99,9 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
                         }
                     });
                 }
+
+                setIsDialogOpen(false)
+                router.refresh()
             } else {
                 console.error(response.error)
                 toast.error(response.error)
@@ -168,7 +175,7 @@ export default function MembersDropdown({member}: { member: MemberWithUser }) {
     if (!showDropdownTrigger) return null;
 
     return (
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger>
                     <Ellipsis />
