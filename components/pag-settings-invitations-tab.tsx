@@ -74,6 +74,13 @@ export default function PAGSettingsInvitationsTab() {
     if (invitees.length === 0) {
         return (
             <div className="h-full w-full flex flex-col mx-auto justify-center items-center">
+                <div className="p-4 w-full sm:flex sm:items-center">
+                    <div className="space-y-2 sm:flex-auto">
+                        <h2 className="text-xl font-semibold leading-6 text-gray-900">Invitations</h2>
+                        <p className="text-sm text-gray-700">All open invitations sent by your organization.</p>
+                    </div>
+                    <InviteUserToOrgDialog />
+                </div>
                 <Image
                     alt="No open invitations"
                     src="https://illustrations.popsy.co/gray/paper-plane.svg"
