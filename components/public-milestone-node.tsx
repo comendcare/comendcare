@@ -72,8 +72,8 @@ function PublicMilestoneNodeContents({props}: {props: NodeProps<PublicMilestoneN
             )}
         >
             <CardHeader>
-                <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
-                    <TypeBadge type={props.type}/>
+                <div className="h-fit flex flex-row align-center items-center justify-end gap-4">
+                    {/* <TypeBadge type={props.type}/> */}
                     {!props.data?.private && props.data.externalLink && <ExternalLink className="h-[20px] w-[20px]"/>}
                 </div>
             </CardHeader>
