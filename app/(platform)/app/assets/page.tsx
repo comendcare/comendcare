@@ -46,7 +46,7 @@ export default async function AssetsPage() {
                 </div>
 
                 {assets.length <= 0 && (
-                    <div className="h-full w-full flex flex-col justify-center items-center gap-4">
+                    <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                         <h1 className="font-cal text-4xl">You do not have any Assets</h1>
                         <Image
                             alt="No Assets"
@@ -55,7 +55,7 @@ export default async function AssetsPage() {
                             height={300}
                         />
                         <p className="text-lg text-stone-500">
-                            You do not have any Assets yet. Create one to get started.
+                            An asset is a milestone outcome that can be used for future research. Ex/ clinical datasets, disease models, papers.
                         </p>
                         <NewAssetDialog />
                     </div>
