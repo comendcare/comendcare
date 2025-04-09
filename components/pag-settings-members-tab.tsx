@@ -1,14 +1,44 @@
-import {getSession} from "@/lib/auth";
-import Image from "next/image";
-import {faker} from "@faker-js/faker";
-import {getMembers} from "@/lib/fetchers";
-import { ProfilePhoto } from "./profile-photo";
-import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog";
-import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button";
-import MembersDropdown from "@/components/members-dropdown";
+"use client"
 
-export default async function PAGSettingsMembersTab() {
-    const session = await getSession()
+import { useEffect, useState } from "react"
+import Image from "next/image"
+import { faker } from "@faker-js/faker"
+import {useSession} from "next-auth/react"
+import { getMembers } from "@/lib/fetchers"
+import { ProfilePhoto } from "./profile-photo"
+import InviteUserToOrgDialog from "@/components/invite-user-to-org-dialog"
+import CreateOrJoinOrganizationButton from "@/components/create-or-join-organization-button"
+import MembersDropdown from "@/components/members-dropdown"
+import Loading from "@/app/loading";
+
+export default function PAGSettingsMembersTab() {
+    const {data: session} = useSession()
+    const [members, setMembers] = useState<any[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true)
+
+            if (session?.user?.organizationId) {
+                const response = await getMembers(session?.user.organizationId)
+
+                if (response.success) {
+                    setMembers(response.data || [])
+                } else {
+                    console.error(response.error)
+                }
+            }
+
+            setLoading(false)
+        }
+
+        fetchData()
+    }, [])
+
+    if (loading) {
+        return <Loading/>
+    }
 
     if (!session?.user?.organizationId) {
         return (
@@ -31,74 +61,51 @@ export default async function PAGSettingsMembersTab() {
                     {`You're not part of an organization yet.`}
                 </p>
                 <div className="mt-8">
-                    <CreateOrJoinOrganizationButton/>
+                    <CreateOrJoinOrganizationButton />
                 </div>
             </div>
-        );
-    }
-
-    let fetchedMembers: any[] | undefined = []
-    const response = await getMembers(session.user.organizationId);
-    if (response.success) {
-        fetchedMembers = response.data
-    } else {
-        console.error(response.error)
+        )
     }
 
     return (
         <div className="p-4">
             <div className="sm:flex sm:items-center">
                 <div className="space-y-2 sm:flex-auto">
-                    <h2 className="text-xl font-semibold leading-6 text-gray-900">
-                        Members
-                    </h2>
-                    <p className="text-sm text-gray-700">
-                        All the members of your organization.
-                    </p>
+                    <h2 className="text-xl font-semibold leading-6 text-gray-900">Members</h2>
+                    <p className="text-sm text-gray-700">All the members of your organization.</p>
                 </div>
             </div>
-            {fetchedMembers !== undefined && fetchedMembers.length > 0 ?
+
+            {members.length > 0 ? (
                 <div className="mt-8 flow-root">
                     <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                         <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                             <table className="min-w-full divide-y divide-gray-300">
                                 <thead>
                                 <tr>
-                                    <th scope="col"
-                                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
+                                    <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
                                         Name
                                     </th>
-                                    {/*<th scope="col"*/}
-                                    {/*    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">*/}
-                                    {/*    Status*/}
-                                    {/*</th>*/}
-                                    <th scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Title
                                     </th>
-                                    <th scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Role
                                     </th>
-                                    <th scope="col"
-                                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Joined
                                     </th>
-                                    <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
+                                    <th className="relative py-3.5 pl-3 pr-4 sm:pr-0">
                                         <span className="sr-only">Edit</span>
                                     </th>
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 bg-white">
-                                {fetchedMembers?.map((person) => (
+                                {members.map((person) => (
                                     <tr key={person?.email}>
                                         <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
                                             <div className="flex items-center">
                                                 <div className="h-11 w-11 flex-shrink-0">
-                                                    {/* <img className="h-11 w-11 rounded-full"
-                                                         src={person.user?.image || createDicebearAvatar(person.user?.name || faker.string.uuid(), 50, 40, "identicon")}
-                                                         alt={`${person.user?.name}'s profile picture`}
-                                                    /> */}
                                                     <ProfilePhoto
                                                         img={person?.user?.image}
                                                         name={person?.user?.name}
@@ -106,19 +113,13 @@ export default async function PAGSettingsMembersTab() {
                                                     />
                                                 </div>
                                                 <div className="ml-4">
-                                                    <div
-                                                        className="font-medium text-gray-900">{person?.user?.name}</div>
+                                                    <div className="font-medium text-gray-900">
+                                                        {person?.user?.name}
+                                                    </div>
                                                     <div className="mt-1 text-gray-500">{person?.email}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        {/*<td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">*/}
-                                        {/*    <span*/}
-                                        {/*        className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20"*/}
-                                        {/*    >*/}
-                                        {/*        Active*/}
-                                        {/*    </span>*/}
-                                        {/*</td>*/}
                                         <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-500">
                                             {person?.title}
                                         </td>
@@ -138,17 +139,17 @@ export default async function PAGSettingsMembersTab() {
                         </div>
                     </div>
                 </div>
-                :
+            ) : (
                 <div className="h-full flex flex-col items-center justify-center py-20">
                     <Image
-                        alt="missing roadmap"
+                        alt="no members"
                         src="https://illustrations.popsy.co/gray/success.svg"
                         width={400}
                         height={400}
                         className="dark:hidden"
                     />
                     <Image
-                        alt="missing roadmap"
+                        alt="no members"
                         src="https://illustrations.popsy.co/white/success.svg"
                         width={400}
                         height={400}
@@ -158,7 +159,7 @@ export default async function PAGSettingsMembersTab() {
                         No members yet.
                     </p>
                 </div>
-            }
+            )}
         </div>
     )
 }
