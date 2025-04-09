@@ -111,18 +111,23 @@ export default async function CROPageHeader({id}: { id: string }) {
                             {companyTypeMap[cro.companyType] || cro.companyType}
                         </div>
                     )}
-                    <div className="flex items-center text-gray-500">
-                        <Star className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                              aria-hidden="true"
-                        />
+                    <Link
+                        href={"?tab=reviews"}
+                        className="flex items-center mb-2 hover:cursor-pointer"
+                    >
                         <div className="flex items-center text-gray-500">
-                            {cro.reviews.length > 0 && typeof cro.avgRating === "number"
-                                ? Number.isInteger(cro.avgRating)
-                                    ? `${cro.avgRating} out of 5`
-                                    : `${cro.avgRating.toFixed(2)} out of 5`
-                                : "No reviews yet"}
+                            <Star className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                  aria-hidden="true"
+                            />
+                            <div className="flex items-center text-gray-500">
+                                {cro.reviews.length > 0 && typeof cro.avgRating === "number"
+                                    ? Number.isInteger(cro.avgRating)
+                                        ? `${cro.avgRating} out of 5`
+                                        : `${cro.avgRating.toFixed(2)} out of 5`
+                                    : "No reviews yet"}
+                            </div>
                         </div>
-                    </div>
+                    </Link>
                 </div>
                 <div className="flex flex-wrap gap-2 w-5/6">
                     {filteredCertifications.map((certification, index) => (

@@ -14,7 +14,7 @@ const selector = (state: MilestoneSearchState) => ({
     setView: state.setView
 })
 
-export default function OrganizationSearchBar() {
+export default function MilestoneSearchBar() {
     const [query, setQuery] = useState("")
     const {
         setSearchTerm,
