@@ -355,6 +355,7 @@ export function EditRFPForm({
                         <DialogClose disabled={!form.formState.isValid}>
                             <Button
                                 disabled={!form.formState.isValid}
+                                variant={"cta"}
                                 onClick={(e) => {
                                     e.preventDefault()
                                     handleFormSubmit(form.getValues())

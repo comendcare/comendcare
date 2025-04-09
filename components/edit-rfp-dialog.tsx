@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { ReactNode, useState } from "react";
 import { EditRFPForm } from "./edit-rfp-form";
 import { RFP } from "@/lib/types";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 export const NewRFPDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
     const [isOpen, setIsOpen] = useState(false)
@@ -16,12 +17,23 @@ export const NewRFPDialog = ({iconOnly = false}: {iconOnly?: boolean}) => {
     
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button variant={"cta"}>
+            {iconOnly ? (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant={"cta"} size={"icon"} onClick={() => setIsOpen(true)}>
+                            <Plus />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        Create an RFP
+                    </TooltipContent>
+                </Tooltip>
+            ) : (
+                <Button variant={"cta"} onClick={() => setIsOpen(true)}>
                     <Plus />
-                    {!iconOnly && `Create an RFP`}
+                    {`Create an RFP`}
                 </Button>
-            </DialogTrigger>
+            )}
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>

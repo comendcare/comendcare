@@ -433,7 +433,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             >
             <div 
                 className={cn(
-                    'min-h-10 rounded-md border border-input text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+                    'rounded-md border border-input text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
                     {
                         'px-3 py-2': selected.length !== 0,
                         'cursor-text': !disabled && selected.length !== 0,
@@ -451,8 +451,8 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                         <Badge
                             key={index}
                             className={cn(
-                                'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
-                                'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
+                                // 'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
+                                // 'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
                                 badgeClassName,
                             )}
                             data-fixed={option.fixed}
@@ -461,7 +461,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                             {option.label}
                             <button
                                 className={cn(
-                                    'ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                                    'rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2',
                                     (disabled || option.fixed) && 'hidden',
                                 )}
                                 onKeyDown={(e) => {
@@ -475,7 +475,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                 }}
                                 onClick={() => handleUnselect(option)}
                             >
-                                <X className="h-2 w-2 text- text-muted-foreground hover:text-foreground"/>
+                                <X className="h-4 w-4"/>
                             </button>
                         </Badge>
                     );
@@ -522,7 +522,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                         onChange?.(selected.filter((s) => s.fixed));
                     }}
                     className={cn(
-                        'absolute right-0 h-6 w-6 p-0',
+                        'absolute right-0',
                         (hideClearAllButton ||
                             disabled ||
                             selected.length < 1 ||
@@ -530,7 +530,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                         'hidden',
                     )}
                 >
-                    <X/>
+                    <X className="h-4 w-4"/>
                 </button>
                 </div>
             </div>

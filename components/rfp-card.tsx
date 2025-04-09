@@ -2,7 +2,8 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PrivateBadge } from "@/components/private-badge";
 import { DateView } from "@/components/miletone-date-view";
-import { User } from "lucide-react";
+import { Calendar, User } from "lucide-react";
+import { PropertyBadge } from "./property-badge";
 
 export const RFPCard = ({rfp}: {rfp: any}) => {
     return (
@@ -14,60 +15,31 @@ export const RFPCard = ({rfp}: {rfp: any}) => {
             </CardHeader>
             <CardContent>
                 <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
-                    {/* {(rfp.milestones || []).map((milestone, index) => {
-                        return (
-                            <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                                <FileText className="h-4 w-4"/>
-                                <p className="w-[90%] text-wrap break-words">{milestone.milestone.title}</p>
-                            </li>
-                        )
-                    })} */}
-
                     {(rfp.startDate || rfp.endDate) && (
-                        <li className="border-l-2 border-gray-300 pl-2">
-                            <DateView 
-                                specific={true} 
-                                startDate={rfp.startDate || undefined} 
-                                endDate={rfp.endDate || undefined} 
-                                startLabel="Request Opens:" 
-                                endLabel="Deadline for Proposals:"
-                            />
+                        <li>
+                            <PropertyBadge icon={Calendar}>
+                                <DateView 
+                                    specific={true} 
+                                    startDate={rfp.startDate || undefined} 
+                                    endDate={rfp.endDate || undefined} 
+                                    startLabel="Request Opens:" 
+                                    endLabel="Deadline for Proposals:"
+                                />
+                            </PropertyBadge>
                         </li>
                     )}
 
                     {(rfp.contacts || []).map((contact: any, index: number) => {
                         return (
-                            <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                                <User className="h-4 w-4"/>
-                                <p className="w-[90%] text-wrap break-words">
-                                    {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
-                                </p>
+                            <li key={index}>
+                                <PropertyBadge icon={User}>
+                                    <p className="w-[90%] text-wrap break-words">
+                                        {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
+                                    </p>
+                                </PropertyBadge>
                             </li>
                         )
                     })}
-
-                    {/* {(rfp.attachments || []).map((attachment, index) => {
-                        return (
-                            <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                                <Link className="h-4 w-4"/>
-                                <a className="w-[90%] text-wrap break-words" href={attachment.link || "#"}>{attachment.name || attachment.link}</a>
-                            </li>
-                        )
-                    })} */}
-                    
-                    {/* {rfp.openTo && rfp.openTo.includes('ACADEMIC') && (
-                        <li className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                            <GraduationCap className="h-4 w-4"/>
-                            <p>Open to Academics</p>
-                        </li>
-                    )}
-
-                    {rfp.openTo && rfp.openTo.includes('CRO') && (
-                        <li className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                            <Building className="h-4 w-4"/>
-                            <p>Open to CROs</p>
-                        </li>
-                    )} */}
                 </ul>
             </CardContent>
         </Card>

@@ -118,6 +118,7 @@ export const NewMilestoneDialogForm = ({open, setOpen}: {open: boolean, setOpen:
                             // disabled={!selectedMilestoneTemplate || !selectedMilestoneType || milestoneTypes.length === 0}
                             disabled={!selectedMilestoneTemplate || milestoneTypes.length === 0}
                             type="button"
+                            variant={"cta"}
                             onClick={() => {
                                 console.log(`add milestone`, selectedMilestoneTemplate)
                                 addMilestones([selectedMilestoneTemplate].map((template: any) => {
