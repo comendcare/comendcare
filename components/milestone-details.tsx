@@ -58,10 +58,9 @@ export function MilestoneDetails({milestone}: { milestone: any }) {
                 <DateView startDate={milestone.startDate} endDate={milestone.endDate}/>
                 <BudgetView budget={milestone.budget}/>
 
-                <span className="w-full flex gap-2 flex-wrap text-wrap">
+                <span className="w-full flex gap-2 flex-wrap">
                     {milestone.status &&
                         <StatusButton
-                            className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
                             disabled={true}
                             status={milestone.status}
                             onStatusChange={() => {}}

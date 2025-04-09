@@ -23,11 +23,12 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { Building, FileText, GraduationCap, Link as LinkIcon, User } from "lucide-react";
+import { Building, Calendar, FileText, GraduationCap, Link as LinkIcon, User } from "lucide-react";
 import { DateView } from "./miletone-date-view";
 import { PrivateBadge } from "./private-badge";
 import Link from "next/link";
 import { ScrollArea } from "./ui/scroll-area";
+import { PropertyBadge } from "./property-badge";
 
 export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }: { assets: any[], rfps: any[], isPrivate: boolean }) => {
     if (assets && rfps) {
@@ -149,38 +150,41 @@ export const AssetDetails = ({asset}: {asset: any}) => {
                 <DialogDescription>{asset.description}</DialogDescription>
             </DialogHeader>
 
-            <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
+            <ul className="pt-2 w-full flex flex-col gap-2 text-sm text-wrap break-words">
                 {(asset.milestones || []).map((milestone: any, index: number) => {
                     return (
-                        <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                            <FileText className="h-4 w-4"/>
-                            <p className="text-wrap break-words">{milestone.milestone.title}</p>
+                        <li key={index}>
+                            <PropertyBadge icon={FileText}>
+                                <p className="text-wrap break-words">{milestone.milestone.title}</p>
+                            </PropertyBadge>
                         </li>
                     )
                 })}
 
                 {(asset.contacts || []).map((contact: any, index: number) => {
                     return (
-                        <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                            <User className="h-4 w-4"/>
-                            <p className="text-wrap break-words">
-                                {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
-                            </p>
+                        <li key={index}>
+                            <PropertyBadge icon={User}>
+                                <p className="text-wrap break-words">
+                                    {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
+                                </p>
+                            </PropertyBadge>
                         </li>
                     )
                 })}
 
                 {(asset.attachments || []).map((attachment: any, index: number) => {
                     return (
-                        <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                            <LinkIcon className="h-4 w-4"/>
-                            <Link 
-                                target="_blank" 
-                                className="text-wrap break-words underline" 
-                                href={attachment.link || "#"}
-                            >
-                                {attachment.name || attachment.link}
-                            </Link>
+                        <li key={index}>
+                            <PropertyBadge icon={LinkIcon}>
+                                <Link 
+                                    target="_blank" 
+                                    className="text-wrap break-words underline" 
+                                    href={attachment.link || "#"}
+                                >
+                                    {attachment.name || attachment.link}
+                                </Link>
+                            </PropertyBadge>
                         </li>
                     )
                 })}
@@ -196,66 +200,72 @@ export const RFPDetails = ({rfp}: {rfp: any}) => {
             <DialogTitle>{rfp.title}</DialogTitle>
             <DialogDescription>{rfp.description}</DialogDescription>
         </DialogHeader>
-
-        <ul className="w-full flex flex-col gap-2 text-sm text-wrap break-words">
+        <ul className="pt-2 w-full flex flex-col gap-2 text-sm text-wrap break-words">
             {(rfp.milestones || []).map((milestone: any, index: number) => {
                 return (
-                    <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                        <FileText className="h-4 w-4"/>
-                        <p className="text-wrap break-words">{milestone.milestone.title}</p>
+                    <li key={index}>
+                        <PropertyBadge icon={FileText}>
+                            <p className="text-wrap break-words">{milestone.milestone.title}</p>
+                        </PropertyBadge>
                     </li>
                 )
             })}
 
             {(rfp.startDate || rfp.endDate) && (
-                <li className="border-l-2 border-gray-300 pl-2">
-                    <DateView 
-                        specific={true} 
-                        startDate={rfp.startDate || undefined} 
-                        endDate={rfp.endDate || undefined} 
-                        startLabel="Request Opens:" 
-                        endLabel="Deadline for Proposals:"
-                    />
+                <li>
+                    <PropertyBadge icon={Calendar}>
+                        <DateView 
+                            specific={true} 
+                            startDate={rfp.startDate || undefined} 
+                            endDate={rfp.endDate || undefined} 
+                            startLabel="Request Opens:" 
+                            endLabel="Deadline for Proposals:"
+                        />
+                    </PropertyBadge>
                 </li>
             )}
 
             {(rfp.contacts || []).map((contact: any, index: number) => {
                 return (
-                    <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                        <User className="h-4 w-4"/>
-                        <p className="text-wrap break-words">
-                            {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
-                        </p>
+                    <li key={index}>
+                        <PropertyBadge icon={User}>
+                            <p className="text-wrap break-words">
+                                {[contact.name, contact.email, contact.affiliation].filter(x => x).join(` \u2022 `)}
+                            </p>
+                        </PropertyBadge>
                     </li>
                 )
             })}
 
             {(rfp.attachments || []).map((attachment: any, index: number) => {
                 return (
-                    <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                        <LinkIcon className="h-4 w-4"/>
-                        <Link 
-                            target="_blank" 
-                            className="text-wrap break-words underline" 
-                            href={attachment.link || "#"}
-                        >
-                            {attachment.name || attachment.link}
-                        </Link>
+                    <li key={index}>
+                        <PropertyBadge icon={LinkIcon}>
+                            <Link 
+                                target="_blank" 
+                                className="text-wrap break-words underline" 
+                                href={attachment.link || "#"}
+                            >
+                                {attachment.name || attachment.link}
+                            </Link>
+                        </PropertyBadge>
                     </li>
                 )
             })}
             
             {rfp.openTo && rfp.openTo.includes('ACADEMIC') && (
-                <li className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                    <GraduationCap className="h-4 w-4"/>
-                    <p>Open to Academics</p>
+                <li>
+                    <PropertyBadge icon={GraduationCap}>
+                        <p>Open to Academics</p>
+                    </PropertyBadge>
                 </li>
             )}
 
             {rfp.openTo && rfp.openTo.includes('CRO') && (
-                <li className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                    <Building className="h-4 w-4"/>
-                    <p>Open to Service Providers</p>
+                <li>
+                    <PropertyBadge icon={Building}>
+                        <p>Open to Service Providers</p>
+                    </PropertyBadge>
                 </li>
             )}
         </ul>

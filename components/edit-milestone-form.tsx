@@ -71,6 +71,7 @@ import { NotificationBubble } from "./notification-bubble"
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore"
 import { ChevronDown, FileText, Globe, Info, Lock, Megaphone, Plus, Star, X, Store } from "lucide-react"
 import { toast } from "sonner"
+import { badgeVariants } from "./ui/badge"
 
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
@@ -768,6 +769,7 @@ export function EditMilestoneForm({
                                     </Dialog>
                                     <Button
                                         disabled={!form.formState.isValid}
+                                        variant={"cta"}
                                         id="edit-milestone-scroll-area"
                                         className="research-plan-tour-step4"
                                         onClick={() => {
@@ -857,6 +859,7 @@ export const MilestoneTypeFormField = ({form, milestoneTypes}: { form: any, mile
                             <MultipleSelector
                                 {...field}
                                 maxSelected={3}
+                                badgeClassName={badgeVariants({variant: "milestoneType"})}
                                 defaultOptions={milestoneTypes.map(type => ({...type, value: type.id}))}
                                 options={milestoneTypes.map(type => ({...type, value: type.id}))}
                                 hidePlaceholderWhenSelected={true}
