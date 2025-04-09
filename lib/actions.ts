@@ -1817,6 +1817,7 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                 id: rfpData.id || nanoid()
             },
             update: {
+                headerImage: rfpData.headerImage,
                 title: rfpData.title,
                 description: rfpData.description,
                 attachments: {
@@ -1853,6 +1854,7 @@ export const createOrUpdateRFP = async (rfpData: Partial<RFP>, organizationId: s
                 },
             },
             create: {
+                headerImage: rfpData.headerImage,
                 title: rfpData.title || "",
                 description: rfpData.description,
                 attachments: {
