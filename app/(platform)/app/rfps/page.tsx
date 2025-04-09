@@ -49,7 +49,7 @@ export default async function RFPsPage() {
         return (
             <main className="flex gap-4 flex-col w-full max-w-7xl p-4 h-full items-center mx-auto">
                 <div className="flex gap-2 w-full justify-end">
-                    <NewRFPDialog />
+                    <NewRFPDialog iconOnly={true}/>
                     <RFPBulkImportDialog />
                 </div>
 

@@ -590,7 +590,7 @@ export function EditTaskForm({
                             <DeleteTaskDialogContent taskData={taskData}/>
                         </Dialog>
                         <DialogClose>
-                            <Button type="submit">Save Changes</Button>
+                            <Button variant={"cta"} type="submit">Save Changes</Button>
                         </DialogClose>
                     </span>
                 </form>

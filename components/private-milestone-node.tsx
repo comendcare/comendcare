@@ -32,8 +32,9 @@ import {PublicMilestoneNode} from "./public-milestone-node"
 import { TypeBadge } from "./type-badge"
 import { MilestoneType } from "@prisma/client"
 import { MilestoneTypeBadge } from "./milestone-type-badge"
-import { CircleDollarSign, Ellipsis, ExternalLink, Megaphone, Plus, Star, Trash, User } from "lucide-react"
+import { Calendar, CircleDollarSign, Ellipsis, ExternalLink, Megaphone, Plus, Star, Trash, User } from "lucide-react"
 import { Asset as DBAsset, RFP as DBRFP } from "@prisma/client"
+import { PropertyBadge } from "./property-badge"
 
 export type PrivateMilestoneNode = Node<
     {
@@ -111,8 +112,8 @@ function PrivateMilestoneNode(props: NodeProps<PrivateMilestoneNode>) {
             props.id === "preview" ? "opacity-50" : ""
         )}>
             <CardHeader>
-                <div className="h-fit flex flex-row align-center items-center justify-between gap-4">
-                    <TypeBadge type={props.type}/>
+                <div className="flex flex-row align-center items-center justify-end gap-4">
+                    {/* <TypeBadge type={props.type}/> */}
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
@@ -313,39 +314,42 @@ export const CardContents = ({props}: { props: NodeProps<PrivateMilestoneNode | 
                     {(props.data?.contacts || []).map((contact, index) => {
                         if (contact.affiliation) {
                             return (
-                                <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                                    <User className="h-4 w-4"/>
-                                    <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
+                                <li key={index}>
+                                    <PropertyBadge icon={User}>
+                                        <p className="w-[90%] text-wrap break-words">{contact.affiliation}</p>
+                                    </PropertyBadge>
                                 </li>
                             )
                         }
                     })}
 
                     {(props?.data?.startDate || props?.data?.endDate) && (
-                        <li className="border-l-2 border-gray-300 pl-2">
-                            <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
+                        <li>
+                            <PropertyBadge icon={Calendar}>
+                                <DateView startDate={props.data?.startDate} endDate={props.data?.endDate}/>
+                            </PropertyBadge>
                         </li>
                     )}
                     {(props.data?.assets || []).map((asset, index) => (
-                        <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                            <Star className="h-4 w-4" />
-                            <p>{asset.asset?.title}</p>
+                        <li key={index}>
+                            <PropertyBadge icon={Star}>
+                                <p>{asset.asset?.title}</p>
+                            </PropertyBadge>
                         </li>
                     ))}
                     {(props.data?.rfps || []).map((rfp, index) => (
-                        <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                            <Megaphone className="h-4 w-4" />
-                            <p>{rfp.rfp?.title}</p>
+                        <li key={index}>
+                            <PropertyBadge icon={Megaphone}>
+                                <p>{rfp.rfp?.title}</p>
+                            </PropertyBadge>
                         </li>
                     ))}
                 </ul>
-                <span className="w-full flex gap-2 flex-wrap text-wrap">
+                <span className="w-full flex gap-2 flex-wrap">
                     <StatusButton
-                        className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
                         disabled={true}
                         status={props.data.status}
-                        onStatusChange={() => {
-                        }}
+                        onStatusChange={() => {}}
                     />
                     {(props?.data?.types || []).sort((a, b) => a?.milestoneType?.label.length - b?.milestoneType?.label.length).map((milestoneType, index) => (
                         <MilestoneTypeBadge key={index} label={milestoneType?.milestoneType?.label} />

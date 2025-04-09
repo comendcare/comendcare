@@ -1,13 +1,14 @@
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import Link from "next/link";
 import {truncate} from "@/lib/utils";
-import React from "react";
+import React, { ReactNode } from "react";
 import {Company} from "@prisma/client";
 import {Separator} from "./ui/separator";
 import {TypeBadge} from "./type-badge";
 import SaveCRODialog from "@/components/save-cro-dialog";
-import {Briefcase, Building, Building2, Factory, FileText, Rocket, Star, University} from "lucide-react";
+import {Briefcase, Building, Building2, Factory, FileText, LucideProps, Rocket, Star, University} from "lucide-react";
 import { Milestone } from "@/lib/types";
+import { PropertyBadge } from "./property-badge";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -163,28 +164,24 @@ export function CROCardContents({cro}: { cro: Company }) {
                                 const count = categoryCounts[key];
                                 const isReview = key === "reviews";
                                 return (
-                                    <div
-                                        key={key}
-                                        className="text-xs flex flex-row justify-start items-center gap-x-1 border-l-2 border-gray-300 pl-2"
-                                    >
-                                        <Icon className="size-4" />
+                                    <PropertyBadge key={key} icon={Icon}>
                                         {isReview ? (
                                             count > 0 ? (
-                                                <div className="text-xs flex items-center gap-x-1">
+                                                <div className="flex items-center gap-x-1">
                                                     {cro.avgRating != null
                                                         ? `${Number(cro.avgRating % 1 === 0 ? cro.avgRating : cro.avgRating.toFixed(1))} (${count} ${count === 1 ? 'review' : 'reviews'})`
                                                         : 'N/A'}
                                                 </div>
                                             ) : (
-                                                <div className="text-xs">No reviews yet</div>
+                                                <div>No reviews yet</div>
                                             )
                                         ) : (
-                                            <div className="flex flex-row text-xs">
+                                            <div className="flex flex-row">
                                                 {label}:&nbsp;
                                                 <div>{count}</div>
                                             </div>
                                         )}
-                                    </div>
+                                    </PropertyBadge>
                                 );
                             })}
                     </div>

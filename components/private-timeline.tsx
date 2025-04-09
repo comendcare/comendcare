@@ -32,6 +32,7 @@ import {
 } from "@dnd-kit/sortable"
 import {CircleDollarSign, GripVertical, Megaphone, Star, User} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
+import { PropertyBadge } from "./property-badge"
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
@@ -324,11 +325,9 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
                 <li>
                     <StatusButton
-                        className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
                         disabled={true}
                         status={milestoneData?.status as StatusType || undefined}
-                        onStatusChange={() => {
-                        }}
+                        onStatusChange={() => {}}
                     />
                 </li>
                 {(milestoneData?.types || []).map((milestoneType, index) => (
@@ -339,23 +338,26 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                 {(milestoneData?.contacts || []).map((contact, index) => {
                     if (contact.affiliation) {
                         return (
-                            <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                                <User className="h-4 w-4"/>
-                                <p>{contact.affiliation}</p>
+                            <li key={index}>
+                                <PropertyBadge icon={User}>
+                                    <p>{contact.affiliation}</p>
+                                </PropertyBadge>
                             </li>
                         )
                     }
                 })}
                 {(milestoneData?.assets || []).map((asset, index) => (
-                    <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                        <Star className="h-4 w-4" />
-                        <p>{asset.asset?.title}</p>
+                    <li key={index}>
+                        <PropertyBadge icon={Star}>
+                            <p>{asset.asset?.title}</p>
+                        </PropertyBadge>
                     </li>
                 ))}
                 {(milestoneData?.rfps || []).map((rfp, index) => (
-                    <li key={index} className="flex gap-2 items-center border-l-2 border-gray-300 pl-2">
-                        <Megaphone className="h-4 w-4" />
-                        <p>{rfp.rfp?.title}</p>
+                    <li key={index}>
+                        <PropertyBadge icon={Megaphone}>
+                            <p>{rfp.rfp?.title}</p>
+                        </PropertyBadge>
                     </li>
                 ))}
             </ul>

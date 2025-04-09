@@ -25,6 +25,7 @@ import {useEffect} from "react"
 import {Info} from "lucide-react"
 import {useQueryState} from "nuqs"
 import {MILESTONE_TYPE_OPTIONS} from "@/prisma/seed/seed-options";
+import { badgeVariants } from "./ui/badge"
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
     ...option,
@@ -181,6 +182,7 @@ export function CROFilters() {
                                 <FormControl>
                                     <MultipleSelector
                                         {...field}
+                                        badgeClassName={badgeVariants({variant: "milestoneType"})}
                                         defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
                                         hidePlaceholderWhenSelected={true}
                                         placeholder="Select associated milestone types..."
@@ -249,6 +251,7 @@ export function CROFilters() {
                                 <FormControl>
                                     <MultipleSelector
                                         {...field}
+                                        badgeClassName={badgeVariants({variant: "certification"})}
                                         defaultOptions={CRO_CERTIFICATIONS}
                                         hidePlaceholderWhenSelected={true}
                                         placeholder="Select associated categories..."
