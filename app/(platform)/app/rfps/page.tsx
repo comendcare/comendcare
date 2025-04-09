@@ -54,7 +54,7 @@ export default async function RFPsPage() {
                 </div>
 
                 {rfps.length <= 0 && (
-                    <div className="h-full w-full flex flex-col justify-center items-center gap-4">
+                    <div className="h-full w-full flex flex-col justify-center items-center gap-4 max-w-lg text-center">
                         <h1 className="font-cal text-4xl">You do not have any RFPs</h1>
                         <Image
                             alt="No RFPs"
@@ -63,7 +63,7 @@ export default async function RFPsPage() {
                             height={300}
                         />
                         <p className="text-lg text-stone-500">
-                            You do not have any RFPs yet. Create one to get started.
+                            An RFP is a milestone you want to support through funding and/or other resources. 
                         </p>
                         <NewRFPDialog />
                     </div>
