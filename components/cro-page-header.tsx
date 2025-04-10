@@ -52,10 +52,12 @@ export default async function CROPageHeader({id}: { id: string }) {
         "Institutional animal care and use committee (IACUC)",
         "Office of Laboratory Animal Welfare (OLAW)",
         "United States Department of Agriculture (USDA)",
+        "Eco-Friendly Business",
+        "Woman-Owned Business",
     ]);
 
-    const filteredCertifications = cro.certifications.filter(certification =>
-        allowedCertifications.has(certification.name)
+    const filteredCertifications = cro.simplifiedCertifications.filter(certification =>
+        allowedCertifications.has(certification)
     );
 
     return (
@@ -133,7 +135,7 @@ export default async function CROPageHeader({id}: { id: string }) {
                     {filteredCertifications.map((certification, index) => (
                         <CertificationBadge
                             key={index}
-                            certificationName={certification.name}
+                            certificationName={certification}
                         />
                     ))}
                 </div>
