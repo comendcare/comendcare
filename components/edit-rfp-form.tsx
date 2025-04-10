@@ -58,21 +58,37 @@ type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
 
 const HEADER_IMAGE_OPTIONS = [
+    // {
+    //     label: "Yellow",
+    //     path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-yellow.svg"
+    // },
+    // {
+    //     label: "Pink",
+    //     path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-pink.png"
+    // },
+    // {
+    //     label: "Purple",
+    //     path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-purple.png"
+    // },
+    // {
+    //     label: "Red",
+    //     path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-red.png"
+    // }
     {
         label: "Yellow",
-        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-yellow.svg"
+        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-light-yellow.png"
     },
     {
         label: "Pink",
-        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-pink.png"
+        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-light-red.png"
     },
     {
-        label: "Purple",
-        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-purple.png"
+        label: "Blue",
+        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-light-blue.png"
     },
     {
-        label: "Red",
-        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-red.png"
+        label: "Green",
+        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-light-green.png"
     }
 ]
 
@@ -127,8 +143,8 @@ export function EditRFPForm({
         mode: "onChange",
         resolver: zodResolver(editRFPForm),
         defaultValues: {
-            // headerImage: rfpData?.headerImage || "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-yellow.svg",
-            headerImage: rfpData?.headerImage || undefined,
+            headerImage: rfpData?.headerImage || "https://storage.googleapis.com/comend-app-public-permanent/zebra-light-blue.png",
+            // headerImage: rfpData?.headerImage || undefined,
             title: rfpData?.title || "",
             description: rfpData?.description || "",
             attachments: rfpData?.attachments || undefined,
