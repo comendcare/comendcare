@@ -33,6 +33,7 @@ import { NotificationsState, useNotificationsStore } from "@/state/notifications
 import { cn, sleep } from "@/lib/utils";
 import { Wand2 } from "lucide-react";
 import {useQueryState} from "nuqs"
+import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -145,7 +146,7 @@ export default function AppLayout({children}: AppLayoutProps) {
                 milestoneTypes: parseQuery(queryMilestoneTypes)
                     .map(query => {
                         const milestoneType = (milestoneTypes.data || []).find(milestone => milestone.id === query.value)
-                        if (!milestoneType) return query
+                        if (!milestoneType) return undefined
                         return {
                             label: milestoneType.label,
                             value: milestoneType.id
@@ -164,9 +165,21 @@ export default function AppLayout({children}: AppLayoutProps) {
 
             // Init Organization/PAG Search Store
             const parsedPAGFilters = {
-                systems: parseQuery(querySystems),
-                mechanisms: parseQuery(queryMechanisms),
-                modalities: parseQuery(queryModalities),
+                systems: parseQuery(querySystems).map(query => {
+                    const system = (ASSOCIATED_SYSTEMS || []).find(system => system.value === query.value)
+                    if (!system) return undefined
+                    return system
+                }).filter(query => query !== undefined),
+                mechanisms: parseQuery(queryMechanisms).map(query => {
+                    const mechanism = (MOLECULAR_MECHANISMS || []).find(mechanism => mechanism.value === query.value)
+                    if (!mechanism) return undefined
+                    return mechanism
+                }).filter(query => query !== undefined),
+                modalities: parseQuery(queryModalities).map(query => {
+                    const modality = (MODALITIES || []).find(modalities => modalities.value === query.value)
+                    if (!modality) return undefined
+                    return modality
+                }).filter(query => query !== undefined),
             }
             initializeOrganizationSearch(parsedPAGFilters)
             console.log(`Organization search initialized...`)
