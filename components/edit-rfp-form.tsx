@@ -36,15 +36,61 @@ import {cn} from "@/lib/utils"
 import {format} from "date-fns"
 import {Calendar} from "./ui/calendar"
 import MultipleSelector from "./ui/multiple-selector"
-import { Calendar as CalendarIcon } from "lucide-react"
+import { Calendar as CalendarIcon, Pencil } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { createOrUpdateRFP, deleteRFP } from "@/lib/actions"
 import { Option } from "@/lib/types"
 import { AttachmentsFormField, ContactsFormField, OpenToFormField, PrivatePublicFormField } from "./edit-milestone-form"
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu"
 
 type AttachmentType = Prisma.ExternalAttachmentGetPayload<{}>
 type ContactType = Prisma.ExternalContactGetPayload<{}>
+
+const HEADER_IMAGE_OPTIONS = [
+    // {
+    //     label: "Yellow",
+    //     path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-yellow.svg"
+    // },
+    // {
+    //     label: "Pink",
+    //     path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-pink.png"
+    // },
+    // {
+    //     label: "Purple",
+    //     path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-purple.png"
+    // },
+    // {
+    //     label: "Red",
+    //     path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-pattern-red.png"
+    // }
+    {
+        label: "Yellow",
+        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-light-yellow.png"
+    },
+    {
+        label: "Pink",
+        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-light-red.png"
+    },
+    {
+        label: "Blue",
+        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-light-blue.png"
+    },
+    {
+        label: "Green",
+        path: "https://storage.googleapis.com/comend-app-public-permanent/zebra-light-green.png"
+    }
+]
 
 export const optionSchema = z.object({
     label: z.string(),
@@ -54,6 +100,7 @@ export const optionSchema = z.object({
 });
 
 const editRFPForm = z.object({
+    headerImage: z.string().optional(),
     title: z
         .string({
             required_error: "Please provide a title"
@@ -96,6 +143,8 @@ export function EditRFPForm({
         mode: "onChange",
         resolver: zodResolver(editRFPForm),
         defaultValues: {
+            headerImage: rfpData?.headerImage || "https://storage.googleapis.com/comend-app-public-permanent/zebra-light-blue.png",
+            // headerImage: rfpData?.headerImage || undefined,
             title: rfpData?.title || "",
             description: rfpData?.description || "",
             attachments: rfpData?.attachments || undefined,
@@ -109,6 +158,7 @@ export function EditRFPForm({
     })
 
     const formData = {
+        headerImage: form.watch("headerImage"),
         title: form.watch("title"),
         description: form.watch("description"),
         attachments: form.watch("attachments"),
@@ -123,6 +173,7 @@ export function EditRFPForm({
     const handleFormSubmit = async (values: z.infer<typeof editRFPForm>) => {
         console.log(`handle form submit`, values)
         const {
+            headerImage,
             title,
             description,
             attachments,
@@ -136,6 +187,7 @@ export function EditRFPForm({
 
         const updateData: Partial<RFP> = {
             ...rfpData,
+            headerImage,
             title,
             private: isPrivate !== undefined && isPrivate !== null ? isPrivate : true,
             milestones: (milestones || []).map((milestone) => {
@@ -151,8 +203,6 @@ export function EditRFPForm({
             ...(startDate ? {startDate} : undefined),
             ...(endDate ? {endDate} : undefined)
         }
-
-        console.log(`updateData`, updateData)
 
         if (!session?.user?.organizationId) {
             toast.error("You're not signed into an organization right now.");
@@ -227,12 +277,66 @@ export function EditRFPForm({
 
     return (
         <Form {...form}>
+            <FormField
+                control={form.control}
+                name="headerImage"
+                render={({field}) => (
+                    <div className="absolute top-0 w-full h-[80px] left-0 flex justify-end items-end absolute -top-px -left-px w-[calc(100%+4px)] bg-blue-light">
+                        <img
+                            src={field.value}
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                objectPosition: "center"
+                            }}
+                            className="absolute w-full"
+                        />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button className="relative bottom-0 right-0 hover:bg-transparent" variant="ghost">
+                                    <Pencil />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-32">
+                            <DropdownMenuRadioGroup value={field.value} onValueChange={(value) => form.setValue("headerImage", value, {shouldValidate: true})}>
+                                {
+                                    HEADER_IMAGE_OPTIONS.map(({label, path}) => (
+                                        <DropdownMenuRadioItem value={path} className="flex justify-between">
+                                            {label}
+                                            <img
+                                                src={path}
+                                                style={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    objectFit: "cover",
+                                                    objectPosition: "start"
+                                                }}
+                                                className="h-4 w-4 rounded-full"
+                                            />
+                                        </DropdownMenuRadioItem>
+                                    ))
+                                }
+                            </DropdownMenuRadioGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                )}
+            />
+
+            {/* <div className="h-[100px]"/> */}
+
             <ScrollArea className={"max-h-[600px] -mr-2 pr-3"} type={"always"}>
                 <ScrollBar />
-                <form
+                {/* <form
                     onSubmit={form.handleSubmit(handleFormSubmit)}
                     className="space-y-6 m-1"
+                > */}
+                <div
+                    // onSubmit={form.handleSubmit(handleFormSubmit)}
+                    className="space-y-6 m-1"
                 >
+
                     <FormField
                         control={form.control}
                         name="title"
@@ -366,7 +470,8 @@ export function EditRFPForm({
                             </Button>
                         </DialogClose>
                     </span>
-                </form>
+                {/* </form> */}
+                </div>
             </ScrollArea>
         </Form>
     )

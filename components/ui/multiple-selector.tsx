@@ -574,6 +574,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                                             className={"cursor-pointer multiselect-item"}
                                                         >
                                                             {framework.label}
+                                                            <p className="hidden">{framework.value}</p>
                                                         </CommandItem>
                                                         </HoverCardTrigger>
                                                         {showHoverCard && (

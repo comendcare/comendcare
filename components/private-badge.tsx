@@ -7,7 +7,7 @@ export function PrivateBadge({ iconOnly = false, className = "" }: { iconOnly?: 
         return (
             <Tooltip>
                 <TooltipTrigger className={cn(className, "text-sm")}>
-                    <Lock className="h-4 w-4"/>
+                    <Lock className="min-h-4 h-4 min-w-4 w-4"/>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-80 text-wrap text-left">
                     <p className={cn(className, "text-normal")}>
