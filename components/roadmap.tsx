@@ -486,16 +486,16 @@ const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val:
     const { startOnborda } = useOnborda()
 
     return (
-        <div className="h-full w-full flex flex-col justify-center items-center gap-4">
-            <h1 className="font-cal text-4xl">You do not have any projects</h1>
+        <div className="h-full w-full flex flex-col justify-center items-center gap-4 text-center">
+            <h1 className="font-cal text-4xl">You do not have any Projects</h1>
             <Image
                 alt="No projects"
                 src="https://illustrations.popsy.co/gray/graphic-design.svg"
                 width={300}
                 height={300}
             />
-            <p className="text-lg text-stone-500">
-                You do not have any projects yet. Create one to get started.
+            <p className="text-lg text-stone-500 max-w-xl">
+                A project is a milestone that is being planned or developed. You may attach Assets and RFPs to Projects. 
             </p>
             <span className="flex gap-4">
             <Button 
