@@ -6,6 +6,7 @@ import {ProfilePhoto} from "./profile-photo";
 import {Separator} from "@/components/ui/separator";
 import {FileText, HandCoins, Megaphone, Star, Users} from "lucide-react";
 import React from "react";
+import { PropertyBadge } from "./property-badge";
 
 type NodeTypeCount = Record<string, number>;
 
@@ -24,7 +25,12 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
     const orgCondition = condition?.[0]?.condition || {};
     const {associatedGenes = [], numberOfPatientsEngaged} = orgCondition;
 
-    const nodeTypeCount = countPublicNodeTypes(organization.Milestone);
+    const nodeTypeCount = countPublicNodeTypes(organization.Milestone)
+    // const nodeTypeCount = {
+    //     "PROJECT": (organization.Milestone || []).filter((item: any) => !item.private).length,
+    //     "ASSET": (organization.Asset || []).filter((item: any) => !item.private).length,
+    //     "RFP": (organization.RFP || []).filter((item: any) => !item.private).length
+    // }
 
     const nodeTypeLabels = [
         {key: "ASSET", icon: Star, label: "Asset"},
@@ -76,17 +82,12 @@ export function OrganizationMarketplaceCard({organization}: { organization: any 
                                 .map(({ key, icon: Icon, label }, index) => {
                                     const count = nodeTypeCount[key];
                                     return (
-                                        <div
-                                            key={key}
-                                            className={`text-xs flex flex-row justify-start items-center gap-x-1 
-                        ${index !== 0 ? "border-l border-gray-300 pl-2" : ""}`}
-                                        >
-                                            <Icon className="size-4" />
+                                        <PropertyBadge icon={Icon}>
                                             <span className="flex flex-row items-center gap-x-1 whitespace-nowrap">
                                                 <div className="text-sm">{count}</div>{label}
                                                 {count > 1 ? "s" : ""}
                                             </span>
-                                        </div>
+                                        </PropertyBadge>
                                     );
                                 })}
                         </div>

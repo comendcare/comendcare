@@ -15,7 +15,9 @@ export async function POST(req: Request) {
                 node: true,
                 contacts: true,
                 attachments: true,
-                types: { include: { milestoneType: true } }
+                types: { include: { milestoneType: true } },
+                assets: { include: { asset: true } },
+                rfps: { include: { rfp: true } }
             }
         });
 

@@ -24,7 +24,13 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import {useEffect} from "react"
 import {Info} from "lucide-react"
 import {useQueryState} from "nuqs"
+import {MILESTONE_TYPE_OPTIONS} from "@/prisma/seed/seed-options";
+import { badgeVariants } from "./ui/badge"
 
+export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
+    ...option,
+    value: option.id,
+}));
 
 const selector = (state: CROSearchState) => ({
     filters: state.filters,
@@ -40,6 +46,7 @@ const optionSchema = z.object({
 
 const filtersFormSchema = z.object({
     categories: z.array(optionSchema),
+    milestoneTypes: z.array(optionSchema),
     types: z.array(optionSchema),
     certifications: z.array(optionSchema),
 })
@@ -47,6 +54,12 @@ const filtersFormSchema = z.object({
 export function CROFilters() {
     const {filters, allResults, setFilters} = useCROSearchStore(useShallow(selector))
     // For URL sync
+    const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
     const [queryCategories, setQueryCategories] = useQueryState("categories", {
         shallow: true,
         history: "replace",
@@ -80,6 +93,7 @@ export function CROFilters() {
         const stringify = (arr: { value: string }[]) => arr.map(x => x.value).join(",")
 
         await setQueryCategories(values.categories.length ? stringify(values.categories) : null)
+        await setQueryMilestoneTypes(values.milestoneTypes.length ? stringify(values.milestoneTypes) : null)
         await setQueryTypes(values.types.length ? stringify(values.types) : null)
         await setQueryCertifications(values.certifications.length ? stringify(values.certifications) : null)
     }
@@ -92,6 +106,7 @@ export function CROFilters() {
     useEffect(() => {
         const parsedFilters = {
             categories: parseQuery(queryCategories),
+            milestoneTypes: parseQuery(queryMilestoneTypes),
             types: parseQuery(queryTypes),
             certifications: parseQuery(queryCertifications),
         }
@@ -99,8 +114,12 @@ export function CROFilters() {
         setFilters(parsedFilters)
         form.reset(parsedFilters)
 
-        // Force search on hydration
-        form.handleSubmit(handleSubmit)()
+        // Avoid blocking hydration
+        const timeout = setTimeout(() => {
+            form.handleSubmit(handleSubmit)()
+        }, 0)
+
+        return () => clearTimeout(timeout)
     }, [])
 
     return (
@@ -114,28 +133,63 @@ export function CROFilters() {
                         Filters
                     </h1>
 
+                    {/*<FormField*/}
+                    {/*    control={form.control}*/}
+                    {/*    name="categories"*/}
+                    {/*    render={({field}) => (*/}
+                    {/*        <FormItem>*/}
+                    {/*            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">*/}
+                    {/*                Service categories*/}
+                    {/*                <Tooltip>*/}
+                    {/*                    <TooltipTrigger>*/}
+                    {/*                        <Info className="h-4 w-4"/>*/}
+                    {/*                    </TooltipTrigger>*/}
+                    {/*                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">*/}
+                    {/*                        {`The service categories provided by the CRO.`}*/}
+                    {/*                    </TooltipContent>*/}
+                    {/*                </Tooltip>*/}
+                    {/*            </FormLabel>*/}
+                    {/*            <FormControl>*/}
+                    {/*                <MultipleSelector*/}
+                    {/*                    {...field}*/}
+                    {/*                    defaultOptions={ASSOCIATED_CATEGORIES}*/}
+                    {/*                    hidePlaceholderWhenSelected={true}*/}
+                    {/*                    placeholder="Select associated categories..."*/}
+                    {/*                    emptyIndicator={*/}
+                    {/*                        <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">*/}
+                    {/*                            no results found.*/}
+                    {/*                        </p>*/}
+                    {/*                    }*/}
+                    {/*                />*/}
+                    {/*            </FormControl>*/}
+                    {/*            <FormMessage/>*/}
+                    {/*        </FormItem>*/}
+                    {/*    )}*/}
+                    {/*/>*/}
+
                     <FormField
                         control={form.control}
-                        name="categories"
+                        name="milestoneTypes"
                         render={({field}) => (
                             <FormItem>
                                 <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
-                                    Service categories
+                                    Milestone types
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <Info className="h-4 w-4"/>
                                         </TooltipTrigger>
                                         <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                            {`The service categories provided by the CRO.`}
+                                            {`The milestone types the CRO has services for.`}
                                         </TooltipContent>
                                     </Tooltip>
                                 </FormLabel>
                                 <FormControl>
                                     <MultipleSelector
                                         {...field}
-                                        defaultOptions={ASSOCIATED_CATEGORIES}
+                                        badgeClassName={badgeVariants({variant: "milestoneType"})}
+                                        defaultOptions={MILESTONE_TYPE_OPTIONS_WITH_VALUE}
                                         hidePlaceholderWhenSelected={true}
-                                        placeholder="Select associated categories..."
+                                        placeholder="Select associated milestone types..."
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -201,6 +255,7 @@ export function CROFilters() {
                                 <FormControl>
                                     <MultipleSelector
                                         {...field}
+                                        badgeClassName={badgeVariants({variant: "certification"})}
                                         defaultOptions={CRO_CERTIFICATIONS}
                                         hidePlaceholderWhenSelected={true}
                                         placeholder="Select associated categories..."

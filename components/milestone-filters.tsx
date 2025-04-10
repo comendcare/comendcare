@@ -73,13 +73,13 @@ export function MilestoneFilters() {
                     render={({field}) => (
                         <FormItem>
                             <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
-                                Milestone types
+                                Project types
                                 <Tooltip>
                                     <TooltipTrigger>
                                         <Info className="h-4 w-4"/>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                        {`Types of milestones an organization may have in their research plan`}
+                                        {`Types of projects an organization may have in their research plan`}
                                     </TooltipContent>
                                 </Tooltip>
                             </FormLabel>
@@ -87,7 +87,7 @@ export function MilestoneFilters() {
                                 <MultipleSelector
                                     {...field}
                                     // defaultOptions={MILESTONE_TYPE_OPTIONS}
-                                    placeholder="Select milestone types..."
+                                    placeholder="Select project types..."
                                     emptyIndicator={
                                         <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                             no results found.
@@ -107,13 +107,13 @@ export function MilestoneFilters() {
                     render={({field}) => (
                         <FormItem>
                             <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
-                                Milestone status
+                                Project status
                                 {/* <Tooltip>
                                     <TooltipTrigger>
                                         <Info className="h-4 w-4"/>
                                     </TooltipTrigger>
                                     <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                        {`Types of milestones an organization may have in their research plan`}
+                                        {`Types of projects an organization may have in their research plan`}
                                     </TooltipContent>
                                 </Tooltip> */}
                             </FormLabel>
@@ -141,95 +141,6 @@ export function MilestoneFilters() {
                         </FormItem>
                     )}
                 />
-
-                <FormField
-                    control={form.control}
-                    name="nodeType"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel className="font-semibold text-base flex items-center justify-start gap-2">
-                                Milestone class
-                                {/* <Tooltip>
-                                    <TooltipTrigger>
-                                        <Info className="h-4 w-4"/>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="max-w-80 text-wrap text-left font-normal">
-                                        {`Types of milestones an organization may have in their research plan`}
-                                    </TooltipContent>
-                                </Tooltip> */}
-                            </FormLabel>
-                            <FormControl>
-                                <ToggleGroup
-                                    type="multiple"
-                                    variant="outline"
-                                    value={field.value}
-                                    onValueChange={
-                                        field.onChange
-                                    }
-                                    className="w-fit flex flex-wrap gap-2 justify-start"
-                                >
-                                    {NODE_TYPE_OPTIONS.map(({label, value}) => (
-                                        <ToggleGroupItem
-                                            key={value}
-                                            value={value}
-                                        >
-                                            {label}
-                                        </ToggleGroupItem>
-                                    ))}
-                                </ToggleGroup>
-                            </FormControl>
-                            <FormMessage/>
-                        </FormItem>
-                    )}
-                />
-
-                {/* <FormItem>
-                    <FormLabel className="font-semibold text-base">Projects and assets</FormLabel>
-                    <FormField
-                        control={form.control}
-                        name="hasProject"
-                        render={({field}) => (
-                            <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                <FormControl>
-                                    <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
-                                </FormControl>
-                                <div className="space-y-1 leading-none">
-                                    <FormLabel>
-                                        {`Associated Project`}
-                                    </FormLabel>
-                                    <FormDescription>
-                                        {`Include milestones that are associated with a project.`}
-                                    </FormDescription>
-                                </div>
-                            </div>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="hasAsset"
-                        render={({field}) => (
-                            <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                <FormControl>
-                                    <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                    />
-                                </FormControl>
-                                <div className="space-y-1 leading-none">
-                                    <FormLabel>
-                                        {`Associated Asset`}
-                                    </FormLabel>
-                                    <FormDescription>
-                                        {`Include milestones that are associated with an asset.`}
-                                    </FormDescription>
-                                </div>
-                            </div>
-                        )}
-                    />
-                </FormItem> */}
 
                 <span className="flex justify-end gap-4 flex-wrap">
                     <Button type="submit" variant="secondary" onClick={() => {

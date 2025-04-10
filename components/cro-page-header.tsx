@@ -1,12 +1,13 @@
 import {getCROData} from "@/lib/fetchers";
 import {notFound} from "next/navigation";
-import {Star} from "@/components/cro-rating-section";
+// import {Star} from "@/components/cro-rating-section";
 import {CertificationBadge} from "@/components/certification-badge";
 import {cn} from "@/lib/utils";
 import SaveCRODialog from "@/components/save-cro-dialog";
 import {
     BriefcaseBusiness,
     Building,
+    Star,
     Building2,
     Calendar,
     ExternalLink,
@@ -31,7 +32,7 @@ const companyTypeIcons: Record<string, JSX.Element> = {
     "Consultant (<5 employees)": <BriefcaseBusiness className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"/>,
 };
 
-export default async function CROPageHeader ({id}: {id: string}) {
+export default async function CROPageHeader({id}: { id: string }) {
     const cro = await getCROData(id)
 
     if (!cro) {
@@ -65,24 +66,24 @@ export default async function CROPageHeader ({id}: {id: string}) {
                         {cro.title}
                     </h1>
                 </div>
-                <Link
-                    href={"?tab=reviews"}
-                    className="flex items-center mb-2"
-                >
-                    {[...Array(5)].map((_, index) => (
-                        <Star
-                            key={index}
-                            filled={cro.avgRating ? index < Math.round(cro.avgRating) : false}
-                        />
-                    ))}
-                    <p className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {cro.reviews.length > 0 && typeof cro.avgRating === "number"
-                            ? Number.isInteger(cro.avgRating)
-                                ? `${cro.avgRating} out of 5`
-                                : `${cro.avgRating.toFixed(2)} out of 5`
-                            : "No reviews yet"}
-                    </p>
-                </Link>
+                {/*<Link*/}
+                {/*    href={"?tab=reviews"}*/}
+                {/*    className="flex items-center mb-2"*/}
+                {/*>*/}
+                {/*    {[...Array(5)].map((_, index) => (*/}
+                {/*        <Star*/}
+                {/*            key={index}*/}
+                {/*            filled={cro.avgRating ? index < Math.round(cro.avgRating) : false}*/}
+                {/*        />*/}
+                {/*    ))}*/}
+                {/*    <p className="ms-2 text-sm font-medium text-gray-500 dark:text-gray-400">*/}
+                {/*        {cro.reviews.length > 0 && typeof cro.avgRating === "number"*/}
+                {/*            ? Number.isInteger(cro.avgRating)*/}
+                {/*                ? `${cro.avgRating} out of 5`*/}
+                {/*                : `${cro.avgRating.toFixed(2)} out of 5`*/}
+                {/*            : "No reviews yet"}*/}
+                {/*    </p>*/}
+                {/*</Link>*/}
                 <div
                     className="flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
                     {cro.headquarters &&
@@ -95,8 +96,10 @@ export default async function CROPageHeader ({id}: {id: string}) {
                         </div>
                     }
                     {cro.yearEstablished && (
-                        <div className="flex items-center text-gray-500"> <Calendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                                                                                    aria-hidden="true"/>
+                        <div className="flex items-center text-gray-500">
+                            <Calendar className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                      aria-hidden="true"
+                            />
                             Founded in {cro.yearEstablished}
                         </div>
                     )}
@@ -108,6 +111,23 @@ export default async function CROPageHeader ({id}: {id: string}) {
                             {companyTypeMap[cro.companyType] || cro.companyType}
                         </div>
                     )}
+                    <Link
+                        href={"?tab=reviews"}
+                        className="flex items-center mb-2 hover:cursor-pointer"
+                    >
+                        <div className="flex items-center text-gray-500">
+                            <Star className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                                  aria-hidden="true"
+                            />
+                            <div className="flex items-center text-gray-500">
+                                {cro.reviews.length > 0 && typeof cro.avgRating === "number"
+                                    ? Number.isInteger(cro.avgRating)
+                                        ? `${cro.avgRating} out of 5`
+                                        : `${cro.avgRating.toFixed(2)} out of 5`
+                                    : "No reviews yet"}
+                            </div>
+                        </div>
+                    </Link>
                 </div>
                 <div className="flex flex-wrap gap-2 w-5/6">
                     {filteredCertifications.map((certification, index) => (

@@ -18,7 +18,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { getMilestoneTypes, getOrganizationFromOrganizationId } from "@/lib/fetchers"
 import { PrivateTimelineView } from "./private-timeline"
 import { Button, buttonVariants } from "./ui/button"
-import { cn, sleep } from "@/lib/utils"
+import { cn, parseCSV, sleep } from "@/lib/utils"
 import Link from "next/link"
 import {
     Dialog,
@@ -27,7 +27,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "./ui/dialog"
-import { ExternalLink, Import, Info, Plus, Redo2, Undo2 } from "lucide-react"
+import { ExternalLink, Import, Info, Plus, Redo2, Undo2, Wand2, WandSparkles } from "lucide-react"
 import { FileUploadForm } from "./file-upload-form"
 import Papa from "papaparse"
 import { toast } from "sonner"
@@ -38,6 +38,7 @@ import { Milestone, NodeType } from "@/lib/types"
 import Loading from "@/app/loading"
 import { MilestoneType } from "@prisma/client"
 import { useSession } from "next-auth/react"
+import { useOnborda } from "./onborda/OnbordaContext"
 
 const selector = (state: RoadmapState) => ({
     roadmapId: state.roadmapId,
@@ -84,9 +85,6 @@ export function Roadmap() {
             if (response.success && response.data) {
                 setMilestoneTypes(response.data || [])
             }
-
-            await sleep(300)
-            if (milestones.length <= 0 && initialized) setNewMilestoneIsOpen(true)
 
             if (session?.user.organizationId) {
                 let orgData = await getOrganizationFromOrganizationId(session.user.organizationId)
@@ -201,10 +199,20 @@ export function Roadmap() {
 
                             {selectedView === "timeline" || selectedView === null && (
                                 <div className="flex flex-row gap-4 items-center">
-                                    <p>Sort by:</p>
                                     <Select value={sortBy} onValueChange={(value: string) => setSortBy(value)}>
                                         <SelectTrigger className="w-[180px]">
-                                            <SelectValue defaultValue={'default'} placeholder={"Sort by"}/>
+                                            <SelectValue defaultValue={'custom'} placeholder={"Sort by"}>
+                                                {(() => {
+                                                    switch(sortBy) {
+                                                        case "start":
+                                                            return "Sort by: Start Date"
+                                                        case "end":
+                                                            return "Sort by: End Date"
+                                                        default:
+                                                            return "Sort by: Custom"
+                                                    }
+                                                })()}
+                                            </SelectValue>
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="custom">{`Custom`}</SelectItem>
@@ -227,7 +235,7 @@ export function Roadmap() {
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
-                                    <p>{`Create a milestone`}</p>
+                                    <p>{`Create a project`}</p>
                                 </TooltipContent>
                             </Tooltip>
 
@@ -246,7 +254,7 @@ export function Roadmap() {
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-80">
-                                    <p>{`Import milestones from .csv`}</p>
+                                    <p>{`Import projects from .csv`}</p>
                                 </TooltipContent>
                             </Tooltip>
 
@@ -347,7 +355,7 @@ export function Roadmap() {
                         <ResizablePanel
                             defaultSize={40}
                             minSize={25}
-                            className="bg-white h-full flex flex-col"
+                            className="bg-white h-full flex flex-col min-w-[400px]"
                         >
                             <MilestoneDetailsPanel
                                 remountKey={milestoneRemountKey}
@@ -367,86 +375,55 @@ export function Roadmap() {
                     <DialogContent className="flex flex-col justify-start">
                         <DialogHeader>
                             <DialogTitle className="text-2xl">
-                                Import milestones
+                                Import projects
                             </DialogTitle>
                             <DialogDescription>
-                                Import multiple milestones at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">Milestone input template</Link>, filling it out, downloading it as a CSV, and uploading it.
+                                Import multiple projects at a time. Start by making a copy of our <Link target={"_blank"} className="underline text-blue-dark" href="https://docs.google.com/spreadsheets/d/1C8yyYY_It4Mag9u7zcXFfZa2ITylqXcSz5GsFS2IdkE/edit?usp=sharing">Project input template</Link>, filling it out, downloading it as a CSV, and uploading it.
                             </DialogDescription>
                         </DialogHeader>
 
                         <FileUploadForm 
                             accept=".csv" 
-                            onSubmit={(file) => {
+                            onSubmit={async (file) => {
                                 if (file && file.name.endsWith(".csv")) {
                                     // parse CSV file
-                                    Papa.parse(file, {
-                                        complete: (result) => {
-                                            try {
-                                                const newMilestones: Partial<Milestone>[] = []
+                                    try {
+                                        const result = await parseCSV(
+                                            file,
+                                            [
+                                                {key: 'title', required: true, defaultValue: 'Untitled Milestone', isValid: (entry) => typeof entry === 'string' && entry.length > 0},
+                                                {key: 'description', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string'},
+                                                {key: 'type', required: false, defaultValue: undefined, isValid: (entry) => typeof entry === 'string' && milestoneTypes.find(type => type.label === entry) !== undefined}
+                                            ]
+                                        )
+                            
+                                        if (result.errors.length > 0) {
+                                            toast('Warning!', {
+                                                position: "bottom-left",
+                                                duration: 6000,
+                                                description: `Missing fields in import file: A title is required for each project. Edit the Project to add title.`
+                                            })
+                                            console.error("Error: imported projects are missing required fields", result.errors)
+                                        }
 
-                                                const isValidFormat = (entry: any) => {
-                                                    const errors = []
-    
-                                                    // only title is a required field
-                                                    if (!(entry.title && typeof entry.title === "string")) {
-                                                        errors.push({
-                                                            type: "title",
-                                                            message: "Field 'title' is not formatted properly"
-                                                        })
-                                                    }
-    
-                                                    if (errors.length > 0) return { isValid: false, errors: errors }
-                                                    return { isValid: true }
-                                                }
-    
-                                                let errors: {type: string, message: string}[] = []
-                                                result.data.forEach((entry: any) => {
-                                                    // validate milestone format
-                                                    const validate = isValidFormat(entry)
-                                                    if (validate.isValid && !validate.errors) {
-                                                        const foundType = milestoneTypes.find(type => type.label === entry.type)
-                                                        newMilestones.push({
-                                                            title: entry.title || 'New Milestone',
-                                                            description: entry.description || '', // description is optional
-                                                            types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [], // types are optional
-                                                            nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT" // category is optional, default to project
-                                                        })
-                                                    } else {
-                                                        errors = errors.concat(validate.errors || [])
-    
-                                                        const foundType = milestoneTypes.find(type => type.label === entry.type)
-                                                        // attempt to create anyways
-                                                        newMilestones.push({
-                                                            title: entry.title && typeof entry.title === 'string' ? entry.title : 'New milestone',
-                                                            description: entry.description || '',
-                                                            types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
-                                                            nodeType: entry.category === "RFP" || entry.category === "PROJECT" || entry.category === "ASSET" ? entry.category : "PROJECT"
-                                                        })
-                                                    }
-                                                })
-    
-                                                if (errors.length > 0) {
-                                                    toast('Warning!', {
-                                                        position: "bottom-left",
-                                                        duration: 4000,
-                                                        description: `Missing fields in import file: A title is required for each milestone. Please ensure all milestones have titles before importing.`
-                                                    })
-                                                    console.error("Error: imported milestones are missing required fields", errors)
-                                                }
-    
-                                                addMilestones(newMilestones)
-                                            } catch (e) {
-                                                toast('Error!', {
-                                                    position: "bottom-left",
-                                                    duration: 4000,
-                                                    description: `Import failed. Please try again. If the problem continues, contact us at support@comendcare.com`
-                                                })
-                                                console.error("Error: failed to import milestones", e)
+                                        addMilestones(result.values.map(milestone => {
+                                            const foundType = milestoneTypes.find(type => type.label === milestone.type)
+
+                                            return {
+                                                title: milestone.title, 
+                                                description: milestone.description, 
+                                                types: foundType ? [{milestoneTypeId: foundType.id, milestoneType: foundType}] : [],
+                                                nodeType: "PROJECT"
                                             }
-                                        },
-                                        header: true,
-                                        skipEmptyLines: true,
-                                    })
+                                        }))
+                                    } catch (e) {
+                                        toast('Error!', {
+                                            position: "bottom-left",
+                                            duration: 6000,
+                                            description: `Import failed. Please try again to upload using a copy of our template. If the problem continues, contact us at support@comendcare.com`
+                                        })
+                                        console.error("Error: failed to import assets", e)
+                                    }
                                 } else {
                                     console.error("Please upload a valid CSV file.");
                                 }
@@ -504,22 +481,40 @@ const MilestoneDetailsPanel = ({
 }
 
 const NoMilestonesCard = ({setNewMilestoneIsOpen}: {setNewMilestoneIsOpen: (val: boolean) => void}) => {
+    const pathname = usePathname()
+    const { setSelectedNodeId } = useRoadmapStore(useShallow(selector))
+    const { startOnborda } = useOnborda()
+
     return (
-        <div className="h-full w-full flex flex-col justify-center items-center gap-4">
-            <h1 className="font-cal text-4xl">You do not have any milestones</h1>
+        <div className="h-full w-full flex flex-col justify-center items-center gap-4 text-center">
+            <h1 className="font-cal text-4xl">You do not have any Projects</h1>
             <Image
-                alt="missing milestones"
+                alt="No projects"
                 src="https://illustrations.popsy.co/gray/graphic-design.svg"
-                width={400}
-                height={400}
+                width={300}
+                height={300}
             />
-            <p className="text-lg text-stone-500">
-                You do not have any milestones yet. Create one to get started.
+            <p className="text-lg text-stone-500 max-w-xl">
+                A project is a milestone that is being planned or developed. You may attach Assets and RFPs to Projects. 
             </p>
+            <span className="flex gap-4">
+            <Button 
+                variant={"secondary"}
+                onClick={() => {
+                    if (pathname.includes('app/research-plan')) {
+                        setSelectedNodeId(null)
+                        startOnborda('research-plan-tour')
+                    }
+                }}
+        >
+                <Wand2 aria-hidden={true} />
+                Take a tour
+            </Button>
             <Button variant={"cta"} onClick={() => setNewMilestoneIsOpen(true)}>
                 <Plus />
-                Create milestone
+                Create a project
             </Button>
+            </span>
         </div>
     )
 }

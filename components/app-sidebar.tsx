@@ -4,7 +4,9 @@ import * as React from "react"
 import {
     Cog,
     Store, User, Workflow,
-    Bookmark
+    Bookmark,
+    Star,
+    Megaphone
 } from "lucide-react"
 import {NavMain} from "@/components/nav-main"
 import {NavUser} from "@/components/nav-user"
@@ -31,7 +33,7 @@ const data = {
             title: "Marketplace",
             icon: Store,
             variant: "ghost",
-            url: "/app/marketplace/cro",
+            url: "/app/marketplace/service-providers",
             subPages: [{
                 title: "Saves",
                 icon: Bookmark,
@@ -44,7 +46,22 @@ const data = {
             icon: Workflow,
             variant: "ghost",
             url: `/app/research-plan`,
-            subPages: []
+            subPages: [
+                {
+                    title: "Assets",
+                    icon: Star,
+                    variant: "ghost",
+                    url: `/app/assets`,
+                    subPages: []
+                },
+                {
+                    title: "RFPs",
+                    icon: Megaphone,
+                    variant: "ghost",
+                    url: `/app/rfps`,
+                    subPages: []
+                }
+            ]
         },
         {
             title: "Organization Profile",

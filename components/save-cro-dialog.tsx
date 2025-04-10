@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Company, OrganizationToCompanyEngagement, Milestone, SavedCompany } from "@prisma/client";
+import { Company, Milestone, SavedCompany } from "@prisma/client";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
     Dialog,
@@ -19,17 +19,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { getMilestones, getSavedCompaniesFromOrganizationId } from "@/lib/fetchers";
 import { useSession } from "next-auth/react";
-import { Form, FormField, FormItem, FormLabel, FormMessage, FormControl } from "@/components/ui/form";
+import {Form, FormField, FormItem, FormLabel, FormMessage, FormControl, FormDescription} from "@/components/ui/form";
 import va from "@vercel/analytics"
 import {saveCRO} from "@/lib/actions";
 import {useRouter} from "next/navigation";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 
 const formSchema = z.object({
-    engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
-        errorMap: () => ({ message: "Select a valid engagement type" })
-    }),
-    milestoneId: z.string().min(1, "Please select a milestone"),
+    // engagement: z.nativeEnum(OrganizationToCompanyEngagement, {
+    //     errorMap: () => ({ message: "Select a valid engagement type" })
+    // }),
+    milestoneId: z.string().min(1, "Please select a project"),
 });
 
 type SaveCROFormData = z.infer<typeof formSchema>;
@@ -41,7 +41,7 @@ const engagementOptions = [
     { id: "COLLABORATED", label: "Previously Worked With" },
 ];
 
-export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card" | "page" }) {
+export default function SaveCRODialog({ cro, type, milestone }: { cro: Company, type: "card" | "page", milestone?: Milestone }) {
     const router = useRouter()
     const { data: session } = useSession();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,13 +52,16 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
 
     const form = useForm<SaveCROFormData>({
         resolver: zodResolver(formSchema),
+        defaultValues: {
+            milestoneId: milestone ? milestone.id : undefined
+        }
     });
 
     useEffect(() => {
         async function fetchData() {
             const milestonesResponse = await getMilestones(session?.user?.organizationId || undefined);
             if (milestonesResponse.success) {
-                setFetchedMilestones(milestonesResponse.data as Milestone[]);
+                setFetchedMilestones(milestonesResponse.data as Milestone[])
             } else {
                 console.error(milestonesResponse.error);
             }
@@ -79,7 +82,7 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
     const onSubmit = async (data: SaveCROFormData) => {
         setIsSubmitting(true);
         try {
-            const response = await saveCRO(cro.id, data.milestoneId, data.engagement);
+            const response = await saveCRO(cro.id, data.milestoneId);
 
             if (response.success) {
                 va.track("Shortlisted CRO");
@@ -104,11 +107,11 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
             <DialogTrigger asChild>
                 {type === "page" ? (
                     <Button variant="secondary" className="w-fit">
-                        {isSaved ? <BookmarkCheck className="mr-2" /> : <Bookmark className="mr-2" />} Save CRO
+                        {isSaved ? <Bookmark fill="currentColor" className="mr-2" /> : <Bookmark className="mr-2" />} Save CRO
                     </Button>
                 ) : (
                     <Button variant="ghost" className="w-fit">
-                        {isSaved ? <BookmarkCheck /> : <Bookmark />}
+                        {isSaved ? <Bookmark fill="currentColor" /> : <Bookmark />}
                     </Button>
                 )}
             </DialogTrigger>
@@ -118,37 +121,40 @@ export default function SaveCRODialog({ cro, type }: { cro: Company, type: "card
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                        <FormField
-                            control={form.control}
-                            name="engagement"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Engagement Type</FormLabel>
-                                    <FormControl>
-                                        <RadioGroup onValueChange={field.onChange} value={field.value}>
-                                            {engagementOptions.map(({ id, label }) => (
-                                                <div key={id} className="flex items-center space-x-3">
-                                                    <RadioGroupItem value={id} />
-                                                    <Label className="font-normal">{label}</Label>
-                                                </div>
-                                            ))}
-                                        </RadioGroup>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {/*<FormField*/}
+                        {/*    control={form.control}*/}
+                        {/*    name="engagement"*/}
+                        {/*    render={({ field }) => (*/}
+                        {/*        <FormItem>*/}
+                        {/*            <FormLabel>Engagement Type</FormLabel>*/}
+                        {/*            <FormControl>*/}
+                        {/*                <RadioGroup onValueChange={field.onChange} value={field.value}>*/}
+                        {/*                    {engagementOptions.map(({ id, label }) => (*/}
+                        {/*                        <div key={id} className="flex items-center space-x-3">*/}
+                        {/*                            <RadioGroupItem value={id} />*/}
+                        {/*                            <Label className="font-normal">{label}</Label>*/}
+                        {/*                        </div>*/}
+                        {/*                    ))}*/}
+                        {/*                </RadioGroup>*/}
+                        {/*            </FormControl>*/}
+                        {/*            <FormMessage />*/}
+                        {/*        </FormItem>*/}
+                        {/*    )}*/}
+                        {/*/>*/}
 
                         <FormField
                             control={form.control}
                             name="milestoneId"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Milestone</FormLabel>
+                                    <FormLabel>Project</FormLabel>
+                                    <FormDescription>
+                                        For which project would you like to connect with this company?
+                                    </FormDescription>
                                     <FormControl>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <SelectTrigger>
-                                                <SelectValue placeholder="Select a milestone" />
+                                                <SelectValue placeholder="Select a project" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {fetchedMilestones.map((milestone) => (

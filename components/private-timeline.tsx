@@ -30,8 +30,9 @@ import {
     useSortable,
     verticalListSortingStrategy
 } from "@dnd-kit/sortable"
-import {CircleDollarSign, GripVertical, User} from "lucide-react"
+import {CircleDollarSign, GripVertical, Megaphone, Star, User} from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
+import { PropertyBadge } from "./property-badge"
 
 const SHOW_ACCESSIBILITY_MESSAGES = process.env.NODE_ENV === "development"
 
@@ -140,19 +141,34 @@ export const PrivateTimelineView = ({sortBy}: {sortBy: string}) => {
                     <SortableContext 
                         disabled={sortBy !== "custom"}
                         items={
-                            milestones ? milestones.sort((a, b) => {
-                                switch (sortBy) {
-                                    case "custom": 
-                                        return (a.timelineOrder - b.timelineOrder)
-                                    case "start":
-                                        if (a.startDate && b.startDate) return (a.startDate.getTime() - b.startDate.getTime())
-                                        return 0
-                                    case "end":
-                                        if (a.endDate && b.endDate) return (a.endDate.getTime() - b.endDate.getTime())
-                                        return 0
-                                    default:
-                                        return 0
-                                }
+                            milestones ? milestones
+                                .sort((a, b) => {
+                                    // pre sort by creation date
+                                    return ((a.createdAt?.getTime() || (new Date().getTime())) - (b.createdAt?.getTime() || (new Date().getTime())))
+                                })
+                                .sort((a, b) => {
+                                    switch (sortBy) {
+                                        case "custom": 
+                                            return a.timelineOrder - b.timelineOrder
+                                        case "start":
+                                            if (!!a.startDate && !!b.startDate) return a.startDate.getTime() - b.startDate.getTime()
+                                    
+                                            // Keep relative order of items without a startDate
+                                            if (!a.startDate && !b.startDate) return 0
+                                    
+                                            // Move items without startDate to the end
+                                            return !!a.startDate ? -1 : 1
+                                        case "end":
+                                            if (!!a.endDate && !!b.endDate) return a.endDate.getTime() - b.endDate.getTime()
+                                    
+                                            // Keep relative order of items without a startDate
+                                            if (!a.endDate && !b.endDate) return 0
+                                    
+                                            // Move items without startDate to the end
+                                            return !!a.endDate ? -1 : 1
+                                        default:
+                                            return 0
+                                    }
                             }).map(milestone => milestone.id) : []
                         }
                         strategy={verticalListSortingStrategy}
@@ -264,56 +280,54 @@ const DraggableTimelineItem = ({milestone, index, selectedNodeId, handleEditClic
 }
 
 export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData: Milestone, nodeType: string }) => {
-    if (nodeType === "ASSET") {
-        return (
-            <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).map((milestoneType, index) => (
-                    <li key={index}>
-                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
-                    </li>
-                ))}
-                {milestoneData?.attachments && milestoneData?.attachments?.length > 0 && (
-                    <li>
-                        <AttachmentsTag attachments={milestoneData.attachments}/>
-                    </li>
-                )}
-                {milestoneData?.contacts && milestoneData.contacts.length > 0 && (milestoneData?.contacts || []).map((contact, index) => {
-                    if (contact.name && contact.email) {
-                        return (
-                            <li key={index} className="flex gap-2 items-center">
-                                <User />
-                                <p>{contact.name} &bull; {contact.email}</p>
-                            </li>)
-                    } else if (contact.name) {
-                        return (
-                            <li key={index} className="flex gap-2 items-center w-full">
-                                <User />
-                                <p>{contact.name}</p>
-                            </li>)
-                    } else if (contact.email) {
-                        return (
-                            <li key={index} className="flex gap-2 items-center">
-                                <User />
-                                <p>{contact.email}</p>
-                            </li>)
-                    }
-                })}
-            </ul>
-        )
+    // if (nodeType === "ASSET") {
+    //     return (
+    //         <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
+    //             {(milestoneData?.types || []).map((milestoneType, index) => (
+    //                 <li key={index}>
+    //                     <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
+    //                 </li>
+    //             ))}
+    //             {milestoneData?.attachments && milestoneData?.attachments?.length > 0 && (
+    //                 <li>
+    //                     <AttachmentsTag attachments={milestoneData.attachments}/>
+    //                 </li>
+    //             )}
+    //             {milestoneData?.contacts && milestoneData.contacts.length > 0 && (milestoneData?.contacts || []).map((contact, index) => {
+    //                 if (contact.name && contact.email) {
+    //                     return (
+    //                         <li key={index} className="flex gap-2 items-center">
+    //                             <User />
+    //                             <p>{contact.name} &bull; {contact.email}</p>
+    //                         </li>)
+    //                 } else if (contact.name) {
+    //                     return (
+    //                         <li key={index} className="flex gap-2 items-center w-full">
+    //                             <User />
+    //                             <p>{contact.name}</p>
+    //                         </li>)
+    //                 } else if (contact.email) {
+    //                     return (
+    //                         <li key={index} className="flex gap-2 items-center">
+    //                             <User />
+    //                             <p>{contact.email}</p>
+    //                         </li>)
+    //                 }
+    //             })}
+    //         </ul>
+    //     )
 
-        return
-    }
+    //     return
+    // }
 
-    if (nodeType === "PROJECT") {
+    // if (nodeType === "PROJECT") {
         return (
             <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
                 <li>
                     <StatusButton
-                        className="text-sm h-7 w-min rounded-md px-2 py-1 font-medium"
                         disabled={true}
                         status={milestoneData?.status as StatusType || undefined}
-                        onStatusChange={() => {
-                        }}
+                        onStatusChange={() => {}}
                     />
                 </li>
                 {(milestoneData?.types || []).map((milestoneType, index) => (
@@ -324,34 +338,49 @@ export const TimelineCardContents = ({milestoneData, nodeType}: { milestoneData:
                 {(milestoneData?.contacts || []).map((contact, index) => {
                     if (contact.affiliation) {
                         return (
-                            <li key={index} className="flex gap-2 items-center">
-                                <User />
-                                <p>{contact.affiliation}</p>
+                            <li key={index}>
+                                <PropertyBadge icon={User}>
+                                    <p>{contact.affiliation}</p>
+                                </PropertyBadge>
                             </li>
                         )
                     }
                 })}
-            </ul>
-        )
-    }
-
-    if (nodeType === "RFP") {
-        return (
-            <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
-                {(milestoneData?.types || []).map((milestoneType, index) => (
+                {(milestoneData?.assets || []).map((asset, index) => (
                     <li key={index}>
-                        <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
+                        <PropertyBadge icon={Star}>
+                            <p>{asset.asset?.title}</p>
+                        </PropertyBadge>
                     </li>
                 ))}
-                {milestoneData?.budget && (
-                    <li className="flex gap-2 items-center">
-                        <CircleDollarSign />
-                        {formatMoney(milestoneData?.budget)} budget
+                {(milestoneData?.rfps || []).map((rfp, index) => (
+                    <li key={index}>
+                        <PropertyBadge icon={Megaphone}>
+                            <p>{rfp.rfp?.title}</p>
+                        </PropertyBadge>
                     </li>
-                )}
+                ))}
             </ul>
         )
-    }
+    // }
+
+    // if (nodeType === "RFP") {
+    //     return (
+    //         <ul className="w-full flex flex-row gap-2 text-sm items-center flex-wrap">
+    //             {(milestoneData?.types || []).map((milestoneType, index) => (
+    //                 <li key={index}>
+    //                     <MilestoneTypeBadge label={milestoneType?.milestoneType?.label} />
+    //                 </li>
+    //             ))}
+    //             {milestoneData?.budget && (
+    //                 <li className="flex gap-2 items-center">
+    //                     <CircleDollarSign />
+    //                     {formatMoney(milestoneData?.budget)} budget
+    //                 </li>
+    //             )}
+    //         </ul>
+    //     )
+    // }
 
     return (
         <div>error</div>

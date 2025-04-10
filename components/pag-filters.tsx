@@ -18,6 +18,7 @@ import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/type
 import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import { useEffect } from "react"
 import { Info } from "lucide-react"
+import {useQueryState} from "nuqs";
 
 const selector = (state: OrganizationSearchState) => ({
     filters: state.filters,
@@ -41,6 +42,28 @@ const filtersFormSchema = z.object({
 
 export function PAGFilters() {
     const { filters, allResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
+
+    const [querySystems, setQuerySystems] = useQueryState("systems", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+    const [queryMechanisms, setQueryMechanisms] = useQueryState("mechanisms", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+    const [queryModalities, setQueryModalities] = useQueryState("modalities", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    const parseQuery = (str: string | null) =>
+        str?.split(",").filter(Boolean).map((value) => ({ label: value, value })) || []
+
+    const stringify = (arr: { value: string }[]) => arr.map(x => x.value).join(",")
+
     const form = useForm<z.infer<typeof filtersFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(filtersFormSchema),
@@ -49,7 +72,24 @@ export function PAGFilters() {
 
     const handleSubmit = async (values: z.infer<typeof filtersFormSchema>) => {
         setFilters(values)
+
+        await setQuerySystems(values.systems.length ? stringify(values.systems) : null)
+        await setQueryMechanisms(values.mechanisms.length ? stringify(values.mechanisms) : null)
+        await setQueryModalities(values.modalities.length ? stringify(values.modalities) : null)
     }
+
+    useEffect(() => {
+        const parsedFilters = {
+            systems: parseQuery(querySystems),
+            mechanisms: parseQuery(queryMechanisms),
+            modalities: parseQuery(queryModalities),
+        }
+
+        setFilters(parsedFilters)
+        form.reset(parsedFilters)
+
+        form.handleSubmit(handleSubmit)()
+    }, [])
 
     useEffect(() => {
         const subscription = form.watch(() => form.handleSubmit(handleSubmit)())

@@ -67,6 +67,8 @@ export function OrganizationSwitcher({
         if (pathname === "/app/profile" || pathname === "/app/settings") {
             router.refresh()
         }
+
+        router.push("/app/profile")
     };
 
     return (
