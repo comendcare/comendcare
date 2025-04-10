@@ -9,7 +9,19 @@ export const RFPCard = ({rfp}: {rfp: any}) => {
     return (
         <Card className="h-full w-full text-left flex flex-col justify-between">
             <CardHeader className="gap-2">
-                <div className="bg-blue-light h-32 -mt-6 -mx-6 rounded-t-md" />
+                <div className="bg-blue-light h-[40px] -mt-6 -mx-6 rounded-t-md overflow-hidden">
+                    {rfp.headerImage && (
+                        <img
+                            src={rfp.headerImage}
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                                objectPosition: "center"
+                            }}
+                        />
+                    )}
+                </div>
                 <CardTitle>{rfp.title} {rfp.private && <PrivateBadge iconOnly className="ml-auto pl-auto"/>}</CardTitle>
                 <CardDescription className="line-clamp-3">{rfp.description}</CardDescription>
             </CardHeader>
