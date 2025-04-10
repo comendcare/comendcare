@@ -145,7 +145,7 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true):
 
 export interface OrganizationSearchState {
     initialized: boolean,
-    initState: () => void,
+    initState: (filters: FiltersType) => void,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | undefined,
@@ -167,8 +167,8 @@ export interface OrganizationSearchState {
 export const useOrganizationSearchStore = create<OrganizationSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: () => {
-                set({initialized: true})
+            initState: (filters: FiltersType) => {
+                set({initialized: true, filters})
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {

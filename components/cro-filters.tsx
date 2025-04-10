@@ -26,6 +26,7 @@ import {Info} from "lucide-react"
 import {useQueryState} from "nuqs"
 import {MILESTONE_TYPE_OPTIONS} from "@/prisma/seed/seed-options";
 import { badgeVariants } from "./ui/badge"
+import { usePathname, useSearchParams } from "next/navigation"
 
 export const MILESTONE_TYPE_OPTIONS_WITH_VALUE = MILESTONE_TYPE_OPTIONS.map(option => ({
     ...option,
@@ -53,34 +54,9 @@ const filtersFormSchema = z.object({
 
 export function CROFilters() {
     const {filters, allResults, setFilters} = useCROSearchStore(useShallow(selector))
-    // For URL sync
-    // const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
-    //     shallow: true,
-    //     history: "replace",
-    //     clearOnDefault: true,
-    // })
+    const searchParams = useSearchParams()
+    const pathname = usePathname()
 
-    // const [queryCategories, setQueryCategories] = useQueryState("categories", {
-    //     shallow: true,
-    //     history: "replace",
-    //     clearOnDefault: true,
-    // })
-
-    // const [queryTypes, setQueryTypes] = useQueryState("types", {
-    //     shallow: true,
-    //     history: "replace",
-    //     clearOnDefault: true,
-    // })
-
-    // const [queryCertifications, setQueryCertifications] = useQueryState("certifications", {
-    //     shallow: true,
-    //     history: "replace",
-    //     clearOnDefault: true,
-    // })
-
-    // Utility: Convert query string -> {label, value}[]
-    const parseQuery = (str: string | null) =>
-        str?.split(",").filter(Boolean).map((value) => ({label: value, value})) || []
     const form = useForm<z.infer<typeof filtersFormSchema>>({
         mode: "onChange",
         resolver: zodResolver(filtersFormSchema),
@@ -90,37 +66,30 @@ export function CROFilters() {
     const handleSubmit = async (values: z.infer<typeof filtersFormSchema>) => {
         setFilters(values)
 
-        // const stringify = (arr: { value: string }[]) => arr.map(x => x.value).join(",")
+        const stringify = (arr: { value: string }[]) => arr.map(x => x.value).join(",")
+        const params = new URLSearchParams(searchParams.toString())
 
-        // await setQueryCategories(values.categories.length ? stringify(values.categories) : null)
-        // await setQueryMilestoneTypes(values.milestoneTypes.length ? stringify(values.milestoneTypes) : null)
-        // await setQueryTypes(values.types.length ? stringify(values.types) : null)
-        // await setQueryCertifications(values.certifications.length ? stringify(values.certifications) : null)
+        params.delete("milestoneTypes")
+        if (values.milestoneTypes && values.milestoneTypes.length > 0) params.set("milestoneTypes", stringify(values.milestoneTypes))
+
+        params.delete("categories")
+        if (values.categories && values.categories.length > 0) params.set("categories", stringify(values.categories))
+
+        params.delete("types")
+        if (values.types && values.types.length > 0) params.set("types", stringify(values.types))
+
+        params.delete("certifications")
+        if (values.certifications && values.certifications.length > 0) params.set("certifications", stringify(values.certifications))
+
+        // ensure shallow url update
+        const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
+        window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
     }
 
     useEffect(() => {
         const subscription = form.watch(() => form.handleSubmit(handleSubmit)())
         return () => subscription.unsubscribe()
     }, [handleSubmit, form.watch])
-
-    // useEffect(() => {
-    //     const parsedFilters = {
-    //         categories: parseQuery(queryCategories),
-    //         milestoneTypes: parseQuery(queryMilestoneTypes),
-    //         types: parseQuery(queryTypes),
-    //         certifications: parseQuery(queryCertifications),
-    //     }
-
-    //     setFilters(parsedFilters)
-    //     form.reset(parsedFilters)
-
-    //     // Avoid blocking hydration
-    //     const timeout = setTimeout(() => {
-    //         form.handleSubmit(handleSubmit)()
-    //     }, 0)
-
-    //     return () => clearTimeout(timeout)
-    // }, [])
 
     return (
         <Form {...form}>
