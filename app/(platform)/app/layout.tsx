@@ -31,6 +31,7 @@ import { useShallow } from "zustand/react/shallow";
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
 import { cn, sleep } from "@/lib/utils";
 import { Wand2 } from "lucide-react";
+import {useQueryState} from "nuqs"
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -43,6 +44,9 @@ interface AppLayoutProps {
 const selector = (state: RoadmapState) => ({
     setSelectedNodeId: state.setSelectedNodeId
 })
+
+const parseQuery = (str: string | null) =>
+    str?.split(",").filter(Boolean).map((value) => ({ label: value, value })) || []
 
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
@@ -66,6 +70,46 @@ export default function AppLayout({children}: AppLayoutProps) {
             }
         }
     }, [status])
+
+    const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    const [queryCategories, setQueryCategories] = useQueryState("categories", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    const [queryTypes, setQueryTypes] = useQueryState("types", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    const [queryCertifications, setQueryCertifications] = useQueryState("certifications", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    const [querySystems, setQuerySystems] = useQueryState("systems", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+    const [queryMechanisms, setQueryMechanisms] = useQueryState("mechanisms", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+    const [queryModalities, setQueryModalities] = useQueryState("modalities", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
 
     const handleSessionUpdate = async () => {
         console.log(`session changed`, session)
@@ -92,36 +136,28 @@ export default function AppLayout({children}: AppLayoutProps) {
                 toast.error(notifications.error)
             }
             console.log(`Notificaions initialized...`)
-            
-            // let kanban = await getKanbanFromOrganizationId()
-            // if (!kanban.data && session.user.organizationId) {
-            //     // kanban was not found, create it
-            //     kanban = await createKanban(session.user.organizationId)
-            // }
-
-            // if (kanban.success) {
-            //     const kanbanResponse = await getColumns(session.user.organizationId)
-            //     if (kanbanResponse.success) {
-            //         initializeKanbanState({
-            //             columns: kanbanResponse.data.columns,
-            //             kanbanId: kanban?.data?.id
-            //         })
-            //     }
-            // } else {
-            //     console.error(kanban.error)
-            //     toast.error(kanban.error)
-            // }
 
             // Init CRO Search Store
-            initializeCROSearch()
+            const parsedCROFilters = {
+                categories: parseQuery(queryCategories),
+                milestoneTypes: parseQuery(queryMilestoneTypes),
+                types: parseQuery(queryTypes),
+                certifications: parseQuery(queryCertifications),
+            }
+            initializeCROSearch(parsedCROFilters)
             console.log(`CRO search initialized...`)
 
             // Init Milestone Search Store
-            initializeMilestoneSearch()
-            console.log(`Milestone search initialized...`)
+            // initializeMilestoneSearch()
+            // console.log(`Milestone search initialized...`)
 
             // Init Organization/PAG Search Store
-            initializeOrganizationSearch()
+            const parsedPAGFilters = {
+                systems: parseQuery(querySystems),
+                mechanisms: parseQuery(queryMechanisms),
+                modalities: parseQuery(queryModalities),
+            }
+            initializeOrganizationSearch(parsedPAGFilters)
             console.log(`Organization search initialized...`)
 
             // Init Research Plan Store

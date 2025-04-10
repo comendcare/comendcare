@@ -6,20 +6,15 @@ import { useNotificationsStore } from "@/state/notifications/notificationsStore"
 import { useCROSearchStore } from "@/state/search/croSearchStore";
 import { useMilestoneSearchStore } from "@/state/search/milestoneSearchStore";
 import { useOrganizationSearchStore } from "@/state/search/organizationSearchStore";
-// import { useKanbanStore } from "@/state/kanban/kanbanStore";
+import { FiltersType as CROMarketplaceFiltersType } from "@/state/search/croSearchStore";
+import { FiltersType as PAGMarketplaceFiltersType} from "@/state/search/organizationSearchStore";
 
-// type ColumnType = Prisma.ColumnGetPayload<{ 
-//     include: { 
-//         tasks: true
-//     } 
-// }>
-
-export function initializeCROSearch() {
+export function initializeCROSearch(filters: CROMarketplaceFiltersType) {
     if (typeof window !== "undefined") {
         const initCROSearchState = useCROSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        initCROSearchState()
+        initCROSearchState(filters)
     }
 }
 
@@ -32,12 +27,12 @@ export function initializeMilestoneSearch() {
     }
 }
 
-export function initializeOrganizationSearch() {
+export function initializeOrganizationSearch(filters: PAGMarketplaceFiltersType) {
     if (typeof window !== "undefined") {
         const initOrganizationSearchState = useOrganizationSearchStore.getState().initState;
 
         // Call Zustand's initState directly
-        initOrganizationSearchState()
+        initOrganizationSearchState(filters)
     }
 }
 
