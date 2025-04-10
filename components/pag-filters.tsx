@@ -19,6 +19,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from "./ui/tooltip";
 import { useEffect } from "react"
 import { Info } from "lucide-react"
 import {useQueryState} from "nuqs";
+import { usePathname, useSearchParams } from "next/navigation"
 
 const selector = (state: OrganizationSearchState) => ({
     filters: state.filters,
@@ -42,27 +43,8 @@ const filtersFormSchema = z.object({
 
 export function PAGFilters() {
     const { filters, allResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
-
-    // const [querySystems, setQuerySystems] = useQueryState("systems", {
-    //     shallow: true,
-    //     history: "replace",
-    //     clearOnDefault: true,
-    // })
-    // const [queryMechanisms, setQueryMechanisms] = useQueryState("mechanisms", {
-    //     shallow: true,
-    //     history: "replace",
-    //     clearOnDefault: true,
-    // })
-    // const [queryModalities, setQueryModalities] = useQueryState("modalities", {
-    //     shallow: true,
-    //     history: "replace",
-    //     clearOnDefault: true,
-    // })
-
-    const parseQuery = (str: string | null) =>
-        str?.split(",").filter(Boolean).map((value) => ({ label: value, value })) || []
-
-    const stringify = (arr: { value: string }[]) => arr.map(x => x.value).join(",")
+    const searchParams = useSearchParams()
+    const pathname = usePathname()
 
     const form = useForm<z.infer<typeof filtersFormSchema>>({
         mode: "onChange",
@@ -73,23 +55,22 @@ export function PAGFilters() {
     const handleSubmit = async (values: z.infer<typeof filtersFormSchema>) => {
         setFilters(values)
 
-        // await setQuerySystems(values.systems.length ? stringify(values.systems) : null)
-        // await setQueryMechanisms(values.mechanisms.length ? stringify(values.mechanisms) : null)
-        // await setQueryModalities(values.modalities.length ? stringify(values.modalities) : null)
+        const stringify = (arr: { value: string }[]) => arr.map(x => x.value).join(",")
+        const params = new URLSearchParams(searchParams.toString())
+
+        params.delete("systems")
+        if (values.systems && values.systems.length > 0) params.set("systems", stringify(values.systems))
+
+        params.delete("mechanisms")
+        if (values.mechanisms && values.mechanisms.length > 0) params.set("mechanisms", stringify(values.mechanisms))
+
+        params.delete("modalities")
+        if (values.modalities && values.modalities.length > 0) params.set("modalities", stringify(values.modalities))
+
+        // ensure shallow url update
+        const url = params.size > 0 ? `${pathname}?${params}` : `${pathname}`
+        window.history.replaceState({ ...window.history.state, as: url, url: url }, '', url)
     }
-
-    // useEffect(() => {
-    //     const parsedFilters = {
-    //         systems: parseQuery(querySystems),
-    //         mechanisms: parseQuery(queryMechanisms),
-    //         modalities: parseQuery(queryModalities),
-    //     }
-
-    //     setFilters(parsedFilters)
-    //     form.reset(parsedFilters)
-
-    //     form.handleSubmit(handleSubmit)()
-    // }, [])
 
     useEffect(() => {
         const subscription = form.watch(() => form.handleSubmit(handleSubmit)())

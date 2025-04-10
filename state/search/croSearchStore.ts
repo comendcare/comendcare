@@ -236,7 +236,7 @@ type SetRecommendationsOptions = {
 
 export interface CROSearchState {
     initialized: boolean,
-    initState: () => void,
+    initState: (filters: FiltersType) => void,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | undefined,
@@ -260,8 +260,8 @@ export interface CROSearchState {
 export const useCROSearchStore = create<CROSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: () => {
-                set({ initialized: true, recommendations: [] })
+            initState: (filters: FiltersType) => {
+                set({ initialized: true, recommendations: [], filters })
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
