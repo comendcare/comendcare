@@ -5,7 +5,7 @@ import {cn} from "@/lib/utils"
 
 const badgeVariants = cva(
     // "inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-    "inline-flex gap-1 items-center px-2.5 py-0.5 font-semibold rounded-md text-md min-h-7 rounded-md px-2 py-1",
+    "inline-flex gap-1 items-center font-semibold text-md min-h-7 rounded-md px-2 py-1",
     {
         variants: {
             variant: {
