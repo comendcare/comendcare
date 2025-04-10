@@ -114,8 +114,12 @@ export function CROFilters() {
         setFilters(parsedFilters)
         form.reset(parsedFilters)
 
-        // Force search on hydration
-        form.handleSubmit(handleSubmit)()
+        // Avoid blocking hydration
+        const timeout = setTimeout(() => {
+            form.handleSubmit(handleSubmit)()
+        }, 0)
+
+        return () => clearTimeout(timeout)
     }, [])
 
     return (
