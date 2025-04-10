@@ -51,7 +51,7 @@ export const PAGProfileAssetsAndRFPsHoverableCard = ({ assets, rfps, isPrivate }
                                                         <DialogTrigger className="w-full h-full">
                                                             <RFPCard rfp={rfp} />
                                                         </DialogTrigger>
-                                                        <DialogContent>
+                                                        <DialogContent className="overflow-hidden">
                                                             <RFPDetails rfp={rfp} />
                                                         </DialogContent>
                                                     </Dialog>
@@ -195,7 +195,20 @@ export const AssetDetails = ({asset}: {asset: any}) => {
 
 export const RFPDetails = ({rfp}: {rfp: any}) => {
     return (
-        <ScrollArea className={"max-h-[600px] -mr-2 pr-3"}>
+        <>
+        <div className="absolute top-0 w-full h-[80px] left-0 flex justify-end items-end absolute -top-px -left-px w-[calc(100%+4px)] bg-blue-light">
+            <img
+                src={rfp.headerImage}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center"
+                }}
+                className="absolute w-full"
+            />
+        </div>
+        <ScrollArea className={"max-h-[600px] -mr-2 pr-3 pt-[80px]"}>
         <DialogHeader>
             <DialogTitle>{rfp.title}</DialogTitle>
             <DialogDescription>{rfp.description}</DialogDescription>
@@ -270,5 +283,6 @@ export const RFPDetails = ({rfp}: {rfp: any}) => {
             )}
         </ul>
         </ScrollArea>
+        </>
     )
 }

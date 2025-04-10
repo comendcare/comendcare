@@ -296,7 +296,7 @@ model RFP {
   attachments ExternalAttachment[]
   budget      Int?
   private     Boolean              @default(true)
-  headerImage              String?                   @db.Text
+  headerImage String?              @db.Text
 
   organizationId String?
   organization   Organization?    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
