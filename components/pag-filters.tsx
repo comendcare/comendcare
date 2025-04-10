@@ -43,21 +43,21 @@ const filtersFormSchema = z.object({
 export function PAGFilters() {
     const { filters, allResults, setFilters } = useOrganizationSearchStore(useShallow(selector))
 
-    const [querySystems, setQuerySystems] = useQueryState("systems", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
-    const [queryMechanisms, setQueryMechanisms] = useQueryState("mechanisms", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
-    const [queryModalities, setQueryModalities] = useQueryState("modalities", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
+    // const [querySystems, setQuerySystems] = useQueryState("systems", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
+    // const [queryMechanisms, setQueryMechanisms] = useQueryState("mechanisms", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
+    // const [queryModalities, setQueryModalities] = useQueryState("modalities", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
 
     const parseQuery = (str: string | null) =>
         str?.split(",").filter(Boolean).map((value) => ({ label: value, value })) || []
@@ -73,23 +73,23 @@ export function PAGFilters() {
     const handleSubmit = async (values: z.infer<typeof filtersFormSchema>) => {
         setFilters(values)
 
-        await setQuerySystems(values.systems.length ? stringify(values.systems) : null)
-        await setQueryMechanisms(values.mechanisms.length ? stringify(values.mechanisms) : null)
-        await setQueryModalities(values.modalities.length ? stringify(values.modalities) : null)
+        // await setQuerySystems(values.systems.length ? stringify(values.systems) : null)
+        // await setQueryMechanisms(values.mechanisms.length ? stringify(values.mechanisms) : null)
+        // await setQueryModalities(values.modalities.length ? stringify(values.modalities) : null)
     }
 
-    useEffect(() => {
-        const parsedFilters = {
-            systems: parseQuery(querySystems),
-            mechanisms: parseQuery(queryMechanisms),
-            modalities: parseQuery(queryModalities),
-        }
+    // useEffect(() => {
+    //     const parsedFilters = {
+    //         systems: parseQuery(querySystems),
+    //         mechanisms: parseQuery(queryMechanisms),
+    //         modalities: parseQuery(queryModalities),
+    //     }
 
-        setFilters(parsedFilters)
-        form.reset(parsedFilters)
+    //     setFilters(parsedFilters)
+    //     form.reset(parsedFilters)
 
-        form.handleSubmit(handleSubmit)()
-    }, [])
+    //     form.handleSubmit(handleSubmit)()
+    // }, [])
 
     useEffect(() => {
         const subscription = form.watch(() => form.handleSubmit(handleSubmit)())

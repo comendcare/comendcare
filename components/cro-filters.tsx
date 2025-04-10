@@ -54,29 +54,29 @@ const filtersFormSchema = z.object({
 export function CROFilters() {
     const {filters, allResults, setFilters} = useCROSearchStore(useShallow(selector))
     // For URL sync
-    const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
+    // const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
 
-    const [queryCategories, setQueryCategories] = useQueryState("categories", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
+    // const [queryCategories, setQueryCategories] = useQueryState("categories", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
 
-    const [queryTypes, setQueryTypes] = useQueryState("types", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
+    // const [queryTypes, setQueryTypes] = useQueryState("types", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
 
-    const [queryCertifications, setQueryCertifications] = useQueryState("certifications", {
-        shallow: true,
-        history: "replace",
-        clearOnDefault: true,
-    })
+    // const [queryCertifications, setQueryCertifications] = useQueryState("certifications", {
+    //     shallow: true,
+    //     history: "replace",
+    //     clearOnDefault: true,
+    // })
 
     // Utility: Convert query string -> {label, value}[]
     const parseQuery = (str: string | null) =>
@@ -90,12 +90,12 @@ export function CROFilters() {
     const handleSubmit = async (values: z.infer<typeof filtersFormSchema>) => {
         setFilters(values)
 
-        const stringify = (arr: { value: string }[]) => arr.map(x => x.value).join(",")
+        // const stringify = (arr: { value: string }[]) => arr.map(x => x.value).join(",")
 
-        await setQueryCategories(values.categories.length ? stringify(values.categories) : null)
-        await setQueryMilestoneTypes(values.milestoneTypes.length ? stringify(values.milestoneTypes) : null)
-        await setQueryTypes(values.types.length ? stringify(values.types) : null)
-        await setQueryCertifications(values.certifications.length ? stringify(values.certifications) : null)
+        // await setQueryCategories(values.categories.length ? stringify(values.categories) : null)
+        // await setQueryMilestoneTypes(values.milestoneTypes.length ? stringify(values.milestoneTypes) : null)
+        // await setQueryTypes(values.types.length ? stringify(values.types) : null)
+        // await setQueryCertifications(values.certifications.length ? stringify(values.certifications) : null)
     }
 
     useEffect(() => {
@@ -103,24 +103,24 @@ export function CROFilters() {
         return () => subscription.unsubscribe()
     }, [handleSubmit, form.watch])
 
-    useEffect(() => {
-        const parsedFilters = {
-            categories: parseQuery(queryCategories),
-            milestoneTypes: parseQuery(queryMilestoneTypes),
-            types: parseQuery(queryTypes),
-            certifications: parseQuery(queryCertifications),
-        }
+    // useEffect(() => {
+    //     const parsedFilters = {
+    //         categories: parseQuery(queryCategories),
+    //         milestoneTypes: parseQuery(queryMilestoneTypes),
+    //         types: parseQuery(queryTypes),
+    //         certifications: parseQuery(queryCertifications),
+    //     }
 
-        setFilters(parsedFilters)
-        form.reset(parsedFilters)
+    //     setFilters(parsedFilters)
+    //     form.reset(parsedFilters)
 
-        // Avoid blocking hydration
-        const timeout = setTimeout(() => {
-            form.handleSubmit(handleSubmit)()
-        }, 0)
+    //     // Avoid blocking hydration
+    //     const timeout = setTimeout(() => {
+    //         form.handleSubmit(handleSubmit)()
+    //     }, 0)
 
-        return () => clearTimeout(timeout)
-    }, [])
+    //     return () => clearTimeout(timeout)
+    // }, [])
 
     return (
         <Form {...form}>

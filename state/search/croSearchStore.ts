@@ -173,7 +173,7 @@ const generateRecommendations = async (milestones: Milestone[]) => {
 const getUpdatedSearchResults = async (
     state: any,
     isNewSearch: boolean = true
-) => {
+): Promise<{results: any[], total: number}> => {
     try {
         const filtersString = generateFiltersString(state.filters)
 
@@ -198,7 +198,11 @@ const getUpdatedSearchResults = async (
         const ids = typeSenseHits.map(hit => hit.document.id);
 
         if (ids.length === 0) {
-            return isNewSearch ? [] : state.searchResults;
+            // return isNewSearch ? [] : state.searchResults;
+            return {
+                results: isNewSearch ? [] : state.searchResults,
+                total: results.found || 0
+            }
         }
 
         const prismaResponse = await fetch('/api/companies', {
@@ -218,7 +222,10 @@ const getUpdatedSearchResults = async (
 
     } catch (error) {
         console.error("Search error:", error);
-        return [];
+        return {
+            results: [],
+            total: 0
+        };
     }
 };
 
