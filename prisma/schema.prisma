@@ -260,14 +260,14 @@ model Asset {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  title       String
+  title       String               @default("Untitled Asset")
   description String?
   contacts    ExternalContact[]
   attachments ExternalAttachment[]
   private     Boolean              @default(true)
 
-  organizationId String
-  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization?      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   milestones     AssetToMilestone[]
 }
 
@@ -287,7 +287,7 @@ model RFP {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  title       String
+  title       String               @default("Untitled RFP")
   description String?
   openTo      String[]
   startDate   DateTime? // request opens
@@ -297,8 +297,8 @@ model RFP {
   budget      Int?
   private     Boolean              @default(true)
 
-  organizationId String
-  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization?    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   milestones     RFPToMilestone[]
 }
 
