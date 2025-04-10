@@ -8,13 +8,14 @@ import {useEffect, useRef} from "react";
 import Image from "next/image"
 import logo from "@/public/logo-square.png"
 import {useState} from "react";
-import {Member, Organization} from "@prisma/client";
+import {Member, Milestone, MilestoneType, Organization} from "@prisma/client";
 import {redirect, usePathname, useRouter, useSearchParams} from "next/navigation";
 import Loading from "@/app/loading";
 import {
     getAllNotifications,
     getColumns,
     getKanbanFromOrganizationId,
+    getMilestoneTypes,
     getNodesEdgesAndMilestones,
     getRoadmapId
 } from "@/lib/fetchers";
@@ -138,9 +139,19 @@ export default function AppLayout({children}: AppLayoutProps) {
             console.log(`Notificaions initialized...`)
 
             // Init CRO Search Store
+            const milestoneTypes = await getMilestoneTypes()
             const parsedCROFilters = {
                 categories: parseQuery(queryCategories),
-                milestoneTypes: parseQuery(queryMilestoneTypes),
+                milestoneTypes: parseQuery(queryMilestoneTypes)
+                    .map(query => {
+                        const milestoneType = (milestoneTypes.data || []).find(milestone => milestone.id === query.value)
+                        if (!milestoneType) return query
+                        return {
+                            label: milestoneType.label,
+                            value: milestoneType.id
+                        }
+                    })
+                    .filter(query => query !== undefined),
                 types: parseQuery(queryTypes),
                 certifications: parseQuery(queryCertifications),
             }
