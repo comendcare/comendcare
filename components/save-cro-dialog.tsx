@@ -107,7 +107,7 @@ export default function SaveCRODialog({ cro, type, milestone }: { cro: Company, 
             <DialogTrigger asChild>
                 {type === "page" ? (
                     <Button variant="secondary" className="w-fit">
-                        {isSaved ? <Bookmark fill="currentColor" className="mr-2" /> : <Bookmark className="mr-2" />} Save CRO
+                        {isSaved ? <Bookmark fill="currentColor" className="mr-2" /> : <Bookmark className="mr-2" />} Save Service Provider
                     </Button>
                 ) : (
                     <Button variant="ghost" className="w-fit">
