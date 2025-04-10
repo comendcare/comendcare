@@ -192,7 +192,7 @@ export function CROFilters() {
                                         {...field}
                                         defaultOptions={BUSINESS_TYPES}
                                         hidePlaceholderWhenSelected={true}
-                                        placeholder="Select associated categories..."
+                                        placeholder="Select business types..."
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.
@@ -227,7 +227,7 @@ export function CROFilters() {
                                         badgeClassName={badgeVariants({variant: "certification"})}
                                         defaultOptions={CRO_CERTIFICATIONS}
                                         hidePlaceholderWhenSelected={true}
-                                        placeholder="Select associated categories..."
+                                        placeholder="Select relevant certifications..."
                                         emptyIndicator={
                                             <p className="text-center text-lg leading-10 text-gray-600 dark:text-gray-400">
                                                 no results found.

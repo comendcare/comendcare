@@ -8,13 +8,14 @@ import {useEffect, useRef} from "react";
 import Image from "next/image"
 import logo from "@/public/logo-square.png"
 import {useState} from "react";
-import {Member, Organization} from "@prisma/client";
+import {Member, Milestone, MilestoneType, Organization} from "@prisma/client";
 import {redirect, usePathname, useRouter, useSearchParams} from "next/navigation";
 import Loading from "@/app/loading";
 import {
     getAllNotifications,
     getColumns,
     getKanbanFromOrganizationId,
+    getMilestoneTypes,
     getNodesEdgesAndMilestones,
     getRoadmapId
 } from "@/lib/fetchers";
@@ -32,6 +33,7 @@ import { NotificationsState, useNotificationsStore } from "@/state/notifications
 import { cn, sleep } from "@/lib/utils";
 import { Wand2 } from "lucide-react";
 import {useQueryState} from "nuqs"
+import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -138,9 +140,19 @@ export default function AppLayout({children}: AppLayoutProps) {
             console.log(`Notificaions initialized...`)
 
             // Init CRO Search Store
+            const milestoneTypes = await getMilestoneTypes()
             const parsedCROFilters = {
                 categories: parseQuery(queryCategories),
-                milestoneTypes: parseQuery(queryMilestoneTypes),
+                milestoneTypes: parseQuery(queryMilestoneTypes)
+                    .map(query => {
+                        const milestoneType = (milestoneTypes.data || []).find(milestone => milestone.id === query.value)
+                        if (!milestoneType) return undefined
+                        return {
+                            label: milestoneType.label,
+                            value: milestoneType.id
+                        }
+                    })
+                    .filter(query => query !== undefined),
                 types: parseQuery(queryTypes),
                 certifications: parseQuery(queryCertifications),
             }
@@ -153,9 +165,21 @@ export default function AppLayout({children}: AppLayoutProps) {
 
             // Init Organization/PAG Search Store
             const parsedPAGFilters = {
-                systems: parseQuery(querySystems),
-                mechanisms: parseQuery(queryMechanisms),
-                modalities: parseQuery(queryModalities),
+                systems: parseQuery(querySystems).map(query => {
+                    const system = (ASSOCIATED_SYSTEMS || []).find(system => system.value === query.value)
+                    if (!system) return undefined
+                    return system
+                }).filter(query => query !== undefined),
+                mechanisms: parseQuery(queryMechanisms).map(query => {
+                    const mechanism = (MOLECULAR_MECHANISMS || []).find(mechanism => mechanism.value === query.value)
+                    if (!mechanism) return undefined
+                    return mechanism
+                }).filter(query => query !== undefined),
+                modalities: parseQuery(queryModalities).map(query => {
+                    const modality = (MODALITIES || []).find(modalities => modalities.value === query.value)
+                    if (!modality) return undefined
+                    return modality
+                }).filter(query => query !== undefined),
             }
             initializeOrganizationSearch(parsedPAGFilters)
             console.log(`Organization search initialized...`)
