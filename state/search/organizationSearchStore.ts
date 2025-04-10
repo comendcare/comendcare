@@ -90,7 +90,7 @@ const sortByFilters: { [key: string]: string } = {
     "patients-engaged-high-low": "firstConditionPatientsEngaged:desc"
 }
 
-const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) => {
+const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true): Promise<{results: any[], total: number}> => {
     try {
         const searchParameters = {
             q: state.searchTerm,
@@ -113,7 +113,10 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
         const ids = typeSenseHits.map(hit => hit.document.id);
 
         if (ids.length === 0) {
-            return isNewSearch ? [] : state.searchResults;
+            return {
+                results: isNewSearch ? [] : state.searchResults,
+                total: results.found || 0
+            }
         }
 
         const prismaResponse = await fetch('/api/organizations', {
@@ -133,13 +136,16 @@ const getUpdatedSearchResults = async (state: any, isNewSearch: boolean = true) 
 
     } catch (error) {
         console.error("Search error:", error);
-        return [];
+        return {
+            results: [],
+            total: 0
+        }
     }
 };
 
 export interface OrganizationSearchState {
     initialized: boolean,
-    initState: () => void,
+    initState: (filters: FiltersType) => void,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | undefined,
@@ -161,8 +167,8 @@ export interface OrganizationSearchState {
 export const useOrganizationSearchStore = create<OrganizationSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: () => {
-                set({initialized: true})
+            initState: (filters: FiltersType) => {
+                set({initialized: true, filters})
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {
