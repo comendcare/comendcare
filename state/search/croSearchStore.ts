@@ -173,7 +173,7 @@ const generateRecommendations = async (milestones: Milestone[]) => {
 const getUpdatedSearchResults = async (
     state: any,
     isNewSearch: boolean = true
-) => {
+): Promise<{results: any[], total: number}> => {
     try {
         const filtersString = generateFiltersString(state.filters)
 
@@ -198,7 +198,11 @@ const getUpdatedSearchResults = async (
         const ids = typeSenseHits.map(hit => hit.document.id);
 
         if (ids.length === 0) {
-            return isNewSearch ? [] : state.searchResults;
+            // return isNewSearch ? [] : state.searchResults;
+            return {
+                results: isNewSearch ? [] : state.searchResults,
+                total: results.found || 0
+            }
         }
 
         const prismaResponse = await fetch('/api/companies', {
@@ -218,7 +222,10 @@ const getUpdatedSearchResults = async (
 
     } catch (error) {
         console.error("Search error:", error);
-        return [];
+        return {
+            results: [],
+            total: 0
+        };
     }
 };
 
@@ -229,7 +236,7 @@ type SetRecommendationsOptions = {
 
 export interface CROSearchState {
     initialized: boolean,
-    initState: () => void,
+    initState: (filters: FiltersType) => void,
     searchTerm: string,
     setSearchTerm: (newSearch: string) => void,
     sortBy: string | undefined,
@@ -253,8 +260,8 @@ export interface CROSearchState {
 export const useCROSearchStore = create<CROSearchState>()(
     temporal((set, get) => ({
             initialized: false,
-            initState: () => {
-                set({ initialized: true, recommendations: [] })
+            initState: (filters: FiltersType) => {
+                set({ initialized: true, recommendations: [], filters })
             },
             searchTerm: '',
             setSearchTerm: async (newSearch: string) => {

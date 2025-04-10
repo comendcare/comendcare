@@ -8,13 +8,14 @@ import {useEffect, useRef} from "react";
 import Image from "next/image"
 import logo from "@/public/logo-square.png"
 import {useState} from "react";
-import {Member, Organization} from "@prisma/client";
+import {Member, Milestone, MilestoneType, Organization} from "@prisma/client";
 import {redirect, usePathname, useRouter, useSearchParams} from "next/navigation";
 import Loading from "@/app/loading";
 import {
     getAllNotifications,
     getColumns,
     getKanbanFromOrganizationId,
+    getMilestoneTypes,
     getNodesEdgesAndMilestones,
     getRoadmapId
 } from "@/lib/fetchers";
@@ -31,6 +32,8 @@ import { useShallow } from "zustand/react/shallow";
 import { NotificationsState, useNotificationsStore } from "@/state/notifications/notificationsStore";
 import { cn, sleep } from "@/lib/utils";
 import { Wand2 } from "lucide-react";
+import {useQueryState} from "nuqs"
+import { ASSOCIATED_SYSTEMS, MODALITIES, MOLECULAR_MECHANISMS } from "@/lib/types";
 
 export type MemberWithOrganization = Member & {
     organization: Organization
@@ -43,6 +46,9 @@ interface AppLayoutProps {
 const selector = (state: RoadmapState) => ({
     setSelectedNodeId: state.setSelectedNodeId
 })
+
+const parseQuery = (str: string | null) =>
+    str?.split(",").filter(Boolean).map((value) => ({ label: value, value })) || []
 
 export default function AppLayout({children}: AppLayoutProps) {
     const {data: session, status} = useSession()
@@ -66,6 +72,46 @@ export default function AppLayout({children}: AppLayoutProps) {
             }
         }
     }, [status])
+
+    const [queryMilestoneTypes, setQueryMilestoneTypes] = useQueryState("milestoneTypes", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    const [queryCategories, setQueryCategories] = useQueryState("categories", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    const [queryTypes, setQueryTypes] = useQueryState("types", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    const [queryCertifications, setQueryCertifications] = useQueryState("certifications", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+
+    const [querySystems, setQuerySystems] = useQueryState("systems", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+    const [queryMechanisms, setQueryMechanisms] = useQueryState("mechanisms", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
+    const [queryModalities, setQueryModalities] = useQueryState("modalities", {
+        shallow: true,
+        history: "replace",
+        clearOnDefault: true,
+    })
 
     const handleSessionUpdate = async () => {
         console.log(`session changed`, session)
@@ -92,36 +138,50 @@ export default function AppLayout({children}: AppLayoutProps) {
                 toast.error(notifications.error)
             }
             console.log(`Notificaions initialized...`)
-            
-            // let kanban = await getKanbanFromOrganizationId()
-            // if (!kanban.data && session.user.organizationId) {
-            //     // kanban was not found, create it
-            //     kanban = await createKanban(session.user.organizationId)
-            // }
-
-            // if (kanban.success) {
-            //     const kanbanResponse = await getColumns(session.user.organizationId)
-            //     if (kanbanResponse.success) {
-            //         initializeKanbanState({
-            //             columns: kanbanResponse.data.columns,
-            //             kanbanId: kanban?.data?.id
-            //         })
-            //     }
-            // } else {
-            //     console.error(kanban.error)
-            //     toast.error(kanban.error)
-            // }
 
             // Init CRO Search Store
-            initializeCROSearch()
+            const milestoneTypes = await getMilestoneTypes()
+            const parsedCROFilters = {
+                categories: parseQuery(queryCategories),
+                milestoneTypes: parseQuery(queryMilestoneTypes)
+                    .map(query => {
+                        const milestoneType = (milestoneTypes.data || []).find(milestone => milestone.id === query.value)
+                        if (!milestoneType) return undefined
+                        return {
+                            label: milestoneType.label,
+                            value: milestoneType.id
+                        }
+                    })
+                    .filter(query => query !== undefined),
+                types: parseQuery(queryTypes),
+                certifications: parseQuery(queryCertifications),
+            }
+            initializeCROSearch(parsedCROFilters)
             console.log(`CRO search initialized...`)
 
             // Init Milestone Search Store
-            initializeMilestoneSearch()
-            console.log(`Milestone search initialized...`)
+            // initializeMilestoneSearch()
+            // console.log(`Milestone search initialized...`)
 
             // Init Organization/PAG Search Store
-            initializeOrganizationSearch()
+            const parsedPAGFilters = {
+                systems: parseQuery(querySystems).map(query => {
+                    const system = (ASSOCIATED_SYSTEMS || []).find(system => system.value === query.value)
+                    if (!system) return undefined
+                    return system
+                }).filter(query => query !== undefined),
+                mechanisms: parseQuery(queryMechanisms).map(query => {
+                    const mechanism = (MOLECULAR_MECHANISMS || []).find(mechanism => mechanism.value === query.value)
+                    if (!mechanism) return undefined
+                    return mechanism
+                }).filter(query => query !== undefined),
+                modalities: parseQuery(queryModalities).map(query => {
+                    const modality = (MODALITIES || []).find(modalities => modalities.value === query.value)
+                    if (!modality) return undefined
+                    return modality
+                }).filter(query => query !== undefined),
+            }
+            initializeOrganizationSearch(parsedPAGFilters)
             console.log(`Organization search initialized...`)
 
             // Init Research Plan Store
